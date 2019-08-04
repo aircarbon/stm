@@ -1,0 +1,37 @@
+{
+    "name": "ac-erc20",
+    "author": "Dominic Morris",
+    "version": "0.0.1",
+    "description": "",
+    "main": "truffle-config.js",
+    "directories": {
+        "test": "test"
+    },
+    "scripts": {
+        "test": "truffle test",
+        "solium:lint": "solium lint -d ./contracts",
+        "migrate": "truffle migrate",
+        "console": "truffle console",
+        "dev": "truffle develop"
+    },
+    "keywords": [],
+    "license": "MIT",
+    "dependencies": {
+        "ethereumjs-tx": "^2.1.0"
+    },
+    "devDependencies": {
+        "ethereumjs-wallet": "^0.6.0",
+        "truffle-hdwallet-provider": "1.0.14",
+        "mocha": "^5.1.1",
+        "truffle": "^5.0.0",
+        "truffle-assertions": "^0.9.1",
+        "web3": "1.0.0-beta.55",
+        "mssql": "^4.3.0",
+        "public-ip": "3.1.0"
+    },
+    "husky": {
+        "hooks": {
+            "precommit": "truffle compile && npm run solium:lint"
+        }
+    }
+}
