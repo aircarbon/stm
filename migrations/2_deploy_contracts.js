@@ -9,16 +9,16 @@ module.exports = function (deployer) {
 
     deployer.deploy(AcMaster).then(async acm => {
 
-        console.dir(acm.abi);
+        //console.dir(acm.abi);
 
         global.configContext = 'erc20';
         await db.erc20.SaveDeployment({
             contractName: 'AcMaster',
-            networkId: deployer.network_id,
-            deployedAddress: acm.address,
-            deployerHostName: os.hostname(),
+               networkId: deployer.network_id,
+         deployedAddress: acm.address,
+        deployerHostName: os.hostname(),
             deployerIpv4: await publicIp.v4(),
-            deployedAbi: JSON.stringify(acm.abi)
+             deployedAbi: JSON.stringify(acm.abi)
         });
     });
 };

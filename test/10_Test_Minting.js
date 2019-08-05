@@ -8,7 +8,7 @@ contract('AcMaster', accounts => {
 
     beforeEach(async () => {
         acm = await ac.deployed();
-        console.log('acm.address', acm.address);
+        //console.log('acm.address', acm.address);
         //const ver = await acm.version();
         //assert.equal(ver, "0.0.3", "test version");
         //const eeuCount = await acm.getEeuMintedCount.call();
@@ -64,13 +64,13 @@ contract('AcMaster', accounts => {
 
     it('minting - should have reasonable gas cost for minting of multi-vEEU batches', async () => {
         mintTx = await acm.mintEeuBatch(CONST.eeuType.UNFCCC, CONST.ktCarbon, 1, accounts[accountNdx], { from: accounts[0], });
-        console.log(`gasUsed - Mint  1 vEEU: ${mintTx.receipt.gasUsed}`);
+        console.log(`gasUsed - Mint  1 vEEU: ${mintTx.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * mintTx.receipt.gasUsed).toFixed(4)} (USD ${(CONST.gasPriceEth * mintTx.receipt.gasUsed * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
 
         mintTx = await acm.mintEeuBatch(CONST.eeuType.UNFCCC, CONST.ktCarbon, 5, accounts[accountNdx], { from: accounts[0], });
-        console.log(`gasUsed - Mint  5 vEEU: ${mintTx.receipt.gasUsed}`);
+        console.log(`gasUsed - Mint  5 vEEU: ${mintTx.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * mintTx.receipt.gasUsed).toFixed(4)} (USD ${(CONST.gasPriceEth * mintTx.receipt.gasUsed * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
 
         var mintTx = await acm.mintEeuBatch(CONST.eeuType.UNFCCC, CONST.ktCarbon, 10, accounts[accountNdx], { from: accounts[0] });
-        console.log(`gasUsed - Mint 10 vEEU: ${mintTx.receipt.gasUsed}`);
+        console.log(`gasUsed - Mint 10 vEEU: ${mintTx.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * mintTx.receipt.gasUsed).toFixed(4)} (USD ${(CONST.gasPriceEth * mintTx.receipt.gasUsed * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
 
         //const tx = await web3.eth.getTransaction(mintTx.tx);
         //const gasCost = tx.gasPrice.mul(mintTx.receipt.gasUsed);
@@ -141,17 +141,14 @@ contract('AcMaster', accounts => {
     });
 
     async function mintBatch({ eeuType, qtyKG, qtyEeus, receiver }) {
-        //const { eeuType, qtyKG, qtyEeus, receiver } = p;
         var batchId = -1;
 
         const ledgerEntryBefore = await acm.getLedgerEntry(receiver);
-        //console.dir(JSON.stringify(ledgerEntryBefore));
+        const ledgerOwnersBefore = await acm.getLedgerOwners();
 
         // mint new vEEU match
         const maxBatchIdBefore = (await acm.getEeuBatchCount.call()).toNumber();
         const mintTx = await acm.mintEeuBatch(eeuType, qtyKG, qtyEeus, receiver, { from: accounts[0] });
-        //console.log(`mintTx (mined): `, mintTx.tx);
-        //truffleAssert.prettyPrintEmittedEvents(mintTx);
 
         // validat batch ID
         const maxBatchIdAfter = (await acm.getEeuBatchCount.call()).toNumber();
@@ -160,13 +157,9 @@ contract('AcMaster', accounts => {
         // validate batch minted event
         truffleAssert.eventEmitted(mintTx, 'MintedEeuBatch', ev => {
             batchId = ev.id;
-            //console.log(`event: MintedEeuBatch ev.id=${ev.id} curMaxBatchId=${maxBatchIdAfter}`);
             return ev.id == maxBatchIdAfter;
         });
         const batch = await acm.getEeuBatch(batchId);
-        //console.dir(JSON.stringify(batch));
-
-        //console.dir(batch);
         assert(batch.mintedKG == qtyKG, 'invalid batch minted kg');
         assert(batch.eeuType == eeuType, 'invalid batch eeu-type');
 
@@ -179,19 +172,19 @@ contract('AcMaster', accounts => {
             });
         }
 
-        // validate ledger entry
-        const ledgerEntryAfter = await acm.getLedgerEntry(receiver);
-        //console.dir(JSON.stringify(ledgerEntryAfter));
+        // validate ledger owner list
+        const ledgerOwnersAfter = await acm.getLedgerOwners();
+        assert(ledgerOwnersAfter.some(p => p == receiver), 'invalid ledger owners list data');
 
+        // validate the ledger entry
+        const ledgerEntryAfter = await acm.getLedgerEntry(receiver);
         assert(ledgerEntryAfter.exists == true, 'missing ledger entry for receiver');
-        assert(
-            ledgerEntryAfter.eeuIds.length == ledgerEntryBefore.eeuIds.length + qtyEeus,
-            'invalid eeu qty in ledger entry'
-        );
-        assert(
-            ledgerEntryAfter.eeu_sumKG == Number(ledgerEntryBefore.eeu_sumKG) + qtyKG,
-            'invalid kg sum ledger entry'
-        );
+        assert(ledgerEntryAfter.eeuIds.length == ledgerEntryBefore.eeuIds.length + qtyEeus, 'invalid eeu qty in ledger entry');
+        assert(ledgerEntryAfter.eeus.length == ledgerEntryAfter.eeuIds.length, 'invalid eeus length wrt. eeuIds length');
+        assert(ledgerEntryAfter.eeus.map(p => p.eeuKG).reduce((a,b) => Number(a) + Number(b), 0) ==
+               ledgerEntryBefore.eeus.map(p => p.eeuKG).reduce((a,b) => Number(a) + Number(b), 0) + qtyKG,
+               'invalid kg in ledger entry eeus');
+        assert(ledgerEntryAfter.eeu_sumKG == Number(ledgerEntryBefore.eeu_sumKG) + qtyKG, 'invalid kg sum ledger entry');
 
         // validate EEUs minted
         for (var ndx = ledgerEntryBefore.eeuIds.length; ndx < ledgerEntryAfter.eeuIds.length; ndx++) {

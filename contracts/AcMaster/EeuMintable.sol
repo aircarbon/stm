@@ -25,52 +25,67 @@ contract EeuMintable is Owned, AcLedger {
 
         // create new EEU batch
         EeuBatch memory newBatch = EeuBatch({
-            id: batchCurMaxId + 1,
+            id: _batchCurMaxId + 1,
             mintedTimestamp: block.timestamp,
             eeuType: eeuType,
             mintedKG: uint256(qtyKG),
             burnedKG: 0
         });
-        //eeuBatches.push(newBatch);
-        eeuBatches[newBatch.id] = newBatch;
-        batchCurMaxId++;
+        //_eeuBatches.push(newBatch);
+        _eeuBatches[newBatch.id] = newBatch;
+        _batchCurMaxId++;
         emit MintedEeuBatch(newBatch.id);
 
-        // create ledger entry as required
-        if (ledger[batchOwner].exists == false) {
-            ledger[batchOwner] = Ledger({
+        // create _ledger entry as required
+        if (_ledger[batchOwner].exists == false) {
+            _ledger[batchOwner] = Ledger({
                 exists: true,
-                //eeuIds: new uint[](0),
-                //eeu_sumKG: 0,
                 usdCents: 0,
                 ethWei: 0
             });
+            _ledgerOwners.push(batchOwner);
         }
 
         // mint & assign EEUs
         for (int256 ndx = 0; ndx < qtyEeus; ndx++) {
-            uint256 newId = eeuCurMaxId + 1 + uint256(ndx);
+            uint256 newId = _eeuCurMaxId + 1 + uint256(ndx);
 
             // mint EEU
             uint256 eeuKG = uint256(qtyKG) / uint256(qtyEeus);
-            eeus_batchId[newId] = newBatch.id;
-            eeus_mintedKG[newId] = eeuKG;
-            eeus_KG[newId] = eeuKG;
-            eeus_mintedTimestamp[newId] = block.timestamp;
+            _eeus_batchId[newId] = newBatch.id;
+            _eeus_mintedKG[newId] = eeuKG;
+            _eeus_KG[newId] = eeuKG;
+            _eeus_mintedTimestamp[newId] = block.timestamp;
 
             emit MintedEeu(newId);
 
             // assign
-            //ledger[batchOwner].eeuIds.push(newId);
-            ledger[batchOwner].type_eeuIds[uint256(eeuType)].push(newId);
+            //_ledger[batchOwner].eeuIds.push(newId);
+            _ledger[batchOwner].type_eeuIds[uint256(eeuType)].push(newId);
 
             // maintain fast EEU ownership lookup - by keccak256(ledgerOwner||eeuId)
-            ownsEeuId[keccak256(abi.encodePacked(batchOwner, newId))] = true;
+            // not currently used (was used when burning by eeuId)
+            //_ownsEeuId[keccak256(abi.encodePacked(batchOwner, newId))] = true;
         }
-        //ledger[batchOwner].eeu_sumKG += uint(qtyKG);
-        ledger[batchOwner].type_sumKG[uint256(eeuType)] += uint256(qtyKG);
+        //_ledger[batchOwner].eeu_sumKG += uint(qtyKG);
+        _ledger[batchOwner].type_sumKG[uint256(eeuType)] += uint256(qtyKG);
 
-        eeuCurMaxId += uint256(qtyEeus);
-        eeuKgMinted += uint256(qtyKG);
+        _eeuCurMaxId += uint256(qtyEeus);
+        _eeuKgMinted += uint256(qtyKG);
+    }
+
+    
+    /**
+     * @dev Returns the global no. of EEUs minted
+     */
+    function getEeuMintedCount() external view returns (uint256 count) {
+        return _eeuCurMaxId;
+    }
+    
+    /**
+     * @dev Returns the global no. of KGs carbon minted in EEUs
+     */
+    function getKgCarbonMinted() external view returns (uint256 count) {
+        return _eeuKgMinted;
     }
 }

@@ -61,6 +61,6 @@
     * authentication & action-logging (implies DB)
     * contract-action invoker (one page per action)
     * contract event viewer (new & historic)
-    * ledger viewer/summary
+    * _ledger viewer/summary
     * proto-TX-explorer
     * API layer (separate deployment to ac-admin?)
