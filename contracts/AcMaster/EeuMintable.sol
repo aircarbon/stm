@@ -11,25 +11,26 @@ contract EeuMintable is Owned, AcLedger {
 
     /**
      * mint and assign ownership new EEU batch
-     * @param eeuType EEU-type for the batch
+     * @param eeuTypeId EEU-type for the batch
      * @param qtyKG KG quanity of carbon to mint across the EEUs
      * @param qtyEeus quantity of EEUs in the batch
      * @param batchOwner who to assign the minted EEUs to
      */
-    function mintEeuBatch(EeuType eeuType, int256 qtyKG, int256 qtyEeus, address batchOwner) public {
+    function mintEeuBatch(/*EeuType eeuType*/uint256 eeuTypeId, int256 qtyKG, int256 qtyEeus, address batchOwner) public {
         require(msg.sender == owner, "Restricted method");
         require(qtyKG >= 1000, "Minimum one metric ton of carbon required");
-        require(eeuType != EeuType.dummy_end, "Invalid EEU type");
+        //require(eeuType != EeuType.dummy_end, "Invalid EEU type");
+        require(eeuTypeId >= 0 && eeuTypeId < _count_eeuTypeIds, "Invalid EEU type");
         require(qtyEeus >= 1, "Minimum one EEU required");
         require(qtyKG % qtyEeus == 0, "Carbon weight must divide evenly into EEUs");
 
         // create new EEU batch
         EeuBatch memory newBatch = EeuBatch({
-            id: _batchCurMaxId + 1,
+                         id: _batchCurMaxId + 1,
             mintedTimestamp: block.timestamp,
-            eeuType: eeuType,
-            mintedKG: uint256(qtyKG),
-            burnedKG: 0
+                  eeuTypeId: eeuTypeId,
+                   mintedKG: uint256(qtyKG),
+                   burnedKG: 0
         });
         //_eeuBatches.push(newBatch);
         _eeuBatches[newBatch.id] = newBatch;
@@ -39,9 +40,9 @@ contract EeuMintable is Owned, AcLedger {
         // create _ledger entry as required
         if (_ledger[batchOwner].exists == false) {
             _ledger[batchOwner] = Ledger({
-                exists: true,
+                  exists: true,
                 usdCents: 0,
-                ethWei: 0
+                  ethWei: 0
             });
             _ledgerOwners.push(batchOwner);
         }
@@ -61,14 +62,14 @@ contract EeuMintable is Owned, AcLedger {
 
             // assign
             //_ledger[batchOwner].eeuIds.push(newId);
-            _ledger[batchOwner].type_eeuIds[uint256(eeuType)].push(newId);
+            _ledger[batchOwner].type_eeuIds[eeuTypeId].push(newId);
 
             // maintain fast EEU ownership lookup - by keccak256(ledgerOwner||eeuId)
             // not currently used (was used when burning by eeuId)
             //_ownsEeuId[keccak256(abi.encodePacked(batchOwner, newId))] = true;
         }
         //_ledger[batchOwner].eeu_sumKG += uint(qtyKG);
-        _ledger[batchOwner].type_sumKG[uint256(eeuType)] += uint256(qtyKG);
+        _ledger[batchOwner].type_sumKG[eeuTypeId] += uint256(qtyKG);
 
         _eeuCurMaxId += uint256(qtyEeus);
         _eeuKgMinted += uint256(qtyKG);

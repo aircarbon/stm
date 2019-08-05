@@ -16,7 +16,7 @@ contract('AcMaster', accounts => {
         accountNdx++;
     });
 
-    // why burn 0.5 eeu costs more gas than burn 1.5 ?
+    // *** why burn 0.5 eeu costs more gas than burn 1.5 ?
 
     it('burning - should allow owner to burn half a vEEU', async () => {
         await acm.mintEeuBatch(CONST.eeuType.UNFCCC, CONST.ktCarbon, 1, accounts[accountNdx], { from: accounts[0], });
@@ -40,15 +40,10 @@ contract('AcMaster', accounts => {
 
         // check global total
         const burnedKgAfter = await acm.getKgCarbonBurned.call();
-        assert(
-            burnedKgAfter.toNumber() == burnedKgBefore.toNumber() + burnKg,
-            'unexpected total burned KG'
-        );
+        assert(burnedKgAfter.toNumber() == burnedKgBefore.toNumber() + burnKg,'unexpected total burned KG');
 
         // check EEU
         const eeuAfter = await acm.getEeu(eeuId);
-        //console.log(`eeuAfter.KG: `, eeuAfter.KG);
-        //console.log(`eeuAfter.mintedKG: `, eeuAfter.mintedKG);
         assert(
             Number(eeuAfter.KG) == Number(eeuAfter.mintedKG) / 2,
             'unexpected remaining KG in EEU after burn'
@@ -56,8 +51,6 @@ contract('AcMaster', accounts => {
 
         // check _ledger
         const ledgerAfter = await acm.getLedgerEntry(accounts[accountNdx]);
-        //console.log(`ledgerAfter.eeu_sumKG: `, ledgerAfter.eeu_sumKG);
-        //console.log(`ledgerBefore.eeu_sumKG: `, ledgerBefore.eeu_sumKG);
         assert(ledgerAfter.eeu_sumKG == ledgerBefore.eeu_sumKG / 2, 'unexpected _ledger KG after burn');
 
         // check batch
@@ -68,7 +61,6 @@ contract('AcMaster', accounts => {
     it('burning - should allow owner to burn a single full vEEU', async () => {
         await acm.mintEeuBatch(CONST.eeuType.UNFCCC, CONST.ktCarbon, 1, accounts[accountNdx], { from: accounts[0], });
         const ledgerBefore = await acm.getLedgerEntry(accounts[accountNdx]);
-        //console.dir(ledgerBefore);
         assert(ledgerBefore.eeus.length == 1, `unexpected _ledger EEU entry before burn (${ledgerBefore.eeus.length})`);
         const eeuId = ledgerBefore.eeuIds[0];
         const eeuBefore = await acm.getEeu(eeuId);
@@ -97,7 +89,6 @@ contract('AcMaster', accounts => {
 
         // check _ledger
         const ledgerAfter = await acm.getLedgerEntry(accounts[accountNdx]);
-        //console.dir(ledgerAfter);
         assert(ledgerAfter.eeu_sumKG == 0, 'unexpected _ledger KG after burn');
         assert(ledgerAfter.eeus.length == 0, 'unexpected _ledger EEU entry after burn');
 
@@ -152,14 +143,9 @@ contract('AcMaster', accounts => {
         await acm.mintEeuBatch(CONST.eeuType.UNFCCC, CONST.ktCarbon, 5, accounts[accountNdx], { from: accounts[0], });
         await acm.mintEeuBatch(CONST.eeuType.VCS, CONST.ktCarbon, 5, accounts[accountNdx], { from: accounts[0], });
         const ledgerBefore = await acm.getLedgerEntry(accounts[accountNdx]);
-        //console.dir(ledgerBefore);
-        //console.log('ledgerBefore.eeus.length', ledgerBefore.eeus.length);
         assert(ledgerBefore.eeus.length == 10, `unexpected _ledger EEU entry before burn (${ledgerBefore.eeus.length})`);
-        //console.log(JSON.stringify(ledgerBefore.eeus));
-        const unfcc_eeus = ledgerBefore.eeus.filter(p => p.eeuType == CONST.eeuType.UNFCCC);
-        const vcs_eeus = ledgerBefore.eeus.filter(p => p.eeuType == CONST.eeuType.VCS);
-        //console.log(JSON.stringify(unfcc_eeus));
-        //console.log(JSON.stringify(vcs_eeus));
+        const unfcc_eeus = ledgerBefore.eeus.filter(p => p.eeuTypeId == CONST.eeuType.UNFCCC);
+        const vcs_eeus = ledgerBefore.eeus.filter(p => p.eeuTypeId == CONST.eeuType.VCS);
 
         const batch0_Before = await acm.getEeuBatch(unfcc_eeus[0].batchId);
         assert(batch0_Before.burnedKG == 0, 'unexpected burn KG value on batch 0 before burn');
@@ -190,7 +176,6 @@ contract('AcMaster', accounts => {
 
         // check _ledger
         const ledgerAfter = await acm.getLedgerEntry(accounts[accountNdx]);
-        //console.dir(ledgerAfter);
         assert(ledgerAfter.eeu_sumKG == CONST.ktCarbon, 'unexpected _ledger KG after burn');
         assert(ledgerAfter.eeus.length == 5, 'unexpected _ledger EEU entry after burn');
 

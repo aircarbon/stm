@@ -13,6 +13,10 @@ contract AcMaster is EeuMintable, EeuBurnable, EeuTradable {
      */
     constructor() public {
         version = "0.0.4";
-    }
 
+        // default EEU types
+        _eeuTypeIds[0] = 'UNFCCC';
+        _eeuTypeIds[1] = 'VCS';
+        _count_eeuTypeIds = 2;
+    }
 }

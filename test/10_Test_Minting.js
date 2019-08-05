@@ -161,7 +161,7 @@ contract('AcMaster', accounts => {
         });
         const batch = await acm.getEeuBatch(batchId);
         assert(batch.mintedKG == qtyKG, 'invalid batch minted kg');
-        assert(batch.eeuType == eeuType, 'invalid batch eeu-type');
+        assert(batch.eeuTypeId == eeuType, 'invalid batch eeu-type');
 
         // validate vEEU(s) minted events
         const curMaxEeuId = (await acm.getEeuMintedCount.call()).toNumber();

@@ -14,24 +14,24 @@ contract EeuBurnable is Owned, AcLedger {
      * removes EEUs (or fractions thereof) from the main list and from the _ledger, resizing as necessary.
      * the supplied _ledger owner must hold the supplied quantity of carbon in aggregate across _ledger EEUs, and of the supplied type.
      * @param ledgerOwner owner address of the EEUs in the _ledger
-     * @param eeuType EEU type
+     * @param eeuTypeId EEU type
      * @param qtyKG tonnage to burn
      */
-    function burnEeus(address ledgerOwner, EeuType eeuType, int256 qtyKG) public {
+    function burnEeus(address ledgerOwner, /*EeuType eeuType*/uint256 eeuTypeId, int256 qtyKG) public {
         require(msg.sender == owner, "Restricted method");
         require(_ledger[ledgerOwner].exists == true, "Invalid _ledger owner");
         require(qtyKG >= 1000, "Minimum one metric ton of carbon required");
-        require(eeuType != EeuType.dummy_end, "Invalid EEU type");
-        //require(eeuIds.length > 0, 'Invalid eeuIds');
+        //require(eeuType != EeuType.dummy_end, "Invalid EEU type");
+        require(eeuTypeId >= 0 && eeuTypeId < _count_eeuTypeIds, "Invalid EEU type");
 
         // check _ledger owner has sufficient carbon tonnage of supplied type
-        require(_ledger[ledgerOwner].type_sumKG[uint256(eeuType)] >= uint256(qtyKG), "Insufficient carbon held by _ledger owner");
+        require(_ledger[ledgerOwner].type_sumKG[eeuTypeId] >= uint256(qtyKG), "Insufficient carbon held by _ledger owner");
 
         // burn sufficient EEUs
         uint256 ndx = 0;
         uint256 remainingToBurn = uint256(qtyKG);
         while (remainingToBurn > 0) {
-            uint256[] storage type_eeuIds = _ledger[ledgerOwner].type_eeuIds[uint256(eeuType)]; // ??? proper ref. to storage
+            uint256[] storage type_eeuIds = _ledger[ledgerOwner].type_eeuIds[eeuTypeId]; // ??? proper ref. to storage
             uint256 eeuId = type_eeuIds[ndx];
             uint256 eeuKg = _eeus_KG[eeuId];
             uint256 batchId = _eeus_batchId[eeuId];
@@ -43,7 +43,7 @@ contract EeuBurnable is Owned, AcLedger {
                 // remove from _ledger
                 type_eeuIds[ndx] = type_eeuIds[type_eeuIds.length - 1];
                 type_eeuIds.length--;
-                _ledger[ledgerOwner].type_sumKG[uint256(eeuType)] -= eeuKg;
+                _ledger[ledgerOwner].type_sumKG[eeuTypeId] -= eeuKg;
 
                 // burn from batch
                 _eeuBatches[batchId].burnedKG += eeuKg;
@@ -56,7 +56,7 @@ contract EeuBurnable is Owned, AcLedger {
                 _eeus_KG[eeuId] -= remainingToBurn;
 
                 // retain on _ledger
-                _ledger[ledgerOwner].type_sumKG[uint256(eeuType)] -= remainingToBurn;
+                _ledger[ledgerOwner].type_sumKG[eeuTypeId] -= remainingToBurn;
 
                 // burn from batch
                 _eeuBatches[batchId].burnedKG += remainingToBurn;
@@ -68,7 +68,7 @@ contract EeuBurnable is Owned, AcLedger {
         }
         _eeuKgBurned += uint256(qtyKG);
     }
-    
+
     /**
      * @dev Returns the global no. of KGs carbon burned in EEUs
      */
