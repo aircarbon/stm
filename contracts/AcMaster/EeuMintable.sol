@@ -40,9 +40,9 @@ contract EeuMintable is Owned, AcLedger {
         // create _ledger entry as required
         if (_ledger[batchOwner].exists == false) {
             _ledger[batchOwner] = Ledger({
-                  exists: true,
-                usdCents: 0,
-                  ethWei: 0
+                  exists: true
+              //usdCents: 0,
+              //  ethWei: 0
             });
             _ledgerOwners.push(batchOwner);
         }
@@ -61,7 +61,6 @@ contract EeuMintable is Owned, AcLedger {
             emit MintedEeu(newId);
 
             // assign
-            //_ledger[batchOwner].eeuIds.push(newId);
             _ledger[batchOwner].type_eeuIds[eeuTypeId].push(newId);
 
             // maintain fast EEU ownership lookup - by keccak256(ledgerOwner||eeuId)
@@ -80,7 +79,7 @@ contract EeuMintable is Owned, AcLedger {
      * @dev Returns the global no. of EEUs minted
      */
     function getEeuMintedCount() external view returns (uint256 count) {
-        return _eeuCurMaxId;
+        return _eeuCurMaxId; // 1-based
     }
     
     /**

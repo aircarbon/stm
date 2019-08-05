@@ -40,13 +40,10 @@
 
 ## WIP - TODOs
 
-    ### contract - extendability
-    * move EeuType separate contract, return as [] -- for dynamic support of new types
-    * make usdCents & ethWei [] to CollateralType[], extendible - same as EeuType
-    * tests - re. extending "Types" contract
-
     ### contract - core fn's
-    * trade/transfer, inc. token split & merge
+    * make usdCents & ethWei [] to CcyType[], extendible - same as EeuType -- TODO: tests...
+    * fund/withdraw - analogous to mint & burn, for collateral types
+    * trade/transfer (Ccy + EEUs - same interface?), inc. EEU split & merge
     * IPFS pointers & URL pointers for batch minting
 
     ### contract - ERC721-compat

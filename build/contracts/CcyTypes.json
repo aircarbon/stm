@@ -1,0 +1,2879 @@
+{
+  "contractName": "CcyTypes",
+  "abi": [
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "name",
+          "type": "string"
+        },
+        {
+          "name": "unit",
+          "type": "string"
+        }
+      ],
+      "name": "addCcyType",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "getCcyTypes",
+      "outputs": [
+        {
+          "components": [
+            {
+              "components": [
+                {
+                  "name": "id",
+                  "type": "uint256"
+                },
+                {
+                  "name": "name",
+                  "type": "string"
+                },
+                {
+                  "name": "unit",
+                  "type": "string"
+                }
+              ],
+              "name": "ccyTypes",
+              "type": "tuple[]"
+            }
+          ],
+          "name": "",
+          "type": "tuple"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "metadata": "{\"compiler\":{\"version\":\"0.5.8+commit.23d335f2\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"constant\":false,\"inputs\":[{\"name\":\"name\",\"type\":\"string\"},{\"name\":\"unit\",\"type\":\"string\"}],\"name\":\"addCcyType\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"getCcyTypes\",\"outputs\":[{\"components\":[{\"components\":[{\"name\":\"id\",\"type\":\"uint256\"},{\"name\":\"name\",\"type\":\"string\"},{\"name\":\"unit\",\"type\":\"string\"}],\"name\":\"ccyTypes\",\"type\":\"tuple[]\"}],\"name\":\"\",\"type\":\"tuple\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"methods\":{\"addCcyType(string,string)\":{\"details\":\"Adds a new currency type\\r\",\"params\":{\"name\":\"The new currency type name\\r\",\"unit\":\"The base unit of the new currency type\\r\"}},\"getCcyTypes()\":{\"details\":\"Returns current currency types\\r\"}}},\"userdoc\":{\"methods\":{},\"notice\":\"Manages currency types used by AcMaster\\r\"}},\"settings\":{\"compilationTarget\":{\"/C/ac/src/ac-monorepo/packages/erc20/contracts/AcMaster/CcyTypes.sol\":\"CcyTypes\"},\"evmVersion\":\"petersburg\",\"libraries\":{},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/C/ac/src/ac-monorepo/packages/erc20/contracts/AcMaster/CcyTypes.sol\":{\"keccak256\":\"0x91310842dbda362f7f018e3d1a83d1755445a719ba8a83d5201bcbfafa226085\",\"urls\":[\"bzzr://e71a749fb88b9c0064c2daa1ad372373e5bee7f4bd9b0abf55aa3badf80fd412\"]},\"/C/ac/src/ac-monorepo/packages/erc20/contracts/AcMaster/Owned.sol\":{\"keccak256\":\"0x4d65acd84896dcf6deadc1d13721fa368cd34ab2dfd11bb8e33a6b300f5c88ea\",\"urls\":[\"bzzr://cfb80214e920857d3c5af01d95d645aa6d22b488740bc1a5be86d9d862bc991c\"]}},\"version\":1}",
+  "bytecode": "0x6080604052336000806101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff16021790555061076d806100536000396000f3fe608060405234801561001057600080fd5b50600436106100365760003560e01c80630834e8641461003b5780634dc26ae814610057575b600080fd5b610055600480360361005091908101906103da565b610075565b005b61005f610126565b60405161006c91906105f8565b60405180910390f35b6000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff1614610104576040517f08c379a00000000000000000000000000000000000000000000000000000000081526004016100fb906105d8565b60405180910390fd5b60008090505b60025481101561012157808060010191505061010a565b505050565b61012e610352565b606060025460405190808252806020026020018201604052801561016c57816020015b610159610365565b8152602001906001900390816101515790505b50905060008090505b60025481101561033057604051806060016040528060016000848152602001908152602001600020600001548152602001600160008481526020019081526020016000206001018054600181600116156101000203166002900480601f0160208091040260200160405190810160405280929190818152602001828054600181600116156101000203166002900480156102505780601f1061022557610100808354040283529160200191610250565b820191906000526020600020905b81548152906001019060200180831161023357829003601f168201915b50505050508152602001600160008481526020019081526020016000206002018054600181600116156101000203166002900480601f0160208091040260200160405190810160405280929190818152602001828054600181600116156101000203166002900480156103045780601f106102d957610100808354040283529160200191610304565b820191906000526020600020905b8154815290600101906020018083116102e757829003601f168201915b505050505081525082828151811061031857fe5b60200260200101819052508080600101915050610175565b50610339610352565b6040518060200160405280838152509050809250505090565b6040518060200160405280606081525090565b60405180606001604052806000815260200160608152602001606081525090565b600082601f83011261039757600080fd5b81356103aa6103a582610647565b61061a565b915080825260208301602083018583830111156103c657600080fd5b6103d18382846106e0565b50505092915050565b600080604083850312156103ed57600080fd5b600083013567ffffffffffffffff81111561040757600080fd5b61041385828601610386565b925050602083013567ffffffffffffffff81111561043057600080fd5b61043c85828601610386565b9150509250929050565b60006104528383610548565b905092915050565b600061046582610680565b61046f81856106a3565b93508360208202850161048185610673565b8060005b858110156104bd578484038952815161049e8582610446565b94506104a983610696565b925060208a01995050600181019050610485565b50829750879550505050505092915050565b60006104da8261068b565b6104e481856106b4565b93506104f48185602086016106ef565b6104fd81610722565b840191505092915050565b60006105156011836106c5565b91507f52657374726963746564206d6574686f640000000000000000000000000000006000830152602082019050919050565b600060608301600083015161056060008601826105c9565b506020830151848203602086015261057882826104cf565b9150506040830151848203604086015261059282826104cf565b9150508091505092915050565b600060208301600083015184820360008601526105bc828261045a565b9150508091505092915050565b6105d2816106d6565b82525050565b600060208201905081810360008301526105f181610508565b9050919050565b60006020820190508181036000830152610612818461059f565b905092915050565b6000604051905081810181811067ffffffffffffffff8211171561063d57600080fd5b8060405250919050565b600067ffffffffffffffff82111561065e57600080fd5b601f19601f8301169050602081019050919050565b6000602082019050919050565b600081519050919050565b600081519050919050565b6000602082019050919050565b600082825260208201905092915050565b600082825260208201905092915050565b600082825260208201905092915050565b6000819050919050565b82818337600083830152505050565b60005b8381101561070d5780820151818401526020810190506106f2565b8381111561071c576000848401525b50505050565b6000601f19601f830116905091905056fea265627a7a7230582009557dbce1a219a96ed6740a9321f04bd39d2e2b6b9d9cfe311149ecc35de3316c6578706572696d656e74616cf50037",
+  "deployedBytecode": "0x608060405234801561001057600080fd5b50600436106100365760003560e01c80630834e8641461003b5780634dc26ae814610057575b600080fd5b610055600480360361005091908101906103da565b610075565b005b61005f610126565b60405161006c91906105f8565b60405180910390f35b6000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff1614610104576040517f08c379a00000000000000000000000000000000000000000000000000000000081526004016100fb906105d8565b60405180910390fd5b60008090505b60025481101561012157808060010191505061010a565b505050565b61012e610352565b606060025460405190808252806020026020018201604052801561016c57816020015b610159610365565b8152602001906001900390816101515790505b50905060008090505b60025481101561033057604051806060016040528060016000848152602001908152602001600020600001548152602001600160008481526020019081526020016000206001018054600181600116156101000203166002900480601f0160208091040260200160405190810160405280929190818152602001828054600181600116156101000203166002900480156102505780601f1061022557610100808354040283529160200191610250565b820191906000526020600020905b81548152906001019060200180831161023357829003601f168201915b50505050508152602001600160008481526020019081526020016000206002018054600181600116156101000203166002900480601f0160208091040260200160405190810160405280929190818152602001828054600181600116156101000203166002900480156103045780601f106102d957610100808354040283529160200191610304565b820191906000526020600020905b8154815290600101906020018083116102e757829003601f168201915b505050505081525082828151811061031857fe5b60200260200101819052508080600101915050610175565b50610339610352565b6040518060200160405280838152509050809250505090565b6040518060200160405280606081525090565b60405180606001604052806000815260200160608152602001606081525090565b600082601f83011261039757600080fd5b81356103aa6103a582610647565b61061a565b915080825260208301602083018583830111156103c657600080fd5b6103d18382846106e0565b50505092915050565b600080604083850312156103ed57600080fd5b600083013567ffffffffffffffff81111561040757600080fd5b61041385828601610386565b925050602083013567ffffffffffffffff81111561043057600080fd5b61043c85828601610386565b9150509250929050565b60006104528383610548565b905092915050565b600061046582610680565b61046f81856106a3565b93508360208202850161048185610673565b8060005b858110156104bd578484038952815161049e8582610446565b94506104a983610696565b925060208a01995050600181019050610485565b50829750879550505050505092915050565b60006104da8261068b565b6104e481856106b4565b93506104f48185602086016106ef565b6104fd81610722565b840191505092915050565b60006105156011836106c5565b91507f52657374726963746564206d6574686f640000000000000000000000000000006000830152602082019050919050565b600060608301600083015161056060008601826105c9565b506020830151848203602086015261057882826104cf565b9150506040830151848203604086015261059282826104cf565b9150508091505092915050565b600060208301600083015184820360008601526105bc828261045a565b9150508091505092915050565b6105d2816106d6565b82525050565b600060208201905081810360008301526105f181610508565b9050919050565b60006020820190508181036000830152610612818461059f565b905092915050565b6000604051905081810181811067ffffffffffffffff8211171561063d57600080fd5b8060405250919050565b600067ffffffffffffffff82111561065e57600080fd5b601f19601f8301169050602081019050919050565b6000602082019050919050565b600081519050919050565b600081519050919050565b6000602082019050919050565b600082825260208201905092915050565b600082825260208201905092915050565b600082825260208201905092915050565b6000819050919050565b82818337600083830152505050565b60005b8381101561070d5780820151818401526020810190506106f2565b8381111561071c576000848401525b50505050565b6000601f19601f830116905091905056fea265627a7a7230582009557dbce1a219a96ed6740a9321f04bd39d2e2b6b9d9cfe311149ecc35de3316c6578706572696d656e74616cf50037",
+  "sourceMap": "142:1747:2:-;;;118:10:8;110:5;;:18;;;;;;;;;;;;;;;;;;142:1747:2;;;;;;",
+  "deployedSourceMap": "142:1747:2:-;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;142:1747:2;;;;;;;;;;;;;;;;;;;;;;;;673:540;;;;;;;;;;;;;;;;:::i;:::-;;1283:603;;;:::i;:::-;;;;;;;;;;;;;;;;673:540;773:5;;;;;;;;;;;759:19;;:10;:19;;;751:49;;;;;;;;;;;;;;;;;;;;;;818:17;838:1;818:21;;813:284;853:17;;841:9;:29;813:284;;;872:11;;;;;;;813:284;;;;673:540;;:::o;1283:603::-;1329:24;;:::i;:::-;1366:21;1419:17;;1409:28;;;;;;;;;;;;;;;;;;;;;;;;;:::i;:::-;;;;;;;;;;;;;;;;;1398:39;;1455:17;1475:1;1455:21;;1450:301;1490:17;;1478:9;:29;1450:301;;;1559:180;;;;;;;;1590:11;:22;1602:9;1590:22;;;;;;;;;;;:25;;;1559:180;;;;1642:11;:22;1654:9;1642:22;;;;;;;;;;;:27;;1559:180;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1696:11;:22;1708:9;1696:22;;;;;;;;;;;:27;;1559:180;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1537:8;1546:9;1537:19;;;;;;;;;;;;;:202;;;;1509:11;;;;;;;1450:301;;;;1763:28;;:::i;:::-;1794:63;;;;;;;;1837:8;1794:63;;;1763:94;;1875:3;1868:10;;;;1283:603;:::o;142:1747::-;;;;;;;;;;;;;;:::o;:::-;;;;;;;;;;;;;;;;;;;;;;;;:::o;6:442:-1:-;;108:3;101:4;93:6;89:17;85:27;75:2;;126:1;123;116:12;75:2;163:6;150:20;185:65;200:49;242:6;200:49;;;185:65;;;176:74;;270:6;263:5;256:21;306:4;298:6;294:17;339:4;332:5;328:16;374:3;365:6;360:3;356:16;353:25;350:2;;;391:1;388;381:12;350:2;401:41;435:6;430:3;425;401:41;;;68:380;;;;;;;;456:578;;;597:2;585:9;576:7;572:23;568:32;565:2;;;613:1;610;603:12;565:2;676:1;665:9;661:17;648:31;699:18;691:6;688:30;685:2;;;731:1;728;721:12;685:2;751:63;806:7;797:6;786:9;782:22;751:63;;;741:73;;627:193;879:2;868:9;864:18;851:32;903:18;895:6;892:30;889:2;;;935:1;932;925:12;889:2;955:63;1010:7;1001:6;990:9;986:22;955:63;;;945:73;;830:194;559:475;;;;;;1042:221;;1175:82;1253:3;1245:6;1175:82;;;1161:96;;1154:109;;;;;1326:940;;1489:66;1549:5;1489:66;;;1568:92;1653:6;1648:3;1568:92;;;1561:99;;1683:3;1725:4;1717:6;1713:17;1708:3;1704:27;1752:68;1814:5;1752:68;;;1840:7;1868:1;1853:374;1878:6;1875:1;1872:13;1853:374;;;1940:9;1934:4;1930:20;1925:3;1918:33;1985:6;1979:13;2007:96;2098:4;2083:13;2007:96;;;1999:104;;2120:72;2185:6;2120:72;;;2110:82;;2215:4;2210:3;2206:14;2199:21;;1910:317;1900:1;1897;1893:9;1888:14;;1853:374;;;1857:14;2240:4;2233:11;;2257:3;2250:10;;1468:798;;;;;;;;;;2274:319;;2372:35;2401:5;2372:35;;;2419:61;2473:6;2468:3;2419:61;;;2412:68;;2485:52;2530:6;2525:3;2518:4;2511:5;2507:16;2485:52;;;2558:29;2580:6;2558:29;;;2553:3;2549:39;2542:46;;2352:241;;;;;;2601:364;;2761:67;2825:2;2820:3;2761:67;;;2754:74;;2861:66;2857:1;2852:3;2848:11;2841:87;2956:2;2951:3;2947:12;2940:19;;2747:218;;;;3022:765;;3149:4;3144:3;3140:14;3230:3;3223:5;3219:15;3213:22;3241:62;3298:3;3293;3289:13;3275:12;3241:62;;;3169:140;3382:4;3375:5;3371:16;3365:23;3434:3;3428:4;3424:14;3417:4;3412:3;3408:14;3401:38;3454:69;3518:4;3504:12;3454:69;;;3446:77;;3319:216;3608:4;3601:5;3597:16;3591:23;3660:3;3654:4;3650:14;3643:4;3638:3;3634:14;3627:38;3680:69;3744:4;3730:12;3680:69;;;3672:77;;3545:216;3778:4;3771:11;;3122:665;;;;;;3871:495;;4040:4;4035:3;4031:14;4127:3;4120:5;4116:15;4110:22;4177:3;4171:4;4167:14;4161:3;4156;4152:13;4145:37;4197:131;4323:4;4309:12;4197:131;;;4189:139;;4060:280;4357:4;4350:11;;4013:353;;;;;;4373:103;4446:24;4464:5;4446:24;;;4441:3;4434:37;4428:48;;;4483:407;;4674:2;4663:9;4659:18;4651:26;;4724:9;4718:4;4714:20;4710:1;4699:9;4695:17;4688:47;4749:131;4875:4;4749:131;;;4741:139;;4645:245;;;;4897:397;;5083:2;5072:9;5068:18;5060:26;;5133:9;5127:4;5123:20;5119:1;5108:9;5104:17;5097:47;5158:126;5279:4;5270:6;5158:126;;;5150:134;;5054:240;;;;;5301:256;;5363:2;5357:9;5347:19;;5401:4;5393:6;5389:17;5500:6;5488:10;5485:22;5464:18;5452:10;5449:34;5446:62;5443:2;;;5521:1;5518;5511:12;5443:2;5541:10;5537:2;5530:22;5341:216;;;;;5564:259;;5708:18;5700:6;5697:30;5694:2;;;5740:1;5737;5730:12;5694:2;5784:4;5780:9;5773:4;5765:6;5761:17;5757:33;5749:41;;5813:4;5807;5803:15;5795:23;;5631:192;;;;5833:135;;5955:4;5947:6;5943:17;5932:28;;5923:45;;;;5978:119;;6086:5;6080:12;6070:22;;6064:33;;;;6104:88;;6181:5;6175:12;6165:22;;6159:33;;;;6201:136;;6325:4;6317:6;6313:17;6302:28;;6294:43;;;;6347:184;;6483:6;6478:3;6471:19;6520:4;6515:3;6511:14;6496:29;;6464:67;;;;;6540:153;;6645:6;6640:3;6633:19;6682:4;6677:3;6673:14;6658:29;;6626:67;;;;;6702:163;;6817:6;6812:3;6805:19;6854:4;6849:3;6845:14;6830:29;;6798:67;;;;;6873:72;;6935:5;6924:16;;6918:27;;;;6953:145;7034:6;7029:3;7024;7011:30;7090:1;7081:6;7076:3;7072:16;7065:27;7004:94;;;;7107:268;7172:1;7179:101;7193:6;7190:1;7187:13;7179:101;;;7269:1;7264:3;7260:11;7254:18;7250:1;7245:3;7241:11;7234:39;7215:2;7212:1;7208:10;7203:15;;7179:101;;;7295:6;7292:1;7289:13;7286:2;;;7360:1;7351:6;7346:3;7342:16;7335:27;7286:2;7156:219;;;;;7383:97;;7471:2;7467:7;7462:2;7455:5;7451:14;7447:28;7437:38;;7431:49;;;",
+  "source": "pragma solidity 0.5.8;\r\npragma experimental ABIEncoderV2;\r\n\r\nimport \"./Owned.sol\";\r\n\r\n/**\r\n  * Manages currency types used by AcMaster\r\n  */\r\ncontract CcyTypes is Owned {\r\n\r\n    // *** CCY TYPES\r\n    struct Ccy {\r\n        uint256 id;\r\n        string  name; // e.g. \"USD\", \"BTC\", \"ETH\"\r\n        string  unit; // e.g. \"cents\", \"satoshi\", \"wei\"\r\n    }\r\n    mapping(uint256 => Ccy) _ccyTypeIds; // typeId -> ccy\r\n    uint256 _count_ccyTypeIds;\r\n    struct GetCcyTypesReturn {\r\n        Ccy[] ccyTypes;\r\n    }\r\n\r\n    /**\r\n     * @dev Adds a new currency type\r\n     * @param name The new currency type name\r\n     * @param unit The base unit of the new currency type\r\n     */\r\n    function addCcyType(string memory name, string memory unit) public {\r\n        require(msg.sender == owner, \"Restricted method\");\r\n\r\n        for (uint256 ccyTypeId = 0; ccyTypeId < _count_ccyTypeIds; ccyTypeId++) {\r\n            // todo ...\r\n            // require(keccak256(abi.encodePacked(_ccyTypeIds[ccyTypeId])) != keccak256(abi.encodePacked(typeName)),\r\n            //         \"EEU type name already exists\");\r\n        }\r\n\r\n        // todo ...\r\n        //_eeuTypeIds[_count_eeuTypeIds] = typeName;\r\n        //_count_eeuTypeIds++;\r\n    }\r\n\r\n    /**\r\n     * @dev Returns current currency types\r\n     */\r\n    function getCcyTypes() external view returns (GetCcyTypesReturn memory) {\r\n        Ccy[] memory ccyTypes;\r\n        ccyTypes = new Ccy[](_count_ccyTypeIds);\r\n\r\n        for (uint256 ccyTypeId = 0; ccyTypeId < _count_ccyTypeIds; ccyTypeId++) {\r\n            ccyTypes[ccyTypeId] = Ccy({\r\n                    id: _ccyTypeIds[ccyTypeId].id,\r\n                  name: _ccyTypeIds[ccyTypeId].name,\r\n                  unit: _ccyTypeIds[ccyTypeId].unit\r\n            });\r\n        }\r\n\r\n        GetCcyTypesReturn memory ret = GetCcyTypesReturn({\r\n            ccyTypes: ccyTypes\r\n        });\r\n        return ret;\r\n    }\r\n}\r\n",
+  "sourcePath": "C:\\ac\\src\\ac-monorepo\\packages\\erc20\\contracts\\AcMaster\\CcyTypes.sol",
+  "ast": {
+    "absolutePath": "/C/ac/src/ac-monorepo/packages/erc20/contracts/AcMaster/CcyTypes.sol",
+    "exportedSymbols": {
+      "CcyTypes": [
+        487
+      ]
+    },
+    "id": 488,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 379,
+        "literals": [
+          "solidity",
+          "0.5",
+          ".8"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "0:22:2"
+      },
+      {
+        "id": 380,
+        "literals": [
+          "experimental",
+          "ABIEncoderV2"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "24:33:2"
+      },
+      {
+        "absolutePath": "/C/ac/src/ac-monorepo/packages/erc20/contracts/AcMaster/Owned.sol",
+        "file": "./Owned.sol",
+        "id": 381,
+        "nodeType": "ImportDirective",
+        "scope": 488,
+        "sourceUnit": 1172,
+        "src": "61:21:2",
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "baseContracts": [
+          {
+            "arguments": null,
+            "baseName": {
+              "contractScope": null,
+              "id": 382,
+              "name": "Owned",
+              "nodeType": "UserDefinedTypeName",
+              "referencedDeclaration": 1171,
+              "src": "163:5:2",
+              "typeDescriptions": {
+                "typeIdentifier": "t_contract$_Owned_$1171",
+                "typeString": "contract Owned"
+              }
+            },
+            "id": 383,
+            "nodeType": "InheritanceSpecifier",
+            "src": "163:5:2"
+          }
+        ],
+        "contractDependencies": [
+          1171
+        ],
+        "contractKind": "contract",
+        "documentation": "Manages currency types used by AcMaster\r",
+        "fullyImplemented": true,
+        "id": 487,
+        "linearizedBaseContracts": [
+          487,
+          1171
+        ],
+        "name": "CcyTypes",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "canonicalName": "CcyTypes.Ccy",
+            "id": 390,
+            "members": [
+              {
+                "constant": false,
+                "id": 385,
+                "name": "id",
+                "nodeType": "VariableDeclaration",
+                "scope": 390,
+                "src": "222:10:2",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 384,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "222:7:2",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 387,
+                "name": "name",
+                "nodeType": "VariableDeclaration",
+                "scope": 390,
+                "src": "243:12:2",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_string_storage_ptr",
+                  "typeString": "string"
+                },
+                "typeName": {
+                  "id": 386,
+                  "name": "string",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "243:6:2",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_storage_ptr",
+                    "typeString": "string"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 389,
+                "name": "unit",
+                "nodeType": "VariableDeclaration",
+                "scope": 390,
+                "src": "294:12:2",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_string_storage_ptr",
+                  "typeString": "string"
+                },
+                "typeName": {
+                  "id": 388,
+                  "name": "string",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "294:6:2",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_storage_ptr",
+                    "typeString": "string"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              }
+            ],
+            "name": "Ccy",
+            "nodeType": "StructDefinition",
+            "scope": 487,
+            "src": "200:148:2",
+            "visibility": "public"
+          },
+          {
+            "constant": false,
+            "id": 394,
+            "name": "_ccyTypeIds",
+            "nodeType": "VariableDeclaration",
+            "scope": 487,
+            "src": "354:35:2",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_mapping$_t_uint256_$_t_struct$_Ccy_$390_storage_$",
+              "typeString": "mapping(uint256 => struct CcyTypes.Ccy)"
+            },
+            "typeName": {
+              "id": 393,
+              "keyType": {
+                "id": 391,
+                "name": "uint256",
+                "nodeType": "ElementaryTypeName",
+                "src": "362:7:2",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                }
+              },
+              "nodeType": "Mapping",
+              "src": "354:23:2",
+              "typeDescriptions": {
+                "typeIdentifier": "t_mapping$_t_uint256_$_t_struct$_Ccy_$390_storage_$",
+                "typeString": "mapping(uint256 => struct CcyTypes.Ccy)"
+              },
+              "valueType": {
+                "contractScope": null,
+                "id": 392,
+                "name": "Ccy",
+                "nodeType": "UserDefinedTypeName",
+                "referencedDeclaration": 390,
+                "src": "373:3:2",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_struct$_Ccy_$390_storage_ptr",
+                  "typeString": "struct CcyTypes.Ccy"
+                }
+              }
+            },
+            "value": null,
+            "visibility": "internal"
+          },
+          {
+            "constant": false,
+            "id": 396,
+            "name": "_count_ccyTypeIds",
+            "nodeType": "VariableDeclaration",
+            "scope": 487,
+            "src": "413:25:2",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_uint256",
+              "typeString": "uint256"
+            },
+            "typeName": {
+              "id": 395,
+              "name": "uint256",
+              "nodeType": "ElementaryTypeName",
+              "src": "413:7:2",
+              "typeDescriptions": {
+                "typeIdentifier": "t_uint256",
+                "typeString": "uint256"
+              }
+            },
+            "value": null,
+            "visibility": "internal"
+          },
+          {
+            "canonicalName": "CcyTypes.GetCcyTypesReturn",
+            "id": 400,
+            "members": [
+              {
+                "constant": false,
+                "id": 399,
+                "name": "ccyTypes",
+                "nodeType": "VariableDeclaration",
+                "scope": 400,
+                "src": "481:14:2",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_array$_t_struct$_Ccy_$390_storage_$dyn_storage_ptr",
+                  "typeString": "struct CcyTypes.Ccy[]"
+                },
+                "typeName": {
+                  "baseType": {
+                    "contractScope": null,
+                    "id": 397,
+                    "name": "Ccy",
+                    "nodeType": "UserDefinedTypeName",
+                    "referencedDeclaration": 390,
+                    "src": "481:3:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_struct$_Ccy_$390_storage_ptr",
+                      "typeString": "struct CcyTypes.Ccy"
+                    }
+                  },
+                  "id": 398,
+                  "length": null,
+                  "nodeType": "ArrayTypeName",
+                  "src": "481:5:2",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_array$_t_struct$_Ccy_$390_storage_$dyn_storage_ptr",
+                    "typeString": "struct CcyTypes.Ccy[]"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              }
+            ],
+            "name": "GetCcyTypesReturn",
+            "nodeType": "StructDefinition",
+            "scope": 487,
+            "src": "445:58:2",
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 427,
+              "nodeType": "Block",
+              "src": "740:473:2",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "commonType": {
+                          "typeIdentifier": "t_address_payable",
+                          "typeString": "address payable"
+                        },
+                        "id": 411,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "leftExpression": {
+                          "argumentTypes": null,
+                          "expression": {
+                            "argumentTypes": null,
+                            "id": 408,
+                            "name": "msg",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 1186,
+                            "src": "759:3:2",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_magic_message",
+                              "typeString": "msg"
+                            }
+                          },
+                          "id": 409,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "memberName": "sender",
+                          "nodeType": "MemberAccess",
+                          "referencedDeclaration": null,
+                          "src": "759:10:2",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_address_payable",
+                            "typeString": "address payable"
+                          }
+                        },
+                        "nodeType": "BinaryOperation",
+                        "operator": "==",
+                        "rightExpression": {
+                          "argumentTypes": null,
+                          "id": 410,
+                          "name": "owner",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 1161,
+                          "src": "773:5:2",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_address_payable",
+                            "typeString": "address payable"
+                          }
+                        },
+                        "src": "759:19:2",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        }
+                      },
+                      {
+                        "argumentTypes": null,
+                        "hexValue": "52657374726963746564206d6574686f64",
+                        "id": 412,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": true,
+                        "kind": "string",
+                        "lValueRequested": false,
+                        "nodeType": "Literal",
+                        "src": "780:19:2",
+                        "subdenomination": null,
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_stringliteral_7ba2799fc305b0981b25c889edc1ebc116417b6078a7cd1fe57a4188bde086dc",
+                          "typeString": "literal_string \"Restricted method\""
+                        },
+                        "value": "Restricted method"
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        },
+                        {
+                          "typeIdentifier": "t_stringliteral_7ba2799fc305b0981b25c889edc1ebc116417b6078a7cd1fe57a4188bde086dc",
+                          "typeString": "literal_string \"Restricted method\""
+                        }
+                      ],
+                      "id": 407,
+                      "name": "require",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [
+                        1189,
+                        1190
+                      ],
+                      "referencedDeclaration": 1190,
+                      "src": "751:7:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_require_pure$_t_bool_$_t_string_memory_ptr_$returns$__$",
+                        "typeString": "function (bool,string memory) pure"
+                      }
+                    },
+                    "id": 413,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "751:49:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 414,
+                  "nodeType": "ExpressionStatement",
+                  "src": "751:49:2"
+                },
+                {
+                  "body": {
+                    "id": 425,
+                    "nodeType": "Block",
+                    "src": "885:212:2",
+                    "statements": []
+                  },
+                  "condition": {
+                    "argumentTypes": null,
+                    "commonType": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    },
+                    "id": 421,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftExpression": {
+                      "argumentTypes": null,
+                      "id": 419,
+                      "name": "ccyTypeId",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 416,
+                      "src": "841:9:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "nodeType": "BinaryOperation",
+                    "operator": "<",
+                    "rightExpression": {
+                      "argumentTypes": null,
+                      "id": 420,
+                      "name": "_count_ccyTypeIds",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 396,
+                      "src": "853:17:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "src": "841:29:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "id": 426,
+                  "initializationExpression": {
+                    "assignments": [
+                      416
+                    ],
+                    "declarations": [
+                      {
+                        "constant": false,
+                        "id": 416,
+                        "name": "ccyTypeId",
+                        "nodeType": "VariableDeclaration",
+                        "scope": 426,
+                        "src": "818:17:2",
+                        "stateVariable": false,
+                        "storageLocation": "default",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        },
+                        "typeName": {
+                          "id": 415,
+                          "name": "uint256",
+                          "nodeType": "ElementaryTypeName",
+                          "src": "818:7:2",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_uint256",
+                            "typeString": "uint256"
+                          }
+                        },
+                        "value": null,
+                        "visibility": "internal"
+                      }
+                    ],
+                    "id": 418,
+                    "initialValue": {
+                      "argumentTypes": null,
+                      "hexValue": "30",
+                      "id": 417,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": true,
+                      "kind": "number",
+                      "lValueRequested": false,
+                      "nodeType": "Literal",
+                      "src": "838:1:2",
+                      "subdenomination": null,
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_rational_0_by_1",
+                        "typeString": "int_const 0"
+                      },
+                      "value": "0"
+                    },
+                    "nodeType": "VariableDeclarationStatement",
+                    "src": "818:21:2"
+                  },
+                  "loopExpression": {
+                    "expression": {
+                      "argumentTypes": null,
+                      "id": 423,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "nodeType": "UnaryOperation",
+                      "operator": "++",
+                      "prefix": false,
+                      "src": "872:11:2",
+                      "subExpression": {
+                        "argumentTypes": null,
+                        "id": 422,
+                        "name": "ccyTypeId",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 416,
+                        "src": "872:9:2",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      },
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "id": 424,
+                    "nodeType": "ExpressionStatement",
+                    "src": "872:11:2"
+                  },
+                  "nodeType": "ForStatement",
+                  "src": "813:284:2"
+                }
+              ]
+            },
+            "documentation": "@dev Adds a new currency type\r\n@param name The new currency type name\r\n@param unit The base unit of the new currency type\r",
+            "id": 428,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "addCcyType",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 405,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 402,
+                  "name": "name",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 428,
+                  "src": "693:18:2",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_memory_ptr",
+                    "typeString": "string"
+                  },
+                  "typeName": {
+                    "id": 401,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "693:6:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 404,
+                  "name": "unit",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 428,
+                  "src": "713:18:2",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_memory_ptr",
+                    "typeString": "string"
+                  },
+                  "typeName": {
+                    "id": 403,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "713:6:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "692:40:2"
+            },
+            "returnParameters": {
+              "id": 406,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "740:0:2"
+            },
+            "scope": 487,
+            "src": "673:540:2",
+            "stateMutability": "nonpayable",
+            "superFunction": null,
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 485,
+              "nodeType": "Block",
+              "src": "1355:531:2",
+              "statements": [
+                {
+                  "assignments": [
+                    436
+                  ],
+                  "declarations": [
+                    {
+                      "constant": false,
+                      "id": 436,
+                      "name": "ccyTypes",
+                      "nodeType": "VariableDeclaration",
+                      "scope": 485,
+                      "src": "1366:21:2",
+                      "stateVariable": false,
+                      "storageLocation": "memory",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_array$_t_struct$_Ccy_$390_memory_$dyn_memory_ptr",
+                        "typeString": "struct CcyTypes.Ccy[]"
+                      },
+                      "typeName": {
+                        "baseType": {
+                          "contractScope": null,
+                          "id": 434,
+                          "name": "Ccy",
+                          "nodeType": "UserDefinedTypeName",
+                          "referencedDeclaration": 390,
+                          "src": "1366:3:2",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_struct$_Ccy_$390_storage_ptr",
+                            "typeString": "struct CcyTypes.Ccy"
+                          }
+                        },
+                        "id": 435,
+                        "length": null,
+                        "nodeType": "ArrayTypeName",
+                        "src": "1366:5:2",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_array$_t_struct$_Ccy_$390_storage_$dyn_storage_ptr",
+                          "typeString": "struct CcyTypes.Ccy[]"
+                        }
+                      },
+                      "value": null,
+                      "visibility": "internal"
+                    }
+                  ],
+                  "id": 437,
+                  "initialValue": null,
+                  "nodeType": "VariableDeclarationStatement",
+                  "src": "1366:21:2"
+                },
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "id": 444,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "argumentTypes": null,
+                      "id": 438,
+                      "name": "ccyTypes",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 436,
+                      "src": "1398:8:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_array$_t_struct$_Ccy_$390_memory_$dyn_memory_ptr",
+                        "typeString": "struct CcyTypes.Ccy memory[] memory"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "=",
+                    "rightHandSide": {
+                      "argumentTypes": null,
+                      "arguments": [
+                        {
+                          "argumentTypes": null,
+                          "id": 442,
+                          "name": "_count_ccyTypeIds",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 396,
+                          "src": "1419:17:2",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_uint256",
+                            "typeString": "uint256"
+                          }
+                        }
+                      ],
+                      "expression": {
+                        "argumentTypes": [
+                          {
+                            "typeIdentifier": "t_uint256",
+                            "typeString": "uint256"
+                          }
+                        ],
+                        "id": 441,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": true,
+                        "lValueRequested": false,
+                        "nodeType": "NewExpression",
+                        "src": "1409:9:2",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_function_objectcreation_pure$_t_uint256_$returns$_t_array$_t_struct$_Ccy_$390_memory_$dyn_memory_$",
+                          "typeString": "function (uint256) pure returns (struct CcyTypes.Ccy memory[] memory)"
+                        },
+                        "typeName": {
+                          "baseType": {
+                            "contractScope": null,
+                            "id": 439,
+                            "name": "Ccy",
+                            "nodeType": "UserDefinedTypeName",
+                            "referencedDeclaration": 390,
+                            "src": "1413:3:2",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_struct$_Ccy_$390_storage_ptr",
+                              "typeString": "struct CcyTypes.Ccy"
+                            }
+                          },
+                          "id": 440,
+                          "length": null,
+                          "nodeType": "ArrayTypeName",
+                          "src": "1413:5:2",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_array$_t_struct$_Ccy_$390_storage_$dyn_storage_ptr",
+                            "typeString": "struct CcyTypes.Ccy[]"
+                          }
+                        }
+                      },
+                      "id": 443,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "kind": "functionCall",
+                      "lValueRequested": false,
+                      "names": [],
+                      "nodeType": "FunctionCall",
+                      "src": "1409:28:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_array$_t_struct$_Ccy_$390_memory_$dyn_memory",
+                        "typeString": "struct CcyTypes.Ccy memory[] memory"
+                      }
+                    },
+                    "src": "1398:39:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_array$_t_struct$_Ccy_$390_memory_$dyn_memory_ptr",
+                      "typeString": "struct CcyTypes.Ccy memory[] memory"
+                    }
+                  },
+                  "id": 445,
+                  "nodeType": "ExpressionStatement",
+                  "src": "1398:39:2"
+                },
+                {
+                  "body": {
+                    "id": 475,
+                    "nodeType": "Block",
+                    "src": "1522:229:2",
+                    "statements": [
+                      {
+                        "expression": {
+                          "argumentTypes": null,
+                          "id": 473,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "leftHandSide": {
+                            "argumentTypes": null,
+                            "baseExpression": {
+                              "argumentTypes": null,
+                              "id": 456,
+                              "name": "ccyTypes",
+                              "nodeType": "Identifier",
+                              "overloadedDeclarations": [],
+                              "referencedDeclaration": 436,
+                              "src": "1537:8:2",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_array$_t_struct$_Ccy_$390_memory_$dyn_memory_ptr",
+                                "typeString": "struct CcyTypes.Ccy memory[] memory"
+                              }
+                            },
+                            "id": 458,
+                            "indexExpression": {
+                              "argumentTypes": null,
+                              "id": 457,
+                              "name": "ccyTypeId",
+                              "nodeType": "Identifier",
+                              "overloadedDeclarations": [],
+                              "referencedDeclaration": 447,
+                              "src": "1546:9:2",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_uint256",
+                                "typeString": "uint256"
+                              }
+                            },
+                            "isConstant": false,
+                            "isLValue": true,
+                            "isPure": false,
+                            "lValueRequested": true,
+                            "nodeType": "IndexAccess",
+                            "src": "1537:19:2",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_struct$_Ccy_$390_memory",
+                              "typeString": "struct CcyTypes.Ccy memory"
+                            }
+                          },
+                          "nodeType": "Assignment",
+                          "operator": "=",
+                          "rightHandSide": {
+                            "argumentTypes": null,
+                            "arguments": [
+                              {
+                                "argumentTypes": null,
+                                "expression": {
+                                  "argumentTypes": null,
+                                  "baseExpression": {
+                                    "argumentTypes": null,
+                                    "id": 460,
+                                    "name": "_ccyTypeIds",
+                                    "nodeType": "Identifier",
+                                    "overloadedDeclarations": [],
+                                    "referencedDeclaration": 394,
+                                    "src": "1590:11:2",
+                                    "typeDescriptions": {
+                                      "typeIdentifier": "t_mapping$_t_uint256_$_t_struct$_Ccy_$390_storage_$",
+                                      "typeString": "mapping(uint256 => struct CcyTypes.Ccy storage ref)"
+                                    }
+                                  },
+                                  "id": 462,
+                                  "indexExpression": {
+                                    "argumentTypes": null,
+                                    "id": 461,
+                                    "name": "ccyTypeId",
+                                    "nodeType": "Identifier",
+                                    "overloadedDeclarations": [],
+                                    "referencedDeclaration": 447,
+                                    "src": "1602:9:2",
+                                    "typeDescriptions": {
+                                      "typeIdentifier": "t_uint256",
+                                      "typeString": "uint256"
+                                    }
+                                  },
+                                  "isConstant": false,
+                                  "isLValue": true,
+                                  "isPure": false,
+                                  "lValueRequested": false,
+                                  "nodeType": "IndexAccess",
+                                  "src": "1590:22:2",
+                                  "typeDescriptions": {
+                                    "typeIdentifier": "t_struct$_Ccy_$390_storage",
+                                    "typeString": "struct CcyTypes.Ccy storage ref"
+                                  }
+                                },
+                                "id": 463,
+                                "isConstant": false,
+                                "isLValue": true,
+                                "isPure": false,
+                                "lValueRequested": false,
+                                "memberName": "id",
+                                "nodeType": "MemberAccess",
+                                "referencedDeclaration": 385,
+                                "src": "1590:25:2",
+                                "typeDescriptions": {
+                                  "typeIdentifier": "t_uint256",
+                                  "typeString": "uint256"
+                                }
+                              },
+                              {
+                                "argumentTypes": null,
+                                "expression": {
+                                  "argumentTypes": null,
+                                  "baseExpression": {
+                                    "argumentTypes": null,
+                                    "id": 464,
+                                    "name": "_ccyTypeIds",
+                                    "nodeType": "Identifier",
+                                    "overloadedDeclarations": [],
+                                    "referencedDeclaration": 394,
+                                    "src": "1642:11:2",
+                                    "typeDescriptions": {
+                                      "typeIdentifier": "t_mapping$_t_uint256_$_t_struct$_Ccy_$390_storage_$",
+                                      "typeString": "mapping(uint256 => struct CcyTypes.Ccy storage ref)"
+                                    }
+                                  },
+                                  "id": 466,
+                                  "indexExpression": {
+                                    "argumentTypes": null,
+                                    "id": 465,
+                                    "name": "ccyTypeId",
+                                    "nodeType": "Identifier",
+                                    "overloadedDeclarations": [],
+                                    "referencedDeclaration": 447,
+                                    "src": "1654:9:2",
+                                    "typeDescriptions": {
+                                      "typeIdentifier": "t_uint256",
+                                      "typeString": "uint256"
+                                    }
+                                  },
+                                  "isConstant": false,
+                                  "isLValue": true,
+                                  "isPure": false,
+                                  "lValueRequested": false,
+                                  "nodeType": "IndexAccess",
+                                  "src": "1642:22:2",
+                                  "typeDescriptions": {
+                                    "typeIdentifier": "t_struct$_Ccy_$390_storage",
+                                    "typeString": "struct CcyTypes.Ccy storage ref"
+                                  }
+                                },
+                                "id": 467,
+                                "isConstant": false,
+                                "isLValue": true,
+                                "isPure": false,
+                                "lValueRequested": false,
+                                "memberName": "name",
+                                "nodeType": "MemberAccess",
+                                "referencedDeclaration": 387,
+                                "src": "1642:27:2",
+                                "typeDescriptions": {
+                                  "typeIdentifier": "t_string_storage",
+                                  "typeString": "string storage ref"
+                                }
+                              },
+                              {
+                                "argumentTypes": null,
+                                "expression": {
+                                  "argumentTypes": null,
+                                  "baseExpression": {
+                                    "argumentTypes": null,
+                                    "id": 468,
+                                    "name": "_ccyTypeIds",
+                                    "nodeType": "Identifier",
+                                    "overloadedDeclarations": [],
+                                    "referencedDeclaration": 394,
+                                    "src": "1696:11:2",
+                                    "typeDescriptions": {
+                                      "typeIdentifier": "t_mapping$_t_uint256_$_t_struct$_Ccy_$390_storage_$",
+                                      "typeString": "mapping(uint256 => struct CcyTypes.Ccy storage ref)"
+                                    }
+                                  },
+                                  "id": 470,
+                                  "indexExpression": {
+                                    "argumentTypes": null,
+                                    "id": 469,
+                                    "name": "ccyTypeId",
+                                    "nodeType": "Identifier",
+                                    "overloadedDeclarations": [],
+                                    "referencedDeclaration": 447,
+                                    "src": "1708:9:2",
+                                    "typeDescriptions": {
+                                      "typeIdentifier": "t_uint256",
+                                      "typeString": "uint256"
+                                    }
+                                  },
+                                  "isConstant": false,
+                                  "isLValue": true,
+                                  "isPure": false,
+                                  "lValueRequested": false,
+                                  "nodeType": "IndexAccess",
+                                  "src": "1696:22:2",
+                                  "typeDescriptions": {
+                                    "typeIdentifier": "t_struct$_Ccy_$390_storage",
+                                    "typeString": "struct CcyTypes.Ccy storage ref"
+                                  }
+                                },
+                                "id": 471,
+                                "isConstant": false,
+                                "isLValue": true,
+                                "isPure": false,
+                                "lValueRequested": false,
+                                "memberName": "unit",
+                                "nodeType": "MemberAccess",
+                                "referencedDeclaration": 389,
+                                "src": "1696:27:2",
+                                "typeDescriptions": {
+                                  "typeIdentifier": "t_string_storage",
+                                  "typeString": "string storage ref"
+                                }
+                              }
+                            ],
+                            "expression": {
+                              "argumentTypes": [
+                                {
+                                  "typeIdentifier": "t_uint256",
+                                  "typeString": "uint256"
+                                },
+                                {
+                                  "typeIdentifier": "t_string_storage",
+                                  "typeString": "string storage ref"
+                                },
+                                {
+                                  "typeIdentifier": "t_string_storage",
+                                  "typeString": "string storage ref"
+                                }
+                              ],
+                              "id": 459,
+                              "name": "Ccy",
+                              "nodeType": "Identifier",
+                              "overloadedDeclarations": [],
+                              "referencedDeclaration": 390,
+                              "src": "1559:3:2",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_type$_t_struct$_Ccy_$390_storage_ptr_$",
+                                "typeString": "type(struct CcyTypes.Ccy storage pointer)"
+                              }
+                            },
+                            "id": 472,
+                            "isConstant": false,
+                            "isLValue": false,
+                            "isPure": false,
+                            "kind": "structConstructorCall",
+                            "lValueRequested": false,
+                            "names": [
+                              "id",
+                              "name",
+                              "unit"
+                            ],
+                            "nodeType": "FunctionCall",
+                            "src": "1559:180:2",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_struct$_Ccy_$390_memory",
+                              "typeString": "struct CcyTypes.Ccy memory"
+                            }
+                          },
+                          "src": "1537:202:2",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_struct$_Ccy_$390_memory",
+                            "typeString": "struct CcyTypes.Ccy memory"
+                          }
+                        },
+                        "id": 474,
+                        "nodeType": "ExpressionStatement",
+                        "src": "1537:202:2"
+                      }
+                    ]
+                  },
+                  "condition": {
+                    "argumentTypes": null,
+                    "commonType": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    },
+                    "id": 452,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftExpression": {
+                      "argumentTypes": null,
+                      "id": 450,
+                      "name": "ccyTypeId",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 447,
+                      "src": "1478:9:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "nodeType": "BinaryOperation",
+                    "operator": "<",
+                    "rightExpression": {
+                      "argumentTypes": null,
+                      "id": 451,
+                      "name": "_count_ccyTypeIds",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 396,
+                      "src": "1490:17:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "src": "1478:29:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "id": 476,
+                  "initializationExpression": {
+                    "assignments": [
+                      447
+                    ],
+                    "declarations": [
+                      {
+                        "constant": false,
+                        "id": 447,
+                        "name": "ccyTypeId",
+                        "nodeType": "VariableDeclaration",
+                        "scope": 476,
+                        "src": "1455:17:2",
+                        "stateVariable": false,
+                        "storageLocation": "default",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        },
+                        "typeName": {
+                          "id": 446,
+                          "name": "uint256",
+                          "nodeType": "ElementaryTypeName",
+                          "src": "1455:7:2",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_uint256",
+                            "typeString": "uint256"
+                          }
+                        },
+                        "value": null,
+                        "visibility": "internal"
+                      }
+                    ],
+                    "id": 449,
+                    "initialValue": {
+                      "argumentTypes": null,
+                      "hexValue": "30",
+                      "id": 448,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": true,
+                      "kind": "number",
+                      "lValueRequested": false,
+                      "nodeType": "Literal",
+                      "src": "1475:1:2",
+                      "subdenomination": null,
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_rational_0_by_1",
+                        "typeString": "int_const 0"
+                      },
+                      "value": "0"
+                    },
+                    "nodeType": "VariableDeclarationStatement",
+                    "src": "1455:21:2"
+                  },
+                  "loopExpression": {
+                    "expression": {
+                      "argumentTypes": null,
+                      "id": 454,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "nodeType": "UnaryOperation",
+                      "operator": "++",
+                      "prefix": false,
+                      "src": "1509:11:2",
+                      "subExpression": {
+                        "argumentTypes": null,
+                        "id": 453,
+                        "name": "ccyTypeId",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 447,
+                        "src": "1509:9:2",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      },
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "id": 455,
+                    "nodeType": "ExpressionStatement",
+                    "src": "1509:11:2"
+                  },
+                  "nodeType": "ForStatement",
+                  "src": "1450:301:2"
+                },
+                {
+                  "assignments": [
+                    478
+                  ],
+                  "declarations": [
+                    {
+                      "constant": false,
+                      "id": 478,
+                      "name": "ret",
+                      "nodeType": "VariableDeclaration",
+                      "scope": 485,
+                      "src": "1763:28:2",
+                      "stateVariable": false,
+                      "storageLocation": "memory",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_struct$_GetCcyTypesReturn_$400_memory_ptr",
+                        "typeString": "struct CcyTypes.GetCcyTypesReturn"
+                      },
+                      "typeName": {
+                        "contractScope": null,
+                        "id": 477,
+                        "name": "GetCcyTypesReturn",
+                        "nodeType": "UserDefinedTypeName",
+                        "referencedDeclaration": 400,
+                        "src": "1763:17:2",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_struct$_GetCcyTypesReturn_$400_storage_ptr",
+                          "typeString": "struct CcyTypes.GetCcyTypesReturn"
+                        }
+                      },
+                      "value": null,
+                      "visibility": "internal"
+                    }
+                  ],
+                  "id": 482,
+                  "initialValue": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "id": 480,
+                        "name": "ccyTypes",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 436,
+                        "src": "1837:8:2",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_array$_t_struct$_Ccy_$390_memory_$dyn_memory_ptr",
+                          "typeString": "struct CcyTypes.Ccy memory[] memory"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_array$_t_struct$_Ccy_$390_memory_$dyn_memory_ptr",
+                          "typeString": "struct CcyTypes.Ccy memory[] memory"
+                        }
+                      ],
+                      "id": 479,
+                      "name": "GetCcyTypesReturn",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 400,
+                      "src": "1794:17:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_type$_t_struct$_GetCcyTypesReturn_$400_storage_ptr_$",
+                        "typeString": "type(struct CcyTypes.GetCcyTypesReturn storage pointer)"
+                      }
+                    },
+                    "id": 481,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "structConstructorCall",
+                    "lValueRequested": false,
+                    "names": [
+                      "ccyTypes"
+                    ],
+                    "nodeType": "FunctionCall",
+                    "src": "1794:63:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_struct$_GetCcyTypesReturn_$400_memory",
+                      "typeString": "struct CcyTypes.GetCcyTypesReturn memory"
+                    }
+                  },
+                  "nodeType": "VariableDeclarationStatement",
+                  "src": "1763:94:2"
+                },
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "id": 483,
+                    "name": "ret",
+                    "nodeType": "Identifier",
+                    "overloadedDeclarations": [],
+                    "referencedDeclaration": 478,
+                    "src": "1875:3:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_struct$_GetCcyTypesReturn_$400_memory_ptr",
+                      "typeString": "struct CcyTypes.GetCcyTypesReturn memory"
+                    }
+                  },
+                  "functionReturnParameters": 432,
+                  "id": 484,
+                  "nodeType": "Return",
+                  "src": "1868:10:2"
+                }
+              ]
+            },
+            "documentation": "@dev Returns current currency types\r",
+            "id": 486,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "getCcyTypes",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 429,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1303:2:2"
+            },
+            "returnParameters": {
+              "id": 432,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 431,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 486,
+                  "src": "1329:24:2",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_struct$_GetCcyTypesReturn_$400_memory_ptr",
+                    "typeString": "struct CcyTypes.GetCcyTypesReturn"
+                  },
+                  "typeName": {
+                    "contractScope": null,
+                    "id": 430,
+                    "name": "GetCcyTypesReturn",
+                    "nodeType": "UserDefinedTypeName",
+                    "referencedDeclaration": 400,
+                    "src": "1329:17:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_struct$_GetCcyTypesReturn_$400_storage_ptr",
+                      "typeString": "struct CcyTypes.GetCcyTypesReturn"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1328:26:2"
+            },
+            "scope": 487,
+            "src": "1283:603:2",
+            "stateMutability": "view",
+            "superFunction": null,
+            "visibility": "external"
+          }
+        ],
+        "scope": 488,
+        "src": "142:1747:2"
+      }
+    ],
+    "src": "0:1891:2"
+  },
+  "legacyAST": {
+    "absolutePath": "/C/ac/src/ac-monorepo/packages/erc20/contracts/AcMaster/CcyTypes.sol",
+    "exportedSymbols": {
+      "CcyTypes": [
+        487
+      ]
+    },
+    "id": 488,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 379,
+        "literals": [
+          "solidity",
+          "0.5",
+          ".8"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "0:22:2"
+      },
+      {
+        "id": 380,
+        "literals": [
+          "experimental",
+          "ABIEncoderV2"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "24:33:2"
+      },
+      {
+        "absolutePath": "/C/ac/src/ac-monorepo/packages/erc20/contracts/AcMaster/Owned.sol",
+        "file": "./Owned.sol",
+        "id": 381,
+        "nodeType": "ImportDirective",
+        "scope": 488,
+        "sourceUnit": 1172,
+        "src": "61:21:2",
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "baseContracts": [
+          {
+            "arguments": null,
+            "baseName": {
+              "contractScope": null,
+              "id": 382,
+              "name": "Owned",
+              "nodeType": "UserDefinedTypeName",
+              "referencedDeclaration": 1171,
+              "src": "163:5:2",
+              "typeDescriptions": {
+                "typeIdentifier": "t_contract$_Owned_$1171",
+                "typeString": "contract Owned"
+              }
+            },
+            "id": 383,
+            "nodeType": "InheritanceSpecifier",
+            "src": "163:5:2"
+          }
+        ],
+        "contractDependencies": [
+          1171
+        ],
+        "contractKind": "contract",
+        "documentation": "Manages currency types used by AcMaster\r",
+        "fullyImplemented": true,
+        "id": 487,
+        "linearizedBaseContracts": [
+          487,
+          1171
+        ],
+        "name": "CcyTypes",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "canonicalName": "CcyTypes.Ccy",
+            "id": 390,
+            "members": [
+              {
+                "constant": false,
+                "id": 385,
+                "name": "id",
+                "nodeType": "VariableDeclaration",
+                "scope": 390,
+                "src": "222:10:2",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 384,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "222:7:2",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 387,
+                "name": "name",
+                "nodeType": "VariableDeclaration",
+                "scope": 390,
+                "src": "243:12:2",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_string_storage_ptr",
+                  "typeString": "string"
+                },
+                "typeName": {
+                  "id": 386,
+                  "name": "string",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "243:6:2",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_storage_ptr",
+                    "typeString": "string"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 389,
+                "name": "unit",
+                "nodeType": "VariableDeclaration",
+                "scope": 390,
+                "src": "294:12:2",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_string_storage_ptr",
+                  "typeString": "string"
+                },
+                "typeName": {
+                  "id": 388,
+                  "name": "string",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "294:6:2",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_storage_ptr",
+                    "typeString": "string"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              }
+            ],
+            "name": "Ccy",
+            "nodeType": "StructDefinition",
+            "scope": 487,
+            "src": "200:148:2",
+            "visibility": "public"
+          },
+          {
+            "constant": false,
+            "id": 394,
+            "name": "_ccyTypeIds",
+            "nodeType": "VariableDeclaration",
+            "scope": 487,
+            "src": "354:35:2",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_mapping$_t_uint256_$_t_struct$_Ccy_$390_storage_$",
+              "typeString": "mapping(uint256 => struct CcyTypes.Ccy)"
+            },
+            "typeName": {
+              "id": 393,
+              "keyType": {
+                "id": 391,
+                "name": "uint256",
+                "nodeType": "ElementaryTypeName",
+                "src": "362:7:2",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                }
+              },
+              "nodeType": "Mapping",
+              "src": "354:23:2",
+              "typeDescriptions": {
+                "typeIdentifier": "t_mapping$_t_uint256_$_t_struct$_Ccy_$390_storage_$",
+                "typeString": "mapping(uint256 => struct CcyTypes.Ccy)"
+              },
+              "valueType": {
+                "contractScope": null,
+                "id": 392,
+                "name": "Ccy",
+                "nodeType": "UserDefinedTypeName",
+                "referencedDeclaration": 390,
+                "src": "373:3:2",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_struct$_Ccy_$390_storage_ptr",
+                  "typeString": "struct CcyTypes.Ccy"
+                }
+              }
+            },
+            "value": null,
+            "visibility": "internal"
+          },
+          {
+            "constant": false,
+            "id": 396,
+            "name": "_count_ccyTypeIds",
+            "nodeType": "VariableDeclaration",
+            "scope": 487,
+            "src": "413:25:2",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_uint256",
+              "typeString": "uint256"
+            },
+            "typeName": {
+              "id": 395,
+              "name": "uint256",
+              "nodeType": "ElementaryTypeName",
+              "src": "413:7:2",
+              "typeDescriptions": {
+                "typeIdentifier": "t_uint256",
+                "typeString": "uint256"
+              }
+            },
+            "value": null,
+            "visibility": "internal"
+          },
+          {
+            "canonicalName": "CcyTypes.GetCcyTypesReturn",
+            "id": 400,
+            "members": [
+              {
+                "constant": false,
+                "id": 399,
+                "name": "ccyTypes",
+                "nodeType": "VariableDeclaration",
+                "scope": 400,
+                "src": "481:14:2",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_array$_t_struct$_Ccy_$390_storage_$dyn_storage_ptr",
+                  "typeString": "struct CcyTypes.Ccy[]"
+                },
+                "typeName": {
+                  "baseType": {
+                    "contractScope": null,
+                    "id": 397,
+                    "name": "Ccy",
+                    "nodeType": "UserDefinedTypeName",
+                    "referencedDeclaration": 390,
+                    "src": "481:3:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_struct$_Ccy_$390_storage_ptr",
+                      "typeString": "struct CcyTypes.Ccy"
+                    }
+                  },
+                  "id": 398,
+                  "length": null,
+                  "nodeType": "ArrayTypeName",
+                  "src": "481:5:2",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_array$_t_struct$_Ccy_$390_storage_$dyn_storage_ptr",
+                    "typeString": "struct CcyTypes.Ccy[]"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              }
+            ],
+            "name": "GetCcyTypesReturn",
+            "nodeType": "StructDefinition",
+            "scope": 487,
+            "src": "445:58:2",
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 427,
+              "nodeType": "Block",
+              "src": "740:473:2",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "commonType": {
+                          "typeIdentifier": "t_address_payable",
+                          "typeString": "address payable"
+                        },
+                        "id": 411,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "leftExpression": {
+                          "argumentTypes": null,
+                          "expression": {
+                            "argumentTypes": null,
+                            "id": 408,
+                            "name": "msg",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 1186,
+                            "src": "759:3:2",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_magic_message",
+                              "typeString": "msg"
+                            }
+                          },
+                          "id": 409,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "memberName": "sender",
+                          "nodeType": "MemberAccess",
+                          "referencedDeclaration": null,
+                          "src": "759:10:2",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_address_payable",
+                            "typeString": "address payable"
+                          }
+                        },
+                        "nodeType": "BinaryOperation",
+                        "operator": "==",
+                        "rightExpression": {
+                          "argumentTypes": null,
+                          "id": 410,
+                          "name": "owner",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 1161,
+                          "src": "773:5:2",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_address_payable",
+                            "typeString": "address payable"
+                          }
+                        },
+                        "src": "759:19:2",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        }
+                      },
+                      {
+                        "argumentTypes": null,
+                        "hexValue": "52657374726963746564206d6574686f64",
+                        "id": 412,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": true,
+                        "kind": "string",
+                        "lValueRequested": false,
+                        "nodeType": "Literal",
+                        "src": "780:19:2",
+                        "subdenomination": null,
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_stringliteral_7ba2799fc305b0981b25c889edc1ebc116417b6078a7cd1fe57a4188bde086dc",
+                          "typeString": "literal_string \"Restricted method\""
+                        },
+                        "value": "Restricted method"
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        },
+                        {
+                          "typeIdentifier": "t_stringliteral_7ba2799fc305b0981b25c889edc1ebc116417b6078a7cd1fe57a4188bde086dc",
+                          "typeString": "literal_string \"Restricted method\""
+                        }
+                      ],
+                      "id": 407,
+                      "name": "require",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [
+                        1189,
+                        1190
+                      ],
+                      "referencedDeclaration": 1190,
+                      "src": "751:7:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_require_pure$_t_bool_$_t_string_memory_ptr_$returns$__$",
+                        "typeString": "function (bool,string memory) pure"
+                      }
+                    },
+                    "id": 413,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "751:49:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 414,
+                  "nodeType": "ExpressionStatement",
+                  "src": "751:49:2"
+                },
+                {
+                  "body": {
+                    "id": 425,
+                    "nodeType": "Block",
+                    "src": "885:212:2",
+                    "statements": []
+                  },
+                  "condition": {
+                    "argumentTypes": null,
+                    "commonType": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    },
+                    "id": 421,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftExpression": {
+                      "argumentTypes": null,
+                      "id": 419,
+                      "name": "ccyTypeId",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 416,
+                      "src": "841:9:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "nodeType": "BinaryOperation",
+                    "operator": "<",
+                    "rightExpression": {
+                      "argumentTypes": null,
+                      "id": 420,
+                      "name": "_count_ccyTypeIds",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 396,
+                      "src": "853:17:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "src": "841:29:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "id": 426,
+                  "initializationExpression": {
+                    "assignments": [
+                      416
+                    ],
+                    "declarations": [
+                      {
+                        "constant": false,
+                        "id": 416,
+                        "name": "ccyTypeId",
+                        "nodeType": "VariableDeclaration",
+                        "scope": 426,
+                        "src": "818:17:2",
+                        "stateVariable": false,
+                        "storageLocation": "default",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        },
+                        "typeName": {
+                          "id": 415,
+                          "name": "uint256",
+                          "nodeType": "ElementaryTypeName",
+                          "src": "818:7:2",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_uint256",
+                            "typeString": "uint256"
+                          }
+                        },
+                        "value": null,
+                        "visibility": "internal"
+                      }
+                    ],
+                    "id": 418,
+                    "initialValue": {
+                      "argumentTypes": null,
+                      "hexValue": "30",
+                      "id": 417,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": true,
+                      "kind": "number",
+                      "lValueRequested": false,
+                      "nodeType": "Literal",
+                      "src": "838:1:2",
+                      "subdenomination": null,
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_rational_0_by_1",
+                        "typeString": "int_const 0"
+                      },
+                      "value": "0"
+                    },
+                    "nodeType": "VariableDeclarationStatement",
+                    "src": "818:21:2"
+                  },
+                  "loopExpression": {
+                    "expression": {
+                      "argumentTypes": null,
+                      "id": 423,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "nodeType": "UnaryOperation",
+                      "operator": "++",
+                      "prefix": false,
+                      "src": "872:11:2",
+                      "subExpression": {
+                        "argumentTypes": null,
+                        "id": 422,
+                        "name": "ccyTypeId",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 416,
+                        "src": "872:9:2",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      },
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "id": 424,
+                    "nodeType": "ExpressionStatement",
+                    "src": "872:11:2"
+                  },
+                  "nodeType": "ForStatement",
+                  "src": "813:284:2"
+                }
+              ]
+            },
+            "documentation": "@dev Adds a new currency type\r\n@param name The new currency type name\r\n@param unit The base unit of the new currency type\r",
+            "id": 428,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "addCcyType",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 405,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 402,
+                  "name": "name",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 428,
+                  "src": "693:18:2",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_memory_ptr",
+                    "typeString": "string"
+                  },
+                  "typeName": {
+                    "id": 401,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "693:6:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 404,
+                  "name": "unit",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 428,
+                  "src": "713:18:2",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_memory_ptr",
+                    "typeString": "string"
+                  },
+                  "typeName": {
+                    "id": 403,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "713:6:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "692:40:2"
+            },
+            "returnParameters": {
+              "id": 406,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "740:0:2"
+            },
+            "scope": 487,
+            "src": "673:540:2",
+            "stateMutability": "nonpayable",
+            "superFunction": null,
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 485,
+              "nodeType": "Block",
+              "src": "1355:531:2",
+              "statements": [
+                {
+                  "assignments": [
+                    436
+                  ],
+                  "declarations": [
+                    {
+                      "constant": false,
+                      "id": 436,
+                      "name": "ccyTypes",
+                      "nodeType": "VariableDeclaration",
+                      "scope": 485,
+                      "src": "1366:21:2",
+                      "stateVariable": false,
+                      "storageLocation": "memory",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_array$_t_struct$_Ccy_$390_memory_$dyn_memory_ptr",
+                        "typeString": "struct CcyTypes.Ccy[]"
+                      },
+                      "typeName": {
+                        "baseType": {
+                          "contractScope": null,
+                          "id": 434,
+                          "name": "Ccy",
+                          "nodeType": "UserDefinedTypeName",
+                          "referencedDeclaration": 390,
+                          "src": "1366:3:2",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_struct$_Ccy_$390_storage_ptr",
+                            "typeString": "struct CcyTypes.Ccy"
+                          }
+                        },
+                        "id": 435,
+                        "length": null,
+                        "nodeType": "ArrayTypeName",
+                        "src": "1366:5:2",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_array$_t_struct$_Ccy_$390_storage_$dyn_storage_ptr",
+                          "typeString": "struct CcyTypes.Ccy[]"
+                        }
+                      },
+                      "value": null,
+                      "visibility": "internal"
+                    }
+                  ],
+                  "id": 437,
+                  "initialValue": null,
+                  "nodeType": "VariableDeclarationStatement",
+                  "src": "1366:21:2"
+                },
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "id": 444,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "argumentTypes": null,
+                      "id": 438,
+                      "name": "ccyTypes",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 436,
+                      "src": "1398:8:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_array$_t_struct$_Ccy_$390_memory_$dyn_memory_ptr",
+                        "typeString": "struct CcyTypes.Ccy memory[] memory"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "=",
+                    "rightHandSide": {
+                      "argumentTypes": null,
+                      "arguments": [
+                        {
+                          "argumentTypes": null,
+                          "id": 442,
+                          "name": "_count_ccyTypeIds",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 396,
+                          "src": "1419:17:2",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_uint256",
+                            "typeString": "uint256"
+                          }
+                        }
+                      ],
+                      "expression": {
+                        "argumentTypes": [
+                          {
+                            "typeIdentifier": "t_uint256",
+                            "typeString": "uint256"
+                          }
+                        ],
+                        "id": 441,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": true,
+                        "lValueRequested": false,
+                        "nodeType": "NewExpression",
+                        "src": "1409:9:2",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_function_objectcreation_pure$_t_uint256_$returns$_t_array$_t_struct$_Ccy_$390_memory_$dyn_memory_$",
+                          "typeString": "function (uint256) pure returns (struct CcyTypes.Ccy memory[] memory)"
+                        },
+                        "typeName": {
+                          "baseType": {
+                            "contractScope": null,
+                            "id": 439,
+                            "name": "Ccy",
+                            "nodeType": "UserDefinedTypeName",
+                            "referencedDeclaration": 390,
+                            "src": "1413:3:2",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_struct$_Ccy_$390_storage_ptr",
+                              "typeString": "struct CcyTypes.Ccy"
+                            }
+                          },
+                          "id": 440,
+                          "length": null,
+                          "nodeType": "ArrayTypeName",
+                          "src": "1413:5:2",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_array$_t_struct$_Ccy_$390_storage_$dyn_storage_ptr",
+                            "typeString": "struct CcyTypes.Ccy[]"
+                          }
+                        }
+                      },
+                      "id": 443,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "kind": "functionCall",
+                      "lValueRequested": false,
+                      "names": [],
+                      "nodeType": "FunctionCall",
+                      "src": "1409:28:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_array$_t_struct$_Ccy_$390_memory_$dyn_memory",
+                        "typeString": "struct CcyTypes.Ccy memory[] memory"
+                      }
+                    },
+                    "src": "1398:39:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_array$_t_struct$_Ccy_$390_memory_$dyn_memory_ptr",
+                      "typeString": "struct CcyTypes.Ccy memory[] memory"
+                    }
+                  },
+                  "id": 445,
+                  "nodeType": "ExpressionStatement",
+                  "src": "1398:39:2"
+                },
+                {
+                  "body": {
+                    "id": 475,
+                    "nodeType": "Block",
+                    "src": "1522:229:2",
+                    "statements": [
+                      {
+                        "expression": {
+                          "argumentTypes": null,
+                          "id": 473,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "leftHandSide": {
+                            "argumentTypes": null,
+                            "baseExpression": {
+                              "argumentTypes": null,
+                              "id": 456,
+                              "name": "ccyTypes",
+                              "nodeType": "Identifier",
+                              "overloadedDeclarations": [],
+                              "referencedDeclaration": 436,
+                              "src": "1537:8:2",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_array$_t_struct$_Ccy_$390_memory_$dyn_memory_ptr",
+                                "typeString": "struct CcyTypes.Ccy memory[] memory"
+                              }
+                            },
+                            "id": 458,
+                            "indexExpression": {
+                              "argumentTypes": null,
+                              "id": 457,
+                              "name": "ccyTypeId",
+                              "nodeType": "Identifier",
+                              "overloadedDeclarations": [],
+                              "referencedDeclaration": 447,
+                              "src": "1546:9:2",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_uint256",
+                                "typeString": "uint256"
+                              }
+                            },
+                            "isConstant": false,
+                            "isLValue": true,
+                            "isPure": false,
+                            "lValueRequested": true,
+                            "nodeType": "IndexAccess",
+                            "src": "1537:19:2",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_struct$_Ccy_$390_memory",
+                              "typeString": "struct CcyTypes.Ccy memory"
+                            }
+                          },
+                          "nodeType": "Assignment",
+                          "operator": "=",
+                          "rightHandSide": {
+                            "argumentTypes": null,
+                            "arguments": [
+                              {
+                                "argumentTypes": null,
+                                "expression": {
+                                  "argumentTypes": null,
+                                  "baseExpression": {
+                                    "argumentTypes": null,
+                                    "id": 460,
+                                    "name": "_ccyTypeIds",
+                                    "nodeType": "Identifier",
+                                    "overloadedDeclarations": [],
+                                    "referencedDeclaration": 394,
+                                    "src": "1590:11:2",
+                                    "typeDescriptions": {
+                                      "typeIdentifier": "t_mapping$_t_uint256_$_t_struct$_Ccy_$390_storage_$",
+                                      "typeString": "mapping(uint256 => struct CcyTypes.Ccy storage ref)"
+                                    }
+                                  },
+                                  "id": 462,
+                                  "indexExpression": {
+                                    "argumentTypes": null,
+                                    "id": 461,
+                                    "name": "ccyTypeId",
+                                    "nodeType": "Identifier",
+                                    "overloadedDeclarations": [],
+                                    "referencedDeclaration": 447,
+                                    "src": "1602:9:2",
+                                    "typeDescriptions": {
+                                      "typeIdentifier": "t_uint256",
+                                      "typeString": "uint256"
+                                    }
+                                  },
+                                  "isConstant": false,
+                                  "isLValue": true,
+                                  "isPure": false,
+                                  "lValueRequested": false,
+                                  "nodeType": "IndexAccess",
+                                  "src": "1590:22:2",
+                                  "typeDescriptions": {
+                                    "typeIdentifier": "t_struct$_Ccy_$390_storage",
+                                    "typeString": "struct CcyTypes.Ccy storage ref"
+                                  }
+                                },
+                                "id": 463,
+                                "isConstant": false,
+                                "isLValue": true,
+                                "isPure": false,
+                                "lValueRequested": false,
+                                "memberName": "id",
+                                "nodeType": "MemberAccess",
+                                "referencedDeclaration": 385,
+                                "src": "1590:25:2",
+                                "typeDescriptions": {
+                                  "typeIdentifier": "t_uint256",
+                                  "typeString": "uint256"
+                                }
+                              },
+                              {
+                                "argumentTypes": null,
+                                "expression": {
+                                  "argumentTypes": null,
+                                  "baseExpression": {
+                                    "argumentTypes": null,
+                                    "id": 464,
+                                    "name": "_ccyTypeIds",
+                                    "nodeType": "Identifier",
+                                    "overloadedDeclarations": [],
+                                    "referencedDeclaration": 394,
+                                    "src": "1642:11:2",
+                                    "typeDescriptions": {
+                                      "typeIdentifier": "t_mapping$_t_uint256_$_t_struct$_Ccy_$390_storage_$",
+                                      "typeString": "mapping(uint256 => struct CcyTypes.Ccy storage ref)"
+                                    }
+                                  },
+                                  "id": 466,
+                                  "indexExpression": {
+                                    "argumentTypes": null,
+                                    "id": 465,
+                                    "name": "ccyTypeId",
+                                    "nodeType": "Identifier",
+                                    "overloadedDeclarations": [],
+                                    "referencedDeclaration": 447,
+                                    "src": "1654:9:2",
+                                    "typeDescriptions": {
+                                      "typeIdentifier": "t_uint256",
+                                      "typeString": "uint256"
+                                    }
+                                  },
+                                  "isConstant": false,
+                                  "isLValue": true,
+                                  "isPure": false,
+                                  "lValueRequested": false,
+                                  "nodeType": "IndexAccess",
+                                  "src": "1642:22:2",
+                                  "typeDescriptions": {
+                                    "typeIdentifier": "t_struct$_Ccy_$390_storage",
+                                    "typeString": "struct CcyTypes.Ccy storage ref"
+                                  }
+                                },
+                                "id": 467,
+                                "isConstant": false,
+                                "isLValue": true,
+                                "isPure": false,
+                                "lValueRequested": false,
+                                "memberName": "name",
+                                "nodeType": "MemberAccess",
+                                "referencedDeclaration": 387,
+                                "src": "1642:27:2",
+                                "typeDescriptions": {
+                                  "typeIdentifier": "t_string_storage",
+                                  "typeString": "string storage ref"
+                                }
+                              },
+                              {
+                                "argumentTypes": null,
+                                "expression": {
+                                  "argumentTypes": null,
+                                  "baseExpression": {
+                                    "argumentTypes": null,
+                                    "id": 468,
+                                    "name": "_ccyTypeIds",
+                                    "nodeType": "Identifier",
+                                    "overloadedDeclarations": [],
+                                    "referencedDeclaration": 394,
+                                    "src": "1696:11:2",
+                                    "typeDescriptions": {
+                                      "typeIdentifier": "t_mapping$_t_uint256_$_t_struct$_Ccy_$390_storage_$",
+                                      "typeString": "mapping(uint256 => struct CcyTypes.Ccy storage ref)"
+                                    }
+                                  },
+                                  "id": 470,
+                                  "indexExpression": {
+                                    "argumentTypes": null,
+                                    "id": 469,
+                                    "name": "ccyTypeId",
+                                    "nodeType": "Identifier",
+                                    "overloadedDeclarations": [],
+                                    "referencedDeclaration": 447,
+                                    "src": "1708:9:2",
+                                    "typeDescriptions": {
+                                      "typeIdentifier": "t_uint256",
+                                      "typeString": "uint256"
+                                    }
+                                  },
+                                  "isConstant": false,
+                                  "isLValue": true,
+                                  "isPure": false,
+                                  "lValueRequested": false,
+                                  "nodeType": "IndexAccess",
+                                  "src": "1696:22:2",
+                                  "typeDescriptions": {
+                                    "typeIdentifier": "t_struct$_Ccy_$390_storage",
+                                    "typeString": "struct CcyTypes.Ccy storage ref"
+                                  }
+                                },
+                                "id": 471,
+                                "isConstant": false,
+                                "isLValue": true,
+                                "isPure": false,
+                                "lValueRequested": false,
+                                "memberName": "unit",
+                                "nodeType": "MemberAccess",
+                                "referencedDeclaration": 389,
+                                "src": "1696:27:2",
+                                "typeDescriptions": {
+                                  "typeIdentifier": "t_string_storage",
+                                  "typeString": "string storage ref"
+                                }
+                              }
+                            ],
+                            "expression": {
+                              "argumentTypes": [
+                                {
+                                  "typeIdentifier": "t_uint256",
+                                  "typeString": "uint256"
+                                },
+                                {
+                                  "typeIdentifier": "t_string_storage",
+                                  "typeString": "string storage ref"
+                                },
+                                {
+                                  "typeIdentifier": "t_string_storage",
+                                  "typeString": "string storage ref"
+                                }
+                              ],
+                              "id": 459,
+                              "name": "Ccy",
+                              "nodeType": "Identifier",
+                              "overloadedDeclarations": [],
+                              "referencedDeclaration": 390,
+                              "src": "1559:3:2",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_type$_t_struct$_Ccy_$390_storage_ptr_$",
+                                "typeString": "type(struct CcyTypes.Ccy storage pointer)"
+                              }
+                            },
+                            "id": 472,
+                            "isConstant": false,
+                            "isLValue": false,
+                            "isPure": false,
+                            "kind": "structConstructorCall",
+                            "lValueRequested": false,
+                            "names": [
+                              "id",
+                              "name",
+                              "unit"
+                            ],
+                            "nodeType": "FunctionCall",
+                            "src": "1559:180:2",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_struct$_Ccy_$390_memory",
+                              "typeString": "struct CcyTypes.Ccy memory"
+                            }
+                          },
+                          "src": "1537:202:2",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_struct$_Ccy_$390_memory",
+                            "typeString": "struct CcyTypes.Ccy memory"
+                          }
+                        },
+                        "id": 474,
+                        "nodeType": "ExpressionStatement",
+                        "src": "1537:202:2"
+                      }
+                    ]
+                  },
+                  "condition": {
+                    "argumentTypes": null,
+                    "commonType": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    },
+                    "id": 452,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftExpression": {
+                      "argumentTypes": null,
+                      "id": 450,
+                      "name": "ccyTypeId",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 447,
+                      "src": "1478:9:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "nodeType": "BinaryOperation",
+                    "operator": "<",
+                    "rightExpression": {
+                      "argumentTypes": null,
+                      "id": 451,
+                      "name": "_count_ccyTypeIds",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 396,
+                      "src": "1490:17:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "src": "1478:29:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "id": 476,
+                  "initializationExpression": {
+                    "assignments": [
+                      447
+                    ],
+                    "declarations": [
+                      {
+                        "constant": false,
+                        "id": 447,
+                        "name": "ccyTypeId",
+                        "nodeType": "VariableDeclaration",
+                        "scope": 476,
+                        "src": "1455:17:2",
+                        "stateVariable": false,
+                        "storageLocation": "default",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        },
+                        "typeName": {
+                          "id": 446,
+                          "name": "uint256",
+                          "nodeType": "ElementaryTypeName",
+                          "src": "1455:7:2",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_uint256",
+                            "typeString": "uint256"
+                          }
+                        },
+                        "value": null,
+                        "visibility": "internal"
+                      }
+                    ],
+                    "id": 449,
+                    "initialValue": {
+                      "argumentTypes": null,
+                      "hexValue": "30",
+                      "id": 448,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": true,
+                      "kind": "number",
+                      "lValueRequested": false,
+                      "nodeType": "Literal",
+                      "src": "1475:1:2",
+                      "subdenomination": null,
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_rational_0_by_1",
+                        "typeString": "int_const 0"
+                      },
+                      "value": "0"
+                    },
+                    "nodeType": "VariableDeclarationStatement",
+                    "src": "1455:21:2"
+                  },
+                  "loopExpression": {
+                    "expression": {
+                      "argumentTypes": null,
+                      "id": 454,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "nodeType": "UnaryOperation",
+                      "operator": "++",
+                      "prefix": false,
+                      "src": "1509:11:2",
+                      "subExpression": {
+                        "argumentTypes": null,
+                        "id": 453,
+                        "name": "ccyTypeId",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 447,
+                        "src": "1509:9:2",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      },
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "id": 455,
+                    "nodeType": "ExpressionStatement",
+                    "src": "1509:11:2"
+                  },
+                  "nodeType": "ForStatement",
+                  "src": "1450:301:2"
+                },
+                {
+                  "assignments": [
+                    478
+                  ],
+                  "declarations": [
+                    {
+                      "constant": false,
+                      "id": 478,
+                      "name": "ret",
+                      "nodeType": "VariableDeclaration",
+                      "scope": 485,
+                      "src": "1763:28:2",
+                      "stateVariable": false,
+                      "storageLocation": "memory",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_struct$_GetCcyTypesReturn_$400_memory_ptr",
+                        "typeString": "struct CcyTypes.GetCcyTypesReturn"
+                      },
+                      "typeName": {
+                        "contractScope": null,
+                        "id": 477,
+                        "name": "GetCcyTypesReturn",
+                        "nodeType": "UserDefinedTypeName",
+                        "referencedDeclaration": 400,
+                        "src": "1763:17:2",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_struct$_GetCcyTypesReturn_$400_storage_ptr",
+                          "typeString": "struct CcyTypes.GetCcyTypesReturn"
+                        }
+                      },
+                      "value": null,
+                      "visibility": "internal"
+                    }
+                  ],
+                  "id": 482,
+                  "initialValue": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "id": 480,
+                        "name": "ccyTypes",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 436,
+                        "src": "1837:8:2",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_array$_t_struct$_Ccy_$390_memory_$dyn_memory_ptr",
+                          "typeString": "struct CcyTypes.Ccy memory[] memory"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_array$_t_struct$_Ccy_$390_memory_$dyn_memory_ptr",
+                          "typeString": "struct CcyTypes.Ccy memory[] memory"
+                        }
+                      ],
+                      "id": 479,
+                      "name": "GetCcyTypesReturn",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 400,
+                      "src": "1794:17:2",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_type$_t_struct$_GetCcyTypesReturn_$400_storage_ptr_$",
+                        "typeString": "type(struct CcyTypes.GetCcyTypesReturn storage pointer)"
+                      }
+                    },
+                    "id": 481,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "structConstructorCall",
+                    "lValueRequested": false,
+                    "names": [
+                      "ccyTypes"
+                    ],
+                    "nodeType": "FunctionCall",
+                    "src": "1794:63:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_struct$_GetCcyTypesReturn_$400_memory",
+                      "typeString": "struct CcyTypes.GetCcyTypesReturn memory"
+                    }
+                  },
+                  "nodeType": "VariableDeclarationStatement",
+                  "src": "1763:94:2"
+                },
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "id": 483,
+                    "name": "ret",
+                    "nodeType": "Identifier",
+                    "overloadedDeclarations": [],
+                    "referencedDeclaration": 478,
+                    "src": "1875:3:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_struct$_GetCcyTypesReturn_$400_memory_ptr",
+                      "typeString": "struct CcyTypes.GetCcyTypesReturn memory"
+                    }
+                  },
+                  "functionReturnParameters": 432,
+                  "id": 484,
+                  "nodeType": "Return",
+                  "src": "1868:10:2"
+                }
+              ]
+            },
+            "documentation": "@dev Returns current currency types\r",
+            "id": 486,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "getCcyTypes",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 429,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1303:2:2"
+            },
+            "returnParameters": {
+              "id": 432,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 431,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 486,
+                  "src": "1329:24:2",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_struct$_GetCcyTypesReturn_$400_memory_ptr",
+                    "typeString": "struct CcyTypes.GetCcyTypesReturn"
+                  },
+                  "typeName": {
+                    "contractScope": null,
+                    "id": 430,
+                    "name": "GetCcyTypesReturn",
+                    "nodeType": "UserDefinedTypeName",
+                    "referencedDeclaration": 400,
+                    "src": "1329:17:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_struct$_GetCcyTypesReturn_$400_storage_ptr",
+                      "typeString": "struct CcyTypes.GetCcyTypesReturn"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1328:26:2"
+            },
+            "scope": 487,
+            "src": "1283:603:2",
+            "stateMutability": "view",
+            "superFunction": null,
+            "visibility": "external"
+          }
+        ],
+        "scope": 488,
+        "src": "142:1747:2"
+      }
+    ],
+    "src": "0:1891:2"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.5.8+commit.23d335f2.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "3.0.11",
+  "updatedAt": "2019-08-05T15:35:04.400Z",
+  "devdoc": {
+    "methods": {
+      "addCcyType(string,string)": {
+        "details": "Adds a new currency type\r",
+        "params": {
+          "name": "The new currency type name\r",
+          "unit": "The base unit of the new currency type\r"
+        }
+      },
+      "getCcyTypes()": {
+        "details": "Returns current currency types\r"
+      }
+    }
+  },
+  "userdoc": {
+    "methods": {},
+    "notice": "Manages currency types used by AcMaster\r"
+  }
+}
