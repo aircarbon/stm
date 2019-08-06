@@ -10,6 +10,9 @@ contract('AcMaster', accounts => {
         acm = await ac.deployed();
         accountNdx++;
     });
+    
+    // todo: test mint first then fund ...
+    // todo: add ccy type then fund ...
 
     it('funding - should allow funding of USD', async () => {
         await fundLedger({ ccyTypeId: CONST.ccyType.USD, amount: CONST.thousandUsd_cents, receiver: accounts[accountNdx]});
@@ -42,9 +45,6 @@ contract('AcMaster', accounts => {
         console.log(`gasUsed - Funding: ${fundTx.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * fundTx.receipt.gasUsed).toFixed(4)} (USD ${(CONST.gasPriceEth * fundTx.receipt.gasUsed * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
     });
 
-    // todo: test mint first then fund 
-    // todo: add ccy type then fund
-
     async function fundLedger({ ccyTypeId, amount, receiver }) {
         var ledgerEntryBefore, ledgerEntryAfter;
 
@@ -57,10 +57,6 @@ contract('AcMaster', accounts => {
         
         // validate funded event
         truffleAssert.eventEmitted(fundTx, 'FundedLedger', ev => {
-            //console.dir(BigNumber(ev.amount));
-            //console.dir(ev.amount.toString());
-            //console.dir(amount.toString());
-            //console.dir(BigNumber(amount));
             return ev.ccyTypeId == ccyTypeId
                 && ev.ledgerOwner == receiver
                 && ev.amount.toString() == amount.toString()
@@ -83,7 +79,7 @@ contract('AcMaster', accounts => {
         assert(totalFundedAfter - totalFundedBefore == amount, 'unexpected total funded after funding');
     }
 
-    /*it('funding - should not allow non-owner to fund a ledger entry', async () => {
+    it('funding - should not allow non-owner to fund a ledger entry', async () => {
         try {
             await acm.fund(CONST.ccyType.USD, 100, accounts[accountNdx], { from: accounts[1] });
         } catch (ex) { return; }
@@ -109,6 +105,6 @@ contract('AcMaster', accounts => {
             await acm.fund(CONST.ccyType.USD, -1, accounts[accountNdx], { from: accounts[0] });
         } catch (ex) { return; }
         assert.fail('expected restriction exception');
-    });*/
+    });
 
 });

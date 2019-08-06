@@ -41,7 +41,7 @@
 ## WIP - TODOs
 
     ### contract - core fn's
-    * fund/withdraw - analogous to mint & burn, for collateral types
+    * fund (2 more tests) + withdraw
     * trade/transfer (Ccy + EEUs - same interface?), inc. EEU split & merge
     * IPFS pointers & URL pointers for batch minting
 

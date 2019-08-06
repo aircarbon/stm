@@ -44,7 +44,7 @@ contract AcLedger is Owned, EeuTypes, CcyTypes {
         bool                          exists;                   // for existance check by address
         mapping(uint256 => uint256[]) eeuType_eeuIds;           // EeuTypeId -> eeuId[] of all owned vEEU(s)
         mapping(uint256 => uint256)   eeuType_sumKG;            // EeuTypeId -> sum KG carbon in all owned vEEU(s)
-        mapping(uint256 => int256)    ccyType_balance;          // CcyTypeId -> balance - note: allows -ve balance
+        mapping(uint256 => int256)    ccyType_balance;          // CcyTypeId -> balance (allows -ve balance, will overflow at ~5*10^76 (2^256/2))
     }
     mapping(uint256 => int256) _ccyType_totalFunded;
     mapping(uint256 => int256) _ccyType_totalWithdrawn;
