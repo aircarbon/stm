@@ -16,11 +16,11 @@
     },
     "keywords": [],
     "license": "MIT",
-    "dependencies": {
-        "ethereumjs-tx": "^2.1.0"
-    },
+    "dependencies": {},
     "devDependencies": {
+        "big-number": "2.0.0",
         "ethereumjs-wallet": "^0.6.0",
+        "ethereumjs-tx": "^2.1.0",
         "truffle-hdwallet-provider": "1.0.14",
         "mocha": "^5.1.1",
         "truffle": "^5.0.0",

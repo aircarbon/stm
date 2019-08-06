@@ -11,7 +11,7 @@ contract EeuTypes is Owned {
 
     // *** EEU TYPES
     mapping(uint256 => string) _eeuTypeNames; // typeId -> typeName
-    uint256 _count_eeuTypeIds;
+    uint256 _count_eeuTypes;
     struct EeuTypeReturn {
         uint256 id;
         string  name;
@@ -24,7 +24,7 @@ contract EeuTypes is Owned {
         // default EEU types
         _eeuTypeNames[0] = 'UNFCCC';
         _eeuTypeNames[1] = 'VCS';
-        _count_eeuTypeIds = 2;
+        _count_eeuTypes = 2;
     }
 
     /**
@@ -34,15 +34,15 @@ contract EeuTypes is Owned {
     function addEeuType(string memory name) public {
         require(msg.sender == owner, "Restricted method");
 
-        for (uint256 eeuTypeId = 0; eeuTypeId < _count_eeuTypeIds; eeuTypeId++) {
+        for (uint256 eeuTypeId = 0; eeuTypeId < _count_eeuTypes; eeuTypeId++) {
             require(keccak256(abi.encodePacked(_eeuTypeNames[eeuTypeId])) != keccak256(abi.encodePacked(name)),
                     "EEU type name already exists");
         }
 
-        _eeuTypeNames[_count_eeuTypeIds] = name;
-        emit AddedEeuType(_count_eeuTypeIds, name);
+        _eeuTypeNames[_count_eeuTypes] = name;
+        emit AddedEeuType(_count_eeuTypes, name);
 
-        _count_eeuTypeIds++;
+        _count_eeuTypes++;
     }
 
     /**
@@ -50,9 +50,9 @@ contract EeuTypes is Owned {
      */
     function getEeuTypes() external view returns (GetEeuTypesReturn memory) {
         EeuTypeReturn[] memory eeuTypes;
-        eeuTypes = new EeuTypeReturn[](_count_eeuTypeIds);
+        eeuTypes = new EeuTypeReturn[](_count_eeuTypes);
 
-        for (uint256 eeuTypeId = 0; eeuTypeId < _count_eeuTypeIds; eeuTypeId++) {
+        for (uint256 eeuTypeId = 0; eeuTypeId < _count_eeuTypes; eeuTypeId++) {
             eeuTypes[eeuTypeId] = EeuTypeReturn({
                 id: eeuTypeId,
               name: _eeuTypeNames[eeuTypeId]

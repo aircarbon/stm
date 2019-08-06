@@ -4,8 +4,9 @@ pragma experimental ABIEncoderV2;
 import "./EeuMintable.sol";
 import "./EeuBurnable.sol";
 import "./EeuTradable.sol";
+import "./CcyFundable.sol";
 
-contract AcMaster is EeuMintable, EeuBurnable, EeuTradable {
+contract AcMaster is EeuMintable, EeuBurnable, CcyFundable, EeuTradable {
     string public version;
 
     /**

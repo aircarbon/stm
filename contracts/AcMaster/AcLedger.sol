@@ -23,8 +23,8 @@ contract AcLedger is Owned, EeuTypes, CcyTypes {
     mapping(uint256 => uint256) _eeus_mintedKG;
     mapping(uint256 => uint256) _eeus_KG;                       // == 0 indicates fully burned, != _eeus_mintedKG indicates partially burned
     mapping(uint256 => uint256) _eeus_mintedTimestamp;
-    uint256 _eeuKgMinted;
-    uint256 _eeuKgBurned;
+    uint256 _eeu_totalMintedKG;
+    uint256 _eeu_totalBurnedKG;
     uint256 _eeuCurMaxId;                                       // 1-based - TODO: to be updated by Mint() **and Split()** ...
         // return structs
         struct EeuReturn {
@@ -41,15 +41,15 @@ contract AcLedger is Owned, EeuTypes, CcyTypes {
     address[] _ledgerOwners;                                    // list of ledger owners (accounts)
     //mapping(bytes32 => bool) _ownsEeuId;                      // old: for EEU ownership lookup: by keccak256(ledgerOwner, EEU ID)
     struct Ledger {
-        bool                                       exists;      // for existance check by address
-        mapping(uint256/*EeuTypeId*/ => uint256[]) type_eeuIds;
-        mapping(uint256/*EeuTypeId*/ => uint256)   type_sumKG;
-        mapping(uint256/*CcyTypeId*/ => int256)    type_sumCcy;
-      //uint256                                    usdCents;    // owned USD quantity
-      //uint256                                    ethWei;      // owned ETH quantity
+        bool                          exists;                   // for existance check by address
+        mapping(uint256 => uint256[]) eeuType_eeuIds;           // EeuTypeId -> eeuId[] of all owned vEEU(s)
+        mapping(uint256 => uint256)   eeuType_sumKG;            // EeuTypeId -> sum KG carbon in all owned vEEU(s)
+        mapping(uint256 => int256)    ccyType_balance;          // CcyTypeId -> balance - note: allows -ve balance
     }
+    mapping(uint256 => int256) _ccyType_totalFunded;
+    mapping(uint256 => int256) _ccyType_totalWithdrawn;
         // return structs
-        struct LedgerEeuReturn {                                // _ledger return structure (can't pass out nested arrays)
+        struct LedgerEeuReturn {                                // ledger return structure (can't pass out nested arrays)
             uint256 eeuId;
             uint256 eeuTypeId;
             string  eeuTypeName;
@@ -73,30 +73,33 @@ contract AcLedger is Owned, EeuTypes, CcyTypes {
      * @dev Returns all accounts in the ledger
      */
     function getLedgerOwners() external view returns (address[] memory) {
+        require(msg.sender == owner, "Restricted method");
         return _ledgerOwners;
     }
 
     /**
-     * @dev Returns the _ledger entry for a single account
+     * @dev Returns the ledger entry for a single account
      */
     function getLedgerEntry(address account) external view returns (LedgerReturn memory) {
         LedgerEeuReturn[] memory eeus;
         LedgerCcyReturn[] memory ccys;
         uint256 eeu_sumKG = 0;
-        if (_ledger[account].exists) {
+        
+        //if (_ledger[account].exists) {
+
             // count total # of eeus across all types
             uint256 countAllEeus = 0;
-            for (uint256 eeuTypeId = 0; eeuTypeId < _count_eeuTypeIds; eeuTypeId++) {
-                countAllEeus += _ledger[account].type_eeuIds[eeuTypeId].length;
+            for (uint256 eeuTypeId = 0; eeuTypeId < _count_eeuTypes; eeuTypeId++) {
+                countAllEeus += _ledger[account].eeuType_eeuIds[eeuTypeId].length;
             }
 
             // flatten EEU IDs and sum sizes across types
             eeus = new LedgerEeuReturn[](countAllEeus);
             uint256 flatEeuNdx = 0;
-            for (uint256 eeuTypeId = 0; eeuTypeId < _count_eeuTypeIds; eeuTypeId++) {
-                uint256[] memory type_eeuIds = _ledger[account].type_eeuIds[eeuTypeId];
-                for (uint256 ndx = 0; ndx < type_eeuIds.length; ndx++) {
-                    uint256 eeuId = type_eeuIds[ndx];
+            for (uint256 eeuTypeId = 0; eeuTypeId < _count_eeuTypes; eeuTypeId++) {
+                uint256[] memory eeuType_eeuIds = _ledger[account].eeuType_eeuIds[eeuTypeId];
+                for (uint256 ndx = 0; ndx < eeuType_eeuIds.length; ndx++) {
+                    uint256 eeuId = eeuType_eeuIds[ndx];
 
                     // sum EEU sizes - convenience for caller
                     eeu_sumKG += _eeus_KG[eeuId];
@@ -120,14 +123,17 @@ contract AcLedger is Owned, EeuTypes, CcyTypes {
                        typeId: ccyTypeId,
                          name: _ccyTypes[ccyTypeId].name,
                          unit: _ccyTypes[ccyTypeId].unit,
-                      balance: _ledger[account].type_sumCcy[ccyTypeId]
+                      balance: _ledger[account].ccyType_balance[ccyTypeId]
                 });
             }
-        }
-        else {
+        //}
+        /*else {
             eeus = new LedgerEeuReturn[](0);
-            ccys = new LedgerCcyReturn[](0);
-        }
+            ccys = new LedgerCcyReturn[](_count_ccyTypes);
+            for (uint256 ccyTypeId = 0; ccyTypeId < _count_ccyTypes; ccyTypeId++) {
+                //...
+            }
+        }*/
 
         LedgerReturn memory ret = LedgerReturn({
             exists: _ledger[account].exists,

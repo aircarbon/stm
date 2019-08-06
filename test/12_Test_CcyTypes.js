@@ -25,8 +25,6 @@ contract('AcMaster', accounts => {
         assert(types[1].id == 1, 'unexpected default ccy type id 1');
     });
 
-    // todo -- admin tasks & perm roles for adding ccy & eeu types
-
     it('ccy types - should be able to use newly added EEU types', async () => {
         // mint 1 vEEU 
         await acm.mintEeuBatch(CONST.eeuType.UNFCCC, CONST.ktCarbon * 100, 1, accounts[accountNdx], { from: accounts[0] });

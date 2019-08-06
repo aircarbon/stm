@@ -36,7 +36,6 @@ contract CcyTypes is Owned {
         _count_ccyTypes = 2;
     }
 
-
     /**
      * @dev Adds a new currency type
      * @param name The new currency type name
