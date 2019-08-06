@@ -41,7 +41,6 @@
 ## WIP - TODOs
 
     ### contract - core fn's
-    * make usdCents & ethWei [] to CcyType[], extendible - same as EeuType -- TODO: tests...
     * fund/withdraw - analogous to mint & burn, for collateral types
     * trade/transfer (Ccy + EEUs - same interface?), inc. EEU split & merge
     * IPFS pointers & URL pointers for batch minting

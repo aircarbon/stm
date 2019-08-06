@@ -5,9 +5,9 @@ import "./Owned.sol";
 import "./AcLedger.sol";
 
 contract EeuMintable is Owned, AcLedger {
-    // Events -- TODO: encode full data in events
-    event MintedEeuBatch(uint256 id);
-    event MintedEeu(uint256 id);
+    // todo: test new fields
+    event MintedEeuBatch(uint256 id, uint256 eeuTypeId, address batchOwner, uint256 qtyKG, uint256 qtyEeus);
+    event MintedEeu(uint256 id, uint256 batchId, uint256 eeuTypeId, address ledgerOwner, uint256 mintedKG);
 
     /**
      * mint and assign ownership new EEU batch
@@ -16,12 +16,11 @@ contract EeuMintable is Owned, AcLedger {
      * @param qtyEeus quantity of EEUs in the batch
      * @param batchOwner who to assign the minted EEUs to
      */
-    function mintEeuBatch(/*EeuType eeuType*/uint256 eeuTypeId, int256 qtyKG, int256 qtyEeus, address batchOwner) public {
+    function mintEeuBatch(uint256 eeuTypeId, int256 qtyKG, int256 qtyEeus, address batchOwner) public {
         require(msg.sender == owner, "Restricted method");
-        require(qtyKG >= 1000, "Minimum one metric ton of carbon required");
-        //require(eeuType != EeuType.dummy_end, "Invalid EEU type");
         require(eeuTypeId >= 0 && eeuTypeId < _count_eeuTypeIds, "Invalid EEU type");
         require(qtyEeus >= 1, "Minimum one EEU required");
+        require(qtyKG >= 1000, "Minimum one metric ton of carbon required");
         require(qtyKG % qtyEeus == 0, "Carbon weight must divide evenly into EEUs");
 
         // create new EEU batch
@@ -35,14 +34,12 @@ contract EeuMintable is Owned, AcLedger {
         //_eeuBatches.push(newBatch);
         _eeuBatches[newBatch.id] = newBatch;
         _batchCurMaxId++;
-        emit MintedEeuBatch(newBatch.id);
+        emit MintedEeuBatch(newBatch.id, eeuTypeId, batchOwner, uint256(qtyKG), uint256(qtyEeus));
 
         // create _ledger entry as required
         if (_ledger[batchOwner].exists == false) {
             _ledger[batchOwner] = Ledger({
                   exists: true
-              //usdCents: 0,
-              //  ethWei: 0
             });
             _ledgerOwners.push(batchOwner);
         }
@@ -58,7 +55,7 @@ contract EeuMintable is Owned, AcLedger {
             _eeus_KG[newId] = eeuKG;
             _eeus_mintedTimestamp[newId] = block.timestamp;
 
-            emit MintedEeu(newId);
+            emit MintedEeu(newId, newBatch.id, eeuTypeId, batchOwner, eeuKG);
 
             // assign
             _ledger[batchOwner].type_eeuIds[eeuTypeId].push(newId);
@@ -74,14 +71,13 @@ contract EeuMintable is Owned, AcLedger {
         _eeuKgMinted += uint256(qtyKG);
     }
 
-    
     /**
      * @dev Returns the global no. of EEUs minted
      */
     function getEeuMintedCount() external view returns (uint256 count) {
         return _eeuCurMaxId; // 1-based
     }
-    
+
     /**
      * @dev Returns the global no. of KGs carbon minted in EEUs
      */

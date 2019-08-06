@@ -7,13 +7,14 @@ import "./Owned.sol";
   * Manages EEU types used by AcMaster
   */
 contract EeuTypes is Owned {
+    event AddedEeuType(uint256 id, string name);
 
     // *** EEU TYPES
-    mapping(uint256 => string) _eeuTypeIds; // typeId -> typeName
+    mapping(uint256 => string) _eeuTypeNames; // typeId -> typeName
     uint256 _count_eeuTypeIds;
     struct EeuTypeReturn {
-        uint256 typeId;
-        string  typeName;
+        uint256 id;
+        string  name;
     }
     struct GetEeuTypesReturn {
         EeuTypeReturn[] eeuTypes;
@@ -21,8 +22,8 @@ contract EeuTypes is Owned {
 
     constructor() public {
         // default EEU types
-        _eeuTypeIds[0] = 'UNFCCC';
-        _eeuTypeIds[1] = 'VCS';
+        _eeuTypeNames[0] = 'UNFCCC';
+        _eeuTypeNames[1] = 'VCS';
         _count_eeuTypeIds = 2;
     }
 
@@ -34,11 +35,13 @@ contract EeuTypes is Owned {
         require(msg.sender == owner, "Restricted method");
 
         for (uint256 eeuTypeId = 0; eeuTypeId < _count_eeuTypeIds; eeuTypeId++) {
-            require(keccak256(abi.encodePacked(_eeuTypeIds[eeuTypeId])) != keccak256(abi.encodePacked(name)),
+            require(keccak256(abi.encodePacked(_eeuTypeNames[eeuTypeId])) != keccak256(abi.encodePacked(name)),
                     "EEU type name already exists");
         }
 
-        _eeuTypeIds[_count_eeuTypeIds] = name;
+        _eeuTypeNames[_count_eeuTypeIds] = name;
+        emit AddedEeuType(_count_eeuTypeIds, name);
+
         _count_eeuTypeIds++;
     }
 
@@ -51,8 +54,8 @@ contract EeuTypes is Owned {
 
         for (uint256 eeuTypeId = 0; eeuTypeId < _count_eeuTypeIds; eeuTypeId++) {
             eeuTypes[eeuTypeId] = EeuTypeReturn({
-                typeId: eeuTypeId,
-              typeName: _eeuTypeIds[eeuTypeId]
+                id: eeuTypeId,
+              name: _eeuTypeNames[eeuTypeId]
             });
         }
 

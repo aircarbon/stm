@@ -57,8 +57,10 @@ contract AcLedger is Owned, EeuTypes, CcyTypes {
             uint256 eeuKG;
         }
         struct LedgerCcyReturn {
-            uint256 ccyTypeId;
-            int256  ccyBalance;
+            uint256 typeId;
+            string  name;
+            string  unit;
+            int256  balance;
         }
         struct LedgerReturn {
             bool              exists;
@@ -103,7 +105,7 @@ contract AcLedger is Owned, EeuTypes, CcyTypes {
                     eeus[flatEeuNdx] = LedgerEeuReturn({
                           eeuId: eeuId,
                       eeuTypeId: eeuTypeId,
-                    eeuTypeName: _eeuTypeIds[eeuTypeId],
+                    eeuTypeName: _eeuTypeNames[eeuTypeId],
                         batchId: _eeus_batchId[eeuId],
                           eeuKG: _eeus_KG[eeuId]
                     });
@@ -115,8 +117,10 @@ contract AcLedger is Owned, EeuTypes, CcyTypes {
             ccys = new LedgerCcyReturn[](_count_ccyTypes);
             for (uint256 ccyTypeId = 0; ccyTypeId < _count_ccyTypes; ccyTypeId++) {
                 ccys[ccyTypeId] = LedgerCcyReturn({
-                    ccyTypeId: ccyTypeId,
-                   ccyBalance: _ledger[account].type_sumCcy[ccyTypeId]
+                       typeId: ccyTypeId,
+                         name: _ccyTypes[ccyTypeId].name,
+                         unit: _ccyTypes[ccyTypeId].unit,
+                      balance: _ledger[account].type_sumCcy[ccyTypeId]
                 });
             }
         }

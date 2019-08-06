@@ -7,6 +7,7 @@ import "./Owned.sol";
   * Manages currency types used by AcMaster
   */
 contract CcyTypes is Owned {
+    event AddedCcyType(uint256 id, string name, string unit);
 
     // *** CCY TYPES
     struct Ccy {
@@ -44,17 +45,19 @@ contract CcyTypes is Owned {
     function addCcyType(string memory name, string memory unit) public {
         require(msg.sender == owner, "Restricted method");
 
-        // TODO: adding ccy type + tests ...
-
         for (uint256 ccyTypeId = 0; ccyTypeId < _count_ccyTypes; ccyTypeId++) {
-            // todo ...
-            // require(keccak256(abi.encodePacked(_ccyTypes[ccyTypeId])) != keccak256(abi.encodePacked(typeName)),
-            //         "EEU type name already exists");
+            require(keccak256(abi.encodePacked(_ccyTypes[ccyTypeId].name)) != keccak256(abi.encodePacked(name)),
+                    "Currency type name already exists");
         }
 
-        // todo ...
-        //_eeuTypeIds[_count_eeuTypeIds] = typeName;
-        //_count_eeuTypeIds++;
+        _ccyTypes[_count_ccyTypes] = Ccy({
+              id: _count_ccyTypes,
+            name: name,
+            unit: unit
+        });
+        emit AddedCcyType(_count_ccyTypes, name, unit);
+        
+        _count_ccyTypes++;
     }
 
     /**

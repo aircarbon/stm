@@ -12,25 +12,31 @@ contract('AcMaster', accounts => {
         accountNdx++;
     });
 
-    it('extending - should have correct default values', async () => {
+    it('eeu types - should have correct default values', async () => {
         const types = (await acm.getEeuTypes()).eeuTypes;
         assert(types.length == countDefaultEeuTypes, 'unexpected default eeu type count');
 
-        assert(types[0].typeName == 'UNFCCC', 'unexpected default eeu type name 0');
-        assert(types[0].typeId == 0, 'unexpected default eeu type id 0');
+        assert(types[0].name == 'UNFCCC', 'unexpected default eeu type name 0');
+        assert(types[0].id == 0, 'unexpected default eeu type id 0');
 
-        assert(types[1].typeName == 'VCS', 'unexpected default eeu type name 1');
-        assert(types[1].typeId == 1, 'unexpected default eeu type id 1');
+        assert(types[1].name == 'VCS', 'unexpected default eeu type name 1');
+        assert(types[1].id == 1, 'unexpected default eeu type id 1');
     });
 
-    it('extending - should be able to use newly added EEU types', async () => {
+    it('eeu types - should be able to use newly added EEU types', async () => {
         // add new EEU type
-        await acm.addEeuType('NEW_TYPE_ID_2');
+        const addEeuTx = await acm.addEeuType('NEW_TYPE_NAME_2');
         const types = (await acm.getEeuTypes()).eeuTypes;
-        assert(types.filter(p => p.typeName == 'NEW_TYPE_ID_2')[0].typeId == countDefaultEeuTypes, 'unexpected/missing new eeu type (2)');
+        assert(types.filter(p => p.name == 'NEW_TYPE_NAME_2')[0].id == countDefaultEeuTypes, 'unexpected/missing new eeu type (2)');
+
+        truffleAssert.eventEmitted(addEeuTx, 'AddedEeuType', ev => { 
+            return ev.id == countDefaultEeuTypes
+                && ev.name == 'NEW_TYPE_NAME_2'
+                ;
+        });
 
         // get new type id
-        const newTypeId = types.filter(p => p.typeName == 'NEW_TYPE_ID_2')[0].typeId;
+        const newTypeId = types.filter(p => p.name == 'NEW_TYPE_NAME_2')[0].id;
         
         // mint new EEU type: 2x 2 vEEUs
         for (var i=0 ; i < 2 ; i++) {
@@ -50,21 +56,17 @@ contract('AcMaster', accounts => {
         assert(ledgerEntryAfter.eeus.filter(p => p.eeuTypeId == newTypeId).length == 4, 'unexpected new eeu type in ledger');
     });
 
-    it('extending - should not allow non-owner to add an EEU type', async () => {
+    it('eeu types - should not allow non-owner to add an EEU type', async () => {
         try {
-            await acm.addEeuType('NEW_TYPE_ID_3', { from: accounts[1], });
-        } catch (ex) {
-            return;
-        }
+            await acm.addEeuType('NEW_TYPE_NAME_3', { from: accounts[1], });
+        } catch (ex) { return; }
         assert.fail('expected restriction exception');
     });
 
-    it('extending - should not allow adding an existing EEU type name', async () => {
+    it('eeu types - should not allow adding an existing EEU type name', async () => {
         try {
             await acm.addEeuType('UNFCCC');
-        } catch (ex) {
-            return;
-        }
+        } catch (ex) { return; }
         assert.fail('expected restriction exception');
     });
 });

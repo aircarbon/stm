@@ -5,9 +5,9 @@ import "./Owned.sol";
 import "./AcLedger.sol";
 
 contract EeuBurnable is Owned, AcLedger {
-    // Events -- TODO: encode full data in events
-    event BurnedFullEeu(uint256 id);
-    event BurnedPartialEeu(uint256 id);
+    // todo: test new fields
+    event BurnedFullEeu(uint256 id, uint256 eeuTypeId, address ledgerOwner, uint256 burnedKG);
+    event BurnedPartialEeu(uint256 id, uint256 eeuTypeId, address ledgerOwner, uint256 burnedKG);
 
     /**
      * burns carbons by resizing EEUs, and/or removing EEUs from the _ledger.
@@ -17,11 +17,10 @@ contract EeuBurnable is Owned, AcLedger {
      * @param eeuTypeId EEU type
      * @param qtyKG tonnage to burn
      */
-    function burnEeus(address ledgerOwner, /*EeuType eeuType*/uint256 eeuTypeId, int256 qtyKG) public {
+    function burnEeus(address ledgerOwner, uint256 eeuTypeId, int256 qtyKG) public {
         require(msg.sender == owner, "Restricted method");
         require(_ledger[ledgerOwner].exists == true, "Invalid _ledger owner");
         require(qtyKG >= 1000, "Minimum one metric ton of carbon required");
-        //require(eeuType != EeuType.dummy_end, "Invalid EEU type");
         require(eeuTypeId >= 0 && eeuTypeId < _count_eeuTypeIds, "Invalid EEU type");
 
         // check _ledger owner has sufficient carbon tonnage of supplied type
@@ -31,7 +30,7 @@ contract EeuBurnable is Owned, AcLedger {
         uint256 ndx = 0;
         uint256 remainingToBurn = uint256(qtyKG);
         while (remainingToBurn > 0) {
-            uint256[] storage type_eeuIds = _ledger[ledgerOwner].type_eeuIds[eeuTypeId]; // ??? proper ref. to storage
+            uint256[] storage type_eeuIds = _ledger[ledgerOwner].type_eeuIds[eeuTypeId];
             uint256 eeuId = type_eeuIds[ndx];
             uint256 eeuKg = _eeus_KG[eeuId];
             uint256 batchId = _eeus_batchId[eeuId];
@@ -50,7 +49,7 @@ contract EeuBurnable is Owned, AcLedger {
 
                 remainingToBurn -= eeuKg;
 
-                emit BurnedFullEeu(eeuId);
+                emit BurnedFullEeu(eeuId, eeuTypeId, ledgerOwner, eeuKg);
             } else {
                 // resize EEU
                 _eeus_KG[eeuId] -= remainingToBurn;
@@ -61,9 +60,8 @@ contract EeuBurnable is Owned, AcLedger {
                 // burn from batch
                 _eeuBatches[batchId].burnedKG += remainingToBurn;
 
+                emit BurnedPartialEeu(eeuId, eeuTypeId, ledgerOwner, remainingToBurn);
                 remainingToBurn = 0;
-
-                emit BurnedPartialEeu(eeuId);
             }
         }
         _eeuKgBurned += uint256(qtyKG);

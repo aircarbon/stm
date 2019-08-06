@@ -67,7 +67,7 @@ module.exports = {
             provider: () => new HDWalletProvider(mnemonic, 'https://node0.scoop.tech:9545', 0, 100),
             network_id: '*',
             gas: 4000000,
-            gasPrice: web3.utils.toWei('150', 'gwei'),
+            gasPrice: web3.utils.toWei('20', 'gwei'),
         },
 
         // not using ropsten infura -- much slower than rinkeby infura, and network id also clashes with ropsten scoop

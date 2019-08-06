@@ -75,54 +75,42 @@ contract('AcMaster', accounts => {
     it('minting - should not allow non-owner to mint vEEU batches', async () => {
         try {
             await acm.mintEeuBatch(CONST.eeuType.UNFCCC, CONST.tonCarbon, 1, accounts[accountNdx], { from: accounts[1], });
-        } catch (ex) {
-            return;
-        }
+        } catch (ex) { return; }
         assert.fail('expected restriction exception');
     });
 
     it('minting - should not allow non-existent vEEU-type to be minted', async () => {
         try {
             await acm.mintEeuBatch(999, CONST.tonCarbon, 1, accounts[accountNdx], { from: accounts[0] });
-        } catch (ex) {
-            return;
-        }
+        } catch (ex) { return; }
         assert.fail('expected restriction exception');
     });
 
     it('minting - should not allow non-integer KG carbon in an vEEU', async () => {
         try {
             await mintBatch({ eeuType: CONST.eeuType.UNFCCC, qtyKG: CONST.tonCarbon, qtyEeus: 3, receiver: accounts[accountNdx], }, { from: accounts[0] } );
-        } catch (ex) {
-            return;
-        }
+        } catch (ex) { return; }
         assert.fail('expected restriction exception');
     });
 
     it('minting - should not allow too small a tonnage', async () => {
         try {
             await mintBatch( { eeuType: CONST.eeuType.UNFCCC, qtyKG: 999, qtyEeus: 1, receiver: accounts[accountNdx] }, { from: accounts[0] } );
-        } catch (ex) {
-            return;
-        }
+        } catch (ex) { return; }
         assert.fail('expected restriction exception');
     });
 
     it('minting - should not allow invalid tonnage', async () => {
         try {
             await mintBatch( { eeuType: CONST.eeuType.UNFCCC, qtyKG: -1, qtyEeus: 1, receiver: accounts[accountNdx] }, { from: accounts[0] } );
-        } catch (ex) {
-            return;
-        }
+        } catch (ex) { return; }
         assert.fail('expected restriction exception');
     });
 
     it('minting - should not allow invalid vEEU quantities (1)', async () => {
         try {
             await mintBatch({ eeuType: CONST.eeuType.UNFCCC, qtyKG: CONST.tonCarbon, qtyEeus: 0, receiver: accounts[accountNdx], }, { from: accounts[0] });
-        } catch (ex) {
-            return;
-        }
+        } catch (ex) { return; }
         assert.fail('expected restriction exception');
     });
 
@@ -151,8 +139,13 @@ contract('AcMaster', accounts => {
 
         // validate batch minted event
         truffleAssert.eventEmitted(mintTx, 'MintedEeuBatch', ev => {
-            batchId = ev.id;
-            return ev.id == maxBatchIdAfter;
+            batchId = Number(ev.id);
+            return ev.id == maxBatchIdAfter
+                && ev.eeuTypeId == eeuType
+                && ev.batchOwner == receiver
+                && ev.qtyKG == qtyKG
+                && ev.qtyEeus == qtyEeus
+                ;
         });
         const batch = await acm.getEeuBatch(batchId);
         assert(batch.mintedKG == qtyKG, 'invalid batch minted kg');
@@ -163,7 +156,12 @@ contract('AcMaster', accounts => {
         for (var eeuCount = 1; eeuCount < 1 + qtyEeus; eeuCount++) {
             truffleAssert.eventEmitted(mintTx, 'MintedEeu', ev => {
                 //console.log(`event: MintedEeu ev.id=${ev.id} curMaxEeuId=${curMaxEeuId}`);
-                return ev.id > curMaxEeuId - qtyEeus && ev.id <= curMaxEeuId;
+                return ev.id > curMaxEeuId - qtyEeus && ev.id <= curMaxEeuId
+                    && ev.batchId == batchId
+                    && ev.eeuTypeId == eeuType
+                    && ev.ledgerOwner == receiver
+                    && ev.mintedKG == qtyKG / qtyEeus
+                    ;
             });
         }
 
@@ -188,10 +186,7 @@ contract('AcMaster', accounts => {
             assert(eeu.batchId == batchId, 'unexpected vEEU batch after minting');
             assert(eeu.mintedTimestamp != 0, 'missing mint timestamp on vEEU after minting');
             assert(eeu.mintedKG == qtyKG / qtyEeus, 'unexpected vEEU minted KG value after minting');
-            assert(
-                eeu.KG == qtyKG / qtyEeus,
-                'unexpected vEEU remaining (unburned) KG value after minting'
-            );
+            assert(eeu.KG == qtyKG / qtyEeus, 'unexpected vEEU remaining (unburned) KG value after minting');
             //assert(eeu.batchSequenceNo == ndx - ledgerEntryBefore.eeus.length, 'unexpected vEEU sequence no. after minting');
         }
 
