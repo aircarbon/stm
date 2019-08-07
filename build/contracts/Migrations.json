@@ -1377,12 +1377,12 @@
     "888": {
       "events": {},
       "links": {},
-      "address": "0x9B32Cc89f02c80F4aCc9dcF447efeC68bC5E639b",
-      "transactionHash": "0xa5515a9ba4d75a0e11b4a36adfb0dfba12fd5b3d253b2651d78cda97279daf18"
+      "address": "0x329437882FE5230845BD60AE830994fcC5b4460F",
+      "transactionHash": "0x3fbb5c70c73943dcbc1f41fd93c9a0f7686c9c8df24efc3a3c60e5b08bcaefcc"
     }
   },
   "schemaVersion": "3.0.11",
-  "updatedAt": "2019-08-07T04:41:01.015Z",
+  "updatedAt": "2019-08-07T04:51:38.255Z",
   "devdoc": {
     "methods": {}
   },
