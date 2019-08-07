@@ -1220,12 +1220,12 @@
     "888": {
       "events": {},
       "links": {},
-      "address": "0xB9F5991a3c98eF60BB8325487E4823fd15181fC4",
-      "transactionHash": "0x828c5df9b3e54f7eedd992dcad92dbfa5e94cc9a03f080fd89163b9e99346be2"
+      "address": "0xc463c77F5D972252eB2b21498f52840830199eaD",
+      "transactionHash": "0x54897278b49879320df54685b1dc33de571f0819b6c4c7bf7fa474efcb45a58b"
     }
   },
   "schemaVersion": "3.0.11",
-  "updatedAt": "2019-08-07T04:51:38.252Z",
+  "updatedAt": "2019-08-07T04:53:33.766Z",
   "devdoc": {
     "methods": {
       "addCcyType(string,string)": {
