@@ -66,7 +66,7 @@ module.exports = {
         ropsten_scoop: {
             provider: () => new HDWalletProvider(mnemonic, 'https://node0.scoop.tech:9545', 0, 100),
             network_id: '*',
-            gas: 4000000,
+            gas: 6000000,
             gasPrice: web3.utils.toWei('20', 'gwei'),
         },
 

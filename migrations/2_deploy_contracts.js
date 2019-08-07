@@ -11,6 +11,8 @@ module.exports = function (deployer) {
 
         //console.dir(acm.abi);
 
+        //console.dir(deployer);
+
         global.configContext = 'erc20';
         await db.erc20.SaveDeployment({
             contractName: 'AcMaster',
