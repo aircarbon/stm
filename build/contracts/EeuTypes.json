@@ -4148,7 +4148,7 @@
   },
   "networks": {},
   "schemaVersion": "3.0.11",
-  "updatedAt": "2019-08-07T04:58:40.367Z",
+  "updatedAt": "2019-08-07T05:01:01.525Z",
   "devdoc": {
     "methods": {
       "addEeuType(string)": {

@@ -41,7 +41,8 @@
 ## WIP - TODOs
 
     ### contract - core fn's
-    * fund (2 more tests) + withdraw
+    * fund - 2 more tests: mint then fund + add ccyType then fund
+    *  + withdraw
     * trade/transfer (Ccy + EEUs - same interface?), inc. EEU split & merge
     * IPFS pointers & URL pointers for batch minting
 

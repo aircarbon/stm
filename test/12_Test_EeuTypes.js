@@ -10,6 +10,7 @@ contract('AcMaster', accounts => {
     beforeEach(async () => {
         acm = await ac.deployed();
         accountNdx++;
+        console.log('beforeEach: getEeuBatchCount', (await acm.getEeuBatchCount.call()));
     });
 
     it('eeu types - should have correct default values', async () => {
@@ -37,18 +38,30 @@ contract('AcMaster', accounts => {
 
         // get new type id
         const newTypeId = types.filter(p => p.name == 'NEW_TYPE_NAME_2')[0].id;
+
+        // batch count before
+        const batchCountBefore = (await acm.getEeuBatchCount.call()).toNumber(); 
+        console.log(`batchCountBefore`, batchCountBefore);
         
-        // mint new EEU type: 2x 2 vEEUs
+        // mint new EEU type: 2 batches of 2 vEEUs
         for (var i=0 ; i < 2 ; i++) {
             await acm.mintEeuBatch(newTypeId, CONST.ktCarbon * 100, 2, accounts[accountNdx], { from: accounts[0] });
         }
-        assert((await acm.getEeuBatchCount.call()).toNumber() == 2, 'unexpected max batch id after minting (1)');
+        const batchCountAfter_Mint1 = (await acm.getEeuBatchCount.call()).toNumber(); 
+        console.log(`batchCountAfter`, batchCountAfter_Mint1);
+        for (var i=1 ; i <= batchCountAfter_Mint1 ; i++) {
+            const batch = (await acm.getEeuBatch.call(i));
+            console.log(`dumping batch ${i} of ${batchCountAfter_Mint1}...`);
+            console.dir(batch);
+        }
+        assert(batchCountAfter_Mint1 == batchCountBefore + 2, `unexpected max batch id ${batchCountAfter_Mint1} after minting (1)`);
 
-        // mint default EEU type: 2x 2 vEEUs
+        // mint default EEU type: 2 batches of 2 vEEUs
         for (var i=0 ; i < 2 ; i++) {
             await acm.mintEeuBatch(CONST.eeuType.UNFCCC, CONST.ktCarbon * 100, 2, accounts[accountNdx], { from: accounts[0] });
         }
-        assert((await acm.getEeuBatchCount.call()).toNumber() == 4, 'unexpected max batch id after minting (2)');
+        const batchCountAfter_Mint2 = (await acm.getEeuBatchCount.call()).toNumber();
+        assert(batchCountAfter_Mint2 == batchCountBefore + 4, `unexpected max batch id ${batchCountAfter_Mint2} after minting (2)`);
 
         // validate ledger: 8 vEEUs, 4 of each type in 2 batches, including 4 of new type
         const ledgerEntryAfter = await acm.getLedgerEntry(accounts[accountNdx]);

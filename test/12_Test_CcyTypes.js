@@ -50,9 +50,6 @@ contract('AcMaster', accounts => {
         assert(ledgerEntryAfter.ccys.some(p => p.typeId == newTypeId), 'missing new currency type id from ledger after minting');
         assert(ledgerEntryAfter.ccys.some(p => p.name == 'TEST_COIN'), 'missing/invalid new currency name from ledger after minting');
         assert(ledgerEntryAfter.ccys.some(p => p.unit == 'TEST_UNIT'), 'missing/invalid new currency unit from ledger after minting');
-
-        // todo: fund/withdraw from ledger with newly added ccy ...
-        //...
     });
 
     it('ccy types - should not allow non-owner to add a currency type', async () => {
