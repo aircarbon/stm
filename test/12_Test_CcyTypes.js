@@ -26,16 +26,16 @@ contract('AcMaster', accounts => {
         assert(types[1].id == 1, 'unexpected default ccy type id 1');
     });
 
-    it('ccy types - should be able to use newly added EEU types', async () => {
+    it('ccy types - should make visible newly added currency types in the ledger', async () => {
         // mint 1 vEEU 
-        await acm.mintEeuBatch(CONST.eeuType.UNFCCC, CONST.ktCarbon * 100, 1, accounts[accountNdx], { from: accounts[0] });
+        //await acm.mintEeuBatch(CONST.eeuType.UNFCCC, CONST.ktCarbon * 100, 1, accounts[accountNdx], { from: accounts[0] });
 
         // add new ccy type
         const addCcyTx = await acm.addCcyType('TEST_COIN', 'TEST_UNIT');
         const types = (await acm.getCcyTypes()).ccyTypes;
+        const newTypeId = types.filter(p => p.name == 'TEST_COIN')[0].id;
         assert(types.filter(p => p.name == 'TEST_COIN')[0].id == countDefaultCcyTypes, 'unexpected/missing new currency type id');
         assert(types.filter(p => p.name == 'TEST_COIN')[0].unit == 'TEST_UNIT', 'unexpected/missing new currency type unit');
-        
         truffleAssert.eventEmitted(addCcyTx, 'AddedCcyType', ev => { 
             return ev.id == countDefaultCcyTypes
                 && ev.name == 'TEST_COIN'
@@ -43,14 +43,23 @@ contract('AcMaster', accounts => {
                 ;
         });
 
-        // get new type id
-        const newTypeId = types.filter(p => p.name == 'TEST_COIN')[0].id;
-
         // validate ledger entry from minting has the new type
         const ledgerEntryAfter = await acm.getLedgerEntry(accounts[accountNdx]);
         assert(ledgerEntryAfter.ccys.some(p => p.typeId == newTypeId), 'missing new currency type id from ledger after minting');
         assert(ledgerEntryAfter.ccys.some(p => p.name == 'TEST_COIN'), 'missing/invalid new currency name from ledger after minting');
         assert(ledgerEntryAfter.ccys.some(p => p.unit == 'TEST_UNIT'), 'missing/invalid new currency unit from ledger after minting');
+    });
+
+    it('ccy types - should allow funding of newly added currency types', async () => {
+        // add new ccy type
+        await acm.addCcyType('TEST_COIN2', 'TEST_UNIT');
+        const types = (await acm.getCcyTypes()).ccyTypes;
+        const newTypeId = types.filter(p => p.name == 'TEST_COIN2')[0].id;
+
+        // fund new ccy type & validate
+        await acm.fund(newTypeId, 424242, accounts[accountNdx], { from: accounts[0] });
+        ledgerEntryAfter = await acm.getLedgerEntry(accounts[accountNdx]);
+        assert(ledgerEntryAfter.ccys.find(p => p.typeId == newTypeId).balance == 424242, 'unexpected ledger balance of new currency type after funding');
     });
 
     it('ccy types - should not allow non-owner to add a currency type', async () => {
