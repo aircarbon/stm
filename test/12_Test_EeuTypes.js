@@ -63,6 +63,10 @@ contract('AcMaster', accounts => {
         const batchCountAfter_Mint2 = (await acm.getEeuBatchCount.call()).toNumber();
         assert(batchCountAfter_Mint2 == batchCountBefore + 4, `unexpected max batch id ${batchCountAfter_Mint2} after minting (2)`);
 
+        //
+        // ### same problem -- somehow the contract data is NOT getting nuked (carries over from ccy tests...)
+        //
+        
         // validate ledger: 8 vEEUs, 4 of each type in 2 batches, including 4 of new type
         const ledgerEntryAfter = await acm.getLedgerEntry(accounts[accountNdx]);
         assert(ledgerEntryAfter.eeus.length == 8, 'unexpected eeu count in ledger');
