@@ -3,13 +3,14 @@ const truffleAssert = require('truffle-assertions');
 const CONST = require('../const.js');
 
 contract('AcMaster', accounts => {
-    var acm, accountNdx = 1;
+    var acm, accountNdx = 40;
 
     const countDefaultCcyTypes = 2;
 
     beforeEach(async () => {
         acm = await ac.deployed();
         accountNdx++;
+        console.log(`beforeEach: ${acm.address} getEeuBatchCount`, (await acm.getEeuBatchCount.call()));
     });
 
     it('ccy types - should have correct default values', async () => {

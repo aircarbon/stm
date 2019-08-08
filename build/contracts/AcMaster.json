@@ -1217,15 +1217,15 @@
     "version": "0.5.8+commit.23d335f2.Emscripten.clang"
   },
   "networks": {
-    "888": {
+    "3": {
       "events": {},
       "links": {},
-      "address": "0x0737b74C4a499B7CC0B667ee616B715629Ed4a15",
-      "transactionHash": "0x2557bde827b92d0db918ffe49298817869187350adf299cf2d148145e6102483"
+      "address": "0x26eBA43E7dD694a31fcC95Faa2273dAEf73e6979",
+      "transactionHash": "0x6f6a0ac6969f9c42c0b0e30b8b54f6b70d279286d3a2825c3139979ba56e7250"
     }
   },
   "schemaVersion": "3.0.11",
-  "updatedAt": "2019-08-07T05:01:02.831Z",
+  "updatedAt": "2019-08-08T05:38:37.035Z",
   "devdoc": {
     "methods": {
       "addCcyType(string,string)": {

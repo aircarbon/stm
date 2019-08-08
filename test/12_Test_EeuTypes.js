@@ -3,14 +3,14 @@ const truffleAssert = require('truffle-assertions');
 const CONST = require('../const.js');
 
 contract('AcMaster', accounts => {
-    var acm, accountNdx = 1;
+    var acm, accountNdx = 50;
 
     const countDefaultEeuTypes = 2;
 
     beforeEach(async () => {
         acm = await ac.deployed();
         accountNdx++;
-        console.log('beforeEach: getEeuBatchCount', (await acm.getEeuBatchCount.call()));
+        console.log(`beforeEach: ${acm.address} getEeuBatchCount`, (await acm.getEeuBatchCount.call()));
     });
 
     it('eeu types - should have correct default values', async () => {
@@ -41,19 +41,19 @@ contract('AcMaster', accounts => {
 
         // batch count before
         const batchCountBefore = (await acm.getEeuBatchCount.call()).toNumber(); 
-        console.log(`batchCountBefore`, batchCountBefore);
+        //console.log(`batchCountBefore`, batchCountBefore);
         
         // mint new EEU type: 2 batches of 2 vEEUs
         for (var i=0 ; i < 2 ; i++) {
             await acm.mintEeuBatch(newTypeId, CONST.ktCarbon * 100, 2, accounts[accountNdx], { from: accounts[0] });
         }
         const batchCountAfter_Mint1 = (await acm.getEeuBatchCount.call()).toNumber(); 
-        console.log(`batchCountAfter`, batchCountAfter_Mint1);
-        for (var i=1 ; i <= batchCountAfter_Mint1 ; i++) {
-            const batch = (await acm.getEeuBatch.call(i));
-            console.log(`dumping batch ${i} of ${batchCountAfter_Mint1}...`);
-            console.dir(batch);
-        }
+        //console.log(`batchCountAfter`, batchCountAfter_Mint1);
+        // for (var i=1 ; i <= batchCountAfter_Mint1 ; i++) {
+        //     const batch = (await acm.getEeuBatch.call(i));
+        //     console.log(`dumping batch ${i} of ${batchCountAfter_Mint1}...`);
+        //     console.dir(batch);
+        // }
         assert(batchCountAfter_Mint1 == batchCountBefore + 2, `unexpected max batch id ${batchCountAfter_Mint1} after minting (1)`);
 
         // mint default EEU type: 2 batches of 2 vEEUs
@@ -63,10 +63,6 @@ contract('AcMaster', accounts => {
         const batchCountAfter_Mint2 = (await acm.getEeuBatchCount.call()).toNumber();
         assert(batchCountAfter_Mint2 == batchCountBefore + 4, `unexpected max batch id ${batchCountAfter_Mint2} after minting (2)`);
 
-        //
-        // ### same problem -- somehow the contract data is NOT getting nuked (carries over from ccy tests...)
-        //
-        
         // validate ledger: 8 vEEUs, 4 of each type in 2 batches, including 4 of new type
         const ledgerEntryAfter = await acm.getLedgerEntry(accounts[accountNdx]);
         assert(ledgerEntryAfter.eeus.length == 8, 'unexpected eeu count in ledger');

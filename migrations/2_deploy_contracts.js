@@ -7,6 +7,8 @@ module.exports = function (deployer) {
 
     process.env.NETWORK = deployer.network; // e.g. "ropsten_scoop"
 
+    AcMaster.synchronization_timeout = 42;  // seconds
+
     deployer.deploy(AcMaster).then(async acm => {
 
         //console.dir(acm.abi);

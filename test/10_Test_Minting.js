@@ -13,6 +13,7 @@ contract('AcMaster', accounts => {
         //const eeuCount = await acm.getEeuMintedCount.call();
         //console.log('eeuCount', eeuCount);
         accountNdx++;
+        console.log(`beforeEach: ${acm.address} getEeuBatchCount`, (await acm.getEeuBatchCount.call()));
     });
 
     it('minting - should allow owner to mint a single-vEEU batch', async () => {

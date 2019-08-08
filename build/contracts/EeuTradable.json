@@ -645,7 +645,7 @@
   },
   "networks": {},
   "schemaVersion": "3.0.11",
-  "updatedAt": "2019-08-07T05:01:01.520Z",
+  "updatedAt": "2019-08-08T05:34:54.953Z",
   "devdoc": {
     "methods": {
       "addCcyType(string,string)": {

@@ -4,11 +4,12 @@ const truffleAssert = require('truffle-assertions');
 const CONST = require('../const.js');
 
 contract('AcMaster', accounts => {
-    var acm, accountNdx = 1;
+    var acm, accountNdx = 30;
 
     beforeEach(async () => {
         acm = await ac.deployed();
         accountNdx++;
+        console.log(`beforeEach: ${acm.address} getEeuBatchCount`, (await acm.getEeuBatchCount.call()));
     });
     
     // todo: test mint first then fund ...

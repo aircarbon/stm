@@ -3,8 +3,7 @@ const truffleAssert = require('truffle-assertions');
 const CONST = require('../const.js');
 
 contract('AcMaster', accounts => {
-    var acm,
-        accountNdx = 20;
+    var acm, accountNdx = 20;
 
     beforeEach(async () => {
         acm = await ac.deployed();
@@ -14,6 +13,7 @@ contract('AcMaster', accounts => {
         //const eeuCount = await acm.getEeuMintedCount.call();
         //console.log('eeuCount', eeuCount);
         accountNdx++;
+        console.log(`beforeEach: ${acm.address} getEeuBatchCount`, (await acm.getEeuBatchCount.call()));
     });
 
     // *** why burn 0.5 eeu costs more gas than burn 1.5 ?
