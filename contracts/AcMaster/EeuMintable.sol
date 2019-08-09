@@ -63,7 +63,6 @@ contract EeuMintable is Owned, AcLedger {
             // not currently used (was used when burning by eeuId)
             //_ownsEeuId[keccak256(abi.encodePacked(batchOwner, newId))] = true;
         }
-        //_ledger[batchOwner].eeu_sumKG += uint(qtyKG);
         _ledger[batchOwner].eeuType_sumKG[eeuTypeId] += uint256(qtyKG);
 
         _eeuCurMaxId += uint256(qtyEeus);
@@ -71,16 +70,18 @@ contract EeuMintable is Owned, AcLedger {
     }
 
     /**
-     * @dev Returns the global no. of EEUs minted
+     * @dev Returns the total global number of EEUs minted
      */
     function getEeuMintedCount() external view returns (uint256) {
+        require(msg.sender == owner, "Restricted method");
         return _eeuCurMaxId; // 1-based
     }
 
     /**
-     * @dev Returns the global no. of KGs carbon minted in EEUs
+     * @dev Returns the total global tonnage of carbon minted
      */
     function getKgCarbonMinted() external view returns (uint256) {
+        require(msg.sender == owner, "Restricted method");
         return _eeu_totalMintedKG;
     }
 }

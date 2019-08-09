@@ -41,7 +41,8 @@
 ## WIP - TODOs
 
     ### contract - core fn's
-    * withdraw
+    * TOOD: test transfer fn() ...
+    * TODO: merge/combine optimize post-transfer ...
     * trade/transfer (Ccy + EEUs - same interface?), inc. EEU split & merge
     * IPFS pointers & URL pointers for batch minting
 

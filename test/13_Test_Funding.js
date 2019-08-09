@@ -36,7 +36,7 @@ contract('AcMaster', accounts => {
         }
     });
 
-    it('funding - should have reasonable gas cost for funding', async () => {
+    /*it('funding - should have reasonable gas cost for funding', async () => {
         const fundTx = await acm.fund(CONST.ccyType.USD, CONST.thousandUsd_cents, accounts[global.accountNdx], { from: accounts[0] });
         console.log(`gasUsed - Funding: ${fundTx.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * fundTx.receipt.gasUsed).toFixed(4)} (USD ${(CONST.gasPriceEth * fundTx.receipt.gasUsed * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
     });
@@ -50,38 +50,6 @@ contract('AcMaster', accounts => {
         assert(Number(ledgerEntryAfter.eeu_sumKG) == Number(CONST.mtCarbon), 'invalid kg sum in ledger entry after minting & funding');
         assert(ledgerEntryAfter.ccys.find(p => p.typeId == CONST.ccyType.USD).balance == CONST.thousandUsd_cents, 'unexpected usd balance in ledger entry after minting & funding');
     });
-
-    async function fundLedger({ ccyTypeId, amount, receiver }) {
-        var ledgerEntryBefore, ledgerEntryAfter;
-
-        ledgerEntryBefore = await acm.getLedgerEntry(receiver);
-        const totalFundedBefore = await acm.getTotalFunded.call(ccyTypeId);
-        
-        // fund
-        const fundTx = await acm.fund(ccyTypeId, amount, receiver, { from: accounts[0] });
-        ledgerEntryAfter = await acm.getLedgerEntry(receiver);
-        truffleAssert.eventEmitted(fundTx, 'CcyFundedLedger', ev => {
-            return ev.ccyTypeId == ccyTypeId
-                && ev.ledgerOwner == receiver
-                && ev.amount.toString() == amount.toString()
-                ;
-        });
-        
-        // validate ledger balance is updated for test ccy
-        assert(ledgerEntryAfter.ccys.find(p => p.typeId == ccyTypeId).balance == 
-               Number(ledgerEntryBefore.ccys.find(p => p.typeId == ccyTypeId).balance) + Number(amount),
-               'unexpected ledger balance after funding for test ccy');
-
-        // validate ledger balance unchanged for other ccy's
-        assert(ledgerEntryAfter.ccys
-               .filter(p => p.typeId != ccyTypeId)
-               .every(p => p.balance == ledgerEntryBefore.ccys.find(p2 => p2.typeId == p.typeId).balance),
-               'unexpected ledger balance after funding for ccy non-test ccy');
-
-        // validate global total funded is updated
-        const totalFundedAfter = await acm.getTotalFunded.call(ccyTypeId);
-        assert(totalFundedAfter - totalFundedBefore == amount, 'unexpected total funded after funding');
-    }
 
     it('funding - should not allow non-owner to fund a ledger entry', async () => {
         try {
@@ -109,6 +77,44 @@ contract('AcMaster', accounts => {
             await acm.fund(CONST.ccyType.USD, -1, accounts[global.accountNdx], { from: accounts[0] });
         } catch (ex) { return; }
         assert.fail('expected restriction exception');
-    });
+    });*/
+    
+    async function fundLedger({ ccyTypeId, amount, receiver }) {
+        var ledgerEntryBefore, ledgerEntryAfter;
+
+        ledgerEntryBefore = await acm.getLedgerEntry(receiver);
+        const totalFundedBefore = await acm.getTotalFunded.call(ccyTypeId);
+        
+        // fund
+        const fundTx = await acm.fund(ccyTypeId, amount, receiver, { from: accounts[0] });
+        ledgerEntryAfter = await acm.getLedgerEntry(receiver);
+        truffleAssert.eventEmitted(fundTx, 'CcyFundedLedger', ev => {
+            return ev.ccyTypeId == ccyTypeId
+                && ev.ledgerOwner == receiver
+                && ev.amount.toString() == amount.toString()
+                ;
+        });
+        
+        // validate ledger balance is updated for test ccy
+        //console.dir(ledgerEntryBefore);
+        //console.dir(ledgerEntryAfter);
+        console.log('before', ledgerEntryBefore.ccys.find(p => p.typeId == ccyTypeId).balance);
+        console.log('after', ledgerEntryAfter.ccys.find(p => p.typeId == ccyTypeId).balance);
+        console.log('amount', amount);
+
+        assert(ledgerEntryAfter.ccys.find(p => p.typeId == ccyTypeId).balance == 
+               Number(ledgerEntryBefore.ccys.find(p => p.typeId == ccyTypeId).balance) + Number(amount),
+               'unexpected ledger balance after funding for test ccy');
+
+        // validate ledger balance unchanged for other ccy's
+        assert(ledgerEntryAfter.ccys
+               .filter(p => p.typeId != ccyTypeId)
+               .every(p => p.balance == ledgerEntryBefore.ccys.find(p2 => p2.typeId == p.typeId).balance),
+               'unexpected ledger balance after funding for ccy non-test ccy');
+
+        // validate global total funded is updated
+        const totalFundedAfter = await acm.getTotalFunded.call(ccyTypeId);
+        assert(totalFundedAfter - totalFundedBefore == amount, 'unexpected total funded after funding');
+    }
 
 });

@@ -24,15 +24,15 @@ contract CcyWithdrawable is Owned, AcLedger {
         _ledger[ledgerOwner].ccyType_balance[ccyTypeId] -= amount;
 
         // update global total withdrawn
-        _ccyType_totalWithdrawn[ccyTypeId] += amount;
+        _ccyType_totalWithdrawn[ccyTypeId] += uint256(amount);
 
         emit CcyWithdrewLedger(ccyTypeId, ledgerOwner, amount);
     }
 
     /**
-     * @dev Returns the total amount funded for the supplied currency
+     * @dev Returns the total global amount withdrawn for the supplied currency
      */
-    function getTotalWithdrawn(uint256 ccyTypeId) external view returns (int256) {
+    function getTotalWithdrawn(uint256 ccyTypeId) external view returns (uint256) {
         require(msg.sender == owner, "Restricted method");
         return _ccyType_totalWithdrawn[ccyTypeId];
     }

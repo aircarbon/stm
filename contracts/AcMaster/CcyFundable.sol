@@ -33,15 +33,15 @@ contract CcyFundable is Owned, AcLedger {
         _ledger[ledgerOwner].ccyType_balance[ccyTypeId] += amount;
 
         // update global total funded
-        _ccyType_totalFunded[ccyTypeId] += amount;
+        _ccyType_totalFunded[ccyTypeId] += uint256(amount);
 
         emit CcyFundedLedger(ccyTypeId, ledgerOwner, amount);
     }
 
     /**
-     * @dev Returns the total amount funded for the supplied currency
+     * @dev Returns the total global amount funded for the supplied currency
      */
-    function getTotalFunded(uint256 ccyTypeId) external view returns (int256) {
+    function getTotalFunded(uint256 ccyTypeId) external view returns (uint256) {
         require(msg.sender == owner, "Restricted method");
         return _ccyType_totalFunded[ccyTypeId];
     }

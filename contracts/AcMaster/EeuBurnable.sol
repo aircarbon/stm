@@ -38,7 +38,7 @@ contract EeuBurnable is Owned, AcLedger {
                 // burn full EEU
                 _eeus_KG[eeuId] = 0;
 
-                // remove from _ledger
+                // remove from ledger
                 eeuType_eeuIds[ndx] = eeuType_eeuIds[eeuType_eeuIds.length - 1];
                 eeuType_eeuIds.length--;
                 _ledger[ledgerOwner].eeuType_sumKG[eeuTypeId] -= eeuKg;
@@ -47,13 +47,12 @@ contract EeuBurnable is Owned, AcLedger {
                 _eeuBatches[batchId].burnedKG += eeuKg;
 
                 remainingToBurn -= eeuKg;
-
                 emit BurnedFullEeu(eeuId, eeuTypeId, ledgerOwner, eeuKg);
             } else {
                 // resize EEU
                 _eeus_KG[eeuId] -= remainingToBurn;
 
-                // retain on _ledger
+                // retain on ledger
                 _ledger[ledgerOwner].eeuType_sumKG[eeuTypeId] -= remainingToBurn;
 
                 // burn from batch
@@ -67,9 +66,10 @@ contract EeuBurnable is Owned, AcLedger {
     }
 
     /**
-     * @dev Returns the global no. of KGs carbon burned in EEUs
+     * @dev Returns the total global tonnage of carbon burned
      */
     function getKgCarbonBurned() external view returns (uint256 count) {
+        require(msg.sender == owner, "Restricted method");
         return _eeu_totalBurnedKG;
     }
 
