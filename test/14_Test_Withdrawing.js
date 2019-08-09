@@ -14,49 +14,51 @@ contract('AcMaster', accounts => {
         console.log(`global.global.accountNdx: ${global.accountNdx} - beforeEach: ${acm.address} - getEeuBatchCount: ${(await acm.getEeuBatchCount.call()).toString()}`);
     });
 
-    // todo: test withdraw too much (no negative)
-    
     it('withdrawing - should allow withdrawing of USD', async () => {
-        await acm.fund(CONST.ccyType.USD, 100, accounts[global.accountNdx], { from: accounts[0] });
-        await withdrawLedger({ ccyTypeId: CONST.ccyType.USD, amount: 50, withdrawer: accounts[global.accountNdx]});
+        await acm.fund(CONST.ccyType.USD, CONST.thousandUsd_cents * 2, accounts[global.accountNdx], { from: accounts[0] });
+        await withdrawLedger({ ccyTypeId: CONST.ccyType.USD, amount: CONST.thousandUsd_cents * 2, withdrawer: accounts[global.accountNdx]});
     });
 
-    /*it('withdrawing - should allow withdrawing of large values of USD', async () => {
-        await fundLedger({ ccyTypeId: CONST.ccyType.USD, amount: CONST.millionUsd_cents.multiply(1000) , receiver: accounts[global.accountNdx]});
+    it('withdrawing - should allow withdrawing of extreme values of USD', async () => {
+        await acm.fund(CONST.ccyType.USD, CONST.millionUsd_cents * 1000 * 1000, accounts[global.accountNdx], { from: accounts[0] });
+        await withdrawLedger({ ccyTypeId: CONST.ccyType.USD, amount: CONST.millionUsd_cents * 1000 * 1000, withdrawer: accounts[global.accountNdx] });
     });
 
     it('withdrawing - should allow withdrawing of ETH', async () => {
-        await fundLedger({ ccyTypeId: CONST.ccyType.ETH, amount: CONST.oneEth_wei, receiver: accounts[global.accountNdx]});
+        await acm.fund(CONST.ccyType.ETH, CONST.oneEth_wei, accounts[global.accountNdx], { from: accounts[0] });
+        await withdrawLedger({ ccyTypeId: CONST.ccyType.ETH, amount: CONST.oneEth_wei, withdrawer: accounts[global.accountNdx] });
     });
 
-    it('withdrawing - should allow withdrawing of large values of ETH', async () => {
-        await fundLedger({ ccyTypeId: CONST.ccyType.ETH, amount: CONST.millionEth_wei, receiver: accounts[global.accountNdx]});
-    });
-
-    it('withdrawing - should allow withdrawing of insane values of ETH', async () => {
-        await fundLedger({ ccyTypeId: CONST.ccyType.ETH, amount: CONST.millionEth_wei.multiply(1000), receiver: accounts[global.accountNdx]});
+    it('withdrawing - should allow withdrawing of extreme values of ETH', async () => {
+        await acm.fund(CONST.ccyType.ETH, CONST.millionEth_wei, accounts[global.accountNdx], { from: accounts[0] });
+        await withdrawLedger({ ccyTypeId: CONST.ccyType.ETH, amount: CONST.millionEth_wei, withdrawer: accounts[global.accountNdx] });
     });
 
     it('withdrawing - should allow repeated withdrawing', async () => {
-        for (var i=0 ; i < 10 ; i++) {
-            await fundLedger({ ccyTypeId: CONST.ccyType.USD, amount: CONST.thousandUsd_cents, receiver: accounts[global.accountNdx]});
+        await acm.fund(CONST.ccyType.USD, 3, accounts[global.accountNdx]);
+        for (var i=0 ; i < 3 ; i++) {
+            await withdrawLedger({ ccyTypeId: CONST.ccyType.USD, amount: 1, withdrawer: accounts[global.accountNdx] });
         }
+        const ledger = await acm.getLedgerEntry(accounts[global.accountNdx]);
+        assert(ledger.ccys.find(p => p.typeId == CONST.ccyType.USD).balance == 0, 'unexpected ledger balance after repeated withdrawing');
     });
 
     it('withdrawing - should have reasonable gas cost for withdrawing', async () => {
-        const fundTx = await acm.fund(CONST.ccyType.USD, CONST.thousandUsd_cents, accounts[global.accountNdx], { from: accounts[0] });
-        console.log(`gasUsed - Funding: ${fundTx.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * fundTx.receipt.gasUsed).toFixed(4)} (USD ${(CONST.gasPriceEth * fundTx.receipt.gasUsed * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
+        await acm.fund(CONST.ccyType.USD, CONST.thousandUsd_cents, accounts[global.accountNdx], { from: accounts[0] });
+        const withdrawTx = await acm.withdraw(CONST.ccyType.USD, CONST.thousandUsd_cents, accounts[global.accountNdx], { from: accounts[0] });
+        console.log(`gasUsed - Withdrawing: ${withdrawTx.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * withdrawTx.receipt.gasUsed).toFixed(4)} (USD ${(CONST.gasPriceEth * withdrawTx.receipt.gasUsed * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
     });
 
-    it('withdrawing - should allow minting and withdrawing on same ledger entry', async () => {
+    it('withdrawing - should allow minting, funding and withdrawing on same ledger entry', async () => {
         await acm.mintEeuBatch(CONST.eeuType.VCS, CONST.mtCarbon, 2, accounts[global.accountNdx], { from: accounts[0] });
         await acm.fund(CONST.ccyType.USD, CONST.thousandUsd_cents, accounts[global.accountNdx], { from: accounts[0] });
+        await withdrawLedger({ ccyTypeId: CONST.ccyType.USD, amount: CONST.thousandUsd_cents / 2, withdrawer: accounts[global.accountNdx] });
         const ledgerEntryAfter = await acm.getLedgerEntry(accounts[global.accountNdx]);
 
-        assert(ledgerEntryAfter.eeus.length == 2, 'unexpected eeu count in ledger entry after minting & funding');
-        assert(Number(ledgerEntryAfter.eeu_sumKG) == Number(CONST.mtCarbon), 'invalid kg sum in ledger entry after minting & funding');
-        assert(ledgerEntryAfter.ccys.find(p => p.typeId == CONST.ccyType.USD).balance == CONST.thousandUsd_cents, 'unexpected usd balance in ledger entry after minting & funding');
-    });*/
+        assert(ledgerEntryAfter.eeus.length == 2, 'unexpected eeu count in ledger entry after minting, funding & withdrawing');
+        assert(Number(ledgerEntryAfter.eeu_sumKG) == Number(CONST.mtCarbon), 'invalid kg sum in ledger entry after minting, funding & withdrawing');
+        assert(ledgerEntryAfter.ccys.find(p => p.typeId == CONST.ccyType.USD).balance == CONST.thousandUsd_cents / 2, 'unexpected usd balance in ledger entry after minting, funding & withdrawing');
+    });
 
     async function withdrawLedger({ ccyTypeId, amount, withdrawer }) {
         var ledgerEntryBefore, ledgerEntryAfter;

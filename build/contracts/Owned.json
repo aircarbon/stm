@@ -8,9 +8,9 @@
       "type": "constructor"
     }
   ],
-  "metadata": "{\"compiler\":{\"version\":\"0.5.8+commit.23d335f2\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"}],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/C/ac/src/ac-monorepo/packages/erc20/contracts/AcMaster/Owned.sol\":\"Owned\"},\"evmVersion\":\"byzantium\",\"libraries\":{},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"/C/ac/src/ac-monorepo/packages/erc20/contracts/AcMaster/Owned.sol\":{\"keccak256\":\"0x4d65acd84896dcf6deadc1d13721fa368cd34ab2dfd11bb8e33a6b300f5c88ea\",\"urls\":[\"bzzr://cfb80214e920857d3c5af01d95d645aa6d22b488740bc1a5be86d9d862bc991c\"]}},\"version\":1}",
-  "bytecode": "0x6080604052348015600f57600080fd5b5060008054600160a060020a03191633179055603580602f6000396000f3fe6080604052600080fdfea165627a7a72305820fc27100cf8b14e6e8d8ccc76839a8c180dddafd87278473830d7fe0f0224fdc40029",
-  "deployedBytecode": "0x6080604052600080fdfea165627a7a72305820fc27100cf8b14e6e8d8ccc76839a8c180dddafd87278473830d7fe0f0224fdc40029",
+  "metadata": "{\"compiler\":{\"version\":\"0.5.8+commit.23d335f2\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"}],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/C/ac/src/ac-monorepo/packages/erc20/contracts/AcMaster/Owned.sol\":\"Owned\"},\"evmVersion\":\"byzantium\",\"libraries\":{},\"optimizer\":{\"enabled\":true,\"runs\":1},\"remappings\":[]},\"sources\":{\"/C/ac/src/ac-monorepo/packages/erc20/contracts/AcMaster/Owned.sol\":{\"keccak256\":\"0x4d65acd84896dcf6deadc1d13721fa368cd34ab2dfd11bb8e33a6b300f5c88ea\",\"urls\":[\"bzzr://cfb80214e920857d3c5af01d95d645aa6d22b488740bc1a5be86d9d862bc991c\"]}},\"version\":1}",
+  "bytecode": "0x6080604052348015600f57600080fd5b5060008054600160a060020a03191633179055603580602f6000396000f3fe6080604052600080fdfea165627a7a723058204a67e0401cb73856afb0472a395848160489986dcc91f8f17810916adaee340a0029",
+  "deployedBytecode": "0x6080604052600080fdfea165627a7a723058204a67e0401cb73856afb0472a395848160489986dcc91f8f17810916adaee340a0029",
   "sourceMap": "26:113:10:-;;;78:58;8:9:-1;5:2;;;30:1;27;20:12;5:2;-1:-1;110:5:10;:18;;-1:-1:-1;;;;;;110:18:10;118:10;110:18;;;26:113;;;;;;",
   "deployedSourceMap": "26:113:10:-;;;;;",
   "source": "pragma solidity 0.5.8;\r\n\r\ncontract Owned {\r\n    address payable owner;\r\n\r\n    constructor() public {\r\n        owner = msg.sender;\r\n    }\r\n}\r\n",
@@ -345,7 +345,7 @@
   },
   "networks": {},
   "schemaVersion": "3.0.11",
-  "updatedAt": "2019-08-09T12:06:27.817Z",
+  "updatedAt": "2019-08-09T14:17:38.186Z",
   "devdoc": {
     "methods": {}
   },

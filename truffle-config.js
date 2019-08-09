@@ -41,7 +41,7 @@ module.exports = {
         solc: {
             optimizer: {
                 enabled: true,
-                runs: 2000,
+                runs: 1000,
             },
         },
 
@@ -120,8 +120,8 @@ module.exports = {
 
     // Set default mocha options here, use special reporters etc.
     mocha: {
-        //timeout: 0
-        //enableTimeouts: false,
+        timeout: 0
+        enableTimeouts: false,
     },
 
     // Configure your compilers
@@ -132,7 +132,7 @@ module.exports = {
             settings: {          // See the solidity docs for advice about optimization and evmVersion
                 optimizer: {
                     enabled: true,
-                    runs: 200
+                    runs: 1000
                 },
                 evmVersion: "byzantium"
             }

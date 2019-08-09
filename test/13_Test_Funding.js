@@ -18,20 +18,16 @@ contract('AcMaster', accounts => {
         await fundLedger({ ccyTypeId: CONST.ccyType.USD, amount: CONST.thousandUsd_cents, receiver: accounts[global.accountNdx]});
     });
 
-    it('funding - should allow funding of large values of USD', async () => {
-        await fundLedger({ ccyTypeId: CONST.ccyType.USD, amount: CONST.millionUsd_cents.multiply(1000) , receiver: accounts[global.accountNdx]});
+    it('funding - should allow funding of extreme values of USD', async () => {
+        await fundLedger({ ccyTypeId: CONST.ccyType.USD, amount: CONST.millionUsd_cents * 1000 * 1000, receiver: accounts[global.accountNdx]});
     });
 
     it('funding - should allow funding of ETH', async () => {
         await fundLedger({ ccyTypeId: CONST.ccyType.ETH, amount: CONST.oneEth_wei, receiver: accounts[global.accountNdx]});
     });
 
-    it('funding - should allow funding of large values of ETH', async () => {
+    it('funding - should allow funding of extreme values of ETH', async () => {
         await fundLedger({ ccyTypeId: CONST.ccyType.ETH, amount: CONST.millionEth_wei, receiver: accounts[global.accountNdx]});
-    });
-
-    it('funding - should allow funding of insane values of ETH', async () => {
-        await fundLedger({ ccyTypeId: CONST.ccyType.ETH, amount: CONST.millionEth_wei.multiply(1000), receiver: accounts[global.accountNdx]});
     });
 
     it('funding - should allow repeated funding', async () => {
