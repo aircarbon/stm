@@ -3,14 +3,16 @@ const truffleAssert = require('truffle-assertions');
 const CONST = require('../const.js');
 
 contract('AcMaster', accounts => {
-    var acm, accountNdx = 40;
+    var acm;//, accountNdx = 100;
 
     const countDefaultCcyTypes = 2;
 
     beforeEach(async () => {
         acm = await ac.deployed();
-        accountNdx++;
-        console.log(`beforeEach: ${acm.address} getEeuBatchCount`, (await acm.getEeuBatchCount.call()));
+
+        if (!global.accountNdx) global.accountNdx = 0;
+        global.accountNdx++;
+        console.log(`global.global.accountNdx: ${global.accountNdx} - beforeEach: ${acm.address} - getEeuBatchCount: ${(await acm.getEeuBatchCount.call()).toString()}`);
     });
 
     it('ccy types - should have correct default values', async () => {
@@ -28,7 +30,7 @@ contract('AcMaster', accounts => {
 
     it('ccy types - should make visible newly added currency types in the ledger', async () => {
         // mint 1 vEEU 
-        //await acm.mintEeuBatch(CONST.eeuType.UNFCCC, CONST.ktCarbon * 100, 1, accounts[accountNdx], { from: accounts[0] });
+        //await acm.mintEeuBatch(CONST.eeuType.UNFCCC, CONST.ktCarbon * 100, 1, accounts[global.accountNdx], { from: accounts[0] });
 
         // add new ccy type
         const addCcyTx = await acm.addCcyType('TEST_COIN', 'TEST_UNIT');
@@ -44,7 +46,7 @@ contract('AcMaster', accounts => {
         });
 
         // validate ledger entry from minting has the new type
-        const ledgerEntryAfter = await acm.getLedgerEntry(accounts[accountNdx]);
+        const ledgerEntryAfter = await acm.getLedgerEntry(accounts[global.accountNdx]);
         assert(ledgerEntryAfter.ccys.some(p => p.typeId == newTypeId), 'missing new currency type id from ledger after minting');
         assert(ledgerEntryAfter.ccys.some(p => p.name == 'TEST_COIN'), 'missing/invalid new currency name from ledger after minting');
         assert(ledgerEntryAfter.ccys.some(p => p.unit == 'TEST_UNIT'), 'missing/invalid new currency unit from ledger after minting');
@@ -57,8 +59,8 @@ contract('AcMaster', accounts => {
         const newTypeId = types.filter(p => p.name == 'TEST_COIN2')[0].id;
 
         // fund new ccy type & validate
-        await acm.fund(newTypeId, 424242, accounts[accountNdx], { from: accounts[0] });
-        ledgerEntryAfter = await acm.getLedgerEntry(accounts[accountNdx]);
+        await acm.fund(newTypeId, 424242, accounts[global.accountNdx], { from: accounts[0] });
+        ledgerEntryAfter = await acm.getLedgerEntry(accounts[global.accountNdx]);
         assert(ledgerEntryAfter.ccys.find(p => p.typeId == newTypeId).balance == 424242, 'unexpected ledger balance of new currency type after funding');
     });
 

@@ -41,7 +41,7 @@ contract("AcMaster", accounts => {
             const EthereumTx = ejs.Transaction
             var tx = new EthereumTx({
                 nonce: nonce,
-                gasPrice: web3.utils.toHex(web3.utils.toWei('20', 'gwei')),
+                gasPrice: web3.utils.toHex(web3.utils.toWei('20', 'gwei')), // ## COME FROM CONFIG
                 gasLimit: 500000,
                 to: address,
                 value: 0,
@@ -63,6 +63,8 @@ contract("AcMaster", accounts => {
             })
             .on("receipt", receipt2 => {
                 console.log('receipt2', receipt2);
+                // + DB txid ...
+                
             });
             console.log('receipt1', receipt1);
         //});

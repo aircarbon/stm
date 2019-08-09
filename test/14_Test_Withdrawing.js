@@ -4,7 +4,7 @@ const truffleAssert = require('truffle-assertions');
 const CONST = require('../const.js');
 
 contract('AcMaster', accounts => {
-    var acm;//, accountNdx = 200;
+    var acm;//, accountNdx = 250;
 
     beforeEach(async () => {
         acm = await ac.deployed();
@@ -13,39 +13,42 @@ contract('AcMaster', accounts => {
         global.accountNdx++;
         console.log(`global.global.accountNdx: ${global.accountNdx} - beforeEach: ${acm.address} - getEeuBatchCount: ${(await acm.getEeuBatchCount.call()).toString()}`);
     });
+
+    // todo: test withdraw too much (no negative)
     
-    it('funding - should allow funding of USD', async () => {
-        await fundLedger({ ccyTypeId: CONST.ccyType.USD, amount: CONST.thousandUsd_cents, receiver: accounts[global.accountNdx]});
+    it('withdrawing - should allow withdrawing of USD', async () => {
+        await acm.fund(CONST.ccyType.USD, 100, accounts[global.accountNdx], { from: accounts[0] });
+        await withdrawLedger({ ccyTypeId: CONST.ccyType.USD, amount: 50, withdrawer: accounts[global.accountNdx]});
     });
 
-    it('funding - should allow funding of large values of USD', async () => {
+    /*it('withdrawing - should allow withdrawing of large values of USD', async () => {
         await fundLedger({ ccyTypeId: CONST.ccyType.USD, amount: CONST.millionUsd_cents.multiply(1000) , receiver: accounts[global.accountNdx]});
     });
 
-    it('funding - should allow funding of ETH', async () => {
+    it('withdrawing - should allow withdrawing of ETH', async () => {
         await fundLedger({ ccyTypeId: CONST.ccyType.ETH, amount: CONST.oneEth_wei, receiver: accounts[global.accountNdx]});
     });
 
-    it('funding - should allow funding of large values of ETH', async () => {
+    it('withdrawing - should allow withdrawing of large values of ETH', async () => {
         await fundLedger({ ccyTypeId: CONST.ccyType.ETH, amount: CONST.millionEth_wei, receiver: accounts[global.accountNdx]});
     });
 
-    it('funding - should allow funding of insane values of ETH', async () => {
+    it('withdrawing - should allow withdrawing of insane values of ETH', async () => {
         await fundLedger({ ccyTypeId: CONST.ccyType.ETH, amount: CONST.millionEth_wei.multiply(1000), receiver: accounts[global.accountNdx]});
     });
 
-    it('funding - should allow repeated funding', async () => {
+    it('withdrawing - should allow repeated withdrawing', async () => {
         for (var i=0 ; i < 10 ; i++) {
             await fundLedger({ ccyTypeId: CONST.ccyType.USD, amount: CONST.thousandUsd_cents, receiver: accounts[global.accountNdx]});
         }
     });
 
-    it('funding - should have reasonable gas cost for funding', async () => {
+    it('withdrawing - should have reasonable gas cost for withdrawing', async () => {
         const fundTx = await acm.fund(CONST.ccyType.USD, CONST.thousandUsd_cents, accounts[global.accountNdx], { from: accounts[0] });
         console.log(`gasUsed - Funding: ${fundTx.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * fundTx.receipt.gasUsed).toFixed(4)} (USD ${(CONST.gasPriceEth * fundTx.receipt.gasUsed * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
     });
 
-    it('funding - should allow minting and funding on same ledger entry', async () => {
+    it('withdrawing - should allow minting and withdrawing on same ledger entry', async () => {
         await acm.mintEeuBatch(CONST.eeuType.VCS, CONST.mtCarbon, 2, accounts[global.accountNdx], { from: accounts[0] });
         await acm.fund(CONST.ccyType.USD, CONST.thousandUsd_cents, accounts[global.accountNdx], { from: accounts[0] });
         const ledgerEntryAfter = await acm.getLedgerEntry(accounts[global.accountNdx]);
@@ -53,66 +56,73 @@ contract('AcMaster', accounts => {
         assert(ledgerEntryAfter.eeus.length == 2, 'unexpected eeu count in ledger entry after minting & funding');
         assert(Number(ledgerEntryAfter.eeu_sumKG) == Number(CONST.mtCarbon), 'invalid kg sum in ledger entry after minting & funding');
         assert(ledgerEntryAfter.ccys.find(p => p.typeId == CONST.ccyType.USD).balance == CONST.thousandUsd_cents, 'unexpected usd balance in ledger entry after minting & funding');
-    });
+    });*/
 
-    async function fundLedger({ ccyTypeId, amount, receiver }) {
+    async function withdrawLedger({ ccyTypeId, amount, withdrawer }) {
         var ledgerEntryBefore, ledgerEntryAfter;
 
-        ledgerEntryBefore = await acm.getLedgerEntry(receiver);
-        const totalFundedBefore = await acm.getTotalFunded.call(ccyTypeId);
+        ledgerEntryBefore = await acm.getLedgerEntry(withdrawer);
+        const totalWithdrawnBefore = await acm.getTotalWithdrawn.call(ccyTypeId);
         
-        // fund
-        const fundTx = await acm.fund(ccyTypeId, amount, receiver, { from: accounts[0] });
-        ledgerEntryAfter = await acm.getLedgerEntry(receiver);
-        truffleAssert.eventEmitted(fundTx, 'CcyFundedLedger', ev => {
+        // withdraw
+        const withdrawTx = await acm.withdraw(ccyTypeId, amount, withdrawer, { from: accounts[0] });
+        ledgerEntryAfter = await acm.getLedgerEntry(withdrawer);
+        truffleAssert.eventEmitted(withdrawTx, 'CcyWithdrewLedger', ev => {
             return ev.ccyTypeId == ccyTypeId
-                && ev.ledgerOwner == receiver
+                && ev.ledgerOwner == withdrawer
                 && ev.amount.toString() == amount.toString()
                 ;
         });
-        
+
         // validate ledger balance is updated for test ccy
         assert(ledgerEntryAfter.ccys.find(p => p.typeId == ccyTypeId).balance == 
-               Number(ledgerEntryBefore.ccys.find(p => p.typeId == ccyTypeId).balance) + Number(amount),
-               'unexpected ledger balance after funding for test ccy');
+               Number(ledgerEntryBefore.ccys.find(p => p.typeId == ccyTypeId).balance) - Number(amount),
+               'unexpected ledger balance after withdrawing for test ccy');
 
         // validate ledger balance unchanged for other ccy's
         assert(ledgerEntryAfter.ccys
                .filter(p => p.typeId != ccyTypeId)
                .every(p => p.balance == ledgerEntryBefore.ccys.find(p2 => p2.typeId == p.typeId).balance),
-               'unexpected ledger balance after funding for ccy non-test ccy');
+               'unexpected ledger balance after withdrawing for ccy non-test ccy');
 
         // validate global total funded is updated
-        const totalFundedAfter = await acm.getTotalFunded.call(ccyTypeId);
-        assert(totalFundedAfter - totalFundedBefore == amount, 'unexpected total funded after funding');
+        const totalWithdrawnAfter = await acm.getTotalWithdrawn.call(ccyTypeId);
+        assert(totalWithdrawnAfter - totalWithdrawnBefore == amount, 'unexpected total withdrawn after withdrawal');
     }
 
-    it('funding - should not allow non-owner to fund a ledger entry', async () => {
+    it('withdrawing - should not allow non-owner to withdrawing from a ledger entry', async () => {
         try {
-            await acm.fund(CONST.ccyType.USD, 100, accounts[global.accountNdx], { from: accounts[1] });
+            await acm.withdraw(CONST.ccyType.USD, 100, accounts[global.accountNdx], { from: accounts[1] });
         } catch (ex) { return; }
         assert.fail('expected restriction exception');
     });
 
-    it('funding - should not allow non-existent currency types', async () => {
+    it('withdrawing - should not allow non-existent currency types', async () => {
         try {
-            await acm.fund(9999, 100, accounts[global.accountNdx], { from: accounts[0] });
+            await acm.withdraw(9999, 100, accounts[global.accountNdx], { from: accounts[0] });
         } catch (ex) { return; }
         assert.fail('expected restriction exception');
     });
 
-    it('funding - should not allow invalid amounts (1)', async () => {
+    it('withdrawing - should not allow invalid amounts (1)', async () => {
         try {
-            await acm.fund(CONST.ccyType.USD, 0, accounts[global.accountNdx], { from: accounts[0] });
+            await acm.withdraw(CONST.ccyType.USD, 0, accounts[global.accountNdx], { from: accounts[0] });
         } catch (ex) { return; }
         assert.fail('expected restriction exception');
     });
 
-    it('funding - should not allow invalid amounts (2)', async () => {
+    it('withdrawing - should not allow invalid amounts (2)', async () => {
         try {
-            await acm.fund(CONST.ccyType.USD, -1, accounts[global.accountNdx], { from: accounts[0] });
+            await acm.withdraw(CONST.ccyType.USD, -1, accounts[global.accountNdx], { from: accounts[0] });
         } catch (ex) { return; }
         assert.fail('expected restriction exception');
     });
 
+    it('withdrawing - should not allow withdrawing beyond available balance', async () => {
+        await acm.fund(CONST.ccyType.USD, 100, accounts[global.accountNdx], { from: accounts[0] });
+        try {
+            await withdrawLedger({ ccyTypeId: CONST.ccyType.USD, amount: 101, withdrawer: accounts[global.accountNdx]});
+        } catch (ex) { return; }
+        assert.fail('expected restriction exception');
+    });
 });

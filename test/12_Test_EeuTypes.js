@@ -3,14 +3,16 @@ const truffleAssert = require('truffle-assertions');
 const CONST = require('../const.js');
 
 contract('AcMaster', accounts => {
-    var acm, accountNdx = 50;
+    var acm;//, accountNdx = 150;
 
     const countDefaultEeuTypes = 2;
 
     beforeEach(async () => {
         acm = await ac.deployed();
-        accountNdx++;
-        console.log(`beforeEach: ${acm.address} getEeuBatchCount`, (await acm.getEeuBatchCount.call()));
+
+        if (!global.accountNdx) global.accountNdx = 0;
+        global.accountNdx++;
+        console.log(`global.global.accountNdx: ${global.accountNdx} - beforeEach: ${acm.address} - getEeuBatchCount: ${(await acm.getEeuBatchCount.call()).toString()}`);
     });
 
     it('eeu types - should have correct default values', async () => {
@@ -45,7 +47,7 @@ contract('AcMaster', accounts => {
         
         // mint new EEU type: 2 batches of 2 vEEUs
         for (var i=0 ; i < 2 ; i++) {
-            await acm.mintEeuBatch(newTypeId, CONST.ktCarbon * 100, 2, accounts[accountNdx], { from: accounts[0] });
+            await acm.mintEeuBatch(newTypeId, CONST.ktCarbon * 100, 2, accounts[global.accountNdx], { from: accounts[0] });
         }
         const batchCountAfter_Mint1 = (await acm.getEeuBatchCount.call()).toNumber(); 
         //console.log(`batchCountAfter`, batchCountAfter_Mint1);
@@ -58,13 +60,13 @@ contract('AcMaster', accounts => {
 
         // mint default EEU type: 2 batches of 2 vEEUs
         for (var i=0 ; i < 2 ; i++) {
-            await acm.mintEeuBatch(CONST.eeuType.UNFCCC, CONST.ktCarbon * 100, 2, accounts[accountNdx], { from: accounts[0] });
+            await acm.mintEeuBatch(CONST.eeuType.UNFCCC, CONST.ktCarbon * 100, 2, accounts[global.accountNdx], { from: accounts[0] });
         }
         const batchCountAfter_Mint2 = (await acm.getEeuBatchCount.call()).toNumber();
         assert(batchCountAfter_Mint2 == batchCountBefore + 4, `unexpected max batch id ${batchCountAfter_Mint2} after minting (2)`);
 
         // validate ledger: 8 vEEUs, 4 of each type in 2 batches, including 4 of new type
-        const ledgerEntryAfter = await acm.getLedgerEntry(accounts[accountNdx]);
+        const ledgerEntryAfter = await acm.getLedgerEntry(accounts[global.accountNdx]);
         assert(ledgerEntryAfter.eeus.length == 8, 'unexpected eeu count in ledger');
         assert(ledgerEntryAfter.eeus.filter(p => p.eeuTypeId == newTypeId).length == 4, 'unexpected new eeu type in ledger');
     });

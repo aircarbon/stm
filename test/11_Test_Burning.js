@@ -3,7 +3,7 @@ const truffleAssert = require('truffle-assertions');
 const CONST = require('../const.js');
 
 contract('AcMaster', accounts => {
-    var acm, accountNdx = 20;
+    var acm;//, global.accountNdx = 50;
 
     beforeEach(async () => {
         acm = await ac.deployed();
@@ -12,15 +12,17 @@ contract('AcMaster', accounts => {
         //assert.equal(ver, "0.0.3", "test version");
         //const eeuCount = await acm.getEeuMintedCount.call();
         //console.log('eeuCount', eeuCount);
-        accountNdx++;
-        console.log(`beforeEach: ${acm.address} getEeuBatchCount`, (await acm.getEeuBatchCount.call()));
+
+        if (!global.accountNdx) global.accountNdx = 0;
+        global.accountNdx++;
+        console.log(`global.global.accountNdx: ${global.accountNdx} - beforeEach: ${acm.address} - getEeuBatchCount: ${(await acm.getEeuBatchCount.call()).toString()}`);
     });
 
     // *** why burn 0.5 eeu costs more gas than burn 1.5 ?
 
     it('burning - should allow owner to burn half a vEEU', async () => {
-        await acm.mintEeuBatch(CONST.eeuType.UNFCCC, CONST.ktCarbon, 1, accounts[accountNdx], { from: accounts[0], });
-        const ledgerBefore = await acm.getLedgerEntry(accounts[accountNdx]);
+        await acm.mintEeuBatch(CONST.eeuType.UNFCCC, CONST.ktCarbon, 1, accounts[global.accountNdx], { from: accounts[0], });
+        const ledgerBefore = await acm.getLedgerEntry(accounts[global.accountNdx]);
         const eeuId = ledgerBefore.eeus[0].eeuId;
         const eeuBefore = await acm.getEeu(eeuId);
         const batchBefore = await acm.getEeuBatch(eeuBefore.batchId);
@@ -29,7 +31,7 @@ contract('AcMaster', accounts => {
         // burn half an EEU
         const burnedKgBefore = await acm.getKgCarbonBurned.call();
         const burnKg = CONST.ktCarbon / 2;
-        const a0_burnTx1 = await acm.burnEeus(accounts[accountNdx], CONST.eeuType.UNFCCC, burnKg);
+        const a0_burnTx1 = await acm.burnEeus(accounts[global.accountNdx], CONST.eeuType.UNFCCC, burnKg);
         console.log(`gasUsed - Burn 0.5 vEEU: ${a0_burnTx1.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * a0_burnTx1.receipt.gasUsed).toFixed(4)} (USD ${((CONST.gasPriceEth * a0_burnTx1.receipt.gasUsed).toFixed(4) * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
 
         // validate burn partial EEU event
@@ -37,7 +39,7 @@ contract('AcMaster', accounts => {
         truffleAssert.eventEmitted(a0_burnTx1, 'BurnedPartialEeu', ev => {
             return ev.id == eeuId
                 && ev.eeuTypeId == CONST.eeuType.UNFCCC
-                && ev.ledgerOwner == accounts[accountNdx]
+                && ev.ledgerOwner == accounts[global.accountNdx]
                 && ev.burnedKG == burnKg
                 ;
         });
@@ -51,7 +53,7 @@ contract('AcMaster', accounts => {
         assert(Number(eeuAfter.KG) == Number(eeuAfter.mintedKG) / 2, 'unexpected remaining KG in EEU after burn');
 
         // check ledger
-        const ledgerAfter = await acm.getLedgerEntry(accounts[accountNdx]);
+        const ledgerAfter = await acm.getLedgerEntry(accounts[global.accountNdx]);
         assert(ledgerAfter.eeu_sumKG == ledgerBefore.eeu_sumKG / 2, 'unexpected ledger KG after burn');
 
         // check batch
@@ -60,8 +62,8 @@ contract('AcMaster', accounts => {
     });
 
     it('burning - should allow owner to burn a single full vEEU', async () => {
-        await acm.mintEeuBatch(CONST.eeuType.UNFCCC, CONST.ktCarbon, 1, accounts[accountNdx], { from: accounts[0], });
-        const ledgerBefore = await acm.getLedgerEntry(accounts[accountNdx]);
+        await acm.mintEeuBatch(CONST.eeuType.UNFCCC, CONST.ktCarbon, 1, accounts[global.accountNdx], { from: accounts[0], });
+        const ledgerBefore = await acm.getLedgerEntry(accounts[global.accountNdx]);
         assert(ledgerBefore.eeus.length == 1, `unexpected ledger EEU entry before burn (${ledgerBefore.eeus.length})`);
         const eeuId = ledgerBefore.eeus[0].eeuId;
         const eeuBefore = await acm.getEeu(eeuId);
@@ -71,7 +73,7 @@ contract('AcMaster', accounts => {
         // burn a full (single) EEU
         const burnedKgBefore = await acm.getKgCarbonBurned.call();
         const burnKg = CONST.ktCarbon;
-        const a0_burnTx1 = await acm.burnEeus(accounts[accountNdx], CONST.eeuType.UNFCCC, burnKg);
+        const a0_burnTx1 = await acm.burnEeus(accounts[global.accountNdx], CONST.eeuType.UNFCCC, burnKg);
         console.log(`gasUsed - Burn 1.0 vEEU: ${a0_burnTx1.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * a0_burnTx1.receipt.gasUsed).toFixed(4)} (USD ${((CONST.gasPriceEth * a0_burnTx1.receipt.gasUsed).toFixed(4) * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
 
         // validate burn full EEU event
@@ -79,7 +81,7 @@ contract('AcMaster', accounts => {
         truffleAssert.eventEmitted(a0_burnTx1, 'BurnedFullEeu', ev => {
             return ev.id == eeuId
                 && ev.eeuTypeId == CONST.eeuType.UNFCCC
-                && ev.ledgerOwner == accounts[accountNdx]
+                && ev.ledgerOwner == accounts[global.accountNdx]
                 && ev.burnedKG == burnKg
                 ;
         });
@@ -93,7 +95,7 @@ contract('AcMaster', accounts => {
         assert(eeuAfter.KG == 0, 'unexpected remaining KG in EEU after burn');
 
         // check ledger
-        const ledgerAfter = await acm.getLedgerEntry(accounts[accountNdx]);
+        const ledgerAfter = await acm.getLedgerEntry(accounts[global.accountNdx]);
         assert(ledgerAfter.eeu_sumKG == 0, 'unexpected ledger KG after burn');
         assert(ledgerAfter.eeus.length == 0, 'unexpected ledger EEU entry after burn');
 
@@ -103,8 +105,8 @@ contract('AcMaster', accounts => {
     });
 
     it('burning - should allow owner to burn 1.5 vEEUs', async () => {
-        await acm.mintEeuBatch(CONST.eeuType.UNFCCC, CONST.ktCarbon, 2, accounts[accountNdx], { from: accounts[0], });
-        const ledgerBefore = await acm.getLedgerEntry(accounts[accountNdx]);
+        await acm.mintEeuBatch(CONST.eeuType.UNFCCC, CONST.ktCarbon, 2, accounts[global.accountNdx], { from: accounts[0], });
+        const ledgerBefore = await acm.getLedgerEntry(accounts[global.accountNdx]);
         //console.dir(ledgerBefore);
         assert(ledgerBefore.eeus.length == 2, `unexpected ledger EEU entry before burn (${ledgerBefore.eeus.length})`);
         const eeu0_Before = await acm.getEeu(ledgerBefore.eeus[0].eeuId);
@@ -115,7 +117,7 @@ contract('AcMaster', accounts => {
         const burnedKgBefore = await acm.getKgCarbonBurned.call();
         const burnKg = (CONST.ktCarbon / 4) * 3;
         const expectRemainKg = CONST.ktCarbon - burnKg;
-        const a0_burnTx1 = await acm.burnEeus(accounts[accountNdx], CONST.eeuType.UNFCCC, burnKg);
+        const a0_burnTx1 = await acm.burnEeus(accounts[global.accountNdx], CONST.eeuType.UNFCCC, burnKg);
         console.log(`gasUsed - Burn 1.5 vEEU: ${a0_burnTx1.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * a0_burnTx1.receipt.gasUsed).toFixed(4)} (USD ${((CONST.gasPriceEth * a0_burnTx1.receipt.gasUsed).toFixed(4) * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
 
         // validate burn full EEU event
@@ -123,14 +125,14 @@ contract('AcMaster', accounts => {
         truffleAssert.eventEmitted(a0_burnTx1, 'BurnedFullEeu', ev => { 
             return ev.id == ledgerBefore.eeus[0].eeuId
                    && ev.eeuTypeId == CONST.eeuType.UNFCCC
-                   && ev.ledgerOwner == accounts[accountNdx]
+                   && ev.ledgerOwner == accounts[global.accountNdx]
                    && ev.burnedKG == CONST.ktCarbon / 2
                    ;
         });
         truffleAssert.eventEmitted(a0_burnTx1, 'BurnedPartialEeu', ev => { 
             return ev.id == ledgerBefore.eeus[1].eeuId
                    && ev.eeuTypeId == CONST.eeuType.UNFCCC
-                   && ev.ledgerOwner == accounts[accountNdx]
+                   && ev.ledgerOwner == accounts[global.accountNdx]
                    && ev.burnedKG == CONST.ktCarbon - expectRemainKg - CONST.ktCarbon / 2
                    ;
         });
@@ -146,7 +148,7 @@ contract('AcMaster', accounts => {
         assert(eeu1_After.KG == expectRemainKg, 'unexpected remaining KG in EEU 1 after burn');
 
         // check ledger
-        const ledgerAfter = await acm.getLedgerEntry(accounts[accountNdx]);
+        const ledgerAfter = await acm.getLedgerEntry(accounts[global.accountNdx]);
         //console.dir(ledgerAfter);
         assert(ledgerAfter.eeu_sumKG == expectRemainKg, 'unexpected ledger KG after burn');
         assert(ledgerAfter.eeus.length == 1, 'unexpected ledger EEU entry after burn');
@@ -157,9 +159,9 @@ contract('AcMaster', accounts => {
     });
 
     it('burning - should allow owner to burn multiple vEEUs of the correct type', async () => {
-        await acm.mintEeuBatch(CONST.eeuType.UNFCCC, CONST.ktCarbon, 5, accounts[accountNdx], { from: accounts[0], });
-        await acm.mintEeuBatch(CONST.eeuType.VCS, CONST.ktCarbon, 5, accounts[accountNdx], { from: accounts[0], });
-        const ledgerBefore = await acm.getLedgerEntry(accounts[accountNdx]);
+        await acm.mintEeuBatch(CONST.eeuType.UNFCCC, CONST.ktCarbon, 5, accounts[global.accountNdx], { from: accounts[0], });
+        await acm.mintEeuBatch(CONST.eeuType.VCS, CONST.ktCarbon, 5, accounts[global.accountNdx], { from: accounts[0], });
+        const ledgerBefore = await acm.getLedgerEntry(accounts[global.accountNdx]);
         assert(ledgerBefore.eeus.length == 10, `unexpected ledger EEU entry before burn (${ledgerBefore.eeus.length})`);
         const unfcc_eeus = ledgerBefore.eeus.filter(p => p.eeuTypeId == CONST.eeuType.UNFCCC);
         const vcs_eeus = ledgerBefore.eeus.filter(p => p.eeuTypeId == CONST.eeuType.VCS);
@@ -174,7 +176,7 @@ contract('AcMaster', accounts => {
         const burnedKgBefore = await acm.getKgCarbonBurned.call();
         const burnKg = CONST.ktCarbon;
         const expectRemainKg = CONST.ktCarbon - burnKg;
-        const a0_burnTx1 = await acm.burnEeus(accounts[accountNdx], CONST.eeuType.VCS, burnKg);
+        const a0_burnTx1 = await acm.burnEeus(accounts[global.accountNdx], CONST.eeuType.VCS, burnKg);
         console.log(`gasUsed - Burn 5.0 vEEU: ${a0_burnTx1.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * a0_burnTx1.receipt.gasUsed).toFixed(4)} (USD ${((CONST.gasPriceEth * a0_burnTx1.receipt.gasUsed).toFixed(4) * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
 
         // validate burn full EEU event
@@ -192,7 +194,7 @@ contract('AcMaster', accounts => {
         }
 
         // check ledger
-        const ledgerAfter = await acm.getLedgerEntry(accounts[accountNdx]);
+        const ledgerAfter = await acm.getLedgerEntry(accounts[global.accountNdx]);
         assert(ledgerAfter.eeu_sumKG == CONST.ktCarbon, 'unexpected ledger KG after burn');
         assert(ledgerAfter.eeus.length == 5, 'unexpected ledger EEU entry after burn');
 
@@ -202,16 +204,16 @@ contract('AcMaster', accounts => {
     });
 
     it('burning - should not allow non-owner to burn EEUs', async () => {
-        await acm.mintEeuBatch(CONST.eeuType.UNFCCC, CONST.ktCarbon, 1, accounts[accountNdx], { from: accounts[0], });
-        const a0_le = await acm.getLedgerEntry(accounts[accountNdx]);
+        await acm.mintEeuBatch(CONST.eeuType.UNFCCC, CONST.ktCarbon, 1, accounts[global.accountNdx], { from: accounts[0], });
+        const a0_le = await acm.getLedgerEntry(accounts[global.accountNdx]);
         try {
-            await acm.burnEeus(accounts[accountNdx], CONST.eeuType.UNFCCC, CONST.ktCarbon, { from: accounts[1], });
+            await acm.burnEeus(accounts[global.accountNdx], CONST.eeuType.UNFCCC, CONST.ktCarbon, { from: accounts[1], });
         } catch (ex) { return; }
         assert.fail('expected restriction exception');
     });
 
     it('burning - should not allow burning for non-existent ledger owner', async () => {
-        await acm.mintEeuBatch(CONST.eeuType.UNFCCC, CONST.ktCarbon, 1, accounts[accountNdx], { from: accounts[0], });
+        await acm.mintEeuBatch(CONST.eeuType.UNFCCC, CONST.ktCarbon, 1, accounts[global.accountNdx], { from: accounts[0], });
         const a9_le = await acm.getLedgerEntry(accounts[9]);
         assert(a9_le.exists == false, 'expected non-existent ledger entry');
         try {
@@ -221,36 +223,36 @@ contract('AcMaster', accounts => {
     });
 
     it('burning - should not allow too small a tonnage', async () => {
-        await acm.mintEeuBatch(CONST.eeuType.UNFCCC, CONST.tonCarbon, 1, accounts[accountNdx], { from: accounts[0], });
-        const a0_le = await acm.getLedgerEntry(accounts[accountNdx]);
+        await acm.mintEeuBatch(CONST.eeuType.UNFCCC, CONST.tonCarbon, 1, accounts[global.accountNdx], { from: accounts[0], });
+        const a0_le = await acm.getLedgerEntry(accounts[global.accountNdx]);
         try {
-            await acm.burnEeus(accounts[accountNdx], CONST.eeuType.UNFCCC, CONST.tonCarbon / 2);
+            await acm.burnEeus(accounts[global.accountNdx], CONST.eeuType.UNFCCC, CONST.tonCarbon / 2);
         } catch (ex) { return; }
         assert(false, 'expected restriction exception');
     });
 
     it('burning - should not allow invalid tonnage', async () => {
-        await acm.mintEeuBatch(CONST.eeuType.UNFCCC, CONST.ktCarbon, 1, accounts[accountNdx], { from: accounts[0], });
+        await acm.mintEeuBatch(CONST.eeuType.UNFCCC, CONST.ktCarbon, 1, accounts[global.accountNdx], { from: accounts[0], });
         try {
-            await acm.burnEeus(accounts[accountNdx], CONST.eeuType.UNFCCC, -1);
+            await acm.burnEeus(accounts[global.accountNdx], CONST.eeuType.UNFCCC, -1);
         } catch (ex) { return; }
         assert.fail('expected restriction exception');
     });
 
     it('burning - should not allow non-existent tonnage (1)', async () => {
-        await acm.mintEeuBatch(CONST.eeuType.UNFCCC, CONST.ktCarbon, 1, accounts[accountNdx], { from: accounts[0], });
+        await acm.mintEeuBatch(CONST.eeuType.UNFCCC, CONST.ktCarbon, 1, accounts[global.accountNdx], { from: accounts[0], });
         try {
-            await acm.burnEeus(accounts[accountNdx], CONST.eeuType.VCS, CONST.ktCarbon);
+            await acm.burnEeus(accounts[global.accountNdx], CONST.eeuType.VCS, CONST.ktCarbon);
         } catch (ex) { return; }
         assert(false, 'expected restriction exception');
     });
 
     it('burning - should not allow non-existent tonnage (2)', async () => {
-        await acm.mintEeuBatch(CONST.eeuType.UNFCCC, CONST.ktCarbon, 1, accounts[accountNdx], { from: accounts[0], });
-        await acm.burnEeus(accounts[accountNdx], CONST.eeuType.UNFCCC, CONST.ktCarbon);
-        var ledger = await acm.getLedgerEntry(accounts[accountNdx]);
+        await acm.mintEeuBatch(CONST.eeuType.UNFCCC, CONST.ktCarbon, 1, accounts[global.accountNdx], { from: accounts[0], });
+        await acm.burnEeus(accounts[global.accountNdx], CONST.eeuType.UNFCCC, CONST.ktCarbon);
+        var ledger = await acm.getLedgerEntry(accounts[global.accountNdx]);
         try {
-            await acm.burnEeus(accounts[accountNdx], CONST.eeuType.UNFCCC, CONST.ktCarbon);
+            await acm.burnEeus(accounts[global.accountNdx], CONST.eeuType.UNFCCC, CONST.ktCarbon);
         } catch (ex) { return; }
         assert(false, 'expected restriction exception');
     });

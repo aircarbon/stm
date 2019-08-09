@@ -57,33 +57,33 @@ module.exports = {
         //     network_id: "*",
         // },
         development: {
-            // for "truffle test" -- with manually launched "ganache-cli -a 100" (100 test accounts)
+            // for "truffle test" -- with manually launched "ganache-cli -a 100" (1000 test accounts)
             host: '127.0.0.1',
             port: 8545,
             network_id: '*',
-            // gas: 6000000,
-            // gasPrice: web3.utils.toWei('20', 'gwei')
         },
 
         ropsten_scoop: {
-            provider: () => new HDWalletProvider(mnemonic, 'https://node0.scoop.tech:9545', 0, 100),
+            //provider: () => new HDWalletProvider(mnemonic, 'https://node0.scoop.tech:9545', 0, 1000),
+            provider: new HDWalletProvider(mnemonic, 'https://node0.scoop.tech:9545', 0, 100),
             network_id: '*',
             gas: 6000000,
-            gasPrice: web3.utils.toWei('20', 'gwei')
+            gasPrice: web3.utils.toWei('20', 'gwei'),
         },
 
-        // not using ropsten infura -- much slower than rinkeby infura, and network id also clashes with ropsten scoop
-        // ropsten_infura: {
-        //     provider: function () {
-        //         return new HDWalletProvider(mnemonic, "https://ropsten.infura.io/v3/93db2c7fd899496d8400e86100058297", 0, 100)
-        //     },
-        //     network_id: "*",
-        //     gas: 4000000,
-        //     gasPrice: web3.utils.toWei("20", "gwei"),
-        // },
+        // ropsten infura -- much slower than rinkeby infura
+        ropsten_infura: {
+            provider: function () {
+                return new HDWalletProvider(mnemonic, "https://ropsten.infura.io/v3/93db2c7fd899496d8400e86100058297", 0, 100)
+            },
+            network_id: "*",
+            gas: 6000000,
+            gasPrice: web3.utils.toWei("20", "gwei"),
+        },
 
         rinkeby_infura: {
-            provider: () => new HDWalletProvider(mnemonic, 'https://rinkeby.infura.io/v3/93db2c7fd899496d8400e86100058297', 0, 100),
+            //provider: () => new HDWalletProvider(mnemonic, 'https://rinkeby.infura.io/v3/93db2c7fd899496d8400e86100058297', 0, 1000),
+            provider: new HDWalletProvider(mnemonic, 'https://rinkeby.infura.io/v3/93db2c7fd899496d8400e86100058297', 0, 100),
             network_id: '*',
             gas: 6000000,
             gasPrice: web3.utils.toWei('20', 'gwei'),
@@ -120,21 +120,22 @@ module.exports = {
 
     // Set default mocha options here, use special reporters etc.
     mocha: {
-        // timeout: 100000
+        //timeout: 0
+        //enableTimeouts: false,
     },
 
     // Configure your compilers
     compilers: {
         solc: {
-            // version: "0.5.1",    // Fetch exact version from solc-bin (default: truffle's version)
-            // docker: true,        // Use "0.5.1" you've installed locally with docker (default: false)
-            // settings: {          // See the solidity docs for advice about optimization and evmVersion
-            //  optimizer: {
-            //    enabled: false,
-            //    runs: 200
-            //  },
-            //  evmVersion: "byzantium"
-            // }
+            version: "0.5.8",    // Fetch exact version from solc-bin (default: truffle's version)
+            docker: false,       // Use "0.5.8" you've installed locally with docker (default: false)
+            settings: {          // See the solidity docs for advice about optimization and evmVersion
+                optimizer: {
+                    enabled: true,
+                    runs: 200
+                },
+                evmVersion: "byzantium"
+            }
         },
     },
 };

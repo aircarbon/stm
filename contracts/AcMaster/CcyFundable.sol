@@ -5,7 +5,7 @@ import "./Owned.sol";
 import "./AcLedger.sol";
 
 contract CcyFundable is Owned, AcLedger {
-    event FundedLedger(uint256 ccyTypeId, address ledgerOwner, int256 amount);
+    event CcyFundedLedger(uint256 ccyTypeId, address ledgerOwner, int256 amount);
 
     /**
      * @dev Funds a ledger entry with a currency amount
@@ -35,7 +35,7 @@ contract CcyFundable is Owned, AcLedger {
         // update global total funded
         _ccyType_totalFunded[ccyTypeId] += amount;
 
-        emit FundedLedger(ccyTypeId, ledgerOwner, amount);
+        emit CcyFundedLedger(ccyTypeId, ledgerOwner, amount);
     }
 
     /**

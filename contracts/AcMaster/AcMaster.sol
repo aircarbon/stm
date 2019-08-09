@@ -5,8 +5,9 @@ import "./EeuMintable.sol";
 import "./EeuBurnable.sol";
 import "./EeuTradable.sol";
 import "./CcyFundable.sol";
+import "./CcyWithdrawable.sol";
 
-contract AcMaster is EeuMintable, EeuBurnable, CcyFundable, EeuTradable {
+contract AcMaster is EeuMintable, EeuBurnable, CcyFundable, CcyWithdrawable, EeuTradable {
     string public version;
 
     /**
