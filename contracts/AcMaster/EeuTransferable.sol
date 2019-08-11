@@ -4,8 +4,10 @@ pragma experimental ABIEncoderV2;
 import "./Owned.sol";
 import "./AcLedger.sol";
 
-contract EeuTradable is Owned, AcLedger {
-    // events...
+contract EeuTransferable is Owned, AcLedger {
+    event TransferedLedgerCcy(address from, address to, uint256 ccyTypeId, int256 amount);
+    event TransferedFullEeu(address from, address to, uint256 eeuId, uint256 eeuTypeId);
+    event TransferedPartialEeu(address from, address to, uint256 splitFromEeuId, uint256 newEeuId, uint256 eeuTypeId);
 
     /**
      * @dev Transfers or trades assets between ledger accounts
@@ -24,20 +26,22 @@ contract EeuTradable is Owned, AcLedger {
     function transfer(
         address ledger_A,
         address ledger_B,
-        uint256 kg_A,
-        uint256 eeuTypeId_A,
-        uint256 kg_B,
-        uint256 eeuTypeId_B,
-        int256 ccy_amount_A,
-        uint256 ccyTypeId_A,
-        int256 ccy_amount_B,
-        uint256 ccyTypeId_B)
-    public {
+        // EEU data
+        uint256 kg_A,           // EEU KGs moving from A
+        uint256 eeuTypeId_A,    // EEU type moving from A
+        uint256 kg_B,           // " from B
+        uint256 eeuTypeId_B,    // " from B
+        // ccy data
+        int256  ccy_amount_A,   // currency amount moving from A
+        uint256 ccyTypeId_A,    // currency type moving from A
+        int256  ccy_amount_B,   // " from B
+        uint256 ccyTypeId_B     // " from B
+    ) public {
         require(msg.sender == owner, "Restricted method");
 
         require(_ledger[ledger_A].exists == true, "Invalid ledger owner A");
         require(_ledger[ledger_B].exists == true, "Invalid ledger owner B");
-        require(kg_A >= 0 || kg_B >= 0 || ccy_amount_A >= 0 || ccy_amount_B >= 0, "Invalid transfer");
+        require(kg_A > 0 || kg_B > 0 || ccy_amount_A > 0 || ccy_amount_B > 0, "Invalid transfer");
         require(!(ccy_amount_A < 0 || ccy_amount_B < 0), "Invalid currency amounts");
         require(_ledger[ledger_A].eeuType_sumKG[eeuTypeId_A] >= kg_A, "Insufficient carbon held by ledger owner A");
         require(_ledger[ledger_B].eeuType_sumKG[eeuTypeId_B] >= kg_B, "Insufficient carbon held by ledger owner B");
@@ -50,14 +54,14 @@ contract EeuTradable is Owned, AcLedger {
             _ledger[ledger_B].ccyType_balance[ccyTypeId_A] += ccy_amount_A;
 
             _ccyType_totalTransfered[ccyTypeId_A] += uint256(ccy_amount_A);
-            // todo: emit event...
+            emit TransferedLedgerCcy(ledger_A, ledger_B, ccyTypeId_A, ccy_amount_A);
         }
         if (ccy_amount_B > 0) {
             _ledger[ledger_B].ccyType_balance[ccyTypeId_B] -= ccy_amount_B;
             _ledger[ledger_A].ccyType_balance[ccyTypeId_B] += ccy_amount_B;
 
             _ccyType_totalTransfered[ccyTypeId_B] += uint256(ccy_amount_B);
-            // todo: emit event...
+            emit TransferedLedgerCcy(ledger_B, ledger_A, ccyTypeId_B, ccy_amount_B);
         }
 
         // transfer EEUs
@@ -103,7 +107,7 @@ contract EeuTradable is Owned, AcLedger {
                 _ledger[to].eeuType_sumKG[eeuTypeId] += eeuKg;
 
                 remainingToTransfer -= eeuKg;
-                // todo: emit event...
+                emit TransferedFullEeu(from, to, eeuId, eeuTypeId);
             }
             else {
                 // split the last EEU across the ledger entries, soft-minting a new EEU in the destination
@@ -131,7 +135,7 @@ contract EeuTradable is Owned, AcLedger {
                 _ledger[to].eeuType_eeuIds[eeuTypeId].push(newId);
                 _ledger[to].eeuType_sumKG[eeuTypeId] += remainingToTransfer;
 
-                // todo: emit event...
+                emit TransferedPartialEeu(from, to, eeuId, newId, eeuTypeId);
                 remainingToTransfer = 0;
             }
         }

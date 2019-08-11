@@ -37,7 +37,7 @@ contract('AcMaster', accounts => {
         // validate burn partial EEU event
         //truffleAssert.prettyPrintEmittedEvents(a0_burnTx1);
         truffleAssert.eventEmitted(a0_burnTx1, 'BurnedPartialEeu', ev => {
-            return ev.id == eeuId
+            return ev.eeuId == eeuId
                 && ev.eeuTypeId == CONST.eeuType.UNFCCC
                 && ev.ledgerOwner == accounts[global.accountNdx]
                 && ev.burnedKG == burnKg
@@ -79,7 +79,7 @@ contract('AcMaster', accounts => {
         // validate burn full EEU event
         //truffleAssert.prettyPrintEmittedEvents(a0_burnTx1);
         truffleAssert.eventEmitted(a0_burnTx1, 'BurnedFullEeu', ev => {
-            return ev.id == eeuId
+            return ev.eeuId == eeuId
                 && ev.eeuTypeId == CONST.eeuType.UNFCCC
                 && ev.ledgerOwner == accounts[global.accountNdx]
                 && ev.burnedKG == burnKg
@@ -123,14 +123,14 @@ contract('AcMaster', accounts => {
         // validate burn full EEU event
         //truffleAssert.prettyPrintEmittedEvents(a0_burnTx1);
         truffleAssert.eventEmitted(a0_burnTx1, 'BurnedFullEeu', ev => { 
-            return ev.id == ledgerBefore.eeus[0].eeuId
+            return ev.eeuId == ledgerBefore.eeus[0].eeuId
                    && ev.eeuTypeId == CONST.eeuType.UNFCCC
                    && ev.ledgerOwner == accounts[global.accountNdx]
                    && ev.burnedKG == CONST.ktCarbon / 2
                    ;
         });
         truffleAssert.eventEmitted(a0_burnTx1, 'BurnedPartialEeu', ev => { 
-            return ev.id == ledgerBefore.eeus[1].eeuId
+            return ev.eeuId == ledgerBefore.eeus[1].eeuId
                    && ev.eeuTypeId == CONST.eeuType.UNFCCC
                    && ev.ledgerOwner == accounts[global.accountNdx]
                    && ev.burnedKG == CONST.ktCarbon - expectRemainKg - CONST.ktCarbon / 2
@@ -181,7 +181,7 @@ contract('AcMaster', accounts => {
 
         // validate burn full EEU event
         //truffleAssert.prettyPrintEmittedEvents(a0_burnTx1);
-        truffleAssert.eventEmitted(a0_burnTx1, 'BurnedFullEeu', ev => vcs_eeus.some(p => ev.id == p.eeuId));
+        truffleAssert.eventEmitted(a0_burnTx1, 'BurnedFullEeu', ev => vcs_eeus.some(p => ev.eeuId == p.eeuId));
 
         // check global total
         const burnedKgAfter = await acm.getKgCarbonBurned.call();

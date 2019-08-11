@@ -25,6 +25,7 @@ module.exports = {
     // ccy constants
     thousandUsd_cents: Big(1000 * 100).toFixed(),
      millionUsd_cents: Big(1000 * 1000 * 100).toFixed(),
+     billionUsd_cents: Big(1000 * 1000 * 1000 * 100).toFixed(),
            oneEth_wei: Big(web3.utils.toWei("1", "ether")).toFixed(),                         // "1000000000000000000", 
       thousandEth_wei: Big(web3.utils.toWei("1", "ether") * 1000).toFixed(),                  // "1000000000000000000000", 
        millionEth_wei: Big(web3.utils.toWei("1", "ether")).times(1000).times(1000).toFixed(), // "1000000000000000000000000", 

@@ -159,7 +159,7 @@ contract('AcMaster', accounts => {
         for (var eeuCount = 1; eeuCount < 1 + qtyEeus; eeuCount++) {
             truffleAssert.eventEmitted(mintTx, 'MintedEeu', ev => {
                 //console.log(`event: MintedEeu ev.id=${ev.id} curMaxEeuId=${curMaxEeuId}`);
-                return ev.id > curMaxEeuId - qtyEeus && ev.id <= curMaxEeuId
+                return ev.eeuId > curMaxEeuId - qtyEeus && ev.eeuId <= curMaxEeuId
                     && ev.batchId == batchId
                     && ev.eeuTypeId == eeuType
                     && ev.ledgerOwner == receiver

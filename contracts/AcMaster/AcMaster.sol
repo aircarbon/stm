@@ -3,17 +3,17 @@ pragma experimental ABIEncoderV2;
 
 import "./EeuMintable.sol";
 import "./EeuBurnable.sol";
-import "./EeuTradable.sol";
 import "./CcyFundable.sol";
 import "./CcyWithdrawable.sol";
+import "./EeuTransferable.sol";
 
-contract AcMaster is EeuMintable, EeuBurnable, CcyFundable, CcyWithdrawable, EeuTradable {
+contract AcMaster is EeuMintable, EeuBurnable, CcyFundable, CcyWithdrawable, EeuTransferable {
     string public version;
 
     /**
      * ctor
      */
     constructor() public {
-        version = "0.0.4";
+        version = "0.0.5";
     }
 }

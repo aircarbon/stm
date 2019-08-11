@@ -5,8 +5,8 @@ import "./Owned.sol";
 import "./AcLedger.sol";
 
 contract EeuBurnable is Owned, AcLedger {
-    event BurnedFullEeu(uint256 id, uint256 eeuTypeId, address ledgerOwner, uint256 burnedKG);
-    event BurnedPartialEeu(uint256 id, uint256 eeuTypeId, address ledgerOwner, uint256 burnedKG);
+    event BurnedFullEeu(uint256 eeuId, uint256 eeuTypeId, address ledgerOwner, uint256 burnedKG);
+    event BurnedPartialEeu(uint256 eeuId, uint256 eeuTypeId, address ledgerOwner, uint256 burnedKG);
 
     /**
      * @dev Burns carbons by resizing EEUs, and/or removing EEUs from the ledger

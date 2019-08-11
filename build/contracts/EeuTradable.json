@@ -12932,7 +12932,7 @@
   },
   "networks": {},
   "schemaVersion": "3.0.11",
-  "updatedAt": "2019-08-09T20:27:42.914Z",
+  "updatedAt": "2019-08-09T20:29:09.098Z",
   "devdoc": {
     "methods": {
       "addCcyType(string,string)": {
