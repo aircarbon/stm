@@ -57,7 +57,7 @@ module.exports = {
         //     network_id: "*",
         // },
         development: {
-            // for "truffle test" -- with manually launched "ganache-cli -a 100" (1000 test accounts)
+            // for "truffle test" -- with manually launched "ganache-cli -a 200" (1000 test accounts)
             host: '127.0.0.1',
             port: 8545,
             network_id: '*',
@@ -65,7 +65,7 @@ module.exports = {
 
         ropsten_scoop: {
             //provider: () => new HDWalletProvider(mnemonic, 'https://node0.scoop.tech:9545', 0, 1000),
-            provider: new HDWalletProvider(mnemonic, 'https://node0.scoop.tech:9545', 0, 100),
+            provider: new HDWalletProvider(mnemonic, 'https://node0.scoop.tech:9545', 0, 200),
             network_id: '*',
             gas: 6000000,
             gasPrice: web3.utils.toWei('20', 'gwei'),
@@ -74,7 +74,7 @@ module.exports = {
         // ropsten infura -- much slower than rinkeby infura
         ropsten_infura: {
             provider: function () {
-                return new HDWalletProvider(mnemonic, "https://ropsten.infura.io/v3/93db2c7fd899496d8400e86100058297", 0, 100)
+                return new HDWalletProvider(mnemonic, "https://ropsten.infura.io/v3/93db2c7fd899496d8400e86100058297", 0, 200)
             },
             network_id: "*",
             gas: 6000000,
@@ -82,8 +82,8 @@ module.exports = {
         },
 
         rinkeby_infura: {
-            //provider: () => new HDWalletProvider(mnemonic, 'https://rinkeby.infura.io/v3/93db2c7fd899496d8400e86100058297', 0, 1000),
-            provider: new HDWalletProvider(mnemonic, 'https://rinkeby.infura.io/v3/93db2c7fd899496d8400e86100058297', 0, 100),
+            //provider: () => new HDWalletProvider(mnemonic, 'https://rinkeby.infura.io/v3/93db2c7fd899496d8400e86100058297', 0, 200),
+            provider: new HDWalletProvider(mnemonic, 'https://rinkeby.infura.io/v3/93db2c7fd899496d8400e86100058297', 0, 200),
             network_id: '*',
             gas: 6000000,
             gasPrice: web3.utils.toWei('20', 'gwei'),

@@ -61,13 +61,6 @@ contract('AcMaster', accounts => {
         });
     });
 
-    // one-sided kg transfer, no consideration, 1 full EEU
-    // one-sided kg transfer, no consideration, 1 full + 1 partial EEU (split)
-    // one-sided kg transfer, no consideration, n full + 1 partial EEU (split)
-    // two-sided kg transfer, kg consideration, x3 as above
-    //
-    // two-sided mixed transfer (trade): kg for ccy, x3 as above
-
     it('transferring - should not allow non-owner to transfer across ledger entries', async () => {
         try {
             await acm.transfer(accounts[global.accountNdx + 0], accounts[global.accountNdx + 1], 0, 0, 0, 0, 0, 0, 0, 0, { from: accounts[1] });
@@ -84,7 +77,7 @@ contract('AcMaster', accounts => {
         assert.fail('expected restriction exception');
     });
     
-    it('transferring ccy - should not allow a currency transfer to an unkown ledger entry', async () => {
+    it('transferring - should not allow a transfer to an unkown ledger entry', async () => {
         await acm.fund(CONST.ccyType.USD, CONST.thousandUsd_cents,       accounts[global.accountNdx + 0], { from: accounts[0] });
         try {
             await acm.transfer(accounts[global.accountNdx + 0], accounts[global.accountNdx + 1], 0, 0, 0, 0,
@@ -97,7 +90,7 @@ contract('AcMaster', accounts => {
         assert.fail('expected restriction exception');
     });
 
-    it('transferring ccy - should not allow a currency transfer from an unkown ledger entry', async () => {
+    it('transferring - should not allow a transfer from an unkown ledger entry', async () => {
         await acm.fund(CONST.ccyType.USD, CONST.thousandUsd_cents,       accounts[global.accountNdx + 1], { from: accounts[0] });
         try {
             await acm.transfer(accounts[global.accountNdx + 0], accounts[global.accountNdx + 1], 0, 0, 0, 0,

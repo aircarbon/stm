@@ -5,7 +5,7 @@ import "./Owned.sol";
 import "./AcLedger.sol";
 
 contract EeuMintable is Owned, AcLedger {
-    event MintedEeuBatch(uint256 eeuId, uint256 eeuTypeId, address batchOwner, uint256 qtyKG, uint256 qtyEeus);
+    event MintedEeuBatch(uint256 batchId, uint256 eeuTypeId, address batchOwner, uint256 qtyKG, uint256 qtyEeus);
     event MintedEeu(uint256 eeuId, uint256 batchId, uint256 eeuTypeId, address ledgerOwner, uint256 mintedKG);
 
     /**

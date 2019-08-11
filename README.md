@@ -8,7 +8,7 @@
 
 ## Run local node
 
-- `ganache-cli -a 100 -i 888`
+- `ganache-cli -a 200 -i 888`
   > runs with 100 accounts (tests require more than 10 built into `truffle develop`)
   > runs with custom network ID 888
   > runs with InstaMining by default
@@ -41,9 +41,8 @@
 ## WIP - TODOs
 
     ### contract - core fn's
-    * TOOD: test transfer fn() ...
     * TODO: merge/combine optimize post-transfer ...
-    * trade/transfer (Ccy + EEUs - same interface?), inc. EEU split & merge
+    * TOOD: test transfer eeu/ccy (trade)
     * IPFS pointers & URL pointers for batch minting
 
     ### contract - ERC721-compat

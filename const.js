@@ -23,6 +23,7 @@ module.exports = {
      gtCarbon: 1000 * 1000 * 1000 * 1000, // gigaton carbon in kg
 
     // ccy constants
+         oneUsd_cents: Big(1 * 100).toFixed(),
     thousandUsd_cents: Big(1000 * 100).toFixed(),
      millionUsd_cents: Big(1000 * 1000 * 100).toFixed(),
      billionUsd_cents: Big(1000 * 1000 * 1000 * 100).toFixed(),

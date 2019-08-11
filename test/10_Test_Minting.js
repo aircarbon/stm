@@ -142,8 +142,8 @@ contract('AcMaster', accounts => {
 
         // validate batch minted event
         truffleAssert.eventEmitted(mintTx, 'MintedEeuBatch', ev => {
-            batchId = Number(ev.id);
-            return ev.id == maxBatchIdAfter
+            batchId = Number(ev.batchId);
+            return ev.batchId == maxBatchIdAfter
                 && ev.eeuTypeId == eeuType
                 && ev.batchOwner == receiver
                 && ev.qtyKG == qtyKG

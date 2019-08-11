@@ -95,7 +95,6 @@ module.exports = {
                `unexpected total transfered delta after, ccy B`);
 
         // validate EEU events
-        //...
         const eeuFullEvents = [];
         const eeuPartialEvents = [];
         if (kg_A > 0 || kg_B > 0) {
@@ -107,10 +106,13 @@ module.exports = {
             try { truffleAssert.eventEmitted(transferTx, 'TransferedPartialEeu', ev => { eeuPartialEvents.push(ev); return true; }); }
             catch {}
 
-            //console.log('eeuFullEvents', eeuFullEvents.length);
-            //console.log('eeuPartialEvents', eeuPartialEvents.length);
-            assert(eeuFullEvents.length > 0 || eeuPartialEvents.length == 1, 'unexpected EEU transferred full vs. partial event count after transfer');
-            assert(eeuPartialEvents.length <= 1, 'unexpected EEU transferred partial event count after transfer');
+            assert(eeuFullEvents.length > 0 || eeuPartialEvents.length == 1, 'unexpected transfer full vs. partial event count after transfer');
+            if ((kg_A > 0 && kg_B == 0) || (kg_B > 0 && kg_A == 0)) {
+                assert(eeuPartialEvents.length <= 1, 'unexpected transfer partial event count after single-sided eeu transfer');
+            }
+            else {
+                assert(eeuPartialEvents.length <= 2, 'unexpected transfer partial event count after two-sided eeu transfer');
+            }
             
             // validate that total tonnage across A and B is unchanged
             assert(Number(ledgerA_before.eeu_sumKG) + Number(ledgerB_before.eeu_sumKG) ==
@@ -118,17 +120,52 @@ module.exports = {
                   'unexpected total tonnage sum across ledger before vs. after');
         }
 
-        // validate EEUs are moved
+        // validate EEUs are moved        
         if (kg_A > 0) {
-            assert(ledgerA_after.eeu_sumKG == Number(ledgerA_before.eeu_sumKG) - kg_A, 'unexpected ledger A tonnage sum after transfer A -> B');
-            assert(ledgerB_after.eeu_sumKG == Number(ledgerB_before.eeu_sumKG) + kg_A, 'unexpected ledger B tonnage sum after transfer A -> B');
+            var netKg_tfd = 0;
+            netKg_tfd += kg_A;
+            netKg_tfd -= kg_B;
+            assert(ledgerA_after.eeu_sumKG == Number(ledgerA_before.eeu_sumKG) - netKg_tfd, 'unexpected ledger A tonnage sum after transfer A -> B');
+            assert(ledgerB_after.eeu_sumKG == Number(ledgerB_before.eeu_sumKG) + netKg_tfd, 'unexpected ledger B tonnage sum after transfer A -> B');
         }
         if (kg_B > 0) {
-            assert(ledgerB_after.eeu_sumKG == Number(ledgerB_before.eeu_sumKG) - kg_B, 'unexpected ledger B tonnage sum after transfer B -> A');
-            assert(ledgerA_after.eeu_sumKG == Number(ledgerA_before.eeu_sumKG) + kg_B, 'unexpected ledger A tonnage sum after transfer B -> A');
+            var netKg_tfd = 0;
+            netKg_tfd += kg_B;
+            netKg_tfd -= kg_A;
+            assert(ledgerB_after.eeu_sumKG == Number(ledgerB_before.eeu_sumKG) - netKg_tfd, 'unexpected ledger B tonnage sum after transfer B -> A');
+            assert(ledgerA_after.eeu_sumKG == Number(ledgerA_before.eeu_sumKG) + netKg_tfd, 'unexpected ledger A tonnage sum after transfer B -> A');
         }
 
         return { eeuFullEvents, eeuPartialEvents,
                  ledgerA_before, ledgerA_after, ledgerB_before, ledgerB_after };
+    },
+
+    assert_nFull_1Partial: ({ 
+        fullEvents, partialEvents,
+        expectFullTransfer_eeuCount,
+        ledgerSender_before,   ledgerSender_after,
+        ledgerReceiver_before, ledgerReceiver_after,
+    }) => {
+
+        const start_Sender_eeuCount = ledgerSender_before.eeus.length;
+        const start_Receiver_eeuCount = ledgerReceiver_before.eeus.length;
+
+        assert(fullEvents.length == expectFullTransfer_eeuCount && partialEvents.length == 1, 'unexpected event composition');
+        assert(ledgerSender_before.eeus.some(p => p.eeuId == partialEvents[0].splitFromEeuId), 'unexpected partial event parent eeu id vs. ledger A before');
+        assert(ledgerReceiver_after.eeus.some(p => p.eeuId == partialEvents[0].newEeuId), 'unexpected partial event soft-minted eeu id vs. ledger B after');
+        
+        const softMintedEeu = ledgerReceiver_after.eeus.find(p => p.eeuId == partialEvents[0].newEeuId);
+        const parentSplitEeu = ledgerSender_after.eeus.find(p => p.eeuId == partialEvents[0].splitFromEeuId);
+        assert(softMintedEeu.eeuTypeId == parentSplitEeu.eeuTypeId, 'unexpected eeu type of soft-minted eeu');
+        assert(softMintedEeu.batchId == parentSplitEeu.batchId, 'unexpected batch id of soft-minted eeu');
+
+        assert(fullEvents.every(p => ledgerSender_before.eeus.some(p2 => p2.eeuId == p.eeuId)), 'unexpected full event eeu id(s) vs. ledger A before');
+        assert(fullEvents.every(p => !ledgerSender_after.eeus.some(p2 => p2.eeuId == p.eeuId)), 'unexpected full event eeu id(s) vs. ledger A after');
+        assert(fullEvents.every(p => ledgerReceiver_after.eeus.some(p2 => p2.eeuId == p.eeuId)), 'unexpected full event eeu id(s) vs. ledger B after');
+
+        assert(ledgerSender_after.eeus.length == start_Sender_eeuCount - expectFullTransfer_eeuCount, 'unexpected eeu count ledger A after');
+        
+        // TODO: expect 1 when combine is done ...
+        assert(ledgerReceiver_after.eeus.length == start_Receiver_eeuCount + expectFullTransfer_eeuCount + 1, 'unexpected eeu count ledger B after'); 
     }
 };

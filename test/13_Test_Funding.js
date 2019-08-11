@@ -98,9 +98,6 @@ contract('AcMaster', accounts => {
         // validate ledger balance is updated for test ccy
         //console.dir(ledgerEntryBefore);
         //console.dir(ledgerEntryAfter);
-        console.log('before', ledgerEntryBefore.ccys.find(p => p.typeId == ccyTypeId).balance);
-        console.log('after', ledgerEntryAfter.ccys.find(p => p.typeId == ccyTypeId).balance);
-        console.log('amount', amount);
 
         assert(ledgerEntryAfter.ccys.find(p => p.typeId == ccyTypeId).balance == 
                Number(ledgerEntryBefore.ccys.find(p => p.typeId == ccyTypeId).balance) + Number(amount),
