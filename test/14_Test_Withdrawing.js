@@ -50,12 +50,12 @@ contract('AcMaster', accounts => {
     });
 
     it('withdrawing - should allow minting, funding and withdrawing on same ledger entry', async () => {
-        await acm.mintEeuBatch(CONST.eeuType.VCS, CONST.mtCarbon, 2, accounts[global.accountNdx], { from: accounts[0] });
+        await acm.mintEeuBatch(CONST.eeuType.VCS, CONST.mtCarbon, 1, accounts[global.accountNdx], { from: accounts[0] });
         await acm.fund(CONST.ccyType.USD, CONST.thousandUsd_cents, accounts[global.accountNdx], { from: accounts[0] });
         await withdrawLedger({ ccyTypeId: CONST.ccyType.USD, amount: CONST.thousandUsd_cents / 2, withdrawer: accounts[global.accountNdx] });
         const ledgerEntryAfter = await acm.getLedgerEntry(accounts[global.accountNdx]);
 
-        assert(ledgerEntryAfter.eeus.length == 2, 'unexpected eeu count in ledger entry after minting, funding & withdrawing');
+        assert(ledgerEntryAfter.eeus.length == 1, 'unexpected eeu count in ledger entry after minting, funding & withdrawing');
         assert(Number(ledgerEntryAfter.eeu_sumKG) == Number(CONST.mtCarbon), 'invalid kg sum in ledger entry after minting, funding & withdrawing');
         assert(ledgerEntryAfter.ccys.find(p => p.typeId == CONST.ccyType.USD).balance == CONST.thousandUsd_cents / 2, 'unexpected usd balance in ledger entry after minting, funding & withdrawing');
     });

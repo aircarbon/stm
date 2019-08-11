@@ -17,7 +17,8 @@
     "keywords": [],
     "license": "MIT",
     "dependencies": {
-        "big.js": "^5.2.2"
+        "big.js": "^5.2.2",
+        "bn.js": "^5.0.0"
     },
     "devDependencies": {
         "big-number": "2.0.0",

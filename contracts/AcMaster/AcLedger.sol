@@ -22,9 +22,9 @@ contract AcLedger is Owned, EeuTypes, CcyTypes {
     mapping(uint256 => uint256) _eeus_batchId;
     mapping(uint256 => uint256) _eeus_mintedKG;
     mapping(uint256 => uint256) _eeus_KG;                       // == 0 indicates fully burned, != _eeus_mintedKG indicates partially burned
-    mapping(uint256 => uint256) _eeus_mintedTimestamp;          // creation time - full initial minting, or transfer soft-minting (split) time
-    mapping(uint256 => uint256) _eeus_splitFromEeuId;           // the parent EEU ID, if the EEU was soft-minted in a transfer split
-    mapping(uint256 => uint256) _eeus_splitToEeuId;             // the child EEU ID, if the EEU was a parent in a transfer split
+    //mapping(uint256 => uint256) _eeus_mintedTimestamp;          // creation time - full initial minting, or transfer soft-minting (split) time
+    //mapping(uint256 => uint256) _eeus_splitFromEeuId;           // the parent EEU ID, if the EEU was soft-minted in a transfer split
+    //mapping(uint256 => uint256) _eeus_splitToEeuId;             // the child EEU ID, if the EEU was a parent in a transfer split
     uint256 _eeu_totalMintedKG;
     uint256 _eeu_totalBurnedKG;
     uint256 _eeu_totalTransferedKG;
@@ -36,9 +36,9 @@ contract AcLedger is Owned, EeuTypes, CcyTypes {
             uint256 mintedKG;                                   // initial KG minted in the EEU
             uint256 KG;                                         // current variable KG in the EEU (i.e. burned = KG - mintedKG)
             uint256 batchId;                                    // parent batch ID
-            uint256 mintedTimestamp;                            // minting block.timestamp
-            uint256 splitFromId;                                // the parent EEU ID, if any
-            uint256 splitToId;                                  // the child EEU ID, if any
+            //uint256 mintedTimestamp;                            // minting block.timestamp
+            //uint256 splitFromId;                                // the parent EEU ID, if any
+            //uint256 splitToId;                                  // the child EEU ID, if any
         }
 
     // *** LEDGER
@@ -48,7 +48,7 @@ contract AcLedger is Owned, EeuTypes, CcyTypes {
     struct Ledger {
         bool                          exists;                   // for existance check by address
         mapping(uint256 => uint256[]) eeuType_eeuIds;           // EeuTypeId -> eeuId[] of all owned vEEU(s)
-        mapping(uint256 => uint256)   eeuType_sumKG;            // EeuTypeId -> sum KG carbon in all owned vEEU(s)
+        //mapping(uint256 => uint256)   eeuType_sumKG;            // EeuTypeId -> sum KG carbon in all owned vEEU(s)
         mapping(uint256 => int256)    ccyType_balance;          // CcyTypeId -> balance
     }
     mapping(uint256 => uint256) _ccyType_totalFunded;
@@ -61,9 +61,9 @@ contract AcLedger is Owned, EeuTypes, CcyTypes {
             string  eeuTypeName;
             uint256 batchId;
             uint256 eeuKG;
-            uint256 mintedTimestamp;
-            uint256 splitFromId;
-            uint256 splitToId;
+            //uint256 mintedTimestamp;
+            //uint256 splitFromId;
+            //uint256 splitToId;
         }
         struct LedgerCcyReturn {
             uint256 typeId;
@@ -95,10 +95,10 @@ contract AcLedger is Owned, EeuTypes, CcyTypes {
                     id: id,
               mintedKG: _eeus_mintedKG[id],
                     KG: _eeus_KG[id],
-               batchId: _eeus_batchId[id],
-       mintedTimestamp: _eeus_mintedTimestamp[id],
-           splitFromId: _eeus_splitFromEeuId[id],
-             splitToId: _eeus_splitToEeuId[id]
+               batchId: _eeus_batchId[id]
+       //mintedTimestamp: _eeus_mintedTimestamp[id],
+           //splitFromId: _eeus_splitFromEeuId[id],
+             //splitToId: _eeus_splitToEeuId[id]
             });
     }
 
@@ -133,10 +133,10 @@ contract AcLedger is Owned, EeuTypes, CcyTypes {
                     eeuTypeId: eeuTypeId,
                   eeuTypeName: _eeuTypeNames[eeuTypeId],
                       batchId: _eeus_batchId[eeuId],
-                        eeuKG: _eeus_KG[eeuId],
-              mintedTimestamp: _eeus_mintedTimestamp[eeuId],
-                  splitFromId: _eeus_splitFromEeuId[eeuId],
-                    splitToId: _eeus_splitToEeuId[eeuId]
+                        eeuKG: _eeus_KG[eeuId]
+              //mintedTimestamp: _eeus_mintedTimestamp[eeuId],
+                  //splitFromId: _eeus_splitFromEeuId[eeuId],
+                    //splitToId: _eeus_splitToEeuId[eeuId]
                 });
                 flatEeuNdx++;
             }

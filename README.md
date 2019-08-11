@@ -41,8 +41,15 @@
 ## WIP - TODOs
 
     ### contract - core fn's
-    * TODO: merge/combine optimize post-transfer ...
+    * TOOD: cleanup burning test (1)
     * TOOD: test transfer eeu/ccy (trade)
+    *
+    * TOOD: long-running simulation test
+    *   > mints batches randomly & assigns to initial owners (eeu xfer)
+    *   > funds new accounts randomly & withdraws randomly
+    *   > trades randomly
+    * expect: split/merge to hold up, KG & ccy consistency overall to hold up, etc.
+
     * IPFS pointers & URL pointers for batch minting
 
     ### contract - ERC721-compat
@@ -57,6 +64,6 @@
     * authentication & action-logging (implies DB)
     * contract-action invoker (one page per action)
     * contract event viewer (new & historic)
-    * _ledger viewer/summary
+    * ledger viewer/summary
     * proto-TX-explorer
     * API layer (separate deployment to ac-admin?)

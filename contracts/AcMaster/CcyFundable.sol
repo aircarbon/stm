@@ -16,7 +16,7 @@ contract CcyFundable is Owned, AcLedger {
     function fund(uint256 ccyTypeId, int256 amount, address ledgerOwner) public {
         require(msg.sender == owner, "Restricted method");
         require(ccyTypeId >= 0 && ccyTypeId < _count_ccyTypes, "Invalid currency type");
-        require(amount > 0, "Minimum one currency unit required");
+        require(amount >= 0, "Invalid amount"); // allow funding zero - initializes empty ledger entry
 
         // we keep amount as signed value - ledger allows -ve balances (currently unused capability)
         //uint256 fundAmount = uint256(amount);

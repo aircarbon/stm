@@ -68,7 +68,7 @@ module.exports = {
             provider: new HDWalletProvider(mnemonic, 'https://node0.scoop.tech:9545', 0, 200),
             network_id: '*',
             gas: 6000000,
-            gasPrice: web3.utils.toWei('20', 'gwei'),
+            gasPrice: web3.utils.toWei('40', 'gwei'),
         },
 
         // ropsten infura -- much slower than rinkeby infura
@@ -78,7 +78,7 @@ module.exports = {
             },
             network_id: "*",
             gas: 6000000,
-            gasPrice: web3.utils.toWei("20", "gwei"),
+            gasPrice: web3.utils.toWei("40", "gwei"),
         },
 
         rinkeby_infura: {
@@ -86,7 +86,7 @@ module.exports = {
             provider: new HDWalletProvider(mnemonic, 'https://rinkeby.infura.io/v3/93db2c7fd899496d8400e86100058297', 0, 200),
             network_id: '*',
             gas: 6000000,
-            gasPrice: web3.utils.toWei('20', 'gwei'),
+            gasPrice: web3.utils.toWei('40', 'gwei'),
         },
 
         // Another network with more advanced options...
@@ -120,8 +120,8 @@ module.exports = {
 
     // Set default mocha options here, use special reporters etc.
     mocha: {
-        timeout: 0,
-        enableTimeouts: false,
+        //timeout: 0,
+        //enableTimeouts: false,
     },
 
     // Configure your compilers

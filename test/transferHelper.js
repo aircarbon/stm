@@ -1,5 +1,6 @@
 const ac = artifacts.require('AcMaster');
 const truffleAssert = require('truffle-assertions');
+const BN = require('bn.js');
 
 module.exports = {
 
@@ -12,15 +13,15 @@ module.exports = {
     }) => {
         var ledgerA_before, ledgerA_after;
         var ledgerB_before, ledgerB_after;
-        var getTotalKgTransfered_before, getTotalKgTransfered_after;
-        const totalCcyTransfered_before = [];
-        const totalCcyTransfered_after = [];
+        var totalKg_tfd_before, totalKg_tfd_after;
+        const totalCcy_tfd_before = [];
+        const totalCcy_tfd_after = [];
 
         ledgerA_before = await acm.getLedgerEntry(ledger_A);
         ledgerB_before = await acm.getLedgerEntry(ledger_B);
-        getTotalKgTransfered_before = await acm.getTotalKgTransfered.call();
-        totalCcyTransfered_before[ccyTypeId_A] = await acm.getTotalCcyTransfered.call(ccyTypeId_A);
-        totalCcyTransfered_before[ccyTypeId_B] = await acm.getTotalCcyTransfered.call(ccyTypeId_B);
+        totalKg_tfd_before = await acm.getTotalKgTransfered.call();
+        totalCcy_tfd_before[ccyTypeId_A] = await acm.getTotalCcyTransfered.call(ccyTypeId_A);
+        totalCcy_tfd_before[ccyTypeId_B] = await acm.getTotalCcyTransfered.call(ccyTypeId_B);
 
         // expected net delta per currency, wrt. account A
         const deltaCcy_fromA = [];
@@ -41,11 +42,11 @@ module.exports = {
         );
         ledgerA_after = await acm.getLedgerEntry(ledger_A);
         ledgerB_after = await acm.getLedgerEntry(ledger_B);
+        totalKg_tfd_after = await acm.getTotalKgTransfered.call();
+        totalCcy_tfd_after[ccyTypeId_A] = await acm.getTotalCcyTransfered.call(ccyTypeId_A);
+        totalCcy_tfd_after[ccyTypeId_B] = await acm.getTotalCcyTransfered.call(ccyTypeId_B);
 
         // validate currency events
-        getTotalKgTransfered_after = await acm.getTotalKgTransfered.call();
-        totalCcyTransfered_after[ccyTypeId_A] = await acm.getTotalCcyTransfered.call(ccyTypeId_A);
-        totalCcyTransfered_after[ccyTypeId_B] = await acm.getTotalCcyTransfered.call(ccyTypeId_B);
         if (ccy_amount_A > 0 || ccy_amount_B > 0) {
             truffleAssert.eventEmitted(transferTx, 'TransferedLedgerCcy', ev => { return (
                 (ccy_amount_A > 0 && ev.from == ledger_A && ev.to == ledger_B && ev.ccyTypeId == ccyTypeId_A && ev.amount == ccy_amount_A)
@@ -82,16 +83,18 @@ module.exports = {
         //...
 
         // validate currency global totals
-        totalCcyTransfered_after[ccyTypeId_A] = await acm.getTotalCcyTransfered.call(ccyTypeId_A);
-        totalCcyTransfered_after[ccyTypeId_B] = await acm.getTotalCcyTransfered.call(ccyTypeId_B);
-        const totalCcy_tfd = [];
-        totalCcy_tfd[ccyTypeId_A] = 0;
-        totalCcy_tfd[ccyTypeId_B] = 0;
-        totalCcy_tfd[ccyTypeId_A] += ccy_amount_A;
-        totalCcy_tfd[ccyTypeId_B] += ccy_amount_B;
-        assert(totalCcyTransfered_after[ccyTypeId_A] - totalCcyTransfered_before[ccyTypeId_A] == totalCcy_tfd[ccyTypeId_A],
+        totalCcy_tfd_after[ccyTypeId_A] = await acm.getTotalCcyTransfered.call(ccyTypeId_A);
+        totalCcy_tfd_after[ccyTypeId_B] = await acm.getTotalCcyTransfered.call(ccyTypeId_B);
+        const expectedCcy_tfd = [];
+        expectedCcy_tfd[ccyTypeId_A] = 0;
+        expectedCcy_tfd[ccyTypeId_B] = 0;
+        expectedCcy_tfd[ccyTypeId_A] += ccy_amount_A;
+        expectedCcy_tfd[ccyTypeId_B] += ccy_amount_B;
+
+        assert(totalCcy_tfd_after[ccyTypeId_A].sub(totalCcy_tfd_before[ccyTypeId_A]).eq(new BN(expectedCcy_tfd[ccyTypeId_A])),
                `unexpected total transfered delta after, ccy A`);
-        assert(totalCcyTransfered_after[ccyTypeId_B] - totalCcyTransfered_before[ccyTypeId_B] == totalCcy_tfd[ccyTypeId_B],
+               
+        assert(totalCcy_tfd_after[ccyTypeId_B].sub(totalCcy_tfd_before[ccyTypeId_B]).eq(new BN(expectedCcy_tfd[ccyTypeId_B])),
                `unexpected total transfered delta after, ccy B`);
 
         // validate EEU events
@@ -106,7 +109,17 @@ module.exports = {
             try { truffleAssert.eventEmitted(transferTx, 'TransferedPartialEeu', ev => { eeuPartialEvents.push(ev); return true; }); }
             catch {}
 
-            assert(eeuFullEvents.length > 0 || eeuPartialEvents.length == 1, 'unexpected transfer full vs. partial event count after transfer');
+            if (kg_A > 0) {
+                assert(eeuFullEvents.filter(p => p.from == ledger_A).length > 0 ||
+                       eeuPartialEvents.filter(p => p.from == ledger_A).length == 1,
+                       'unexpected transfer full vs. partial event count after transfer for ledger A');
+            }
+            if (kg_B > 0) {
+                assert(eeuFullEvents.filter(p => p.from == ledger_B).length > 0 ||
+                       eeuPartialEvents.filter(p => p.from == ledger_B).length == 1,
+                       'unexpected transfer full vs. partial event count after transfer for ledger B');
+            }
+            
             if ((kg_A > 0 && kg_B == 0) || (kg_B > 0 && kg_A == 0)) {
                 assert(eeuPartialEvents.length <= 1, 'unexpected transfer partial event count after single-sided eeu transfer');
             }
@@ -136,7 +149,11 @@ module.exports = {
             assert(ledgerA_after.eeu_sumKG == Number(ledgerA_before.eeu_sumKG) + netKg_tfd, 'unexpected ledger A tonnage sum after transfer B -> A');
         }
 
-        return { eeuFullEvents, eeuPartialEvents,
+        // validate carbon global totals
+        assert(totalKg_tfd_after.sub(totalKg_tfd_before).eq(new BN(kg_A).add(new BN(kg_B))), 'unexpected total tonnage carbon after transfer');
+
+        return { transferTx, 
+                 eeuFullEvents, eeuPartialEvents,
                  ledgerA_before, ledgerA_after, ledgerB_before, ledgerB_after };
     },
 

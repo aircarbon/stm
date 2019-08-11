@@ -16,14 +16,19 @@ contract EeuBurnable is Owned, AcLedger {
      * @param eeuTypeId The EEU type to burn
      * @param qtyKG The tonnage to burn
      */
-    function burnEeus(address ledgerOwner, uint256 eeuTypeId, int256 qtyKG) public {
+    function retireCarbon(address ledgerOwner, uint256 eeuTypeId, int256 qtyKG) public {
         require(msg.sender == owner, "Restricted method");
         require(_ledger[ledgerOwner].exists == true, "Invalid ledger owner");
         require(qtyKG >= 1000, "Minimum one metric ton of carbon required");
         require(eeuTypeId >= 0 && eeuTypeId < _count_eeuTypes, "Invalid EEU type");
 
         // check ledger owner has sufficient carbon tonnage of supplied type
-        require(_ledger[ledgerOwner].eeuType_sumKG[eeuTypeId] >= uint256(qtyKG), "Insufficient carbon held by ledger owner");
+        uint256 kgAvailable = 0;
+        for (uint i = 0; i < _ledger[ledgerOwner].eeuType_eeuIds[eeuTypeId].length; i++) {
+            kgAvailable += _eeus_KG[_ledger[ledgerOwner].eeuType_eeuIds[eeuTypeId][i]];
+        }
+        require(kgAvailable >= uint256(qtyKG), "Insufficient carbon held by ledger owner");
+        //require(_ledger[ledgerOwner].eeuType_sumKG[eeuTypeId] >= uint256(qtyKG), "Insufficient carbon held by ledger owner");
 
         // burn sufficient EEUs
         uint256 ndx = 0;
@@ -41,7 +46,7 @@ contract EeuBurnable is Owned, AcLedger {
                 // remove from ledger
                 eeuType_eeuIds[ndx] = eeuType_eeuIds[eeuType_eeuIds.length - 1];
                 eeuType_eeuIds.length--;
-                _ledger[ledgerOwner].eeuType_sumKG[eeuTypeId] -= eeuKg;
+                //_ledger[ledgerOwner].eeuType_sumKG[eeuTypeId] -= eeuKg;
 
                 // burn from batch
                 _eeuBatches[batchId].burnedKG += eeuKg;
@@ -53,7 +58,7 @@ contract EeuBurnable is Owned, AcLedger {
                 _eeus_KG[eeuId] -= remainingToBurn;
 
                 // retain on ledger
-                _ledger[ledgerOwner].eeuType_sumKG[eeuTypeId] -= remainingToBurn;
+                //_ledger[ledgerOwner].eeuType_sumKG[eeuTypeId] -= remainingToBurn;
 
                 // burn from batch
                 _eeuBatches[batchId].burnedKG += remainingToBurn;

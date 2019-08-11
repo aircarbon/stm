@@ -18,7 +18,8 @@ contract EeuMintable is Owned, AcLedger {
     function mintEeuBatch(uint256 eeuTypeId, int256 qtyKG, int256 qtyEeus, address batchOwner) public {
         require(msg.sender == owner, "Restricted method");
         require(eeuTypeId >= 0 && eeuTypeId < _count_eeuTypes, "Invalid EEU type");
-        require(qtyEeus >= 1, "Minimum one EEU required");
+        //require(qtyEeus >= 1, "Minimum one EEU required");
+        require(qtyEeus == 1, "Exactly one EEU required");
         require(qtyKG >= 1000, "Minimum one metric ton of carbon required");
         require(qtyKG % qtyEeus == 0, "Carbon weight must divide evenly into EEUs");
 
@@ -30,7 +31,6 @@ contract EeuMintable is Owned, AcLedger {
                    mintedKG: uint256(qtyKG),
                    burnedKG: 0
         });
-        //_eeuBatches.push(newBatch);
         _eeuBatches[newBatch.id] = newBatch;
         _batchCurMaxId++;
         emit MintedEeuBatch(newBatch.id, eeuTypeId, batchOwner, uint256(qtyKG), uint256(qtyEeus));
@@ -52,7 +52,7 @@ contract EeuMintable is Owned, AcLedger {
             _eeus_batchId[newId] = newBatch.id;
             _eeus_mintedKG[newId] = eeuKG;
             _eeus_KG[newId] = eeuKG;
-            _eeus_mintedTimestamp[newId] = block.timestamp;
+            //_eeus_mintedTimestamp[newId] = block.timestamp;
 
             emit MintedEeu(newId, newBatch.id, eeuTypeId, batchOwner, eeuKG);
 
@@ -63,7 +63,7 @@ contract EeuMintable is Owned, AcLedger {
             // not currently used (was used when burning by eeuId)
             //_ownsEeuId[keccak256(abi.encodePacked(batchOwner, newId))] = true;
         }
-        _ledger[batchOwner].eeuType_sumKG[eeuTypeId] += uint256(qtyKG);
+        //_ledger[batchOwner].eeuType_sumKG[eeuTypeId] += uint256(qtyKG);
 
         _eeuCurMaxId += uint256(qtyEeus);
         _eeu_totalMintedKG += uint256(qtyKG);

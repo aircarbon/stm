@@ -6,8 +6,8 @@ import "./AcLedger.sol";
 
 contract EeuTransferable is Owned, AcLedger {
     event TransferedLedgerCcy(address from, address to, uint256 ccyTypeId, int256 amount);
-    event TransferedFullEeu(address from, address to, uint256 eeuId, uint256 eeuTypeId);
-    event TransferedPartialEeu(address from, address to, uint256 splitFromEeuId, uint256 newEeuId, uint256 eeuTypeId);
+    event TransferedFullEeu(address from, address to, uint256 eeuId, uint256 mergedToEeuId, uint256 eeuTypeId);
+    event TransferedPartialEeu(address from, address to, uint256 splitFromEeuId, uint256 newEeuId, uint256 mergedToEeuId, uint256 eeuTypeId);
 
     /**
      * @dev Transfers or trades assets between ledger accounts
@@ -43,8 +43,21 @@ contract EeuTransferable is Owned, AcLedger {
         require(_ledger[ledger_B].exists == true, "Invalid ledger owner B");
         require(kg_A > 0 || kg_B > 0 || ccy_amount_A > 0 || ccy_amount_B > 0, "Invalid transfer");
         require(!(ccy_amount_A < 0 || ccy_amount_B < 0), "Invalid currency amounts");
-        require(_ledger[ledger_A].eeuType_sumKG[eeuTypeId_A] >= kg_A, "Insufficient carbon held by ledger owner A");
-        require(_ledger[ledger_B].eeuType_sumKG[eeuTypeId_B] >= kg_B, "Insufficient carbon held by ledger owner B");
+
+        uint256 kgAvailable_typeA = 0;
+        for (uint i = 0; i < _ledger[ledger_A].eeuType_eeuIds[eeuTypeId_A].length; i++) {
+            kgAvailable_typeA += _eeus_KG[_ledger[ledger_A].eeuType_eeuIds[eeuTypeId_A][i]];
+        }
+        require(kgAvailable_typeA >= kg_A, "Insufficient carbon held by ledger owner A");
+        //require(_ledger[ledger_A].eeuType_sumKG[eeuTypeId_A] >= kg_A, "Insufficient carbon held by ledger owner A");
+
+        uint256 kgAvailable_typeB = 0;
+        for (uint i = 0; i < _ledger[ledger_B].eeuType_eeuIds[eeuTypeId_B].length; i++) {
+            kgAvailable_typeB += _eeus_KG[_ledger[ledger_B].eeuType_eeuIds[eeuTypeId_B][i]];
+        }
+        require(kgAvailable_typeB >= kg_B, "Insufficient carbon held by ledger owner B");
+        //require(_ledger[ledger_B].eeuType_sumKG[eeuTypeId_B] >= kg_B, "Insufficient carbon held by ledger owner B");
+
         require(_ledger[ledger_A].ccyType_balance[ccyTypeId_A] >= ccy_amount_A, "Insufficient currency held by ledger owner A");
         require(_ledger[ledger_B].ccyType_balance[ccyTypeId_B] >= ccy_amount_B, "Insufficient currency held by ledger owner B");
 
@@ -65,14 +78,21 @@ contract EeuTransferable is Owned, AcLedger {
         }
 
         // transfer EEUs
-        transferSplitEeus(ledger_A, ledger_B, kg_A, eeuTypeId_A);
-        transferSplitEeus(ledger_B, ledger_A, kg_B, eeuTypeId_B);
+        if (kg_A > 0) {
+            transferSplitEeus(ledger_A, ledger_B, kg_A, eeuTypeId_A);
+        }
+        if (kg_B > 0) {
+            transferSplitEeus(ledger_B, ledger_A, kg_B, eeuTypeId_B);
+        }
 
         // TODO...
+        //
         // merge (optimization): for both sender and receiver - after split:
         // simply combine same-type ** AND SAME BATCH ** EEUs into a single larger EEU
         // so, only ever should be a single EEU per owner per type per batch in the ledger
-        // (implies the "retirement" of old merged EEU IDs)
+        //   (implies the "retirement" of old merged EEU IDs)
+        //
+        // then, disable minting > 1 eeu count
     }
 
     /**
@@ -100,14 +120,38 @@ contract EeuTransferable is Owned, AcLedger {
                 // remove from origin
                 from_eeuIds[ndx] = from_eeuIds[from_eeuIds.length - 1];
                 from_eeuIds.length--;
-                _ledger[from].eeuType_sumKG[eeuTypeId] -= eeuKg;
+                //_ledger[from].eeuType_sumKG[eeuTypeId] -= eeuKg;                 //* gas - DROP DONE - only used internally, validation params
 
                 // assign to destination
-                to_eeuIds.push(eeuId);
-                _ledger[to].eeuType_sumKG[eeuTypeId] += eeuKg;
+                // while minting >1 EEU is disallowed, the merge condition below can never be true:
+
+                    // MERGE - if any existing destination EEU is from same batch
+                    // bool mergedExisting = false;
+                    // for (uint i = 0; i < to_eeuIds.length; i++) {
+                    //     if (_eeus_batchId[to_eeuIds[i]] == batchId) {
+
+                    //         // resize (grow) the destination EEU
+                    //         _eeus_KG[to_eeuIds[i]] += eeuKg;                       // TODO gas - pack/combine
+                    //         _eeus_mintedKG[to_eeuIds[i]] += eeuKg;                 // TODO gas - pack/combine
+
+                    //         // retire the old EEU from the main list
+                    //         _eeus_KG[eeuId] = 0;
+                    //         _eeus_mintedKG[eeuId] = 0;
+
+                    //         mergedExisting = true;
+                    //         emit TransferedFullEeu(from, to, eeuId, to_eeuIds[i], eeuTypeId);
+                    //         break;
+                    //     }
+                    // }
+                    // TRANSFER - if no existing destination EEU from same batch
+                    //if (!mergedExisting) {
+                        to_eeuIds.push(eeuId);
+                        emit TransferedFullEeu(from, to, eeuId, 0, eeuTypeId);
+                    //}
+
+                //_ledger[to].eeuType_sumKG[eeuTypeId] += eeuKg;                   //* gas - DROP DONE - only used internally, validation params
 
                 remainingToTransfer -= eeuKg;
-                emit TransferedFullEeu(from, to, eeuId, eeuTypeId);
             }
             else {
                 // split the last EEU across the ledger entries, soft-minting a new EEU in the destination
@@ -116,26 +160,42 @@ contract EeuTransferable is Owned, AcLedger {
                 //         and also so the total burned amount in the EEU can still be calculated by _eeus_mintedKG[x] - _eeus_KG[x]
                 // note: both parent and child EEU point to each other like a double-linked list
 
-                // soft-mint a new EEU
-                uint256 newId = _eeuCurMaxId + 1;
-                _eeus_batchId[newId] = batchId; // inherit batch from parent EEU
-                _eeus_mintedKG[newId] = remainingToTransfer;
-                _eeus_KG[newId] = remainingToTransfer;
-                _eeus_mintedTimestamp[newId] = block.timestamp;
-                _eeus_splitFromEeuId[newId] = eeuId;
-                _eeuCurMaxId++;
+                // assign new EEU to destination
 
-                // resize the origin EEU
-                _eeus_KG[eeuId] -= remainingToTransfer;
-                _eeus_mintedKG[eeuId] -= remainingToTransfer;
-                _eeus_splitToEeuId[eeuId] = newId;
-                _ledger[from].eeuType_sumKG[eeuTypeId] -= remainingToTransfer;
+                    // MERGE - if any existing destination EEU is from same batch
+                    bool mergedExisting = false;
+                    for (uint i = 0; i < to_eeuIds.length; i++) {
+                        if (_eeus_batchId[to_eeuIds[i]] == batchId) {
+                            // resize (grow) the destination EEU
+                            _eeus_KG[to_eeuIds[i]] += remainingToTransfer;                // TODO gas - pack/combine
+                            _eeus_mintedKG[to_eeuIds[i]] += remainingToTransfer;          // TODO gas - pack/combine
 
-                // assign new EEU
-                _ledger[to].eeuType_eeuIds[eeuTypeId].push(newId);
-                _ledger[to].eeuType_sumKG[eeuTypeId] += remainingToTransfer;
+                            mergedExisting = true;
+                            emit TransferedPartialEeu(from, to, eeuId, 0, to_eeuIds[i], eeuTypeId);
+                            break;
+                        }
+                    }
+                    // SOFT-MINT - if no existing destination EEU from same batch
+                    if (!mergedExisting) {
+                        uint256 newId = _eeuCurMaxId + 1;
+                        _eeus_batchId[newId] = batchId; // inherit batch from parent EEU  // TODO gas - pack/combine
+                        _eeus_KG[newId] = remainingToTransfer;                            // TODO gas - pack/combine
+                        _eeus_mintedKG[newId] = remainingToTransfer;                      // TODO gas - pack/combine
+                        //_eeus_mintedTimestamp[newId] = block.timestamp;                 // gas - DROP DONE - can fetch from events
+                        //_eeus_splitFromEeuId[newId] = eeuId;                            // gas - DROP DONE - can fetch from events
+                        to_eeuIds.push(newId);
+                        _eeuCurMaxId++;
+                        //_ledger[to].eeuType_sumKG[eeuTypeId] += remainingToTransfer;    // gas - DROP DONE - only used internally, validation params
 
-                emit TransferedPartialEeu(from, to, eeuId, newId, eeuTypeId);
+                        emit TransferedPartialEeu(from, to, eeuId, newId, 0, eeuTypeId);
+                    }
+
+                // resize (shrink) the origin EEU
+                _eeus_KG[eeuId] -= remainingToTransfer;                           // TODO gas - pack/combine
+                _eeus_mintedKG[eeuId] -= remainingToTransfer;                     // TODO gas - pack/combine
+                //_eeus_splitToEeuId[eeuId] = newId;                              // gas - DROP DONE - can index from events
+                //_ledger[from].eeuType_sumKG[eeuTypeId] -= remainingToTransfer;  // gas - DROP DONE - only used internally, validation params
+
                 remainingToTransfer = 0;
             }
         }

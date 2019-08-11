@@ -22,16 +22,16 @@ contract('AcMaster', accounts => {
         await mintBatch({ eeuType: CONST.eeuType.UNFCCC, qtyKG: CONST.ktCarbon * 100, qtyEeus: 1, receiver: accounts[global.accountNdx], },{ from: accounts[0] });
     });
 
-    it('minting - should allow owner to mint a multi-vEEU (2) batch', async () => {
-        await mintBatch({ eeuType: CONST.eeuType.UNFCCC, qtyKG: CONST.ktCarbon * 100, qtyEeus: 2, receiver: accounts[global.accountNdx], },{ from: accounts[0] });
-    });
+    // it('minting - should allow owner to mint a multi-vEEU (2) batch', async () => {
+    //     await mintBatch({ eeuType: CONST.eeuType.UNFCCC, qtyKG: CONST.ktCarbon * 100, qtyEeus: 2, receiver: accounts[global.accountNdx], },{ from: accounts[0] });
+    // });
 
     it('minting - should allow owner to mint a minimum-sized token (one ton)', async () => {
         await mintBatch({ eeuType: CONST.eeuType.UNFCCC, qtyKG: CONST.tonCarbon * 1, qtyEeus: 1, receiver: accounts[global.accountNdx], }, { from: accounts[0] });
     });
 
     it('minting - should allow owner to mint a megatoken (10 gigatons)', async () => {
-        await mintBatch({ eeuType: CONST.eeuType.UNFCCC, qtyKG: CONST.gtCarbon * 10, qtyEeus: 2, receiver: accounts[global.accountNdx], }, { from: accounts[0] });
+        await mintBatch({ eeuType: CONST.eeuType.UNFCCC, qtyKG: CONST.gtCarbon * 10, qtyEeus: 1, receiver: accounts[global.accountNdx], }, { from: accounts[0] });
     });
 
     it('minting - should allow owner to mint different vEEU-types', async () => {
@@ -45,7 +45,7 @@ contract('AcMaster', accounts => {
         var totalMintedEeus = 0;
         for (var i = 0; i < 3; i++) {
             const qtyKG = (i + 1) * 2 * CONST.tonCarbon;
-            const qtyEeus = 2;
+            const qtyEeus = 1;
             const batchId = await mintBatch({ eeuType: CONST.eeuType.UNFCCC, qtyKG, qtyEeus, receiver: accounts[global.accountNdx] }, { from: accounts[0] });
             totalMintedKG += qtyKG;
             totalMintedEeus += qtyEeus;
@@ -68,11 +68,11 @@ contract('AcMaster', accounts => {
         mintTx = await acm.mintEeuBatch(CONST.eeuType.UNFCCC, CONST.ktCarbon, 1, accounts[global.accountNdx], { from: accounts[0], });
         console.log(`gasUsed - Mint  1 vEEU: ${mintTx.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * mintTx.receipt.gasUsed).toFixed(4)} (USD ${(CONST.gasPriceEth * mintTx.receipt.gasUsed * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
 
-        mintTx = await acm.mintEeuBatch(CONST.eeuType.UNFCCC, CONST.ktCarbon, 5, accounts[global.accountNdx], { from: accounts[0], });
-        console.log(`gasUsed - Mint  5 vEEU: ${mintTx.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * mintTx.receipt.gasUsed).toFixed(4)} (USD ${(CONST.gasPriceEth * mintTx.receipt.gasUsed * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
+        // mintTx = await acm.mintEeuBatch(CONST.eeuType.UNFCCC, CONST.ktCarbon, 5, accounts[global.accountNdx], { from: accounts[0], });
+        // console.log(`gasUsed - Mint  5 vEEU: ${mintTx.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * mintTx.receipt.gasUsed).toFixed(4)} (USD ${(CONST.gasPriceEth * mintTx.receipt.gasUsed * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
 
-        var mintTx = await acm.mintEeuBatch(CONST.eeuType.UNFCCC, CONST.ktCarbon, 10, accounts[global.accountNdx], { from: accounts[0] });
-        console.log(`gasUsed - Mint 10 vEEU: ${mintTx.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * mintTx.receipt.gasUsed).toFixed(4)} (USD ${(CONST.gasPriceEth * mintTx.receipt.gasUsed * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
+        // var mintTx = await acm.mintEeuBatch(CONST.eeuType.UNFCCC, CONST.ktCarbon, 10, accounts[global.accountNdx], { from: accounts[0] });
+        // console.log(`gasUsed - Mint 10 vEEU: ${mintTx.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * mintTx.receipt.gasUsed).toFixed(4)} (USD ${(CONST.gasPriceEth * mintTx.receipt.gasUsed * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
     });
 
     it('minting - should not allow non-owner to mint vEEU batches', async () => {
@@ -89,12 +89,19 @@ contract('AcMaster', accounts => {
         assert.fail('expected restriction exception');
     });
 
-    it('minting - should not allow non-integer KG carbon in an vEEU', async () => {
+    it('minting - should not allow multi-vEEU minting', async () => {
         try {
-            await mintBatch({ eeuType: CONST.eeuType.UNFCCC, qtyKG: CONST.tonCarbon, qtyEeus: 3, receiver: accounts[global.accountNdx], }, { from: accounts[0] } );
+            await mintBatch({ eeuType: CONST.eeuType.UNFCCC, qtyKG: CONST.tonCarbon, qtyEeus: 2, receiver: accounts[global.accountNdx], }, { from: accounts[0] } );
         } catch (ex) { return; }
         assert.fail('expected restriction exception');
-    });
+    });    
+
+    // it('minting - should not allow non-integer KG carbon in an vEEU', async () => {
+    //     try {
+    //         await mintBatch({ eeuType: CONST.eeuType.UNFCCC, qtyKG: CONST.tonCarbon, qtyEeus: 3, receiver: accounts[global.accountNdx], }, { from: accounts[0] } );
+    //     } catch (ex) { return; }
+    //     assert.fail('expected restriction exception');
+    // });
 
     it('minting - should not allow too small a tonnage', async () => {
         try {
@@ -190,7 +197,6 @@ contract('AcMaster', accounts => {
             assert(eeu.mintedTimestamp != 0, 'missing mint timestamp on vEEU after minting');
             assert(eeu.mintedKG == qtyKG / qtyEeus, 'unexpected vEEU minted KG value after minting');
             assert(eeu.KG == qtyKG / qtyEeus, 'unexpected vEEU remaining (unburned) KG value after minting');
-            //assert(eeu.batchSequenceNo == ndx - ledgerEntryBefore.eeus.length, 'unexpected vEEU sequence no. after minting');
         }
 
         return batchId;

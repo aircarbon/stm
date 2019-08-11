@@ -36,17 +36,17 @@ contract('AcMaster', accounts => {
         }
     });
 
-    /*it('funding - should have reasonable gas cost for funding', async () => {
+    it('funding - should have reasonable gas cost for funding', async () => {
         const fundTx = await acm.fund(CONST.ccyType.USD, CONST.thousandUsd_cents, accounts[global.accountNdx], { from: accounts[0] });
         console.log(`gasUsed - Funding: ${fundTx.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * fundTx.receipt.gasUsed).toFixed(4)} (USD ${(CONST.gasPriceEth * fundTx.receipt.gasUsed * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
     });
 
     it('funding - should allow minting and funding on same ledger entry', async () => {
-        await acm.mintEeuBatch(CONST.eeuType.VCS, CONST.mtCarbon, 2, accounts[global.accountNdx], { from: accounts[0] });
+        await acm.mintEeuBatch(CONST.eeuType.VCS, CONST.mtCarbon, 1, accounts[global.accountNdx], { from: accounts[0] });
         await acm.fund(CONST.ccyType.USD, CONST.thousandUsd_cents, accounts[global.accountNdx], { from: accounts[0] });
         const ledgerEntryAfter = await acm.getLedgerEntry(accounts[global.accountNdx]);
 
-        assert(ledgerEntryAfter.eeus.length == 2, 'unexpected eeu count in ledger entry after minting & funding');
+        assert(ledgerEntryAfter.eeus.length == 1, 'unexpected eeu count in ledger entry after minting & funding');
         assert(Number(ledgerEntryAfter.eeu_sumKG) == Number(CONST.mtCarbon), 'invalid kg sum in ledger entry after minting & funding');
         assert(ledgerEntryAfter.ccys.find(p => p.typeId == CONST.ccyType.USD).balance == CONST.thousandUsd_cents, 'unexpected usd balance in ledger entry after minting & funding');
     });
@@ -65,19 +65,12 @@ contract('AcMaster', accounts => {
         assert.fail('expected restriction exception');
     });
 
-    it('funding - should not allow invalid amounts (1)', async () => {
-        try {
-            await acm.fund(CONST.ccyType.USD, 0, accounts[global.accountNdx], { from: accounts[0] });
-        } catch (ex) { return; }
-        assert.fail('expected restriction exception');
-    });
-
-    it('funding - should not allow invalid amounts (2)', async () => {
+    it('funding - should not allow negative amounts', async () => {
         try {
             await acm.fund(CONST.ccyType.USD, -1, accounts[global.accountNdx], { from: accounts[0] });
         } catch (ex) { return; }
         assert.fail('expected restriction exception');
-    });*/
+    });
     
     async function fundLedger({ ccyTypeId, amount, receiver }) {
         var ledgerEntryBefore, ledgerEntryAfter;
