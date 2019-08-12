@@ -1,6 +1,6 @@
 const ac = artifacts.require('AcMaster');
 const CONST = require('../const.js');
-const helper = require('../test/transferHelper.js');
+const helper = require('./transferHelper.js');
 
 contract('AcMaster', accounts => {
     var acm;
