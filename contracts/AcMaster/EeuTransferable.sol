@@ -28,20 +28,26 @@ contract EeuTransferable is Owned, AcLedger {
      * TODO: both sides - fixed value or % value FEE - with system/exchange account passed in as receiver
      *       take fees (both sides possibly) before applying main transfer
      *       throw if insufficient to cover fees
+     * TODO: events for fees
+     //
+     // // ## stack too deep -- least bad option: set as data fields, emit fees in events
      */
-    function transfer(
+    function transfer( 
         address ledger_A,
         address ledger_B,
+
         // EEU data
         uint256 kg_A,           // EEU KGs moving from A
         uint256 eeuTypeId_A,    // EEU type moving from A
         uint256 kg_B,           // " from B
         uint256 eeuTypeId_B,    // " from B
+
         // ccy data
         int256  ccy_amount_A,   // currency amount moving from A
         uint256 ccyTypeId_A,    // currency type moving from A
         int256  ccy_amount_B,   // " from B
         uint256 ccyTypeId_B     // " from B
+
     ) public {
         require(msg.sender == owner, "Restricted method");
 
@@ -54,39 +60,23 @@ contract EeuTransferable is Owned, AcLedger {
         require(!((kg_A > 0 && ccy_amount_A > 0) || (kg_B > 0 && ccy_amount_B > 0)), 'Single-origin multiple asset disallowed');
 
         // validate KG balances
-        uint256 kgAvailable_typeA = 0;
-        for (uint i = 0; i < _ledger[ledger_A].eeuType_eeuIds[eeuTypeId_A].length; i++) {
-            kgAvailable_typeA += _eeus_KG[_ledger[ledger_A].eeuType_eeuIds[eeuTypeId_A][i]];
-        }
-        require(kgAvailable_typeA >= kg_A, "Insufficient carbon held by ledger owner A");
+        require(sufficientKg(ledger_A, eeuTypeId_A, kg_A) == true, "Insufficient carbon held by ledger owner A");
         //require(_ledger[ledger_A].eeuType_sumKG[eeuTypeId_A] >= kg_A, "Insufficient carbon held by ledger owner A");
 
         // validate KG balances
-        uint256 kgAvailable_typeB = 0;
-        for (uint i = 0; i < _ledger[ledger_B].eeuType_eeuIds[eeuTypeId_B].length; i++) {
-            kgAvailable_typeB += _eeus_KG[_ledger[ledger_B].eeuType_eeuIds[eeuTypeId_B][i]];
-        }
-        require(kgAvailable_typeB >= kg_B, "Insufficient carbon held by ledger owner B");
+        require(sufficientKg(ledger_B, eeuTypeId_B, kg_B) == true, "Insufficient carbon held by ledger owner B");
         //require(_ledger[ledger_B].eeuType_sumKG[eeuTypeId_B] >= kg_B, "Insufficient carbon held by ledger owner B");
 
         // validate currency balances
-        require(_ledger[ledger_A].ccyType_balance[ccyTypeId_A] >= ccy_amount_A, "Insufficient currency held by ledger owner A");
-        require(_ledger[ledger_B].ccyType_balance[ccyTypeId_B] >= ccy_amount_B, "Insufficient currency held by ledger owner B");
+        require(sufficientCcy(ledger_A, ccyTypeId_A, ccy_amount_A) == true, "Insufficient currency held by ledger owner A");
+        require(sufficientCcy(ledger_B, ccyTypeId_B, ccy_amount_B) == true, "Insufficient currency held by ledger owner B");
 
         // transfer currencies
         if (ccy_amount_A > 0) {
-            _ledger[ledger_A].ccyType_balance[ccyTypeId_A] -= ccy_amount_A;
-            _ledger[ledger_B].ccyType_balance[ccyTypeId_A] += ccy_amount_A;
-
-            _ccyType_totalTransfered[ccyTypeId_A] += uint256(ccy_amount_A);
-            emit TransferedLedgerCcy(ledger_A, ledger_B, ccyTypeId_A, ccy_amount_A);
+            transferCcy(ledger_A, ledger_B, ccyTypeId_A, ccy_amount_A);
         }
         if (ccy_amount_B > 0) {
-            _ledger[ledger_B].ccyType_balance[ccyTypeId_B] -= ccy_amount_B;
-            _ledger[ledger_A].ccyType_balance[ccyTypeId_B] += ccy_amount_B;
-
-            _ccyType_totalTransfered[ccyTypeId_B] += uint256(ccy_amount_B);
-            emit TransferedLedgerCcy(ledger_B, ledger_A, ccyTypeId_B, ccy_amount_B);
+            transferCcy(ledger_B, ledger_A, ccyTypeId_B, ccy_amount_B);
         }
 
         // transfer EEUs
@@ -96,15 +86,25 @@ contract EeuTransferable is Owned, AcLedger {
         if (kg_B > 0) {
             transferSplitEeus(ledger_B, ledger_A, kg_B, eeuTypeId_B);
         }
+    }
 
-        // TODO...
-        //
-        // merge (optimization): for both sender and receiver - after split:
-        // simply combine same-type ** AND SAME BATCH ** EEUs into a single larger EEU
-        // so, only ever should be a single EEU per owner per type per batch in the ledger
-        //   (implies the "retirement" of old merged EEU IDs)
-        //
-        // then, disable minting > 1 eeu count
+    function sufficientKg(address ledger, uint256 eeuTypeId, uint256 amount) private returns (bool) {
+        uint256 kgAvailable = 0;
+        for (uint i = 0; i < _ledger[ledger].eeuType_eeuIds[eeuTypeId].length; i++) {
+            kgAvailable += _eeus_KG[_ledger[ledger].eeuType_eeuIds[eeuTypeId][i]];
+        }
+        return kgAvailable >= amount;
+    }
+
+    function sufficientCcy(address ledger, uint256 ccyTypeId, int256 amount) private returns (bool) {
+        return _ledger[ledger].ccyType_balance[ccyTypeId] >= amount;
+    }
+
+    function transferCcy(address ledgerFrom, address ledgerTo, uint256 ccyTypeId, int256 amount) private {
+        _ledger[ledgerFrom].ccyType_balance[ccyTypeId] -= amount;
+        _ledger[ledgerTo].ccyType_balance[ccyTypeId] += amount;
+        _ccyType_totalTransfered[ccyTypeId] += uint256(amount);
+        emit TransferedLedgerCcy(ledgerFrom, ledgerTo, ccyTypeId, amount);
     }
 
     /**

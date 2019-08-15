@@ -6,10 +6,10 @@ module.exports = {
 
     transferLedger: async ({ acm, accounts, 
         ledger_A,     ledger_B, 
-        kg_A,         eeuTypeId_A,
-        kg_B,         eeuTypeId_B,
-        ccy_amount_A, ccyTypeId_A,
-        ccy_amount_B, ccyTypeId_B
+        kg_A,         eeuTypeId_A,  
+        kg_B,         eeuTypeId_B,   
+        ccy_amount_A, ccyTypeId_A,   
+        ccy_amount_B, ccyTypeId_B,   
     }) => {
         var ledgerA_before, ledgerA_after;
         var ledgerB_before, ledgerB_after;
@@ -34,9 +34,9 @@ module.exports = {
         // transfer
         const transferTx = await acm.transfer(
             ledger_A,     ledger_B, 
-            kg_A,         eeuTypeId_A,
-            kg_B,         eeuTypeId_B,
-            ccy_amount_A, ccyTypeId_A,
+            kg_A,         eeuTypeId_A, 
+            kg_B,         eeuTypeId_B, 
+            ccy_amount_A, ccyTypeId_A, 
             ccy_amount_B, ccyTypeId_B, 
             { from: accounts[0] }
         );

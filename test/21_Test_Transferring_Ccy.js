@@ -92,7 +92,8 @@ contract('AcMaster', accounts => {
         await acm.fund(CONST.ccyType.USD, CONST.thousandUsd_cents,       accounts[global.accountNdx + 1], { from: accounts[0] });
         try {
             await acm.transfer(
-                accounts[global.accountNdx + 0], accounts[global.accountNdx + 1], 0, 0, 0, 0, 
+                accounts[global.accountNdx + 0], accounts[global.accountNdx + 1], 
+                0, 0, 0, 0, 0
                 -1,                          // ccy_amount_A
                 CONST.ccyType.USD,           // ccyTypeId_A
                 0,                           // ccy_amount_B
@@ -107,7 +108,8 @@ contract('AcMaster', accounts => {
         await acm.fund(CONST.ccyType.USD, CONST.thousandUsd_cents,       accounts[global.accountNdx + 1], { from: accounts[0] });
         try {
             await acm.transfer(
-                accounts[global.accountNdx + 0], accounts[global.accountNdx + 1], 0, 0, 0, 0, 
+                accounts[global.accountNdx + 0], accounts[global.accountNdx + 1], 
+                0, 0, 0, 0, 
                 0,                           // ccy_amount_A
                 0,                           // ccyTypeId_A
                 -1,                          // ccy_amount_B
@@ -122,7 +124,8 @@ contract('AcMaster', accounts => {
         await acm.fund(CONST.ccyType.USD, CONST.thousandUsd_cents,       accounts[global.accountNdx + 1], { from: accounts[0] });
         try {
             await acm.transfer(
-                accounts[global.accountNdx + 0], accounts[global.accountNdx + 1], 0, 0, 0, 0, 
+                accounts[global.accountNdx + 0], accounts[global.accountNdx + 1], 
+                0, 0, 0, 0, 
                 -1,                          // ccy_amount_A
                 CONST.ccyType.USD,           // ccyTypeId_A
                 -1,                          // ccy_amount_B
@@ -137,7 +140,8 @@ contract('AcMaster', accounts => {
         await acm.fund(CONST.ccyType.USD, CONST.thousandUsd_cents,       accounts[global.accountNdx + 1], { from: accounts[0] });
         try {
             await acm.transfer(
-                accounts[global.accountNdx + 0], accounts[global.accountNdx + 1], 0, 0, 0, 0, 
+                accounts[global.accountNdx + 0], accounts[global.accountNdx + 1], 
+                0, 0, 0, 0, 
                 CONST.thousandUsd_cents + 1, // ccy_amount_A
                 CONST.ccyType.USD,           // ccyTypeId_A
                 0,                           // ccy_amount_B
@@ -152,7 +156,8 @@ contract('AcMaster', accounts => {
         await acm.fund(CONST.ccyType.ETH, CONST.oneEth_wei,              accounts[global.accountNdx + 1], { from: accounts[0] });
         try {
             await acm.transfer(
-                accounts[global.accountNdx + 0], accounts[global.accountNdx + 1], 0, 0, 0, 0, 
+                accounts[global.accountNdx + 0], accounts[global.accountNdx + 1], 
+                0, 0, 0, 0, 
                 0,                           // ccy_amount_A
                 0,                           // ccyTypeId_A
                 CONST.thousandEth_wei,       // ccy_amount_B
@@ -167,7 +172,8 @@ contract('AcMaster', accounts => {
         await acm.fund(CONST.ccyType.ETH, CONST.oneEth_wei,              accounts[global.accountNdx + 1], { from: accounts[0] });
         try {
             await acm.transfer(
-                accounts[global.accountNdx + 0], accounts[global.accountNdx + 1], 0, 0, 0, 0, 
+                accounts[global.accountNdx + 0], accounts[global.accountNdx + 1], 
+                0, 0, 0, 0, 
                 CONST.millionUsd_cents,      // ccy_amount_A
                 CONST.ccyType.USD,           // ccyTypeId_A
                 CONST.thousandEth_wei,       // ccy_amount_B

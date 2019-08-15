@@ -15,7 +15,7 @@ contract('AcMaster', accounts => {
 
     it('transferring - should not allow non-owner to transfer across ledger entries', async () => {
         try {
-            await acm.transfer(accounts[global.accountNdx + 0], accounts[global.accountNdx + 1], 0, 0, 0, 0, 0, 0, 0, 0, { from: accounts[1] });
+            await acm.transfer(accounts[global.accountNdx + 0], accounts[global.accountNdx + 1], 0, 0, 0, 0, 0, 0, 0, 0,  { from: accounts[1] });
         } catch (ex) { return; }
         assert.fail('expected restriction exception');
     });
@@ -24,7 +24,7 @@ contract('AcMaster', accounts => {
         await acm.fund(CONST.ccyType.USD, CONST.thousandUsd_cents,       accounts[global.accountNdx + 0], { from: accounts[0] });
         await acm.fund(CONST.ccyType.USD, CONST.thousandUsd_cents,       accounts[global.accountNdx + 1], { from: accounts[0] });
         try {
-            await acm.transfer(accounts[global.accountNdx + 0], accounts[global.accountNdx + 1], 0, 0, 0, 0, 0, 0, 0, 0, { from: accounts[0] });
+            await acm.transfer(accounts[global.accountNdx + 0], accounts[global.accountNdx + 1], 0, 0, 0, 0, 0, 0, 0, 0,  { from: accounts[0] });
         } catch (ex) { return; }
         assert.fail('expected restriction exception');
     });
@@ -32,7 +32,8 @@ contract('AcMaster', accounts => {
     it('transferring - should not allow a transfer to an unkown ledger entry', async () => {
         await acm.fund(CONST.ccyType.USD, CONST.thousandUsd_cents,       accounts[global.accountNdx + 0], { from: accounts[0] });
         try {
-            await acm.transfer(accounts[global.accountNdx + 0], accounts[global.accountNdx + 1], 0, 0, 0, 0,
+            await acm.transfer(accounts[global.accountNdx + 0], accounts[global.accountNdx + 1], 
+                0, 0, 0, 0, 
                 CONST.thousandUsd_cents,     // ccy_amount_A
                 CONST.ccyType.USD,           // ccyTypeId_A
                 0,                           // ccy_amount_B
@@ -45,7 +46,8 @@ contract('AcMaster', accounts => {
     it('transferring - should not allow a transfer from an unkown ledger entry', async () => {
         await acm.fund(CONST.ccyType.USD, CONST.thousandUsd_cents,       accounts[global.accountNdx + 1], { from: accounts[0] });
         try {
-            await acm.transfer(accounts[global.accountNdx + 0], accounts[global.accountNdx + 1], 0, 0, 0, 0,
+            await acm.transfer(accounts[global.accountNdx + 0], accounts[global.accountNdx + 1], 
+                0, 0, 0, 0, 
                 CONST.thousandUsd_cents,     // ccy_amount_A
                 CONST.ccyType.USD,           // ccyTypeId_A
                 0,                           // ccy_amount_B
