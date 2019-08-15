@@ -41,8 +41,7 @@
 ## WIP - TODOs
 
     ### contract - core fn's
-    * TOOD: cleanup burning test (1)
-    * TOOD: test transfer eeu/ccy (trade)
+    * TOOD: test transfer eeu/ccy (trade), w/ trade commission
     *
     * TOOD: long-running simulation test
     *   > mints batches randomly & assigns to initial owners (eeu xfer)

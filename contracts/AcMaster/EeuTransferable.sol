@@ -11,7 +11,8 @@ contract EeuTransferable is Owned, AcLedger {
 
     /**
      * @dev Transfers or trades assets between ledger accounts
-     * @dev (allows one-sided transfers, and allows transfers of same asset types)
+     * @dev allows: one-sided transfers, allows transfers of same asset types and transfers (trades) of different asset types
+     * @dev disallows: movement from a single origin of more than one asset-type
      * @param ledger_A Ledger owner A
      * @param ledger_B Ledger owner B
      * @param kg_A The KG quantity of carbon to move from A to B
@@ -22,6 +23,11 @@ contract EeuTransferable is Owned, AcLedger {
      * @param ccyTypeId_A The currency type to move from A to B
      * @param ccy_amount_B The amount of currency to move from B to A
      * @param ccyTypeId_B The currency type to move from B to A
+     *
+     * configurable fees
+     * TODO: both sides - fixed value or % value FEE - with system/exchange account passed in as receiver
+     *       take fees (both sides possibly) before applying main transfer
+     *       throw if insufficient to cover fees
      */
     function transfer(
         address ledger_A,
@@ -44,6 +50,10 @@ contract EeuTransferable is Owned, AcLedger {
         require(kg_A > 0 || kg_B > 0 || ccy_amount_A > 0 || ccy_amount_B > 0, "Invalid transfer");
         require(!(ccy_amount_A < 0 || ccy_amount_B < 0), "Invalid currency amounts");
 
+        // prevent single-origin muliple asset type movement
+        require(!((kg_A > 0 && ccy_amount_A > 0) || (kg_B > 0 && ccy_amount_B > 0)), 'Single-origin multiple asset disallowed');
+
+        // validate KG balances
         uint256 kgAvailable_typeA = 0;
         for (uint i = 0; i < _ledger[ledger_A].eeuType_eeuIds[eeuTypeId_A].length; i++) {
             kgAvailable_typeA += _eeus_KG[_ledger[ledger_A].eeuType_eeuIds[eeuTypeId_A][i]];
@@ -51,6 +61,7 @@ contract EeuTransferable is Owned, AcLedger {
         require(kgAvailable_typeA >= kg_A, "Insufficient carbon held by ledger owner A");
         //require(_ledger[ledger_A].eeuType_sumKG[eeuTypeId_A] >= kg_A, "Insufficient carbon held by ledger owner A");
 
+        // validate KG balances
         uint256 kgAvailable_typeB = 0;
         for (uint i = 0; i < _ledger[ledger_B].eeuType_eeuIds[eeuTypeId_B].length; i++) {
             kgAvailable_typeB += _eeus_KG[_ledger[ledger_B].eeuType_eeuIds[eeuTypeId_B][i]];
@@ -58,6 +69,7 @@ contract EeuTransferable is Owned, AcLedger {
         require(kgAvailable_typeB >= kg_B, "Insufficient carbon held by ledger owner B");
         //require(_ledger[ledger_B].eeuType_sumKG[eeuTypeId_B] >= kg_B, "Insufficient carbon held by ledger owner B");
 
+        // validate currency balances
         require(_ledger[ledger_A].ccyType_balance[ccyTypeId_A] >= ccy_amount_A, "Insufficient currency held by ledger owner A");
         require(_ledger[ledger_B].ccyType_balance[ccyTypeId_B] >= ccy_amount_B, "Insufficient currency held by ledger owner B");
 

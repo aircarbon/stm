@@ -13,7 +13,7 @@ contract('AcMaster', accounts => {
         console.log(`global.global.accountNdx: ${global.accountNdx} - beforeEach: ${acm.address} - getEeuBatchCount: ${(await acm.getEeuBatchCount.call()).toString()}`);
     });
 
-     it('trading eeu - should have reasonable gas cost for two-sided 0.5 vEEU / ccy transfer (A <-> B), aka. trade', async () => {
+    it('trading eeu - should have reasonable gas cost for two-sided 0.5 vEEU / ccy transfer (A <-> B), aka. trade', async () => {
         await acm.mintEeuBatch(CONST.eeuType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], { from: accounts[0] });
         await acm.fund(CONST.ccyType.ETH, CONST.oneEth_wei,                   accounts[global.accountNdx + 1], { from: accounts[0] });
         const data = await helper.transferLedger({ acm, accounts, 
