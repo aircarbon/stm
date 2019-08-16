@@ -98,6 +98,7 @@ contract('AcMaster', accounts => {
                 CONST.ccyType.USD,           // ccyTypeId_A
                 0,                           // ccy_amount_B
                 0,                           // ccyTypeId_B
+                false,                       // applyFees
                 { from: accounts[0] });
         } catch (ex) { return; }
         assert.fail('expected restriction exception');
@@ -114,6 +115,7 @@ contract('AcMaster', accounts => {
                 0,                           // ccyTypeId_A
                 -1,                          // ccy_amount_B
                 CONST.ccyType.USD,           // ccyTypeId_B
+                false,                       // applyFees
                 { from: accounts[0] });
         } catch (ex) { return; }
         assert.fail('expected restriction exception');
@@ -130,6 +132,7 @@ contract('AcMaster', accounts => {
                 CONST.ccyType.USD,           // ccyTypeId_A
                 -1,                          // ccy_amount_B
                 CONST.ccyType.USD,           // ccyTypeId_B
+                false,                       // applyFees
                 { from: accounts[0] });
         } catch (ex) { return; }
         assert.fail('expected restriction exception');
@@ -146,6 +149,7 @@ contract('AcMaster', accounts => {
                 CONST.ccyType.USD,           // ccyTypeId_A
                 0,                           // ccy_amount_B
                 0,                           // ccyTypeId_B
+                false,                       // applyFees
                 { from: accounts[0] });
         } catch (ex) { return; }
         assert.fail('expected restriction exception');
@@ -162,6 +166,7 @@ contract('AcMaster', accounts => {
                 0,                           // ccyTypeId_A
                 CONST.thousandEth_wei,       // ccy_amount_B
                 CONST.ccyType.ETH,           // ccyTypeId_B
+                false,                       // applyFees
                 { from: accounts[0] });
         } catch (ex) { return; }
         assert.fail('expected restriction exception');
@@ -178,6 +183,7 @@ contract('AcMaster', accounts => {
                 CONST.ccyType.USD,           // ccyTypeId_A
                 CONST.thousandEth_wei,       // ccy_amount_B
                 CONST.ccyType.ETH,           // ccyTypeId_B
+                false,                       // applyFees
                 { from: accounts[0] });
         } catch (ex) { return; }
         assert.fail('expected restriction exception');

@@ -41,7 +41,7 @@
 ## WIP - TODOs
 
     ### contract - core fn's
-    * TOOD: test transfer eeu/ccy (trade), w/ trade commission
+    * TODO: TEST FEES -- transfer test suite (all types inc. trade) w/ fees applied
     *
     * TOOD: long-running simulation test
     *   > mints batches randomly & assigns to initial owners (eeu xfer)

@@ -175,4 +175,28 @@ contract AcLedger is Owned, EeuTypes, CcyTypes {
     function getEeuBatch(uint256 id) external view returns (EeuBatch memory) {
         return _eeuBatches[id];
     }
+
+    /**
+     * @dev Validates if the supplied ledger owner holds the specified quantity or more of supplied EEU type
+     * @param ledger Ledger owner for which to validate
+     * @param eeuTypeId EEU type for which to validate
+     * @param amount Amount in KG to check for
+     */
+    function sufficientKg(address ledger, uint256 eeuTypeId, uint256 amount) internal view returns (bool) {
+        uint256 kgAvailable = 0;
+        for (uint i = 0; i < _ledger[ledger].eeuType_eeuIds[eeuTypeId].length; i++) {
+            kgAvailable += _eeus_KG[_ledger[ledger].eeuType_eeuIds[eeuTypeId][i]];
+        }
+        return kgAvailable >= amount;
+    }
+
+    /**
+     * @dev Validates if the supplied ledger owner holds the specified quantity or more of the supplied currency type
+     * @param ledger Ledger owner for which to validate
+     * @param ccyTypeId currency type for which to validate
+     * @param amount Amount in currency type units to check for
+     */
+    function sufficientCcy(address ledger, uint256 ccyTypeId, int256 amount) internal view returns (bool) {
+        return _ledger[ledger].ccyType_balance[ccyTypeId] >= amount;
+    }
 }

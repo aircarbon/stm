@@ -15,7 +15,7 @@ contract('AcMaster', accounts => {
 
     it('transferring - should not allow non-owner to transfer across ledger entries', async () => {
         try {
-            await acm.transfer(accounts[global.accountNdx + 0], accounts[global.accountNdx + 1], 0, 0, 0, 0, 0, 0, 0, 0,  { from: accounts[1] });
+            await acm.transfer(accounts[global.accountNdx + 0], accounts[global.accountNdx + 1], 0, 0, 0, 0, 0, 0, 0, 0, false, { from: accounts[1] });
         } catch (ex) { return; }
         assert.fail('expected restriction exception');
     });
@@ -24,7 +24,7 @@ contract('AcMaster', accounts => {
         await acm.fund(CONST.ccyType.USD, CONST.thousandUsd_cents,       accounts[global.accountNdx + 0], { from: accounts[0] });
         await acm.fund(CONST.ccyType.USD, CONST.thousandUsd_cents,       accounts[global.accountNdx + 1], { from: accounts[0] });
         try {
-            await acm.transfer(accounts[global.accountNdx + 0], accounts[global.accountNdx + 1], 0, 0, 0, 0, 0, 0, 0, 0,  { from: accounts[0] });
+            await acm.transfer(accounts[global.accountNdx + 0], accounts[global.accountNdx + 1], 0, 0, 0, 0, 0, 0, 0, 0, false, { from: accounts[0] });
         } catch (ex) { return; }
         assert.fail('expected restriction exception');
     });
@@ -38,6 +38,7 @@ contract('AcMaster', accounts => {
                 CONST.ccyType.USD,           // ccyTypeId_A
                 0,                           // ccy_amount_B
                 0,                           // ccyTypeId_B
+                false,
                 { from: accounts[0] });
         } catch (ex) { return; }
         assert.fail('expected restriction exception');
@@ -52,12 +53,13 @@ contract('AcMaster', accounts => {
                 CONST.ccyType.USD,           // ccyTypeId_A
                 0,                           // ccy_amount_B
                 0,                           // ccyTypeId_B
+                false,                       // applyFees
                 { from: accounts[0] });
         } catch (ex) { return; }
         assert.fail('expected restriction exception');
     });
 
-    it('transferring - should not same-origin multiple asset transfers (1)', async () => {
+    it('transferring - should not allow single-origin multiple-asset transfers (1)', async () => {
         await acm.fund(CONST.ccyType.USD, CONST.thousandUsd_cents,       accounts[global.accountNdx + 0], { from: accounts[0] });
         await acm.mintEeuBatch(CONST.eeuType.VCS, CONST.ktCarbon, 1,     accounts[global.accountNdx + 0], { from: accounts[0] });
         await acm.fund(CONST.ccyType.USD, CONST.thousandUsd_cents,       accounts[global.accountNdx + 1], { from: accounts[0] });
@@ -72,12 +74,13 @@ contract('AcMaster', accounts => {
                 CONST.ccyType.USD,           // ccyTypeId_A
                 0,                           // ccy_amount_B
                 0,                           // ccyTypeId_B
+                false,
                 { from: accounts[0] });
         } catch (ex) { return; }
         assert.fail('expected restriction exception');
     });
 
-    it('transferring - should not same-origin multiple asset transfers (2)', async () => {
+    it('transferring - should not allow single-origin multiple-asset transfers (2)', async () => {
         await acm.fund(CONST.ccyType.USD, CONST.thousandUsd_cents,       accounts[global.accountNdx + 0], { from: accounts[0] });
         await acm.mintEeuBatch(CONST.eeuType.VCS, CONST.ktCarbon, 1,     accounts[global.accountNdx + 0], { from: accounts[0] });
         await acm.fund(CONST.ccyType.USD, CONST.thousandUsd_cents,       accounts[global.accountNdx + 1], { from: accounts[0] });
@@ -92,12 +95,13 @@ contract('AcMaster', accounts => {
                 0,                           // ccyTypeId_A
                 CONST.thousandUsd_cents,     // ccy_amount_B
                 CONST.ccyType.USD,           // ccyTypeId_B
+                false,                       // applyFees
                 { from: accounts[0] });
         } catch (ex) { return; }
         assert.fail('expected restriction exception');
     });
 
-    it('transferring - should not same-origin multiple asset transfers (3)', async () => {
+    it('transferring - should not allow single-origin multiple-asset transfers (3)', async () => {
         await acm.fund(CONST.ccyType.USD, CONST.thousandUsd_cents,       accounts[global.accountNdx + 0], { from: accounts[0] });
         await acm.mintEeuBatch(CONST.eeuType.VCS, CONST.ktCarbon, 1,     accounts[global.accountNdx + 0], { from: accounts[0] });
         await acm.fund(CONST.ccyType.USD, CONST.thousandUsd_cents,       accounts[global.accountNdx + 1], { from: accounts[0] });
@@ -112,6 +116,23 @@ contract('AcMaster', accounts => {
                 CONST.ccyType.USD,           // ccyTypeId_A
                 CONST.thousandUsd_cents,     // ccy_amount_B
                 CONST.ccyType.USD,           // ccyTypeId_B
+                false,                       // applyFees
+                { from: accounts[0] });
+        } catch (ex) { return; }
+        assert.fail('expected restriction exception');
+    });
+
+    it('transferring - should not allow transfer to self', async () => {
+        await acm.fund(CONST.ccyType.USD, CONST.thousandUsd_cents,       accounts[global.accountNdx + 0], { from: accounts[0] });
+        await acm.fund(CONST.ccyType.USD, CONST.thousandUsd_cents,       accounts[global.accountNdx + 1], { from: accounts[0] });
+        try {
+            await acm.transfer(accounts[global.accountNdx + 0], accounts[global.accountNdx + 0], 
+                0, 0, 0, 0, 
+                CONST.thousandUsd_cents,     // ccy_amount_A
+                CONST.ccyType.USD,           // ccyTypeId_A
+                0,                           // ccy_amount_B
+                0,                           // ccyTypeId_B
+                false,                       // applyFees
                 { from: accounts[0] });
         } catch (ex) { return; }
         assert.fail('expected restriction exception');

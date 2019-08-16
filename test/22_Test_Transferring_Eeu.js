@@ -341,6 +341,7 @@ contract('AcMaster', accounts => {
                 0,                           // kg_B
                 0,                           // eeuTypeId_B
                 0, 0, 0, 0, 
+                false,                       // applyFees
                 { from: accounts[0] });
         } catch (ex) { return; }
         assert.fail('expected restriction exception');
@@ -357,6 +358,7 @@ contract('AcMaster', accounts => {
                 -1,                          // kg_B
                 CONST.eeuType.VCS,           // eeuTypeId_B
                 0, 0, 0, 0, 
+                false,                       // applyFees
                 { from: accounts[0] });
         } catch (ex) { return; }
         assert.fail('expected restriction exception');
@@ -373,6 +375,7 @@ contract('AcMaster', accounts => {
                 0,                           // kg_B
                 0,                           // eeuTypeId_B
                 0, 0, 0, 0, 
+                false,                       // applyFees
                 { from: accounts[0] });
         } catch (ex) { return; }
         assert.fail('expected restriction exception');
@@ -389,6 +392,7 @@ contract('AcMaster', accounts => {
                 0,                           // kg_B
                 0,                           // eeuTypeId_B
                 0, 0, 0, 0, 
+                false,                       // applyFees
                 { from: accounts[0] });
         } catch (ex) { return; }
         assert.fail('expected restriction exception');
@@ -405,6 +409,7 @@ contract('AcMaster', accounts => {
                 CONST.tonCarbon + 1,         // kg_B
                 CONST.eeuType.VCS,           // eeuTypeId_B
                 0, 0, 0, 0, 
+                false,                       // applyFees
                 { from: accounts[0] });
         } catch (ex) { return; }
         assert.fail('expected restriction exception');
@@ -421,6 +426,7 @@ contract('AcMaster', accounts => {
                 CONST.tonCarbon,             // kg_B
                 CONST.eeuType.UNFCCC,        // eeuTypeId_B
                 0, 0, 0, 0, 
+                false,                       // applyFees
                 { from: accounts[0] });
         } catch (ex) { return; }
         assert.fail('expected restriction exception');

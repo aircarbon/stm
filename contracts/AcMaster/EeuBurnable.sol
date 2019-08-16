@@ -23,11 +23,12 @@ contract EeuBurnable is Owned, AcLedger {
         require(eeuTypeId >= 0 && eeuTypeId < _count_eeuTypes, "Invalid EEU type");
 
         // check ledger owner has sufficient carbon tonnage of supplied type
-        uint256 kgAvailable = 0;
-        for (uint i = 0; i < _ledger[ledgerOwner].eeuType_eeuIds[eeuTypeId].length; i++) {
-            kgAvailable += _eeus_KG[_ledger[ledgerOwner].eeuType_eeuIds[eeuTypeId][i]];
-        }
-        require(kgAvailable >= uint256(qtyKG), "Insufficient carbon held by ledger owner");
+        require(sufficientKg(ledgerOwner, eeuTypeId, uint256(qtyKG)) == true, "Insufficient carbon held by ledger owner");
+        // uint256 kgAvailable = 0;
+        // for (uint i = 0; i < _ledger[ledgerOwner].eeuType_eeuIds[eeuTypeId].length; i++) {
+        //     kgAvailable += _eeus_KG[_ledger[ledgerOwner].eeuType_eeuIds[eeuTypeId][i]];
+        // }
+        // require(kgAvailable >= uint256(qtyKG), "Insufficient carbon held by ledger owner");
         //require(_ledger[ledgerOwner].eeuType_sumKG[eeuTypeId] >= uint256(qtyKG), "Insufficient carbon held by ledger owner");
 
         // burn sufficient EEUs

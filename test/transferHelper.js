@@ -10,6 +10,7 @@ module.exports = {
         kg_B,         eeuTypeId_B,   
         ccy_amount_A, ccyTypeId_A,   
         ccy_amount_B, ccyTypeId_B,   
+        applyFees,
     }) => {
         var ledgerA_before, ledgerA_after;
         var ledgerB_before, ledgerB_after;
@@ -38,6 +39,7 @@ module.exports = {
             kg_B,         eeuTypeId_B, 
             ccy_amount_A, ccyTypeId_A, 
             ccy_amount_B, ccyTypeId_B, 
+            applyFees, 
             { from: accounts[0] }
         );
         ledgerA_after = await acm.getLedgerEntry(ledger_A);
