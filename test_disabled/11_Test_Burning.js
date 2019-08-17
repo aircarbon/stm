@@ -15,7 +15,7 @@ contract('AcMaster', accounts => {
 
         if (!global.accountNdx) global.accountNdx = 0;
         global.accountNdx++;
-        console.log(`global.global.accountNdx: ${global.accountNdx} - beforeEach: ${acm.address} - getEeuBatchCount: ${(await acm.getEeuBatchCount.call()).toString()}`);
+        console.log(`global.global.accountNdx: ${global.accountNdx} - contract @ ${acm.address} (owner: ${accounts[0]}) - getEeuBatchCount: ${(await acm.getEeuBatchCount.call()).toString()}`);
     });
 
     // *** why burn 0.5 eeu costs more gas than burn 1.5 ?

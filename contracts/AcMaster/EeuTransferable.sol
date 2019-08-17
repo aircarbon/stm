@@ -30,11 +30,14 @@ contract EeuTransferable is Owned, AcLedger {
     }
     // TODO: % fees...
 
+    // TODO: global total ccy and eeus transferred in fees
+    //       (so total customer transfers is the delta)
+
     /**
      * @dev Transfers or trades assets between ledger accounts
      * @dev allows: one-sided transfers, allows transfers of same asset types and transfers (trades) of different asset types
      * @dev disallows: movement from a single origin of more than one asset-type
-     * @dev optionally applies: fees per current fee structure, paying fees to contract owner's ledger entry
+     * @dev optionally applies: fees per the current fee structure, and paying them to contract owner's ledger entry
      * @param ledger_A Ledger owner A
      * @param ledger_B Ledger owner B
      * @param kg_A The KG quantity of carbon to move from A to B
@@ -45,7 +48,7 @@ contract EeuTransferable is Owned, AcLedger {
      * @param ccyTypeId_A The currency type to move from A to B
      * @param ccy_amount_B The amount of currency to move from B to A
      * @param ccyTypeId_B The currency type to move from B to A
-     * @param applyFees Whether or not to apply fees (both legs) per contract current fee structure
+     * @param applyFees Whether or not to apply fees (both legs) per the contract's current fee structure
      *
      * fees
      * TODO: both sides - fixed value or % value FEE - with system/exchange account passed in as receiver
@@ -55,11 +58,11 @@ contract EeuTransferable is Owned, AcLedger {
     function transfer(
         address ledger_A,
         address ledger_B,
-        uint256 kg_A,           // EEU KGs moving from A
+        uint256 kg_A,           // EEU KGs moving from A (excluding fees, if any)
         uint256 eeuTypeId_A,    // EEU type moving from A
         uint256 kg_B,           // " from B
         uint256 eeuTypeId_B,    // " from B
-        int256  ccy_amount_A,   // currency amount moving from A
+        int256  ccy_amount_A,   // currency amount moving from A (excluding fees, if any)
         uint256 ccyTypeId_A,    // currency type moving from A
         int256  ccy_amount_B,   // " from B
         uint256 ccyTypeId_B,    // " from B
@@ -76,29 +79,50 @@ contract EeuTransferable is Owned, AcLedger {
         // prevent single-origin muliple asset type movement
         require(!((kg_A > 0 && ccy_amount_A > 0) || (kg_B > 0 && ccy_amount_B > 0)), 'Single-origin multiple-asset disallowed');
 
-        // validate KG balances
-        require(sufficientKg(ledger_A, eeuTypeId_A, kg_A) == true, "Insufficient carbon held by ledger owner A");
-
-        // validate KG balances
-        require(sufficientKg(ledger_B, eeuTypeId_B, kg_B) == true, "Insufficient carbon held by ledger owner B");
+        // calc total amounts with fees if any
+        // ## "stack too deep"
+        //uint256 kg_A_incFee = kg_A + (fee_eeuType_Fixed[eeuTypeId_A] * (applyFees ? 1 : 0));
+        //uint256 kg_B_incFee = kg_B + (fee_eeuType_Fixed[eeuTypeId_B] * (applyFees ? 1 : 0));
+        //int256  ccy_amount_A_incFee = ccy_amount_A + (int256(fee_ccyType_Fixed[ccyTypeId_A]) * (applyFees ? 1 : 0));
+        //int256  ccy_amount_B_incFee = ccy_amount_B + (int256(fee_ccyType_Fixed[ccyTypeId_B]) * (applyFees ? 1 : 0));
 
         // validate currency balances
-        require(sufficientCcy(ledger_A, ccyTypeId_A, ccy_amount_A) == true, "Insufficient currency held by ledger owner A");
-        require(sufficientCcy(ledger_B, ccyTypeId_B, ccy_amount_B) == true, "Insufficient currency held by ledger owner B");
+        require(sufficientCcy(ledger_A, ccyTypeId_A, ccy_amount_A,
+                              (int256(fee_ccyType_Fixed[ccyTypeId_A]) * (applyFees && ccy_amount_A > 0 ? 1 : 0))), "Insufficient currency held by ledger owner A");
+        require(sufficientCcy(ledger_B, ccyTypeId_B, ccy_amount_B,
+                              (int256(fee_ccyType_Fixed[ccyTypeId_B]) * (applyFees && ccy_amount_B > 0 ? 1 : 0))), "Insufficient currency held by ledger owner B");
+
+        // validate KG balances
+        require(sufficientKg(ledger_A, eeuTypeId_A, kg_A,
+                             (fee_eeuType_Fixed[eeuTypeId_A] * (applyFees && kg_A > 0 ? 1 : 0))), "Insufficient carbon held by ledger owner A");
+        require(sufficientKg(ledger_B, eeuTypeId_B, kg_B,
+                             (fee_eeuType_Fixed[eeuTypeId_B] * (applyFees && kg_B > 0 ? 1 : 0))), "Insufficient carbon held by ledger owner B");
 
         // transfer currencies
         if (ccy_amount_A > 0) {
+            if (applyFees) {
+                transferCcy(ledger_A, owner, ccyTypeId_A, int256(fee_ccyType_Fixed[ccyTypeId_A]));
+            }
             transferCcy(ledger_A, ledger_B, ccyTypeId_A, ccy_amount_A);
         }
         if (ccy_amount_B > 0) {
+            if (applyFees) {
+                transferCcy(ledger_B, owner, ccyTypeId_B, int256(fee_ccyType_Fixed[ccyTypeId_B]));
+            }
             transferCcy(ledger_B, ledger_A, ccyTypeId_B, ccy_amount_B);
         }
 
         // transfer EEUs
         if (kg_A > 0) {
+            if (applyFees) {
+                transferSplitEeus(ledger_A, owner, eeuTypeId_A, fee_eeuType_Fixed[eeuTypeId_A]);
+            }
             transferSplitEeus(ledger_A, ledger_B, eeuTypeId_A, kg_A);
         }
         if (kg_B > 0) {
+            if (applyFees) {
+                transferSplitEeus(ledger_B, owner, eeuTypeId_B, fee_eeuType_Fixed[eeuTypeId_B]);
+            }
             transferSplitEeus(ledger_B, ledger_A, eeuTypeId_B, kg_B);
         }
     }

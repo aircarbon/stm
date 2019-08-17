@@ -182,12 +182,12 @@ contract AcLedger is Owned, EeuTypes, CcyTypes {
      * @param eeuTypeId EEU type for which to validate
      * @param amount Amount in KG to check for
      */
-    function sufficientKg(address ledger, uint256 eeuTypeId, uint256 amount) internal view returns (bool) {
+    function sufficientKg(address ledger, uint256 eeuTypeId, uint256 amount, uint256 fee) internal view returns (bool) {
         uint256 kgAvailable = 0;
         for (uint i = 0; i < _ledger[ledger].eeuType_eeuIds[eeuTypeId].length; i++) {
             kgAvailable += _eeus_KG[_ledger[ledger].eeuType_eeuIds[eeuTypeId][i]];
         }
-        return kgAvailable >= amount;
+        return kgAvailable >= amount + fee;
     }
 
     /**
@@ -196,7 +196,7 @@ contract AcLedger is Owned, EeuTypes, CcyTypes {
      * @param ccyTypeId currency type for which to validate
      * @param amount Amount in currency type units to check for
      */
-    function sufficientCcy(address ledger, uint256 ccyTypeId, int256 amount) internal view returns (bool) {
-        return _ledger[ledger].ccyType_balance[ccyTypeId] >= amount;
+    function sufficientCcy(address ledger, uint256 ccyTypeId, int256 amount, int256 fee) internal view returns (bool) {
+        return _ledger[ledger].ccyType_balance[ccyTypeId] >= amount + fee;
     }
 }

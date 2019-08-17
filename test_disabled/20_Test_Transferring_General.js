@@ -10,7 +10,7 @@ contract('AcMaster', accounts => {
 
         if (!global.accountNdx) global.accountNdx = 0;
         global.accountNdx += 2;
-        console.log(`global.global.accountNdx: ${global.accountNdx} - beforeEach: ${acm.address} - getEeuBatchCount: ${(await acm.getEeuBatchCount.call()).toString()}`);
+        console.log(`global.global.accountNdx: ${global.accountNdx} - contract @ ${acm.address} (owner: ${accounts[0]}) - getEeuBatchCount: ${(await acm.getEeuBatchCount.call()).toString()}`);
     });
 
     it('transferring - should not allow non-owner to transfer across ledger entries', async () => {

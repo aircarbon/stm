@@ -10,10 +10,10 @@ contract('AcMaster', accounts => {
 
         if (!global.accountNdx) global.accountNdx = 0;
         global.accountNdx += 2;
-        console.log(`global.global.accountNdx: ${global.accountNdx} - beforeEach: ${acm.address} - getEeuBatchCount: ${(await acm.getEeuBatchCount.call()).toString()}`);
+        console.log(`global.global.accountNdx: ${global.accountNdx} - contract @ ${acm.address} (owner: ${accounts[0]}) - getEeuBatchCount: ${(await acm.getEeuBatchCount.call()).toString()}`);
     });
 
-    it('trading eeu - should allow two-sided (vEEU <-> ccy) transfer (A <-> B) across ledger entries', async () => {
+    it('trading - should allow two-sided (vEEU <-> ccy) transfer (A <-> B) across ledger entries', async () => {
         await acm.mintEeuBatch(CONST.eeuType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], { from: accounts[0] });
         await acm.fund(CONST.ccyType.ETH,            CONST.oneEth_wei,        accounts[global.accountNdx + 1], { from: accounts[0] });
         const data = await helper.transferLedger({ acm, accounts, 
@@ -29,7 +29,7 @@ contract('AcMaster', accounts => {
         assert(data.ledgerB_after.eeu_sumKG > 0, 'unexpected ledger B EEU tonnage after');
     });
 
-    it('trading eeu - should allow two-sided (ccy <-> vEEU) transfer (A <-> B) across ledger entries', async () => {
+    it('trading - should allow two-sided (ccy <-> vEEU) transfer (A <-> B) across ledger entries', async () => {
         await acm.fund(CONST.ccyType.ETH,            CONST.oneEth_wei,        accounts[global.accountNdx + 0], { from: accounts[0] });
         await acm.mintEeuBatch(CONST.eeuType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], { from: accounts[0] });
         const data = await helper.transferLedger({ acm, accounts, 
@@ -45,7 +45,7 @@ contract('AcMaster', accounts => {
         assert(data.ledgerB_after.ccys.find(p => p.typeId == CONST.ccyType.ETH).balance > 0, 'unexpected ledger B currency after');
     });
 
-    it('trading eeu - should have reasonable gas cost for two-sided transfer', async () => {
+    it('trading - should have reasonable gas cost for two-sided transfer', async () => {
         await acm.mintEeuBatch(CONST.eeuType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], { from: accounts[0] });
         await acm.fund(CONST.ccyType.ETH,            CONST.oneEth_wei,        accounts[global.accountNdx + 1], { from: accounts[0] });
         const data = await helper.transferLedger({ acm, accounts, 
