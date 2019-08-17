@@ -74,41 +74,41 @@ module.exports = {
         }
 
         // validate currency ledger balances are updated: A -> B
-        const A_bal_aft_ccyA = Number(ledgerA_after.ccys.find(p => p.typeId == ccyTypeId_A).balance);
-        const B_bal_aft_ccyA = Number(ledgerB_after.ccys.find(p => p.typeId == ccyTypeId_A).balance);
-        const A_bal_bef_ccyA = Number(ledgerA_before.ccys.find(p => p.typeId == ccyTypeId_A).balance);
-        const B_bal_bef_ccyA = Number(ledgerB_before.ccys.find(p => p.typeId == ccyTypeId_A).balance);
+        if (ccy_amount_A > 0) {
+            const A_bal_aft_ccyA = Number(ledgerA_after.ccys.find(p => p.typeId == ccyTypeId_A).balance);
+            const B_bal_aft_ccyA = Number(ledgerB_after.ccys.find(p => p.typeId == ccyTypeId_A).balance);
+            const A_bal_bef_ccyA = Number(ledgerA_before.ccys.find(p => p.typeId == ccyTypeId_A).balance);
+            const B_bal_bef_ccyA = Number(ledgerB_before.ccys.find(p => p.typeId == ccyTypeId_A).balance);
 
-        assert(A_bal_aft_ccyA - A_bal_bef_ccyA + fee_ccy_A == deltaCcy_fromA[ccyTypeId_A] * +1,
-               `unexpected ledger A balance ${A_bal_aft_ccyA} after transfer A -> B amount ${ccy_amount_A} ccy type ${ccyTypeId_A}`);
+            assert(A_bal_aft_ccyA - A_bal_bef_ccyA + fee_ccy_A == deltaCcy_fromA[ccyTypeId_A] * +1,
+                `unexpected ledger A balance ${A_bal_aft_ccyA} after transfer A -> B amount ${ccy_amount_A} ccy type ${ccyTypeId_A}`);
 
-        assert(B_bal_aft_ccyA - B_bal_bef_ccyA == deltaCcy_fromA[ccyTypeId_A] * -1,
-               `unexpected ledger B balance ${B_bal_aft_ccyA} after transfer A -> B amount ${ccy_amount_A} ccy type ${ccyTypeId_A}`);
+            assert(B_bal_aft_ccyA - B_bal_bef_ccyA == deltaCcy_fromA[ccyTypeId_A] * -1,
+                `unexpected ledger B balance ${B_bal_aft_ccyA} after transfer A -> B amount ${ccy_amount_A} ccy type ${ccyTypeId_A}`);
+        }
 
         // validate currency ledger balances are updated: B -> A
-        const B_bal_aft_ccyB = Number(ledgerB_after.ccys.find(p => p.typeId == ccyTypeId_B).balance);
-        const A_bal_aft_ccyB = Number(ledgerA_after.ccys.find(p => p.typeId == ccyTypeId_B).balance);
-        const B_bal_bef_ccyB = Number(ledgerB_before.ccys.find(p => p.typeId == ccyTypeId_B).balance);
-        const A_bal_bef_ccyB = Number(ledgerA_before.ccys.find(p => p.typeId == ccyTypeId_B).balance);
+        if (ccy_amount_B > 0) {
+            const B_bal_aft_ccyB = Number(ledgerB_after.ccys.find(p => p.typeId == ccyTypeId_B).balance);
+            const A_bal_aft_ccyB = Number(ledgerA_after.ccys.find(p => p.typeId == ccyTypeId_B).balance);
+            const B_bal_bef_ccyB = Number(ledgerB_before.ccys.find(p => p.typeId == ccyTypeId_B).balance);
+            const A_bal_bef_ccyB = Number(ledgerA_before.ccys.find(p => p.typeId == ccyTypeId_B).balance);
 
-        // console.log('B_bal_bef_ccyB', B_bal_bef_ccyB);
-        // console.log('B_bal_aft_ccyB', B_bal_aft_ccyB);
-        // console.log('fee_ccy_A', fee_ccy_B);
-        // console.log('deltaCcy_fromA[ccyTypeId_B]', deltaCcy_fromA[ccyTypeId_B]);
-        assert(B_bal_aft_ccyB - B_bal_bef_ccyB + fee_ccy_B == deltaCcy_fromA[ccyTypeId_B] * -1,
-               `unexpected ledger B balance ${B_bal_aft_ccyB} after transfer B -> A amount ${ccy_amount_B} ccy type ${ccyTypeId_B}`);
+            assert(B_bal_aft_ccyB - B_bal_bef_ccyB + fee_ccy_B == deltaCcy_fromA[ccyTypeId_B] * -1,
+                `unexpected ledger B balance ${B_bal_aft_ccyB} after transfer B -> A amount ${ccy_amount_B} ccy type ${ccyTypeId_B}`);
 
-        assert(A_bal_aft_ccyB - A_bal_bef_ccyB == deltaCcy_fromA[ccyTypeId_B] * +1,
-               `unexpected ledger A balance ${A_bal_aft_ccyB} after transfer B -> A amount ${ccy_amount_B} ccy type ${ccyTypeId_B}`);
+            assert(A_bal_aft_ccyB - A_bal_bef_ccyB == deltaCcy_fromA[ccyTypeId_B] * +1,
+                `unexpected ledger A balance ${A_bal_aft_ccyB} after transfer B -> A amount ${ccy_amount_B} ccy type ${ccyTypeId_B}`);
+        }
 
         // validate currency global totals
         totalCcy_tfd_after[ccyTypeId_A] = await acm.getTotalCcyTransfered.call(ccyTypeId_A);
         totalCcy_tfd_after[ccyTypeId_B] = await acm.getTotalCcyTransfered.call(ccyTypeId_B);
-        const expectedCcy_tfd = [];
-        expectedCcy_tfd[ccyTypeId_A] = 0;
-        expectedCcy_tfd[ccyTypeId_B] = 0;
-        expectedCcy_tfd[ccyTypeId_A] += ccy_amount_A;
-        expectedCcy_tfd[ccyTypeId_B] += ccy_amount_B;
+        const expectedCcy_tfd = []; 
+        expectedCcy_tfd[ccyTypeId_A] = Number(0);
+        expectedCcy_tfd[ccyTypeId_B] = Number(0);
+        expectedCcy_tfd[ccyTypeId_A] = expectedCcy_tfd[ccyTypeId_A] + Number(ccy_amount_A);
+        expectedCcy_tfd[ccyTypeId_B] = expectedCcy_tfd[ccyTypeId_B] + Number(ccy_amount_B);
         if (applyFees) {
             if (ccy_amount_A > 0) {
                 expectedCcy_tfd[ccyTypeId_A] = Number(expectedCcy_tfd[ccyTypeId_A]) + Number(fee_ccy_A);
@@ -117,10 +117,10 @@ module.exports = {
                 expectedCcy_tfd[ccyTypeId_B] = Number(expectedCcy_tfd[ccyTypeId_B]) + Number(fee_ccy_B);
             }
         }
-
-        // console.log('totalCcy_tfd_after[ccyTypeId_A]', totalCcy_tfd_after[ccyTypeId_A].toString());
+        // console.log('                       fee_ccy_A', fee_ccy_A.toString());
+        // console.log(' totalCcy_tfd_after[ccyTypeId_A]', totalCcy_tfd_after[ccyTypeId_A].toString());
         // console.log('totalCcy_tfd_before[ccyTypeId_A]', totalCcy_tfd_before[ccyTypeId_A].toString());
-        // console.log('expectedCcy_tfd[ccyTypeId_A]', expectedCcy_tfd[ccyTypeId_A].toString());
+        // console.log('    expectedCcy_tfd[ccyTypeId_A]', expectedCcy_tfd[ccyTypeId_A].toString());
         assert(totalCcy_tfd_after[ccyTypeId_A].sub(totalCcy_tfd_before[ccyTypeId_A]).eq(new BN(expectedCcy_tfd[ccyTypeId_A].toString())),
                `unexpected total transfered delta after, ccy A`);
                
