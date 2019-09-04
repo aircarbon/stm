@@ -13,7 +13,7 @@ contract("AcMaster", accounts => {
         let networkID = process.env.NETWORK;
         console.log('net_version: ', networkID);
 
-        if (networkID !== "rinkeby_infura") {
+        if (networkID !== "rinkeby_infura") {``
             console.log('aborting - not rinkeby infura');
             return;
         }

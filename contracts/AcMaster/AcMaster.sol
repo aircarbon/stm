@@ -14,7 +14,7 @@ contract AcMaster is EeuMintable, EeuBurnable, CcyFundable, CcyWithdrawable, Eeu
      * ctor
      */
     constructor() public {
-        version = "0.0.6";
+        version = "0.0.7";
 
          // create ledger entry for contract owner - transfer fees are paid to this ledger entry
         _ledger[owner] = Ledger({

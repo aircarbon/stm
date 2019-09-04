@@ -5,7 +5,7 @@ const db = require('../../util/db.js');
 
 module.exports = function (deployer) {
 
-    process.env.NETWORK = deployer.network; // e.g. "ropsten_scoop"
+    process.env.NETWORK = deployer.network; // e.g. "ropsten_ac"
 
     AcMaster.synchronization_timeout = 42;  // seconds
 

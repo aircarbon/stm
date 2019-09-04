@@ -19,7 +19,7 @@ contract('AcMaster', accounts => {
     });
 
     it('minting - should allow owner to mint a single-vEEU batch', async () => {
-        await mintBatch({ eeuType: CONST.eeuType.UNFCCC, qtyKG: CONST.ktCarbon * 100, qtyEeus: 1, receiver: accounts[global.accountNdx], },{ from: accounts[0] });
+        await mintBatch({ eeuType: CONST.eeuType.UNFCCC, qtyKG: CONST.ktCarbon * 100, qtyEeus: 1, receiver: accounts[global.accountNdx], }, { from: accounts[0] });
     });
 
     // it('minting - should allow owner to mint a multi-vEEU (2) batch', async () => {

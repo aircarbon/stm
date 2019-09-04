@@ -8,7 +8,7 @@
 
 ## Run local node
 
-- `ganache-cli -a 200 -i 888`
+- `ganache-cli -a 200 -i 888 -m "educate school blast ability display bleak club soon curve car oil ostrich"`
   > runs with 100 accounts (tests require more than 10 built into `truffle develop`)
   > runs with custom network ID 888
   > runs with InstaMining by default
@@ -20,9 +20,9 @@
 
 ## Migrate (Deploy) Contracts
 
-- `truffle migrate --network development` (ganache-cli local node)
-- `truffle migrate --network ropsten_scoop` (scoop's ropsten geth node)
-- `truffle migrate --network rinkeby_infura` (infura rinkeby is much faster than infura ropsten)
+- `truffle migrate --network development --reset` (ganache-cli local node)
+- `truffle migrate --network ropsten_ac --reset` (AirCarbon's ropsten geth node)
+- `truffle migrate --network rinkeby_infura --reset` (infura rinkeby is much faster than infura ropsten)
 
 ## Dbg - `truffle develop`
 
