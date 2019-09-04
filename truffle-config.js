@@ -63,6 +63,7 @@ module.exports = {
             network_id: '*',
         },
 
+        // aircarbon geth node -- a bit faster than infura, but representative of mainnet
         ropsten_ac: {
             //provider: new HDWalletProvider(mnemonic, 'https://node0.scoop.tech:9545', 0, 200),
             provider: new HDWalletProvider(mnemonic, 'https://ac-dev0.net:9545', 0, 200),
@@ -72,14 +73,14 @@ module.exports = {
         },
 
         // ropsten infura -- much slower than rinkeby infura
-        ropsten_infura: {
-            provider: function () {
-                return new HDWalletProvider(mnemonic, "https://ropsten.infura.io/v3/93db2c7fd899496d8400e86100058297", 0, 200)
-            },
-            network_id: "*",
-            gas: 6000000,
-            gasPrice: web3.utils.toWei("40", "gwei"),
-        },
+        // ropsten_infura: {
+        //     provider: function () {
+        //         return new HDWalletProvider(mnemonic, "https://ropsten.infura.io/v3/93db2c7fd899496d8400e86100058297", 0, 200)
+        //     },
+        //     network_id: "*",
+        //     gas: 6000000,
+        //     gasPrice: web3.utils.toWei("40", "gwei"),
+        // },
 
         rinkeby_infura: {
             //provider: () => new HDWalletProvider(mnemonic, 'https://rinkeby.infura.io/v3/93db2c7fd899496d8400e86100058297', 0, 200),
