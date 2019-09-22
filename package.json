@@ -10,7 +10,8 @@
     "scripts": {
         "test": "truffle test",
         "solium:lint": "solium lint -d ./contracts",
-        "migrate": "truffle migrate",
+        "prepare": "yarn run migrate",
+        "migrate": "rimraf -rf ./build/contracts && truffle migrate",
         "console": "truffle console",
         "dev": "truffle develop"
     },
@@ -21,16 +22,17 @@
         "bn.js": "^5.0.0"
     },
     "devDependencies": {
+        "@truffle/hdwallet-provider": "^1.0.18",
         "big-number": "2.0.0",
-        "ethereumjs-wallet": "^0.6.0",
-        "ethereumjs-tx": "^2.1.0",
-        "truffle-hdwallet-provider": "1.0.14",
+        "ethereumjs-tx": "^2.1.1",
+        "ethereumjs-wallet": "^0.6.3",
         "mocha": "^5.1.1",
-        "truffle": "^5.0.0",
+        "mssql": "^5.1.0",
+        "public-ip": "3.2.0",
+        "rimraf": "^3.0.0",
+        "truffle": "^5.0.37",
         "truffle-assertions": "^0.9.1",
-        "web3": "1.0.0-beta.55",
-        "mssql": "^4.3.0",
-        "public-ip": "3.1.0"
+        "web3": "2.0.0-alpha"
     },
     "husky": {
         "hooks": {
