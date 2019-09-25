@@ -4,6 +4,7 @@ pragma experimental ABIEncoderV2;
 import "./Owned.sol";
 import "./AcLedger.sol";
 
+
 contract EeuTransferable is Owned, AcLedger {
     event TransferedLedgerCcy(address from, address to, uint256 ccyTypeId, int256 amount);
     event TransferedFullEeu(address from, address to, uint256 eeuId, uint256 mergedToEeuId, uint256 eeuTypeId);
@@ -43,7 +44,7 @@ contract EeuTransferable is Owned, AcLedger {
      * @param kg_A The KG quantity of carbon to move from A to B
      * @param eeuTypeId_A The EEU type to move from A to B
      * @param kg_B The KG quanity of carbon to move from B to A
-     * @param eeuTypeId_B The EEU type to move from A to B
+     * @param eeuTypeId_B The EEU type to move from B to A
      * @param ccy_amount_A The amount of currency to move from A to B
      * @param ccyTypeId_A The currency type to move from A to B
      * @param ccy_amount_B The amount of currency to move from B to A

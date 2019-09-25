@@ -1,6 +1,7 @@
 const ac = artifacts.require('AcMaster');
 const truffleAssert = require('truffle-assertions');
 const BN = require('bn.js');
+const Big = require('big.js');
 
 module.exports = {
 
@@ -75,29 +76,29 @@ module.exports = {
 
         // validate currency ledger balances are updated: A -> B
         if (ccy_amount_A > 0) {
-            const A_bal_aft_ccyA = Number(ledgerA_after.ccys.find(p => p.typeId == ccyTypeId_A).balance);
-            const B_bal_aft_ccyA = Number(ledgerB_after.ccys.find(p => p.typeId == ccyTypeId_A).balance);
-            const A_bal_bef_ccyA = Number(ledgerA_before.ccys.find(p => p.typeId == ccyTypeId_A).balance);
-            const B_bal_bef_ccyA = Number(ledgerB_before.ccys.find(p => p.typeId == ccyTypeId_A).balance);
+            const A_bal_aft_ccyA = Big(ledgerA_after.ccys.find(p => p.typeId == ccyTypeId_A).balance);
+            const B_bal_aft_ccyA = Big(ledgerB_after.ccys.find(p => p.typeId == ccyTypeId_A).balance);
+            const A_bal_bef_ccyA = Big(ledgerA_before.ccys.find(p => p.typeId == ccyTypeId_A).balance);
+            const B_bal_bef_ccyA = Big(ledgerB_before.ccys.find(p => p.typeId == ccyTypeId_A).balance);
 
-            assert(A_bal_aft_ccyA - A_bal_bef_ccyA + fee_ccy_A == deltaCcy_fromA[ccyTypeId_A] * +1,
+            assert(A_bal_aft_ccyA.minus(A_bal_bef_ccyA).plus(Big(fee_ccy_A)).eq(Big(deltaCcy_fromA[ccyTypeId_A]).times(+1)),
                 `unexpected ledger A balance ${A_bal_aft_ccyA} after transfer A -> B amount ${ccy_amount_A} ccy type ${ccyTypeId_A}`);
 
-            assert(B_bal_aft_ccyA - B_bal_bef_ccyA == deltaCcy_fromA[ccyTypeId_A] * -1,
+            assert(B_bal_aft_ccyA.minus(B_bal_bef_ccyA).eq(Big(deltaCcy_fromA[ccyTypeId_A]).times(-1)),
                 `unexpected ledger B balance ${B_bal_aft_ccyA} after transfer A -> B amount ${ccy_amount_A} ccy type ${ccyTypeId_A}`);
         }
 
         // validate currency ledger balances are updated: B -> A
         if (ccy_amount_B > 0) {
-            const B_bal_aft_ccyB = Number(ledgerB_after.ccys.find(p => p.typeId == ccyTypeId_B).balance);
-            const A_bal_aft_ccyB = Number(ledgerA_after.ccys.find(p => p.typeId == ccyTypeId_B).balance);
-            const B_bal_bef_ccyB = Number(ledgerB_before.ccys.find(p => p.typeId == ccyTypeId_B).balance);
-            const A_bal_bef_ccyB = Number(ledgerA_before.ccys.find(p => p.typeId == ccyTypeId_B).balance);
+            const B_bal_aft_ccyB = Big(ledgerB_after.ccys.find(p => p.typeId == ccyTypeId_B).balance);
+            const A_bal_aft_ccyB = Big(ledgerA_after.ccys.find(p => p.typeId == ccyTypeId_B).balance);
+            const B_bal_bef_ccyB = Big(ledgerB_before.ccys.find(p => p.typeId == ccyTypeId_B).balance);
+            const A_bal_bef_ccyB = Big(ledgerA_before.ccys.find(p => p.typeId == ccyTypeId_B).balance);
 
-            assert(B_bal_aft_ccyB - B_bal_bef_ccyB + fee_ccy_B == deltaCcy_fromA[ccyTypeId_B] * -1,
+            assert(B_bal_aft_ccyB.minus(B_bal_bef_ccyB).plus(Big(fee_ccy_B)).eq(Big(deltaCcy_fromA[ccyTypeId_B]).times(-1)),
                 `unexpected ledger B balance ${B_bal_aft_ccyB} after transfer B -> A amount ${ccy_amount_B} ccy type ${ccyTypeId_B}`);
 
-            assert(A_bal_aft_ccyB - A_bal_bef_ccyB == deltaCcy_fromA[ccyTypeId_B] * +1,
+            assert(A_bal_aft_ccyB.minus(A_bal_bef_ccyB).eq(Big(deltaCcy_fromA[ccyTypeId_B]).times(+1)),
                 `unexpected ledger A balance ${A_bal_aft_ccyB} after transfer B -> A amount ${ccy_amount_B} ccy type ${ccyTypeId_B}`);
         }
 
@@ -121,10 +122,10 @@ module.exports = {
         // console.log(' totalCcy_tfd_after[ccyTypeId_A]', totalCcy_tfd_after[ccyTypeId_A].toString());
         // console.log('totalCcy_tfd_before[ccyTypeId_A]', totalCcy_tfd_before[ccyTypeId_A].toString());
         // console.log('    expectedCcy_tfd[ccyTypeId_A]', expectedCcy_tfd[ccyTypeId_A].toString());
-        assert(totalCcy_tfd_after[ccyTypeId_A].sub(totalCcy_tfd_before[ccyTypeId_A]).eq(new BN(expectedCcy_tfd[ccyTypeId_A].toString())),
+        assert(Big(totalCcy_tfd_after[ccyTypeId_A]).minus(Big(totalCcy_tfd_before[ccyTypeId_A])).eq(Big(expectedCcy_tfd[ccyTypeId_A])),
                `unexpected total transfered delta after, ccy A`);
                
-        assert(totalCcy_tfd_after[ccyTypeId_B].sub(totalCcy_tfd_before[ccyTypeId_B]).eq(new BN(expectedCcy_tfd[ccyTypeId_B].toString())),
+        assert(Big(totalCcy_tfd_after[ccyTypeId_B]).minus(totalCcy_tfd_before[ccyTypeId_B]).eq(Big(expectedCcy_tfd[ccyTypeId_B])),
                `unexpected total transfered delta after, ccy B`);
 
         // validate EEU events
