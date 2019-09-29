@@ -9,9 +9,9 @@ contract CcyWithdrawable is Owned, AcLedger {
 
     /**
      * @dev Withdraws currency from a ledger entry
-     * @param ccyTypeId The currency type ID
-     * @param amount The mount of the currency to withdraw, in currency base units
-     * @param ledgerOwner The withdrawing ledger owner
+     * @param ccyTypeId Currency type ID
+     * @param amount Amount of the currency to withdraw, in currency base units
+     * @param ledgerOwner Withdrawing ledger owner
      */
     function withdraw(uint256 ccyTypeId, int256 amount, address ledgerOwner) public {
         require(msg.sender == owner, "Restricted method");

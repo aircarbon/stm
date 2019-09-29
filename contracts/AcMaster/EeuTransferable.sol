@@ -41,14 +41,14 @@ contract EeuTransferable is Owned, AcLedger {
      * @dev optionally applies: fees per the current fee structure, and paying them to contract owner's ledger entry
      * @param ledger_A Ledger owner A
      * @param ledger_B Ledger owner B
-     * @param kg_A The KG quantity of carbon to move from A to B
-     * @param eeuTypeId_A The EEU type to move from A to B
-     * @param kg_B The KG quanity of carbon to move from B to A
-     * @param eeuTypeId_B The EEU type to move from B to A
-     * @param ccy_amount_A The amount of currency to move from A to B
-     * @param ccyTypeId_A The currency type to move from A to B
-     * @param ccy_amount_B The amount of currency to move from B to A
-     * @param ccyTypeId_B The currency type to move from B to A
+     * @param kg_A KG quantity of carbon to move from A to B
+     * @param eeuTypeId_A EEU type to move from A to B
+     * @param kg_B KG quanity of carbon to move from B to A
+     * @param eeuTypeId_B EEU type to move from B to A
+     * @param ccy_amount_A Amount of currency to move from A to B
+     * @param ccyTypeId_A Currency type to move from A to B
+     * @param ccy_amount_B Amount of currency to move from B to A
+     * @param ccyTypeId_B Currency type to move from B to A
      * @param applyFees Whether or not to apply fees (both legs) per the contract's current fee structure
      *
      * fees

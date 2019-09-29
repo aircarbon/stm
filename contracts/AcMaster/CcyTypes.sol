@@ -38,8 +38,8 @@ contract CcyTypes is Owned {
 
     /**
      * @dev Adds a new currency type
-     * @param name The new currency type name
-     * @param unit The base unit of the new currency type
+     * @param name New currency type name
+     * @param unit Base unit of the new currency type
      */
     function addCcyType(string memory name, string memory unit) public {
         require(msg.sender == owner, "Restricted method");

@@ -9,9 +9,9 @@ contract CcyFundable is Owned, AcLedger {
 
     /**
      * @dev Funds a ledger entry with a currency amount
-     * @param ccyTypeId The currency type ID
-     * @param amount The mount of the currency to fund, in currency base units
-     * @param ledgerOwner The ledger owner to fund
+     * @param ccyTypeId Currency type ID
+     * @param amount Amount of the currency to fund, in currency base units
+     * @param ledgerOwner Ledger owner to fund
      */
     function fund(uint256 ccyTypeId, int256 amount, address ledgerOwner) public {
         require(msg.sender == owner, "Restricted method");

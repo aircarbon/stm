@@ -65,7 +65,7 @@ contract('AcMaster', accounts => {
     });
 
     it('minting - should have reasonable gas cost for minting of multi-vEEU batches', async () => {
-        mintTx = await acm.mintEeuBatch(CONST.eeuType.UNFCCC, CONST.ktCarbon, 1, accounts[global.accountNdx], { from: accounts[0], });
+        mintTx = await acm.mintEeuBatch(CONST.eeuType.UNFCCC, CONST.ktCarbon, 1, accounts[global.accountNdx], [], [], { from: accounts[0], });
         console.log(`gasUsed - Mint  1 vEEU: ${mintTx.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * mintTx.receipt.gasUsed).toFixed(4)} (USD ${(CONST.gasPriceEth * mintTx.receipt.gasUsed * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
 
         // mintTx = await acm.mintEeuBatch(CONST.eeuType.UNFCCC, CONST.ktCarbon, 5, accounts[global.accountNdx], { from: accounts[0], });
@@ -77,14 +77,14 @@ contract('AcMaster', accounts => {
 
     it('minting - should not allow non-owner to mint vEEU batches', async () => {
         try {
-            await acm.mintEeuBatch(CONST.eeuType.UNFCCC, CONST.tonCarbon, 1, accounts[global.accountNdx], { from: accounts[1], });
+            await acm.mintEeuBatch(CONST.eeuType.UNFCCC, CONST.tonCarbon, 1, accounts[global.accountNdx], [], [], { from: accounts[1], });
         } catch (ex) { return; }
         assert.fail('expected restriction exception');
     });
 
     it('minting - should not allow non-existent vEEU-type to be minted', async () => {
         try {
-            await acm.mintEeuBatch(999, CONST.tonCarbon, 1, accounts[global.accountNdx], { from: accounts[0] });
+            await acm.mintEeuBatch(999, CONST.tonCarbon, 1, accounts[global.accountNdx], [], [], { from: accounts[0] });
         } catch (ex) { return; }
         assert.fail('expected restriction exception');
     });
@@ -141,7 +141,14 @@ contract('AcMaster', accounts => {
 
         // mint new vEEU match
         const maxBatchIdBefore = (await acm.getEeuBatchCount.call()).toNumber();
-        const mintTx = await acm.mintEeuBatch(eeuType, qtyKG, qtyEeus, receiver, { from: accounts[0] });
+        const mintTx = await acm.mintEeuBatch(
+            eeuType, 
+            qtyKG, 
+            qtyEeus, 
+            receiver, 
+            ['test_key'], 
+            ['test_value'], 
+        { from: accounts[0] });
 
         // validat batch ID
         const maxBatchIdAfter = (await acm.getEeuBatchCount.call()).toNumber();

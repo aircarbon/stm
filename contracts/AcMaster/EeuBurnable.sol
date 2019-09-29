@@ -12,9 +12,9 @@ contract EeuBurnable is Owned, AcLedger {
      * @dev Burns carbons by resizing EEUs, and/or removing EEUs from the ledger
      * @dev Removes EEUs (or fractions thereof) from the main list and from the ledger, resizing as necessary
      * @dev The supplied ledger owner must hold the supplied quantity of carbon in aggregate across ledger EEUs, and of the supplied type
-     * @param ledgerOwner The ledger owner to burn
-     * @param eeuTypeId The EEU type to burn
-     * @param qtyKG The tonnage to burn
+     * @param ledgerOwner Ledger owner to burn
+     * @param eeuTypeId EEU type to burn
+     * @param qtyKG Tonnage to burn
      */
     function retireCarbon(address ledgerOwner, uint256 eeuTypeId, int256 qtyKG) public {
         require(msg.sender == owner, "Restricted method");

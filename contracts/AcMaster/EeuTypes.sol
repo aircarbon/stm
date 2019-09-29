@@ -29,7 +29,7 @@ contract EeuTypes is Owned {
 
     /**
      * @dev Adds a new EEU type
-     * @param name The new EEU type name
+     * @param name New EEU type name
      */
     function addEeuType(string memory name) public {
         require(msg.sender == owner, "Restricted method");

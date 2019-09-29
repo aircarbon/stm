@@ -30,7 +30,7 @@ contract('AcMaster', accounts => {
 
     it('ccy types - should make visible newly added currency types in the ledger', async () => {
         // mint 1 vEEU 
-        //await acm.mintEeuBatch(CONST.eeuType.UNFCCC, CONST.ktCarbon * 100, 1, accounts[global.accountNdx], { from: accounts[0] });
+        //await acm.mintEeuBatch(CONST.eeuType.UNFCCC, CONST.ktCarbon * 100, 1, accounts[global.accountNdx], [], [], { from: accounts[0] });
 
         // add new ccy type
         const addCcyTx = await acm.addCcyType('TEST_COIN', 'TEST_UNIT');

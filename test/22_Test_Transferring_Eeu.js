@@ -15,8 +15,8 @@ contract('AcMaster', accounts => {
 
     // one-sided kg transfer, no consideration, 1 full EEU
     it('transferring eeu - should allow one-sided transfer (A -> B) of 1.0 vEEU (VCS) across ledger entries', async () => {
-        await acm.mintEeuBatch(CONST.eeuType.VCS, CONST.ktCarbon, 1,       accounts[global.accountNdx + 0], { from: accounts[0] });
-        await acm.fund        (CONST.ccyType.USD, CONST.thousandUsd_cents, accounts[global.accountNdx + 1], { from: accounts[0] });
+        await acm.mintEeuBatch(CONST.eeuType.VCS, CONST.ktCarbon, 1,       accounts[global.accountNdx + 0], [], [], { from: accounts[0] });
+        await acm.fund        (CONST.ccyType.USD, CONST.thousandUsd_cents, accounts[global.accountNdx + 1],         { from: accounts[0] });
         
         const data = await helper.transferLedger({ acm, accounts, 
                 ledger_A: accounts[global.accountNdx + 0],     ledger_B: accounts[global.accountNdx + 1],
@@ -33,8 +33,8 @@ contract('AcMaster', accounts => {
     });
 
     it('transferring eeu - should allow one-sided transfer (B -> A) of 1.0 vEEU (UNFCCC) across ledger entries', async () => {
-        await acm.fund        (CONST.ccyType.USD,    CONST.thousandUsd_cents, accounts[global.accountNdx + 0], { from: accounts[0] });
-        await acm.mintEeuBatch(CONST.eeuType.UNFCCC, CONST.ktCarbon, 1,       accounts[global.accountNdx + 1], { from: accounts[0] });
+        await acm.fund        (CONST.ccyType.USD,    CONST.thousandUsd_cents, accounts[global.accountNdx + 0],         { from: accounts[0] });
+        await acm.mintEeuBatch(CONST.eeuType.UNFCCC, CONST.ktCarbon, 1,       accounts[global.accountNdx + 1], [], [], { from: accounts[0] });
         
         const data = await helper.transferLedger({ acm, accounts, 
                 ledger_A: accounts[global.accountNdx + 0],     ledger_B: accounts[global.accountNdx + 1],
@@ -52,8 +52,8 @@ contract('AcMaster', accounts => {
 
     // one-sided kg transfer, no consideration, 0.5 EEU (split)
     it('transferring eeu - should allow one-sided transfer (A -> B) of 0.5 vEEU (VCS) across ledger entries', async () => {
-        await acm.mintEeuBatch(CONST.eeuType.VCS, CONST.ktCarbon, 1,       accounts[global.accountNdx + 0], { from: accounts[0] });
-        await acm.fund        (CONST.ccyType.USD, CONST.thousandUsd_cents, accounts[global.accountNdx + 1], { from: accounts[0] });
+        await acm.mintEeuBatch(CONST.eeuType.VCS, CONST.ktCarbon, 1,       accounts[global.accountNdx + 0], [], [], { from: accounts[0] });
+        await acm.fund        (CONST.ccyType.USD, CONST.thousandUsd_cents, accounts[global.accountNdx + 1],         { from: accounts[0] });
         
         const data = await helper.transferLedger({ acm, accounts, 
                 ledger_A: accounts[global.accountNdx + 0],     ledger_B: accounts[global.accountNdx + 1],
@@ -71,8 +71,8 @@ contract('AcMaster', accounts => {
     });
 
     it('transferring eeu - should allow one-sided transfer (B -> A) of 0.5 vEEU (VCS) across ledger entries', async () => {
-        await acm.fund        (CONST.ccyType.USD, CONST.thousandUsd_cents, accounts[global.accountNdx + 0], { from: accounts[0] });
-        await acm.mintEeuBatch(CONST.eeuType.VCS, CONST.ktCarbon, 1,       accounts[global.accountNdx + 1], { from: accounts[0] });
+        await acm.fund        (CONST.ccyType.USD, CONST.thousandUsd_cents, accounts[global.accountNdx + 0],         { from: accounts[0] });
+        await acm.mintEeuBatch(CONST.eeuType.VCS, CONST.ktCarbon, 1,       accounts[global.accountNdx + 1], [], [], { from: accounts[0] });
         
         const data = await helper.transferLedger({ acm, accounts, 
                 ledger_A: accounts[global.accountNdx + 0],     ledger_B: accounts[global.accountNdx + 1],
@@ -91,8 +91,8 @@ contract('AcMaster', accounts => {
 
     // one-sided kg transfer, no consideration, 1 full + 1 partial EEU (split)
     // it('transferring eeu - should allow one-sided transfer (A -> B) of 1.5 vEEUs (VCS) across ledger entries', async () => {
-    //     await acm.mintEeuBatch(CONST.eeuType.VCS, CONST.tonCarbon, 2,      accounts[global.accountNdx + 0], { from: accounts[0] });
-    //     await acm.fund        (CONST.ccyType.USD, CONST.thousandUsd_cents, accounts[global.accountNdx + 1], { from: accounts[0] });
+    //     await acm.mintEeuBatch(CONST.eeuType.VCS, CONST.tonCarbon, 2,      accounts[global.accountNdx + 0], [], [], { from: accounts[0] });
+    //     await acm.fund        (CONST.ccyType.USD, CONST.thousandUsd_cents, accounts[global.accountNdx + 1],         { from: accounts[0] });
     //     const data = await helper.transferLedger({ acm, accounts, 
     //             ledger_A: accounts[global.accountNdx + 0],     ledger_B: accounts[global.accountNdx + 1],
     //                 kg_A: 750,                              eeuTypeId_A: CONST.eeuType.VCS,
@@ -109,8 +109,8 @@ contract('AcMaster', accounts => {
     //     });
     // });
     // it('transferring eeu - should allow one-sided transfer (B -> A) of 1.5 vEEUs (UNFCCC) across ledger entries', async () => {
-    //     await acm.fund        (CONST.ccyType.USD,    CONST.thousandUsd_cents, accounts[global.accountNdx + 0], { from: accounts[0] });
-    //     await acm.mintEeuBatch(CONST.eeuType.UNFCCC, CONST.tonCarbon, 2,      accounts[global.accountNdx + 1], { from: accounts[0] });
+    //     await acm.fund        (CONST.ccyType.USD,    CONST.thousandUsd_cents, accounts[global.accountNdx + 0],         { from: accounts[0] });
+    //     await acm.mintEeuBatch(CONST.eeuType.UNFCCC, CONST.tonCarbon, 2,      accounts[global.accountNdx + 1], [], [], { from: accounts[0] });
     //     const data = await helper.transferLedger({ acm, accounts, 
     //             ledger_A: accounts[global.accountNdx + 0],     ledger_B: accounts[global.accountNdx + 1],
     //                 kg_A: 0,                                eeuTypeId_A: 0,
@@ -129,8 +129,8 @@ contract('AcMaster', accounts => {
 
     // one-sided kg transfer, no consideration, partial EEU (split), receiver owns other type
     it('transferring eeu - should allow one-sided transfer (A -> B) of 0.5 vEEU (VCS) across ledger entries, receiver owns other type', async () => {
-        await acm.mintEeuBatch(CONST.eeuType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], { from: accounts[0] });
-        await acm.mintEeuBatch(CONST.eeuType.UNFCCC, CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], { from: accounts[0] });
+        await acm.mintEeuBatch(CONST.eeuType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], [], [], { from: accounts[0] });
+        await acm.mintEeuBatch(CONST.eeuType.UNFCCC, CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], [], [], { from: accounts[0] });
         
         const data = await helper.transferLedger({ acm, accounts, 
                 ledger_A: accounts[global.accountNdx + 0],     ledger_B: accounts[global.accountNdx + 1],
@@ -150,9 +150,9 @@ contract('AcMaster', accounts => {
 
     // one-sided kg transfer, no consideration, full + partial EEU (split), receiver owns other type
     it('transferring eeu - should allow one-sided transfer (A -> B) of 1.5 vEEUs (VCS) across ledger entries, receiver owns other type', async () => {
-        await acm.mintEeuBatch(CONST.eeuType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], { from: accounts[0] });
-        await acm.mintEeuBatch(CONST.eeuType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], { from: accounts[0] });
-        await acm.mintEeuBatch(CONST.eeuType.UNFCCC, CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], { from: accounts[0] });
+        await acm.mintEeuBatch(CONST.eeuType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], [], [], { from: accounts[0] });
+        await acm.mintEeuBatch(CONST.eeuType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], [], [], { from: accounts[0] });
+        await acm.mintEeuBatch(CONST.eeuType.UNFCCC, CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], [], [], { from: accounts[0] });
         
         const data = await helper.transferLedger({ acm, accounts, 
                 ledger_A: accounts[global.accountNdx + 0],     ledger_B: accounts[global.accountNdx + 1],
@@ -172,9 +172,9 @@ contract('AcMaster', accounts => {
 
     // one-sided kg transfer, no consideration, full + partial EEU (split), receiver owns same type
     it('transferring eeu - should allow one-sided transfer (A -> B) of 1.5 vEEUs (VCS) across ledger entries, receiver owns same type', async () => {
-        await acm.mintEeuBatch(CONST.eeuType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], { from: accounts[0] });
-        await acm.mintEeuBatch(CONST.eeuType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], { from: accounts[0] });
-        await acm.mintEeuBatch(CONST.eeuType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], { from: accounts[0] });
+        await acm.mintEeuBatch(CONST.eeuType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], [], [], { from: accounts[0] });
+        await acm.mintEeuBatch(CONST.eeuType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], [], [], { from: accounts[0] });
+        await acm.mintEeuBatch(CONST.eeuType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], [], [], { from: accounts[0] });
         const data = await helper.transferLedger({ acm, accounts, 
                 ledger_A: accounts[global.accountNdx + 0],     ledger_B: accounts[global.accountNdx + 1],
                     kg_A: 1500,                             eeuTypeId_A: CONST.eeuType.VCS,
@@ -195,9 +195,9 @@ contract('AcMaster', accounts => {
 
     // two-sided kg transfer / kg consideration, 1 full + 1 partial EEU (split), receiver owns and sends same type
     it('transferring eeu - should allow two-sided transfer (A <-> B) 1.5 vEEUs (VCS) across ledger entries, receiver owns same type', async () => {
-        await acm.mintEeuBatch(CONST.eeuType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], { from: accounts[0] });
-        await acm.mintEeuBatch(CONST.eeuType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], { from: accounts[0] });
-        await acm.mintEeuBatch(CONST.eeuType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], { from: accounts[0] });
+        await acm.mintEeuBatch(CONST.eeuType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], [], [], { from: accounts[0] });
+        await acm.mintEeuBatch(CONST.eeuType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], [], [], { from: accounts[0] });
+        await acm.mintEeuBatch(CONST.eeuType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], [], [], { from: accounts[0] });
         const data = await helper.transferLedger({ acm, accounts, 
                 ledger_A: accounts[global.accountNdx + 0],     ledger_B: accounts[global.accountNdx + 1],
                     kg_A: 750,                              eeuTypeId_A: CONST.eeuType.VCS,
@@ -209,10 +209,10 @@ contract('AcMaster', accounts => {
 
     // two-sided kg transfer / kg consideration, 1 full + 1 partial EEU (split), receiver owns and sends different type
     it('transferring eeu - should allow two-sided transfer (A <-> B) 1.5 vEEUs of different EEU types across ledger entries', async () => {
-        await acm.mintEeuBatch(CONST.eeuType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], { from: accounts[0] });
-        await acm.mintEeuBatch(CONST.eeuType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], { from: accounts[0] });
-        await acm.mintEeuBatch(CONST.eeuType.UNFCCC, CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], { from: accounts[0] });
-        await acm.mintEeuBatch(CONST.eeuType.UNFCCC, CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], { from: accounts[0] });
+        await acm.mintEeuBatch(CONST.eeuType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], [], [], { from: accounts[0] });
+        await acm.mintEeuBatch(CONST.eeuType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], [], [], { from: accounts[0] });
+        await acm.mintEeuBatch(CONST.eeuType.UNFCCC, CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], [], [], { from: accounts[0] });
+        await acm.mintEeuBatch(CONST.eeuType.UNFCCC, CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], [], [], { from: accounts[0] });
         const data = await helper.transferLedger({ acm, accounts, 
                 ledger_A: accounts[global.accountNdx + 0],     ledger_B: accounts[global.accountNdx + 1],
                     kg_A: 750,                              eeuTypeId_A: CONST.eeuType.VCS,
@@ -229,8 +229,8 @@ contract('AcMaster', accounts => {
     // merge test
     // one-sided kg transfer, no consideration, partial EEU (split), receiver owns same type, same batch (merge)
     it('transferring eeu - should allow one-sided transfer (A -> B) of 0.5 + 0.25 vEEUs (VCS) across ledger entries, receiver owns same type, same batch', async () => {
-        await acm.mintEeuBatch(CONST.eeuType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], { from: accounts[0] });
-        await acm.fund        (CONST.ccyType.USD,    0,                       accounts[global.accountNdx + 1], { from: accounts[0] });
+        await acm.mintEeuBatch(CONST.eeuType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], [], [], { from: accounts[0] });
+        await acm.fund        (CONST.ccyType.USD,    0,                       accounts[global.accountNdx + 1],         { from: accounts[0] });
         
         // setup: transfer 0.5, from batch 1 
         await helper.transferLedger({ acm, accounts, 
@@ -256,8 +256,8 @@ contract('AcMaster', accounts => {
     // merge test
     // one-sided kg transfer, no consideration, partial EEU (split), receiver owns same type, same and different batches (merge)
     it('transferring eeu - should allow one-sided transfer (A -> B) of 0.1 + 0.001, 0.001... vEEUs (UNFCCC) across ledger entries, receiver owns same type, same batch', async () => {
-        await acm.mintEeuBatch(CONST.eeuType.UNFCCC,    CONST.tonCarbon, 1,   accounts[global.accountNdx + 0], { from: accounts[0] });
-        await acm.mintEeuBatch(CONST.eeuType.UNFCCC,    CONST.tonCarbon, 1,   accounts[global.accountNdx + 1], { from: accounts[0] });
+        await acm.mintEeuBatch(CONST.eeuType.UNFCCC,    CONST.tonCarbon, 1,   accounts[global.accountNdx + 0], [], [], { from: accounts[0] });
+        await acm.mintEeuBatch(CONST.eeuType.UNFCCC,    CONST.tonCarbon, 1,   accounts[global.accountNdx + 1], [], [], { from: accounts[0] });
         
         // setup: transfer 0.1, split batch 1 to receiver
         await helper.transferLedger({ acm, accounts, 
@@ -287,8 +287,8 @@ contract('AcMaster', accounts => {
     // merge test
     // two-sided kg / kg transfer, partial EEU (split), receiver owns same type, same batch (merge)
     it('transferring eeu - should allow two-sided transfer (A <-> B) of 0.1 + 0.001, 0.001... vEEUs (UNFCCC) across ledger entries, receiver owns same type, same batch', async () => {
-        await acm.mintEeuBatch(CONST.eeuType.UNFCCC,    CONST.tonCarbon, 1,   accounts[global.accountNdx + 0], { from: accounts[0] });
-        await acm.mintEeuBatch(CONST.eeuType.VCS,       CONST.tonCarbon, 1,   accounts[global.accountNdx + 1], { from: accounts[0] });
+        await acm.mintEeuBatch(CONST.eeuType.UNFCCC,    CONST.tonCarbon, 1,   accounts[global.accountNdx + 0], [], [], { from: accounts[0] });
+        await acm.mintEeuBatch(CONST.eeuType.VCS,       CONST.tonCarbon, 1,   accounts[global.accountNdx + 1], [], [], { from: accounts[0] });
         
         // setup A: transfer 0.1 from B, split batch 2 to A
         // setup B: transfer 0.1 from A, split batch 1 to B
@@ -318,8 +318,8 @@ contract('AcMaster', accounts => {
     });
 
     it('transferring eeu - should have reasonable gas cost for one-sided 0.5 vEEU transfer (A -> B), aka. carbon movement', async () => {
-        await acm.mintEeuBatch(CONST.eeuType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], { from: accounts[0] });
-        await acm.fund(CONST.ccyType.ETH, 0,                                  accounts[global.accountNdx + 1], { from: accounts[0] });
+        await acm.mintEeuBatch(CONST.eeuType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], [], [], { from: accounts[0] });
+        await acm.fund(CONST.ccyType.ETH, 0,                                  accounts[global.accountNdx + 1],         { from: accounts[0] });
         const data = await helper.transferLedger({ acm, accounts, 
                 ledger_A: accounts[global.accountNdx + 0],     ledger_B: accounts[global.accountNdx + 1],
                     kg_A: 750,                              eeuTypeId_A: CONST.eeuType.VCS,
@@ -331,8 +331,8 @@ contract('AcMaster', accounts => {
     });
 
     it('transferring eeu - should not allow one-sided transfer (A -> B) of an invalid tonnage', async () => {
-        await acm.mintEeuBatch(CONST.eeuType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], { from: accounts[0] });
-        await acm.mintEeuBatch(CONST.eeuType.UNFCCC, CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], { from: accounts[0] });
+        await acm.mintEeuBatch(CONST.eeuType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], [], [], { from: accounts[0] });
+        await acm.mintEeuBatch(CONST.eeuType.UNFCCC, CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], [], [], { from: accounts[0] });
         try {
             await acm.transfer(
                 accounts[global.accountNdx + 0], accounts[global.accountNdx + 1],
@@ -348,8 +348,8 @@ contract('AcMaster', accounts => {
     });
 
     it('transferring eeu - should not allow one-sided transfer (B -> A) of an invalid tonnage', async () => {
-        await acm.mintEeuBatch(CONST.eeuType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], { from: accounts[0] });
-        await acm.mintEeuBatch(CONST.eeuType.UNFCCC, CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], { from: accounts[0] });
+        await acm.mintEeuBatch(CONST.eeuType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], [], [], { from: accounts[0] });
+        await acm.mintEeuBatch(CONST.eeuType.UNFCCC, CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], [], [], { from: accounts[0] });
         try {
             await acm.transfer(
                 accounts[global.accountNdx + 0], accounts[global.accountNdx + 1],
@@ -365,8 +365,8 @@ contract('AcMaster', accounts => {
     });    
 
     it('transferring eeu - should not allow one-sided transfer (A -> B) of a tonnage in excess of the amount held, correct type held', async () => {
-        await acm.mintEeuBatch(CONST.eeuType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], { from: accounts[0] });
-        await acm.mintEeuBatch(CONST.eeuType.VCS,    CONST.mtCarbon,  1,      accounts[global.accountNdx + 1], { from: accounts[0] });
+        await acm.mintEeuBatch(CONST.eeuType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], [], [], { from: accounts[0] });
+        await acm.mintEeuBatch(CONST.eeuType.VCS,    CONST.mtCarbon,  1,      accounts[global.accountNdx + 1], [], [], { from: accounts[0] });
         try {
             await acm.transfer(
                 accounts[global.accountNdx + 0], accounts[global.accountNdx + 1],
@@ -382,8 +382,8 @@ contract('AcMaster', accounts => {
     });
 
     it('transferring eeu - should not allow one-sided transfer (A -> B) of a tonnage in excess of the amount held, incorrect type held', async () => {
-        await acm.mintEeuBatch(CONST.eeuType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], { from: accounts[0] });
-        await acm.mintEeuBatch(CONST.eeuType.VCS,    CONST.mtCarbon,  1,      accounts[global.accountNdx + 1], { from: accounts[0] });
+        await acm.mintEeuBatch(CONST.eeuType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], [], [], { from: accounts[0] });
+        await acm.mintEeuBatch(CONST.eeuType.VCS,    CONST.mtCarbon,  1,      accounts[global.accountNdx + 1], [], [], { from: accounts[0] });
         try {
             await acm.transfer(
                 accounts[global.accountNdx + 0], accounts[global.accountNdx + 1],
@@ -399,8 +399,8 @@ contract('AcMaster', accounts => {
     });    
 
     it('transferring eeu - should not allow one-sided transfer (B -> A) of a tonnage in excess of the amount held, correct type held', async () => {
-        await acm.mintEeuBatch(CONST.eeuType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], { from: accounts[0] });
-        await acm.mintEeuBatch(CONST.eeuType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], { from: accounts[0] });
+        await acm.mintEeuBatch(CONST.eeuType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], [], [], { from: accounts[0] });
+        await acm.mintEeuBatch(CONST.eeuType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], [], [], { from: accounts[0] });
         try {
             await acm.transfer(
                 accounts[global.accountNdx + 0], accounts[global.accountNdx + 1],
@@ -416,8 +416,8 @@ contract('AcMaster', accounts => {
     });
     
     it('transferring eeu - should not allow one-sided transfer (B -> A) of a tonnage in excess of the amount held, incorrect type held', async () => {
-        await acm.mintEeuBatch(CONST.eeuType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], { from: accounts[0] });
-        await acm.mintEeuBatch(CONST.eeuType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], { from: accounts[0] });
+        await acm.mintEeuBatch(CONST.eeuType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], [], [], { from: accounts[0] });
+        await acm.mintEeuBatch(CONST.eeuType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], [], [], { from: accounts[0] });
         try {
             await acm.transfer(
                 accounts[global.accountNdx + 0], accounts[global.accountNdx + 1],

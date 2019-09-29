@@ -42,8 +42,8 @@ contract('AcMaster', accounts => {
     });
 
     it('funding - should allow minting and funding on same ledger entry', async () => {
-        await acm.mintEeuBatch(CONST.eeuType.VCS, CONST.mtCarbon, 1, accounts[global.accountNdx], { from: accounts[0] });
-        await acm.fund(CONST.ccyType.USD, CONST.thousandUsd_cents, accounts[global.accountNdx], { from: accounts[0] });
+        await acm.mintEeuBatch(CONST.eeuType.VCS, CONST.mtCarbon, 1, accounts[global.accountNdx], [], [], { from: accounts[0] });
+        await acm.fund(CONST.ccyType.USD, CONST.thousandUsd_cents, accounts[global.accountNdx],           { from: accounts[0] });
         const ledgerEntryAfter = await acm.getLedgerEntry(accounts[global.accountNdx]);
 
         assert(ledgerEntryAfter.eeus.length == 1, 'unexpected eeu count in ledger entry after minting & funding');

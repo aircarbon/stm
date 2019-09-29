@@ -10,12 +10,21 @@ contract EeuMintable is Owned, AcLedger {
 
     /**
      * @dev Mints and assigns initial ownership of a new EEU batch
-     * @param eeuTypeId The EEU-type for the batch
-     * @param qtyKG The KG quanity of carbon to mint across the EEUs
-     * @param qtyEeus The quantity of EEUs to mint - recommended, due to memory & gas cost, always set to 1
-     * @param batchOwner The ledger owner to assign the minted EEUs to
+     * @param eeuTypeId EEU-type for the batch
+     * @param qtyKG KG quantity of carbon to mint across the EEUs
+     * @param qtyEeus Quantity of EEUs to mint - recommended, due to memory & gas cost, always set to 1
+     * @param batchOwner Ledger owner to assign the minted EEUs to
+     * @param metaKeys Batch metadata keys
+     * @param metaValues Batch metadata values
      */
-    function mintEeuBatch(uint256 eeuTypeId, int256 qtyKG, int256 qtyEeus, address batchOwner) public {
+    function mintEeuBatch(
+        uint256 eeuTypeId,
+        int256  qtyKG,
+        int256  qtyEeus,
+        address batchOwner,
+        string[] memory metaKeys,
+        string[] memory metaValues)
+    public {
         require(msg.sender == owner, "Restricted method");
         require(eeuTypeId >= 0 && eeuTypeId < _count_eeuTypes, "Invalid EEU type");
         //require(qtyEeus >= 1, "Minimum one EEU required");
