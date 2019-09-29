@@ -11,7 +11,7 @@ contract('AcMaster', accounts => {
 
         if (!global.accountNdx) global.accountNdx = 0;
         global.accountNdx++;
-        console.log(`global.global.accountNdx: ${global.accountNdx} - contract @ ${acm.address} (owner: ${accounts[0]}) - getEeuBatchCount: ${(await acm.getEeuBatchCount.call()).toString()}`);
+        //console.log(`global.accountNdx: ${global.accountNdx} - contract @ ${acm.address} (owner: ${accounts[0]}) - getEeuBatchCount: ${(await acm.getEeuBatchCount.call()).toString()}`);
     });
 
     it('withdrawing - should allow withdrawing of USD', async () => {

@@ -9,7 +9,7 @@ contract('AcMaster', accounts => {
         acm = await ac.deployed();
         if (!global.accountNdx) global.accountNdx = 0;
         global.accountNdx++;
-        console.log(`global.global.accountNdx: ${global.accountNdx} - contract @ ${acm.address} (owner: ${accounts[0]}) - getEeuBatchCount: ${(await acm.getEeuBatchCount.call()).toString()}`);
+        //console.log(`global.accountNdx: ${global.accountNdx} - contract @ ${acm.address} (owner: ${accounts[0]}) - getEeuBatchCount: ${(await acm.getEeuBatchCount.call()).toString()}`);
     });
 
     it('setup - contract owner should have default ledger entry', async () => {

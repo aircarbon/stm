@@ -10,7 +10,7 @@ contract('AcMaster', accounts => {
 
         if (!global.accountNdx) global.accountNdx = 0;
         global.accountNdx += 2;
-        console.log(`global.global.accountNdx: ${global.accountNdx} - contract @ ${acm.address} (owner: ${accounts[0]}) - getEeuBatchCount: ${(await acm.getEeuBatchCount.call()).toString()}`);
+        //console.log(`global.accountNdx: ${global.accountNdx} - contract @ ${acm.address} (owner: ${accounts[0]}) - getEeuBatchCount: ${(await acm.getEeuBatchCount.call()).toString()}`);
     });
 
     it('transferring ccy - should allow one-sided transfer (A -> B) of one currency (USD) across ledger entries', async () => {
