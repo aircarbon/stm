@@ -100,7 +100,7 @@ contract('AcMaster', accounts => {
         }, { from: accounts[0] } );
     });
 
-    it('minting metadata - should allow metadata KVP minting for example UNFCCC VCUs', async () => {
+    it('minting metadata - should allow metadata KVP minting for example UNFCCC CERs', async () => {
         const batchId = await mintBatchWithMetadata( 
             { eeuType: CONST.eeuType.UNFCCC, qtyKG: 1000, qtyEeus: 1, receiver: accounts[global.accountNdx],
              metaKeys: unfccc_ExampleKvps.map(p => p.k),
