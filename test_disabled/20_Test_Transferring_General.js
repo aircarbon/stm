@@ -61,9 +61,9 @@ contract('AcMaster', accounts => {
 
     it('transferring - should not allow single-origin multiple-asset transfers (1)', async () => {
         await acm.fund(CONST.ccyType.USD, CONST.thousandUsd_cents,       accounts[global.accountNdx + 0],         { from: accounts[0] });
-        await acm.mintEeuBatch(CONST.eeuType.VCS, CONST.ktCarbon, 1,     accounts[global.accountNdx + 0], [], [], { from: accounts[0] });
+        await acm.mintEeuBatch(CONST.eeuType.VCS, CONST.ktCarbon, 1,     accounts[global.accountNdx + 0], ['dummyKey'], ['dummyValue'], { from: accounts[0] });
         await acm.fund(CONST.ccyType.USD, CONST.thousandUsd_cents,       accounts[global.accountNdx + 1],         { from: accounts[0] });
-        await acm.mintEeuBatch(CONST.eeuType.VCS, CONST.ktCarbon, 1,     accounts[global.accountNdx + 1], [], [], { from: accounts[0] });
+        await acm.mintEeuBatch(CONST.eeuType.VCS, CONST.ktCarbon, 1,     accounts[global.accountNdx + 1], ['dummyKey'], ['dummyValue'], { from: accounts[0] });
         try {
             await acm.transfer(accounts[global.accountNdx + 0], accounts[global.accountNdx + 1], 
                 CONST.ktCarbon,              // kg_A
@@ -82,9 +82,9 @@ contract('AcMaster', accounts => {
 
     it('transferring - should not allow single-origin multiple-asset transfers (2)', async () => {
         await acm.fund(CONST.ccyType.USD, CONST.thousandUsd_cents,       accounts[global.accountNdx + 0],         { from: accounts[0] });
-        await acm.mintEeuBatch(CONST.eeuType.VCS, CONST.ktCarbon, 1,     accounts[global.accountNdx + 0], [], [], { from: accounts[0] });
+        await acm.mintEeuBatch(CONST.eeuType.VCS, CONST.ktCarbon, 1,     accounts[global.accountNdx + 0], ['dummyKey'], ['dummyValue'], { from: accounts[0] });
         await acm.fund(CONST.ccyType.USD, CONST.thousandUsd_cents,       accounts[global.accountNdx + 1],         { from: accounts[0] });
-        await acm.mintEeuBatch(CONST.eeuType.VCS, CONST.ktCarbon, 1,     accounts[global.accountNdx + 1], [], [], { from: accounts[0] });
+        await acm.mintEeuBatch(CONST.eeuType.VCS, CONST.ktCarbon, 1,     accounts[global.accountNdx + 1], ['dummyKey'], ['dummyValue'], { from: accounts[0] });
         try {
             await acm.transfer(accounts[global.accountNdx + 0], accounts[global.accountNdx + 1], 
                 0,                           // kg_A
@@ -103,9 +103,9 @@ contract('AcMaster', accounts => {
 
     it('transferring - should not allow single-origin multiple-asset transfers (3)', async () => {
         await acm.fund(CONST.ccyType.USD, CONST.thousandUsd_cents,       accounts[global.accountNdx + 0],         { from: accounts[0] });
-        await acm.mintEeuBatch(CONST.eeuType.VCS, CONST.ktCarbon, 1,     accounts[global.accountNdx + 0], [], [], { from: accounts[0] });
+        await acm.mintEeuBatch(CONST.eeuType.VCS, CONST.ktCarbon, 1,     accounts[global.accountNdx + 0], ['dummyKey'], ['dummyValue'], { from: accounts[0] });
         await acm.fund(CONST.ccyType.USD, CONST.thousandUsd_cents,       accounts[global.accountNdx + 1],         { from: accounts[0] });
-        await acm.mintEeuBatch(CONST.eeuType.VCS, CONST.ktCarbon, 1,     accounts[global.accountNdx + 1], [], [], { from: accounts[0] });
+        await acm.mintEeuBatch(CONST.eeuType.VCS, CONST.ktCarbon, 1,     accounts[global.accountNdx + 1], ['dummyKey'], ['dummyValue'], { from: accounts[0] });
         try {
             await acm.transfer(accounts[global.accountNdx + 0], accounts[global.accountNdx + 1], 
                 CONST.ktCarbon,              // kg_A

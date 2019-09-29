@@ -38,11 +38,11 @@ contract('AcMaster', accounts => {
 
     it('funding - should have reasonable gas cost for funding', async () => {
         const fundTx = await acm.fund(CONST.ccyType.USD, CONST.thousandUsd_cents, accounts[global.accountNdx], { from: accounts[0] });
-        console.log(`gasUsed - Funding: ${fundTx.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * fundTx.receipt.gasUsed).toFixed(4)} (USD ${(CONST.gasPriceEth * fundTx.receipt.gasUsed * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
+        console.log(`\t>>> gasUsed - Funding: ${fundTx.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * fundTx.receipt.gasUsed).toFixed(4)} (USD ${(CONST.gasPriceEth * fundTx.receipt.gasUsed * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
     });
 
     it('funding - should allow minting and funding on same ledger entry', async () => {
-        await acm.mintEeuBatch(CONST.eeuType.VCS, CONST.mtCarbon, 1, accounts[global.accountNdx], [], [], { from: accounts[0] });
+        await acm.mintEeuBatch(CONST.eeuType.VCS, CONST.mtCarbon, 1, accounts[global.accountNdx], ['dummyKey'], ['dummyValue'], { from: accounts[0] });
         await acm.fund(CONST.ccyType.USD, CONST.thousandUsd_cents, accounts[global.accountNdx],           { from: accounts[0] });
         const ledgerEntryAfter = await acm.getLedgerEntry(accounts[global.accountNdx]);
 

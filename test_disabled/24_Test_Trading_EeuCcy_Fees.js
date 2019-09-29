@@ -17,7 +17,7 @@ contract('AcMaster', accounts => {
 
     // EEU FEES
     it('trading fees - apply VCS carbon fee on a trade (fee on A)', async () => {
-        await acm.mintEeuBatch(CONST.eeuType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], [], [], { from: accounts[0] });
+        await acm.mintEeuBatch(CONST.eeuType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], ['dummyKey'], ['dummyValue'], { from: accounts[0] });
         await acm.fund(CONST.ccyType.ETH,            CONST.oneEth_wei,        accounts[global.accountNdx + 1],         { from: accounts[0] });
 
         // set fee structure VCS: 1 KG carbon fixed
@@ -46,7 +46,7 @@ contract('AcMaster', accounts => {
 
     it('trading fees - apply UNFCCC carbon fee on a trade (fee on B)', async () => {
         await acm.fund(CONST.ccyType.ETH,            CONST.oneEth_wei,        accounts[global.accountNdx + 0],         { from: accounts[0] });
-        await acm.mintEeuBatch(CONST.eeuType.UNFCCC, CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], [], [], { from: accounts[0] });
+        await acm.mintEeuBatch(CONST.eeuType.UNFCCC, CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], ['dummyKey'], ['dummyValue'], { from: accounts[0] });
 
         // set fee structure UNFCCC: 1 KG carbon fixed, VCS: no fee
         const unfccFixedFee = 2;
@@ -82,9 +82,9 @@ contract('AcMaster', accounts => {
         const types = (await acm.getEeuTypes()).eeuTypes;
         const newTypeId = types.filter(p => p.name == 'TEST_EEU_TYPE')[0].id;
 
-        await acm.mintEeuBatch(newTypeId, 1000, 1,                            accounts[global.accountNdx + 0], [], [], { from: accounts[0] });
-        await acm.mintEeuBatch(newTypeId, 1000, 1,                            accounts[global.accountNdx + 0], [], [], { from: accounts[0] });
-        await acm.mintEeuBatch(newTypeId, 1000, 1,                            accounts[global.accountNdx + 0], [], [], { from: accounts[0] });
+        await acm.mintEeuBatch(newTypeId, 1000, 1,                            accounts[global.accountNdx + 0], ['dummyKey'], ['dummyValue'], { from: accounts[0] });
+        await acm.mintEeuBatch(newTypeId, 1000, 1,                            accounts[global.accountNdx + 0], ['dummyKey'], ['dummyValue'], { from: accounts[0] });
+        await acm.mintEeuBatch(newTypeId, 1000, 1,                            accounts[global.accountNdx + 0], ['dummyKey'], ['dummyValue'], { from: accounts[0] });
         await acm.fund(CONST.ccyType.ETH,            CONST.oneEth_wei,        accounts[global.accountNdx + 1],         { from: accounts[0] });
 
         // set fee structure new EEU type: 1500 KG carbon fixed (1.5 EEUs, 2 batches)
@@ -112,7 +112,7 @@ contract('AcMaster', accounts => {
     // CCY FEES
     it('trading fees - apply ETH ccy fee on a max. trade (fee on A)', async () => {
         await acm.fund(CONST.ccyType.ETH,            CONST.oneEth_wei,        accounts[global.accountNdx + 0],         { from: accounts[0] });
-        await acm.mintEeuBatch(CONST.eeuType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], [], [], { from: accounts[0] });
+        await acm.mintEeuBatch(CONST.eeuType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], ['dummyKey'], ['dummyValue'], { from: accounts[0] });
 
         // set fee structure ETH: 1000 Wei fixed
         const ethFeeFixed_Wei = 1000;
@@ -139,7 +139,7 @@ contract('AcMaster', accounts => {
     });
 
     it('trading fees - apply USD ccy fee on a max. trade (fee on B)', async () => {
-        await acm.mintEeuBatch(CONST.eeuType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], [], [], { from: accounts[0] });
+        await acm.mintEeuBatch(CONST.eeuType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], ['dummyKey'], ['dummyValue'], { from: accounts[0] });
         await acm.fund(CONST.ccyType.USD,            CONST.millionUsd_cents,  accounts[global.accountNdx + 1],         { from: accounts[0] });
 
         // set fee structure USD: 1000 $ in cents
@@ -169,7 +169,7 @@ contract('AcMaster', accounts => {
         const types = (await acm.getCcyTypes()).ccyTypes;
         const newCcyTypeId = types.filter(p => p.name == 'TEST_CCY_TYPE')[0].id;
 
-        await acm.mintEeuBatch(CONST.eeuType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], [], [], { from: accounts[0] });
+        await acm.mintEeuBatch(CONST.eeuType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], ['dummyKey'], ['dummyValue'], { from: accounts[0] });
         await acm.fund(newCcyTypeId,                 1000,                    accounts[global.accountNdx + 1],         { from: accounts[0] });
 
         // set fee structure new ccy: 100 units
@@ -197,7 +197,7 @@ contract('AcMaster', accounts => {
     // EEU + CCY FEES
     it('trading fees - apply ETH ccy & VCS EEU fee on a max. trade (fees on both sides)', async () => {
         await acm.fund(CONST.ccyType.ETH,            CONST.oneEth_wei,        accounts[global.accountNdx + 0],         { from: accounts[0] });
-        await acm.mintEeuBatch(CONST.eeuType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], [], [], { from: accounts[0] });
+        await acm.mintEeuBatch(CONST.eeuType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], ['dummyKey'], ['dummyValue'], { from: accounts[0] });
 
         // set fee structure ETH: 1000 Wei fixed
         const ethFeeFixed_Wei = 1000;
@@ -235,7 +235,7 @@ contract('AcMaster', accounts => {
 
     it('trading fees - apply USD ccy & UNFCCC EEU fee on a max. trade (fees on both sides)', async () => {
         await acm.fund(CONST.ccyType.USD,            CONST.millionUsd_cents,  accounts[global.accountNdx + 0],         { from: accounts[0] });
-        await acm.mintEeuBatch(CONST.eeuType.UNFCCC, CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], [], [], { from: accounts[0] });
+        await acm.mintEeuBatch(CONST.eeuType.UNFCCC, CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], ['dummyKey'], ['dummyValue'], { from: accounts[0] });
 
         // set fee structure USD: 100 cents
         const usdFeeFixed_cents = CONST.oneUsd_cents;
@@ -280,7 +280,7 @@ contract('AcMaster', accounts => {
         const newEeuTypeId = eeuTypes.filter(p => p.name == 'TEST_EEU_TYPE_2')[0].id;
 
         await acm.fund(newCcyTypeId,                 1000,                    accounts[global.accountNdx + 0],         { from: accounts[0] });
-        await acm.mintEeuBatch(newEeuTypeId,         CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], [], [], { from: accounts[0] });
+        await acm.mintEeuBatch(newEeuTypeId,         CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], ['dummyKey'], ['dummyValue'], { from: accounts[0] });
 
         // set fee structure new ccy
         const ccyFeeFixed_units = 10;

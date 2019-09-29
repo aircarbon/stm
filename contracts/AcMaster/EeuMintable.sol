@@ -31,6 +31,14 @@ contract EeuMintable is Owned, AcLedger {
         require(qtyEeus == 1, "Exactly one EEU required");
         require(qtyKG >= 1000, "Minimum one metric ton of carbon required");
         require(qtyKG % qtyEeus == 0, "Carbon weight must divide evenly into EEUs");
+        
+        // ### string[] param lengths are reported as zero!
+        /*require(metaKeys.length == 0, "At least one metadata key must be provided");
+        require(metaKeys.length <= 42, "Maximum metadata KVP length is 42");
+        require(metaKeys.length != metaValues.length, "Metadata keys/values length mismatch");
+        for (uint i = 0; i < metaKeys.length; i++) {
+            require(bytes(metaKeys[i]).length == 0 || bytes(metaValues[i]).length == 0, "Zero-length metadata key or value supplied");
+        }*/
 
         // create new EEU batch
         EeuBatch memory newBatch = EeuBatch({
@@ -38,7 +46,9 @@ contract EeuMintable is Owned, AcLedger {
             mintedTimestamp: block.timestamp,
                   eeuTypeId: eeuTypeId,
                    mintedKG: uint256(qtyKG),
-                   burnedKG: 0
+                   burnedKG: 0,
+                   metaKeys: metaKeys,
+                 metaValues: metaValues
         });
         _eeuBatches[newBatch.id] = newBatch;
         _batchCurMaxId++;

@@ -14,7 +14,7 @@ contract('AcMaster', accounts => {
     });
 
     it('trading - should allow two-sided (vEEU <-> ccy) transfer (A <-> B) across ledger entries', async () => {
-        await acm.mintEeuBatch(CONST.eeuType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], [], [], { from: accounts[0] });
+        await acm.mintEeuBatch(CONST.eeuType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], ['dummyKey'], ['dummyValue'], { from: accounts[0] });
         await acm.fund(CONST.ccyType.ETH,            CONST.oneEth_wei,        accounts[global.accountNdx + 1],         { from: accounts[0] });
         const data = await helper.transferLedger({ acm, accounts, 
                 ledger_A: accounts[global.accountNdx + 0],     ledger_B: accounts[global.accountNdx + 1],
@@ -31,7 +31,7 @@ contract('AcMaster', accounts => {
 
     it('trading - should allow two-sided (ccy <-> vEEU) transfer (A <-> B) across ledger entries', async () => {
         await acm.fund(CONST.ccyType.ETH,            CONST.oneEth_wei,        accounts[global.accountNdx + 0],         { from: accounts[0] });
-        await acm.mintEeuBatch(CONST.eeuType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], [], [], { from: accounts[0] });
+        await acm.mintEeuBatch(CONST.eeuType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], ['dummyKey'], ['dummyValue'], { from: accounts[0] });
         const data = await helper.transferLedger({ acm, accounts, 
                 ledger_A: accounts[global.accountNdx + 0],     ledger_B: accounts[global.accountNdx + 1],
                     kg_A: 0,                                eeuTypeId_A: 0,
@@ -46,7 +46,7 @@ contract('AcMaster', accounts => {
     });
 
     it('trading - should have reasonable gas cost for two-sided transfer', async () => {
-        await acm.mintEeuBatch(CONST.eeuType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], [], [], { from: accounts[0] });
+        await acm.mintEeuBatch(CONST.eeuType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], ['dummyKey'], ['dummyValue'], { from: accounts[0] });
         await acm.fund(CONST.ccyType.ETH,            CONST.oneEth_wei,        accounts[global.accountNdx + 1],         { from: accounts[0] });
         const data = await helper.transferLedger({ acm, accounts, 
                 ledger_A: accounts[global.accountNdx + 0],     ledger_B: accounts[global.accountNdx + 1],
@@ -55,7 +55,7 @@ contract('AcMaster', accounts => {
             ccy_amount_A: 0,                                ccyTypeId_A: 0,
             ccy_amount_B: CONST.oneEth_wei,                 ccyTypeId_B: CONST.ccyType.ETH,
         });
-        console.log(`gasUsed - 0.5 vEEU trade eeu/ccy (A <-> B): ${data.transferTx.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * data.transferTx.receipt.gasUsed).toFixed(4)} (USD ${(CONST.gasPriceEth * data.transferTx.receipt.gasUsed * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
+        console.log(`\t>>> gasUsed - 0.5 vEEU trade eeu/ccy (A <-> B): ${data.transferTx.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * data.transferTx.receipt.gasUsed).toFixed(4)} (USD ${(CONST.gasPriceEth * data.transferTx.receipt.gasUsed * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
     });
 
 });

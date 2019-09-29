@@ -65,26 +65,26 @@ contract('AcMaster', accounts => {
     });
 
     it('minting - should have reasonable gas cost for minting of multi-vEEU batches', async () => {
-        mintTx = await acm.mintEeuBatch(CONST.eeuType.UNFCCC, CONST.ktCarbon, 1, accounts[global.accountNdx], [], [], { from: accounts[0], });
-        console.log(`gasUsed - Mint  1 vEEU: ${mintTx.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * mintTx.receipt.gasUsed).toFixed(4)} (USD ${(CONST.gasPriceEth * mintTx.receipt.gasUsed * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
+        mintTx = await acm.mintEeuBatch(CONST.eeuType.UNFCCC, CONST.ktCarbon, 1, accounts[global.accountNdx], ['dummyKey'], ['dummyValue'], { from: accounts[0], });
+        console.log(`\t>>> gasUsed - Mint  1 vEEU: ${mintTx.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * mintTx.receipt.gasUsed).toFixed(4)} (USD ${(CONST.gasPriceEth * mintTx.receipt.gasUsed * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
 
         // mintTx = await acm.mintEeuBatch(CONST.eeuType.UNFCCC, CONST.ktCarbon, 5, accounts[global.accountNdx], { from: accounts[0], });
-        // console.log(`gasUsed - Mint  5 vEEU: ${mintTx.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * mintTx.receipt.gasUsed).toFixed(4)} (USD ${(CONST.gasPriceEth * mintTx.receipt.gasUsed * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
+        // console.log(`\t>>> gasUsed - Mint  5 vEEU: ${mintTx.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * mintTx.receipt.gasUsed).toFixed(4)} (USD ${(CONST.gasPriceEth * mintTx.receipt.gasUsed * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
 
         // var mintTx = await acm.mintEeuBatch(CONST.eeuType.UNFCCC, CONST.ktCarbon, 10, accounts[global.accountNdx], { from: accounts[0] });
-        // console.log(`gasUsed - Mint 10 vEEU: ${mintTx.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * mintTx.receipt.gasUsed).toFixed(4)} (USD ${(CONST.gasPriceEth * mintTx.receipt.gasUsed * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
+        // console.log(`\t>>> gasUsed - Mint 10 vEEU: ${mintTx.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * mintTx.receipt.gasUsed).toFixed(4)} (USD ${(CONST.gasPriceEth * mintTx.receipt.gasUsed * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
     });
 
     it('minting - should not allow non-owner to mint vEEU batches', async () => {
         try {
-            await acm.mintEeuBatch(CONST.eeuType.UNFCCC, CONST.tonCarbon, 1, accounts[global.accountNdx], [], [], { from: accounts[1], });
+            await acm.mintEeuBatch(CONST.eeuType.UNFCCC, CONST.tonCarbon, 1, accounts[global.accountNdx], ['dummyKey'], ['dummyValue'], { from: accounts[1], });
         } catch (ex) { return; }
         assert.fail('expected restriction exception');
     });
 
     it('minting - should not allow non-existent vEEU-type to be minted', async () => {
         try {
-            await acm.mintEeuBatch(999, CONST.tonCarbon, 1, accounts[global.accountNdx], [], [], { from: accounts[0] });
+            await acm.mintEeuBatch(999, CONST.tonCarbon, 1, accounts[global.accountNdx], ['dummyKey'], ['dummyValue'], { from: accounts[0] });
         } catch (ex) { return; }
         assert.fail('expected restriction exception');
     });
@@ -146,8 +146,7 @@ contract('AcMaster', accounts => {
             qtyKG, 
             qtyEeus, 
             receiver, 
-            ['test_key'], 
-            ['test_value'], 
+            ['dummyKey'], ['dummyValue'],
         { from: accounts[0] });
 
         // validat batch ID

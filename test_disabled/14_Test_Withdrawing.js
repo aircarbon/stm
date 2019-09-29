@@ -46,11 +46,11 @@ contract('AcMaster', accounts => {
     it('withdrawing - should have reasonable gas cost for withdrawing', async () => {
         await acm.fund(CONST.ccyType.USD, CONST.thousandUsd_cents, accounts[global.accountNdx], { from: accounts[0] });
         const withdrawTx = await acm.withdraw(CONST.ccyType.USD, CONST.thousandUsd_cents, accounts[global.accountNdx], { from: accounts[0] });
-        console.log(`gasUsed - Withdrawing: ${withdrawTx.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * withdrawTx.receipt.gasUsed).toFixed(4)} (USD ${(CONST.gasPriceEth * withdrawTx.receipt.gasUsed * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
+        console.log(`\t>>> gasUsed - Withdrawing: ${withdrawTx.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * withdrawTx.receipt.gasUsed).toFixed(4)} (USD ${(CONST.gasPriceEth * withdrawTx.receipt.gasUsed * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
     });
 
     it('withdrawing - should allow minting, funding and withdrawing on same ledger entry', async () => {
-        await acm.mintEeuBatch(CONST.eeuType.VCS, CONST.mtCarbon, 1, accounts[global.accountNdx], [], [], { from: accounts[0] });
+        await acm.mintEeuBatch(CONST.eeuType.VCS, CONST.mtCarbon, 1, accounts[global.accountNdx], ['dummyKey'], ['dummyValue'], { from: accounts[0] });
         await acm.fund(CONST.ccyType.USD, CONST.thousandUsd_cents, accounts[global.accountNdx],           { from: accounts[0] });
         await withdrawLedger({ ccyTypeId: CONST.ccyType.USD, amount: CONST.thousandUsd_cents / 2, withdrawer: accounts[global.accountNdx] });
         const ledgerEntryAfter = await acm.getLedgerEntry(accounts[global.accountNdx]);

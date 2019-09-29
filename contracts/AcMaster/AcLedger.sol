@@ -16,6 +16,8 @@ contract AcLedger is Owned, EeuTypes, CcyTypes {
         uint256 eeuTypeId;                                      // EEU-type of the batch
         uint256 mintedKG;                                       // total KG of carbon minted in the batch EEUs
         uint256 burnedKG;                                       // total KG of carbon burned from the batch EEUs
+        string[] metaKeys;                                      // metadata keys
+        string[] metaValues;                                    // metadata values
     }
 
     // *** EEU LIST (slightly more gas effecient than mapping(uint => Eeu))

@@ -71,7 +71,7 @@ contract('AcMaster', accounts => {
             ccy_amount_A: CONST.oneEth_wei,                 ccyTypeId_A: CONST.ccyType.ETH,
             ccy_amount_B: 0,                                ccyTypeId_B: 0,
         });
-        console.log(`gasUsed - ccy one-way (A -> B): ${data.transferTx.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * data.transferTx.receipt.gasUsed).toFixed(4)} (USD ${(CONST.gasPriceEth * data.transferTx.receipt.gasUsed * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
+        console.log(`\t>>> gasUsed - ccy one-way (A -> B): ${data.transferTx.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * data.transferTx.receipt.gasUsed).toFixed(4)} (USD ${(CONST.gasPriceEth * data.transferTx.receipt.gasUsed * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
     });
 
     it('transferring ccy - should have reasonable gas cost for two-sided currency transfer (A <-> B)', async () => {
@@ -84,7 +84,7 @@ contract('AcMaster', accounts => {
             ccy_amount_A: 10000000,                         ccyTypeId_A: CONST.ccyType.ETH,
             ccy_amount_B: 50000000,                         ccyTypeId_B: CONST.ccyType.ETH,
         });
-        console.log(`gasUsed - ccy two-way (A <-> B): ${data.transferTx.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * data.transferTx.receipt.gasUsed).toFixed(4)} (USD ${(CONST.gasPriceEth * data.transferTx.receipt.gasUsed * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
+        console.log(`\t>>> gasUsed - ccy two-way (A <-> B): ${data.transferTx.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * data.transferTx.receipt.gasUsed).toFixed(4)} (USD ${(CONST.gasPriceEth * data.transferTx.receipt.gasUsed * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
     });
 
     it('transferring ccy - should not allow one-sided transfer (A -> B) of an invalid currency value', async () => {
