@@ -163,7 +163,7 @@ contract AcLedger is Owned, EeuTypes, CcyTypes {
         });
         return ret;
     }
-
+    
     /**
      * @dev Returns the global EEU batch count
      */

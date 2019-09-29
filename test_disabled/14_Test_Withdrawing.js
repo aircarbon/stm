@@ -50,7 +50,7 @@ contract('AcMaster', accounts => {
     });
 
     it('withdrawing - should allow minting, funding and withdrawing on same ledger entry', async () => {
-        await acm.mintEeuBatch(CONST.eeuType.VCS, CONST.mtCarbon, 1, accounts[global.accountNdx], ['dummyKey'], ['dummyValue'], { from: accounts[0] });
+        await acm.mintEeuBatch(CONST.eeuType.VCS, CONST.mtCarbon, 1, accounts[global.accountNdx], [], [], { from: accounts[0] });
         await acm.fund(CONST.ccyType.USD, CONST.thousandUsd_cents, accounts[global.accountNdx],           { from: accounts[0] });
         await withdrawLedger({ ccyTypeId: CONST.ccyType.USD, amount: CONST.thousandUsd_cents / 2, withdrawer: accounts[global.accountNdx] });
         const ledgerEntryAfter = await acm.getLedgerEntry(accounts[global.accountNdx]);

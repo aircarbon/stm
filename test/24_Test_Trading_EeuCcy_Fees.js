@@ -17,7 +17,7 @@ contract('AcMaster', accounts => {
 
     // EEU FEES
     it('trading fees - apply VCS carbon fee on a trade (fee on A)', async () => {
-        await acm.mintEeuBatch(CONST.eeuType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], ['dummyKey'], ['dummyValue'], { from: accounts[0] });
+        await acm.mintEeuBatch(CONST.eeuType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], [], [], { from: accounts[0] });
         await acm.fund(CONST.ccyType.ETH,            CONST.oneEth_wei,        accounts[global.accountNdx + 1],         { from: accounts[0] });
 
         // set fee structure VCS: 1 KG carbon fixed
@@ -46,7 +46,7 @@ contract('AcMaster', accounts => {
 
     it('trading fees - apply UNFCCC carbon fee on a trade (fee on B)', async () => {
         await acm.fund(CONST.ccyType.ETH,            CONST.oneEth_wei,        accounts[global.accountNdx + 0],         { from: accounts[0] });
-        await acm.mintEeuBatch(CONST.eeuType.UNFCCC, CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], ['dummyKey'], ['dummyValue'], { from: accounts[0] });
+        await acm.mintEeuBatch(CONST.eeuType.UNFCCC, CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], [], [], { from: accounts[0] });
 
         // set fee structure UNFCCC: 1 KG carbon fixed, VCS: no fee
         const unfccFixedFee = 2;
@@ -82,9 +82,9 @@ contract('AcMaster', accounts => {
         const types = (await acm.getEeuTypes()).eeuTypes;
         const newTypeId = types.filter(p => p.name == 'TEST_EEU_TYPE')[0].id;
 
-        await acm.mintEeuBatch(newTypeId, 1000, 1,                            accounts[global.accountNdx + 0], ['dummyKey'], ['dummyValue'], { from: accounts[0] });
-        await acm.mintEeuBatch(newTypeId, 1000, 1,                            accounts[global.accountNdx + 0], ['dummyKey'], ['dummyValue'], { from: accounts[0] });
-        await acm.mintEeuBatch(newTypeId, 1000, 1,                            accounts[global.accountNdx + 0], ['dummyKey'], ['dummyValue'], { from: accounts[0] });
+        await acm.mintEeuBatch(newTypeId, 1000, 1,                            accounts[global.accountNdx + 0], [], [], { from: accounts[0] });
+        await acm.mintEeuBatch(newTypeId, 1000, 1,                            accounts[global.accountNdx + 0], [], [], { from: accounts[0] });
+        await acm.mintEeuBatch(newTypeId, 1000, 1,                            accounts[global.accountNdx + 0], [], [], { from: accounts[0] });
         await acm.fund(CONST.ccyType.ETH,            CONST.oneEth_wei,        accounts[global.accountNdx + 1],         { from: accounts[0] });
 
         // set fee structure new EEU type: 1500 KG carbon fixed (1.5 EEUs, 2 batches)
@@ -112,7 +112,7 @@ contract('AcMaster', accounts => {
     // CCY FEES
     it('trading fees - apply ETH ccy fee on a max. trade (fee on A)', async () => {
         await acm.fund(CONST.ccyType.ETH,            CONST.oneEth_wei,        accounts[global.accountNdx + 0],         { from: accounts[0] });
-        await acm.mintEeuBatch(CONST.eeuType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], ['dummyKey'], ['dummyValue'], { from: accounts[0] });
+        await acm.mintEeuBatch(CONST.eeuType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], [], [], { from: accounts[0] });
 
         // set fee structure ETH: 1000 Wei fixed
         const ethFeeFixed_Wei = 1000;
@@ -139,7 +139,7 @@ contract('AcMaster', accounts => {
     });
 
     it('trading fees - apply USD ccy fee on a max. trade (fee on B)', async () => {
-        await acm.mintEeuBatch(CONST.eeuType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], ['dummyKey'], ['dummyValue'], { from: accounts[0] });
+        await acm.mintEeuBatch(CONST.eeuType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], [], [], { from: accounts[0] });
         await acm.fund(CONST.ccyType.USD,            CONST.millionUsd_cents,  accounts[global.accountNdx + 1],         { from: accounts[0] });
 
         // set fee structure USD: 1000 $ in cents
@@ -169,7 +169,7 @@ contract('AcMaster', accounts => {
         const types = (await acm.getCcyTypes()).ccyTypes;
         const newCcyTypeId = types.filter(p => p.name == 'TEST_CCY_TYPE')[0].id;
 
-        await acm.mintEeuBatch(CONST.eeuType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], ['dummyKey'], ['dummyValue'], { from: accounts[0] });
+        await acm.mintEeuBatch(CONST.eeuType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], [], [], { from: accounts[0] });
         await acm.fund(newCcyTypeId,                 1000,                    accounts[global.accountNdx + 1],         { from: accounts[0] });
 
         // set fee structure new ccy: 100 units
@@ -197,7 +197,7 @@ contract('AcMaster', accounts => {
     // EEU + CCY FEES
     it('trading fees - apply ETH ccy & VCS EEU fee on a max. trade (fees on both sides)', async () => {
         await acm.fund(CONST.ccyType.ETH,            CONST.oneEth_wei,        accounts[global.accountNdx + 0],         { from: accounts[0] });
-        await acm.mintEeuBatch(CONST.eeuType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], ['dummyKey'], ['dummyValue'], { from: accounts[0] });
+        await acm.mintEeuBatch(CONST.eeuType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], [], [], { from: accounts[0] });
 
         // set fee structure ETH: 1000 Wei fixed
         const ethFeeFixed_Wei = 1000;
@@ -235,7 +235,7 @@ contract('AcMaster', accounts => {
 
     it('trading fees - apply USD ccy & UNFCCC EEU fee on a max. trade (fees on both sides)', async () => {
         await acm.fund(CONST.ccyType.USD,            CONST.millionUsd_cents,  accounts[global.accountNdx + 0],         { from: accounts[0] });
-        await acm.mintEeuBatch(CONST.eeuType.UNFCCC, CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], ['dummyKey'], ['dummyValue'], { from: accounts[0] });
+        await acm.mintEeuBatch(CONST.eeuType.UNFCCC, CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], [], [], { from: accounts[0] });
 
         // set fee structure USD: 100 cents
         const usdFeeFixed_cents = CONST.oneUsd_cents;
@@ -280,7 +280,7 @@ contract('AcMaster', accounts => {
         const newEeuTypeId = eeuTypes.filter(p => p.name == 'TEST_EEU_TYPE_2')[0].id;
 
         await acm.fund(newCcyTypeId,                 1000,                    accounts[global.accountNdx + 0],         { from: accounts[0] });
-        await acm.mintEeuBatch(newEeuTypeId,         CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], ['dummyKey'], ['dummyValue'], { from: accounts[0] });
+        await acm.mintEeuBatch(newEeuTypeId,         CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], [], [], { from: accounts[0] });
 
         // set fee structure new ccy
         const ccyFeeFixed_units = 10;
@@ -315,13 +315,128 @@ contract('AcMaster', accounts => {
         assert(contractOwnerEeuKgAfter == Number(contractOwnerEeuKgBefore) + Number(newEeuTypeKgFeeFixed), 'unexpected contract owner (fee receiver) newly added EEU type tonnage after transfer');    
     });
 
+    it('trading fees - should have reasonable gas cost for two-sided transfer (eeu/ccy) (fees on both sides)', async () => {
+        await acm.fund(CONST.ccyType.USD,            CONST.millionUsd_cents,  accounts[global.accountNdx + 0],         { from: accounts[0] });
+        await acm.mintEeuBatch(CONST.eeuType.UNFCCC, CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], [], [], { from: accounts[0] });
+
+        // set fee structure USD: 100 cents
+        const usdFeeFixed_cents = CONST.oneUsd_cents;
+        const setUsdFeeTx = await acm.setFee_CcyType_Fixed(CONST.ccyType.USD, usdFeeFixed_cents);
+        truffleAssert.eventEmitted(setUsdFeeTx, 'SetFeeCcyTypeFixed', ev => ev.ccyTypeId == CONST.ccyType.USD && ev.new_fee_ccyTx_Fixed == usdFeeFixed_cents);
+        assert(await acm.fee_ccyType_Fixed(CONST.ccyType.USD) == usdFeeFixed_cents, 'unexpected USD fixed cents fee after setting USD fee structure');
+
+        // set fee structure UNFCCC: 10 KG fixed
+        const unfcccKgFeeFixed = 10;
+        const setCarbonFeeTx = await acm.setFee_EeuType_Fixed(CONST.eeuType.UNFCCC, unfcccKgFeeFixed);
+        truffleAssert.eventEmitted(setCarbonFeeTx, 'SetFeeEeuTypeFixed', ev => ev.eeuTypeId == CONST.eeuType.UNFCCC && ev.new_fee_kgTx_Fixed == unfcccKgFeeFixed);
+        assert(await acm.fee_eeuType_Fixed(CONST.eeuType.UNFCCC) == unfcccKgFeeFixed, 'unexpected UNFCCC fixed KG fee after setting UNFCCC fee structure');
+
+        // transfer, with fee structure applied
+        const tradeTx = await helper.transferLedger({ acm, accounts, 
+                ledger_A: accounts[global.accountNdx + 0],                               ledger_B: accounts[global.accountNdx + 1],
+                    kg_A: 0,                                                             eeuTypeId_A: 0,
+                    kg_B: new BN(CONST.tonCarbon).sub(new BN(unfcccKgFeeFixed)),         eeuTypeId_B: CONST.eeuType.UNFCCC,
+            ccy_amount_A: new BN(CONST.millionUsd_cents).sub(new BN(usdFeeFixed_cents)), ccyTypeId_A: CONST.ccyType.USD,
+            ccy_amount_B: 0,                                                             ccyTypeId_B: 0,
+               applyFees: true,
+        });
+
+        console.log(`\t>>> gasUsed - 1.0 vEEU trade eeu/ccy (A <-> B) w/ fees on both: ${tradeTx.transferTx.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * tradeTx.transferTx.receipt.gasUsed).toFixed(4)} (USD ${(CONST.gasPriceEth * tradeTx.transferTx.receipt.gasUsed * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
+    });
+
+    it('trading fees - should have reasonable gas cost for two-sided transfer (eeu/ccy) (fee on ccy)', async () => {
+        await acm.fund(CONST.ccyType.USD,            CONST.millionUsd_cents,  accounts[global.accountNdx + 0],         { from: accounts[0] });
+        await acm.mintEeuBatch(CONST.eeuType.UNFCCC, CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], [], [], { from: accounts[0] });
+
+        // set fee structure USD: 100 cents
+        const usdFeeFixed_cents = CONST.oneUsd_cents;
+        const setUsdFeeTx = await acm.setFee_CcyType_Fixed(CONST.ccyType.USD, usdFeeFixed_cents);
+        truffleAssert.eventEmitted(setUsdFeeTx, 'SetFeeCcyTypeFixed', ev => ev.ccyTypeId == CONST.ccyType.USD && ev.new_fee_ccyTx_Fixed == usdFeeFixed_cents);
+        assert(await acm.fee_ccyType_Fixed(CONST.ccyType.USD) == usdFeeFixed_cents, 'unexpected USD fixed cents fee after setting USD fee structure');
+
+        // set fee structure UNFCCC: 0 KG fixed
+        const unfcccKgFeeFixed = 0;
+        const setCarbonFeeTx = await acm.setFee_EeuType_Fixed(CONST.eeuType.UNFCCC, unfcccKgFeeFixed);
+        truffleAssert.eventEmitted(setCarbonFeeTx, 'SetFeeEeuTypeFixed', ev => ev.eeuTypeId == CONST.eeuType.UNFCCC && ev.new_fee_kgTx_Fixed == unfcccKgFeeFixed);
+        assert(await acm.fee_eeuType_Fixed(CONST.eeuType.UNFCCC) == unfcccKgFeeFixed, 'unexpected UNFCCC fixed KG fee after setting UNFCCC fee structure');
+
+        // transfer, with fee structure applied
+        const tradeTx = await helper.transferLedger({ acm, accounts, 
+                ledger_A: accounts[global.accountNdx + 0],                               ledger_B: accounts[global.accountNdx + 1],
+                    kg_A: 0,                                                             eeuTypeId_A: 0,
+                    kg_B: new BN(CONST.tonCarbon).sub(new BN(unfcccKgFeeFixed)),         eeuTypeId_B: CONST.eeuType.UNFCCC,
+            ccy_amount_A: new BN(CONST.millionUsd_cents).sub(new BN(usdFeeFixed_cents)), ccyTypeId_A: CONST.ccyType.USD,
+            ccy_amount_B: 0,                                                             ccyTypeId_B: 0,
+               applyFees: true,
+        });
+
+        console.log(`\t>>> gasUsed - 1.0 vEEU trade eeu/ccy (A <-> B) w/ fees on ccy: ${tradeTx.transferTx.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * tradeTx.transferTx.receipt.gasUsed).toFixed(4)} (USD ${(CONST.gasPriceEth * tradeTx.transferTx.receipt.gasUsed * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
+    });
+
+    it('trading fees - should have reasonable gas cost for two-sided transfer (eeu/ccy) (fee on eeu)', async () => {
+        await acm.fund(CONST.ccyType.USD,            CONST.millionUsd_cents,  accounts[global.accountNdx + 0],         { from: accounts[0] });
+        await acm.mintEeuBatch(CONST.eeuType.UNFCCC, CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], [], [], { from: accounts[0] });
+
+        // set fee structure USD: 0 cents
+        const usdFeeFixed_cents = CONST.oneUsd_cents;
+        const setUsdFeeTx = await acm.setFee_CcyType_Fixed(CONST.ccyType.USD, usdFeeFixed_cents);
+        truffleAssert.eventEmitted(setUsdFeeTx, 'SetFeeCcyTypeFixed', ev => ev.ccyTypeId == CONST.ccyType.USD && ev.new_fee_ccyTx_Fixed == usdFeeFixed_cents);
+        assert(await acm.fee_ccyType_Fixed(CONST.ccyType.USD) == usdFeeFixed_cents, 'unexpected USD fixed cents fee after setting USD fee structure');
+
+        // set fee structure UNFCCC: 10 KG fixed
+        const unfcccKgFeeFixed = 10;
+        const setCarbonFeeTx = await acm.setFee_EeuType_Fixed(CONST.eeuType.UNFCCC, unfcccKgFeeFixed);
+        truffleAssert.eventEmitted(setCarbonFeeTx, 'SetFeeEeuTypeFixed', ev => ev.eeuTypeId == CONST.eeuType.UNFCCC && ev.new_fee_kgTx_Fixed == unfcccKgFeeFixed);
+        assert(await acm.fee_eeuType_Fixed(CONST.eeuType.UNFCCC) == unfcccKgFeeFixed, 'unexpected UNFCCC fixed KG fee after setting UNFCCC fee structure');
+
+        // transfer, with fee structure applied
+        const tradeTx = await helper.transferLedger({ acm, accounts, 
+                ledger_A: accounts[global.accountNdx + 0],                               ledger_B: accounts[global.accountNdx + 1],
+                    kg_A: 0,                                                             eeuTypeId_A: 0,
+                    kg_B: new BN(CONST.tonCarbon).sub(new BN(unfcccKgFeeFixed)),         eeuTypeId_B: CONST.eeuType.UNFCCC,
+            ccy_amount_A: new BN(CONST.millionUsd_cents).sub(new BN(usdFeeFixed_cents)), ccyTypeId_A: CONST.ccyType.USD,
+            ccy_amount_B: 0,                                                             ccyTypeId_B: 0,
+               applyFees: true,
+        });
+
+        console.log(`\t>>> gasUsed - 1.0 vEEU trade eeu/ccy (A <-> B) w/ fees on eeu: ${tradeTx.transferTx.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * tradeTx.transferTx.receipt.gasUsed).toFixed(4)} (USD ${(CONST.gasPriceEth * tradeTx.transferTx.receipt.gasUsed * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
+    });
+
+    it('trading fees - should have reasonable gas cost for two-sided transfer (eeu/ccy) (base gas cost: no fees)', async () => {
+        await acm.fund(CONST.ccyType.USD,            CONST.millionUsd_cents,  accounts[global.accountNdx + 0],         { from: accounts[0] });
+        await acm.mintEeuBatch(CONST.eeuType.UNFCCC, CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], [], [], { from: accounts[0] });
+
+        // set fee structure USD: 0 cents
+        const usdFeeFixed_cents = CONST.oneUsd_cents;
+        const setUsdFeeTx = await acm.setFee_CcyType_Fixed(CONST.ccyType.USD, usdFeeFixed_cents);
+        truffleAssert.eventEmitted(setUsdFeeTx, 'SetFeeCcyTypeFixed', ev => ev.ccyTypeId == CONST.ccyType.USD && ev.new_fee_ccyTx_Fixed == usdFeeFixed_cents);
+        assert(await acm.fee_ccyType_Fixed(CONST.ccyType.USD) == usdFeeFixed_cents, 'unexpected USD fixed cents fee after setting USD fee structure');
+
+        // set fee structure UNFCCC: 0 KG fixed
+        const unfcccKgFeeFixed = 0;
+        const setCarbonFeeTx = await acm.setFee_EeuType_Fixed(CONST.eeuType.UNFCCC, unfcccKgFeeFixed);
+        truffleAssert.eventEmitted(setCarbonFeeTx, 'SetFeeEeuTypeFixed', ev => ev.eeuTypeId == CONST.eeuType.UNFCCC && ev.new_fee_kgTx_Fixed == unfcccKgFeeFixed);
+        assert(await acm.fee_eeuType_Fixed(CONST.eeuType.UNFCCC) == unfcccKgFeeFixed, 'unexpected UNFCCC fixed KG fee after setting UNFCCC fee structure');
+
+        // transfer, with fee structure applied
+        const tradeTx = await helper.transferLedger({ acm, accounts, 
+                ledger_A: accounts[global.accountNdx + 0],                               ledger_B: accounts[global.accountNdx + 1],
+                    kg_A: 0,                                                             eeuTypeId_A: 0,
+                    kg_B: new BN(CONST.tonCarbon).sub(new BN(unfcccKgFeeFixed)),         eeuTypeId_B: CONST.eeuType.UNFCCC,
+            ccy_amount_A: new BN(CONST.millionUsd_cents).sub(new BN(usdFeeFixed_cents)), ccyTypeId_A: CONST.ccyType.USD,
+            ccy_amount_B: 0,                                                             ccyTypeId_B: 0,
+               applyFees: true,
+        });
+
+        console.log(`\t>>> gasUsed - 1.0 vEEU trade eeu/ccy (A <-> B) w/ no fees: ${tradeTx.transferTx.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * tradeTx.transferTx.receipt.gasUsed).toFixed(4)} (USD ${(CONST.gasPriceEth * tradeTx.transferTx.receipt.gasUsed * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
+    });
+
     // positive: validate fee events (not done by helper)
 
     // negative: only owner can set fee structure...
     // negative: not enough carbon/ccy to cover fee...
 
-    it('trading eeu - should have reasonable gas cost for two-sided transfer with fees...', async () => {
-        //...
-    });
+    // TODO: alert Thom to range of tx cost, esp. for multi-batch transfers -- needs to be baked into the model
+    // TODO: % fees not yet implemented...
 
 });
