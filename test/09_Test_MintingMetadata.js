@@ -168,8 +168,8 @@ contract('AcMaster', accounts => {
         // console.dir(metaKeys);
         // console.dir(metaValues);
         
-        console.dir(batchKeys);
-        console.dir(batchValues);
+        //console.dir(batchKeys);
+        //console.dir(batchValues);
 
         assert(batchKeys.length == metaKeys.length, 'batch/supplied meta keys length mismatch');
         assert(batchValues.length == metaValues.length, 'batch/supplied meta values length mismatch');
