@@ -22,7 +22,7 @@
         "bn.js": "^5.0.0"
     },
     "devDependencies": {
-        "@truffle/hdwallet-provider": "^1.0.18",
+        "@truffle/hdwallet-provider": "^1.0.19",
         "big-number": "2.0.0",
         "ethereumjs-tx": "^2.1.1",
         "ethereumjs-wallet": "^0.6.3",
@@ -30,9 +30,9 @@
         "mssql": "^5.1.0",
         "public-ip": "3.2.0",
         "rimraf": "^3.0.0",
-        "truffle": "^5.0.37",
+        "truffle": "^5.0.27",
         "truffle-assertions": "^0.9.1",
-        "web3": "2.0.0-alpha"
+        "web3": "^2.0.0-alpha"
     },
     "husky": {
         "hooks": {
