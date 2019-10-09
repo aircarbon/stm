@@ -10,7 +10,6 @@
     "scripts": {
         "test": "truffle test",
         "solium:lint": "solium lint -d ./contracts",
-        "prepare": "yarn run migrate",
         "migrate": "rimraf -rf ./build/contracts && truffle migrate",
         "console": "truffle console",
         "dev": "truffle develop"
