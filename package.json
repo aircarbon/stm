@@ -18,11 +18,12 @@
     "keywords": [],
     "license": "MIT",
     "dependencies": {
+        "@babel/runtime": "^7.6.3",
         "big.js": "^5.2.2",
         "bn.js": "^5.0.0"
     },
     "devDependencies": {
-        "@truffle/hdwallet-provider": "^1.0.19",
+        "@truffle/hdwallet-provider": "^1.0.20",
         "big-number": "2.0.0",
         "ethereumjs-tx": "^2.1.1",
         "ethereumjs-wallet": "^0.6.3",
