@@ -6,17 +6,17 @@ contract('AcMaster', accounts => {
     var acm;
 
     const vcs_ExampleKvps = [
-        { k: 'VCS_PROJECT_ID',            v: '959' },
-        { k: 'VCS_PROJECT_URL',           v: 'https://www.vcsprojectdatabase.org/#/project_details/959' },
-        { k: 'VCS_ISSUANCE_URL',          v: 'https://www.vcsprojectdatabase.org/index-no-tabs.html#/vcu_details_report/165504' },
-        { k: 'VCS_ISSUANCE_SERIAL_RANGE', v: '7144-374222312-374242311-VCU-007-MER-UY-14-959-01012012-31122012-0' }
+        { k: 'VCS_PROJECT_ID',            v: '959' }, // int
+        { k: 'VCS_PROJECT_URL',           v: 'https://www.vcsprojectdatabase.org/#/project_details/959' }, // url
+        { k: 'VCS_ISSUANCE_URL',          v: 'https://www.vcsprojectdatabase.org/index-no-tabs.html#/vcu_details_report/165504' }, // url
+        { k: 'VCS_ISSUANCE_SERIAL_RANGE', v: '7144-374222312-374242311-VCU-007-MER-UY-14-959-01012012-31122012-0' } // freetext
     ];
     const unfccc_ExampleKvps = [
-        { k: 'UNFCCC_PROJECT_ID',            v: '0008' },
-        { k: 'UNFCCC_PROJECT_URL',           v: 'https://cdm.unfccc.int/Projects/DB/DNV-CUK1095236970.6/view' },
-        { k: 'UNFCCC_ISSUANCE_URL',          v: 'https://cdm.unfccc.int/Projects/DB/DNV-CUK1095236970.6/CP/S7AT4T5YDHX1RNDGO6ZOZO6SDNY485/iProcess/RWTUV1346049921.05/view' },
-        { k: 'UNFCCC_ISSUANCE_SERIAL_START', v: 'BR-5-85316059-1-1-0-8' },
-        { k: 'UNFCCC_ISSUANCE_SERIAL_END',   v: 'BR-5-85448545-1-1-0-8' }
+        { k: 'UNFCCC_PROJECT_ID',            v: '0008' }, // int
+        { k: 'UNFCCC_PROJECT_URL',           v: 'https://cdm.unfccc.int/Projects/DB/DNV-CUK1095236970.6/view' }, // url
+        { k: 'UNFCCC_ISSUANCE_URL',          v: 'https://cdm.unfccc.int/Projects/DB/DNV-CUK1095236970.6/CP/S7AT4T5YDHX1RNDGO6ZOZO6SDNY485/iProcess/RWTUV1346049921.05/view' }, // url
+        { k: 'UNFCCC_ISSUANCE_SERIAL_START', v: 'BR-5-85316059-1-1-0-8' }, // freetext
+        { k: 'UNFCCC_ISSUANCE_SERIAL_END',   v: 'BR-5-85448545-1-1-0-8' } // freetext
     ];
 
     beforeEach(async () => {

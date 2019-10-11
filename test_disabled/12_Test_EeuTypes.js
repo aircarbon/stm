@@ -47,7 +47,7 @@ contract('AcMaster', accounts => {
         
         // mint new EEU type: 2 batches 
         for (var i=0 ; i < 2 ; i++) {
-            await acm.mintEeuBatch(newTypeId, CONST.ktCarbon * 100, 1, accounts[global.accountNdx], ['dummyKey'], ['dummyValue'], { from: accounts[0] });
+            await acm.mintEeuBatch(newTypeId, CONST.ktCarbon * 100, 1, accounts[global.accountNdx], [], [], { from: accounts[0] });
         }
         const batchCountAfter_Mint1 = (await acm.getEeuBatchCount.call()).toNumber(); 
         //console.log(`batchCountAfter`, batchCountAfter_Mint1);
@@ -60,7 +60,7 @@ contract('AcMaster', accounts => {
 
         // mint default EEU type: 4 batches 
         for (var i=0 ; i < 4 ; i++) {
-            await acm.mintEeuBatch(CONST.eeuType.UNFCCC, CONST.ktCarbon * 100, 1, accounts[global.accountNdx], ['dummyKey'], ['dummyValue'], { from: accounts[0] });
+            await acm.mintEeuBatch(CONST.eeuType.UNFCCC, CONST.ktCarbon * 100, 1, accounts[global.accountNdx], [], [], { from: accounts[0] });
         }
         const batchCountAfter_Mint2 = (await acm.getEeuBatchCount.call()).toNumber();
         assert(batchCountAfter_Mint2 == batchCountBefore + 6, `unexpected max batch id ${batchCountAfter_Mint2} after minting (2)`);
