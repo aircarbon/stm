@@ -127,4 +127,17 @@ contract('AcMaster', accounts => {
         } catch (ex) { return; }
         assert.fail('expected restriction exception');
     });
+
+    it('withdrawing - should not allow withdrawing when contract is read only', async () => {
+        await acm.fund(CONST.ccyType.USD, 100, accounts[global.accountNdx], { from: accounts[0] });
+        try {
+            await acm.setReadOnly(true, { from: accounts[0] });
+            await withdrawLedger({ ccyTypeId: CONST.ccyType.USD, amount: 50, withdrawer: accounts[global.accountNdx]});
+        } catch (ex) { 
+            await acm.setReadOnly(false, { from: accounts[0] });
+            return;
+        }
+        await acm.setReadOnly(false, { from: accounts[0] });
+        assert.fail('expected restriction exception');
+    });
 });
