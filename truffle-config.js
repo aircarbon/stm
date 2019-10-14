@@ -76,7 +76,7 @@ module.exports = {
     testnet_ace: {
       provider: () => new HDWalletProvider(mnemonic, "https://ac-dev1.net:9545", 0, 200),
       network_id: "*",
-      gas: 10000000,
+      gas: 6000000,
       gasPrice: web3.utils.toWei("40", "gwei")
     },
 

@@ -7,14 +7,13 @@ module.exports = function (deployer) {
 
     process.env.NETWORK = deployer.network; // e.g. "ropsten_ac"
 
-    console.log('2_deploy_contracts...', deployer);
+    //console.log('2_deploy_contracts...', deployer);
 
     AcMaster.synchronization_timeout = 42;  // seconds
 
     deployer.deploy(AcMaster).then(async acm => {
 
         //console.dir(acm.abi);
-
         //console.dir(deployer);
 
         global.configContext = 'erc20';
