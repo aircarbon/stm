@@ -26,6 +26,7 @@ contract EeuMintable is Owned, AcLedger {
         string[] memory metaValues)
     public {
         require(msg.sender == owner, "Restricted method");
+        require(_readOnly == false, "Contract is read only");
         require(eeuTypeId >= 0 && eeuTypeId < _count_eeuTypes, "Invalid EEU type");
         //require(qtyEeus >= 1, "Minimum one EEU required");
         require(qtyEeus == 1, "Exactly one EEU required");

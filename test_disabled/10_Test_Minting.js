@@ -133,6 +133,18 @@ contract('AcMaster', accounts => {
         assert.fail('expected restriction exception');
     });
 
+    it('minting - should not allow minting when contract is read only', async () => {
+        try {
+            await acm.setReadOnly(true, { from: accounts[0] });
+            await mintBatch({ eeuType: CONST.eeuType.UNFCCC, qtyKG: CONST.tonCarbon, qtyEeus: 1, receiver: accounts[global.accountNdx], }, { from: accounts[0] });
+        } catch (ex) {
+            await acm.setReadOnly(false, { from: accounts[0] });
+            return;
+        }
+        await acm.setReadOnly(false, { from: accounts[0] });
+        assert.fail('expected restriction exception');
+    });
+
     async function mintBatch({ eeuType, qtyKG, qtyEeus, receiver }) {
         var batchId = -1;
 

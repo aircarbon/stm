@@ -77,4 +77,16 @@ contract('AcMaster', accounts => {
         } catch (ex) { return; }
         assert.fail('expected restriction exception');
     });
+
+    it('ccy types - should not allow adding a currency type when contract is read only', async () => {
+        try {
+            await acm.setReadOnly(true, { from: accounts[0] }); 
+            await acm.addCcyType('NEW_TYPE_ID_4');
+        } catch (ex) { 
+            await acm.setReadOnly(false, { from: accounts[0] });
+            return;
+        }
+        await acm.setReadOnly(false, { from: accounts[0] });
+        assert.fail('expected restriction exception');
+    });
 });

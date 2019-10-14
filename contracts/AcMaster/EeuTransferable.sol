@@ -17,6 +17,7 @@ contract EeuTransferable is Owned, AcLedger {
     event SetFeeEeuTypeFixed(uint256 eeuTypeId, uint256 new_fee_kgTx_Fixed);
     function setFee_EeuType_Fixed(uint256 eeuTypeId, uint256 new_fee_kgTx_Fixed) public {
         require(msg.sender == owner, "Restricted method");
+        require(_readOnly == false, "Contract is read only");
         require(eeuTypeId >= 0 && eeuTypeId < _count_eeuTypes, "Invalid EEU type");
         fee_eeuType_Fixed[eeuTypeId] = new_fee_kgTx_Fixed;
         emit SetFeeEeuTypeFixed(eeuTypeId, new_fee_kgTx_Fixed);
@@ -25,6 +26,7 @@ contract EeuTransferable is Owned, AcLedger {
     event SetFeeCcyTypeFixed(uint256 ccyTypeId, uint256 new_fee_ccyTx_Fixed);
     function setFee_CcyType_Fixed(uint256 ccyTypeId, uint256 new_fee_ccyTx_Fixed) public {
         require(msg.sender == owner, "Restricted method");
+        require(_readOnly == false, "Contract is read only");
         require(ccyTypeId >= 0 && ccyTypeId < _count_ccyTypes, "Invalid currency type");
         fee_ccyType_Fixed[ccyTypeId] = new_fee_ccyTx_Fixed;
         emit SetFeeCcyTypeFixed(ccyTypeId, new_fee_ccyTx_Fixed);
@@ -70,6 +72,7 @@ contract EeuTransferable is Owned, AcLedger {
         bool    applyFees       // apply fee structure to the transfer (both legs)
     ) public {
         require(msg.sender == owner, "Restricted method");
+        require(_readOnly == false, "Contract is read only");
 
         require(_ledger[ledger_A].exists == true, "Invalid ledger owner A");
         require(_ledger[ledger_B].exists == true, "Invalid ledger owner B");

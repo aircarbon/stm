@@ -71,6 +71,18 @@ contract('AcMaster', accounts => {
         } catch (ex) { return; }
         assert.fail('expected restriction exception');
     });
+
+    it('funding - should not allow when contract is read only', async () => {
+        try {
+            await acm.setReadOnly(true, { from: accounts[0] });
+            await acm.fund(CONST.ccyType.USD, 100, accounts[global.accountNdx], { from: accounts[0] });
+        } catch (ex) { 
+            await acm.setReadOnly(false, { from: accounts[0] });
+            return;
+        }
+        await acm.setReadOnly(false, { from: accounts[0] });
+        assert.fail('expected restriction exception');
+    });
     
     async function fundLedger({ ccyTypeId, amount, receiver }) {
         var ledgerEntryBefore, ledgerEntryAfter;

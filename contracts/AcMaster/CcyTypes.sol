@@ -43,6 +43,7 @@ contract CcyTypes is Owned {
      */
     function addCcyType(string memory name, string memory unit) public {
         require(msg.sender == owner, "Restricted method");
+        require(_readOnly == false, "Contract is read only");
 
         for (uint256 ccyTypeId = 0; ccyTypeId < _count_ccyTypes; ccyTypeId++) {
             require(keccak256(abi.encodePacked(_ccyTypes[ccyTypeId].name)) != keccak256(abi.encodePacked(name)),

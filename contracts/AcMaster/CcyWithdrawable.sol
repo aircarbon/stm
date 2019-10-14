@@ -15,6 +15,7 @@ contract CcyWithdrawable is Owned, AcLedger {
      */
     function withdraw(uint256 ccyTypeId, int256 amount, address ledgerOwner) public {
         require(msg.sender == owner, "Restricted method");
+        require(_readOnly == false, "Contract is read only");
         require(ccyTypeId >= 0 && ccyTypeId < _count_ccyTypes, "Invalid currency type");
         require(amount > 0, "Minimum one currency unit required");
         require(_ledger[ledgerOwner].exists == true, "Invalid ledger owner");

@@ -84,4 +84,16 @@ contract('AcMaster', accounts => {
         } catch (ex) { return; }
         assert.fail('expected restriction exception');
     });
+
+    it('eeu types - should not allow adding an EEU type when contract is read only', async () => {
+        try {
+            await acm.setReadOnly(true, { from: accounts[0] });
+            await acm.addEeuType('UNFCCC');
+        } catch (ex) { 
+            await acm.setReadOnly(false, { from: accounts[0] });
+            return;
+        }
+        await acm.setReadOnly(false, { from: accounts[0] });
+        assert.fail('expected restriction exception');
+    });
 });

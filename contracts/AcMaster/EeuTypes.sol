@@ -33,6 +33,7 @@ contract EeuTypes is Owned {
      */
     function addEeuType(string memory name) public {
         require(msg.sender == owner, "Restricted method");
+        require(_readOnly == false, "Contract is read only");
 
         for (uint256 eeuTypeId = 0; eeuTypeId < _count_eeuTypes; eeuTypeId++) {
             require(keccak256(abi.encodePacked(_eeuTypeNames[eeuTypeId])) != keccak256(abi.encodePacked(name)),

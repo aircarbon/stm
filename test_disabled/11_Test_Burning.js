@@ -286,4 +286,18 @@ contract('AcMaster', accounts => {
         } catch (ex) { return; }
         assert(false, 'expected restriction exception');
     });
+
+    it('burning - should not allow burning when contract is read only', async () => {
+        await acm.mintEeuBatch(CONST.eeuType.UNFCCC, CONST.ktCarbon, 1, accounts[global.accountNdx], [], [], { from: accounts[0], });
+        const a0_le = await acm.getLedgerEntry(accounts[global.accountNdx]);
+        try {
+            await acm.setReadOnly(true, { from: accounts[0] });
+            await acm.retireCarbon(accounts[global.accountNdx], CONST.eeuType.UNFCCC, CONST.ktCarbon, { from: accounts[0], });
+        } catch (ex) { 
+            await acm.setReadOnly(false, { from: accounts[0] });
+            return;
+        }
+        await acm.setReadOnly(false, { from: accounts[0] });
+        assert.fail('expected restriction exception');
+    });
 });

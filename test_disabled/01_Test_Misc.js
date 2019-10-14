@@ -16,4 +16,13 @@ contract('AcMaster', accounts => {
         const ownerLedgerEntry = await acm.getLedgerEntry(accounts[0]);
         assert(ownerLedgerEntry.exists == true, 'contract owner missing ledger entry');
     });
+
+    it('setup - only contract owner should be able to set read only state', async () => {
+        try {
+            await acm.setReadOnly(true, { from: accounts[1] });
+        } catch (ex) {
+            return;
+        }
+        assert.fail('expected restriction exception');
+    });
 });

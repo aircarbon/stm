@@ -18,6 +18,7 @@ contract EeuBurnable is Owned, AcLedger {
      */
     function retireCarbon(address ledgerOwner, uint256 eeuTypeId, int256 qtyKG) public {
         require(msg.sender == owner, "Restricted method");
+        require(_readOnly == false, "Contract is read only");
         require(_ledger[ledgerOwner].exists == true, "Invalid ledger owner");
         require(qtyKG >= 1000, "Minimum one metric ton of carbon required");
         require(eeuTypeId >= 0 && eeuTypeId < _count_eeuTypes, "Invalid EEU type");

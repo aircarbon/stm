@@ -138,4 +138,25 @@ contract('AcMaster', accounts => {
         assert.fail('expected restriction exception');
     });
 
+    it('transferring - should not allow transfers when contract is read only', async () => {
+        await acm.fund(CONST.ccyType.USD, CONST.thousandUsd_cents,       accounts[global.accountNdx + 0],         { from: accounts[0] });
+        await acm.fund(CONST.ccyType.ETH, CONST.oneEth_wei,              accounts[global.accountNdx + 1],         { from: accounts[0] });
+        try {
+            await acm.setReadOnly(true, { from: accounts[0] });
+            await acm.transfer(accounts[global.accountNdx + 0], accounts[global.accountNdx + 1], 
+                0, 0, 0, 0, 
+                CONST.thousandUsd_cents,     // ccy_amount_A
+                CONST.ccyType.USD,           // ccyTypeId_A
+                CONST.oneEth_wei,            // ccy_amount_B
+                CONST.ccyType.ETH,           // ccyTypeId_B
+                false,                       // applyFees
+                { from: accounts[0] });
+        } catch (ex) { 
+            await acm.setReadOnly(false, { from: accounts[0] });
+            return;
+        }
+        await acm.setReadOnly(false, { from: accounts[0] });
+        assert.fail('expected restriction exception');
+    });
+
 });
