@@ -432,11 +432,12 @@ contract('AcMaster', accounts => {
     });
 
     // positive: validate fee events (not done by helper)
-
     // negative: only owner can set fee structure...
     // negative: not enough carbon/ccy to cover fee...
 
-    // TODO: alert Thom to range of tx cost, esp. for multi-batch transfers -- needs to be baked into the model
-    // TODO: % fees not yet implemented...
-
+    //
+    // PRI 1
+    // TODO: % fees not yet implemented... (1.5$ per 1000 tons) >> fee structure (override?) to ledger level...
+    // TODO: fee to originator on each trade (i.e. data on batch...)
+    //
 });
