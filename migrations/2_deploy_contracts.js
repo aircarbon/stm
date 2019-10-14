@@ -1,7 +1,7 @@
 const os = require('os');
 const publicIp = require('public-ip');
 const AcMaster = artifacts.require('./AcMaster.sol');
-const db = require('../../util/db.js');
+const { db } = require('../../common/dist');
 
 module.exports = function (deployer) {
 
@@ -17,7 +17,7 @@ module.exports = function (deployer) {
         //console.dir(deployer);
 
         global.configContext = 'erc20';
-        await db.erc20.SaveDeployment({
+        await db.SaveDeployment({
             contractName: 'AcMaster',
                networkId: deployer.network_id,
          deployedAddress: acm.address,
