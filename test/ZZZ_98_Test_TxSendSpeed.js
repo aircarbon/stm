@@ -8,8 +8,15 @@ contract("AcMaster", accounts => {
         acm = await ac.deployed();
     });
 
+    it("web3 - misc", async () => {
+        const Web3 = require('web3');
+        const web3 = new Web3('http://127.0.0.1:8545'); // ganache
+        const accounts = await web3.eth.getAccounts();
+        console.dir(accounts);
+    })
+
     // leave for now -- do properly in API layer, and measure there
-    it("speed - should allow fast return of txid (rinkeby_infura)", async () => {
+    /*, it("speed - should allow fast return of txid (rinkeby_infura)", async () => {
         let networkID = process.env.NETWORK;
         console.log('net_version: ', networkID);
 
@@ -86,24 +93,24 @@ contract("AcMaster", accounts => {
         // console.log('awaited: ', tx);
 
         // https://github.com/trufflesuite/truffle/issues/624
-        /*console.dir(acm.contract);
-        console.time('send mintTx');
-        const tx = await acm.mintEeuBatch // not a web3 contract instance, but a TruffleContract instance
-            //.sendTransaction
-            (CONST.eeuType.UNFCCC, CONST.ktCarbon, 1, accounts[0], { from: accounts[0] }
-                // TruffleContact has no callback
-                // , function (err, txHash) {
-                //     console.log(txHash);
-                // }
-            )
-            ;
-            // .then(tx => {
-            //     console.log('tx: ', tx);
-            //     return tx;
-            // });
+        // console.dir(acm.contract);
+        // console.time('send mintTx');
+        // const tx = await acm.mintEeuBatch // not a web3 contract instance, but a TruffleContract instance
+        //     //.sendTransaction
+        //     (CONST.eeuType.UNFCCC, CONST.ktCarbon, 1, accounts[0], { from: accounts[0] }
+        //         // TruffleContact has no callback
+        //         // , function (err, txHash) {
+        //         //     console.log(txHash);
+        //         // }
+        //     )
+        //     ;
+        //     // .then(tx => {
+        //     //     console.log('tx: ', tx);
+        //     //     return tx;
+        //     // });
 
-        console.dir(tx);
-        console.timeEnd('send mintTx');*/
-    });
+        // console.dir(tx);
+        // console.timeEnd('send mintTx');
+    });*/
 
 });

@@ -68,7 +68,7 @@ module.exports = {
     // aircarbon ropsten geth node -- a bit faster than infura, but representative of mainnet
     ropsten_ac: {
       provider: () => new HDWalletProvider(mnemonic, "https://ac-dev0.net:9545", 0, 200),
-      network_id: "*",
+      network_id: "*",  
       gas: 6000000,
       gasPrice: web3.utils.toWei("40", "gwei")
     },
