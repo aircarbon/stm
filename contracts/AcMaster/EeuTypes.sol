@@ -22,8 +22,8 @@ contract EeuTypes is Owned {
 
     constructor() public {
         // default EEU types
-        _eeuTypeNames[0] = 'UNFCCC';
-        _eeuTypeNames[1] = 'VCS';
+        _eeuTypeNames[0] = 'UNFCCC - UN - Certified Emission Reduction';
+        _eeuTypeNames[1] = 'VCS - VERRA - Verified Carbon Standard';
         _count_eeuTypes = 2;
     }
 
