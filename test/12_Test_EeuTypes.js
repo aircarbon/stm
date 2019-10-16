@@ -17,12 +17,13 @@ contract('AcMaster', accounts => {
 
     it('eeu types - should have correct default values', async () => {
         const types = (await acm.getEeuTypes()).eeuTypes;
+        console.dir(types);
         assert(types.length == countDefaultEeuTypes, 'unexpected default eeu type count');
 
-        assert(types[0].name == 'UNFCCC', 'unexpected default eeu type name 0');
+        assert(types[0].name.includes('UNFCCC'), `unexpected default eeu type name 0 (${types[0].name})`);
         assert(types[0].id == 0, 'unexpected default eeu type id 0');
 
-        assert(types[1].name == 'VCS', 'unexpected default eeu type name 1');
+        assert(types[1].name.includes('VERRA'), `unexpected default eeu type name 1 (${types[1].name})`);
         assert(types[1].id == 1, 'unexpected default eeu type id 1');
     });
 
@@ -80,7 +81,8 @@ contract('AcMaster', accounts => {
 
     it('eeu types - should not allow adding an existing EEU type name', async () => {
         try {
-            await acm.addEeuType('UNFCCC');
+            const types = (await acm.getEeuTypes()).eeuTypes;
+            await acm.addEeuType(types[0].name);
         } catch (ex) { return; }
         assert.fail('expected restriction exception');
     });
@@ -88,7 +90,7 @@ contract('AcMaster', accounts => {
     it('eeu types - should not allow adding an EEU type when contract is read only', async () => {
         try {
             await acm.setReadOnly(true, { from: accounts[0] });
-            await acm.addEeuType('UNFCCC');
+            await acm.addEeuType('NEW_TYPE_NAME_4');
         } catch (ex) { 
             await acm.setReadOnly(false, { from: accounts[0] });
             return;
