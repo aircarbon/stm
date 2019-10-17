@@ -88,7 +88,7 @@ contract('AcMaster', accounts => {
         var ledgerEntryBefore, ledgerEntryAfter;
 
         ledgerEntryBefore = await acm.getLedgerEntry(receiver);
-        const totalFundedBefore = await acm.getTotalFunded.call(ccyTypeId);
+        const totalFundedBefore = await acm.getTotalCcyFunded.call(ccyTypeId);
         
         // fund
         const fundTx = await acm.fund(ccyTypeId, amount, receiver, { from: accounts[0] });
@@ -115,7 +115,7 @@ contract('AcMaster', accounts => {
                'unexpected ledger balance after funding for ccy non-test ccy');
 
         // validate global total funded is updated
-        const totalFundedAfter = await acm.getTotalFunded.call(ccyTypeId);
+        const totalFundedAfter = await acm.getTotalCcyFunded.call(ccyTypeId);
         assert(totalFundedAfter - totalFundedBefore == amount, 'unexpected total funded after funding');
     }
 

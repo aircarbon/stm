@@ -6,12 +6,14 @@ import "./AcLedger.sol";
 
 
 contract EeuTransferable is Owned, AcLedger {
-    event TransferedLedgerCcy(address from, address to, uint256 ccyTypeId, int256 amount);
-    event TransferedFullEeu(address from, address to, uint256 eeuId, uint256 mergedToEeuId, uint256 eeuTypeId);
-    event TransferedPartialEeu(address from, address to, uint256 splitFromEeuId, uint256 newEeuId, uint256 mergedToEeuId, uint256 eeuTypeId);
+    event TransferedLedgerCcy(address from, address to, uint256 ccyTypeId, uint256 amount, bool isFee);
+    event TransferedFullEeu(address from, address to, uint256 eeuId, uint256 mergedToEeuId, /*uint256 eeuTypeId,*/ uint256 qtyKG, bool isFee);
+    event TransferedPartialEeu(address from, address to, uint256 splitFromEeuId, uint256 newEeuId, uint256 mergedToEeuId, /*uint256 eeuTypeId,*/ uint256 qtyKG, bool isFee);
 
     /**
-     * Fee Structure: these are applied (optionally) when transferring ledger assets
+     * Global Fee Structure
+     * NOTE: fees are applied ON TOP OF the supplied transfer amounts to the transfer() fn.
+     *       i.e. transfer amounts are not inclusive of fees, they are additional
      */
     mapping(uint256 => uint256) public fee_eeuType_Fixed; // fixed KG EEU fee per transfer TX
     event SetFeeEeuTypeFixed(uint256 eeuTypeId, uint256 new_fee_kgTx_Fixed);
@@ -31,10 +33,25 @@ contract EeuTransferable is Owned, AcLedger {
         fee_ccyType_Fixed[ccyTypeId] = new_fee_ccyTx_Fixed;
         emit SetFeeCcyTypeFixed(ccyTypeId, new_fee_ccyTx_Fixed);
     }
+    //
     // TODO: % fees...
+    //
 
-    // TODO: global total ccy and eeus transferred in fees
-    //       (so total customer transfers is the delta)
+    /**
+     * @dev Returns the total global tonnage of carbon fees paid
+     */
+    function getKgCarbonFeesPaid() external view returns (uint256) {
+        require(msg.sender == owner, "Restricted method");
+        return _eeu_totalFeesPaidKG;
+    }
+
+    /**
+     * @dev Returns the total global amount of fees paid for the supplied currency
+     */
+    function getTotalCcyFeesPaid(uint256 ccyTypeId) external view returns (uint256) {
+        require(msg.sender == owner, "Restricted method");
+        return _ccyType_totalFeesPaid[ccyTypeId];
+    }
 
     /**
      * @dev Transfers or trades assets between ledger accounts
@@ -51,25 +68,23 @@ contract EeuTransferable is Owned, AcLedger {
      * @param ccyTypeId_A Currency type to move from A to B
      * @param ccy_amount_B Amount of currency to move from B to A
      * @param ccyTypeId_B Currency type to move from B to A
-     * @param applyFees Whether or not to apply fees (both legs) per the contract's current fee structure
-     *
-     * fees
-     * TODO: both sides - fixed value or % value FEE - with system/exchange account passed in as receiver
-     *       take fees (both sides possibly) before applying main transfer
-     *       throw if insufficient to cover fees
+     * @param applyFees Whether or not to apply fees (both legs, on top of the supplied ccy/eeu transfer amounts), per the global fee structure
      */
     function transfer(
         address ledger_A,
         address ledger_B,
+
         uint256 kg_A,           // EEU KGs moving from A (excluding fees, if any)
         uint256 eeuTypeId_A,    // EEU type moving from A
         uint256 kg_B,           // " from B
         uint256 eeuTypeId_B,    // " from B
-        int256  ccy_amount_A,   // currency amount moving from A (excluding fees, if any)
+
+        int256  ccy_amount_A,   // currency amount moving from A (excluding fees, if any) -- (signed value: ledger ccyType_balance supports (theoretical) -ve balances)
         uint256 ccyTypeId_A,    // currency type moving from A
-        int256  ccy_amount_B,   // " from B
+        int256  ccy_amount_B,   // " from B                                               -- (signed value: ledger ccyType_balance supports (theoretical) -ve balances)
         uint256 ccyTypeId_B,    // " from B
-        bool    applyFees       // apply fee structure to the transfer (both legs)
+
+        bool    applyFees       // apply global fee structure to the transfer (both legs)
     ) public {
         require(msg.sender == owner, "Restricted method");
         require(_readOnly == false, "Contract is read only");
@@ -78,7 +93,7 @@ contract EeuTransferable is Owned, AcLedger {
         require(_ledger[ledger_B].exists == true, "Invalid ledger owner B");
         require(ledger_A != ledger_B, "Self transfer disallowed");
         require(kg_A > 0 || kg_B > 0 || ccy_amount_A > 0 || ccy_amount_B > 0, "Invalid transfer");
-        require(!(ccy_amount_A < 0 || ccy_amount_B < 0), "Invalid currency amounts");
+        require(!(ccy_amount_A < 0 || ccy_amount_B < 0), "Invalid currency amounts"); // disallow negative ccy transfers
 
         // prevent single-origin muliple asset type movement
         require(!((kg_A > 0 && ccy_amount_A > 0) || (kg_B > 0 && ccy_amount_B > 0)), 'Single-origin multiple-asset disallowed');
@@ -105,62 +120,82 @@ contract EeuTransferable is Owned, AcLedger {
         // transfer currencies
         if (ccy_amount_A > 0) {
             if (applyFees) {
-                transferCcy(ledger_A, owner, ccyTypeId_A, int256(fee_ccyType_Fixed[ccyTypeId_A]));
+                if (fee_ccyType_Fixed[ccyTypeId_A] > 0) { // fixed fee
+                    transferCcy(TransferCcyArgs({ from: ledger_A, to: owner, ccyTypeId: ccyTypeId_A, amount: fee_ccyType_Fixed[ccyTypeId_A], isFee: true }));
+                    _ccyType_totalFeesPaid[ccyTypeId_A] += fee_ccyType_Fixed[ccyTypeId_A];
+                }
             }
-            transferCcy(ledger_A, ledger_B, ccyTypeId_A, ccy_amount_A);
+            transferCcy(TransferCcyArgs({ from: ledger_A, to: ledger_B, ccyTypeId: ccyTypeId_A, amount: uint256(ccy_amount_A), isFee: false }));
         }
         if (ccy_amount_B > 0) {
             if (applyFees) {
-                transferCcy(ledger_B, owner, ccyTypeId_B, int256(fee_ccyType_Fixed[ccyTypeId_B]));
+                if (fee_ccyType_Fixed[ccyTypeId_B] > 0) { // fixed fee
+                    transferCcy(TransferCcyArgs({ from: ledger_B, to: owner, ccyTypeId: ccyTypeId_B, amount: fee_ccyType_Fixed[ccyTypeId_B], isFee: true }));
+                    _ccyType_totalFeesPaid[ccyTypeId_B] += fee_ccyType_Fixed[ccyTypeId_B];
+                }
             }
-            transferCcy(ledger_B, ledger_A, ccyTypeId_B, ccy_amount_B);
+            transferCcy(TransferCcyArgs({ from: ledger_B, to: ledger_A, ccyTypeId: ccyTypeId_B, amount: uint256(ccy_amount_B), isFee: false }));
         }
 
         // transfer EEUs
         if (kg_A > 0) {
             if (applyFees) {
-                transferSplitEeus(ledger_A, owner, eeuTypeId_A, fee_eeuType_Fixed[eeuTypeId_A]);
+                if (fee_eeuType_Fixed[eeuTypeId_A] > 0) { // fixed fee
+                    transferSplitEeus(TransferSplitArgs({ from: ledger_A, to: owner, eeuTypeId: eeuTypeId_A, qtyKG: fee_eeuType_Fixed[eeuTypeId_A], isFee: true }));
+                    _eeu_totalFeesPaidKG += fee_eeuType_Fixed[eeuTypeId_A];
+                }
             }
-            transferSplitEeus(ledger_A, ledger_B, eeuTypeId_A, kg_A);
+            transferSplitEeus(TransferSplitArgs({ from: ledger_A, to: ledger_B, eeuTypeId: eeuTypeId_A, qtyKG: kg_A, isFee: false }));
         }
         if (kg_B > 0) {
             if (applyFees) {
-                transferSplitEeus(ledger_B, owner, eeuTypeId_B, fee_eeuType_Fixed[eeuTypeId_B]);
+                if (fee_eeuType_Fixed[eeuTypeId_B] > 0) { // fixed fee
+                    transferSplitEeus(TransferSplitArgs({ from: ledger_B, to: owner, eeuTypeId: eeuTypeId_B, qtyKG: fee_eeuType_Fixed[eeuTypeId_B], isFee: true }));
+                    _eeu_totalFeesPaidKG += fee_eeuType_Fixed[eeuTypeId_B];
+                }
             }
-            transferSplitEeus(ledger_B, ledger_A, eeuTypeId_B, kg_B);
+            transferSplitEeus(TransferSplitArgs({ from: ledger_B, to: ledger_A, eeuTypeId: eeuTypeId_B, qtyKG: kg_B, isFee: false }));
         }
     }
 
-
     /**
      * @dev Transfers currency across ledger owners
-     * @param from Transfer from
-     * @param to Transfer to
-     * @param ccyTypeId The currency type to transfer
-     * @param amount The amount of currency of carbon to transfer
+     * @param a args
      */
-    function transferCcy(address from, address to, uint256 ccyTypeId, int256 amount) private {
-        _ledger[from].ccyType_balance[ccyTypeId] -= amount;
-        _ledger[to].ccyType_balance[ccyTypeId] += amount;
-        _ccyType_totalTransfered[ccyTypeId] += uint256(amount);
-        emit TransferedLedgerCcy(from, to, ccyTypeId, amount);
+    struct TransferCcyArgs {
+        address from;
+        address to;
+        uint256 ccyTypeId;
+        uint256 amount;
+        bool isFee;
+    }
+    function transferCcy(TransferCcyArgs memory a) private {
+        _ledger[a.from].ccyType_balance[a.ccyTypeId] -= int256(a.amount);
+        _ledger[a.to].ccyType_balance[a.ccyTypeId] += int256(a.amount);
+        _ccyType_totalTransfered[a.ccyTypeId] += a.amount;
+        emit TransferedLedgerCcy(a.from, a.to, a.ccyTypeId, a.amount, a.isFee);
     }
 
     /**
      * @dev Transfers EEUs across ledger owners, splitting (soft-minting) the last EEU as necessary
      * @dev (the residual amount left in the origin last EEU after splitting is similar to a UTXO change output)
-     * @param from Transfer from
-     * @param to Transfer to
-     * @param eeuTypeId The EEU type to transfer
-     * @param qtyKG The KG quantity of carbon to transfer
+     * @param a args
      */
-    function transferSplitEeus(address from, address to, uint256 eeuTypeId, uint256 qtyKG) private {
+    struct TransferSplitArgs {
+        address from;
+        address to;
+        uint256 eeuTypeId;
+        uint256 qtyKG;
+        bool isFee;
+    }
+    function transferSplitEeus(TransferSplitArgs memory a) private {
+
         // transfer sufficient EEUs (last one may gets split)
         uint256 ndx = 0;
-        uint256 remainingToTransfer = uint256(qtyKG);
+        uint256 remainingToTransfer = uint256(a.qtyKG);
         while (remainingToTransfer > 0) {
-            uint256[] storage from_eeuIds = _ledger[from].eeuType_eeuIds[eeuTypeId];
-            uint256[] storage to_eeuIds = _ledger[to].eeuType_eeuIds[eeuTypeId];
+            uint256[] storage from_eeuIds = _ledger[a.from].eeuType_eeuIds[a.eeuTypeId];
+            uint256[] storage to_eeuIds = _ledger[a.to].eeuType_eeuIds[a.eeuTypeId];
             uint256 eeuId = from_eeuIds[ndx];
             uint256 eeuKg = _eeus_KG[eeuId];
 
@@ -170,7 +205,7 @@ contract EeuTransferable is Owned, AcLedger {
                 // remove from origin
                 from_eeuIds[ndx] = from_eeuIds[from_eeuIds.length - 1];
                 from_eeuIds.length--;
-                //_ledger[from].eeuType_sumKG[eeuTypeId] -= eeuKg;                 //* gas - DROP DONE - only used internally, validation params
+                //_ledger[from].eeuType_sumKG[a.eeuTypeId] -= eeuKg;                 //* gas - DROP DONE - only used internally, validation params
 
                 // assign to destination
                 // while minting >1 EEU is disallowed, the merge condition below can never be true:
@@ -189,14 +224,14 @@ contract EeuTransferable is Owned, AcLedger {
                     //         _eeus_mintedKG[eeuId] = 0;
 
                     //         mergedExisting = true;
-                    //         emit TransferedFullEeu(from, to, eeuId, to_eeuIds[i], eeuTypeId);
+                    //         emit TransferedFullEeu(a.from, a.to, eeuId, to_eeuIds[i], eeuKg/*, a.eeuTypeId*/, isFee);
                     //         break;
                     //     }
                     // }
                     // TRANSFER - if no existing destination EEU from same batch
                     //if (!mergedExisting) {
                         to_eeuIds.push(eeuId);
-                        emit TransferedFullEeu(from, to, eeuId, 0, eeuTypeId);
+                        emit TransferedFullEeu(a.from, a.to, eeuId, 0, /*a.eeuTypeId,*/ eeuKg, a.isFee);
                     //}
 
                 //_ledger[to].eeuType_sumKG[eeuTypeId] += eeuKg;                   //* gas - DROP DONE - only used internally, validation params
@@ -221,7 +256,7 @@ contract EeuTransferable is Owned, AcLedger {
                             _eeus_mintedKG[to_eeuIds[i]] += remainingToTransfer;          // TODO gas - pack/combine
 
                             mergedExisting = true;
-                            emit TransferedPartialEeu(from, to, eeuId, 0, to_eeuIds[i], eeuTypeId);
+                            emit TransferedPartialEeu(a.from, a.to, eeuId, 0, to_eeuIds[i], /*a.eeuTypeId,*/ remainingToTransfer, a.isFee);
                             break;
                         }
                     }
@@ -237,7 +272,7 @@ contract EeuTransferable is Owned, AcLedger {
                         _eeuCurMaxId++;
                         //_ledger[to].eeuType_sumKG[eeuTypeId] += remainingToTransfer;    // gas - DROP DONE - only used internally, validation params
 
-                        emit TransferedPartialEeu(from, to, eeuId, newId, 0, eeuTypeId);
+                        emit TransferedPartialEeu(a.from, a.to, eeuId, newId, 0, /*a.eeuTypeId,*/ remainingToTransfer, a.isFee);
                     }
 
                 // resize (shrink) the origin EEU
@@ -249,9 +284,8 @@ contract EeuTransferable is Owned, AcLedger {
                 remainingToTransfer = 0;
             }
         }
-        _eeu_totalTransferedKG += qtyKG;
+        _eeu_totalTransferedKG += a.qtyKG;
     }
-
 
     /**
      * @dev Returns the total global currency amount transfered for the supplied currency

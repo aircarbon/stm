@@ -64,7 +64,7 @@ contract('AcMaster', accounts => {
         var ledgerEntryBefore, ledgerEntryAfter;
 
         ledgerEntryBefore = await acm.getLedgerEntry(withdrawer);
-        const totalWithdrawnBefore = await acm.getTotalWithdrawn.call(ccyTypeId);
+        const totalWithdrawnBefore = await acm.getTotalCcyWithdrawn.call(ccyTypeId);
         
         // withdraw
         const withdrawTx = await acm.withdraw(ccyTypeId, amount, withdrawer, { from: accounts[0] });
@@ -88,7 +88,7 @@ contract('AcMaster', accounts => {
                'unexpected ledger balance after withdrawing for ccy non-test ccy');
 
         // validate global total funded is updated
-        const totalWithdrawnAfter = await acm.getTotalWithdrawn.call(ccyTypeId);
+        const totalWithdrawnAfter = await acm.getTotalCcyWithdrawn.call(ccyTypeId);
         assert(totalWithdrawnAfter - totalWithdrawnBefore == amount, 'unexpected total withdrawn after withdrawal');
     }
 

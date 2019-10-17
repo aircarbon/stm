@@ -13,19 +13,29 @@ module.exports = {
         ccy_amount_B, ccyTypeId_B,   
         applyFees,
     }) => {
+        // ledger entries before
         var ledgerA_before, ledgerA_after;
         var ledgerB_before, ledgerB_after;
         var ledgerContractOwner_before, ledgerContractOwner_after;
-        var totalKg_tfd_before, totalKg_tfd_after;
-        const totalCcy_tfd_before = [];
-        const totalCcy_tfd_after = [];
-
         ledgerA_before = await acm.getLedgerEntry(ledger_A);
         ledgerB_before = await acm.getLedgerEntry(ledger_B);
         ledgerContractOwner_before = await acm.getLedgerEntry(accounts[0]);
+        
+        // global totals: transferred before
+        var totalKg_tfd_before, totalKg_tfd_after;
+        const totalCcy_tfd_before = [];
+        const totalCcy_tfd_after = [];
         totalKg_tfd_before = await acm.getTotalKgTransfered.call();
         totalCcy_tfd_before[ccyTypeId_A] = await acm.getTotalCcyTransfered.call(ccyTypeId_A);
         totalCcy_tfd_before[ccyTypeId_B] = await acm.getTotalCcyTransfered.call(ccyTypeId_B);
+
+        // global totals: fees before
+        var totalKg_fees_before, totalKg_fees_after;
+        const totalCcy_fees_before = [];
+        const totalCcy_fees_after = [];
+        totalKg_fees_before = await acm.getKgCarbonFeesPaid.call();
+        totalCcy_fees_before[ccyTypeId_A] = await acm.getTotalCcyFeesPaid.call(ccyTypeId_A);
+        totalCcy_fees_before[ccyTypeId_B] = await acm.getTotalCcyFeesPaid.call(ccyTypeId_B);
 
         // expected net delta per currency, wrt. account A
         const deltaCcy_fromA = [];
@@ -54,20 +64,71 @@ module.exports = {
             applyFees, 
             { from: accounts[0] }
         );
+
+        // ledger entries after
         ledgerA_after = await acm.getLedgerEntry(ledger_A);
         ledgerB_after = await acm.getLedgerEntry(ledger_B);
         ledgerContractOwner_after = await acm.getLedgerEntry(accounts[0]);
+
+        // global totals: transferred after
         totalKg_tfd_after = await acm.getTotalKgTransfered.call();
         totalCcy_tfd_after[ccyTypeId_A] = await acm.getTotalCcyTransfered.call(ccyTypeId_A);
         totalCcy_tfd_after[ccyTypeId_B] = await acm.getTotalCcyTransfered.call(ccyTypeId_B);
 
-        // validate currency events
+        // global totals: fees after
+        totalKg_fees_after = await acm.getKgCarbonFeesPaid.call();
+        totalCcy_fees_after[ccyTypeId_A] = await acm.getTotalCcyFeesPaid.call(ccyTypeId_A);
+        totalCcy_fees_after[ccyTypeId_B] = await acm.getTotalCcyFeesPaid.call(ccyTypeId_B);
+
+        // validate fees
+        if (applyFees) {
+            // validate ccy fee events & global totals
+            const eventCcy_fees = []
+            eventCcy_fees[ccyTypeId_A] = new BN(0);
+            eventCcy_fees[ccyTypeId_B] = new BN(0);
+            //console.log(JSON.stringify(transferTx, null, 2));
+            truffleAssert.eventEmitted(transferTx, 'TransferedLedgerCcy', ev => { 
+                if (ev.isFee) { 
+                    //console.dir(ev);
+                    //console.log(`FEE: ${ev.from} --> ${ev.to} ccyTypeId=${ev.ccyTypeId} ... amount=${Number(ev.amount)}`);
+                    eventCcy_fees[ev.ccyTypeId] = eventCcy_fees[ev.ccyTypeId].add(ev.amount);
+                }
+                return true;
+            });
+            //console.log('totalCcy_fees_before[ccyTypeId_A]', totalCcy_fees_before[ccyTypeId_A].toString());
+            //console.log('totalCcy_fees_before[ccyTypeId_B]', totalCcy_fees_before[ccyTypeId_B].toString());
+            //console.log('eventCcy_fees[ccyTypeId_A]', eventCcy_fees[ccyTypeId_A].toString());
+            //console.log('eventCcy_fees[ccyTypeId_B]', eventCcy_fees[ccyTypeId_B].toString());
+            //console.log('totalCcy_fees_after[ccyTypeId_A]', totalCcy_fees_after[ccyTypeId_A].toString());
+            //console.log('totalCcy_fees_after[ccyTypeId_B]', totalCcy_fees_after[ccyTypeId_B].toString());
+            assert(totalCcy_fees_after[ccyTypeId_A].sub(totalCcy_fees_before[ccyTypeId_A]).eq(eventCcy_fees[ccyTypeId_A]), `unexpected global total ccy fees before/after vs. events ccy type ${ccyTypeId_A}`);
+            assert(totalCcy_fees_after[ccyTypeId_B].sub(totalCcy_fees_before[ccyTypeId_B]).eq(eventCcy_fees[ccyTypeId_B]), `unexpected global total ccy fees before/after vs. events ccy type ${ccyTypeId_B}`);
+
+            // validate eeu fee events & global totals
+            var eventKg_fees = new BN(0);
+            try {
+                truffleAssert.eventEmitted(transferTx, 'TransferedFullEeu', ev => { 
+                    if (ev.isFee) eventKg_fees = eventKg_fees.add(ev.qtyKG); return true;
+                });
+            } catch {}
+            try {
+                truffleAssert.eventEmitted(transferTx, 'TransferedPartialEeu', ev => { 
+                    if (ev.isFee) eventKg_fees = eventKg_fees.add(ev.qtyKG); return true;
+                });
+            } catch {}
+            //console.log('totalKg_fees_before', totalKg_fees_before.toString());
+            //console.log('eventKg_fees', eventKg_fees.toString());
+            //console.log('totalKg_fees_after', totalKg_fees_after.toString());
+            assert(totalKg_fees_after.sub(totalKg_fees_before).eq(eventKg_fees), `unexpected global total carbon fees before/after vs. events`);
+        }
+
+        // validate currency transfer events
         if (ccy_amount_A > 0 || ccy_amount_B > 0) {
             truffleAssert.eventEmitted(transferTx, 'TransferedLedgerCcy', ev => { return (
-                // main transfer events
+                // main transfer events - by receiver account being non-owner account
                 (ccy_amount_A > 0 && ev.from == ledger_A && ev.to == ledger_B && ev.ccyTypeId == ccyTypeId_A && ev.amount == ccy_amount_A)
              || (ccy_amount_B > 0 && ev.from == ledger_B && ev.to == ledger_A && ev.ccyTypeId == ccyTypeId_B && ev.amount == ccy_amount_B)
-                // fee transfer events
+                // fee transfer events - by receiver account being owner's account
              || (ccy_amount_A > 0 && ev.from == ledger_A && ev.to == accounts[0] && ev.ccyTypeId == ccyTypeId_A)
              || (ccy_amount_B > 0 && ev.from == ledger_B && ev.to == accounts[0] && ev.ccyTypeId == ccyTypeId_B)
                 );
@@ -199,7 +260,7 @@ module.exports = {
         return {
             transferTx, 
             eeuFullEvents,              eeuPartialEvents,
-            ledgerA_before,             ledgerA_after,
+            ledgerA_before,             ledgerA_after,  
             ledgerB_before,             ledgerB_after,
             ledgerContractOwner_before, ledgerContractOwner_after,
         };

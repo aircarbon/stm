@@ -13,11 +13,14 @@ contract CcyFundable is Owned, AcLedger {
      * @param amount Amount of the currency to fund, in currency base units
      * @param ledgerOwner Ledger owner to fund
      */
-    function fund(uint256 ccyTypeId, int256 amount, address ledgerOwner) public {
+    function fund(uint256 ccyTypeId,
+                  int256  amount, // signed value: ledger ccyType_balance supports (theoretical) -ve balances
+                  address ledgerOwner)
+    public {
         require(msg.sender == owner, "Restricted method");
         require(_readOnly == false, "Contract is read only");
         require(ccyTypeId >= 0 && ccyTypeId < _count_ccyTypes, "Invalid currency type");
-        require(amount >= 0, "Invalid amount"); // allow funding zero - initializes empty ledger entry
+        require(amount >= 0, "Invalid amount"); // allow funding zero (initializes empty ledger entry), disallow negative funding
 
         // we keep amount as signed value - ledger allows -ve balances (currently unused capability)
         //uint256 fundAmount = uint256(amount);
@@ -42,7 +45,7 @@ contract CcyFundable is Owned, AcLedger {
     /**
      * @dev Returns the total global amount funded for the supplied currency
      */
-    function getTotalFunded(uint256 ccyTypeId) external view returns (uint256) {
+    function getTotalCcyFunded(uint256 ccyTypeId) external view returns (uint256) {
         require(msg.sender == owner, "Restricted method");
         return _ccyType_totalFunded[ccyTypeId];
     }
