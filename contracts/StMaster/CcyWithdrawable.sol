@@ -2,9 +2,9 @@ pragma solidity 0.5.8;
 pragma experimental ABIEncoderV2;
 
 import "./Owned.sol";
-import "./AcLedger.sol";
+import "./StLedger.sol";
 
-contract CcyWithdrawable is Owned, AcLedger {
+contract CcyWithdrawable is Owned, StLedger {
     event CcyWithdrewLedger(uint256 ccyTypeId, address ledgerOwner, int256 amount);
 
     /**

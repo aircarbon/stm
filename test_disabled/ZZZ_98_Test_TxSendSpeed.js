@@ -1,11 +1,11 @@
-const ac = artifacts.require("AcMaster");
+const st = artifacts.require("AcMaster");
 const CONST = require('../const.js');
 
-contract("AcMaster", accounts => {
-    var acm;
+contract("StMaster", accounts => {
+    var stm;
 
     beforeEach(async () => {
-        acm = await ac.deployed();
+        stm = await st.deployed();
     });
 
     it("web3 - misc", async () => {
@@ -30,7 +30,7 @@ contract("AcMaster", accounts => {
         const abi = acmJson['abi'];
 
         // LAB -- pure web3: sendRawTransaction (fast tx id) via Rinkeby Infura
-        var address = acm.address; //"0x41ffed08c64B339A62DC8003b5b3cCEDC81BcB29"; // deployed addr
+        var address = stm.address; //"0x41ffed08c64B339A62DC8003b5b3cCEDC81BcB29"; // deployed addr
         var account = "0xf57B0adC78461888BF32d5FB92784CF3FC8f9956"; // owner
         var privateKey = "0CF8F198ACE6D2D92A2C1CD7F3FC9B42E2AF3B7FD7E64371922CB73A81493C1A"; // owner privkey
         const infura_web3 = new Web3('https://rinkeby.infura.io/v3/93db2c7fd899496d8400e86100058297'); // ropsten_infura
@@ -41,7 +41,7 @@ contract("AcMaster", accounts => {
             var contract = new infura_web3.eth.Contract(abi, address);
 
             var data = contract.methods
-                .mintEeuBatch(CONST.eeuType.UNFCCC, CONST.ktCarbon, 1, '0xf57B0adC78461888BF32d5FB92784CF3FC8f9956')
+                .mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.ktCarbon, 1, '0xf57B0adC78461888BF32d5FB92784CF3FC8f9956')
                 .encodeABI(); // replaces getData()
 
             const ejs = require('ethereumjs-tx');
@@ -81,10 +81,10 @@ contract("AcMaster", accounts => {
         // https://github.com/trufflesuite/truffle/issues/2003
         // const scp_web3 = new Web3('https://node0.scoop.tech:9545'); // ropsten_scp -- ## "unknown account" back from node on .send()
         // const acmWeb3 = new scp_web3.eth.Contract(abi, '0x0dF1c0F898dcCb6210c7581098dC5E60294579c0'); // deployed ropsten (through infura) contract addr
-        // console.dir(acmWeb3.methods.mintEeuBatch);
+        // console.dir(acmWeb3.methods.mintSecTokenBatch);
 
         // const tx = await acmWeb3.methods
-        //     .mintEeuBatch(CONST.eeuType.UNFCCC, CONST.ktCarbon, 1, '0xf57B0adC78461888BF32d5FB92784CF3FC8f9956')
+        //     .mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.ktCarbon, 1, '0xf57B0adC78461888BF32d5FB92784CF3FC8f9956')
         //     .send({ from: '0xf57B0adC78461888BF32d5FB92784CF3FC8f9956' }, function (err, tx) {
         //         console.log('callback: tx=', tx);
         //         console.log('callback: err=', err);
@@ -93,11 +93,11 @@ contract("AcMaster", accounts => {
         // console.log('awaited: ', tx);
 
         // https://github.com/trufflesuite/truffle/issues/624
-        // console.dir(acm.contract);
+        // console.dir(stm.contract);
         // console.time('send mintTx');
-        // const tx = await acm.mintEeuBatch // not a web3 contract instance, but a TruffleContract instance
+        // const tx = await stm.mintSecTokenBatch // not a web3 contract instance, but a TruffleContract instance
         //     //.sendTransaction
-        //     (CONST.eeuType.UNFCCC, CONST.ktCarbon, 1, accounts[0], { from: accounts[0] }
+        //     (CONST.tokenType.UNFCCC, CONST.ktCarbon, 1, accounts[0], { from: accounts[0] }
         //         // TruffleContact has no callback
         //         // , function (err, txHash) {
         //         //     console.log(txHash);

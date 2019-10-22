@@ -8,7 +8,7 @@ const web3 = new Web3();
 
 module.exports = {
     // types
-    eeuType: Object.freeze({
+    tokenType: Object.freeze({
         UNFCCC: 0,
            VCS: 1,
     }),

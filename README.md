@@ -32,11 +32,11 @@
 
 - `migrate`
 - `AcMaster.deployed().then((i) => { ac=i })`
-- `` AcMaster.MintedEeuBatch({}).watch((err,res) => { console.log(`MintedEeuBatch... id = ${res.args.id}`) }) ``
+- `` AcMaster.MintedSecTokenBatch({}).watch((err,res) => { console.log(`MintedSecTokenBatch... id = ${res.args.id}`) }) ``
 - `ac.methods`
-- `ac.mintEeuBatch(0, 1, '0xc3241d546dDE0Bf0A42BE0b3fEe70Da17ad724c9')`
+- `ac.mintSecTokenBatch(0, 1, '0xc3241d546dDE0Bf0A42BE0b3fEe70Da17ad724c9')`
 - `ac.getLedgerEntry('0xc3241d546dDE0Bf0A42BE0b3fEe70Da17ad724c9')`
-- `ac.getEeus()`
+- `ac.getSecTokens()`
 
 ## WIP - TODOs
 

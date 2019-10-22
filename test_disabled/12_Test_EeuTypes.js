@@ -1,24 +1,23 @@
-const ac = artifacts.require('AcMaster');
+const st = artifacts.require('StMaster');
 const truffleAssert = require('truffle-assertions');
 const CONST = require('../const.js');
 
-contract('AcMaster', accounts => {
-    var acm;//, accountNdx = 150;
+contract("StMaster", accounts => {
+    var stm;
 
-    const countDefaultEeuTypes = 2;
+    const countDefaultSecSecTokenTypes = 2;
 
     beforeEach(async () => {
-        acm = await ac.deployed();
-
+        stm = await st.deployed();
         if (!global.accountNdx) global.accountNdx = 0;
         global.accountNdx++;
-        //console.log(`global.accountNdx: ${global.accountNdx} - contract @ ${acm.address} (owner: ${accounts[0]}) - getEeuBatchCount: ${(await acm.getEeuBatchCount.call()).toString()}`);
+        //console.log(`global.accountNdx: ${global.accountNdx} - contract @ ${stm.address} (owner: ${accounts[0]}) - getSecTokenBatchCount: ${(await stm.getSecTokenBatchCount.call()).toString()}`);
     });
 
     it('eeu types - should have correct default values', async () => {
-        const types = (await acm.getEeuTypes()).eeuTypes;
+        const types = (await stm.getSecSecTokenTypes()).tokenTypes;
         console.dir(types);
-        assert(types.length == countDefaultEeuTypes, 'unexpected default eeu type count');
+        assert(types.length == countDefaultSecSecTokenTypes, 'unexpected default eeu type count');
 
         assert(types[0].name.includes('UNFCCC'), `unexpected default eeu type name 0 (${types[0].name})`);
         assert(types[0].id == 0, 'unexpected default eeu type id 0');
@@ -29,12 +28,12 @@ contract('AcMaster', accounts => {
 
     it('eeu types - should be able to use newly added EEU types', async () => {
         // add new EEU type
-        const addEeuTx = await acm.addEeuType('NEW_TYPE_NAME_2');
-        const types = (await acm.getEeuTypes()).eeuTypes;
-        assert(types.filter(p => p.name == 'NEW_TYPE_NAME_2')[0].id == countDefaultEeuTypes, 'unexpected/missing new eeu type (2)');
+        const addSecTokenTx = await stm.addSecTokenType('NEW_TYPE_NAME_2');
+        const types = (await stm.getSecSecTokenTypes()).tokenTypes;
+        assert(types.filter(p => p.name == 'NEW_TYPE_NAME_2')[0].id == countDefaultSecSecTokenTypes, 'unexpected/missing new eeu type (2)');
 
-        truffleAssert.eventEmitted(addEeuTx, 'AddedEeuType', ev => { 
-            return ev.id == countDefaultEeuTypes
+        truffleAssert.eventEmitted(addSecTokenTx, 'AddedSecTokenType', ev => { 
+            return ev.id == countDefaultSecSecTokenTypes
                 && ev.name == 'NEW_TYPE_NAME_2'
                 ;
         });
@@ -43,17 +42,17 @@ contract('AcMaster', accounts => {
         const newTypeId = types.filter(p => p.name == 'NEW_TYPE_NAME_2')[0].id;
 
         // batch count before
-        const batchCountBefore = (await acm.getEeuBatchCount.call()).toNumber(); 
+        const batchCountBefore = (await stm.getSecTokenBatchCount.call()).toNumber(); 
         //console.log(`batchCountBefore`, batchCountBefore);
         
         // mint new EEU type: 2 batches 
         for (var i=0 ; i < 2 ; i++) {
-            await acm.mintEeuBatch(newTypeId, CONST.ktCarbon * 100, 1, accounts[global.accountNdx], [], [], { from: accounts[0] });
+            await stm.mintSecTokenBatch(newTypeId, CONST.ktCarbon * 100, 1, accounts[global.accountNdx], [], [], { from: accounts[0] });
         }
-        const batchCountAfter_Mint1 = (await acm.getEeuBatchCount.call()).toNumber(); 
+        const batchCountAfter_Mint1 = (await stm.getSecTokenBatchCount.call()).toNumber(); 
         //console.log(`batchCountAfter`, batchCountAfter_Mint1);
         // for (var i=1 ; i <= batchCountAfter_Mint1 ; i++) {
-        //     const batch = (await acm.getEeuBatch.call(i));
+        //     const batch = (await stm.getSecTokenBatch.call(i));
         //     console.log(`dumping batch ${i} of ${batchCountAfter_Mint1}...`);
         //     console.dir(batch);
         // }
@@ -61,41 +60,41 @@ contract('AcMaster', accounts => {
 
         // mint default EEU type: 4 batches 
         for (var i=0 ; i < 4 ; i++) {
-            await acm.mintEeuBatch(CONST.eeuType.UNFCCC, CONST.ktCarbon * 100, 1, accounts[global.accountNdx], [], [], { from: accounts[0] });
+            await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.ktCarbon * 100, 1, accounts[global.accountNdx], [], [], { from: accounts[0] });
         }
-        const batchCountAfter_Mint2 = (await acm.getEeuBatchCount.call()).toNumber();
+        const batchCountAfter_Mint2 = (await stm.getSecTokenBatchCount.call()).toNumber();
         assert(batchCountAfter_Mint2 == batchCountBefore + 6, `unexpected max batch id ${batchCountAfter_Mint2} after minting (2)`);
 
         // validate ledger: 6 vEEUs, 2 of new type
-        const ledgerEntryAfter = await acm.getLedgerEntry(accounts[global.accountNdx]);
-        assert(ledgerEntryAfter.eeus.length == 6, 'unexpected eeu count in ledger');
-        assert(ledgerEntryAfter.eeus.filter(p => p.eeuTypeId == newTypeId).length == 2, 'unexpected new eeu type in ledger');
+        const ledgerEntryAfter = await stm.getLedgerEntry(accounts[global.accountNdx]);
+        assert(ledgerEntryAfter.tokens.length == 6, 'unexpected eeu count in ledger');
+        assert(ledgerEntryAfter.tokens.filter(p => p.tokenTypeId == newTypeId).length == 2, 'unexpected new eeu type in ledger');
     });
 
     it('eeu types - should not allow non-owner to add an EEU type', async () => {
         try {
-            await acm.addEeuType('NEW_TYPE_NAME_3', { from: accounts[1], });
+            await stm.addSecTokenType('NEW_TYPE_NAME_3', { from: accounts[1], });
         } catch (ex) { return; }
         assert.fail('expected restriction exception');
     });
 
     it('eeu types - should not allow adding an existing EEU type name', async () => {
         try {
-            const types = (await acm.getEeuTypes()).eeuTypes;
-            await acm.addEeuType(types[0].name);
+            const types = (await stm.getSecSecTokenTypes()).tokenTypes;
+            await stm.addSecTokenType(types[0].name);
         } catch (ex) { return; }
         assert.fail('expected restriction exception');
     });
 
     it('eeu types - should not allow adding an EEU type when contract is read only', async () => {
         try {
-            await acm.setReadOnly(true, { from: accounts[0] });
-            await acm.addEeuType('NEW_TYPE_NAME_4');
+            await stm.setReadOnly(true, { from: accounts[0] });
+            await stm.addSecTokenType('NEW_TYPE_NAME_4');
         } catch (ex) { 
-            await acm.setReadOnly(false, { from: accounts[0] });
+            await stm.setReadOnly(false, { from: accounts[0] });
             return;
         }
-        await acm.setReadOnly(false, { from: accounts[0] });
+        await stm.setReadOnly(false, { from: accounts[0] });
         assert.fail('expected restriction exception');
     });
 });

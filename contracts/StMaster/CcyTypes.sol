@@ -12,8 +12,8 @@ contract CcyTypes is Owned {
     // *** CCY TYPES
     struct Ccy {
         uint256 id;
-        string  name; // e.g. "USD", "BTC", "ETH"
-        string  unit; // e.g. "cents", "satoshi", "wei"
+        string  name; // e.g. "USD", "BTC"
+        string  unit; // e.g. "cents", "satoshi"
     }
     mapping(uint256 => Ccy) _ccyTypes; // typeId -> ccy
     uint256 _count_ccyTypes;
@@ -21,20 +21,7 @@ contract CcyTypes is Owned {
         Ccy[] ccyTypes;
     }
 
-     constructor() public {
-        // default currency types
-        _ccyTypes[0] = Ccy({
-            id: 0,
-            name: 'USD',
-            unit: 'cents'
-        });
-        _ccyTypes[1] = Ccy({
-            id: 1,
-            name: 'ETH',
-            unit: 'Wei'
-        });
-        _count_ccyTypes = 2;
-    }
+    constructor() public {}
 
     /**
      * @dev Adds a new currency type
@@ -56,7 +43,7 @@ contract CcyTypes is Owned {
             unit: unit
         });
         emit AddedCcyType(_count_ccyTypes, name, unit);
-        
+
         _count_ccyTypes++;
     }
 
