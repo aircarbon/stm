@@ -16,7 +16,7 @@ contract SecTokenTypes is Owned {
         uint256 id;
         string  name;
     }
-    struct GetSecSecTokenTypesReturn {
+    struct GetSecTokenTypesReturn {
         SecTokenTypeReturn[] tokenTypes;
     }
 
@@ -49,7 +49,7 @@ contract SecTokenTypes is Owned {
     /**
      * @dev Returns current ST types
      */
-    function getSecSecTokenTypes() external view returns (GetSecSecTokenTypesReturn memory) {
+    function getSecTokenTypes() external view returns (GetSecTokenTypesReturn memory) {
         SecTokenTypeReturn[] memory tokenTypes;
         tokenTypes = new SecTokenTypeReturn[](_count_tokenTypes);
 
@@ -60,7 +60,7 @@ contract SecTokenTypes is Owned {
             });
         }
 
-        GetSecSecTokenTypesReturn memory ret = GetSecSecTokenTypesReturn({
+        GetSecTokenTypesReturn memory ret = GetSecTokenTypesReturn({
             tokenTypes: tokenTypes
         });
         return ret;

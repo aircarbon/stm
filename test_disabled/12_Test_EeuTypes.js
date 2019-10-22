@@ -15,7 +15,7 @@ contract("StMaster", accounts => {
     });
 
     it('eeu types - should have correct default values', async () => {
-        const types = (await stm.getSecSecTokenTypes()).tokenTypes;
+        const types = (await stm.getSecTokenTypes()).tokenTypes;
         console.dir(types);
         assert(types.length == countDefaultSecSecTokenTypes, 'unexpected default eeu type count');
 
@@ -29,7 +29,7 @@ contract("StMaster", accounts => {
     it('eeu types - should be able to use newly added EEU types', async () => {
         // add new EEU type
         const addSecTokenTx = await stm.addSecTokenType('NEW_TYPE_NAME_2');
-        const types = (await stm.getSecSecTokenTypes()).tokenTypes;
+        const types = (await stm.getSecTokenTypes()).tokenTypes;
         assert(types.filter(p => p.name == 'NEW_TYPE_NAME_2')[0].id == countDefaultSecSecTokenTypes, 'unexpected/missing new eeu type (2)');
 
         truffleAssert.eventEmitted(addSecTokenTx, 'AddedSecTokenType', ev => { 
@@ -80,7 +80,7 @@ contract("StMaster", accounts => {
 
     it('eeu types - should not allow adding an existing EEU type name', async () => {
         try {
-            const types = (await stm.getSecSecTokenTypes()).tokenTypes;
+            const types = (await stm.getSecTokenTypes()).tokenTypes;
             await stm.addSecTokenType(types[0].name);
         } catch (ex) { return; }
         assert.fail('expected restriction exception');

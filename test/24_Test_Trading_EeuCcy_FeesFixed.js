@@ -88,7 +88,7 @@ contract("StMaster", accounts => {
 
     it('trading fees (fixed) - apply large (>1 batch EEU size) carbon fee on a trade on a newly added EEU type', async () => {
         await stm.addSecTokenType('TEST_EEU_TYPE');
-        const types = (await stm.getSecSecTokenTypes()).tokenTypes;
+        const types = (await stm.getSecTokenTypes()).tokenTypes;
         const newTypeId = types.filter(p => p.name == 'TEST_EEU_TYPE')[0].id;
 
         await stm.mintSecTokenBatch(newTypeId, 1000, 1,                            accounts[global.accountNdx + 0], [], [], { from: accounts[0] });
@@ -285,7 +285,7 @@ contract("StMaster", accounts => {
         const newCcyTypeId = ccyTypes.filter(p => p.name == 'TEST_CCY_TYPE_2')[0].id;
 
         await stm.addSecTokenType('TEST_EEU_TYPE_2');
-        const tokenTypes = (await stm.getSecSecTokenTypes()).tokenTypes;
+        const tokenTypes = (await stm.getSecTokenTypes()).tokenTypes;
         const newSecTokenTypeId = tokenTypes.filter(p => p.name == 'TEST_EEU_TYPE_2')[0].id;
 
         await stm.fund(newCcyTypeId,                           1000,                    accounts[global.accountNdx + 0],         { from: accounts[0] });
