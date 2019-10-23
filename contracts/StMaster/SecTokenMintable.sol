@@ -20,7 +20,7 @@ contract SecTokenMintable is Owned, StLedger {
     function mintSecTokenBatch(
         uint256 tokenTypeId,
         int256  mintQty,
-        int256  mintSecTokenCount,
+        int256  mintSecTokenCount,  
         address batchOwner,
         string[] memory metaKeys,
         string[] memory metaValues)
