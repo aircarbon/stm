@@ -14,8 +14,8 @@ contract StMaster is SecTokenMintable, SecTokenBurnable, CcyFundable, CcyWithdra
     string public unit; // the smallest (integer, non-divisible) security token unit, e.g. "KG"
 
     function getName() external view returns (string memory) { return name; }
-    function getVersion() external view returns (address[] memory) { return version; }
-    function getUnit() external view returns (address[] memory) { return unit; }
+    function getVersion() external view returns (string memory) { return version; }
+    function getUnit() external view returns (string memory) { return unit; }
 
     /**
      * ctor
