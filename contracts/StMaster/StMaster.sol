@@ -10,8 +10,12 @@ import "./SecTokenTransferable.sol";
 contract StMaster is SecTokenMintable, SecTokenBurnable, CcyFundable, CcyWithdrawable, SecTokenTransferable {
     string public name;
     string public version;
-    
+
     string public unit; // the smallest (integer, non-divisible) security token unit, e.g. "KG"
+
+    function getName() external view returns (string memory) { return name; }
+    function getVersion() external view returns (address[] memory) { return version; }
+    function getUnit() external view returns (address[] memory) { return unit; }
 
     /**
      * ctor
