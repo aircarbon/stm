@@ -20,17 +20,13 @@ contract SecTokenTypes is Owned {
         SecTokenTypeReturn[] tokenTypes;
     }
 
-    constructor() public {
-        // default types
-        //_tokenTypeNames[0] = 'CER - UNFCCC - Certified Emission Reduction';
-        //_tokenTypeNames[1] = 'VCS - VERRA - Verified Carbon Standard';
-        //_count_tokenTypes = 2;
-    }
+    constructor() public {}
 
     /**
      * @dev Adds a new ST type
      * @param name New ST type name
      */
+    // DEMO TMP: remove for easier migration (todo - separate contracts?)
     function addSecTokenType(string memory name) public {
         require(msg.sender == owner, "Restricted method");
         require(_readOnly == false, "Contract is read only");

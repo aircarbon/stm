@@ -23,7 +23,7 @@ contract StMaster is SecTokenMintable, SecTokenBurnable, CcyFundable, CcyWithdra
     constructor() public {
         // params - global
         name = "SecTok_Master";
-        version = "0.2";
+        version = "0.3";
         unit = "KG";
 
         // params - token types
@@ -32,7 +32,7 @@ contract StMaster is SecTokenMintable, SecTokenBurnable, CcyFundable, CcyWithdra
         _count_tokenTypes = 2;
 
         // params - currency types
-        _ccyTypes[0] = Ccy({ id: 0, name: 'USD', unit: 'cents' });
+        _ccyTypes[0] = Ccy({ id: 0, name: 'SGD', unit: 'cents' });
         _ccyTypes[1] = Ccy({ id: 1, name: 'ETH', unit: 'Wei'   });
         _count_ccyTypes = 2;
 

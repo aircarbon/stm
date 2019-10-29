@@ -16,6 +16,7 @@ contract SecTokenTransferable is Owned, StLedger {
      */
     mapping(uint256 => uint256) public fee_tokenType_Fixed; // fixed token qty fee per transfer
     event SetFeeSecTokenTypeFixed(uint256 tokenTypeId, uint256 fee_tokenQty_Fixed);
+    // DEMO TMP: remove for easier migration (todo - separate contracts?)
     function setFee_SecTokenType_Fixed(uint256 tokenTypeId, uint256 fee_tokenQty_Fixed) public {
         require(msg.sender == owner, "Restricted method");
         require(_readOnly == false, "Contract is read only");
@@ -25,6 +26,7 @@ contract SecTokenTransferable is Owned, StLedger {
     }
     mapping(uint256 => uint256) public fee_ccyType_Fixed; // fixed currency fee per transfer
     event SetFeeCcyTypeFixed(uint256 ccyTypeId, uint256 fee_ccy_Fixed);
+    // DEMO TMP: remove for easier migration (todo - separate contracts?)
     function setFee_CcyType_Fixed(uint256 ccyTypeId, uint256 fee_ccy_Fixed) public {
         require(msg.sender == owner, "Restricted method");
         require(_readOnly == false, "Contract is read only");
@@ -39,6 +41,7 @@ contract SecTokenTransferable is Owned, StLedger {
     /**
      * @dev Returns the global total quantity of token fees paid, in the contract base unit
      */
+    // DEMO TMP: remove for easier migration (todo - separate contracts?)
     function getSecToken_totalFeesPaidQty() external view returns (uint256) {
         require(msg.sender == owner, "Restricted method");
         return _tokens_totalFeesPaidQty;
@@ -47,6 +50,7 @@ contract SecTokenTransferable is Owned, StLedger {
     /**
      * @dev Returns the global total amount of currency fees paid, for the supplied currency
      */
+    // DEMO TMP: remove for easier migration (todo - separate contracts?)
     function getCcy_totalFeesPaidAmount(uint256 ccyTypeId) external view returns (uint256) {
         require(msg.sender == owner, "Restricted method");
         return _ccyType_totalFeesPaid[ccyTypeId];
@@ -289,6 +293,7 @@ contract SecTokenTransferable is Owned, StLedger {
     /**
      * @dev Returns the total global currency amount transfered for the supplied currency
      */
+    // DEMO TMP: remove for easier migration (todo - separate contracts?)
     function getCcy_totalTransfered(uint256 ccyTypeId) external view returns (uint256) {
         require(msg.sender == owner, "Restricted method");
         return _ccyType_totalTransfered[ccyTypeId];
@@ -297,6 +302,7 @@ contract SecTokenTransferable is Owned, StLedger {
     /**
      * @dev Returns the total global tonnage of carbon transfered
      */
+    // DEMO TMP: remove for easier migration (todo - separate contracts?)
     function getSecToken_totalTransfered() external view returns (uint256) {
         require(msg.sender == owner, "Restricted method");
         return _tokens_totalTransferedQty;

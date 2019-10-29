@@ -28,6 +28,7 @@ contract CcyTypes is Owned {
      * @param name New currency type name
      * @param unit Base unit of the new currency type
      */
+    // DEMO TMP: remove for easier migration (todo - separate contracts?)
     function addCcyType(string memory name, string memory unit) public {
         require(msg.sender == owner, "Restricted method");
         require(_readOnly == false, "Contract is read only");

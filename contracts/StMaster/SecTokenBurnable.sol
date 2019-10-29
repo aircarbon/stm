@@ -16,6 +16,7 @@ contract SecTokenBurnable is Owned, StLedger {
      * @param tokenTypeId ST type to burn
      * @param burnQty Quantity of contact base token units to burn
      */
+    // DEMO TMP: remove for easier migration (todo - separate contracts?)
     function burnTokens(address ledgerOwner, uint256 tokenTypeId, int256 burnQty) public {
         require(msg.sender == owner, "Restricted method");
         require(_readOnly == false, "Contract is read only");
@@ -75,31 +76,9 @@ contract SecTokenBurnable is Owned, StLedger {
     /**
      * @dev Returns the total global contract base unit quantities in all ST tokens burned, or partially burned
      */
+    // DEMO TMP: remove for easier migration (todo - separate contracts?)
     function getSecToken_totalBurnedQty() external view returns (uint256 count) {
         require(msg.sender == owner, "Restricted method");
         return _tokens_totalBurnedQty;
     }
-
-    /*function arrayRemoveSwapDelete(uint256 valueToFindAndRemove, uint256[] storage array) private returns (bool found)
-    {
-        for (uint256 i = 0; i < array.length; i++) {
-            if (array[i] == valueToFindAndRemove) {
-                array[i] = array[array.length - 1];
-                //delete array[array.length - 1]; // length-- is sufficient
-                array.length--;
-                return true;
-            }
-        }
-        return false;
-    }*/
-
-    /*function arrayRemoveNewArray(uint valueToFindAndRemove, uint[] memory array)
-    internal returns(uint[] memory)  {
-        uint[] storage auxArray;
-        for (uint i = 0; i < array.length; i++){
-            if(array[i] != valueToFindAndRemove)
-                auxArray.push(array[i]);
-        }
-        return auxArray;
-    }*/
 }
