@@ -18,7 +18,7 @@ contract("StMaster", accounts => {
         const types = (await stm.getCcyTypes()).ccyTypes;
         assert(types.length == countDefaultCcyTypes, 'unexpected default ccy type count');
 
-        assert(types[0].name == 'USD', 'unexpected default ccy type name 0');
+        assert(types[0].name == 'SGD', 'unexpected default ccy type name 0');
         assert(types[0].unit == 'cents', 'unexpected default ccy type unit 0');
         assert(types[0].id == 0, 'unexpected default ccy type id 0');
 

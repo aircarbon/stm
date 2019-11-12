@@ -2,10 +2,10 @@ pragma solidity 0.5.8;
 pragma experimental ABIEncoderV2;
 
 import "./Owned.sol";
-import "./SecTokenTypes.sol";
+import "./StTypes.sol";
 import "./CcyTypes.sol";
 
-contract StLedger is Owned, SecTokenTypes, CcyTypes {
+contract StLedger is Owned, StTypes, CcyTypes {
 
     // *** Batch LIST
     mapping(uint256 => SecTokenBatch) _batches;                 // main batch list: all ST batches, by batch ID

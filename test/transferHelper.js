@@ -47,11 +47,15 @@ module.exports = {
         // expected currency fees paid by A and B
         var fee_ccy_A = 0;
         if (ccy_amount_A > 0 && applyFees) {
-            fee_ccy_A = Number(await stm.fee_ccyType_Fixed(ccyTypeId_A)); // ccy fee paid by A
+            fee_ccy_A = Number(await stm.fee_ccyType_Fixed(ccyTypeId_A)) // ccy fee paid by A
+                      + Number((ccy_amount_A / 100) * Number(await stm.fee_ccyType_Perc(ccyTypeId_A)));
+            //console.log('fee_ccy_A', fee_ccy_A);
         }
         var fee_ccy_B = 0;
         if (ccy_amount_B > 0 && applyFees) {
-            fee_ccy_B = Number(await stm.fee_ccyType_Fixed(ccyTypeId_B)); // ccy fee paid by B
+            fee_ccy_B = Number(await stm.fee_ccyType_Fixed(ccyTypeId_B)) // ccy fee paid by B
+                      + Number((ccy_amount_B / 100) * Number(await stm.fee_ccyType_Perc(ccyTypeId_B)));
+            console.log('fee_ccy_B', fee_ccy_B);
         }
 
         // transfer
@@ -95,11 +99,11 @@ module.exports = {
                 }
                 return true;
             });
-            //console.log('totalCcy_fees_before[ccyTypeId_A]', totalCcy_fees_before[ccyTypeId_A].toString());
+            console.log('totalCcy_fees_before[ccyTypeId_A]', totalCcy_fees_before[ccyTypeId_A].toString());
             //console.log('totalCcy_fees_before[ccyTypeId_B]', totalCcy_fees_before[ccyTypeId_B].toString());
-            //console.log('eventCcy_fees[ccyTypeId_A]', eventCcy_fees[ccyTypeId_A].toString());
+            console.log('eventCcy_fees[ccyTypeId_A]', eventCcy_fees[ccyTypeId_A].toString());
             //console.log('eventCcy_fees[ccyTypeId_B]', eventCcy_fees[ccyTypeId_B].toString());
-            //console.log('totalCcy_fees_after[ccyTypeId_A]', totalCcy_fees_after[ccyTypeId_A].toString());
+            console.log('totalCcy_fees_after[ccyTypeId_A]', totalCcy_fees_after[ccyTypeId_A].toString());
             //console.log('totalCcy_fees_after[ccyTypeId_B]', totalCcy_fees_after[ccyTypeId_B].toString());
             assert(totalCcy_fees_after[ccyTypeId_A].sub(totalCcy_fees_before[ccyTypeId_A]).eq(eventCcy_fees[ccyTypeId_A]), `unexpected global total ccy fees before/after vs. events ccy type ${ccyTypeId_A}`);
             assert(totalCcy_fees_after[ccyTypeId_B].sub(totalCcy_fees_before[ccyTypeId_B]).eq(eventCcy_fees[ccyTypeId_B]), `unexpected global total ccy fees before/after vs. events ccy type ${ccyTypeId_B}`);

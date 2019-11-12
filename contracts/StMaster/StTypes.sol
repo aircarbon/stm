@@ -6,7 +6,7 @@ import "./Owned.sol";
 /**
   * Manages ST types
   */
-contract SecTokenTypes is Owned {
+contract StTypes is Owned {
     event AddedSecTokenType(uint256 id, string name);
 
     // *** ST TYPES

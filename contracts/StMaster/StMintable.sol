@@ -4,7 +4,7 @@ pragma experimental ABIEncoderV2;
 import "./Owned.sol";
 import "./StLedger.sol";
 
-contract SecTokenMintable is Owned, StLedger {
+contract StMintable is Owned, StLedger {
     event MintedSecTokenBatch(uint256 batchId, uint256 tokenTypeId, address batchOwner, uint256 mintQty, uint256 mintSecTokenCount);
     event MintedSecToken(uint256 stId, uint256 batchId, uint256 tokenTypeId, address ledgerOwner, uint256 mintedQty);
 

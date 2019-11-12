@@ -1,13 +1,13 @@
 pragma solidity 0.5.8;
 pragma experimental ABIEncoderV2;
 
-import "./SecTokenMintable.sol";
-import "./SecTokenBurnable.sol";
+import "./StMintable.sol";
+import "./StBurnable.sol";
 import "./CcyFundable.sol";
 import "./CcyWithdrawable.sol";
-import "./SecTokenTransferable.sol";
+import "./StTransferable.sol";
 
-contract StMaster is SecTokenMintable, SecTokenBurnable, CcyFundable, CcyWithdrawable, SecTokenTransferable {
+contract StMaster is StMintable, StBurnable, CcyFundable, CcyWithdrawable, StTransferable {
     string public name;
     string public version;
 
@@ -35,7 +35,7 @@ contract StMaster is SecTokenMintable, SecTokenBurnable, CcyFundable, CcyWithdra
         _ccyTypes[0] = Ccy({ id: 0, name: 'SGD', unit: 'cents' });
         _ccyTypes[1] = Ccy({ id: 1, name: 'ETH', unit: 'Wei'   });
         _count_ccyTypes = 2;
-
+    
          // create ledger entry for contract owner - transfer fees are paid to this ledger entry
         _ledger[owner] = Ledger({
             exists: true

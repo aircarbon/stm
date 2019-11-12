@@ -4,7 +4,7 @@ pragma experimental ABIEncoderV2;
 import "./Owned.sol";
 import "./StLedger.sol";
 
-contract SecTokenBurnable is Owned, StLedger {
+contract StBurnable is Owned, StLedger {
     event BurnedFullSecToken(uint256 stId, uint256 tokenTypeId, address ledgerOwner, uint256 burnedQty);
     event BurnedPartialSecToken(uint256 stId, uint256 tokenTypeId, address ledgerOwner, uint256 burnedQty);
 
