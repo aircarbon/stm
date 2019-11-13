@@ -47,22 +47,24 @@ module.exports = {
         // expected currency fees paid by A and B
         var fee_ccy_A = 0;
         if (ccy_amount_A > 0 && applyFees) {
-            fee_ccy_A = Number(await stm.fee_ccyType_Fixed(ccyTypeId_A)) // ccy fee paid by A
-                      + Number((ccy_amount_A / 100) * Number(await stm.fee_ccyType_Perc(ccyTypeId_A)));
-            //console.log('fee_ccy_A', fee_ccy_A);
+            fee_ccy_A = Math.floor(
+                            Number(await stm.fee_ccyType_Fixed(ccyTypeId_A)) // ccy fee paid by A
+                          + Number((ccy_amount_A / 10000) * Number(await stm.fee_ccyType_PercBips(ccyTypeId_A))));
+            console.log('fee_ccy_A', fee_ccy_A);
         }
         var fee_ccy_B = 0;
         if (ccy_amount_B > 0 && applyFees) {
-            fee_ccy_B = Number(await stm.fee_ccyType_Fixed(ccyTypeId_B)) // ccy fee paid by B
-                      + Number((ccy_amount_B / 100) * Number(await stm.fee_ccyType_Perc(ccyTypeId_B)));
+            fee_ccy_B = Math.floor(
+                            Number(await stm.fee_ccyType_Fixed(ccyTypeId_B)) // ccy fee paid by B
+                          + Number((ccy_amount_B / 10000) * Number(await stm.fee_ccyType_PercBips(ccyTypeId_B))));
             console.log('fee_ccy_B', fee_ccy_B);
         }
 
         // transfer
         const transferTx = await stm.transfer(
             ledger_A,     ledger_B, 
-            qty_A,         tokenTypeId_A, 
-            qty_B,         tokenTypeId_B, 
+            qty_A,        tokenTypeId_A, 
+            qty_B,        tokenTypeId_B, 
             ccy_amount_A, ccyTypeId_A, 
             ccy_amount_B, ccyTypeId_B, 
             applyFees, 
@@ -99,11 +101,11 @@ module.exports = {
                 }
                 return true;
             });
-            console.log('totalCcy_fees_before[ccyTypeId_A]', totalCcy_fees_before[ccyTypeId_A].toString());
+            //console.log('totalCcy_fees_before[ccyTypeId_A]', totalCcy_fees_before[ccyTypeId_A].toString());
             //console.log('totalCcy_fees_before[ccyTypeId_B]', totalCcy_fees_before[ccyTypeId_B].toString());
-            console.log('eventCcy_fees[ccyTypeId_A]', eventCcy_fees[ccyTypeId_A].toString());
+            //console.log('eventCcy_fees[ccyTypeId_A]', eventCcy_fees[ccyTypeId_A].toString());
             //console.log('eventCcy_fees[ccyTypeId_B]', eventCcy_fees[ccyTypeId_B].toString());
-            console.log('totalCcy_fees_after[ccyTypeId_A]', totalCcy_fees_after[ccyTypeId_A].toString());
+            //console.log('totalCcy_fees_after[ccyTypeId_A]', totalCcy_fees_after[ccyTypeId_A].toString());
             //console.log('totalCcy_fees_after[ccyTypeId_B]', totalCcy_fees_after[ccyTypeId_B].toString());
             assert(totalCcy_fees_after[ccyTypeId_A].sub(totalCcy_fees_before[ccyTypeId_A]).eq(eventCcy_fees[ccyTypeId_A]), `unexpected global total ccy fees before/after vs. events ccy type ${ccyTypeId_A}`);
             assert(totalCcy_fees_after[ccyTypeId_B].sub(totalCcy_fees_before[ccyTypeId_B]).eq(eventCcy_fees[ccyTypeId_B]), `unexpected global total ccy fees before/after vs. events ccy type ${ccyTypeId_B}`);
@@ -159,6 +161,11 @@ module.exports = {
             const A_bal_aft_ccyB = Big(ledgerA_after.ccys.find(p => p.ccyTypeId == ccyTypeId_B).balance);
             const B_bal_bef_ccyB = Big(ledgerB_before.ccys.find(p => p.ccyTypeId == ccyTypeId_B).balance);
             const A_bal_bef_ccyB = Big(ledgerA_before.ccys.find(p => p.ccyTypeId == ccyTypeId_B).balance);
+
+            // console.log('B_bal_aft_ccyB', B_bal_aft_ccyB.toString());
+            // console.log('B_bal_bef_ccyB', B_bal_bef_ccyB.toString());
+            // console.log('fee_ccy_B', fee_ccy_B.toString());
+            // console.log('deltaCcy_fromA[ccyTypeId_B]', deltaCcy_fromA[ccyTypeId_B].toString());
 
             assert(B_bal_aft_ccyB.minus(B_bal_bef_ccyB).plus(Big(fee_ccy_B)).eq(Big(deltaCcy_fromA[ccyTypeId_B]).times(-1)),
                 `unexpected ledger B balance ${B_bal_aft_ccyB} after transfer B -> A amount ${ccy_amount_B} ccy type ${ccyTypeId_B}`);

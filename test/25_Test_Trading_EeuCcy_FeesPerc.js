@@ -119,22 +119,21 @@ contract("StMaster", accounts => {
     });*/
 
     // CCY FEES
-    it('trading fees (percentage) - apply ETH ccy fee on a max. trade (fee on A)', async () => {
+    it('trading fees (percentage) - apply ETH ccy fee 100BP on a trade (fee on A)', async () => {
         await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        accounts[global.accountNdx + 0],         { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], [], [], { from: accounts[0] });
 
-        // set fee structure ETH: 10% fixed
-        // ### TODO -- need support for low % fees, e.g. 0.01% -- i.e. mult 100 on % units...
-        const ethFeePerc = 10;
-        assert(await stm.fee_ccyType_Perc(CONST.ccyType.ETH) == 0, 'unexpected ETH percentage fee before setting ETH fee structure');
-        const setCarbonFeeTx = await stm.setFee_CcyType_Perc(CONST.ccyType.ETH, ethFeePerc);
-        truffleAssert.eventEmitted(setCarbonFeeTx, 'SetFeeCcyTypePerc', ev => ev.ccyTypeId == CONST.ccyType.ETH && ev.fee_ccy_Perc == ethFeePerc);
-        assert(await stm.fee_ccyType_Perc(CONST.ccyType.ETH) == ethFeePerc, 'unexpected ETH percentage fee after setting ETH fee structure');
-        assert(await stm.fee_ccyType_Perc(CONST.ccyType.USD) == 0, 'unexpected USD percentage fee after setting ETH fee structure');
+        // set fee structure ETH: 1%
+        const ethFeePercBips = 100; // 100 bp = 1%
+        assert(await stm.fee_ccyType_PercBips(CONST.ccyType.ETH) == 0, 'unexpected ETH percentage fee before setting ETH fee structure');
+        const setCarbonFeeTx = await stm.setFee_CcyType_PercBips(CONST.ccyType.ETH, ethFeePercBips);
+        truffleAssert.eventEmitted(setCarbonFeeTx, 'SetFeeCcyTypePerc', ev => ev.ccyTypeId == CONST.ccyType.ETH && ev.fee_ccy_PercBips == ethFeePercBips);
+        assert(await stm.fee_ccyType_PercBips(CONST.ccyType.ETH) == ethFeePercBips, 'unexpected ETH percentage fee after setting ETH fee structure');
+        assert(await stm.fee_ccyType_PercBips(CONST.ccyType.USD) == 0, 'unexpected USD percentage fee after setting ETH fee structure');
 
         // transfer, with fee structure applied
-        const transferAmountCcy = new BN(100).div(new BN(2)); // 50 Wei
-        const expectedFeeCcy = Number(transferAmountCcy.toString()) * (ethFeePerc/100);//transferAmountCcy.div(new BN(100)).mul(new BN(ethFeePerc));
+        const transferAmountCcy = new BN(100); // Wei
+        const expectedFeeCcy = Math.floor(Number(transferAmountCcy.toString()) * (ethFeePercBips/10000));
         const data = await helper.transferLedger({ stm, accounts, 
                 ledger_A: accounts[global.accountNdx + 0],                          ledger_B: accounts[global.accountNdx + 1],
                    qty_A: 0,                                                   tokenTypeId_A: 0,
@@ -153,33 +152,35 @@ contract("StMaster", accounts => {
         assert(contractOwnerFeeBalanceAfter == Number(contractOwnerFeeBalanceBefore) + Number(expectedFeeCcy), 'unexpected contract owner (fee receiver) ETH balance after transfer');
     });
 
-    /*it('trading fees (percentage) - apply USD ccy fee on a max. trade (fee on B)', async () => {
+    it('trading fees (percentage) - apply USD ccy fee 1BP on a trade (fee on B)', async () => {
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], [], [], { from: accounts[0] });
         await stm.fund(CONST.ccyType.USD,                   CONST.millionUsd_cents,  accounts[global.accountNdx + 1],         { from: accounts[0] });
 
-        // set fee structure USD: 1000 $ in cents
-        const usdFeeFixed_cents = CONST.thousandUsd_cents;
-        const setCarbonFeeTx = await stm.setFee_CcyType_Fixed(CONST.ccyType.USD, usdFeeFixed_cents);
-        truffleAssert.eventEmitted(setCarbonFeeTx, 'SetFeeCcyTypeFixed', ev => ev.ccyTypeId == CONST.ccyType.USD && ev.fee_ccy_Fixed == usdFeeFixed_cents);
-        assert(await stm.fee_ccyType_Fixed(CONST.ccyType.USD) == usdFeeFixed_cents, 'unexpected USD fixed cents fee after setting USD fee structure');
+        // set fee structure USD: 0.01% 
+        const usdFeePercBips = 1; // 1 bp = 0.01%
+        const setFeeTx = await stm.setFee_CcyType_PercBips(CONST.ccyType.USD, usdFeePercBips);
+        truffleAssert.eventEmitted(setFeeTx, 'SetFeeCcyTypePerc', ev => ev.ccyTypeId == CONST.ccyType.USD && ev.fee_ccy_PercBips == usdFeePercBips);
+        assert(await stm.fee_ccyType_PercBips(CONST.ccyType.USD) == usdFeePercBips, 'unexpected USD percentage fee after setting USD fee structure');
 
         // transfer, with fee structure applied
+        const transferAmountCcy = new BN(10000); // 100$ = 10,000 cents
+        const expectedFeeCcy = Math.floor(Number(transferAmountCcy.toString()) * (usdFeePercBips/10000)); // 0.01% of 100$ = 1 cent
         const data = await helper.transferLedger({ stm, accounts, 
                 ledger_A: accounts[global.accountNdx + 0],                                    ledger_B: accounts[global.accountNdx + 1],
                    qty_A: 750,                                                           tokenTypeId_A: CONST.tokenType.VCS,
                    qty_B: 0,                                                             tokenTypeId_B: 0,
             ccy_amount_A: 0,                                                               ccyTypeId_A: 0,
-            ccy_amount_B: new BN(CONST.millionUsd_cents).sub(new BN(usdFeeFixed_cents)),   ccyTypeId_B: CONST.ccyType.USD,
+            ccy_amount_B: transferAmountCcy,                                               ccyTypeId_B: CONST.ccyType.USD,
                applyFees: true,
         });
 
         // test contract owner has received expected ETH fee
         const contractOwnerFeeBalanceBefore = data.ledgerContractOwner_before.ccys.filter(p => p.ccyTypeId == CONST.ccyType.USD).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
         const contractOwnerFeeBalanceAfter  =  data.ledgerContractOwner_after.ccys.filter(p => p.ccyTypeId == CONST.ccyType.USD).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
-        assert(contractOwnerFeeBalanceAfter == Number(contractOwnerFeeBalanceBefore) + Number(usdFeeFixed_cents), 'unexpected contract owner (fee receiver) USD balance after transfer');
+        assert(contractOwnerFeeBalanceAfter == Number(contractOwnerFeeBalanceBefore) + Number(expectedFeeCcy), 'unexpected contract owner (fee receiver) USD balance after transfer');
     });
 
-    it('trading fees (percentage) - apply ccy fee on a max. trade on a newly added ccy', async () => {
+    it('trading fees (percentage) - apply ccy fee 50BP on a trade on a newly added ccy', async () => {
         await stm.addCcyType('TEST_CCY_TYPE', 'TEST_UNIT');
         const types = (await stm.getCcyTypes()).ccyTypes;
         const newCcyTypeId = types.filter(p => p.name == 'TEST_CCY_TYPE')[0].id;
@@ -187,30 +188,35 @@ contract("StMaster", accounts => {
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], [], [], { from: accounts[0] });
         await stm.fund(newCcyTypeId,                        1000,                    accounts[global.accountNdx + 1],         { from: accounts[0] });
 
-        // set fee structure new ccy: 100 units
-        const newCcyFeeFixed_units = 100;
-        const setCarbonFeeTx = await stm.setFee_CcyType_Fixed(newCcyTypeId, newCcyFeeFixed_units);
-        truffleAssert.eventEmitted(setCarbonFeeTx, 'SetFeeCcyTypeFixed', ev => ev.ccyTypeId == newCcyTypeId && ev.fee_ccy_Fixed == newCcyFeeFixed_units);
-        assert(await stm.fee_ccyType_Fixed(newCcyTypeId) == newCcyFeeFixed_units, 'unexpected new currency fixed fee after setting fee structure');
-
+        // set fee structure on new ccy: 0.5% 
+        const feeBips = 50; // 50 bp = 0.5%
+        const setFeeTx = await stm.setFee_CcyType_PercBips(newCcyTypeId, feeBips);
+        truffleAssert.eventEmitted(setFeeTx, 'SetFeeCcyTypePerc', ev => ev.ccyTypeId == newCcyTypeId && ev.fee_ccy_PercBips == feeBips);
+        assert(await stm.fee_ccyType_PercBips(newCcyTypeId) == feeBips, 'unexpected new ccy percentage fee after setting fee structure');
+        
         // transfer, with fee structure applied
+        const transferAmountCcy = new BN(500); // 500 new ccy units
+        const expectedFeeCcy = Math.floor(Number(transferAmountCcy.toString()) * (feeBips/10000)); // 0.5% of 500 = 2.5 ccy units
         const data = await helper.transferLedger({ stm, accounts, 
                 ledger_A: accounts[global.accountNdx + 0],                     ledger_B: accounts[global.accountNdx + 1],
                    qty_A: 750,                                            tokenTypeId_A: CONST.tokenType.VCS,
                    qty_B: 0,                                              tokenTypeId_B: 0,
             ccy_amount_A: 0,                                                ccyTypeId_A: 0,
-            ccy_amount_B: new BN(1000).sub(new BN(newCcyFeeFixed_units)),   ccyTypeId_B: newCcyTypeId,
+            ccy_amount_B: transferAmountCcy,                                ccyTypeId_B: newCcyTypeId,
                applyFees: true,
         });
 
         // test contract owner has received expected ETH fee
         const contractOwnerFeeBalanceBefore = data.ledgerContractOwner_before.ccys.filter(p => p.ccyTypeId == newCcyTypeId).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
         const contractOwnerFeeBalanceAfter  =  data.ledgerContractOwner_after.ccys.filter(p => p.ccyTypeId == newCcyTypeId).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
-        assert(contractOwnerFeeBalanceAfter == Number(contractOwnerFeeBalanceBefore) + Number(newCcyFeeFixed_units), 'unexpected contract owner (fee receiver) new ccy balance after transfer');
+        //console.log('contractOwnerFeeBalanceBefore', contractOwnerFeeBalanceBefore.toString());
+        //console.log('contractOwnerFeeBalanceAfter', contractOwnerFeeBalanceAfter.toString());
+        //console.log('expectedFeeCcy', expectedFeeCcy.toString());
+        assert(contractOwnerFeeBalanceAfter == Number(contractOwnerFeeBalanceBefore) + Number(expectedFeeCcy), 'unexpected contract owner (fee receiver) new ccy balance after transfer');
     });
 
     // EEU + CCY FEES
-    it('trading fees (percentage) - apply ETH ccy & VCS EEU fee on a max. trade (fees on both sides)', async () => {
+    /*it('trading fees (percentage) - apply ETH ccy & VCS EEU fee on a max. trade (fees on both sides)', async () => {
         await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        accounts[global.accountNdx + 0],         { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], [], [], { from: accounts[0] });
 
