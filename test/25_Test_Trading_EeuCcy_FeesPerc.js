@@ -15,23 +15,23 @@ contract("StMaster", accounts => {
     });
 
     // EEU FEES
-    /*it('trading fees (percentage) - apply VCS carbon fee on a trade (fee on A)', async () => {
+    it('trading fees (percentage) - apply VCS carbon fee 100 BP on a trade (fee on A)', async () => {
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], [], [], { from: accounts[0] });
         await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        accounts[global.accountNdx + 1],         { from: accounts[0] });
 
-        // set fee structure VCS: 2 KG carbon fixed
-        const carbonKgFixedFee = 2;
-        assert(await stm.fee_tokenType_Fixed(CONST.tokenType.VCS) == 0, 'unexpected VCS fixed KG fee before setting VCS fee structure');
-        const setCarbonFeeTx = await stm.setFee_SecTokenType_Fixed(CONST.tokenType.VCS, carbonKgFixedFee);
-        truffleAssert.eventEmitted(setCarbonFeeTx, 'SetFeeSecTokenTypeFixed', ev => ev.tokenTypeId == CONST.tokenType.VCS && ev.fee_tokenQty_Fixed == carbonKgFixedFee);
-        assert(await stm.fee_tokenType_Fixed(CONST.tokenType.VCS) == carbonKgFixedFee, 'unexpected VCS fixed KG fee after setting VCS fee structure');
-        assert(await stm.fee_tokenType_Fixed(CONST.tokenType.UNFCCC) == 0, 'unexpected UNFCCC fixed KG fee after setting VCS fee structure');
+        // set fee structure VCS: 1% 
+        const feeBips = 100; // 100 bp = 1%
+        const setFeeTx = await stm.setFee_SecTokenType_Perc(CONST.tokenType.VCS, feeBips);
+        truffleAssert.eventEmitted(setFeeTx, 'SetFeeSecTokenTypePerc', ev => ev.tokenTypeId == CONST.tokenType.VCS && ev.fee_token_PercBips == feeBips);
+        assert(await stm.fee_tokenType_PercBips(CONST.tokenType.VCS) == feeBips, 'unexpected VCS percentage fee after setting VCS fee structure');
+        assert(await stm.fee_tokenType_PercBips(CONST.tokenType.UNFCCC) == 0, 'unexpected UNFCCC percentage fee after setting VCS fee structure');
 
         // transfer, with fee structure applied
-        const carbonKgTransferAmount = 750;
+        const transferAmountKg = new BN(100); // 100 kg
+        const expectedFeeKg = Math.floor(Number(transferAmountKg.toString()) * (feeBips/10000));
         const data = await helper.transferLedger({ stm, accounts, 
                 ledger_A: accounts[global.accountNdx + 0],     ledger_B: accounts[global.accountNdx + 1],
-                   qty_A: carbonKgTransferAmount,         tokenTypeId_A: CONST.tokenType.VCS,
+                   qty_A: transferAmountKg,               tokenTypeId_A: CONST.tokenType.VCS,
                    qty_B: 0,                              tokenTypeId_B: 0,
             ccy_amount_A: 0,                                ccyTypeId_A: 0,
             ccy_amount_B: CONST.oneEth_wei,                 ccyTypeId_B: CONST.ccyType.ETH,
@@ -43,33 +43,33 @@ contract("StMaster", accounts => {
         const contractOwner_VcsKgAfter  =  data.ledgerContractOwner_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
         //console.log(`accountNdx=${global.accountNdx} contractOwner_VcsKgBefore`, contractOwner_VcsKgBefore);
         //console.log(`accountNdx=${global.accountNdx} contractOwner_VcsKgAfter`, contractOwner_VcsKgAfter);
-        assert(contractOwner_VcsKgAfter == Number(contractOwner_VcsKgBefore) + Number(carbonKgFixedFee), 'unexpected contract owner (fee receiver) VCS EEU tonnage after transfer');
+        assert(contractOwner_VcsKgAfter == Number(contractOwner_VcsKgBefore) + Number(expectedFeeKg), 'unexpected contract owner (fee receiver) VCS EEU tonnage after transfer');
         
         // fees are *additional* to the supplied transfer KGs...
         const ledgerA_VcsKgBefore = data.ledgerA_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
         const ledgerA_VcsKgAfter  =  data.ledgerA_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
         //console.log(`accountNdx=${global.accountNdx} ledgerA_VcsKgBefore`, ledgerA_VcsKgBefore);
         //console.log(`accountNdx=${global.accountNdx} ledgerA_VcsKgAfter`, ledgerA_VcsKgAfter);
-        assert(ledgerA_VcsKgAfter == Number(ledgerA_VcsKgBefore) - Number(carbonKgFixedFee) - Number(carbonKgTransferAmount), 'unexpected ledger A (fee payer) VCS EEU tonnage after transfer');
+        assert(ledgerA_VcsKgAfter == Number(ledgerA_VcsKgBefore) - Number(expectedFeeKg) - Number(transferAmountKg), 'unexpected ledger A (fee payer) VCS EEU tonnage after transfer');
     });
 
-    it('trading fees (percentage) - apply UNFCCC carbon fee on a trade (fee on B)', async () => {
+    it('trading fees (percentage) - apply UNFCCC carbon fee 1 BP (min) on a trade 1000 tons (min lot size) (fee on B)', async () => {
         await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        accounts[global.accountNdx + 0],         { from: accounts[0] });
-        await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.mtCarbon, 1,       accounts[global.accountNdx + 1], [], [], { from: accounts[0] });
 
-        // set fee structure UNFCCC: 1 KG carbon fixed, VCS: no fee
-        const unfccFixedFee = 2;
-        const setUnfccFeeTx = await stm.setFee_SecTokenType_Fixed(CONST.tokenType.UNFCCC, unfccFixedFee);
-        const setVcsFeeTx = await stm.setFee_SecTokenType_Fixed(CONST.tokenType.VCS, 0);
-        truffleAssert.eventEmitted(setUnfccFeeTx, 'SetFeeSecTokenTypeFixed', ev => ev.tokenTypeId == CONST.tokenType.UNFCCC && ev.fee_tokenQty_Fixed == unfccFixedFee);
-        assert(await stm.fee_tokenType_Fixed(CONST.tokenType.UNFCCC) == unfccFixedFee, 'unexpected UNFCCC fixed KG fee after setting UNFCCC fee structure');
-        assert(await stm.fee_tokenType_Fixed(CONST.tokenType.VCS) == 0, 'unexpected VCS fixed KG fee after setting UNFCCC fee structure');
+        // set fee structure UNFCCC: 0.01% (1 bip - minimum % fee)
+        const feeBips = 1;
+        const setFeeTx = await stm.setFee_SecTokenType_Perc(CONST.tokenType.UNFCCC, feeBips);
+        truffleAssert.eventEmitted(setFeeTx, 'SetFeeSecTokenTypePerc', ev => ev.tokenTypeId == CONST.tokenType.UNFCCC && ev.fee_token_PercBips == feeBips);
+        assert(await stm.fee_tokenType_PercBips(CONST.tokenType.UNFCCC) == feeBips, 'unexpected UNFCCC percentage fee after setting UNFCCC fee structure');
 
         // transfer, with fee structure applied
+        const transferAmountKg = new BN(CONST.ktCarbon); // 1000 tons: minimum lot size
+        const expectedFeeKg = Math.floor(Number(transferAmountKg.toString()) * (feeBips/10000));
         const data = await helper.transferLedger({ stm, accounts, 
                 ledger_A: accounts[global.accountNdx + 0],     ledger_B: accounts[global.accountNdx + 1],
                    qty_A: 0,                              tokenTypeId_A: 0,
-                   qty_B: 750,                            tokenTypeId_B: CONST.tokenType.UNFCCC,
+                   qty_B: transferAmountKg,               tokenTypeId_B: CONST.tokenType.UNFCCC,
             ccy_amount_A: CONST.oneEth_wei,                 ccyTypeId_A: CONST.ccyType.ETH,
             ccy_amount_B: 0,                                ccyTypeId_B: 0,
                applyFees: true,
@@ -78,7 +78,7 @@ contract("StMaster", accounts => {
         // test contract owner has received expected carbon UNFCCC fee
         const contractOwnerUnfcccKgBefore = data.ledgerContractOwner_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.UNFCCC).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
         const contractOwnerUnfcccKgAfter  =  data.ledgerContractOwner_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.UNFCCC).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
-        assert(contractOwnerUnfcccKgAfter == Number(contractOwnerUnfcccKgBefore) + Number(unfccFixedFee), 'unexpected contract owner (fee receiver) UNFCCC EEU tonnage after transfer');
+        assert(contractOwnerUnfcccKgAfter == Number(contractOwnerUnfcccKgBefore) + Number(expectedFeeKg), 'unexpected contract owner (fee receiver) UNFCCC EEU tonnage after transfer');
 
         // test contract owner has unchanged VCS balance (i.e. no VCS fees received)
         const contractOwnerVcsKgBefore = data.ledgerContractOwner_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
@@ -86,7 +86,9 @@ contract("StMaster", accounts => {
         assert(contractOwnerVcsKgAfter == Number(contractOwnerVcsKgBefore), 'unexpected contract owner (fee receiver) VCS EEU tonnage after transfer');
     });
 
-    it('trading fees (percentage) - apply large (>1 batch EEU size) carbon fee on a trade on a newly added EEU type', async () => {
+    // TODO: NEGATIVE RE. INSUFFICIENT FUNDS...
+
+    /*it('trading fees (percentage) - apply large (>1 batch EEU size) carbon fee 5000 BP on a trade on a newly added EEU type', async () => {
         await stm.addSecTokenType('TEST_EEU_TYPE');
         const types = (await stm.getSecTokenTypes()).tokenTypes;
         const newTypeId = types.filter(p => p.name == 'TEST_EEU_TYPE')[0].id;
@@ -96,16 +98,18 @@ contract("StMaster", accounts => {
         await stm.mintSecTokenBatch(newTypeId, 1000, 1,                            accounts[global.accountNdx + 0], [], [], { from: accounts[0] });
         await stm.fund(CONST.ccyType.ETH,            CONST.oneEth_wei,        accounts[global.accountNdx + 1],         { from: accounts[0] });
 
-        // set fee structure new EEU type: 1500 KG carbon fixed (1.5 EEUs, 2 batches)
-        const newSecTokenTypeFixedFee = 1500;
-        const setFeeTx = await stm.setFee_SecTokenType_Fixed(newTypeId, newSecTokenTypeFixedFee);
-        truffleAssert.eventEmitted(setFeeTx, 'SetFeeSecTokenTypeFixed', ev => ev.tokenTypeId == newTypeId && ev.fee_tokenQty_Fixed == newSecTokenTypeFixedFee);
-        assert(await stm.fee_tokenType_Fixed(newTypeId) == newSecTokenTypeFixedFee, 'unexpected new EEU type fixed KG fee after setting fee structure');
+        // set fee structure new EEU type: 50% = 5000 BP(1.5 EEUs, 2 batches)
+        const feeBips = 5000;
+        const setFeeTx = await stm.setFee_SecTokenType_Perc(newTypeId, feeBips);
+        truffleAssert.eventEmitted(setFeeTx, 'SetFeeSecTokenTypePerc', ev => ev.tokenTypeId == newTypeId && ev.fee_token_PercBips == feeBips);
+        assert(await stm.fee_tokenType_PercBips(newTypeId) == feeBips, 'unexpected new eeu type percentage fee after setting fee structure');
 
         // transfer, with fee structure applied
+        const transferAmountKg = new BN(1); // ??? 50% of TRANSFER ...
+        const expectedFeeKg = Math.floor(Number(transferAmountKg.toString()) * (feeBips/10000));
         const data = await helper.transferLedger({ stm, accounts, 
                 ledger_A: accounts[global.accountNdx + 0],     ledger_B: accounts[global.accountNdx + 1],
-                   qty_A: 1,                              tokenTypeId_A: newTypeId,
+                   qty_A: ,                               tokenTypeId_A: newTypeId,
                    qty_B: 0,                              tokenTypeId_B: 0,
             ccy_amount_A: 0,                                ccyTypeId_A: 0,
             ccy_amount_B: CONST.oneEth_wei,                 ccyTypeId_B: CONST.ccyType.ETH,
@@ -119,7 +123,7 @@ contract("StMaster", accounts => {
     });*/
 
     // CCY FEES
-    it('trading fees (percentage) - apply ETH ccy fee 100BP on a trade (fee on A)', async () => {
+    it('trading fees (percentage) - apply ETH ccy fee 100 BP on a trade (fee on A)', async () => {
         await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        accounts[global.accountNdx + 0],         { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], [], [], { from: accounts[0] });
 
@@ -152,7 +156,7 @@ contract("StMaster", accounts => {
         assert(contractOwnerFeeBalanceAfter == Number(contractOwnerFeeBalanceBefore) + Number(expectedFeeCcy), 'unexpected contract owner (fee receiver) ETH balance after transfer');
     });
 
-    it('trading fees (percentage) - apply USD ccy fee 1BP on a trade (fee on B)', async () => {
+    it('trading fees (percentage) - apply USD ccy fee 1 BP on a trade (fee on B)', async () => {
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], [], [], { from: accounts[0] });
         await stm.fund(CONST.ccyType.USD,                   CONST.millionUsd_cents,  accounts[global.accountNdx + 1],         { from: accounts[0] });
 
@@ -180,7 +184,7 @@ contract("StMaster", accounts => {
         assert(contractOwnerFeeBalanceAfter == Number(contractOwnerFeeBalanceBefore) + Number(expectedFeeCcy), 'unexpected contract owner (fee receiver) USD balance after transfer');
     });
 
-    it('trading fees (percentage) - apply ccy fee 50BP on a trade on a newly added ccy', async () => {
+    it('trading fees (percentage) - apply ccy fee 50 BP on a trade on a newly added ccy', async () => {
         await stm.addCcyType('TEST_CCY_TYPE', 'TEST_UNIT');
         const types = (await stm.getCcyTypes()).ccyTypes;
         const newCcyTypeId = types.filter(p => p.name == 'TEST_CCY_TYPE')[0].id;

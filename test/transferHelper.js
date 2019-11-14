@@ -7,8 +7,8 @@ module.exports = {
 
     transferLedger: async ({ stm, accounts,
         ledger_A,     ledger_B, 
-        qty_A,         tokenTypeId_A,
-        qty_B,         tokenTypeId_B,
+        qty_A,        tokenTypeId_A,
+        qty_B,        tokenTypeId_B,
         ccy_amount_A, ccyTypeId_A,
         ccy_amount_B, ccyTypeId_B,
         applyFees,
@@ -61,14 +61,16 @@ module.exports = {
         }
 
         // transfer
-        const transferTx = await stm.transfer(
-            ledger_A,     ledger_B, 
-            qty_A,        tokenTypeId_A, 
-            qty_B,        tokenTypeId_B, 
-            ccy_amount_A, ccyTypeId_A, 
-            ccy_amount_B, ccyTypeId_B, 
-            applyFees, 
-            { from: accounts[0] }
+        console.log('qty_A', qty_A);
+        console.log('qty_B', qty_B);
+        const transferTx = await transferWrapped( { stm, accounts,
+                    ledger_A, ledger_B, 
+                       qty_A, tokenTypeId_A, 
+                       qty_B, tokenTypeId_B, 
+                ccy_amount_A, ccyTypeId_A, 
+                ccy_amount_B, ccyTypeId_B, 
+                   applyFees
+        }, { from: accounts[0] }
         );
 
         // ledger entries after
@@ -242,7 +244,11 @@ module.exports = {
         var totalqty_AllSecSecTokenTypes_fees = new BN(0);
         if (qty_A > 0) {
             var netKg_tfd = 0;
-            const eeuFee_A = Number(await stm.fee_tokenType_Fixed(tokenTypeId_A)); // EEU fee paid by A
+            const eeuFee_A = Math.floor(
+                                Number(await stm.fee_tokenType_Fixed(tokenTypeId_A))  // EEU fee paid by A
+                              + Number((qty_A / 10000) * Number(await stm.fee_tokenType_PercBips(tokenTypeId_A))));
+            console.log('eeuFee_A', eeuFee_A);
+
             totalKg_tfd_incFees = totalKg_tfd_incFees.add(new BN(eeuFee_A));
             totalqty_AllSecSecTokenTypes_fees = totalqty_AllSecSecTokenTypes_fees.add(new BN(eeuFee_A));
             netKg_tfd += qty_A; // transfered by A
@@ -252,7 +258,11 @@ module.exports = {
         }
         if (qty_B > 0) {
             var netKg_tfd = 0;
-            const eeuFee_B = Number(await stm.fee_tokenType_Fixed(tokenTypeId_B)); // EEU fee paid by B
+            const eeuFee_B = Math.floor(
+                                Number(await stm.fee_tokenType_Fixed(tokenTypeId_B)) // EEU fee paid by B
+                              + Number((qty_B / 10000) * Number(await stm.fee_tokenType_PercBips(tokenTypeId_B)))); 
+            console.log('eeuFee_B', eeuFee_B);
+
             totalKg_tfd_incFees = totalKg_tfd_incFees.add(new BN(eeuFee_B));
             totalqty_AllSecSecTokenTypes_fees = totalqty_AllSecSecTokenTypes_fees.add(new BN(eeuFee_B));
             netKg_tfd += qty_B; // transfered by B
@@ -275,6 +285,25 @@ module.exports = {
             ledgerB_before,             ledgerB_after,
             ledgerContractOwner_before, ledgerContractOwner_after,
         };
+    },
+
+    transferWrapper: (stm, accounts,
+        ledger_A, ledger_B, 
+           qty_A, tokenTypeId_A, 
+           qty_B, tokenTypeId_B, 
+    ccy_amount_A, ccyTypeId_A, 
+    ccy_amount_B, ccyTypeId_B, 
+       applyFees,
+            from
+        ) => {
+        return transferWrapped({ stm, accounts,
+        ledger_A, ledger_B, 
+           qty_A, tokenTypeId_A, 
+           qty_B, tokenTypeId_B, 
+    ccy_amount_A, ccyTypeId_A, 
+    ccy_amount_B, ccyTypeId_B, 
+       applyFees
+        }, from);
     },
 
     assert_nFull_1Partial: ({ 
@@ -305,3 +334,26 @@ module.exports = {
         assert(ledgerReceiver_after.tokens.length == start_Receiver_eeuCount + expectFullTransfer_eeuCount + 1, 'unexpected eeu count ledger B after'); 
     }
 };
+
+async function transferWrapped({
+    stm, accounts,
+    ledger_A,     ledger_B, 
+    qty_A,        tokenTypeId_A,
+    qty_B,        tokenTypeId_B,
+    ccy_amount_A, ccyTypeId_A,
+    ccy_amount_B, ccyTypeId_B,
+    applyFees
+}, from) {
+    const tx = await stm.transfer(
+        { 
+                ledger_A,                          ledger_B, 
+                   qty_A: qty_A.toString(),        tokenTypeId_A, 
+                   qty_B: qty_B.toString(),        tokenTypeId_B, 
+            ccy_amount_A: ccy_amount_A.toString(), ccyTypeId_A, 
+            ccy_amount_B: ccy_amount_B.toString(), ccyTypeId_B, 
+            applyFees, 
+        },
+        from //{ from: accounts[0] }
+    );
+    return tx;
+}
