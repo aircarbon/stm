@@ -7,10 +7,8 @@ import "./CcyFundable.sol";
 import "./CcyWithdrawable.sol";
 import "./StTransferable.sol";
 
-//import "./St2_Abi.sol";
-contract St2_Abi {
-    function name2() public pure returns(string memory);
-}
+import "../Interfaces/St2Interface.sol";
+//import "../St2x/St2x.sol";
 
 contract StMaster is StMintable, StBurnable, CcyFundable, CcyWithdrawable, StTransferable {
     string public name;
@@ -21,9 +19,17 @@ contract StMaster is StMintable, StBurnable, CcyFundable, CcyWithdrawable, StTra
     // function getUnit() external view returns (string memory) { return unit; }
 
     // TODO: ... split up StMaster
+    // https://ethereum.stackexchange.com/questions/26674/deploying-abstract-contracts-and-interfaces
     address public addr_st2;
+    
+    mapping(uint256 => St2Interface.SecTokenBatch) __batches;
     function call_st2() external returns (string memory) {
-        St2_Abi st2 = St2_Abi(addr_st2);
+        St2Interface st2 = St2Interface(addr_st2);
+        //St2x st2 = St2x(addr_st2);
+
+        // ## visibility problem...
+        //st2.set_batch_id1(__batches);
+        
         return st2.name2();
     }
 
