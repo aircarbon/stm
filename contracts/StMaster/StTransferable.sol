@@ -3,82 +3,14 @@ pragma experimental ABIEncoderV2;
 
 import "./Owned.sol";
 import "./StLedger.sol";
+import "./StFees.sol";
 
-contract StTransferable is Owned, StLedger {
+contract StTransferable is Owned, StLedger, StFees {
     event TransferedLedgerCcy(address from, address to, uint256 ccyTypeId, uint256 amount, bool isFee);
     event TransferedFullSecToken(address from, address to, uint256 stId, uint256 mergedToSecTokenId, /*uint256 tokenTypeId,*/ uint256 qty, bool isFee);
     event TransferedPartialSecToken(address from, address to, uint256 splitFromSecTokenId, uint256 newSecTokenId, uint256 mergedToSecTokenId, /*uint256 tokenTypeId,*/ uint256 qty, bool isFee);
 
-    /**
-     * Global Fee Structure
-     * NOTE: fees are applied ON TOP OF the supplied transfer amounts to the transfer() fn.
-     *       i.e. transfer amounts are not inclusive of fees, they are additional
-     */
-    // FIXED FEES - TOKENS
-    mapping(uint256 => uint256) public fee_tokenType_Fixed; // fixed token qty fee per transfer
-    event SetFeeSecTokenTypeFixed(uint256 tokenTypeId, uint256 fee_tokenQty_Fixed);
-    function setFee_SecTokenType_Fixed(uint256 tokenTypeId, uint256 fee_tokenQty_Fixed) public {
-        require(msg.sender == owner, "Restricted method");
-        require(_readOnly == false, "Contract is read only");
-        require(tokenTypeId >= 0 && tokenTypeId < _count_tokenTypes, "Invalid ST type");
-        fee_tokenType_Fixed[tokenTypeId] = fee_tokenQty_Fixed;
-        fee_tokenType_PercBips[tokenTypeId] = 0;
-        emit SetFeeSecTokenTypeFixed(tokenTypeId, fee_tokenQty_Fixed);
-    }
-    // FIXED FEES - CCY
-    mapping(uint256 => uint256) public fee_ccyType_Fixed; // fixed currency fee per transfer
-    event SetFeeCcyTypeFixed(uint256 ccyTypeId, uint256 fee_ccy_Fixed);
-    function setFee_CcyType_Fixed(uint256 ccyTypeId, uint256 fee_ccy_Fixed) public {
-        require(msg.sender == owner, "Restricted method");
-        require(_readOnly == false, "Contract is read only");
-        require(ccyTypeId >= 0 && ccyTypeId < _count_ccyTypes, "Invalid currency type");
-        fee_ccyType_Fixed[ccyTypeId] = fee_ccy_Fixed;
-        fee_ccyType_PercBips[ccyTypeId] = 0;
-        emit SetFeeCcyTypeFixed(ccyTypeId, fee_ccy_Fixed);
-    }
-
-    // PERCENTAGE FEES (BASIS POINTS, 1/100 of 1%) - TOKENS
-    mapping(uint256 => uint256) public fee_tokenType_PercBips; // bips (0-10000) token qty fee per transfer
-    event SetFeeSecTokenTypePerc(uint256 tokenTypeId, uint256 fee_token_PercBips);
-    function setFee_SecTokenType_Perc(uint256 tokenTypeId, uint256 fee_token_PercBips) public {
-        require(msg.sender == owner, "Restricted method");
-        require(_readOnly == false, "Contract is read only");
-        require(tokenTypeId >= 0 && tokenTypeId < _count_tokenTypes, "Invalid ST type");
-        require(fee_token_PercBips < 10000, "Invalid fee basis points");
-        fee_tokenType_PercBips[tokenTypeId] = fee_token_PercBips;
-        fee_tokenType_Fixed[tokenTypeId] = 0;
-        emit SetFeeSecTokenTypePerc(tokenTypeId, fee_token_PercBips);
-    }
-    // PERCENTAGE FEES (BASIS POINTS, 1/100 of 1%) - CCY
-    mapping(uint256 => uint256) public fee_ccyType_PercBips; // bips (0-10000) currency fee per transfer
-    event SetFeeCcyTypePerc(uint256 ccyTypeId, uint256 fee_ccy_PercBips);
-    function setFee_CcyType_PercBips(uint256 ccyTypeId, uint256 fee_ccy_PercBips) public {
-        require(msg.sender == owner, "Restricted method");
-        require(_readOnly == false, "Contract is read only");
-        require(ccyTypeId >= 0 && ccyTypeId < _count_ccyTypes, "Invalid currency type");
-        require(fee_ccy_PercBips < 10000, "Invalid fee percentage");
-        fee_ccyType_PercBips[ccyTypeId] = fee_ccy_PercBips;
-        fee_ccyType_Fixed[ccyTypeId] = 0;
-        emit SetFeeCcyTypePerc(ccyTypeId, fee_ccy_PercBips);
-    }
-
-    /**
-     * @dev Returns the global total quantity of token fees paid, in the contract base unit
-     */
-    // DEMO TMP: remove for easier migration (todo - separate contracts?)
-    function getSecToken_totalFeesPaidQty() external view returns (uint256) {
-        require(msg.sender == owner, "Restricted method");
-        return _tokens_totalFeesPaidQty;
-    }
-
-    /**
-     * @dev Returns the global total amount of currency fees paid, for the supplied currency
-     */
-    function getCcy_totalFeesPaidAmount(uint256 ccyTypeId) external view returns (uint256) {
-        require(msg.sender == owner, "Restricted method");
-        return _ccyType_totalFeesPaid[ccyTypeId];
-    }
-
+  
     /**
      * @dev Transfers or trades assets between ledger accounts
      * @dev allows: one-sided transfers, transfers of same asset types, and transfers (trades) of different asset types
@@ -122,8 +54,11 @@ contract StTransferable is Owned, StLedger {
         require(a.qty_A > 0 || a.qty_B > 0 || a.ccy_amount_A > 0 || a.ccy_amount_B > 0, "Invalid transfer");
         require(!(a.ccy_amount_A < 0 || a.ccy_amount_B < 0), "Invalid currency amounts"); // disallow negative ccy transfers
 
-        // prevent single origin muliple asset type movement
+        // prevent single origin multiple asset type movement
         require(!((a.qty_A > 0 && a.ccy_amount_A > 0) || (a.qty_B > 0 && a.ccy_amount_B > 0)), "Same origin multiple asset transfer disallowed");
+
+        // TODO: cleanup now got more stack available (consolidate fee amounts, can send in single op)
+        // TODO: -ve tests for % fees on balance exceeded (test ccy & token balance validations)
 
         // validate currency balances
         require(sufficientCcy(a.ledger_A, a.ccyTypeId_A, a.ccy_amount_A,

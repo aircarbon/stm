@@ -16,7 +16,6 @@ contract StBurnable is Owned, StLedger {
      * @param tokenTypeId ST type to burn
      * @param burnQty Quantity of contact base token units to burn
      */
-    // DEMO TMP: remove for easier migration (todo - separate contracts?)
     function burnTokens(address ledgerOwner, uint256 tokenTypeId, int256 burnQty) public {
         require(msg.sender == owner, "Restricted method");
         require(_readOnly == false, "Contract is read only");
@@ -76,7 +75,6 @@ contract StBurnable is Owned, StLedger {
     /**
      * @dev Returns the total global contract base unit quantities in all ST tokens burned, or partially burned
      */
-    // DEMO TMP: remove for easier migration (todo - separate contracts?)
     function getSecToken_totalBurnedQty() external view returns (uint256 count) {
         require(msg.sender == owner, "Restricted method");
         return _tokens_totalBurnedQty;

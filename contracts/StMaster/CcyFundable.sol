@@ -45,7 +45,6 @@ contract CcyFundable is Owned, StLedger {
     /**
      * @dev Returns the total global amount funded for the supplied currency
      */
-    // DEMO TMP: remove for easier migration (todo - separate contracts?)
     function getTotalCcyFunded(uint256 ccyTypeId) external view returns (uint256) {
         require(msg.sender == owner, "Restricted method");
         return _ccyType_totalFunded[ccyTypeId];

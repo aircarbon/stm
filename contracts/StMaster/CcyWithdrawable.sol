@@ -13,7 +13,6 @@ contract CcyWithdrawable is Owned, StLedger {
      * @param amount Amount of the currency to withdraw, in currency base units
      * @param ledgerOwner Withdrawing ledger owner
      */
-    // DEMO TMP: remove for easier migration (todo - separate contracts?)
     function withdraw(uint256 ccyTypeId,
                       int256  amount, // signed value: ledger ccyType_balance supports (theoretical) -ve balances
                       address ledgerOwner)
@@ -37,7 +36,6 @@ contract CcyWithdrawable is Owned, StLedger {
     /**
      * @dev Returns the total global amount withdrawn for the supplied currency
      */
-    // DEMO TMP: remove for easier migration (todo - separate contracts?)
     function getTotalCcyWithdrawn(uint256 ccyTypeId) external view returns (uint256) {
         require(msg.sender == owner, "Restricted method");
         return _ccyType_totalWithdrawn[ccyTypeId];

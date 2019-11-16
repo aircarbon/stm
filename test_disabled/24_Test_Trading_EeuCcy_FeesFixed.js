@@ -22,8 +22,13 @@ contract("StMaster", accounts => {
         // set fee structure VCS: 2 KG carbon fixed
         const carbonKgFixedFee = 2;
         assert(await stm.fee_tokenType_Fixed(CONST.tokenType.VCS) == 0, 'unexpected VCS fixed KG fee before setting VCS fee structure');
-        const setCarbonFeeTx = await stm.setFee_SecTokenType_Fixed(CONST.tokenType.VCS, carbonKgFixedFee);
-        truffleAssert.eventEmitted(setCarbonFeeTx, 'SetFeeSecTokenTypeFixed', ev => ev.tokenTypeId == CONST.tokenType.VCS && ev.fee_tokenQty_Fixed == carbonKgFixedFee);
+        
+        //const setCarbonFeeTx = await stm.setFee_SecTokenType_Fixed(CONST.tokenType.VCS, carbonKgFixedFee);
+        //truffleAssert.eventEmitted(setCarbonFeeTx, 'SetFeeSecTokenTypeFixed', ev => ev.tokenTypeId == CONST.tokenType.VCS && ev.fee_tokenQty_Fixed == carbonKgFixedFee);
+        const setFeeTx = await stm.setGlobalFee_TokenType(
+            CONST.tokenType.VCS, { fee_fixed: carbonKgFixedFee }
+        );
+
         assert(await stm.fee_tokenType_Fixed(CONST.tokenType.VCS) == carbonKgFixedFee, 'unexpected VCS fixed KG fee after setting VCS fee structure');
         assert(await stm.fee_tokenType_Fixed(CONST.tokenType.UNFCCC) == 0, 'unexpected UNFCCC fixed KG fee after setting VCS fee structure');
 
@@ -53,7 +58,7 @@ contract("StMaster", accounts => {
         assert(ledgerA_VcsKgAfter == Number(ledgerA_VcsKgBefore) - Number(carbonKgFixedFee) - Number(carbonKgTransferAmount), 'unexpected ledger A (fee payer) VCS EEU tonnage after transfer');
     });
 
-    it('trading fees (fixed) - apply UNFCCC carbon fee on a trade (fee on B)', async () => {
+    /*it('trading fees (fixed) - apply UNFCCC carbon fee on a trade (fee on B)', async () => {
         await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        accounts[global.accountNdx + 0],         { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], [], [], { from: accounts[0] });
 
@@ -494,6 +499,6 @@ contract("StMaster", accounts => {
         }
         catch (ex) { return; }
         assert.fail('expected restriction exception');
-    });
+    });*/
 
 });

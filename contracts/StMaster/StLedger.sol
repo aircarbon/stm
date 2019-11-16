@@ -97,7 +97,6 @@ contract StLedger is Owned, StTypes, CcyTypes {
     /**
      * @dev Returns an ST by ID
      */
-     // DEMO TMP: remove for easier migration (todo - separate contracts?)
     function getSecToken(uint256 id) external view returns (SecTokenReturn memory) {
         return SecTokenReturn({
                 exists: _sts_batchId[id] != 0,
@@ -174,7 +173,6 @@ contract StLedger is Owned, StTypes, CcyTypes {
     /**
      * @dev Returns the global ST batch count
      */
-    // DEMO TMP: remove for easier migration (todo - separate contracts?)
     function getSecTokenBatchCount() external view returns (uint256) {
         return _batches_currentMax_id; // 1-based
     }
@@ -185,6 +183,7 @@ contract StLedger is Owned, StTypes, CcyTypes {
     function getSecTokenBatch(uint256 id) external view returns (SecTokenBatch memory) {
         return _batches[id];
     }
+
 
     /**
      * @dev Checks if the supplied ledger owner holds at least the specified quantity of supplied ST type

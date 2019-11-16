@@ -26,7 +26,6 @@ contract StTypes is Owned {
      * @dev Adds a new ST type
      * @param name New ST type name
      */
-    // DEMO TMP: remove for easier migration (todo - separate contracts?)
     function addSecTokenType(string memory name) public {
         require(msg.sender == owner, "Restricted method");
         require(_readOnly == false, "Contract is read only");

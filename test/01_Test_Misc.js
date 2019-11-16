@@ -12,6 +12,11 @@ contract("StMaster", accounts => {
         //console.log(`global.accountNdx: ${global.accountNdx} - contract @ ${stm.address} (owner: ${accounts[0]}) - getSecTokenBatchCount: ${(await stm.getSecTokenBatchCount.call()).toString()}`);
     });
 
+    it('setup - sub-contract refs', async () => {
+        console.log('st2 addr', await stm.addr_st2.call());
+        console.log('call st2', await stm.call_st2.call());
+    });
+
     it('setup - contract owner should have default ledger entry', async () => {
         const ownerLedgerEntry = await stm.getLedgerEntry(accounts[0]);
         assert(ownerLedgerEntry.exists == true, 'contract owner missing ledger entry');

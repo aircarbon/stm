@@ -8,6 +8,7 @@ contract StMintable is Owned, StLedger {
     event MintedSecTokenBatch(uint256 batchId, uint256 tokenTypeId, address batchOwner, uint256 mintQty, uint256 mintSecTokenCount);
     event MintedSecToken(uint256 stId, uint256 batchId, uint256 tokenTypeId, address ledgerOwner, uint256 mintedQty);
 
+
     /**
      * @dev Mints and assigns ownership of a new ST batch
      * @param tokenTypeId ST-type for the batch
@@ -92,7 +93,6 @@ contract StMintable is Owned, StLedger {
     /**
      * @dev Returns the global ST count (variable-sized: ST count != total ST quantities)
      */
-    // DEMO TMP: remove for easier migration (todo - separate contracts?)
     function getSecToken_countMinted() external view returns (uint256) {
         require(msg.sender == owner, "Restricted method");
         return _tokens_currentMax_id; // 1-based
@@ -101,7 +101,6 @@ contract StMintable is Owned, StLedger {
     /**
      * @dev Returns the global sum of total quantities in all STs minted, in the contract base unit
      */
-    // DEMO TMP: remove for easier migration (todo - separate contracts?)
     function getSecToken_totalMintedQty() external view returns (uint256) {
         require(msg.sender == owner, "Restricted method");
         return _tokens_totalMintedQty;
