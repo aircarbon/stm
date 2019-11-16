@@ -19,17 +19,8 @@ library St2x /*is St2Interface*/ {
     //     // string[] metaValues;                                    // metadata values
     // }
 
-    //
     // ### problem is visibility of param mapping() functions on abstract contract (can't be public!)
-    //
-    // TODO: #1 try passing in a struct (instead of a direct mapping)?
-    //
-    //       #2 try referencing by address.call(bytes(4...)) e.g. https://ethereum.stackexchange.com/questions/44383/creating-a-function-that-calls-another-contract
-    //          (interface goes away in that case?)
-    //
-
     // *** Batch LIST
-    //mapping(uint256 => SecTokenBatch) _batches;                 // main batch list: all ST batches, by batch ID
     function set_batch_id1(mapping(uint256 => St2Interface.SecTokenBatch) storage _batches) external {
         St2Interface.SecTokenBatch memory newBatch = St2Interface.SecTokenBatch({
                          id: 42,

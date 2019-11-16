@@ -29,7 +29,14 @@ contract StMaster is StMintable, StBurnable, CcyFundable, CcyWithdrawable, StTra
 
         // ## visibility problem...
         //st2.set_batch_id1(__batches);
-        
+
+        // ## __batches: "this type cannot be encoded" -- so still no way of passing in a mapping...
+        //
+        // this looks like the answer: https://ethereum.stackexchange.com/questions/6755/how-to-access-a-mapping-in-a-library
+        // simplyify, repro just that struct { mapping (int,int) } call ....
+        //
+        //addr_st2.delegatecall(abi.encodePacked(bytes4(keccak256("set_batch_id1(mapping(uint256 => St2Interface.SecTokenBatch))")), __batches));
+
         return st2.name2();
     }
 
