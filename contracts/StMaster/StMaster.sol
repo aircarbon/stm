@@ -7,23 +7,50 @@ import "./CcyFundable.sol";
 import "./CcyWithdrawable.sol";
 import "./StTransferable.sol";
 
-//import "../Interfaces/St2Interface.sol";
-import "../St2x/St2x.sol"; // bytecode of lib gets *removed* during LINKING (solc/truffle migrate)
+//import "../St2x/St2x.sol"; // bytecode of lib gets *removed* during LINKING (solc/truffle migrate)
+import "../Lib/CcyLib.sol";
+import "../Lib/LedgerLib.sol";
+import "../Lib/StructLib.sol";
 
 contract StMaster is StMintable, StBurnable, CcyFundable, CcyWithdrawable, StTransferable {
-    // TODO: for updateable libs - proxy dispatcher
-    // https://blog.openzeppelin.com/proxy-libraries-in-solidity-79fbe4b970fd/
 
     string public name;
     string public version;
     string public unit; // the smallest (integer, non-divisible) security token unit, e.g. "KG"
-    // function getName() external view returns (string memory) { return name; }
-    // function getVersion() external view returns (string memory) { return version; }
-    // function getUnit() external view returns (string memory) { return unit; }
 
-    address public addr_st2;
-    
-    mapping(uint256 => St2x.SecTokenBatch) __batches;
+    // TODO: for updateable libs - proxy dispatcher
+    // https://blog.openzeppelin.com/proxy-libraries-in-solidity-79fbe4b970fd/
+    //address public addr_st2;
+
+    constructor(
+        //address st2
+    ) public {
+        //addr_st2 = st2; // TODO: want to be able to update this post-deployment (public owner-only setter)...
+
+        // params - global
+        name = "SecTok_Master";
+        version = "0.4";
+        unit = "KG";
+
+        // params - token types
+        stTypesData._tokenTypeNames[0] = 'CER - UNFCCC - Certified Emission Reduction';
+        stTypesData._tokenTypeNames[1] = 'VCS - VERRA - Verified Carbon Standard';
+        stTypesData._count_tokenTypes = 2;
+
+        // params - currency types
+        ccyTypesData._ccyTypes[0] = StructLib.Ccy({ id: 0, name: 'SGD', unit: 'cents' });
+        ccyTypesData._ccyTypes[1] = StructLib.Ccy({ id: 1, name: 'ETH', unit: 'Wei'   });
+        ccyTypesData._count_ccyTypes = 2;
+
+         // create ledger entry for contract owner - transfer fees are paid to this ledger entry
+        ledgerData._ledger[owner] = LedgerLib.Ledger({
+            exists: true
+        });
+        ledgerData._ledgerOwners.push(owner);
+    }
+
+    // test lib
+    /*mapping(uint256 => St2x.SecTokenBatch) __batches;
     function call_st2() external returns (uint256) {
         //St2Interface st2 = St2Interface(addr_st2);
 
@@ -47,33 +74,5 @@ contract StMaster is StMintable, StBurnable, CcyFundable, CcyWithdrawable, StTra
         //addr_st2.delegatecall(abi.encodePacked(bytes4(keccak256("set_batch_id1(mapping(uint256 => St2Interface.SecTokenBatch))")), __batches));
 
         //return st2.name2();
-    }
-
-    /**
-     * ctor
-     */
-    constructor(address st2) public {
-        addr_st2 = st2; // TODO: want to be able to update this post-deployment (public owner-only setter)...
-
-        // params - global
-        name = "SecTok_Master";
-        version = "0.3";
-        unit = "KG";
-
-        // params - token types
-        _tokenTypeNames[0] = 'CER - UNFCCC - Certified Emission Reduction';
-        _tokenTypeNames[1] = 'VCS - VERRA - Verified Carbon Standard';
-        _count_tokenTypes = 2;
-
-        // params - currency types
-        _ccyTypes[0] = Ccy({ id: 0, name: 'SGD', unit: 'cents' });
-        _ccyTypes[1] = Ccy({ id: 1, name: 'ETH', unit: 'Wei'   });
-        _count_ccyTypes = 2;
-    
-         // create ledger entry for contract owner - transfer fees are paid to this ledger entry
-        _ledger[owner] = Ledger({
-            exists: true
-        });
-        _ledgerOwners.push(owner);
-    }
+    }*/
 }

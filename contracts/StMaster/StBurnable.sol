@@ -19,57 +19,57 @@ contract StBurnable is Owned, StLedger {
     function burnTokens(address ledgerOwner, uint256 tokenTypeId, int256 burnQty) public {
         require(msg.sender == owner, "Restricted method");
         require(_readOnly == false, "Contract is read only");
-        require(_ledger[ledgerOwner].exists == true, "Invalid ledger owner");
+        require(ledgerData._ledger[ledgerOwner].exists == true, "Invalid ledger owner");
         require(burnQty >= 1, "Minimum burnQty one unit");
-        require(tokenTypeId >= 0 && tokenTypeId < _count_tokenTypes, "Invalid ST type");
+        require(tokenTypeId >= 0 && tokenTypeId < stTypesData._count_tokenTypes, "Invalid ST type");
 
         // check ledger owner has sufficient carbon tonnage of supplied type
         require(sufficientTokens(ledgerOwner, tokenTypeId, uint256(burnQty), 0) == true, "Insufficient carbon held by ledger owner");
         // uint256 kgAvailable = 0;
-        // for (uint i = 0; i < _ledger[ledgerOwner].tokenType_stIds[tokenTypeId].length; i++) {
-        //     kgAvailable += _sts_currentQty[_ledger[ledgerOwner].tokenType_stIds[tokenTypeId][i]];
+        // for (uint i = 0; i < ledgerData._ledger[ledgerOwner].tokenType_stIds[tokenTypeId].length; i++) {
+        //     kgAvailable += ledgerData._sts_currentQty[ledgerData._ledger[ledgerOwner].tokenType_stIds[tokenTypeId][i]];
         // }
         // require(kgAvailable >= uint256(burnQty), "Insufficient carbon held by ledger owner");
-        //require(_ledger[ledgerOwner].tokenType_sumQty[tokenTypeId] >= uint256(burnQty), "Insufficient carbon held by ledger owner");
+        //require(ledgerData._ledger[ledgerOwner].tokenType_sumQty[tokenTypeId] >= uint256(burnQty), "Insufficient carbon held by ledger owner");
 
         // burn (i.e. delete or resize) sufficient ST(s)
         uint256 ndx = 0;
         uint256 remainingToBurn = uint256(burnQty);
         while (remainingToBurn > 0) {
-            uint256[] storage tokenType_stIds = _ledger[ledgerOwner].tokenType_stIds[tokenTypeId];
+            uint256[] storage tokenType_stIds = ledgerData._ledger[ledgerOwner].tokenType_stIds[tokenTypeId];
             uint256 stId = tokenType_stIds[ndx];
-            uint256 stQty = _sts_currentQty[stId];
-            uint256 batchId = _sts_batchId[stId];
+            uint256 stQty = ledgerData._sts_currentQty[stId];
+            uint256 batchId = ledgerData._sts_batchId[stId];
 
             if (remainingToBurn >= stQty) {
                 // burn the full ST
-                _sts_currentQty[stId] = 0;
+                ledgerData._sts_currentQty[stId] = 0;
 
                 // remove from ledger
                 tokenType_stIds[ndx] = tokenType_stIds[tokenType_stIds.length - 1];
                 tokenType_stIds.length--;
-                //_ledger[ledgerOwner].tokenType_sumQty[tokenTypeId] -= stQty;
+                //ledgerData._ledger[ledgerOwner].tokenType_sumQty[tokenTypeId] -= stQty;
 
                 // burn from batch
-                _batches[batchId].burnedQty += stQty;
+                ledgerData._batches[batchId].burnedQty += stQty;
 
                 remainingToBurn -= stQty;
                 emit BurnedFullSecToken(stId, tokenTypeId, ledgerOwner, stQty);
             } else {
                 // resize the ST (partial burn)
-                _sts_currentQty[stId] -= remainingToBurn;
+                ledgerData._sts_currentQty[stId] -= remainingToBurn;
 
                 // retain on ledger
-                //_ledger[ledgerOwner].tokenType_sumQty[tokenTypeId] -= remainingToBurn;
+                //ledgerData._ledger[ledgerOwner].tokenType_sumQty[tokenTypeId] -= remainingToBurn;
 
                 // burn from batch
-                _batches[batchId].burnedQty += remainingToBurn;
+                ledgerData._batches[batchId].burnedQty += remainingToBurn;
 
                 emit BurnedPartialSecToken(stId, tokenTypeId, ledgerOwner, remainingToBurn);
                 remainingToBurn = 0;
             }
         }
-        _tokens_totalBurnedQty += uint256(burnQty);
+        ledgerData._tokens_totalBurnedQty += uint256(burnQty);
     }
 
     /**
@@ -77,6 +77,6 @@ contract StBurnable is Owned, StLedger {
      */
     function getSecToken_totalBurnedQty() external view returns (uint256 count) {
         require(msg.sender == owner, "Restricted method");
-        return _tokens_totalBurnedQty;
+        return ledgerData._tokens_totalBurnedQty;
     }
 }

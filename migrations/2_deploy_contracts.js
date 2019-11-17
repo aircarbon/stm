@@ -1,6 +1,9 @@
 const os = require('os');
 const publicIp = require('public-ip');
-const St2x = artifacts.require('./St2x.sol');
+//const St2x = artifacts.require('./St2x.sol');
+const CcyLib = artifacts.require('./CcyLib.sol');
+const StLib = artifacts.require('./StLib.sol');
+const StructLib = artifacts.require('./StructLib.sol');
 const StMaster = artifacts.require('./StMaster.sol');
 const { db } = require('../../common/dist');
 
@@ -11,13 +14,18 @@ module.exports = async function (deployer) {
 
     StMaster.synchronization_timeout = 42;  // seconds
 
-    // St2x
-    deployer.deploy(St2x).then(async st2x => {
+    //deployer.deploy(St2x).then(async st2x => {
+        //deployer.link(St2x, StMaster);
 
-        deployer.link(St2x, StMaster);
+    deployer.deploy(StructLib).then(async ccyLib => { 
+        deployer.link(StructLib, StMaster);
+        deployer.link(StructLib, CcyLib);
+        deployer.link(StructLib, StLib);
+    return deployer.deploy(CcyLib).then(async ccyLib => { deployer.link(CcyLib, StMaster);
+    return deployer.deploy(StLib).then(async stLib => { deployer.link(StLib, StMaster);
 
         // StMaster
-        return deployer.deploy(StMaster, st2x.address).then(async stm => {
+        return deployer.deploy(StMaster/*, st2x.address*/).then(async stm => {
             
             //console.dir(stm.abi);
             //console.dir(deployer);
@@ -26,7 +34,7 @@ module.exports = async function (deployer) {
                 global.configContext = 'erc20';
 
                 const contractName = "SecTok_Master";
-                const contractVer = "0.3";
+                const contractVer = "0.4";
 
                 await db.SaveDeployment({
                     contractName: contractName,
@@ -40,6 +48,8 @@ module.exports = async function (deployer) {
             }
         }).catch(err => { console.error('failed deployment: StMaster', err); });
     
-    }).catch(err => { console.error('failed deployment: St2', err); });
+    }).catch(err => { console.error('failed deployment: StLib', err); });
+    }).catch(err => { console.error('failed deployment: CcyLib', err); });
+    }).catch(err => { console.error('failed deployment: StructLib', err); });
 
 };

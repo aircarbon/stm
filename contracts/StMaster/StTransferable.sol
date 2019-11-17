@@ -48,8 +48,8 @@ contract StTransferable is Owned, StLedger, StFees {
         require(msg.sender == owner, "Restricted method");
         require(_readOnly == false, "Contract is read only");
 
-        require(_ledger[a.ledger_A].exists == true, "Invalid ledger owner A");
-        require(_ledger[a.ledger_B].exists == true, "Invalid ledger owner B");
+        require(ledgerData._ledger[a.ledger_A].exists == true, "Invalid ledger owner A");
+        require(ledgerData._ledger[a.ledger_B].exists == true, "Invalid ledger owner B");
         require(a.ledger_A != a.ledger_B, "Self transfer disallowed");
         require(a.qty_A > 0 || a.qty_B > 0 || a.ccy_amount_A > 0 || a.ccy_amount_B > 0, "Invalid transfer");
         require(!(a.ccy_amount_A < 0 || a.ccy_amount_B < 0), "Invalid currency amounts"); // disallow negative ccy transfers
@@ -161,13 +161,13 @@ contract StTransferable is Owned, StLedger, StFees {
         bool isFee;
     }
     function transferCcy(TransferCcyArgs memory a) private {
-        _ledger[a.from].ccyType_balance[a.ccyTypeId] -= int256(a.amount);
-        _ledger[a.to].ccyType_balance[a.ccyTypeId] += int256(a.amount);
-        _ccyType_totalTransfered[a.ccyTypeId] += a.amount;
+        ledgerData._ledger[a.from].ccyType_balance[a.ccyTypeId] -= int256(a.amount);
+        ledgerData._ledger[a.to].ccyType_balance[a.ccyTypeId] += int256(a.amount);
+        ledgerData._ccyType_totalTransfered[a.ccyTypeId] += a.amount;
         emit TransferedLedgerCcy(a.from, a.to, a.ccyTypeId, a.amount, a.isFee);
 
         if (a.isFee) {
-            _ccyType_totalFeesPaid[a.ccyTypeId] += a.amount;
+            ledgerData._ccyType_totalFeesPaid[a.ccyTypeId] += a.amount;
         }
     }
 
@@ -189,10 +189,10 @@ contract StTransferable is Owned, StLedger, StFees {
         uint256 ndx = 0;
         uint256 remainingToTransfer = uint256(a.qtyUnit);
         while (remainingToTransfer > 0) {
-            uint256[] storage from_stIds = _ledger[a.from].tokenType_stIds[a.tokenTypeId];
-            uint256[] storage to_stIds = _ledger[a.to].tokenType_stIds[a.tokenTypeId];
+            uint256[] storage from_stIds = ledgerData._ledger[a.from].tokenType_stIds[a.tokenTypeId];
+            uint256[] storage to_stIds = ledgerData._ledger[a.to].tokenType_stIds[a.tokenTypeId];
             uint256 stId = from_stIds[ndx];
-            uint256 stQty = _sts_currentQty[stId];
+            uint256 stQty = ledgerData._sts_currentQty[stId];
 
             if (remainingToTransfer >= stQty) {
                 // reassign the full ST across the ledger entries
@@ -200,7 +200,7 @@ contract StTransferable is Owned, StLedger, StFees {
                 // remove from origin
                 from_stIds[ndx] = from_stIds[from_stIds.length - 1];
                 from_stIds.length--;
-                //_ledger[from].tokenType_sumQty[a.tokenTypeId] -= stQty;            //* gas - DROP DONE - only used internally, validation params
+                //ledgerData._ledger[from].tokenType_sumQty[a.tokenTypeId] -= stQty;            //* gas - DROP DONE - only used internally, validation params
 
                 // assign to destination
                 // while minting >1 ST is disallowed, the merge condition below can never be true:
@@ -229,7 +229,7 @@ contract StTransferable is Owned, StLedger, StFees {
                         emit TransferedFullSecToken(a.from, a.to, stId, 0, /*a.tokenTypeId,*/ stQty, a.isFee);
                     //}
 
-                //_ledger[to].tokenType_sumQty[tokenTypeId] += stQty;                //* gas - DROP DONE - only used internally, validation params
+                //ledgerData._ledger[to].tokenType_sumQty[tokenTypeId] += stQty;                //* gas - DROP DONE - only used internally, validation params
 
                 remainingToTransfer -= stQty;
             }
@@ -245,10 +245,10 @@ contract StTransferable is Owned, StLedger, StFees {
                     // MERGE - if any existing destination ST is from same batch
                     bool mergedExisting = false;
                     for (uint i = 0; i < to_stIds.length; i++) {
-                        if (_sts_batchId[to_stIds[i]] == _sts_batchId[stId]) {
+                        if (ledgerData._sts_batchId[to_stIds[i]] == ledgerData._sts_batchId[stId]) {
                             // resize (grow) the destination ST
-                            _sts_currentQty[to_stIds[i]] += remainingToTransfer;         // TODO gas - pack/combine
-                            _sts_mintedQty[to_stIds[i]] += remainingToTransfer;          // TODO gas - pack/combine
+                            ledgerData._sts_currentQty[to_stIds[i]] += remainingToTransfer;         // TODO gas - pack/combine
+                            ledgerData._sts_mintedQty[to_stIds[i]] += remainingToTransfer;          // TODO gas - pack/combine
 
                             mergedExisting = true;
                             emit TransferedPartialSecToken(a.from, a.to, stId, 0, to_stIds[i], /*a.tokenTypeId,*/ remainingToTransfer, a.isFee);
@@ -257,32 +257,32 @@ contract StTransferable is Owned, StLedger, StFees {
                     }
                     // SOFT-MINT - if no existing destination ST from same batch
                     if (!mergedExisting) {
-                        uint256 newId = _tokens_currentMax_id + 1;
-                        _sts_batchId[newId] = _sts_batchId[stId];                        // inherit batch from parent ST  // TODO gas - pack/combine
-                        _sts_currentQty[newId] = remainingToTransfer;                    // TODO gas - pack/combine
-                        _sts_mintedQty[newId] = remainingToTransfer;                     // TODO gas - pack/combine
-                        //_sts_mintedTimestamp[newId] = block.timestamp;                 // gas - DROP DONE - can fetch from events
-                        //_sts_splitFrom_id[newId] = stId;                               // gas - DROP DONE - can fetch from events
+                        uint256 newId = ledgerData._tokens_currentMax_id + 1;
+                        ledgerData._sts_batchId[newId] = ledgerData._sts_batchId[stId];             // inherit batch from parent ST  // TODO gas - pack/combine
+                        ledgerData._sts_currentQty[newId] = remainingToTransfer;                    // TODO gas - pack/combine
+                        ledgerData._sts_mintedQty[newId] = remainingToTransfer;                     // TODO gas - pack/combine
+                        //ledgerData._sts_mintedTimestamp[newId] = block.timestamp;                 // gas - DROP DONE - can fetch from events
+                        //ledgerData._sts_splitFrom_id[newId] = stId;                               // gas - DROP DONE - can fetch from events
                         to_stIds.push(newId);
-                        _tokens_currentMax_id++;
-                        //_ledger[to].tokenType_sumQty[tokenTypeId] += remainingToTransfer;    // gas - DROP DONE - only used internally, validation params
+                        ledgerData._tokens_currentMax_id++;
+                        //ledgerData._ledger[to].tokenType_sumQty[tokenTypeId] += remainingToTransfer;    // gas - DROP DONE - only used internally, validation params
 
                         emit TransferedPartialSecToken(a.from, a.to, stId, newId, 0, /*a.tokenTypeId,*/ remainingToTransfer, a.isFee);
                     }
 
                 // resize (shrink) the origin ST
-                _sts_currentQty[stId] -= remainingToTransfer;                            // TODO gas - pack/combine
-                _sts_mintedQty[stId] -= remainingToTransfer;                             // TODO gas - pack/combine
-                //_sts_splitTo_id[stId] = newId;                                         // gas - DROP DONE - can index from events
-                //_ledger[from].tokenType_sumQty[tokenTypeId] -= remainingToTransfer;    // gas - DROP DONE - only used internally, validation params
+                ledgerData._sts_currentQty[stId] -= remainingToTransfer;                            // TODO gas - pack/combine
+                ledgerData._sts_mintedQty[stId] -= remainingToTransfer;                             // TODO gas - pack/combine
+                //ledgerData._sts_splitTo_id[stId] = newId;                                         // gas - DROP DONE - can index from events
+                //ledgerData._ledger[from].tokenType_sumQty[tokenTypeId] -= remainingToTransfer;    // gas - DROP DONE - only used internally, validation params
 
                 remainingToTransfer = 0;
             }
         }
-        _tokens_totalTransferedQty += a.qtyUnit;
+        ledgerData._tokens_totalTransferedQty += a.qtyUnit;
 
         if (a.isFee) {
-            _tokens_totalFeesPaidQty += a.qtyUnit;
+            ledgerData._tokens_totalFeesPaidQty += a.qtyUnit;
         }
     }
 
@@ -291,7 +291,7 @@ contract StTransferable is Owned, StLedger, StFees {
      */
     function getCcy_totalTransfered(uint256 ccyTypeId) external view returns (uint256) {
         require(msg.sender == owner, "Restricted method");
-        return _ccyType_totalTransfered[ccyTypeId];
+        return ledgerData._ccyType_totalTransfered[ccyTypeId];
     }
 
     /**
@@ -299,6 +299,6 @@ contract StTransferable is Owned, StLedger, StFees {
      */
     function getSecToken_totalTransfered() external view returns (uint256) {
         require(msg.sender == owner, "Restricted method");
-        return _tokens_totalTransferedQty;
+        return ledgerData._tokens_totalTransferedQty;
     }
 }

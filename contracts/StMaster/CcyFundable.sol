@@ -4,6 +4,8 @@ pragma experimental ABIEncoderV2;
 import "./Owned.sol";
 import "./StLedger.sol";
 
+import "../Lib/LedgerLib.sol";
+
 contract CcyFundable is Owned, StLedger {
     event CcyFundedLedger(uint256 ccyTypeId, address ledgerOwner, int256 amount);
 
@@ -19,25 +21,25 @@ contract CcyFundable is Owned, StLedger {
     public {
         require(msg.sender == owner, "Restricted method");
         require(_readOnly == false, "Contract is read only");
-        require(ccyTypeId >= 0 && ccyTypeId < _count_ccyTypes, "Invalid currency type");
+        require(ccyTypeId >= 0 && ccyTypeId < ccyTypesData._count_ccyTypes, "Invalid currency type");
         require(amount >= 0, "Invalid amount"); // allow funding zero (initializes empty ledger entry), disallow negative funding
 
         // we keep amount as signed value - ledger allows -ve balances (currently unused capability)
         //uint256 fundAmount = uint256(amount);
 
         // create ledger entry as required
-        if (_ledger[ledgerOwner].exists == false) {
-            _ledger[ledgerOwner] = Ledger({
+        if (ledgerData._ledger[ledgerOwner].exists == false) {
+            ledgerData._ledger[ledgerOwner] = LedgerLib.Ledger({
                   exists: true
             });
-            _ledgerOwners.push(ledgerOwner);
+            ledgerData._ledgerOwners.push(ledgerOwner);
         }
 
         // update ledger balance
-        _ledger[ledgerOwner].ccyType_balance[ccyTypeId] += amount;
+        ledgerData._ledger[ledgerOwner].ccyType_balance[ccyTypeId] += amount;
 
         // update global total funded
-        _ccyType_totalFunded[ccyTypeId] += uint256(amount);
+        ledgerData._ccyType_totalFunded[ccyTypeId] += uint256(amount);
 
         emit CcyFundedLedger(ccyTypeId, ledgerOwner, amount);
     }
@@ -47,6 +49,6 @@ contract CcyFundable is Owned, StLedger {
      */
     function getTotalCcyFunded(uint256 ccyTypeId) external view returns (uint256) {
         require(msg.sender == owner, "Restricted method");
-        return _ccyType_totalFunded[ccyTypeId];
+        return ledgerData._ccyType_totalFunded[ccyTypeId];
     }
 }

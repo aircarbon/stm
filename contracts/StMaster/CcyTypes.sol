@@ -3,25 +3,29 @@ pragma experimental ABIEncoderV2;
 
 import "./Owned.sol";
 
+import "../Lib/CcyLib.sol";
+import "../Lib/StructLib.sol";
+
 /**
   * Manages currency types
   */
 contract CcyTypes is Owned {
-    event AddedCcyType(uint256 id, string name, string unit);
+    //event AddedCcyType(uint256 id, string name, string unit);
 
     // *** CCY TYPES
-    struct Ccy {
-        uint256 id;
-        string  name; // e.g. "USD", "BTC"
-        string  unit; // e.g. "cents", "satoshi"
-    }
-    mapping(uint256 => Ccy) _ccyTypes; // typeId -> ccy
-    uint256 _count_ccyTypes;
-    struct GetCcyTypesReturn {
-        Ccy[] ccyTypes;
-    }
-
-    constructor() public {}
+    // struct Ccy {
+    //     uint256 id;
+    //     string  name; // e.g. "USD", "BTC"
+    //     string  unit; // e.g. "cents", "satoshi"
+    // }
+    // struct GetCcyTypesReturn {
+    //     Ccy[] ccyTypes;
+    // }
+    // struct CcyTypesStruct {
+    //     mapping(uint256 => CcyLib.Ccy) _ccyTypes; // typeId -> ccy
+    //     uint256 _count_ccyTypes;
+    // }
+    StructLib.CcyTypesStruct ccyTypesData;
 
     /**
      * @dev Adds a new currency type
@@ -32,39 +36,43 @@ contract CcyTypes is Owned {
         require(msg.sender == owner, "Restricted method");
         require(_readOnly == false, "Contract is read only");
 
-        for (uint256 ccyTypeId = 0; ccyTypeId < _count_ccyTypes; ccyTypeId++) {
-            require(keccak256(abi.encodePacked(_ccyTypes[ccyTypeId].name)) != keccak256(abi.encodePacked(name)),
-                    "Currency type name already exists");
-        }
+        CcyLib.addCcyType(ccyTypesData, name, unit);
 
-        _ccyTypes[_count_ccyTypes] = Ccy({
-              id: _count_ccyTypes,
-            name: name,
-            unit: unit
-        });
-        emit AddedCcyType(_count_ccyTypes, name, unit);
+        // for (uint256 ccyTypeId = 0; ccyTypeId < ccyTypesData._count_ccyTypes; ccyTypeId++) {
+        //     require(keccak256(abi.encodePacked(ccyTypesData._ccyTypes[ccyTypeId].name)) != keccak256(abi.encodePacked(name)),
+        //             "Currency type name already exists");
+        // }
 
-        _count_ccyTypes++;
+        // ccyTypesData._ccyTypes[ccyTypesData._count_ccyTypes] = CcyLib.Ccy({
+        //       id: ccyTypesData._count_ccyTypes,
+        //     name: name,
+        //     unit: unit
+        // });
+        // emit AddedCcyType(ccyTypesData._count_ccyTypes, name, unit);
+
+        // ccyTypesData._count_ccyTypes++;
     }
 
     /**
      * @dev Returns current currency types
      */
-    function getCcyTypes() external view returns (GetCcyTypesReturn memory) {
-        Ccy[] memory ccyTypes;
-        ccyTypes = new Ccy[](_count_ccyTypes);
+    function getCcyTypes() external view returns (StructLib.GetCcyTypesReturn memory) {
+        return CcyLib.getCcyTypes(ccyTypesData);
+        
+        // CcyLib.Ccy[] memory ccyTypes;
+        // ccyTypes = new CcyLib.Ccy[](ccyTypesData._count_ccyTypes);
 
-        for (uint256 ccyTypeId = 0; ccyTypeId < _count_ccyTypes; ccyTypeId++) {
-            ccyTypes[ccyTypeId] = Ccy({
-                    id: _ccyTypes[ccyTypeId].id,
-                  name: _ccyTypes[ccyTypeId].name,
-                  unit: _ccyTypes[ccyTypeId].unit
-            });
-        }
+        // for (uint256 ccyTypeId = 0; ccyTypeId < ccyTypesData._count_ccyTypes; ccyTypeId++) {
+        //     ccyTypes[ccyTypeId] = CcyLib.Ccy({
+        //             id: ccyTypesData._ccyTypes[ccyTypeId].id,
+        //           name: ccyTypesData._ccyTypes[ccyTypeId].name,
+        //           unit: ccyTypesData._ccyTypes[ccyTypeId].unit
+        //     });
+        // }
 
-        GetCcyTypesReturn memory ret = GetCcyTypesReturn({
-            ccyTypes: ccyTypes
-        });
-        return ret;
+        // CcyLib.GetCcyTypesReturn memory ret = CcyLib.GetCcyTypesReturn({
+        //     ccyTypes: ccyTypes
+        // });
+        // return ret;
     }
 }

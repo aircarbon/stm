@@ -5,9 +5,12 @@ import "./Owned.sol";
 import "./StTypes.sol";
 import "./CcyTypes.sol";
 
+import "../Lib/LedgerLib.sol";
+
 contract StLedger is Owned, StTypes, CcyTypes {
 
     // *** Batch LIST
+    /*
     mapping(uint256 => SecTokenBatch) _batches;                 // main batch list: all ST batches, by batch ID
     uint256 _batches_currentMax_id;                             // 1-based
     struct SecTokenBatch {
@@ -20,7 +23,7 @@ contract StLedger is Owned, StTypes, CcyTypes {
         string[] metaValues;                                    // metadata values
     }
 
-    // *** SecTokens LIST (slightly more gas effecient than mapping(uint/*SecTokenId*/ => St/*{struct}*/))
+    // *** SecTokens LIST (slightly more gas effecient than mapping(uint/ => struct))
     mapping(uint256 => uint256) _sts_batchId;
     mapping(uint256 => uint256) _sts_mintedQty;
     mapping(uint256 => uint256) _sts_currentQty;                // == 0 indicates fully burned, != _sts_mintedQty indicates partially burned
@@ -83,105 +86,111 @@ contract StLedger is Owned, StTypes, CcyTypes {
             uint256                tokens_sumQty;               // retained for caller convenience - v1
             LedgerCcyReturn[]      ccys;                        // currency balances
         }
+    */
 
-    
+    LedgerLib.LedgerStruct ledgerData;
 
     /**
      * @dev Returns all accounts in the ledger
      */
     function getLedgerOwners() external view returns (address[] memory) {
         require(msg.sender == owner, "Restricted method");
-        return _ledgerOwners;
+        return ledgerData._ledgerOwners;
     }
-    
+
     /**
      * @dev Returns an ST by ID
      */
-    function getSecToken(uint256 id) external view returns (SecTokenReturn memory) {
-        return SecTokenReturn({
-                exists: _sts_batchId[id] != 0,
+    function getSecToken(uint256 id) external view returns (LedgerLib.SecTokenReturn memory) {
+        return LedgerLib.SecTokenReturn({
+                exists: ledgerData._sts_batchId[id] != 0,
                     id: id,
-             mintedQty: _sts_mintedQty[id],
-            currentQty: _sts_currentQty[id],
-               batchId: _sts_batchId[id]
-     //mintedTimestamp: _sts_mintedTimestamp[id],
-        //splitFrom_id: _sts_splitFrom_id[id],
-          //splitTo_id: _sts_splitTo_id[id]
+             mintedQty: ledgerData._sts_mintedQty[id],
+            currentQty: ledgerData._sts_currentQty[id],
+               batchId: ledgerData._sts_batchId[id]
+     //mintedTimestamp: ledgerData._sts_mintedTimestamp[id],
+        //splitFrom_id: ledgerData._sts_splitFrom_id[id],
+          //splitTo_id: ledgerData._sts_splitTo_id[id]
             });
     }
 
     /**
      * @dev Returns the ledger entry for a single account
      */
-    function getLedgerEntry(address account) external view returns (LedgerReturn memory) {
-        LedgerSecTokenReturn[] memory tokens;
-        LedgerCcyReturn[] memory ccys;
+    function getLedgerEntry(address account) external view returns (LedgerLib.LedgerReturn memory) {
+        //
+        // TODO: move LedgerLib structs to StructLib...
+        //
+        //return LedgerLib.getLedgerEntry(ledgerData, account);
+
+        LedgerLib.LedgerSecTokenReturn[] memory tokens;
+        LedgerLib.LedgerCcyReturn[] memory ccys;
         uint256 tokens_sumQty = 0;
 
         // count total # of tokens across all types
         uint256 countAllSecTokens = 0;
-        for (uint256 tokenTypeId = 0; tokenTypeId < _count_tokenTypes; tokenTypeId++) {
-            countAllSecTokens += _ledger[account].tokenType_stIds[tokenTypeId].length;
+        for (uint256 tokenTypeId = 0; tokenTypeId < stTypesData._count_tokenTypes; tokenTypeId++) {
+            countAllSecTokens += ledgerData._ledger[account].tokenType_stIds[tokenTypeId].length;
         }
 
         // flatten ST IDs and sum sizes across types
-        tokens = new LedgerSecTokenReturn[](countAllSecTokens);
+        tokens = new LedgerLib.LedgerSecTokenReturn[](countAllSecTokens);
         uint256 flatSecTokenNdx = 0;
-        for (uint256 tokenTypeId = 0; tokenTypeId < _count_tokenTypes; tokenTypeId++) {
-            uint256[] memory tokenType_stIds = _ledger[account].tokenType_stIds[tokenTypeId];
+        for (uint256 tokenTypeId = 0; tokenTypeId < stTypesData._count_tokenTypes; tokenTypeId++) {
+            uint256[] memory tokenType_stIds = ledgerData._ledger[account].tokenType_stIds[tokenTypeId];
             for (uint256 ndx = 0; ndx < tokenType_stIds.length; ndx++) {
                 uint256 stId = tokenType_stIds[ndx];
 
                 // sum ST sizes - convenience for caller
-                tokens_sumQty += _sts_currentQty[stId];
+                tokens_sumQty += ledgerData._sts_currentQty[stId];
 
                 // STs by type
-                tokens[flatSecTokenNdx] = LedgerSecTokenReturn({
+                tokens[flatSecTokenNdx] = LedgerLib.LedgerSecTokenReturn({
                            stId: stId,
                     tokenTypeId: tokenTypeId,
-                  tokenTypeName: _tokenTypeNames[tokenTypeId],
-                        batchId: _sts_batchId[stId],
-                     currentQty: _sts_currentQty[stId]
-              //mintedTimestamp: _sts_mintedTimestamp[stId],
-                 //splitFrom_id: _sts_splitFrom_id[stId],
-                   //splitTo_id: _sts_splitTo_id[stId]
+                  tokenTypeName: stTypesData._tokenTypeNames[tokenTypeId],
+                        batchId: ledgerData._sts_batchId[stId],
+                     currentQty: ledgerData._sts_currentQty[stId]
+              //mintedTimestamp: ledgerData._sts_mintedTimestamp[stId],
+                 //splitFrom_id: ledgerData._sts_splitFrom_id[stId],
+                   //splitTo_id: ledgerData._sts_splitTo_id[stId]
                 });
                 flatSecTokenNdx++;
             }
         }
 
         // populate balances for each currency type
-        ccys = new LedgerCcyReturn[](_count_ccyTypes);
-        for (uint256 ccyTypeId = 0; ccyTypeId < _count_ccyTypes; ccyTypeId++) {
-            ccys[ccyTypeId] = LedgerCcyReturn({
+        ccys = new LedgerLib.LedgerCcyReturn[](ccyTypesData._count_ccyTypes);
+        for (uint256 ccyTypeId = 0; ccyTypeId < ccyTypesData._count_ccyTypes; ccyTypeId++) {
+            ccys[ccyTypeId] = LedgerLib.LedgerCcyReturn({
                    ccyTypeId: ccyTypeId,
-                        name: _ccyTypes[ccyTypeId].name,
-                        unit: _ccyTypes[ccyTypeId].unit,
-                     balance: _ledger[account].ccyType_balance[ccyTypeId]
+                        name: ccyTypesData._ccyTypes[ccyTypeId].name,
+                        unit: ccyTypesData._ccyTypes[ccyTypeId].unit,
+                     balance: ledgerData._ledger[account].ccyType_balance[ccyTypeId]
             });
         }
 
-        LedgerReturn memory ret = LedgerReturn({
-            exists: _ledger[account].exists,
+        LedgerLib.LedgerReturn memory ret = LedgerLib.LedgerReturn({
+            exists: ledgerData._ledger[account].exists,
             tokens: tokens,
      tokens_sumQty: tokens_sumQty,
               ccys: ccys
         });
         return ret;
     }
-    
+
     /**
      * @dev Returns the global ST batch count
      */
     function getSecTokenBatchCount() external view returns (uint256) {
-        return _batches_currentMax_id; // 1-based
+        return ledgerData._batches_currentMax_id; // 1-based
     }
 
     /**
      * @dev Returns an ST batch by ID
      */
-    function getSecTokenBatch(uint256 id) external view returns (SecTokenBatch memory) {
-        return _batches[id];
+    function getSecTokenBatch(uint256 id) external view returns (LedgerLib.SecTokenBatch memory) {
+        return ledgerData._batches[id];
     }
 
 
@@ -193,8 +202,8 @@ contract StLedger is Owned, StTypes, CcyTypes {
      */
     function sufficientTokens(address ledger, uint256 tokenTypeId, uint256 qty, uint256 fee) internal view returns (bool) {
         uint256 qtyAvailable = 0;
-        for (uint i = 0; i < _ledger[ledger].tokenType_stIds[tokenTypeId].length; i++) {
-            qtyAvailable += _sts_currentQty[_ledger[ledger].tokenType_stIds[tokenTypeId][i]];
+        for (uint i = 0; i < ledgerData._ledger[ledger].tokenType_stIds[tokenTypeId].length; i++) {
+            qtyAvailable += ledgerData._sts_currentQty[ledgerData._ledger[ledger].tokenType_stIds[tokenTypeId][i]];
         }
         return qtyAvailable >= qty + fee;
     }
@@ -206,6 +215,6 @@ contract StLedger is Owned, StTypes, CcyTypes {
      * @param amount Validation amount
      */
     function sufficientCcy(address ledger, uint256 ccyTypeId, int256 amount, int256 fee) internal view returns (bool) {
-        return _ledger[ledger].ccyType_balance[ccyTypeId] >= amount + fee;
+        return ledgerData._ledger[ledger].ccyType_balance[ccyTypeId] >= amount + fee;
     }
 }

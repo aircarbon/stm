@@ -38,7 +38,7 @@ contract StFees is Owned, StLedger {
     function setFee_SecTokenType_Fixed(uint256 tokenTypeId, uint256 fee_tokenQty_Fixed) public {
         require(msg.sender == owner, "Restricted method");
         require(_readOnly == false, "Contract is read only");
-        require(tokenTypeId >= 0 && tokenTypeId < _count_tokenTypes, "Invalid ST type");
+        require(tokenTypeId >= 0 && tokenTypeId < stTypesData._count_tokenTypes, "Invalid ST type");
         fee_tokenType_Fixed[tokenTypeId] = fee_tokenQty_Fixed;
         fee_tokenType_PercBips[tokenTypeId] = 0;
         emit SetFeeSecTokenTypeFixed(tokenTypeId, fee_tokenQty_Fixed);
@@ -48,7 +48,7 @@ contract StFees is Owned, StLedger {
     function setFee_CcyType_Fixed(uint256 ccyTypeId, uint256 fee_ccy_Fixed) public {
         require(msg.sender == owner, "Restricted method");
         require(_readOnly == false, "Contract is read only");
-        require(ccyTypeId >= 0 && ccyTypeId < _count_ccyTypes, "Invalid currency type");
+        require(ccyTypeId >= 0 && ccyTypeId < ccyTypesData._count_ccyTypes, "Invalid currency type");
         fee_ccyType_Fixed[ccyTypeId] = fee_ccy_Fixed;
         fee_ccyType_PercBips[ccyTypeId] = 0;
         emit SetFeeCcyTypeFixed(ccyTypeId, fee_ccy_Fixed);
@@ -59,7 +59,7 @@ contract StFees is Owned, StLedger {
     function setFee_SecTokenType_Perc(uint256 tokenTypeId, uint256 fee_token_PercBips) public {
         require(msg.sender == owner, "Restricted method");
         require(_readOnly == false, "Contract is read only");
-        require(tokenTypeId >= 0 && tokenTypeId < _count_tokenTypes, "Invalid ST type");
+        require(tokenTypeId >= 0 && tokenTypeId < stTypesData._count_tokenTypes, "Invalid ST type");
         require(fee_token_PercBips < 10000, "Invalid fee basis points");
         fee_tokenType_PercBips[tokenTypeId] = fee_token_PercBips;
         fee_tokenType_Fixed[tokenTypeId] = 0;
@@ -70,7 +70,7 @@ contract StFees is Owned, StLedger {
     function setFee_CcyType_PercBips(uint256 ccyTypeId, uint256 fee_ccy_PercBips) public {
         require(msg.sender == owner, "Restricted method");
         require(_readOnly == false, "Contract is read only");
-        require(ccyTypeId >= 0 && ccyTypeId < _count_ccyTypes, "Invalid currency type");
+        require(ccyTypeId >= 0 && ccyTypeId < ccyTypesData._count_ccyTypes, "Invalid currency type");
         require(fee_ccy_PercBips < 10000, "Invalid fee percentage");
         fee_ccyType_PercBips[ccyTypeId] = fee_ccy_PercBips;
         fee_ccyType_Fixed[ccyTypeId] = 0;
@@ -82,7 +82,7 @@ contract StFees is Owned, StLedger {
      */
     function getSecToken_totalFeesPaidQty() external view returns (uint256) {
         require(msg.sender == owner, "Restricted method");
-        return _tokens_totalFeesPaidQty;
+        return ledgerData._tokens_totalFeesPaidQty;
     }
 
     /**
@@ -90,6 +90,6 @@ contract StFees is Owned, StLedger {
      */
     function getCcy_totalFeesPaidAmount(uint256 ccyTypeId) external view returns (uint256) {
         require(msg.sender == owner, "Restricted method");
-        return _ccyType_totalFeesPaid[ccyTypeId];
+        return ledgerData._ccyType_totalFeesPaid[ccyTypeId];
     }
 }

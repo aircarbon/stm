@@ -19,16 +19,16 @@ contract CcyWithdrawable is Owned, StLedger {
     public {
         require(msg.sender == owner, "Restricted method");
         require(_readOnly == false, "Contract is read only");
-        require(ccyTypeId >= 0 && ccyTypeId < _count_ccyTypes, "Invalid currency type");
+        require(ccyTypeId >= 0 && ccyTypeId < ccyTypesData._count_ccyTypes, "Invalid currency type");
         require(amount > 0, "Minimum one currency unit required"); // disallow negative withdrawing
-        require(_ledger[ledgerOwner].exists == true, "Invalid ledger owner");
-        require(_ledger[ledgerOwner].ccyType_balance[ccyTypeId] >= amount, "Insufficient ledger owner balance");
+        require(ledgerData._ledger[ledgerOwner].exists == true, "Invalid ledger owner");
+        require(ledgerData._ledger[ledgerOwner].ccyType_balance[ccyTypeId] >= amount, "Insufficient ledger owner balance");
 
         // update ledger balance
-        _ledger[ledgerOwner].ccyType_balance[ccyTypeId] -= amount;
+        ledgerData._ledger[ledgerOwner].ccyType_balance[ccyTypeId] -= amount;
 
         // update global total withdrawn
-        _ccyType_totalWithdrawn[ccyTypeId] += uint256(amount);
+        ledgerData._ccyType_totalWithdrawn[ccyTypeId] += uint256(amount);
 
         emit CcyWithdrewLedger(ccyTypeId, ledgerOwner, amount);
     }
@@ -38,6 +38,6 @@ contract CcyWithdrawable is Owned, StLedger {
      */
     function getTotalCcyWithdrawn(uint256 ccyTypeId) external view returns (uint256) {
         require(msg.sender == owner, "Restricted method");
-        return _ccyType_totalWithdrawn[ccyTypeId];
+        return ledgerData._ccyType_totalWithdrawn[ccyTypeId];
     }
 }

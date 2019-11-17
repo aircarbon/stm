@@ -4,6 +4,8 @@ pragma experimental ABIEncoderV2;
 import "./Owned.sol";
 import "./StLedger.sol";
 
+import "../Lib/LedgerLib.sol";
+
 contract StMintable is Owned, StLedger {
     event MintedSecTokenBatch(uint256 batchId, uint256 tokenTypeId, address batchOwner, uint256 mintQty, uint256 mintSecTokenCount);
     event MintedSecToken(uint256 stId, uint256 batchId, uint256 tokenTypeId, address ledgerOwner, uint256 mintedQty);
@@ -28,7 +30,7 @@ contract StMintable is Owned, StLedger {
     public {
         require(msg.sender == owner, "Restricted method");
         require(_readOnly == false, "Contract is read only");
-        require(tokenTypeId >= 0 && tokenTypeId < _count_tokenTypes, "Invalid ST type");
+        require(tokenTypeId >= 0 && tokenTypeId < stTypesData._count_tokenTypes, "Invalid ST type");
         //require(mintSecTokenCount >= 1, "Minimum one ST required");
         require(mintSecTokenCount == 1, "Exactly one ST required");
         require(mintQty >= 1, "Minimum one mintQty required");
@@ -43,8 +45,8 @@ contract StMintable is Owned, StLedger {
         }*/
 
         // create new ST batch
-        SecTokenBatch memory newBatch = SecTokenBatch({
-                         id: _batches_currentMax_id + 1,
+        LedgerLib.SecTokenBatch memory newBatch = LedgerLib.SecTokenBatch({
+                         id: ledgerData._batches_currentMax_id + 1,
             mintedTimestamp: block.timestamp,
                 tokenTypeId: tokenTypeId,
                   mintedQty: uint256(mintQty),
@@ -52,42 +54,42 @@ contract StMintable is Owned, StLedger {
                    metaKeys: metaKeys,
                  metaValues: metaValues
         });
-        _batches[newBatch.id] = newBatch;
-        _batches_currentMax_id++;
+        ledgerData._batches[newBatch.id] = newBatch;
+        ledgerData._batches_currentMax_id++;
         emit MintedSecTokenBatch(newBatch.id, tokenTypeId, batchOwner, uint256(mintQty), uint256(mintSecTokenCount));
 
         // create ledger entry as required
-        if (_ledger[batchOwner].exists == false) {
-            _ledger[batchOwner] = Ledger({
+        if (ledgerData._ledger[batchOwner].exists == false) {
+            ledgerData._ledger[batchOwner] = LedgerLib.Ledger({
                   exists: true
             });
-            _ledgerOwners.push(batchOwner);
+            ledgerData._ledgerOwners.push(batchOwner);
         }
 
         // mint & assign STs
         for (int256 ndx = 0; ndx < mintSecTokenCount; ndx++) {
-            uint256 newId = _tokens_currentMax_id + 1 + uint256(ndx);
+            uint256 newId = ledgerData._tokens_currentMax_id + 1 + uint256(ndx);
 
             // mint ST
             uint256 stQty = uint256(mintQty) / uint256(mintSecTokenCount);
-            _sts_batchId[newId] = newBatch.id;
-            _sts_mintedQty[newId] = stQty;
-            _sts_currentQty[newId] = stQty;
-            //_sts_mintedTimestamp[newId] = block.timestamp;
+            ledgerData._sts_batchId[newId] = newBatch.id;
+            ledgerData._sts_mintedQty[newId] = stQty;
+            ledgerData._sts_currentQty[newId] = stQty;
+            //ledgerData._sts_mintedTimestamp[newId] = block.timestamp;
 
             emit MintedSecToken(newId, newBatch.id, tokenTypeId, batchOwner, stQty);
 
             // assign
-            _ledger[batchOwner].tokenType_stIds[tokenTypeId].push(newId);
+            ledgerData._ledger[batchOwner].tokenType_stIds[tokenTypeId].push(newId);
 
             // maintain fast ST ownership lookup - by keccak256(ledgerOwner||stId)
             // not currently used (was used when burning by stId)
-            //_ownsSecTokenId[keccak256(abi.encodePacked(batchOwner, newId))] = true;
+            //ledgerData._ownsSecTokenId[keccak256(abi.encodePacked(batchOwner, newId))] = true;
         }
-        //_ledger[batchOwner].tokenType_sumQty[tokenTypeId] += uint256(mintQty);
+        //ledgerData._ledger[batchOwner].tokenType_sumQty[tokenTypeId] += uint256(mintQty);
 
-        _tokens_currentMax_id += uint256(mintSecTokenCount);
-        _tokens_totalMintedQty += uint256(mintQty);
+        ledgerData._tokens_currentMax_id += uint256(mintSecTokenCount);
+        ledgerData._tokens_totalMintedQty += uint256(mintQty);
     }
 
     /**
@@ -95,7 +97,7 @@ contract StMintable is Owned, StLedger {
      */
     function getSecToken_countMinted() external view returns (uint256) {
         require(msg.sender == owner, "Restricted method");
-        return _tokens_currentMax_id; // 1-based
+        return ledgerData._tokens_currentMax_id; // 1-based
     }
 
     /**
@@ -103,6 +105,6 @@ contract StMintable is Owned, StLedger {
      */
     function getSecToken_totalMintedQty() external view returns (uint256) {
         require(msg.sender == owner, "Restricted method");
-        return _tokens_totalMintedQty;
+        return ledgerData._tokens_totalMintedQty;
     }
 }
