@@ -1,4 +1,4 @@
-const st = artifacts.require("AcMaster");
+const st = artifacts.require("StMaster");
 const db = require('../db.js');
 
 contract("StMaster", accounts => {

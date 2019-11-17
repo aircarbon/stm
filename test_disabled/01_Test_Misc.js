@@ -17,7 +17,7 @@ contract("StMaster", accounts => {
         console.log('call st2', await stm.call_st2.call());
     });
 
-    it('setup - contract owner should have default ledger entry', async () => {
+    /*it('setup - contract owner should have default ledger entry', async () => {
         const ownerLedgerEntry = await stm.getLedgerEntry(accounts[0]);
         assert(ownerLedgerEntry.exists == true, 'contract owner missing ledger entry');
     });
@@ -29,5 +29,5 @@ contract("StMaster", accounts => {
             return;
         }
         assert.fail('expected restriction exception');
-    });
+    });*/
 });

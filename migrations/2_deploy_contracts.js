@@ -14,8 +14,11 @@ module.exports = async function (deployer) {
     // St2x
     deployer.deploy(St2x).then(async st2x => {
 
+        deployer.link(St2x, StMaster);
+
         // StMaster
         return deployer.deploy(StMaster, st2x.address).then(async stm => {
+            
             //console.dir(stm.abi);
             //console.dir(deployer);
 

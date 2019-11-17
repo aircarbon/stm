@@ -1,4 +1,4 @@
-const st = artifacts.require("AcMaster");
+const st = artifacts.require("StMaster");
 const CONST = require('../const.js');
 
 contract("StMaster", accounts => {
@@ -15,6 +15,24 @@ contract("StMaster", accounts => {
         console.dir(accounts);
     })
 
+    , it("public accessors - should work", async () => {
+        let networkID = process.env.NETWORK;
+        console.log('net_version: ', networkID);
+        
+        var Web3 = require('web3');
+        const acmJson = require('../build/contracts/StMaster.json');
+        const abi = acmJson['abi'];
+
+        var address = stm.address;
+        var account = "0xf57B0adC78461888BF32d5FB92784CF3FC8f9956"; // owner
+        var privateKey = "0CF8F198ACE6D2D92A2C1CD7F3FC9B42E2AF3B7FD7E64371922CB73A81493C1A"; // owner privkey
+        const web3 = new Web3('http://127.0.0.1:8545');
+
+        const nonce = await web3.eth.getTransactionCount(account, "pending");
+        var contract = new web3.eth.Contract(abi, address);
+        console.log(await contract.methods.name.call());
+    });
+
     // leave for now -- do properly in API layer, and measure there
     /*, it("speed - should allow fast return of txid (rinkeby_infura)", async () => {
         let networkID = process.env.NETWORK;
@@ -26,7 +44,7 @@ contract("StMaster", accounts => {
         }
         
         var Web3 = require('web3');
-        const acmJson = require('../build/contracts/AcMaster.json');
+        const acmJson = require('../build/contracts/StMaster.json');
         const abi = acmJson['abi'];
 
         // LAB -- pure web3: sendRawTransaction (fast tx id) via Rinkeby Infura

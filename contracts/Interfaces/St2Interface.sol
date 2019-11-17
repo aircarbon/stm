@@ -2,9 +2,14 @@ pragma solidity 0.5.8;
 
 // abstract contract (not interface)
 contract St2Interface {
-    function set_batch_id1(mapping(uint256 => SecTokenBatch) storage _batches) internal; // ### not useful for referencing!
+    function set_batch_id1(mapping(uint256 => SecTokenBatch) storage _batches) internal; // ###
 
-    function name2() external pure returns (string memory);
+    function name2() public pure returns (string memory);
+
+    // function test(Test calldata test) external;
+    // struct Test {
+    //     mapping(uint256 => string) testMapping;
+    // }
 
     struct SecTokenBatch {
         uint256 id;                                             // global sequential id: 1-based

@@ -9,20 +9,20 @@ library St2x /*is St2Interface*/ {
         return "St2x Lives";
     }
 
-    // struct SecTokenBatch {
-    //     uint256 id;                                             // global sequential id: 1-based
-    //     uint256 mintedTimestamp;                                // minting block.timestamp
-    //     uint256 tokenTypeId;                                    // token type of the batch
-    //     uint256 mintedQty;                                      // total unit qty minted in the batch
-    //     uint256 burnedQty;                                      // total unit qty burned from the batch
-    //     // string[] metaKeys;                                      // metadata keys
-    //     // string[] metaValues;                                    // metadata values
-    // }
+    struct SecTokenBatch {
+        uint256 id;                                             // global sequential id: 1-based
+        uint256 mintedTimestamp;                                // minting block.timestamp
+        uint256 tokenTypeId;                                    // token type of the batch
+        uint256 mintedQty;                                      // total unit qty minted in the batch
+        uint256 burnedQty;                                      // total unit qty burned from the batch
+        // string[] metaKeys;                                      // metadata keys
+        // string[] metaValues;                                    // metadata values
+    }
 
     // ### problem is visibility of param mapping() functions on abstract contract (can't be public!)
     // *** Batch LIST
-    function set_batch_id1(mapping(uint256 => St2Interface.SecTokenBatch) storage _batches) external {
-        St2Interface.SecTokenBatch memory newBatch = St2Interface.SecTokenBatch({
+    function set_batch_id1(mapping(uint256 => SecTokenBatch) storage _batches) external {
+        SecTokenBatch memory newBatch = SecTokenBatch({
                          id: 42,
             mintedTimestamp: block.timestamp,
                 tokenTypeId: 9999,

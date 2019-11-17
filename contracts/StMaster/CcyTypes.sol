@@ -4,11 +4,10 @@ pragma experimental ABIEncoderV2;
 import "./Owned.sol";
 
 /**
-  * Manages currency types used by AcMaster
+  * Manages currency types
   */
 contract CcyTypes is Owned {
     event AddedCcyType(uint256 id, string name, string unit);
-
 
     // *** CCY TYPES
     struct Ccy {
