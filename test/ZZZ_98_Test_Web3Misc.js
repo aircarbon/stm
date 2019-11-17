@@ -12,7 +12,7 @@ contract("StMaster", accounts => {
         const Web3 = require('web3');
         const web3 = new Web3('http://127.0.0.1:8545'); // ganache
         const accounts = await web3.eth.getAccounts();
-        console.dir(accounts);
+        //console.dir(accounts);
     })
 
     , it("public accessors - should work", async () => {
@@ -30,7 +30,7 @@ contract("StMaster", accounts => {
 
         const nonce = await web3.eth.getTransactionCount(account, "pending");
         var contract = new web3.eth.Contract(abi, address);
-        console.log(await contract.methods.name.call());
+        assert(await contract.methods.name.call() == 'SecTok_Master', 'fail');
     });
 
     // leave for now -- do properly in API layer, and measure there
