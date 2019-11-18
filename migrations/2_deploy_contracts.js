@@ -3,8 +3,13 @@ const publicIp = require('public-ip');
 //const St2x = artifacts.require('./St2x.sol');
 const CcyLib = artifacts.require('./CcyLib.sol');
 const StLib = artifacts.require('./StLib.sol');
+const LedgerLib = artifacts.require('./LedgerLib.sol');
 const StructLib = artifacts.require('./StructLib.sol');
+
+const StMintable = artifacts.require('./StMintable.sol');
+const StLedger = artifacts.require('./StLedger.sol');
 const StMaster = artifacts.require('./StMaster.sol');
+
 const { db } = require('../../common/dist');
 
 module.exports = async function (deployer) {
@@ -18,11 +23,20 @@ module.exports = async function (deployer) {
         //deployer.link(St2x, StMaster);
 
     deployer.deploy(StructLib).then(async ccyLib => { 
-        deployer.link(StructLib, StMaster);
         deployer.link(StructLib, CcyLib);
         deployer.link(StructLib, StLib);
-    return deployer.deploy(CcyLib).then(async ccyLib => { deployer.link(CcyLib, StMaster);
-    return deployer.deploy(StLib).then(async stLib => { deployer.link(StLib, StMaster);
+        deployer.link(StructLib, LedgerLib);
+
+        deployer.link(StructLib, StMaster);
+
+    return deployer.deploy(LedgerLib).then(async ccyLib => { 
+        deployer.link(LedgerLib, StMaster);
+
+    return deployer.deploy(CcyLib).then(async ccyLib => {
+        deployer.link(CcyLib, StMaster);
+
+    return deployer.deploy(StLib).then(async stLib => { 
+        deployer.link(StLib, StMaster);
 
         // StMaster
         return deployer.deploy(StMaster/*, st2x.address*/).then(async stm => {
@@ -50,6 +64,7 @@ module.exports = async function (deployer) {
     
     }).catch(err => { console.error('failed deployment: StLib', err); });
     }).catch(err => { console.error('failed deployment: CcyLib', err); });
+    }).catch(err => { console.error('failed deployment: LedgerLib', err); });
     }).catch(err => { console.error('failed deployment: StructLib', err); });
 
 };

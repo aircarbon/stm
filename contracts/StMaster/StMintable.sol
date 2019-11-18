@@ -5,11 +5,11 @@ import "./Owned.sol";
 import "./StLedger.sol";
 
 import "../Lib/LedgerLib.sol";
+import "../Lib/StructLib.sol";
 
 contract StMintable is Owned, StLedger {
     event MintedSecTokenBatch(uint256 batchId, uint256 tokenTypeId, address batchOwner, uint256 mintQty, uint256 mintSecTokenCount);
     event MintedSecToken(uint256 stId, uint256 batchId, uint256 tokenTypeId, address ledgerOwner, uint256 mintedQty);
-
 
     /**
      * @dev Mints and assigns ownership of a new ST batch
@@ -20,6 +20,7 @@ contract StMintable is Owned, StLedger {
      * @param metaKeys Batch metadata keys
      * @param metaValues Batch metadata values
      */
+    //LedgerLib.mintSecTokenBatchArgs testA;
     function mintSecTokenBatch(
         uint256 tokenTypeId,
         int256  mintQty,
@@ -35,17 +36,30 @@ contract StMintable is Owned, StLedger {
         require(mintSecTokenCount == 1, "Exactly one ST required");
         require(mintQty >= 1, "Minimum one mintQty required");
         require(mintQty % mintSecTokenCount == 0, "mintQty must divide evenly into mintSecTokenCount");
-        
-        // ### string[] param lengths are reported as zero!
-        /*require(metaKeys.length == 0, "At least one metadata key must be provided");
-        require(metaKeys.length <= 42, "Maximum metadata KVP length is 42");
-        require(metaKeys.length != metaValues.length, "Metadata keys/values length mismatch");
-        for (uint i = 0; i < metaKeys.length; i++) {
-            require(bytes(metaKeys[i]).length == 0 || bytes(metaValues[i]).length == 0, "Zero-length metadata key or value supplied");
-        }*/
 
+        // ### string[] param lengths are reported as zero!
+        // require(metaKeys.length == 0, "At least one metadata key must be provided");
+        // require(metaKeys.length <= 42, "Maximum metadata KVP length is 42");
+        // require(metaKeys.length != metaValues.length, "Metadata keys/values length mismatch");
+        // for (uint i = 0; i < metaKeys.length; i++) {
+        //     require(bytes(metaKeys[i]).length == 0 || bytes(metaValues[i]).length == 0, "Zero-length metadata key or value supplied");
+        // }
+
+        // with this: 562 - identical to inlined! (without any: 533)
+        // testA = LedgerLib.mintSecTokenBatchArgs({
+        //     ledgerData: ledgerData,
+        //     tokenTypeId: tokenTypeId,
+        //     mintQty: mintQty,
+        //     mintSecTokenCount: mintSecTokenCount,
+        //     batchOwner: batchOwner,
+        //     metaKeys: metaKeys,
+        //     metaValues: metaValues
+        // });
+        // LedgerLib.mintSecTokenBatch(testA);
+
+        // 562
         // create new ST batch
-        LedgerLib.SecTokenBatch memory newBatch = LedgerLib.SecTokenBatch({
+        StructLib.SecTokenBatch memory newBatch = StructLib.SecTokenBatch({
                          id: ledgerData._batches_currentMax_id + 1,
             mintedTimestamp: block.timestamp,
                 tokenTypeId: tokenTypeId,
@@ -60,7 +74,7 @@ contract StMintable is Owned, StLedger {
 
         // create ledger entry as required
         if (ledgerData._ledger[batchOwner].exists == false) {
-            ledgerData._ledger[batchOwner] = LedgerLib.Ledger({
+            ledgerData._ledger[batchOwner] = StructLib.Ledger({
                   exists: true
             });
             ledgerData._ledgerOwners.push(batchOwner);

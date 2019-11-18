@@ -5,6 +5,7 @@ import "./Owned.sol";
 import "./StLedger.sol";
 
 import "../Lib/LedgerLib.sol";
+import "../Lib/StructLib.sol";
 
 contract CcyFundable is Owned, StLedger {
     event CcyFundedLedger(uint256 ccyTypeId, address ledgerOwner, int256 amount);
@@ -29,7 +30,7 @@ contract CcyFundable is Owned, StLedger {
 
         // create ledger entry as required
         if (ledgerData._ledger[ledgerOwner].exists == false) {
-            ledgerData._ledger[ledgerOwner] = LedgerLib.Ledger({
+            ledgerData._ledger[ledgerOwner] = StructLib.Ledger({
                   exists: true
             });
             ledgerData._ledgerOwners.push(ledgerOwner);

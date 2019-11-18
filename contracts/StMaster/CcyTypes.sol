@@ -12,19 +12,6 @@ import "../Lib/StructLib.sol";
 contract CcyTypes is Owned {
     //event AddedCcyType(uint256 id, string name, string unit);
 
-    // *** CCY TYPES
-    // struct Ccy {
-    //     uint256 id;
-    //     string  name; // e.g. "USD", "BTC"
-    //     string  unit; // e.g. "cents", "satoshi"
-    // }
-    // struct GetCcyTypesReturn {
-    //     Ccy[] ccyTypes;
-    // }
-    // struct CcyTypesStruct {
-    //     mapping(uint256 => CcyLib.Ccy) _ccyTypes; // typeId -> ccy
-    //     uint256 _count_ccyTypes;
-    // }
     StructLib.CcyTypesStruct ccyTypesData;
 
     /**

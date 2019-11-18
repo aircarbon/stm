@@ -130,7 +130,7 @@ module.exports = {
     timeout: 0,
     enableTimeouts: false,
     reporter: 'eth-gas-reporter',
-    reportOptions: {
+    reporterOptions: {
       currency: 'usd',
       gasPrice: 20,
     }
