@@ -4,8 +4,8 @@ pragma experimental ABIEncoderV2;
 import "./Owned.sol";
 import "./StLedger.sol";
 
-import "../Lib/LedgerLib.sol";
-import "../Lib/StructLib.sol";
+import "../Libs/LedgerLib.sol";
+import "../Libs/StructLib.sol";
 
 contract StMintable is Owned, StLedger {
     event MintedSecTokenBatch(uint256 batchId, uint256 tokenTypeId, address batchOwner, uint256 mintQty, uint256 mintSecTokenCount);

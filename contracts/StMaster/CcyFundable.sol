@@ -4,8 +4,8 @@ pragma experimental ABIEncoderV2;
 import "./Owned.sol";
 import "./StLedger.sol";
 
-import "../Lib/LedgerLib.sol";
-import "../Lib/StructLib.sol";
+import "../Libs/LedgerLib.sol";
+import "../Libs/StructLib.sol";
 
 contract CcyFundable is Owned, StLedger {
     event CcyFundedLedger(uint256 ccyTypeId, address ledgerOwner, int256 amount);

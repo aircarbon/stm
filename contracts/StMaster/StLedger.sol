@@ -5,8 +5,8 @@ import "./Owned.sol";
 import "./StTypes.sol";
 import "./CcyTypes.sol";
 
-import "../Lib/LedgerLib.sol";
-import "../Lib/StructLib.sol";
+import "../Libs/LedgerLib.sol";
+import "../Libs/StructLib.sol";
 
 contract StLedger is Owned, StTypes, CcyTypes {
 

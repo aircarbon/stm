@@ -3,8 +3,8 @@ pragma experimental ABIEncoderV2;
 
 import "./Owned.sol";
 
-import "../Lib/StLib.sol";
-import "../Lib/StructLib.sol";
+import "../Libs/StLib.sol";
+import "../Libs/StructLib.sol";
 
 /**
   * Manages ST types

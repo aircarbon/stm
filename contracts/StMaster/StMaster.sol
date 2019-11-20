@@ -8,9 +8,9 @@ import "./CcyWithdrawable.sol";
 import "./StTransferable.sol";
 
 //import "../St2x/St2x.sol"; // bytecode of lib gets *removed* during LINKING (solc/truffle migrate)
-import "../Lib/CcyLib.sol";
-import "../Lib/LedgerLib.sol";
-import "../Lib/StructLib.sol";
+import "../Libs/CcyLib.sol";
+import "../Libs/LedgerLib.sol";
+import "../Libs/StructLib.sol";
 
 contract StMaster is StMintable, StBurnable, CcyFundable, CcyWithdrawable, StTransferable {
 
