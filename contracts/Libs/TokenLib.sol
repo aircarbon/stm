@@ -3,22 +3,10 @@ pragma experimental ABIEncoderV2;
 
 import "./StructLib.sol";
 
-library StLib {
+library TokenLib {
     event AddedSecTokenType(uint256 id, string name);
 
-    // struct SecTokenTypeReturn {
-    //     uint256 id;
-    //     string  name;
-    // }
-    // struct GetSecTokenTypesReturn {
-    //     SecTokenTypeReturn[] tokenTypes;
-    // }
-
-    // struct StTypesStruct {
-    //     mapping(uint256 => string) _tokenTypeNames; // typeId -> typeName
-    //     uint256 _count_tokenTypes;
-    // }
-
+    // TOKEN TYYPES
     function addSecTokenType(StructLib.StTypesStruct storage data, string memory name) public {
         for (uint256 tokenTypeId = 0; tokenTypeId < data._count_tokenTypes; tokenTypeId++) {
             require(keccak256(abi.encodePacked(data._tokenTypeNames[tokenTypeId])) != keccak256(abi.encodePacked(name)),
@@ -47,4 +35,6 @@ library StLib {
         });
         return ret;
     }
+
+    // TODO: mint/burn ...
 }

@@ -19,6 +19,7 @@ contract CcyWithdrawable is Owned, StLedger {
     public {
         require(msg.sender == owner, "Restricted method");
         require(_readOnly == false, "Contract is read only");
+        
         require(ccyTypeId >= 0 && ccyTypeId < ccyTypesData._count_ccyTypes, "Invalid currency type");
         require(amount > 0, "Minimum one currency unit required"); // disallow negative withdrawing
         require(ledgerData._ledger[ledgerOwner].exists == true, "Invalid ledger owner");

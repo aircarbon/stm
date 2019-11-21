@@ -4,7 +4,7 @@ const publicIp = require('public-ip');
 //const St2x = artifacts.require('./St2x.sol');
 const StructLib = artifacts.require('./StructLib.sol');
 const CcyLib = artifacts.require('./CcyLib.sol');
-const StLib = artifacts.require('./StLib.sol');
+const TokenLib = artifacts.require('./TokenLib.sol');
 const LedgerLib = artifacts.require('./LedgerLib.sol');
 const TransferLib = artifacts.require('./TransferLib.sol');
 
@@ -26,7 +26,7 @@ module.exports = async function (deployer) {
 
     deployer.deploy(StructLib).then(async ccyLib => { 
         deployer.link(StructLib, CcyLib);
-        deployer.link(StructLib, StLib);
+        deployer.link(StructLib, TokenLib);
         deployer.link(StructLib, LedgerLib);
         deployer.link(StructLib, TransferLib);
 
@@ -38,8 +38,8 @@ module.exports = async function (deployer) {
     return deployer.deploy(CcyLib).then(async ccyLib => {
         deployer.link(CcyLib, StMaster);
 
-    return deployer.deploy(StLib).then(async stLib => { 
-        deployer.link(StLib, StMaster);
+    return deployer.deploy(TokenLib).then(async tokenLib => { 
+        deployer.link(TokenLib, StMaster);
 
     return deployer.deploy(TransferLib).then(async transferLib => { 
         deployer.link(TransferLib, StMaster);

@@ -22,6 +22,7 @@ contract CcyFundable is Owned, StLedger {
     public {
         require(msg.sender == owner, "Restricted method");
         require(_readOnly == false, "Contract is read only");
+        
         require(ccyTypeId >= 0 && ccyTypeId < ccyTypesData._count_ccyTypes, "Invalid currency type");
         require(amount >= 0, "Invalid amount"); // allow funding zero (initializes empty ledger entry), disallow negative funding
 

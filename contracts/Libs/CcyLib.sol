@@ -6,21 +6,7 @@ import "./StructLib.sol";
 library CcyLib {
     event AddedCcyType(uint256 id, string name, string unit);
 
-    // struct Ccy {
-    //     uint256 id;
-    //     string  name; // e.g. "USD", "BTC"
-    //     string  unit; // e.g. "cents", "satoshi"
-    // }
-
-    // struct GetCcyTypesReturn {
-    //     Ccy[] ccyTypes;
-    // }
-
-    // struct CcyTypesStruct {
-    //     mapping(uint256 => Ccy) _ccyTypes; // typeId -> ccy
-    //     uint256 _count_ccyTypes;
-    // }
-
+    // CCY TYPES
     function addCcyType(StructLib.CcyTypesStruct storage data, string memory name, string memory unit) public {
         for (uint256 ccyTypeId = 0; ccyTypeId < data._count_ccyTypes; ccyTypeId++) {
             require(keccak256(abi.encodePacked(data._ccyTypes[ccyTypeId].name)) != keccak256(abi.encodePacked(name)),
@@ -54,5 +40,7 @@ library CcyLib {
         });
         return ret;
     }
+
+    // TODO: fund/withdraw ...
 }
 
