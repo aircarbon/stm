@@ -1,13 +1,15 @@
 const os = require('os');
 const publicIp = require('public-ip');
+
 //const St2x = artifacts.require('./St2x.sol');
+const StructLib = artifacts.require('./StructLib.sol');
 const CcyLib = artifacts.require('./CcyLib.sol');
 const StLib = artifacts.require('./StLib.sol');
 const LedgerLib = artifacts.require('./LedgerLib.sol');
-const StructLib = artifacts.require('./StructLib.sol');
+const TransferLib = artifacts.require('./TransferLib.sol');
 
-const StMintable = artifacts.require('./StMintable.sol');
-const StLedger = artifacts.require('./StLedger.sol');
+//const StMintable = artifacts.require('./StMintable.sol');
+//const StLedger = artifacts.require('./StLedger.sol');
 const StMaster = artifacts.require('./StMaster.sol');
 
 const { db } = require('../../common/dist');
@@ -26,6 +28,7 @@ module.exports = async function (deployer) {
         deployer.link(StructLib, CcyLib);
         deployer.link(StructLib, StLib);
         deployer.link(StructLib, LedgerLib);
+        deployer.link(StructLib, TransferLib);
 
         deployer.link(StructLib, StMaster);
 
@@ -38,6 +41,9 @@ module.exports = async function (deployer) {
     return deployer.deploy(StLib).then(async stLib => { 
         deployer.link(StLib, StMaster);
 
+    return deployer.deploy(TransferLib).then(async transferLib => { 
+        deployer.link(TransferLib, StMaster);
+    
         // StMaster
         return deployer.deploy(StMaster/*, st2x.address*/).then(async stm => {
             
@@ -62,6 +68,7 @@ module.exports = async function (deployer) {
             }
         }).catch(err => { console.error('failed deployment: StMaster', err); });
     
+    }).catch(err => { console.error('failed deployment: TransferLib', err); });
     }).catch(err => { console.error('failed deployment: StLib', err); });
     }).catch(err => { console.error('failed deployment: CcyLib', err); });
     }).catch(err => { console.error('failed deployment: LedgerLib', err); });

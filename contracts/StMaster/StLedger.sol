@@ -115,27 +115,27 @@ contract StLedger is Owned, StTypes, CcyTypes {
     }
 
 
-    /**
-     * @dev Checks if the supplied ledger owner holds at least the specified quantity of supplied ST type
-     * @param ledger Ledger owner
-     * @param tokenTypeId ST type
-     * @param qty Validation quantity in contract base unit
-     */
-    function sufficientTokens(address ledger, uint256 tokenTypeId, uint256 qty, uint256 fee) internal view returns (bool) {
-        uint256 qtyAvailable = 0;
-        for (uint i = 0; i < ledgerData._ledger[ledger].tokenType_stIds[tokenTypeId].length; i++) {
-            qtyAvailable += ledgerData._sts_currentQty[ledgerData._ledger[ledger].tokenType_stIds[tokenTypeId][i]];
-        }
-        return qtyAvailable >= qty + fee;
-    }
+    // /**
+    //  * @dev Checks if the supplied ledger owner holds at least the specified quantity of supplied ST type
+    //  * @param ledger Ledger owner
+    //  * @param tokenTypeId ST type
+    //  * @param qty Validation quantity in contract base unit
+    //  */
+    // function sufficientTokens(address ledger, uint256 tokenTypeId, uint256 qty, uint256 fee) internal view returns (bool) {
+    //     uint256 qtyAvailable = 0;
+    //     for (uint i = 0; i < ledgerData._ledger[ledger].tokenType_stIds[tokenTypeId].length; i++) {
+    //         qtyAvailable += ledgerData._sts_currentQty[ledgerData._ledger[ledger].tokenType_stIds[tokenTypeId][i]];
+    //     }
+    //     return qtyAvailable >= qty + fee;
+    // }
 
-    /**
-     * @dev Checks if the supplied ledger owner holds at least the specified amount of supplied currency type
-     * @param ledger Ledger owner
-     * @param ccyTypeId currency type
-     * @param amount Validation amount
-     */
-    function sufficientCcy(address ledger, uint256 ccyTypeId, int256 amount, int256 fee) internal view returns (bool) {
-        return ledgerData._ledger[ledger].ccyType_balance[ccyTypeId] >= amount + fee;
-    }
+    // /**
+    //  * @dev Checks if the supplied ledger owner holds at least the specified amount of supplied currency type
+    //  * @param ledger Ledger owner
+    //  * @param ccyTypeId currency type
+    //  * @param amount Validation amount
+    //  */
+    // function sufficientCcy(address ledger, uint256 ccyTypeId, int256 amount, int256 fee) internal view returns (bool) {
+    //     return ledgerData._ledger[ledger].ccyType_balance[ccyTypeId] >= amount + fee;
+    // }
 }

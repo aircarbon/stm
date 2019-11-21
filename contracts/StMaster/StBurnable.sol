@@ -4,6 +4,8 @@ pragma experimental ABIEncoderV2;
 import "./Owned.sol";
 import "./StLedger.sol";
 
+import "../Libs/StructLib.sol";
+
 contract StBurnable is Owned, StLedger {
     event BurnedFullSecToken(uint256 stId, uint256 tokenTypeId, address ledgerOwner, uint256 burnedQty);
     event BurnedPartialSecToken(uint256 stId, uint256 tokenTypeId, address ledgerOwner, uint256 burnedQty);
@@ -24,7 +26,7 @@ contract StBurnable is Owned, StLedger {
         require(tokenTypeId >= 0 && tokenTypeId < stTypesData._count_tokenTypes, "Invalid ST type");
 
         // check ledger owner has sufficient carbon tonnage of supplied type
-        require(sufficientTokens(ledgerOwner, tokenTypeId, uint256(burnQty), 0) == true, "Insufficient carbon held by ledger owner");
+        require(StructLib.sufficientTokens(ledgerData, ledgerOwner, tokenTypeId, uint256(burnQty), 0) == true, "Insufficient carbon held by ledger owner");
         // uint256 kgAvailable = 0;
         // for (uint i = 0; i < ledgerData._ledger[ledgerOwner].tokenType_stIds[tokenTypeId].length; i++) {
         //     kgAvailable += ledgerData._sts_currentQty[ledgerData._ledger[ledgerOwner].tokenType_stIds[tokenTypeId][i]];

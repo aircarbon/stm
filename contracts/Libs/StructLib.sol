@@ -110,4 +110,44 @@ library StructLib {
         mapping(uint256 => uint256) _ccyType_totalTransfered;
         mapping(uint256 => uint256) _ccyType_totalFeesPaid;
     }
+
+    // FEE TYPES
+    struct FeeStruct {
+        mapping(uint256 => uint256) fee_tokenType_Fixed; // fixed token qty fee per transfer
+        mapping(uint256 => uint256) fee_ccyType_Fixed; // fixed currency fee per transfer
+
+        mapping(uint256 => uint256) fee_tokenType_PercBips; // bips (0-10000) token qty fee per transfer
+        mapping(uint256 => uint256) fee_ccyType_PercBips; // bips (0-10000) currency fee per transfer
+    }
+
+    /**
+     * @dev Checks if the supplied ledger owner holds at least the specified quantity of supplied ST type
+     * @param ledger Ledger owner
+     * @param tokenTypeId ST type
+     * @param qty Validation quantity in contract base unit
+     */
+    function sufficientTokens(
+        StructLib.LedgerStruct storage ledgerData,
+        address ledger, uint256 tokenTypeId, uint256 qty, uint256 fee
+    ) public view returns (bool) {
+        uint256 qtyAvailable = 0;
+        for (uint i = 0; i < ledgerData._ledger[ledger].tokenType_stIds[tokenTypeId].length; i++) {
+            qtyAvailable += ledgerData._sts_currentQty[ledgerData._ledger[ledger].tokenType_stIds[tokenTypeId][i]];
+        }
+        return qtyAvailable >= qty + fee;
+    }
+
+    /**
+     * @dev Checks if the supplied ledger owner holds at least the specified amount of supplied currency type
+     * @param ledger Ledger owner
+     * @param ccyTypeId currency type
+     * @param amount Validation amount
+     */
+    function sufficientCcy(
+        StructLib.LedgerStruct storage ledgerData,
+        address ledger, uint256 ccyTypeId, int256 amount, int256 fee
+    ) public view returns (bool) {
+        return ledgerData._ledger[ledger].ccyType_balance[ccyTypeId] >= amount + fee;
+    }
+
 }
