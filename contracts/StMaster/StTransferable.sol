@@ -10,7 +10,7 @@ contract StTransferable is Owned, StLedger, StFees {
     event TransferedFullSecToken(address from, address to, uint256 stId, uint256 mergedToSecTokenId, /*uint256 tokenTypeId,*/ uint256 qty, bool isFee);
     event TransferedPartialSecToken(address from, address to, uint256 splitFromSecTokenId, uint256 newSecTokenId, uint256 mergedToSecTokenId, /*uint256 tokenTypeId,*/ uint256 qty, bool isFee);
 
-  
+
     /**
      * @dev Transfers or trades assets between ledger accounts
      * @dev allows: one-sided transfers, transfers of same asset types, and transfers (trades) of different asset types
