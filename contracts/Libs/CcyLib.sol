@@ -5,33 +5,41 @@ import "./StructLib.sol";
 
 library CcyLib {
     event AddedCcyType(uint256 id, string name, string unit);
-
+    event CcyFundedLedger(uint256 ccyTypeId, address ledgerOwner, int256 amount);
+    event CcyWithdrewLedger(uint256 ccyTypeId, address ledgerOwner, int256 amount);
+    
     // CCY TYPES
-    function addCcyType(StructLib.CcyTypesStruct storage data, string memory name, string memory unit) public {
-        for (uint256 ccyTypeId = 0; ccyTypeId < data._count_ccyTypes; ccyTypeId++) {
-            require(keccak256(abi.encodePacked(data._ccyTypes[ccyTypeId].name)) != keccak256(abi.encodePacked(name)),
+    function addCcyType(
+        StructLib.CcyTypesStruct storage ccyTypesData,
+        string memory name,
+        string memory unit)
+    public {
+        for (uint256 ccyTypeId = 0; ccyTypeId < ccyTypesData._count_ccyTypes; ccyTypeId++) {
+            require(keccak256(abi.encodePacked(ccyTypesData._ccyTypes[ccyTypeId].name)) != keccak256(abi.encodePacked(name)),
                     "Currency type name already exists");
         }
 
-        data._ccyTypes[data._count_ccyTypes] = StructLib.Ccy({
-              id: data._count_ccyTypes,
+        ccyTypesData._ccyTypes[ccyTypesData._count_ccyTypes] = StructLib.Ccy({
+              id: ccyTypesData._count_ccyTypes,
             name: name,
             unit: unit
         });
-        emit AddedCcyType(data._count_ccyTypes, name, unit);
+        emit AddedCcyType(ccyTypesData._count_ccyTypes, name, unit);
 
-        data._count_ccyTypes++;
+        ccyTypesData._count_ccyTypes++;
     }
 
-    function getCcyTypes(StructLib.CcyTypesStruct storage data) external view returns (StructLib.GetCcyTypesReturn memory) {
+    function getCcyTypes(
+        StructLib.CcyTypesStruct storage ccyTypesData)
+    external view returns (StructLib.GetCcyTypesReturn memory) {
         StructLib.Ccy[] memory ccyTypes;
-        ccyTypes = new StructLib.Ccy[](data._count_ccyTypes);
+        ccyTypes = new StructLib.Ccy[](ccyTypesData._count_ccyTypes);
 
-        for (uint256 ccyTypeId = 0; ccyTypeId < data._count_ccyTypes; ccyTypeId++) {
+        for (uint256 ccyTypeId = 0; ccyTypeId < ccyTypesData._count_ccyTypes; ccyTypeId++) {
             ccyTypes[ccyTypeId] = StructLib.Ccy({
-                    id: data._ccyTypes[ccyTypeId].id,
-                  name: data._ccyTypes[ccyTypeId].name,
-                  unit: data._ccyTypes[ccyTypeId].unit
+                    id: ccyTypesData._ccyTypes[ccyTypeId].id,
+                  name: ccyTypesData._ccyTypes[ccyTypeId].name,
+                  unit: ccyTypesData._ccyTypes[ccyTypeId].unit
             });
         }
 
@@ -41,6 +49,59 @@ library CcyLib {
         return ret;
     }
 
-    // TODO: fund/withdraw ...
+    // FUNDING
+    function fund(
+        StructLib.LedgerStruct storage ledgerData,
+        StructLib.CcyTypesStruct storage ccyTypesData,
+        uint256 ccyTypeId,
+        int256  amount, // signed value: ledger ccyType_balance supports (theoretical) -ve balances
+        address ledgerOwner)
+    public {
+        require(ccyTypeId >= 0 && ccyTypeId < ccyTypesData._count_ccyTypes, "Invalid currency type");
+        require(amount >= 0, "Invalid amount"); // allow funding zero (initializes empty ledger entry), disallow negative funding
+
+        // we keep amount as signed value - ledger allows -ve balances (currently unused capability)
+        //uint256 fundAmount = uint256(amount);
+
+        // create ledger entry as required
+        if (ledgerData._ledger[ledgerOwner].exists == false) {
+            ledgerData._ledger[ledgerOwner] = StructLib.Ledger({
+                  exists: true
+            });
+            ledgerData._ledgerOwners.push(ledgerOwner);
+        }
+
+        // update ledger balance
+        ledgerData._ledger[ledgerOwner].ccyType_balance[ccyTypeId] += amount;
+
+        // update global total funded
+        ledgerData._ccyType_totalFunded[ccyTypeId] += uint256(amount);
+
+        emit CcyFundedLedger(ccyTypeId, ledgerOwner, amount);
+    }
+
+    // WITHDRAWING
+    function withdraw(
+        StructLib.LedgerStruct storage ledgerData,
+        StructLib.CcyTypesStruct storage ccyTypesData,
+        uint256 ccyTypeId,
+        int256  amount, // signed value: ledger ccyType_balance supports (theoretical) -ve balances
+        address ledgerOwner)
+    public {
+        require(ccyTypeId >= 0 && ccyTypeId < ccyTypesData._count_ccyTypes, "Invalid currency type");
+        require(amount > 0, "Minimum one currency unit required"); // disallow negative withdrawing
+        require(ledgerData._ledger[ledgerOwner].exists == true, "Invalid ledger owner");
+        require(ledgerData._ledger[ledgerOwner].ccyType_balance[ccyTypeId] >= amount, "Insufficient ledger owner balance");
+
+        // update ledger balance
+        ledgerData._ledger[ledgerOwner].ccyType_balance[ccyTypeId] -= amount;
+
+        // update global total withdrawn
+        ledgerData._ccyType_totalWithdrawn[ccyTypeId] += uint256(amount);
+
+        emit CcyWithdrewLedger(ccyTypeId, ledgerOwner, amount);
+    }
+
+    // TODO: withdraw ...
 }
 

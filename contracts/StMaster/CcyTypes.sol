@@ -3,8 +3,8 @@ pragma experimental ABIEncoderV2;
 
 import "./Owned.sol";
 
-import "../Libs/CcyLib.sol";
 import "../Libs/StructLib.sol";
+import "../Libs/CcyLib.sol";
 
 /**
   * Manages currency types

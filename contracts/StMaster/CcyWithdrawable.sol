@@ -4,8 +4,11 @@ pragma experimental ABIEncoderV2;
 import "./Owned.sol";
 import "./StLedger.sol";
 
+import "../Libs/StructLib.sol";
+import "../Libs/CcyLib.sol";
+
 contract CcyWithdrawable is Owned, StLedger {
-    event CcyWithdrewLedger(uint256 ccyTypeId, address ledgerOwner, int256 amount);
+    //event CcyWithdrewLedger(uint256 ccyTypeId, address ledgerOwner, int256 amount);
 
     /**
      * @dev Withdraws currency from a ledger entry
@@ -19,19 +22,21 @@ contract CcyWithdrawable is Owned, StLedger {
     public {
         require(msg.sender == owner, "Restricted method");
         require(_readOnly == false, "Contract is read only");
-        
-        require(ccyTypeId >= 0 && ccyTypeId < ccyTypesData._count_ccyTypes, "Invalid currency type");
-        require(amount > 0, "Minimum one currency unit required"); // disallow negative withdrawing
-        require(ledgerData._ledger[ledgerOwner].exists == true, "Invalid ledger owner");
-        require(ledgerData._ledger[ledgerOwner].ccyType_balance[ccyTypeId] >= amount, "Insufficient ledger owner balance");
 
-        // update ledger balance
-        ledgerData._ledger[ledgerOwner].ccyType_balance[ccyTypeId] -= amount;
+        CcyLib.withdraw(ledgerData, ccyTypesData, ccyTypeId, amount, ledgerOwner);
 
-        // update global total withdrawn
-        ledgerData._ccyType_totalWithdrawn[ccyTypeId] += uint256(amount);
+        // require(ccyTypeId >= 0 && ccyTypeId < ccyTypesData._count_ccyTypes, "Invalid currency type");
+        // require(amount > 0, "Minimum one currency unit required"); // disallow negative withdrawing
+        // require(ledgerData._ledger[ledgerOwner].exists == true, "Invalid ledger owner");
+        // require(ledgerData._ledger[ledgerOwner].ccyType_balance[ccyTypeId] >= amount, "Insufficient ledger owner balance");
 
-        emit CcyWithdrewLedger(ccyTypeId, ledgerOwner, amount);
+        // // update ledger balance
+        // ledgerData._ledger[ledgerOwner].ccyType_balance[ccyTypeId] -= amount;
+
+        // // update global total withdrawn
+        // ledgerData._ccyType_totalWithdrawn[ccyTypeId] += uint256(amount);
+
+        // emit CcyWithdrewLedger(ccyTypeId, ledgerOwner, amount);
     }
 
     /**
