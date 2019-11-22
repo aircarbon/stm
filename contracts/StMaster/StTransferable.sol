@@ -16,13 +16,11 @@ contract StTransferable is Owned, StLedger, StFees {
      * @dev optionally applies: fees per the current fee structure, and paying them to contract owner's ledger entry
      */
     function transfer(TransferLib.TransferArgs memory a) public {
-
         require(msg.sender == owner, "Restricted method");
         require(_readOnly == false, "Contract is read only");
-
         TransferLib.transfer(ledgerData, feeData, a, owner);
     }
-    
+
     /**
      * @dev Returns the total global currency amount transfered for the supplied currency
      */
