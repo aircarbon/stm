@@ -21,7 +21,7 @@ contract("StMaster", accounts => {
 
         // set fee structure VCS: 1%
         const feeBips = 100; // 100 bp = 1%
-        const setFeeTx = await stm.setFee_SecTokenType_Perc(CONST.tokenType.VCS, feeBips);
+        const setFeeTx = await stm.setFee_SecTokenType_PercBips(CONST.tokenType.VCS, feeBips);
         truffleAssert.eventEmitted(setFeeTx, 'SetFeeSecTokenTypePerc', ev => ev.tokenTypeId == CONST.tokenType.VCS && ev.fee_token_PercBips == feeBips);
         assert(await stm.fee_tokenType_PercBips(CONST.tokenType.VCS) == feeBips, 'unexpected VCS percentage fee after setting VCS fee structure');
         assert(await stm.fee_tokenType_PercBips(CONST.tokenType.UNFCCC) == 0, 'unexpected UNFCCC percentage fee after setting VCS fee structure');
@@ -59,7 +59,7 @@ contract("StMaster", accounts => {
 
         // set fee structure UNFCCC: 0.01% (1 bip - minimum % fee)
         const feeBips = 1;
-        const setFeeTx = await stm.setFee_SecTokenType_Perc(CONST.tokenType.UNFCCC, feeBips);
+        const setFeeTx = await stm.setFee_SecTokenType_PercBips(CONST.tokenType.UNFCCC, feeBips);
         truffleAssert.eventEmitted(setFeeTx, 'SetFeeSecTokenTypePerc', ev => ev.tokenTypeId == CONST.tokenType.UNFCCC && ev.fee_token_PercBips == feeBips);
         assert(await stm.fee_tokenType_PercBips(CONST.tokenType.UNFCCC) == feeBips, 'unexpected UNFCCC percentage fee after setting UNFCCC fee structure');
 
@@ -98,7 +98,7 @@ contract("StMaster", accounts => {
 
         // set fee structure new EEU type: 50% = 5000 BP(1.5 EEUs, 2 batches)
         const feeBips = 5000;
-        const setFeeTx = await stm.setFee_SecTokenType_Perc(newTypeId, feeBips);
+        const setFeeTx = await stm.setFee_SecTokenType_PercBips(newTypeId, feeBips);
         truffleAssert.eventEmitted(setFeeTx, 'SetFeeSecTokenTypePerc', ev => ev.tokenTypeId == newTypeId && ev.fee_token_PercBips == feeBips);
         assert(await stm.fee_tokenType_PercBips(newTypeId) == feeBips, 'unexpected new eeu type percentage fee after setting fee structure');
 

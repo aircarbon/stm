@@ -59,7 +59,7 @@ contract StFees is Owned, StLedger {
     }
 
     // PERCENTAGE FEES (BASIS POINTS, 1/100 of 1%) - TOKENS
-    function setFee_SecTokenType_Perc(uint256 tokenTypeId, uint256 fee_token_PercBips) public {
+    function setFee_SecTokenType_PercBips(uint256 tokenTypeId, uint256 fee_token_PercBips) public {
         require(msg.sender == owner, "Restricted method");
         require(_readOnly == false, "Contract is read only");
         require(tokenTypeId >= 0 && tokenTypeId < stTypesData._count_tokenTypes, "Invalid ST type");
