@@ -8,8 +8,8 @@
 
 ## Run local node
 
-- `ganache-cli -a 200 -i 888 -m "educate school blast ability display bleak club soon curve car oil ostrich"`
-  > runs with 100 accounts (tests require more than 10 built into `truffle develop`)
+- `ganache-cli -a 888 -i 888 -m "educate school blast ability display bleak club soon curve car oil ostrich"`
+  > runs with a large number of accounts (the tests require way more than 10 built into `truffle develop`)
   > runs with custom network ID 888
   > runs with InstaMining by default
 

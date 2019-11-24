@@ -13,6 +13,15 @@ contract StFees is Owned, StLedger {
     event SetFeeTokBps(uint256 tokenTypeId, uint256 fee_token_PercBips);
     event SetFeeCcyBps(uint256 ccyTypeId, uint256 fee_ccy_PercBips);
 
+    //
+    // PRI 1
+    // TODO: edit-batch (add KVPs)...
+    // TODO: fees - MULTI-FEES tests, i.e. fixed + at same time...
+    // TODO: fees - CAP/COLLAR + tests...
+    // TODO: fees - structure override on ledger level...
+    // TODO: fees - additional set of fees to originator on each trade (i.e. data on batch struct)...
+    //
+
     // GLOBAL FEES
     StructLib.FeeStruct globalFees;
 
@@ -29,7 +38,7 @@ contract StFees is Owned, StLedger {
     // STANDARDIZED FEE STRUCT
     struct Fee { // TODO: move this to StructLib, so it can also be used on the ledger
         uint256 fee_fixed;      // apply fixed fee, if any
-        uint256 fee_percBips;   // add a basis points fee, if any
+        uint256 fee_percBips;   // add a basis points fee, if any - in basis points, i.e. minimum % = 1bp = 1/100 of 1% = 0.0001x
         uint256 fee_min;        // collar
         uint256 fee_max;        // and cap
     }

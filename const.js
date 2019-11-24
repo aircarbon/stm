@@ -7,6 +7,8 @@ const web3 = new Web3();
 
 
 module.exports = {
+    logTestAccountUsage: true,
+    
     // types
     tokenType: Object.freeze({
         UNFCCC: 0,
@@ -35,7 +37,7 @@ module.exports = {
        millionEth_wei: Big(web3.utils.toWei("1", "ether")).times(1000).times(1000).toFixed(), // "1000000000000000000000000", 
 
     // gas approx values - for cost estimations
-    gasPriceEth: web3.utils.fromWei(web3.utils.toWei("40", "gwei"), 'ether'),
-         ethUsd: 172
+    gasPriceEth: web3.utils.fromWei(web3.utils.toWei("20", "gwei"), 'ether'),
+         ethUsd: 146
 
 };

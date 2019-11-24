@@ -132,11 +132,37 @@ module.exports = {
 
         // validate currency transfer events
         if (ccy_amount_A > 0 || ccy_amount_B > 0) {
-            truffleAssert.eventEmitted(transferTx, 'TransferedLedgerCcy', ev => { return (
-                // main transfer events - by receiver account being non-owner account
-                (ccy_amount_A > 0 && ev.from == ledger_A && ev.to == ledger_B && ev.ccyTypeId == ccyTypeId_A && ev.amount == ccy_amount_A)
-             || (ccy_amount_B > 0 && ev.from == ledger_B && ev.to == ledger_A && ev.ccyTypeId == ccyTypeId_B && ev.amount == ccy_amount_B)
-                // fee transfer events - by receiver account being owner's account
+            truffleAssert.eventEmitted(transferTx, 'TransferedLedgerCcy', ev => { 
+                /*console.log(`ccy_amount_A: ${ccy_amount_A}`);
+                console.log(`ccy_amount_B: ${ccy_amount_B}`);
+                console.log(`ev.from: ${ev.from}`);
+                console.log(`ev.to: ${ev.to}`);
+                console.log(`ledger_A: ${ledger_A}`);
+                console.log(`ledger_B: ${ledger_B}`);
+                console.log(`ev.ccyTypeId: ${ev.ccyTypeId}`);
+                console.log(`ccyTypeId_A: ${ccyTypeId_A}`);
+                console.log(`ccyTypeId_B: ${ccyTypeId_B}`);
+                console.log('ev.amount', ev.amount);
+                console.log('ccy_amount_A', ccy_amount_A);
+                console.log('ccy_amount_A', ccy_amount_B);
+                console.log('---');
+                console.log('ccy_amount_A > 0', ccy_amount_A > 0);
+                console.log('ev.from == ledger_A', ev.from == ledger_A);
+                console.log('ev.to == ledger_B', ev.to == ledger_B);
+                console.log('ev.ccyTypeId == ccyTypeId_A', ev.ccyTypeId == ccyTypeId_A);
+                console.log('ev.amount.eq(ccy_amount_A)', ev.amount.eq(ccy_amount_A));
+                console.log('---');
+                console.log('ccy_amount_B > 0', ccy_amount_B > 0);
+                console.log('ev.from == ledger_B', ev.from == ledger_B);
+                console.log('ev.to == ledger_A', ev.to == ledger_A);
+                console.log('ev.ccyTypeId == ccyTypeId_B', ev.ccyTypeId == ccyTypeId_B);
+                console.log('ev.amount.eq(ccy_amount_B)', ev.amount.eq(ccy_amount_B));*/
+
+                return (
+                // main transfer events
+                (ccy_amount_A > 0 && ev.from == ledger_A && ev.to == ledger_B && ev.ccyTypeId == ccyTypeId_A && ev.amount.eq(new BN(ccy_amount_A)))
+             || (ccy_amount_B > 0 && ev.from == ledger_B && ev.to == ledger_A && ev.ccyTypeId == ccyTypeId_B && ev.amount.eq(new BN(ccy_amount_B)))
+                // fee transfer events
              || (ccy_amount_A > 0 && ev.from == ledger_A && ev.to == accounts[0] && ev.ccyTypeId == ccyTypeId_A)
              || (ccy_amount_B > 0 && ev.from == ledger_B && ev.to == accounts[0] && ev.ccyTypeId == ccyTypeId_B)
                 );

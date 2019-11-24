@@ -10,7 +10,8 @@ contract("StMaster", accounts => {
         stm = await st.deployed();
         if (!global.accountNdx) global.accountNdx = 0;
         global.accountNdx++;
-        //console.log(`global.accountNdx: ${global.accountNdx} - contract @ ${stm.address} (owner: ${accounts[0]}) - getSecTokenBatchCount: ${(await stm.getSecTokenBatchCount.call()).toString()}`);
+        if (CONST.logTestAccountUsage)
+            console.log(`global.accountNdx: ${global.accountNdx} - contract @ ${stm.address} (owner: ${accounts[0]}) - getSecTokenBatchCount: ${(await stm.getSecTokenBatchCount.call()).toString()}`);
     });
     
     it('funding - should allow funding of USD', async () => {

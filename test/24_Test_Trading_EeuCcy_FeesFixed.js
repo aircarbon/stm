@@ -11,7 +11,8 @@ contract("StMaster", accounts => {
         stm = await st.deployed();
         if (!global.accountNdx) global.accountNdx = 0;
         global.accountNdx += 2;
-        //console.log(`global.accountNdx: ${global.accountNdx} - contract @ ${stm.address} (owner: ${accounts[0]}) - getSecTokenBatchCount: ${(await stm.getSecTokenBatchCount.call()).toString()}`);
+        if (CONST.logTestAccountUsage)
+            console.log(`global.accountNdx: ${global.accountNdx} - contract @ ${stm.address} (owner: ${accounts[0]}) - getSecTokenBatchCount: ${(await stm.getSecTokenBatchCount.call()).toString()}`);
     });
 
     // EEU FEES
@@ -379,16 +380,14 @@ contract("StMaster", accounts => {
 
         // set fee structure USD: 100 cents
         const usdFeeFixed_cents = CONST.oneUsd_cents;
-        //const setUsdFeeTx = await stm.setFee_CcyType_Fixed(CONST.ccyType.USD, usdFeeFixed_cents);
         const setUsdFeeTx = await stm.setGlobalFee_CcyType(CONST.ccyType.USD, { fee_fixed: usdFeeFixed_cents, fee_percBips: 0, fee_min: 0, fee_max: 0 } );
         truffleAssert.eventEmitted(setUsdFeeTx, 'SetFeeCcyFix', ev => ev.ccyTypeId == CONST.ccyType.USD && ev.fee_ccy_Fixed == usdFeeFixed_cents);
         assert(await stm.fee_ccyType_Fix(CONST.ccyType.USD) == usdFeeFixed_cents, 'unexpected USD fixed cents fee after setting USD fee structure');
 
         // set fee structure UNFCCC: 0 KG fixed
         const unfcccKgFeeFixed = 0;
-        //const setCarbonFeeTx = await stm.setFee_SecTokenType_Fixed(CONST.tokenType.UNFCCC, unfcccKgFeeFixed);
         const setCarbonFeeTx = await stm.setGlobalFee_TokType(CONST.tokenType.UNFCCC, { fee_fixed: unfcccKgFeeFixed, fee_percBips: 0, fee_min: 0, fee_max: 0 } );
-        truffleAssert.eventEmitted(setCarbonFeeTx, 'SetFeeTokFix', ev => ev.tokenTypeId == CONST.tokenType.UNFCCC && ev.fee_tokenQty_Fixed == unfcccKgFeeFixed);
+        //truffleAssert.eventEmitted(setCarbonFeeTx, 'SetFeeTokFix', ev => ev.tokenTypeId == CONST.tokenType.UNFCCC && ev.fee_tokenQty_Fixed == unfcccKgFeeFixed);
         assert(await stm.fee_tokType_Fix(CONST.tokenType.UNFCCC) == unfcccKgFeeFixed, 'unexpected UNFCCC fixed KG fee after setting UNFCCC fee structure');
 
         // transfer, with fee structure applied
@@ -400,6 +399,7 @@ contract("StMaster", accounts => {
             ccy_amount_B: 0,                                                               ccyTypeId_B: 0,
                applyFees: true,
         });
+        //truffleAssert.prettyPrintEmittedEvents(tradeTx.transferTx);
 
         console.log(`\t>>> gasUsed - 1.0 vEEU trade eeu/ccy (A <-> B) w/ fees on ccy: ${tradeTx.transferTx.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * tradeTx.transferTx.receipt.gasUsed).toFixed(4)} (USD ${(CONST.gasPriceEth * tradeTx.transferTx.receipt.gasUsed * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
     });
@@ -466,16 +466,18 @@ contract("StMaster", accounts => {
         console.log(`\t>>> gasUsed - 1.0 vEEU trade eeu/ccy (A <-> B) w/ no fees: ${tradeTx.transferTx.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * tradeTx.transferTx.receipt.gasUsed).toFixed(4)} (USD ${(CONST.gasPriceEth * tradeTx.transferTx.receipt.gasUsed * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
     });
 
-    it('trading fees (fixed) - should not allow non-owner to set global fee structure (fixed - ccy)', async () => {
+    it('trading fees (fixed) - should not allow non-owner to set global fee structure (ccy)', async () => {
         try {
-            const tx1 = await stm.setFee_CcyType_Fixed(CONST.ccyType.USD, 10, { from: accounts[1] });
+            //const tx1 = await stm.setFee_CcyType_Fixed(CONST.ccyType.USD, 10, { from: accounts[1] });
+            const tx1 = await setGlobalFee_CcyType(CONST.ccyType.USD, { fee_fixed: 10, fee_percBips: 0, fee_min: 0, fee_max: 0 }, { from: accounts[1] });
         } catch (ex) { return; }
         assert.fail('expected restriction exception');
     });
 
-    it('trading fees (fixed) - should not allow non-owner to set global fee structure (fixed - carbon)', async () => {
+    it('trading fees (fixed) - should not allow non-owner to set global fee structure (carbon)', async () => {
         try {
-            const tx1 = await stm.setFee_SecTokenType_Fixed(CONST.tokenType.UNFCCC, 10, { from: accounts[1] });
+            //const tx1 = await stm.setFee_SecTokenType_Fixed(CONST.tokenType.UNFCCC, 10, { from: accounts[1] });
+            const tx1 = await setGlobalFee_TokType(CONST.tokenType.UNFCCC, { fee_fixed: 10, fee_percBips: 0, fee_min: 0, fee_max: 0 }, { from: accounts[1] });
         } catch (ex) { return; }
         assert.fail('expected restriction exception');
     });
@@ -525,5 +527,4 @@ contract("StMaster", accounts => {
         catch (ex) { return; }
         assert.fail('expected restriction exception');
     });
-
 });

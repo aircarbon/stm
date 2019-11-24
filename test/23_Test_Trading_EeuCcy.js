@@ -9,16 +9,17 @@ contract("StMaster", accounts => {
         stm = await st.deployed();
         if (!global.accountNdx) global.accountNdx = 0;
         global.accountNdx += 2;
-        //console.log(`global.accountNdx: ${global.accountNdx} - contract @ ${stm.address} (owner: ${accounts[0]}) - getSecTokenBatchCount: ${(await stm.getSecTokenBatchCount.call()).toString()}`);
+        if (CONST.logTestAccountUsage)
+            console.log(`global.accountNdx: ${global.accountNdx} - contract @ ${stm.address} (owner: ${accounts[0]}) - getSecTokenBatchCount: ${(await stm.getSecTokenBatchCount.call()).toString()}`);
     });
 
     it('trading - should allow two-sided (vEEU <-> ccy) transfer (A <-> B) across ledger entries', async () => {
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], [], [], { from: accounts[0] });
         await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        accounts[global.accountNdx + 1],         { from: accounts[0] });
         const data = await helper.transferLedger({ stm, accounts, 
-                ledger_A: accounts[global.accountNdx + 0],  ledger_B: accounts[global.accountNdx + 1],
-                    qty_A: 750,                              tokenTypeId_A: CONST.tokenType.VCS,
-                    qty_B: 0,                                tokenTypeId_B: 0,
+                ledger_A: accounts[global.accountNdx + 0],     ledger_B: accounts[global.accountNdx + 1],
+                   qty_A: 750,                            tokenTypeId_A: CONST.tokenType.VCS,
+                   qty_B: 0,                              tokenTypeId_B: 0,
             ccy_amount_A: 0,                                ccyTypeId_A: 0,
             ccy_amount_B: CONST.oneEth_wei,                 ccyTypeId_B: CONST.ccyType.ETH,
         });
@@ -32,11 +33,11 @@ contract("StMaster", accounts => {
         await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        accounts[global.accountNdx + 0],         { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], [], [], { from: accounts[0] });
         const data = await helper.transferLedger({ stm, accounts, 
-                ledger_A: accounts[global.accountNdx + 0],  ledger_B: accounts[global.accountNdx + 1],
+                 ledger_A: accounts[global.accountNdx + 0],       ledger_B: accounts[global.accountNdx + 1],
                     qty_A: 0,                                tokenTypeId_A: 0,
                     qty_B: 750,                              tokenTypeId_B: CONST.tokenType.VCS,
-            ccy_amount_A: CONST.oneEth_wei,                 ccyTypeId_A: CONST.ccyType.ETH,
-            ccy_amount_B: 0,                                ccyTypeId_B: 0,
+             ccy_amount_A: CONST.oneEth_wei,                   ccyTypeId_A: CONST.ccyType.ETH,
+             ccy_amount_B: 0,                                  ccyTypeId_B: 0,
         });
         assert(data.ledgerA_before.tokens_sumQty == 0, 'unexpected ledger A EEU tonnage before');
         assert(data.ledgerA_after.tokens_sumQty > 0, 'unexpected ledger A EEU tonnage after');
@@ -48,11 +49,11 @@ contract("StMaster", accounts => {
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], [], [], { from: accounts[0] });
         await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        accounts[global.accountNdx + 1],         { from: accounts[0] });
         const data = await helper.transferLedger({ stm, accounts, 
-                ledger_A: accounts[global.accountNdx + 0],  ledger_B: accounts[global.accountNdx + 1],
+                 ledger_A: accounts[global.accountNdx + 0],       ledger_B: accounts[global.accountNdx + 1],
                     qty_A: 500,                              tokenTypeId_A: CONST.tokenType.VCS,
                     qty_B: 0,                                tokenTypeId_B: 0,
-            ccy_amount_A: 0,                                ccyTypeId_A: 0,
-            ccy_amount_B: CONST.oneEth_wei,                 ccyTypeId_B: CONST.ccyType.ETH,
+             ccy_amount_A: 0,                                  ccyTypeId_A: 0,
+             ccy_amount_B: CONST.oneEth_wei,                   ccyTypeId_B: CONST.ccyType.ETH,
         });
         console.log(`\t>>> gasUsed - 0.5 vEEU trade eeu/ccy (A <-> B): ${data.transferTx.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * data.transferTx.receipt.gasUsed).toFixed(4)} (USD ${(CONST.gasPriceEth * data.transferTx.receipt.gasUsed * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
     });
