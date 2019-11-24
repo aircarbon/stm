@@ -7,28 +7,35 @@ library TokenLib {
     event AddedSecTokenType(uint256 id, string name);
     event BurnedFullSecToken(uint256 stId, uint256 tokenTypeId, address ledgerOwner, uint256 burnedQty);
     event BurnedPartialSecToken(uint256 stId, uint256 tokenTypeId, address ledgerOwner, uint256 burnedQty);
+    event MintedSecTokenBatch(uint256 batchId, uint256 tokenTypeId, address batchOwner, uint256 mintQty, uint256 mintSecTokenCount);
+    event MintedSecToken(uint256 stId, uint256 batchId, uint256 tokenTypeId, address ledgerOwner, uint256 mintedQty);
 
-    // TOKEN TYYPES
-    function addSecTokenType(StructLib.StTypesStruct storage data, string memory name) public {
-        for (uint256 tokenTypeId = 0; tokenTypeId < data._count_tokenTypes; tokenTypeId++) {
-            require(keccak256(abi.encodePacked(data._tokenTypeNames[tokenTypeId])) != keccak256(abi.encodePacked(name)),
+    // TOKEN TYPES
+    function addSecTokenType(
+        StructLib.StTypesStruct storage stTypesData,
+        string memory name)
+    public {
+        for (uint256 tokenTypeId = 0; tokenTypeId < stTypesData._count_tokenTypes; tokenTypeId++) {
+            require(keccak256(abi.encodePacked(stTypesData._tokenTypeNames[tokenTypeId])) != keccak256(abi.encodePacked(name)),
                     "ST type name already exists");
         }
 
-        data._tokenTypeNames[data._count_tokenTypes] = name;
-        emit AddedSecTokenType(data._count_tokenTypes, name);
+        stTypesData._tokenTypeNames[stTypesData._count_tokenTypes] = name;
+        emit AddedSecTokenType(stTypesData._count_tokenTypes, name);
 
-        data._count_tokenTypes++;
+        stTypesData._count_tokenTypes++;
     }
 
-    function getSecTokenTypes(StructLib.StTypesStruct storage data) external view returns (StructLib.GetSecTokenTypesReturn memory) {
+    function getSecTokenTypes(
+        StructLib.StTypesStruct storage stTypesData)
+    public view returns (StructLib.GetSecTokenTypesReturn memory) {
         StructLib.SecTokenTypeReturn[] memory tokenTypes;
-        tokenTypes = new StructLib.SecTokenTypeReturn[](data._count_tokenTypes);
+        tokenTypes = new StructLib.SecTokenTypeReturn[](stTypesData._count_tokenTypes);
 
-        for (uint256 tokenTypeId = 0; tokenTypeId < data._count_tokenTypes; tokenTypeId++) {
+        for (uint256 tokenTypeId = 0; tokenTypeId < stTypesData._count_tokenTypes; tokenTypeId++) {
             tokenTypes[tokenTypeId] = StructLib.SecTokenTypeReturn({
                 id: tokenTypeId,
-              name: data._tokenTypeNames[tokenTypeId]
+              name: stTypesData._tokenTypeNames[tokenTypeId]
             });
         }
 
@@ -39,7 +46,80 @@ library TokenLib {
     }
 
     // MINTING
-    // ...
+    struct MintSecTokenBatchArgs {
+        uint256 tokenTypeId;
+        int256  mintQty;
+        int256  mintSecTokenCount;
+        address batchOwner;
+        string[] metaKeys;
+        string[] metaValues;
+    }
+    function mintSecTokenBatch(
+        StructLib.LedgerStruct storage ledgerData,
+        StructLib.StTypesStruct storage stTypesData,
+        MintSecTokenBatchArgs memory a)
+    public {
+
+        require(a.tokenTypeId >= 0 && a.tokenTypeId < stTypesData._count_tokenTypes, "Invalid ST type");
+        //require(a.mintSecTokenCount >= 1, "Minimum one ST required");
+        require(a.mintSecTokenCount == 1, "Exactly one ST required");
+        require(a.mintQty >= 1, "Minimum one mintQty required");
+        require(a.mintQty % a.mintSecTokenCount == 0, "mintQty must divide evenly into mintSecTokenCount");
+
+        // ### string[] param lengths are reported as zero!
+        /*require(metaKeys.length == 0, "At least one metadata key must be provided");
+        require(metaKeys.length <= 42, "Maximum metadata KVP length is 42");
+        require(metaKeys.length != metaValues.length, "Metadata keys/values length mismatch");
+        for (uint i = 0; i < metaKeys.length; i++) {
+            require(bytes(metaKeys[i]).length == 0 || bytes(metaValues[i]).length == 0, "Zero-length metadata key or value supplied");
+        }*/
+
+        StructLib.SecTokenBatch memory newBatch = StructLib.SecTokenBatch({
+                         id: ledgerData._batches_currentMax_id + 1,
+            mintedTimestamp: block.timestamp,
+                tokenTypeId: a.tokenTypeId,
+                  mintedQty: uint256(a.mintQty),
+                  burnedQty: 0,
+                   metaKeys: a.metaKeys,
+                 metaValues: a.metaValues
+        });
+        ledgerData._batches[newBatch.id] = newBatch;
+        ledgerData._batches_currentMax_id++;
+        emit MintedSecTokenBatch(newBatch.id, a.tokenTypeId, a.batchOwner, uint256(a.mintQty), uint256(a.mintSecTokenCount));
+
+        // create ledger entry as required
+        if (ledgerData._ledger[a.batchOwner].exists == false) {
+            ledgerData._ledger[a.batchOwner] = StructLib.Ledger({
+                  exists: true
+            });
+            ledgerData._ledgerOwners.push(a.batchOwner);
+        }
+
+        // mint & assign STs
+        for (int256 ndx = 0; ndx < a.mintSecTokenCount; ndx++) {
+            uint256 newId = ledgerData._tokens_currentMax_id + 1 + uint256(ndx);
+
+            // mint ST
+            uint256 stQty = uint256(a.mintQty) / uint256(a.mintSecTokenCount);
+            ledgerData._sts_batchId[newId] = newBatch.id;
+            ledgerData._sts_mintedQty[newId] = stQty;
+            ledgerData._sts_currentQty[newId] = stQty;
+            //ledgerData._sts_mintedTimestamp[newId] = block.timestamp;
+
+            emit MintedSecToken(newId, newBatch.id, a.tokenTypeId, a.batchOwner, stQty);
+
+            // assign
+            ledgerData._ledger[a.batchOwner].tokenType_stIds[a.tokenTypeId].push(newId);
+
+            // maintain fast ST ownership lookup - by keccak256(ledgerOwner||stId)
+            // not currently used (was used when burning by stId)
+            //ledgerData._ownsSecTokenId[keccak256(abi.encodePacked(a.batchOwner, newId))] = true;
+        }
+        //ledgerData._ledger[a.batchOwner].tokenType_sumQty[a.tokenTypeId] += uint256(a.mintQty);
+
+        ledgerData._tokens_currentMax_id += uint256(a.mintSecTokenCount);
+        ledgerData._tokens_totalMintedQty += uint256(a.mintQty);
+    }
 
     // BURNING
     function burnTokens(

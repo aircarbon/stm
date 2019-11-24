@@ -113,11 +113,17 @@ library StructLib {
 
     // FEE TYPES
     struct FeeStruct {
-        mapping(uint256 => uint256) fee_tokenType_Fixed; // fixed token qty fee per transfer
-        mapping(uint256 => uint256) fee_ccyType_Fixed; // fixed currency fee per transfer
+        mapping(uint256 => uint256) fee_tokType_Fix; // fixed token qty fee per transfer
+        mapping(uint256 => uint256) fee_ccyType_Fix; // fixed currency fee per transfer
 
-        mapping(uint256 => uint256) fee_tokenType_PercBips; // bips (0-10000) token qty fee per transfer
-        mapping(uint256 => uint256) fee_ccyType_PercBips; // bips (0-10000) currency fee per transfer
+        mapping(uint256 => uint256) fee_tokType_Bps; // bips (0-10000) token qty fee per transfer
+        mapping(uint256 => uint256) fee_ccyType_Bps; // bips (0-10000) currency fee per transfer
+
+        mapping(uint256 => uint256) fee_tokType_Min; // collar (min) token qty fee per transfer
+        mapping(uint256 => uint256) fee_ccyType_Min; // collar (min) currency fee per transfer
+
+        mapping(uint256 => uint256) fee_tokType_Max; // cap (max) token qty fee per transfer
+        mapping(uint256 => uint256) fee_ccyType_Max; // cap (max) currency fee per transfer
     }
 
     /**

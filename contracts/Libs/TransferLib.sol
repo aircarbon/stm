@@ -27,10 +27,10 @@ library TransferLib {
 
     function transfer(
         StructLib.LedgerStruct storage ledgerData,
-        StructLib.FeeStruct storage feeData,
+        StructLib.FeeStruct storage globalFees,
         TransferLib.TransferArgs memory a,
-        address feeAddrOwner    // exchange fees receive address
-    ) public {
+        address feeAddrOwner)   // exchange fees receive address
+    public {
         require(ledgerData._ledger[a.ledger_A].exists == true, "Invalid ledger owner A");
         require(ledgerData._ledger[a.ledger_B].exists == true, "Invalid ledger owner B");
         require(a.ledger_A != a.ledger_B, "Self transfer disallowed");
@@ -40,46 +40,43 @@ library TransferLib {
         // prevent single origin multiple asset type movement
         require(!((a.qty_A > 0 && a.ccy_amount_A > 0) || (a.qty_B > 0 && a.ccy_amount_B > 0)), "Same origin multiple asset transfer disallowed");
 
-        // TODO: cleanup now got more stack available (consolidate fee amounts, can send in single op)
-        // TODO: -ve tests for % fees on balance exceeded (test ccy & token balance validations)
-
         // validate currency balances
         require(StructLib.sufficientCcy(ledgerData, a.ledger_A, a.ccyTypeId_A, a.ccy_amount_A,
-                              (
-                                   int256(feeData.fee_ccyType_Fixed[a.ccyTypeId_A]) // fixed ccy fee from A
-                                 + int256(((uint256(a.ccy_amount_A)*1000000 / 10000) * feeData.fee_ccyType_PercBips[a.ccyTypeId_A]) / 1000000) // bips ccy fee from A
-                              )
-                              * (a.applyFees && a.ccy_amount_A > 0 ? 1 : 0)), "Insufficient currency held by ledger owner A");
+                (
+                    int256(globalFees.fee_ccyType_Fix[a.ccyTypeId_A]) // fixed ccy fee from A
+                    + int256(((uint256(a.ccy_amount_A)*1000000 / 10000) * globalFees.fee_ccyType_Bps[a.ccyTypeId_A]) / 1000000) // bips ccy fee from A
+                )
+                * (a.applyFees && a.ccy_amount_A > 0 ? 1 : 0)), "Insufficient currency held by ledger owner A");
         require(StructLib.sufficientCcy(ledgerData, a.ledger_B, a.ccyTypeId_B, a.ccy_amount_B,
-                              (
-                                  int256(feeData.fee_ccyType_Fixed[a.ccyTypeId_B]) // fixed ccy fee from A
-                                + int256(((uint256(a.ccy_amount_B)*1000000 / 10000) * feeData.fee_ccyType_PercBips[a.ccyTypeId_B]) / 1000000) // bips ccy fee from B
-                              )
-                              * (a.applyFees && a.ccy_amount_B > 0 ? 1 : 0)), "Insufficient currency held by ledger owner B");
+                (
+                    int256(globalFees.fee_ccyType_Fix[a.ccyTypeId_B]) // fixed ccy fee from A
+                + int256(((uint256(a.ccy_amount_B)*1000000 / 10000) * globalFees.fee_ccyType_Bps[a.ccyTypeId_B]) / 1000000) // bips ccy fee from B
+                )
+                * (a.applyFees && a.ccy_amount_B > 0 ? 1 : 0)), "Insufficient currency held by ledger owner B");
 
         // validate token balances
         require(StructLib.sufficientTokens(ledgerData, a.ledger_A, a.tokenTypeId_A, a.qty_A,
-                             ((feeData.fee_tokenType_Fixed[a.tokenTypeId_A]                                                       // fixed token fee from A
-                              + ((uint256(a.qty_A)*1000000 / 10000) * feeData.fee_tokenType_PercBips[a.tokenTypeId_A]) / 1000000) // bips token fee from A
-                             )
-                             * (a.applyFees && a.qty_A > 0 ? 1 : 0)), "Insufficient tokens held by ledger owner A");
+                ((globalFees.fee_tokType_Fix[a.tokenTypeId_A]                                                       // fixed token fee from A
+                + ((uint256(a.qty_A)*1000000 / 10000) * globalFees.fee_tokType_Bps[a.tokenTypeId_A]) / 1000000) // bips token fee from A
+                )
+                * (a.applyFees && a.qty_A > 0 ? 1 : 0)), "Insufficient tokens held by ledger owner A");
         require(StructLib.sufficientTokens(ledgerData, a.ledger_B, a.tokenTypeId_B, a.qty_B,
-                             ((feeData.fee_tokenType_Fixed[a.tokenTypeId_B]                                                       // fixed token fee from B
-                              + ((uint256(a.qty_B)*1000000 / 10000) * feeData.fee_tokenType_PercBips[a.tokenTypeId_B]) / 1000000) // bips token fee from B
-                             )
-                             * (a.applyFees && a.qty_B > 0 ? 1 : 0)), "Insufficient tokens held by ledger owner B");
+                ((globalFees.fee_tokType_Fix[a.tokenTypeId_B]                                                       // fixed token fee from B
+                + ((uint256(a.qty_B)*1000000 / 10000) * globalFees.fee_tokType_Bps[a.tokenTypeId_B]) / 1000000) // bips token fee from B
+                )
+                * (a.applyFees && a.qty_B > 0 ? 1 : 0)), "Insufficient tokens held by ledger owner B");
 
         // transfer currencies
         if (a.ccy_amount_A > 0) {
             if (a.applyFees) {
-                if (feeData.fee_ccyType_Fixed[a.ccyTypeId_A] > 0) { // fixed fee: ccy from A
+                if (globalFees.fee_ccyType_Fix[a.ccyTypeId_A] > 0) { // fixed fee: ccy from A
                     transferCcy(ledgerData, TransferCcyArgs({ from: a.ledger_A, to: feeAddrOwner, ccyTypeId: a.ccyTypeId_A,
-                        amount: feeData.fee_ccyType_Fixed[a.ccyTypeId_A],
+                        amount: globalFees.fee_ccyType_Fix[a.ccyTypeId_A],
                          isFee: true }));
                 }
-                if (feeData.fee_ccyType_PercBips[a.ccyTypeId_A] > 0) { // bips fee: ccy from A (x1000000 for adequate int precision)
+                if (globalFees.fee_ccyType_Bps[a.ccyTypeId_A] > 0) { // bips fee: ccy from A (x1000000 for adequate int precision)
                     transferCcy(ledgerData, TransferCcyArgs({ from: a.ledger_A, to: feeAddrOwner, ccyTypeId: a.ccyTypeId_A,
-                        amount: ((uint256(a.ccy_amount_A) * 1000000 / 10000) * feeData.fee_ccyType_PercBips[a.ccyTypeId_A]) / 1000000,
+                        amount: ((uint256(a.ccy_amount_A) * 1000000 / 10000) * globalFees.fee_ccyType_Bps[a.ccyTypeId_A]) / 1000000,
                          isFee: true }));
                 }
             }
@@ -87,14 +84,14 @@ library TransferLib {
         }
         if (a.ccy_amount_B > 0) {
             if (a.applyFees) {
-                if (feeData.fee_ccyType_Fixed[a.ccyTypeId_B] > 0) { // fixed fee: ccy from B
+                if (globalFees.fee_ccyType_Fix[a.ccyTypeId_B] > 0) { // fixed fee: ccy from B
                     transferCcy(ledgerData, TransferCcyArgs({ from: a.ledger_B, to: feeAddrOwner, ccyTypeId: a.ccyTypeId_B,
-                        amount: feeData.fee_ccyType_Fixed[a.ccyTypeId_B],
+                        amount: globalFees.fee_ccyType_Fix[a.ccyTypeId_B],
                          isFee: true }));
                 }
-                if (feeData.fee_ccyType_PercBips[a.ccyTypeId_B] > 0) { // bips fee: ccy from B (x1000000 for adequate int precision)
+                if (globalFees.fee_ccyType_Bps[a.ccyTypeId_B] > 0) { // bips fee: ccy from B (x1000000 for adequate int precision)
                     transferCcy(ledgerData, TransferCcyArgs({ from: a.ledger_B, to: feeAddrOwner, ccyTypeId: a.ccyTypeId_B,
-                        amount: ((uint256(a.ccy_amount_B)*1000000 / 10000) * feeData.fee_ccyType_PercBips[a.ccyTypeId_B]) / 1000000,
+                        amount: ((uint256(a.ccy_amount_B)*1000000 / 10000) * globalFees.fee_ccyType_Bps[a.ccyTypeId_B]) / 1000000,
                          isFee: true }));
                 }
             }
@@ -104,16 +101,16 @@ library TransferLib {
         // transfer tokens
         if (a.qty_A > 0) {
             if (a.applyFees) {
-                if (feeData.fee_tokenType_Fixed[a.tokenTypeId_A] > 0) { // fixed fee
+                if (globalFees.fee_tokType_Fix[a.tokenTypeId_A] > 0) { // fixed fee
                     transferSplitSecTokens(ledgerData,
                         TransferSplitArgs({ from: a.ledger_A, to: feeAddrOwner, tokenTypeId: a.tokenTypeId_A,
-                        qtyUnit: feeData.fee_tokenType_Fixed[a.tokenTypeId_A],
+                        qtyUnit: globalFees.fee_tokType_Fix[a.tokenTypeId_A],
                           isFee: true }));
                 }
-                if (feeData.fee_tokenType_PercBips[a.tokenTypeId_A] > 0) { // bips fee
+                if (globalFees.fee_tokType_Bps[a.tokenTypeId_A] > 0) { // bips fee
                     transferSplitSecTokens(ledgerData,
                         TransferSplitArgs({ from: a.ledger_A, to: feeAddrOwner, tokenTypeId: a.tokenTypeId_A,
-                        qtyUnit: ((uint256(a.qty_A)*1000000 / 10000) * feeData.fee_tokenType_PercBips[a.tokenTypeId_A]) / 1000000,
+                        qtyUnit: ((uint256(a.qty_A)*1000000 / 10000) * globalFees.fee_tokType_Bps[a.tokenTypeId_A]) / 1000000,
                           isFee: true }));
                 }
             }
@@ -122,16 +119,16 @@ library TransferLib {
         }
         if (a.qty_B > 0) {
             if (a.applyFees) {
-                if (feeData.fee_tokenType_Fixed[a.tokenTypeId_B] > 0) { // fixed fee
+                if (globalFees.fee_tokType_Fix[a.tokenTypeId_B] > 0) { // fixed fee
                     transferSplitSecTokens(ledgerData,
                         TransferSplitArgs({ from: a.ledger_B, to: feeAddrOwner, tokenTypeId: a.tokenTypeId_B,
-                        qtyUnit: feeData.fee_tokenType_Fixed[a.tokenTypeId_B],
+                        qtyUnit: globalFees.fee_tokType_Fix[a.tokenTypeId_B],
                           isFee: true }));
                 }
-                if (feeData.fee_tokenType_PercBips[a.tokenTypeId_B] > 0) { // bips fee
+                if (globalFees.fee_tokType_Bps[a.tokenTypeId_B] > 0) { // bips fee
                     transferSplitSecTokens(ledgerData,
                         TransferSplitArgs({ from: a.ledger_B, to: feeAddrOwner, tokenTypeId: a.tokenTypeId_B,
-                        qtyUnit: ((uint256(a.qty_B)*1000000 / 10000) * feeData.fee_tokenType_PercBips[a.tokenTypeId_B]) / 1000000,
+                        qtyUnit: ((uint256(a.qty_B)*1000000 / 10000) * globalFees.fee_tokType_Bps[a.tokenTypeId_B]) / 1000000,
                           isFee: true }));
                 }
             }
@@ -139,7 +136,7 @@ library TransferLib {
                 TransferSplitArgs({ from: a.ledger_B, to: a.ledger_A, tokenTypeId: a.tokenTypeId_B, qtyUnit: a.qty_B, isFee: false }));
         }
     }
-    
+
     /**
      * @dev Transfers currency across ledger owners
      * @param a args
@@ -153,8 +150,8 @@ library TransferLib {
     }
     function transferCcy(
         StructLib.LedgerStruct storage ledgerData,
-        TransferCcyArgs memory a
-    ) private {
+        TransferCcyArgs memory a)
+    private {
         ledgerData._ledger[a.from].ccyType_balance[a.ccyTypeId] -= int256(a.amount);
         ledgerData._ledger[a.to].ccyType_balance[a.ccyTypeId] += int256(a.amount);
         ledgerData._ccyType_totalTransfered[a.ccyTypeId] += a.amount;
@@ -179,8 +176,8 @@ library TransferLib {
     }
     function transferSplitSecTokens(
         StructLib.LedgerStruct storage ledgerData,
-        TransferSplitArgs memory a
-    ) private {
+        TransferSplitArgs memory a)
+    private {
 
         // transfer sufficient STs (last one may get split)
         uint256 ndx = 0;

@@ -7,32 +7,69 @@ import "./StLedger.sol";
 import "../Libs/StructLib.sol";
 
 contract StFees is Owned, StLedger {
-    event SetFeeSecTokenTypeFixed(uint256 tokenTypeId, uint256 fee_tokenQty_Fixed);
-    event SetFeeCcyTypeFixed(uint256 ccyTypeId, uint256 fee_ccy_Fixed);
+    event SetFeeTokFix(uint256 tokenTypeId, uint256 fee_tokenQty_Fixed);
+    event SetFeeCcyFix(uint256 ccyTypeId, uint256 fee_ccy_Fixed);
     
-    event SetFeeSecTokenTypePerc(uint256 tokenTypeId, uint256 fee_token_PercBips);
-    event SetFeeCcyTypePerc(uint256 ccyTypeId, uint256 fee_ccy_PercBips);
+    event SetFeeTokBps(uint256 tokenTypeId, uint256 fee_token_PercBips);
+    event SetFeeCcyBps(uint256 ccyTypeId, uint256 fee_ccy_PercBips);
 
-    StructLib.FeeStruct feeData;
+    // GLOBAL FEES
+    StructLib.FeeStruct globalFees;
 
-    function fee_tokenType_Fixed(uint256 tokenTypeId) public  view returns (uint256) { return feeData.fee_tokenType_Fixed[tokenTypeId]; }
-    function fee_ccyType_Fixed(uint256 ccyTypeId) public  view returns (uint256) { return feeData.fee_ccyType_Fixed[ccyTypeId]; }
-    function fee_tokenType_PercBips(uint256 tokenTypeId) public  view returns (uint256) { return feeData.fee_tokenType_PercBips[tokenTypeId]; }
-    function fee_ccyType_PercBips(uint256 ccyTypeId) public  view returns (uint256) { return feeData.fee_ccyType_PercBips[ccyTypeId]; }
+    // TODO: step 2: remove - read direct from globalFees
+    function fee_tokType_Fix(uint256 tokenTypeId) public  view returns (uint256) { return globalFees.fee_tokType_Fix[tokenTypeId]; }
+    function fee_tokType_Bps(uint256 tokenTypeId) public  view returns (uint256) { return globalFees.fee_tokType_Bps[tokenTypeId]; }
+    function fee_tokType_Min(uint256 tokenTypeId) public  view returns (uint256) { return globalFees.fee_tokType_Min[tokenTypeId]; }
+    function fee_tokType_Max(uint256 tokenTypeId) public  view returns (uint256) { return globalFees.fee_tokType_Max[tokenTypeId]; }
 
-    // TODO: ...
-    // struct Fee {
-    //     uint256 fee_fixed;
-    //     uint256 percBips;
-    //     uint256 min;
-    //     uint256 max;
-    // }
-    // function setGlobalFee_TokenType(uint256 tokenTypeId, Fee memory fee) public {
-    //     fee_tokenType_Fixed[tokenTypeId] = fee.fee_fixed;
-    // }
-    // function setGlobalFee_CcyType(uint256 ccyTypeId, Fee memory fee) public {
-    //     //...
-    // }
+    function fee_ccyType_Fix(uint256 ccyTypeId) public  view returns (uint256) { return globalFees.fee_ccyType_Fix[ccyTypeId]; }
+    function fee_ccyType_Bps(uint256 ccyTypeId) public  view returns (uint256) { return globalFees.fee_ccyType_Bps[ccyTypeId]; }
+    function fee_ccyType_Min(uint256 ccyTypeId) public  view returns (uint256) { return globalFees.fee_ccyType_Min[ccyTypeId]; }
+    function fee_ccyType_Max(uint256 ccyTypeId) public  view returns (uint256) { return globalFees.fee_ccyType_Max[ccyTypeId]; }
+
+    // STANDARDIZED FEE STRUCT - step 1 move to this
+    struct Fee {
+        uint256 fee_fixed;      // apply fixed fee, if any
+        uint256 fee_percBips;   // add a basis points fee, if any
+        uint256 fee_min;        // collar
+        uint256 fee_max;        // and cap
+    }
+    function setGlobalFee_TokType(uint256 tokenTypeId, Fee memory fee) public {
+        require(msg.sender == owner, "Restricted method");
+        require(_readOnly == false, "Contract is read only");
+        require(tokenTypeId >= 0 && tokenTypeId < stTypesData._count_tokenTypes, "Invalid ST type");
+
+        if (globalFees.fee_tokType_Fix[tokenTypeId] != fee.fee_fixed || fee.fee_fixed != 0)
+            emit SetFeeTokFix(tokenTypeId, fee.fee_fixed);
+        globalFees.fee_tokType_Fix[tokenTypeId] = fee.fee_fixed;
+
+        if (globalFees.fee_tokType_Bps[tokenTypeId] != fee.fee_percBips || fee.fee_percBips != 0)
+            emit SetFeeTokBps(tokenTypeId, fee.fee_percBips);
+        globalFees.fee_tokType_Bps[tokenTypeId] = fee.fee_percBips;
+
+        globalFees.fee_tokType_Min[tokenTypeId] = fee.fee_min;
+        globalFees.fee_tokType_Max[tokenTypeId] = fee.fee_max;
+    }
+    function setGlobalFee_CcyType(uint256 ccyTypeId, Fee memory fee) public {
+        require(msg.sender == owner, "Restricted method");
+        require(_readOnly == false, "Contract is read only");
+        require(ccyTypeId >= 0 && ccyTypeId < ccyTypesData._count_ccyTypes, "Invalid currency type");
+
+        if (globalFees.fee_ccyType_Fix[ccyTypeId] != fee.fee_fixed || fee.fee_fixed != 0)
+            emit SetFeeCcyFix(ccyTypeId, fee.fee_fixed);
+        globalFees.fee_ccyType_Fix[ccyTypeId] = fee.fee_fixed;
+
+        if (globalFees.fee_ccyType_Bps[ccyTypeId] != fee.fee_percBips || fee.fee_percBips != 0)
+            emit SetFeeCcyBps(ccyTypeId, fee.fee_percBips);
+        globalFees.fee_ccyType_Bps[ccyTypeId] = fee.fee_percBips;
+
+        globalFees.fee_ccyType_Min[ccyTypeId] = fee.fee_min;
+        globalFees.fee_ccyType_Max[ccyTypeId] = fee.fee_max;
+    }
+
+    // TODO: cleanup in TransferLib: now got more stack available: consolidate fee amounts, *can send in single op*
+    // TODO: -ve tests for % fees on balance exceeded (test ccy & token balance validations)
+    // TODO: tests for multi-fees (fixed + basis) and tests for capped and collared...
 
     /**
      * Global Fee Structure
@@ -40,44 +77,44 @@ contract StFees is Owned, StLedger {
      *       i.e. transfer amounts are not inclusive of fees, they are additional
      */
     // FIXED FEES - TOKENS
-    function setFee_SecTokenType_Fixed(uint256 tokenTypeId, uint256 fee_tokenQty_Fixed) public {
-        require(msg.sender == owner, "Restricted method");
-        require(_readOnly == false, "Contract is read only");
-        require(tokenTypeId >= 0 && tokenTypeId < stTypesData._count_tokenTypes, "Invalid ST type");
-        feeData.fee_tokenType_Fixed[tokenTypeId] = fee_tokenQty_Fixed;
-        feeData.fee_tokenType_PercBips[tokenTypeId] = 0;
-        emit SetFeeSecTokenTypeFixed(tokenTypeId, fee_tokenQty_Fixed);
-    }
-    // FIXED FEES - CCY
-    function setFee_CcyType_Fixed(uint256 ccyTypeId, uint256 fee_ccy_Fixed) public {
-        require(msg.sender == owner, "Restricted method");
-        require(_readOnly == false, "Contract is read only");
-        require(ccyTypeId >= 0 && ccyTypeId < ccyTypesData._count_ccyTypes, "Invalid currency type");
-        feeData.fee_ccyType_Fixed[ccyTypeId] = fee_ccy_Fixed;
-        feeData.fee_ccyType_PercBips[ccyTypeId] = 0;
-        emit SetFeeCcyTypeFixed(ccyTypeId, fee_ccy_Fixed);
-    }
+    // function setFee_SecTokenType_Fixed(uint256 tokenTypeId, uint256 fee_tokenQty_Fixed) public {
+    //     require(msg.sender == owner, "Restricted method");
+    //     require(_readOnly == false, "Contract is read only");
+    //     require(tokenTypeId >= 0 && tokenTypeId < stTypesData._count_tokenTypes, "Invalid ST type");
+    //     globalFees.fee_tokType_Fix[tokenTypeId] = fee_tokenQty_Fixed;
+    //     globalFees.fee_tokType_Bps[tokenTypeId] = 0;
+    //     emit SetFeeTokFix(tokenTypeId, fee_tokenQty_Fixed);
+    // }
+    // // FIXED FEES - CCY
+    // function setFee_CcyType_Fixed(uint256 ccyTypeId, uint256 fee_ccy_Fixed) public {
+    //     require(msg.sender == owner, "Restricted method");
+    //     require(_readOnly == false, "Contract is read only");
+    //     require(ccyTypeId >= 0 && ccyTypeId < ccyTypesData._count_ccyTypes, "Invalid currency type");
+    //     globalFees.fee_ccyType_Fix[ccyTypeId] = fee_ccy_Fixed;
+    //     globalFees.fee_ccyType_Bps[ccyTypeId] = 0;
+    //     emit SetFeeCcyFix(ccyTypeId, fee_ccy_Fixed);
+    // }
 
-    // PERCENTAGE FEES (BASIS POINTS, 1/100 of 1%) - TOKENS
-    function setFee_SecTokenType_PercBips(uint256 tokenTypeId, uint256 fee_token_PercBips) public {
-        require(msg.sender == owner, "Restricted method");
-        require(_readOnly == false, "Contract is read only");
-        require(tokenTypeId >= 0 && tokenTypeId < stTypesData._count_tokenTypes, "Invalid ST type");
-        require(fee_token_PercBips < 10000, "Invalid fee basis points");
-        feeData.fee_tokenType_PercBips[tokenTypeId] = fee_token_PercBips;
-        feeData.fee_tokenType_Fixed[tokenTypeId] = 0;
-        emit SetFeeSecTokenTypePerc(tokenTypeId, fee_token_PercBips);
-    }
-    // PERCENTAGE FEES (BASIS POINTS, 1/100 of 1%) - CCY
-    function setFee_CcyType_PercBips(uint256 ccyTypeId, uint256 fee_ccy_PercBips) public {
-        require(msg.sender == owner, "Restricted method");
-        require(_readOnly == false, "Contract is read only");
-        require(ccyTypeId >= 0 && ccyTypeId < ccyTypesData._count_ccyTypes, "Invalid currency type");
-        require(fee_ccy_PercBips < 10000, "Invalid fee percentage");
-        feeData.fee_ccyType_PercBips[ccyTypeId] = fee_ccy_PercBips;
-        feeData.fee_ccyType_Fixed[ccyTypeId] = 0;
-        emit SetFeeCcyTypePerc(ccyTypeId, fee_ccy_PercBips);
-    }
+    // // PERCENTAGE FEES (BASIS POINTS, 1/100 of 1%) - TOKENS
+    // function setFee_SecTokenType_PercBips(uint256 tokenTypeId, uint256 fee_token_PercBips) public {
+    //     require(msg.sender == owner, "Restricted method");
+    //     require(_readOnly == false, "Contract is read only");
+    //     require(tokenTypeId >= 0 && tokenTypeId < stTypesData._count_tokenTypes, "Invalid ST type");
+    //     require(fee_token_PercBips < 10000, "Invalid fee basis points");
+    //     globalFees.fee_tokType_Bps[tokenTypeId] = fee_token_PercBips;
+    //     globalFees.fee_tokType_Fix[tokenTypeId] = 0;
+    //     emit SetFeeTokBps(tokenTypeId, fee_token_PercBips);
+    // }
+    // // PERCENTAGE FEES (BASIS POINTS, 1/100 of 1%) - CCY
+    // function setFee_CcyType_PercBips(uint256 ccyTypeId, uint256 fee_ccy_PercBips) public {
+    //     require(msg.sender == owner, "Restricted method");
+    //     require(_readOnly == false, "Contract is read only");
+    //     require(ccyTypeId >= 0 && ccyTypeId < ccyTypesData._count_ccyTypes, "Invalid currency type");
+    //     require(fee_ccy_PercBips < 10000, "Invalid fee percentage");
+    //     globalFees.fee_ccyType_Bps[ccyTypeId] = fee_ccy_PercBips;
+    //     globalFees.fee_ccyType_Fix[ccyTypeId] = 0;
+    //     emit SetFeeCcyBps(ccyTypeId, fee_ccy_PercBips);
+    // }
 
     /**
      * @dev Returns the global total quantity of token fees paid, in the contract base unit

@@ -48,15 +48,15 @@ module.exports = {
         var fee_ccy_A = 0;
         if (ccy_amount_A > 0 && applyFees) {
             fee_ccy_A = Math.floor(
-                            Number(await stm.fee_ccyType_Fixed(ccyTypeId_A)) // ccy fee paid by A
-                          + Number((ccy_amount_A / 10000) * Number(await stm.fee_ccyType_PercBips(ccyTypeId_A))));
+                            Number(await stm.fee_ccyType_Fix(ccyTypeId_A)) // ccy fee paid by A
+                          + Number((ccy_amount_A / 10000) * Number(await stm.fee_ccyType_Bps(ccyTypeId_A))));
             //console.log('fee_ccy_A', fee_ccy_A);
         }
         var fee_ccy_B = 0;
         if (ccy_amount_B > 0 && applyFees) {
             fee_ccy_B = Math.floor(
-                            Number(await stm.fee_ccyType_Fixed(ccyTypeId_B)) // ccy fee paid by B
-                          + Number((ccy_amount_B / 10000) * Number(await stm.fee_ccyType_PercBips(ccyTypeId_B))));
+                            Number(await stm.fee_ccyType_Fix(ccyTypeId_B)) // ccy fee paid by B
+                          + Number((ccy_amount_B / 10000) * Number(await stm.fee_ccyType_Bps(ccyTypeId_B))));
             //console.log('fee_ccy_B', fee_ccy_B);
         }
 
@@ -245,8 +245,8 @@ module.exports = {
         if (qty_A > 0) {
             var netKg_tfd = 0;
             const eeuFee_A = Math.floor(
-                                Number(await stm.fee_tokenType_Fixed(tokenTypeId_A))  // EEU fee paid by A
-                              + Number((qty_A / 10000) * Number(await stm.fee_tokenType_PercBips(tokenTypeId_A))));
+                                Number(await stm.fee_tokType_Fix(tokenTypeId_A))  // EEU fee paid by A
+                              + Number((qty_A / 10000) * Number(await stm.fee_tokType_Bps(tokenTypeId_A))));
             //console.log('eeuFee_A', eeuFee_A);
 
             totalKg_tfd_incFees = totalKg_tfd_incFees.add(new BN(eeuFee_A));
@@ -259,8 +259,8 @@ module.exports = {
         if (qty_B > 0) {
             var netKg_tfd = 0;
             const eeuFee_B = Math.floor(
-                                Number(await stm.fee_tokenType_Fixed(tokenTypeId_B)) // EEU fee paid by B
-                              + Number((qty_B / 10000) * Number(await stm.fee_tokenType_PercBips(tokenTypeId_B)))); 
+                                Number(await stm.fee_tokType_Fix(tokenTypeId_B)) // EEU fee paid by B
+                              + Number((qty_B / 10000) * Number(await stm.fee_tokType_Bps(tokenTypeId_B)))); 
             //console.log('eeuFee_B', eeuFee_B);
 
             totalKg_tfd_incFees = totalKg_tfd_incFees.add(new BN(eeuFee_B));

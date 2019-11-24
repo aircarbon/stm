@@ -31,7 +31,7 @@ library CcyLib {
 
     function getCcyTypes(
         StructLib.CcyTypesStruct storage ccyTypesData)
-    external view returns (StructLib.GetCcyTypesReturn memory) {
+    public view returns (StructLib.GetCcyTypesReturn memory) {
         StructLib.Ccy[] memory ccyTypes;
         ccyTypes = new StructLib.Ccy[](ccyTypesData._count_ccyTypes);
 

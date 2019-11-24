@@ -18,7 +18,7 @@ contract StTransferable is Owned, StLedger, StFees {
     function transfer(TransferLib.TransferArgs memory a) public {
         require(msg.sender == owner, "Restricted method");
         require(_readOnly == false, "Contract is read only");
-        TransferLib.transfer(ledgerData, feeData, a, owner);
+        TransferLib.transfer(ledgerData, globalFees, a, owner);
     }
 
     /**
