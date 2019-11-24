@@ -21,10 +21,13 @@ contract("StMaster", accounts => {
 
         // set fee structure VCS: 1%
         const feeBips = 100; // 100 bp = 1%
-        const setFeeTx = await stm.setFee_SecTokenType_PercBips(CONST.tokenType.VCS, feeBips);
+        //const setFeeTx = await stm.setFee_SecTokenType_PercBips(CONST.tokenType.VCS, feeBips);
+        const setFeeTx = await stm.setGlobalFee_TokType(CONST.tokenType.VCS, { fee_fixed: 0, fee_percBips: feeBips, fee_min: 0, fee_max: 0 } );
         truffleAssert.eventEmitted(setFeeTx, 'SetFeeTokBps', ev => ev.tokenTypeId == CONST.tokenType.VCS && ev.fee_token_PercBips == feeBips);
-        assert(await stm.fee_tokType_Bps(CONST.tokenType.VCS) == feeBips, 'unexpected VCS percentage fee after setting VCS fee structure');
-        assert(await stm.fee_tokType_Bps(CONST.tokenType.UNFCCC) == 0, 'unexpected UNFCCC percentage fee after setting VCS fee structure');
+        
+        console.dir(stm.globalFees);
+        //assert(await stm.fee_tokType_Bps(CONST.tokenType.VCS) == feeBips, 'unexpected VCS percentage fee after setting VCS fee structure');
+        //assert(await stm.fee_tokType_Bps(CONST.tokenType.UNFCCC) == 0, 'unexpected UNFCCC percentage fee after setting VCS fee structure');
 
         // transfer, with fee structure applied
         const transferAmountKg = new BN(100); // 100 kg
@@ -53,13 +56,14 @@ contract("StMaster", accounts => {
         assert(ledgerA_VcsKgAfter == Number(ledgerA_VcsKgBefore) - Number(expectedFeeKg) - Number(transferAmountKg), 'unexpected ledger A (fee payer) VCS EEU tonnage after transfer');
     });
 
-    it('trading fees (percentage) - apply UNFCCC carbon fee 1 BP (min) on a trade 1000 tons (min lot size) (fee on B)', async () => {
+    /*it('trading fees (percentage) - apply UNFCCC carbon fee 1 BP (min) on a trade 1000 tons (min lot size) (fee on B)', async () => {
         await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        accounts[global.accountNdx + 0],         { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.mtCarbon, 1,       accounts[global.accountNdx + 1], [], [], { from: accounts[0] });
 
         // set fee structure UNFCCC: 0.01% (1 bip - minimum % fee)
         const feeBips = 1;
-        const setFeeTx = await stm.setFee_SecTokenType_PercBips(CONST.tokenType.UNFCCC, feeBips);
+        //const setFeeTx = await stm.setFee_SecTokenType_PercBips(CONST.tokenType.UNFCCC, feeBips);
+        const setFeeTx = await stm.setGlobalFee_TokType(CONST.tokenType.UNFCCC, { fee_fixed: 0, fee_percBips: feeBips, fee_min: 0, fee_max: 0 } );
         truffleAssert.eventEmitted(setFeeTx, 'SetFeeTokBps', ev => ev.tokenTypeId == CONST.tokenType.UNFCCC && ev.fee_token_PercBips == feeBips);
         assert(await stm.fee_tokType_Bps(CONST.tokenType.UNFCCC) == feeBips, 'unexpected UNFCCC percentage fee after setting UNFCCC fee structure');
 
@@ -98,7 +102,8 @@ contract("StMaster", accounts => {
 
         // set fee structure new EEU type: 50% = 5000 BP(1.5 EEUs, 2 batches)
         const feeBips = 5000;
-        const setFeeTx = await stm.setFee_SecTokenType_PercBips(newTypeId, feeBips);
+        //const setFeeTx = await stm.setFee_SecTokenType_PercBips(newTypeId, feeBips);
+        const setFeeTx = await stm.setGlobalFee_TokType(newTypeId, { fee_fixed: 0, fee_percBips: feeBips, fee_min: 0, fee_max: 0 } );
         truffleAssert.eventEmitted(setFeeTx, 'SetFeeTokBps', ev => ev.tokenTypeId == newTypeId && ev.fee_token_PercBips == feeBips);
         assert(await stm.fee_tokType_Bps(newTypeId) == feeBips, 'unexpected new eeu type percentage fee after setting fee structure');
 
@@ -128,8 +133,9 @@ contract("StMaster", accounts => {
         // set fee structure ETH: 1%
         const ethFeePercBips = 100; // 100 bp = 1%
         assert(await stm.fee_ccyType_Bps(CONST.ccyType.ETH) == 0, 'unexpected ETH percentage fee before setting ETH fee structure');
-        const setCarbonFeeTx = await stm.setFee_CcyType_PercBips(CONST.ccyType.ETH, ethFeePercBips);
-        truffleAssert.eventEmitted(setCarbonFeeTx, 'SetFeeCcyBps', ev => ev.ccyTypeId == CONST.ccyType.ETH && ev.fee_ccy_PercBips == ethFeePercBips);
+        //const setFeeTx = await stm.setFee_CcyType_PercBips(CONST.ccyType.ETH, ethFeePercBips);
+        const setFeeTx = await stm.setGlobalFee_CcyType(CONST.ccyType.ETH, { fee_fixed: 0, fee_percBips: ethFeePercBips, fee_min: 0, fee_max: 0 } );
+        truffleAssert.eventEmitted(setFeeTx, 'SetFeeCcyBps', ev => ev.ccyTypeId == CONST.ccyType.ETH && ev.fee_ccy_PercBips == ethFeePercBips);
         assert(await stm.fee_ccyType_Bps(CONST.ccyType.ETH) == ethFeePercBips, 'unexpected ETH percentage fee after setting ETH fee structure');
         assert(await stm.fee_ccyType_Bps(CONST.ccyType.USD) == 0, 'unexpected USD percentage fee after setting ETH fee structure');
 
@@ -160,7 +166,8 @@ contract("StMaster", accounts => {
 
         // set fee structure USD: 0.01% 
         const usdFeePercBips = 1; // 1 bp = 0.01%
-        const setFeeTx = await stm.setFee_CcyType_PercBips(CONST.ccyType.USD, usdFeePercBips);
+        //const setFeeTx = await stm.setFee_CcyType_PercBips(CONST.ccyType.USD, usdFeePercBips);
+        const setFeeTx = await stm.setGlobalFee_CcyType(CONST.ccyType.USD, { fee_fixed: 0, fee_percBips: usdFeePercBips, fee_min: 0, fee_max: 0 } );
         truffleAssert.eventEmitted(setFeeTx, 'SetFeeCcyBps', ev => ev.ccyTypeId == CONST.ccyType.USD && ev.fee_ccy_PercBips == usdFeePercBips);
         assert(await stm.fee_ccyType_Bps(CONST.ccyType.USD) == usdFeePercBips, 'unexpected USD percentage fee after setting USD fee structure');
 
@@ -192,7 +199,8 @@ contract("StMaster", accounts => {
 
         // set fee structure on new ccy: 0.5% 
         const feeBips = 50; // 50 bp = 0.5%
-        const setFeeTx = await stm.setFee_CcyType_PercBips(newCcyTypeId, feeBips);
+        //const setFeeTx = await stm.setFee_CcyType_PercBips(newCcyTypeId, feeBips);
+        const setFeeTx = await stm.setGlobalFee_CcyType(newCcyTypeId, { fee_fixed: 0, fee_percBips: feeBips, fee_min: 0, fee_max: 0 } );
         truffleAssert.eventEmitted(setFeeTx, 'SetFeeCcyBps', ev => ev.ccyTypeId == newCcyTypeId && ev.fee_ccy_PercBips == feeBips);
         assert(await stm.fee_ccyType_Bps(newCcyTypeId) == feeBips, 'unexpected new ccy percentage fee after setting fee structure');
         
@@ -215,7 +223,7 @@ contract("StMaster", accounts => {
         //console.log('contractOwnerFeeBalanceAfter', contractOwnerFeeBalanceAfter.toString());
         //console.log('expectedFeeCcy', expectedFeeCcy.toString());
         assert(contractOwnerFeeBalanceAfter == Number(contractOwnerFeeBalanceBefore) + Number(expectedFeeCcy), 'unexpected contract owner (fee receiver) new ccy balance after transfer');
-    });
+    });*/
 
     // TODO: NEGATIVE RE. INSUFFICIENT FUNDS...
 

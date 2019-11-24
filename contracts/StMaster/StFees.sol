@@ -16,24 +16,28 @@ contract StFees is Owned, StLedger {
     // GLOBAL FEES
     StructLib.FeeStruct globalFees;
 
-    // TODO: step 2: remove - read direct from globalFees
     function fee_tokType_Fix(uint256 tokenTypeId) public  view returns (uint256) { return globalFees.fee_tokType_Fix[tokenTypeId]; }
     function fee_tokType_Bps(uint256 tokenTypeId) public  view returns (uint256) { return globalFees.fee_tokType_Bps[tokenTypeId]; }
     function fee_tokType_Min(uint256 tokenTypeId) public  view returns (uint256) { return globalFees.fee_tokType_Min[tokenTypeId]; }
     function fee_tokType_Max(uint256 tokenTypeId) public  view returns (uint256) { return globalFees.fee_tokType_Max[tokenTypeId]; }
 
-    function fee_ccyType_Fix(uint256 ccyTypeId) public  view returns (uint256) { return globalFees.fee_ccyType_Fix[ccyTypeId]; }
-    function fee_ccyType_Bps(uint256 ccyTypeId) public  view returns (uint256) { return globalFees.fee_ccyType_Bps[ccyTypeId]; }
-    function fee_ccyType_Min(uint256 ccyTypeId) public  view returns (uint256) { return globalFees.fee_ccyType_Min[ccyTypeId]; }
-    function fee_ccyType_Max(uint256 ccyTypeId) public  view returns (uint256) { return globalFees.fee_ccyType_Max[ccyTypeId]; }
+    function fee_ccyType_Fix(uint256 ccyTypeId)   public  view returns (uint256) { return globalFees.fee_ccyType_Fix[ccyTypeId]; }
+    function fee_ccyType_Bps(uint256 ccyTypeId)   public  view returns (uint256) { return globalFees.fee_ccyType_Bps[ccyTypeId]; }
+    function fee_ccyType_Min(uint256 ccyTypeId)   public  view returns (uint256) { return globalFees.fee_ccyType_Min[ccyTypeId]; }
+    function fee_ccyType_Max(uint256 ccyTypeId)   public  view returns (uint256) { return globalFees.fee_ccyType_Max[ccyTypeId]; }
 
-    // STANDARDIZED FEE STRUCT - step 1 move to this
-    struct Fee {
+    // STANDARDIZED FEE STRUCT
+    struct Fee { // TODO: move this to StructLib, so it can also be used on the ledger
         uint256 fee_fixed;      // apply fixed fee, if any
         uint256 fee_percBips;   // add a basis points fee, if any
         uint256 fee_min;        // collar
         uint256 fee_max;        // and cap
     }
+    /**
+     * Global Fee Structure
+     * NOTE: fees are applied ON TOP OF the supplied transfer amounts to the transfer() fn.
+     *       i.e. transfer amounts are not inclusive of fees, they are additional
+     */
     function setGlobalFee_TokType(uint256 tokenTypeId, Fee memory fee) public {
         require(msg.sender == owner, "Restricted method");
         require(_readOnly == false, "Contract is read only");
@@ -67,15 +71,9 @@ contract StFees is Owned, StLedger {
         globalFees.fee_ccyType_Max[ccyTypeId] = fee.fee_max;
     }
 
-    // TODO: cleanup in TransferLib: now got more stack available: consolidate fee amounts, *can send in single op*
     // TODO: -ve tests for % fees on balance exceeded (test ccy & token balance validations)
     // TODO: tests for multi-fees (fixed + basis) and tests for capped and collared...
-
-    /**
-     * Global Fee Structure
-     * NOTE: fees are applied ON TOP OF the supplied transfer amounts to the transfer() fn.
-     *       i.e. transfer amounts are not inclusive of fees, they are additional
-     */
+   
     // FIXED FEES - TOKENS
     // function setFee_SecTokenType_Fixed(uint256 tokenTypeId, uint256 fee_tokenQty_Fixed) public {
     //     require(msg.sender == owner, "Restricted method");
