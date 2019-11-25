@@ -53,7 +53,8 @@ contract StLedger is Owned, StTypes, CcyTypes {
     /**
      * @dev Returns an ST batch by ID
      */
-    function getSecTokenBatch(uint256 id) external view returns (StructLib.SecTokenBatch memory) {
-        return ledgerData._batches[id];
+    function getSecTokenBatch(uint256 batchId) external view returns (StructLib.SecTokenBatch memory) {
+        require(batchId >= 1 && batchId <= ledgerData._batches_currentMax_id, "Invalid batchId");
+        return ledgerData._batches[batchId];
     }
 }

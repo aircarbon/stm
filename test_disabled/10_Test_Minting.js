@@ -21,7 +21,7 @@ contract("StMaster", accounts => {
     //    await mintBatch({ tokenType: CONST.tokenType.UNFCCC, qtyUnit: CONST.ktCarbon * 100, qtySecTokens: 2, receiver: accounts[global.accountNdx], },{ from: accounts[0] });
     //});
 
-    /*it('minting - should allow owner to mint a minimum-sized token (one ton)', async () => {
+    it('minting - should allow owner to mint a minimum-sized token (one ton)', async () => {
         await mintBatch({ tokenType: CONST.tokenType.UNFCCC, qtyUnit: CONST.tonCarbon * 1, qtySecTokens: 1, receiver: accounts[global.accountNdx], }, { from: accounts[0] });
     });
 
@@ -138,7 +138,7 @@ contract("StMaster", accounts => {
         }
         await stm.setReadOnly(false, { from: accounts[0] });
         assert.fail('expected restriction exception');
-    });*/
+    });
 
     async function mintBatch({ tokenType, qtyUnit, qtySecTokens, receiver }) {
         var batchId = -1;

@@ -39,6 +39,16 @@ contract StMintable is Owned, StLedger {
         TokenLib.mintSecTokenBatch(ledgerData, stTypesData, args);
     }
 
+    function addMetaSecTokenBatch(
+        uint256 batchId,
+        string memory metaKeyNew,
+        string memory metaValueNew)
+    public {
+        require(msg.sender == owner, "Restricted method");
+        require(_readOnly == false, "Contract is read only");
+        TokenLib.addMetaSecTokenBatch(ledgerData, batchId, metaKeyNew, metaValueNew);
+    }
+
     /**
      * @dev Returns the global ST count (variable-sized: ST count != total ST quantities)
      */

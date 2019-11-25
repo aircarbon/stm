@@ -112,53 +112,89 @@ contract("StMaster", accounts => {
     // ###
     // issues doing validation in the contact: string[] dynamic (ABIEncoderV2) string [] params' .length property returns 0 (?!)
     // will need to do this validation in the API...
-    /*it('minting - should not allow minting with empty metadata KVP lists', async () => {
-        try {
-            await mintBatchWithMetadata( { tokenType: CONST.tokenType.UNFCCC, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.accountNdx], 
-                metaKeys: [],
-              metaValues: [],
-            }, { from: accounts[0] } );
-        } catch (ex) { return; }
-        assert.fail('expected restriction exception');
-    });
+    // it('minting - should not allow minting with empty metadata KVP lists', async () => {
+    //     try {
+    //         await mintBatchWithMetadata( { tokenType: CONST.tokenType.UNFCCC, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.accountNdx], 
+    //             metaKeys: [],
+    //           metaValues: [],
+    //         }, { from: accounts[0] } );
+    //     } catch (ex) { return; }
+    //     assert.fail('expected restriction exception');
+    // });
     
-    it('minting - should not allow minting with zero-length metadata keys or values', async () => {
+    // it('minting - should not allow minting with zero-length metadata keys or values', async () => {
+    //     try {
+    //         await mintBatchWithMetadata( { tokenType: CONST.tokenType.UNFCCC, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.accountNdx], 
+    //             metaKeys: [''],
+    //           metaValues: ['testValue'],
+    //         }, { from: accounts[0] } );
+    //     } catch (ex) { return; }
+    //     assert.fail('expected restriction exception');
+    // });
+
+    // it('minting - should not allow minting with mismatched metadata KVP list lengths', async () => {
+    //     try {
+    //         await mintBatchWithMetadata( { tokenType: CONST.tokenType.UNFCCC, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.accountNdx], 
+    //             metaKeys: ['testKey'],
+    //           metaValues: [],
+    //         }, { from: accounts[0] } );
+    //     } catch (ex) { return; }
+    //     assert.fail('expected restriction exception');
+    // });
+
+    // it('minting - should not allow minting batches with excessive KVP metadata', async () => {
+    //     const metaKeys = [], metaValues = [];
+    //     for (var i=0 ; i < 43 ; i++) {
+    //         metaKeys.push(`testKey_${i}`);
+    //         metaValues.push(`testValue_${i}`);
+    //     }
+    //     try {
+    //         await mintBatchWithMetadata( { tokenType: CONST.tokenType.UNFCCC, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.accountNdx], 
+    //             metaKeys, metaValues
+    //         }, { from: accounts[0] } );
+    //     } catch (ex) { return; }
+    //     assert.fail('expected restriction exception');
+    // });
+
+    it('post-minting metadata - should allow adding of a new KVP after minting', async () => {
+        const batchId = await mintBatchWithMetadata( 
+            { tokenType: CONST.tokenType.UNFCCC, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.accountNdx],
+             metaKeys: unfccc_ExampleKvps.map(p => p.k),
+           metaValues: unfccc_ExampleKvps.map(p => p.v),
+        }, { from: accounts[0] } );
+
+        const batchBefore = await stm.getSecTokenBatch(batchId);
+
+        const testKey = 'TEST_NEW_KEY', testValue = 'TEST_NEW_VALUE';
+        const addKvpTx = await stm.addMetaSecTokenBatch(batchId, testKey, testValue);
+        truffleAssert.eventEmitted(addKvpTx, 'AddedBatchMetadata', ev => ev.batchId == batchId && ev.key == testKey && ev.value == testValue);
+        const batchAfter = await stm.getSecTokenBatch(batchId);
+
+        //console.log('batchBefore', batchBefore);
+        //console.log('batchAfter', batchAfter);
+        assert(batchAfter.metaKeys.length == batchBefore.metaKeys.length + 1, 'unexpected meta keys length after adding batch metadata');
+        assert(batchAfter.metaValues.length == batchBefore.metaValues.length + 1, 'unexpected meta values length after adding batch metadata');
+        assert(batchAfter.metaKeys.includes(testKey), 'missing meta key after adding batch metadata');
+        assert(batchAfter.metaValues.includes(testValue), 'missing meta key after adding batch metadata');
+    });
+
+    it('post-minting metadata - should not allow non-owner to add a new KVP after minting', async () => {
+        const batchId = await mintBatchWithMetadata( 
+            { tokenType: CONST.tokenType.UNFCCC, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.accountNdx],
+             metaKeys: unfccc_ExampleKvps.map(p => p.k),
+           metaValues: unfccc_ExampleKvps.map(p => p.v),
+        }, { from: accounts[0] } );
+
         try {
-            await mintBatchWithMetadata( { tokenType: CONST.tokenType.UNFCCC, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.accountNdx], 
-                metaKeys: [''],
-              metaValues: ['testValue'],
-            }, { from: accounts[0] } );
+            const testKey = 'TEST_NEW_KEY', testValue = 'TEST_NEW_VALUE';
+            const addKvpTx = await stm.addMetaSecTokenBatch(batchId, 'testKey', testValue, {from: accounts[1] });
         } catch (ex) { return; }
         assert.fail('expected restriction exception');
     });
-
-    it('minting - should not allow minting with mismatched metadata KVP list lengths', async () => {
-        try {
-            await mintBatchWithMetadata( { tokenType: CONST.tokenType.UNFCCC, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.accountNdx], 
-                metaKeys: ['testKey'],
-              metaValues: [],
-            }, { from: accounts[0] } );
-        } catch (ex) { return; }
-        assert.fail('expected restriction exception');
-    });
-
-    it('minting - should not allow minting batches with excessive KVP metadata', async () => {
-        const metaKeys = [], metaValues = [];
-        for (var i=0 ; i < 43 ; i++) {
-            metaKeys.push(`testKey_${i}`);
-            metaValues.push(`testValue_${i}`);
-        }
-        try {
-            await mintBatchWithMetadata( { tokenType: CONST.tokenType.UNFCCC, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.accountNdx], 
-                metaKeys, metaValues
-            }, { from: accounts[0] } );
-        } catch (ex) { return; }
-        assert.fail('expected restriction exception');
-    });*/
 
     async function mintBatchWithMetadata({ tokenType, qtyUnit, qtySecTokens, receiver, metaKeys, metaValues }) {
         const mintTx = await stm.mintSecTokenBatch(tokenType, qtyUnit, qtySecTokens, receiver, metaKeys, metaValues, { from: accounts[0] });
-        console.log(`\t>>> gasUsed - Mint  1 vEEU w/ ${metaKeys.length} metadata keys: ${mintTx.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * mintTx.receipt.gasUsed).toFixed(4)} (USD ${(CONST.gasPriceEth * mintTx.receipt.gasUsed * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
+        //console.log(`\t>>> gasUsed - Mint 1 vEEU w/ ${metaKeys.length} metadata keys: ${mintTx.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * mintTx.receipt.gasUsed).toFixed(4)} (USD ${(CONST.gasPriceEth * mintTx.receipt.gasUsed * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
 
         const batchId = (await stm.getSecTokenBatchCount.call()).toNumber();
         const batch = await stm.getSecTokenBatch(batchId);
@@ -168,7 +204,6 @@ contract("StMaster", accounts => {
         
         // console.dir(metaKeys);
         // console.dir(metaValues);
-        
         //console.dir(batchKeys);
         //console.dir(batchValues);
 
