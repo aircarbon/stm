@@ -47,17 +47,21 @@ module.exports = {
         // expected currency fees paid by A and B
         var fee_ccy_A = 0;
         if (ccy_amount_A > 0 && applyFees) {
-            fee_ccy_A = Math.floor(
-                            Number(await stm.fee_ccyType_Fix(ccyTypeId_A)) // ccy fee paid by A
-                          + Number((ccy_amount_A / 10000) * Number(await stm.fee_ccyType_Bps(ccyTypeId_A))));
-            //console.log('fee_ccy_A', fee_ccy_A);
+            fee_ccy_A =  Big(Math.floor(
+                            Big(await stm.fee_ccyType_Fix(ccyTypeId_A)) // ccy fee paid by A
+                          .plus(((Big(ccy_amount_A).div(10000)).times(Big(await stm.fee_ccyType_Bps(ccyTypeId_A)))))
+                        ))
+                        ;
+            //console.log('fee_ccy_A', fee_ccy_A.toFixed());
         }
         var fee_ccy_B = 0;
         if (ccy_amount_B > 0 && applyFees) {
-            fee_ccy_B = Math.floor(
-                            Number(await stm.fee_ccyType_Fix(ccyTypeId_B)) // ccy fee paid by B
-                          + Number((ccy_amount_B / 10000) * Number(await stm.fee_ccyType_Bps(ccyTypeId_B))));
-            //console.log('fee_ccy_B', fee_ccy_B);
+            fee_ccy_B =  Big(Math.floor(
+                            Big(await stm.fee_ccyType_Fix(ccyTypeId_B)) // ccy fee paid by B
+                          .plus(((Big(ccy_amount_B).div(10000)).times(Big(await stm.fee_ccyType_Bps(ccyTypeId_B)))))
+                        ))
+                        ;
+            //console.log('fee_ccy_B', fee_ccy_B.toFixed());
         }
 
         // transfer
@@ -176,11 +180,18 @@ module.exports = {
             const A_bal_bef_ccyA = Big(ledgerA_before.ccys.find(p => p.ccyTypeId == ccyTypeId_A).balance);
             const B_bal_bef_ccyA = Big(ledgerB_before.ccys.find(p => p.ccyTypeId == ccyTypeId_A).balance);
 
+            // console.log('A_bal_aft_ccyA', A_bal_aft_ccyA.toFixed());
+            // console.log('A_bal_bef_ccyA', A_bal_bef_ccyA.toFixed());
+            // console.log('fee_ccy_A', fee_ccy_A);
+            // console.log('Big(fee_ccy_A)', Big(fee_ccy_A).toFixed());
+            // console.log('deltaCcy_fromA[ccyTypeId_A]', deltaCcy_fromA[ccyTypeId_A]);
+            // console.log('Big(deltaCcy_fromA[ccyTypeId_A])', Big(deltaCcy_fromA[ccyTypeId_A]).toFixed());
+
             assert(A_bal_aft_ccyA.minus(A_bal_bef_ccyA).plus(Big(fee_ccy_A)).eq(Big(deltaCcy_fromA[ccyTypeId_A]).times(+1)),
-                `unexpected ledger A balance ${A_bal_aft_ccyA} after transfer A -> B amount ${ccy_amount_A} ccy type ${ccyTypeId_A}`);
+                `unexpected ledger A balance ${A_bal_aft_ccyA.toFixed()} after transfer A -> B amount ${ccy_amount_A} ccy type ${ccyTypeId_A}`);
 
             assert(B_bal_aft_ccyA.minus(B_bal_bef_ccyA).eq(Big(deltaCcy_fromA[ccyTypeId_A]).times(-1)),
-                `unexpected ledger B balance ${B_bal_aft_ccyA} after transfer A -> B amount ${ccy_amount_A} ccy type ${ccyTypeId_A}`);
+                `unexpected ledger B balance ${B_bal_aft_ccyA.toFixed()} after transfer A -> B amount ${ccy_amount_A} ccy type ${ccyTypeId_A}`);
         }
 
         // validate currency ledger balances are updated: B -> A
@@ -206,26 +217,29 @@ module.exports = {
         totalCcy_tfd_after[ccyTypeId_A] = await stm.getCcy_totalTransfered.call(ccyTypeId_A);
         totalCcy_tfd_after[ccyTypeId_B] = await stm.getCcy_totalTransfered.call(ccyTypeId_B);
         const expectedCcy_tfd = []; 
-        expectedCcy_tfd[ccyTypeId_A] = Number(0);
-        expectedCcy_tfd[ccyTypeId_B] = Number(0);
-        expectedCcy_tfd[ccyTypeId_A] = expectedCcy_tfd[ccyTypeId_A] + Number(ccy_amount_A);
-        expectedCcy_tfd[ccyTypeId_B] = expectedCcy_tfd[ccyTypeId_B] + Number(ccy_amount_B);
+        expectedCcy_tfd[ccyTypeId_A] = Big(0);
+        expectedCcy_tfd[ccyTypeId_B] = Big(0);
+        expectedCcy_tfd[ccyTypeId_A] = expectedCcy_tfd[ccyTypeId_A].plus(ccy_amount_A);
+        expectedCcy_tfd[ccyTypeId_B] = expectedCcy_tfd[ccyTypeId_B].plus(ccy_amount_B);
         if (applyFees) {
             if (ccy_amount_A > 0) {
-                expectedCcy_tfd[ccyTypeId_A] = Number(expectedCcy_tfd[ccyTypeId_A]) + Number(fee_ccy_A);
+                //console.log('> expectedCcy_tfd[ccyTypeId_A]', expectedCcy_tfd[ccyTypeId_A]);
+                //console.log('> fee_ccy_A', fee_ccy_A);
+                expectedCcy_tfd[ccyTypeId_A] = expectedCcy_tfd[ccyTypeId_A].plus(Big(fee_ccy_A));
+                //console.log('> expectedCcy_tfd[ccyTypeId_A]', expectedCcy_tfd[ccyTypeId_A]);
             }
             if (ccy_amount_B > 0) {
-                expectedCcy_tfd[ccyTypeId_B] = Number(expectedCcy_tfd[ccyTypeId_B]) + Number(fee_ccy_B);
+                expectedCcy_tfd[ccyTypeId_B] = expectedCcy_tfd[ccyTypeId_B].plus(Big(fee_ccy_B));
             }
         }
         // console.log('                       fee_ccy_A', fee_ccy_A.toString());
         // console.log(' totalCcy_tfd_after[ccyTypeId_A]', totalCcy_tfd_after[ccyTypeId_A].toString());
         // console.log('totalCcy_tfd_before[ccyTypeId_A]', totalCcy_tfd_before[ccyTypeId_A].toString());
         // console.log('    expectedCcy_tfd[ccyTypeId_A]', expectedCcy_tfd[ccyTypeId_A].toString());
-        assert(Big(totalCcy_tfd_after[ccyTypeId_A]).minus(Big(totalCcy_tfd_before[ccyTypeId_A])).eq(Big(expectedCcy_tfd[ccyTypeId_A])),
+        assert(Big(totalCcy_tfd_after[ccyTypeId_A]).minus(totalCcy_tfd_before[ccyTypeId_A]).eq(expectedCcy_tfd[ccyTypeId_A]),
                `unexpected total transfered delta after, ccy A`);
                
-        assert(Big(totalCcy_tfd_after[ccyTypeId_B]).minus(totalCcy_tfd_before[ccyTypeId_B]).eq(Big(expectedCcy_tfd[ccyTypeId_B])),
+        assert(Big(totalCcy_tfd_after[ccyTypeId_B]).minus(totalCcy_tfd_before[ccyTypeId_B]).eq(expectedCcy_tfd[ccyTypeId_B]),
                `unexpected total transfered delta after, ccy B`);
 
         // validate EEU events
