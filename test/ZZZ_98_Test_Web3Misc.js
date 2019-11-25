@@ -1,5 +1,7 @@
 const st = artifacts.require("StMaster");
 const CONST = require('../const.js');
+const acmJson = require('../build/contracts/StMaster.json');
+const abi = acmJson['abi'];
 
 contract("StMaster", accounts => {
     var stm;
@@ -8,20 +10,30 @@ contract("StMaster", accounts => {
         stm = await st.deployed();
     });
 
-    it("web3 - misc", async () => {
+    it("web3 - events", async () => {
+        const Web3 = require('web3');
+        const web3 = new Web3('http://127.0.0.1:8545'); // ganache
+
+        var contract = new web3.eth.Contract(abi, stm.address);
+        const events =  await contract.getPastEvents('MintedSecToken', {
+            fromBlock: 0,
+            toBlock: "latest"
+        });
+        console.log('events', events);
+    })
+
+    /*it("web3 - misc", async () => {
         const Web3 = require('web3');
         const web3 = new Web3('http://127.0.0.1:8545'); // ganache
         const accounts = await web3.eth.getAccounts();
         //console.dir(accounts);
     })
 
-    , it("public accessors - should work", async () => {
+    ,it("public accessors - should work", async () => {
         let networkID = process.env.NETWORK;
         console.log('net_version: ', networkID);
         
         var Web3 = require('web3');
-        const acmJson = require('../build/contracts/StMaster.json');
-        const abi = acmJson['abi'];
 
         var address = stm.address;
         var account = "0xf57B0adC78461888BF32d5FB92784CF3FC8f9956"; // owner
@@ -31,10 +43,10 @@ contract("StMaster", accounts => {
         const nonce = await web3.eth.getTransactionCount(account, "pending");
         var contract = new web3.eth.Contract(abi, address);
         assert(await contract.methods.name.call() == 'SecTok_Master', 'fail');
-    });
+    });*/
 
-    // leave for now -- do properly in API layer, and measure there
-    /*, it("speed - should allow fast return of txid (rinkeby_infura)", async () => {
+    /*
+    ,it("speed - should allow fast return of txid (rinkeby_infura)", async () => {
         let networkID = process.env.NETWORK;
         console.log('net_version: ', networkID);
 
@@ -44,8 +56,6 @@ contract("StMaster", accounts => {
         }
         
         var Web3 = require('web3');
-        const acmJson = require('../build/contracts/StMaster.json');
-        const abi = acmJson['abi'];
 
         // LAB -- pure web3: sendRawTransaction (fast tx id) via Rinkeby Infura
         var address = stm.address; //"0x41ffed08c64B339A62DC8003b5b3cCEDC81BcB29"; // deployed addr

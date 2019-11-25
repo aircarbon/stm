@@ -156,6 +156,8 @@ contract("StMaster", accounts => {
     //     // TODO ... - multi fees on both sides, ccy & carbon
     // });
 
+    // TODO: events not found in web3... (post libs?)
+
     // TODO: CCY CAP & COLLARS
     // TODO: EEU CAP & COLLARS
 

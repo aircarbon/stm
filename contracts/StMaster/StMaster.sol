@@ -7,27 +7,36 @@ import "./CcyFundable.sol";
 import "./CcyWithdrawable.sol";
 import "./StTransferable.sol";
 
-//import "../St2x/St2x.sol"; // bytecode of lib gets *removed* during LINKING (solc/truffle migrate)
-import "../Libs/CcyLib.sol";
-import "../Libs/LedgerLib.sol";
+// bytecode of libs get *removed* during LINKING (solc/truffle migrate)
 import "../Libs/StructLib.sol";
+//import "../Libs/CcyLib.sol";
+//import "../Libs/LedgerLib.sol";
 
 contract StMaster is StMintable, StBurnable, CcyFundable, CcyWithdrawable, StTransferable {
-
+    // contact properties
     string public name;
     string public version;
     string public unit; // the smallest (integer, non-divisible) security token unit, e.g. "KG"
 
-    // TODO: for updateable libs - proxy dispatcher
-    // https://blog.openzeppelin.com/proxy-libraries-in-solidity-79fbe4b970fd/
-    //address public addr_st2;
+    // events -- (hack: see: https://ethereum.stackexchange.com/questions/11137/watching-events-defined-in-libraries)
+    // CcyLib events
+    event AddedCcyType(uint256 id, string name, string unit);
+    event CcyFundedLedger(uint256 ccyTypeId, address ledgerOwner, int256 amount);
+    event CcyWithdrewLedger(uint256 ccyTypeId, address ledgerOwner, int256 amount);
+    // TokenLib events
+    event AddedSecTokenType(uint256 id, string name);
+    event BurnedFullSecToken(uint256 stId, uint256 tokenTypeId, address ledgerOwner, uint256 burnedQty);
+    event BurnedPartialSecToken(uint256 stId, uint256 tokenTypeId, address ledgerOwner, uint256 burnedQty);
+    event MintedSecTokenBatch(uint256 batchId, uint256 tokenTypeId, address batchOwner, uint256 mintQty, uint256 mintSecTokenCount);
+    event MintedSecToken(uint256 stId, uint256 batchId, uint256 tokenTypeId, address ledgerOwner, uint256 mintedQty);
+    event AddedBatchMetadata(uint256 batchId, string key, string value);
+    // TransferLib events
+    event TransferedLedgerCcy(address from, address to, uint256 ccyTypeId, uint256 amount, bool isFee);
+    event TransferedFullSecToken(address from, address to, uint256 stId, uint256 mergedToSecTokenId, /*uint256 tokenTypeId,*/ uint256 qty, bool isFee);
+    event TransferedPartialSecToken(address from, address to, uint256 splitFromSecTokenId, uint256 newSecTokenId, uint256 mergedToSecTokenId, /*uint256 tokenTypeId,*/ uint256 qty, bool isFee);
 
-    constructor(
-        //address st2
-    ) public {
-        //addr_st2 = st2; // TODO: want to be able to update this post-deployment (public owner-only setter)...
-
-        // params - global
+    constructor() public {
+        // set contract properties
         name = "SecTok_Master";
         version = "0.4";
         unit = "KG";
@@ -49,7 +58,9 @@ contract StMaster is StMintable, StBurnable, CcyFundable, CcyWithdrawable, StTra
         ledgerData._ledgerOwners.push(owner);
     }
 
-    // test lib
+    // TODO: for updateable libs - proxy dispatcher
+    // https://blog.openzeppelin.com/proxy-libraries-in-solidity-79fbe4b970fd/
+    // test lib...
     /*mapping(uint256 => St2x.SecTokenBatch) __batches;
     function call_st2() external returns (uint256) {
         //St2Interface st2 = St2Interface(addr_st2);
