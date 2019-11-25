@@ -153,8 +153,11 @@ contract("StMaster", accounts => {
 
     // CCY + EEU MULTI FEES
     // it('trading fees (multi) - apply ETH ccy fee 1000 BP + 1000 ETH fixed, VCS fee 1000 BP + 1000 KG on a large (500m ETH / 0.5GT) trade (fees on both sides)', async () => {
-    //     //...
+    //     // TODO ... - multi fees on both sides, ccy & carbon
     // });
+
+    // TODO: CCY CAP & COLLARS
+    // TODO: EEU CAP & COLLARS
 
     /*it('trading fees (percentage) - apply ccy fee 50 BP on a trade on a newly added ccy', async () => {
         await stm.addCcyType('TEST_CCY_TYPE', 'TEST_UNIT');

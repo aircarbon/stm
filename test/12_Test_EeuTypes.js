@@ -17,7 +17,7 @@ contract("StMaster", accounts => {
 
     it('eeu types - should have correct default values', async () => {
         const types = (await stm.getSecTokenTypes()).tokenTypes;
-        console.dir(types);
+        //console.dir(types);
         assert(types.length == countDefaultSecSecTokenTypes, 'unexpected default eeu type count');
 
         assert(types[0].name.includes('UNFCCC'), `unexpected default eeu type name 0 (${types[0].name})`);

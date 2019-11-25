@@ -27,6 +27,8 @@ const HDWalletProvider = require("@truffle/hdwallet-provider");
 const rootPackageJson = require("../../package.json");
 const mnemonic = rootPackageJson.config.mnemonic;
 
+const gweiDeployment = "20";
+
 module.exports = {
   /**
    * Networks define how you connect to your ethereum client and let you set the
@@ -71,7 +73,7 @@ module.exports = {
                       0, 888), // # test accounts
       network_id: "*",  
       gas: 6000000,
-      gasPrice: web3.utils.toWei("40", "gwei")
+      gasPrice: web3.utils.toWei(gweiDeployment, "gwei")
     },
 
     // aircarbon private testnet geth node
@@ -80,7 +82,7 @@ module.exports = {
                       0, 888), // # test accounts
       network_id: "*",
       gas: 6000000,
-      gasPrice: web3.utils.toWei("40", "gwei")
+      gasPrice: web3.utils.toWei(gweiDeployment, "gwei")
     },
 
     // ropsten infura -- much slower than rinkeby infura
@@ -89,7 +91,7 @@ module.exports = {
                       0, 888), // # test accounts
       network_id: "*",
       gas: 6000000,
-      gasPrice: web3.utils.toWei("40", "gwei")
+      gasPrice: web3.utils.toWei(gweiDeployment, "gwei")
     },
 
     rinkeby_infura: {
@@ -97,7 +99,7 @@ module.exports = {
                       0, 888), // # test accounts
       network_id: "*",
       gas: 6000000,
-      gasPrice: web3.utils.toWei("40", "gwei")
+      gasPrice: web3.utils.toWei(gweiDeployment, "gwei")
     }
 
     // Another network with more advanced options...
@@ -136,7 +138,8 @@ module.exports = {
     reporter: 'eth-gas-reporter',
     reporterOptions: {
       currency: 'usd',
-      gasPrice: 20,
+      gasPrice: 20
+       //, url: 'https://ac-dev0.net:9545'
     }
   },
 
