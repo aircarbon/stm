@@ -51,10 +51,10 @@ contract("StMaster", accounts => {
         assert(ledgerA_VcsKgAfter == Number(ledgerA_VcsKgBefore) - Number(expectedFeeKg) - Number(transferAmountKg), 'unexpected ledger A (fee payer) VCS EEU tonnage after transfer');
     });
 
-    it('trading fees (multi) - apply VCS carbon fee 1000 BP + 1000 KG fixed on a large (0.5 GT) trade (fee on A)', async () => {
-        await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.gtCarbon, 1,       accounts[global.accountNdx + 0], [], [], { from: accounts[0] });
-        await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        accounts[global.accountNdx + 1],         { from: accounts[0] });
-
+    it('trading fees (multi) - apply VCS carbon fee 1000 BP + 1000 KG fixed on a large (0.5 GT) trade (fee on B)', async () => {
+        await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        accounts[global.accountNdx + 0],         { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.gtCarbon, 1,       accounts[global.accountNdx + 1], [], [], { from: accounts[0] });
+        
         // set fee structure VCS: 10% + 1000 KG
         const feeBps = 1000; // 1000 bp = 10%
         const feeFix = 1000; // 1000 kg
@@ -68,10 +68,10 @@ contract("StMaster", accounts => {
         const expectedFeeKg = Math.floor(Number(transferAmountKg.toString()) * (feeBps/10000)) + feeFix;
         const data = await helper.transferLedger({ stm, accounts, 
                 ledger_A: accounts[global.accountNdx + 0],     ledger_B: accounts[global.accountNdx + 1],
-                   qty_A: transferAmountKg,               tokenTypeId_A: CONST.tokenType.VCS,
-                   qty_B: 0,                              tokenTypeId_B: 0,
-            ccy_amount_A: 0,                                ccyTypeId_A: 0,
-            ccy_amount_B: CONST.oneEth_wei,                 ccyTypeId_B: CONST.ccyType.ETH,
+                   qty_A: 0,                              tokenTypeId_A: 0,
+                   qty_B: transferAmountKg,               tokenTypeId_B: CONST.tokenType.VCS,
+            ccy_amount_A: CONST.oneEth_wei,                 ccyTypeId_A: CONST.ccyType.ETH,
+            ccy_amount_B: 0,                                ccyTypeId_B: 0,
                applyFees: true,
         });
 
@@ -81,9 +81,9 @@ contract("StMaster", accounts => {
         assert(contractOwner_VcsKgAfter == Number(contractOwner_VcsKgBefore) + Number(expectedFeeKg), 'unexpected contract owner (fee receiver) VCS EEU tonnage after transfer');
         
         // test sender has sent expected quantity and fees
-        const ledgerA_VcsKgBefore = data.ledgerA_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
-        const ledgerA_VcsKgAfter  =  data.ledgerA_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
-        assert(ledgerA_VcsKgAfter == Number(ledgerA_VcsKgBefore) - Number(expectedFeeKg) - Number(transferAmountKg), 'unexpected ledger A (fee payer) VCS EEU tonnage after transfer');
+        const ledgerB_VcsKgBefore = data.ledgerB_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
+        const ledgerB_VcsKgAfter  =  data.ledgerB_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
+        assert(ledgerB_VcsKgAfter == Number(ledgerB_VcsKgBefore) - Number(expectedFeeKg) - Number(transferAmountKg), 'unexpected ledger A (fee payer) VCS EEU tonnage after transfer');
     });
 
     // CCY MULTI FEES
@@ -119,9 +119,9 @@ contract("StMaster", accounts => {
         assert(contractOwnerFeeBalanceAfter == Number(contractOwnerFeeBalanceBefore) + Number(expectedFeeCcy), 'unexpected contract owner (fee receiver) ETH balance after transfer');
     });
 
-    it('trading fees (multi) - apply ETH ccy fee 1000 BP + 1000 ETH fixed on a large (500m ETH) trade (fee on A)', async () => {
-        await stm.fund(CONST.ccyType.ETH,                   CONST.millionEth_wei,    accounts[global.accountNdx + 0],         { from: accounts[0] });
-        await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], [], [], { from: accounts[0] });
+    it('trading fees (multi) - apply ETH ccy fee 1000 BP + 1000 ETH fixed on a large (500k ETH) trade (fee on B)', async () => {
+        await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], [], [], { from: accounts[0] });
+        await stm.fund(CONST.ccyType.ETH,                   CONST.millionEth_wei,    accounts[global.accountNdx + 1],         { from: accounts[0] });
 
         // set fee structure ETH: 10% + 1000 ETH fixed
         const ethFeeBps = 1000; // 1000 bp
@@ -138,10 +138,10 @@ contract("StMaster", accounts => {
         const expectedFeeCcy = Math.floor(Number(transferAmountCcy.toString()) * (ethFeeBps/10000)) + Number(ethFeeFix);
         const data = await helper.transferLedger({ stm, accounts, 
                 ledger_A: accounts[global.accountNdx + 0],                          ledger_B: accounts[global.accountNdx + 1],
-                   qty_A: 0,                                                   tokenTypeId_A: 0,
-                   qty_B: 750,                                                 tokenTypeId_B: CONST.tokenType.VCS,
-            ccy_amount_A: transferAmountCcy,                                     ccyTypeId_A: CONST.ccyType.ETH,
-            ccy_amount_B: 0,                                                     ccyTypeId_B: 0,
+                   qty_A: 750,                                                 tokenTypeId_A: CONST.tokenType.VCS,
+                   qty_B: 0,                                                   tokenTypeId_B: 0,
+            ccy_amount_A: 0,                                                     ccyTypeId_A: 0,
+            ccy_amount_B: transferAmountCcy,                                     ccyTypeId_B: CONST.ccyType.ETH,
                applyFees: true,
         });
 
@@ -152,7 +152,7 @@ contract("StMaster", accounts => {
     });
 
     // CCY + EEU MULTI FEES
-    it('trading fees (multi) - apply ETH ccy fee 1000 BP + 1000 ETH fixed, VCS fee 1000 BP + 1000 KG on a large (500m ETH / 0.5GT) trade (fees on both sides)', async () => {
+    it('trading fees (multi) - apply ETH ccy fee 1000 BP + 1000 ETH fixed, VCS fee 1000 BP + 1000 KG on a large (500k ETH / 0.5GT) trade (fees on both sides)', async () => {
         await stm.fund(CONST.ccyType.ETH,                   CONST.millionEth_wei,    accounts[global.accountNdx + 0],         { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.gtCarbon, 1,       accounts[global.accountNdx + 1], [], [], { from: accounts[0] });
 
@@ -198,9 +198,6 @@ contract("StMaster", accounts => {
         const contractOwner_VcsKgAfter  =  data.ledgerContractOwner_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
         assert(contractOwner_VcsKgAfter == Number(contractOwner_VcsKgBefore) + Number(expectedFeeEeu), 'unexpected contract owner (fee receiver) VCS EEU tonnage after transfer');
     });
-
-    // TODO: CCY CAP & COLLARS
-    // TODO: EEU CAP & COLLARS
 
     it('trading fees (multi) - should not allow a transfer with insufficient ccy (fixed + percentage) to cover fees (fee on A)', async () => {
         await stm.fund(CONST.ccyType.ETH,                   101,                     accounts[global.accountNdx + 0],         { from: accounts[0] });

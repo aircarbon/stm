@@ -47,20 +47,28 @@ module.exports = {
         // expected currency fees paid by A and B
         var fee_ccy_A = 0;
         if (ccy_amount_A > 0 && applyFees) {
-            fee_ccy_A =  Big(Math.floor(
+            fee_ccy_A = Big(Math.floor(
                             Big(await stm.fee_ccyType_Fix(ccyTypeId_A)) // ccy fee paid by A
-                          .plus(((Big(ccy_amount_A).div(10000)).times(Big(await stm.fee_ccyType_Bps(ccyTypeId_A)))))
-                        ))
-                        ;
+                          .plus(((Big(ccy_amount_A).div(10000)).times(Big(await stm.fee_ccyType_Bps(ccyTypeId_A)))))));
+            
+            const max = Big(await stm.fee_ccyType_Max(ccyTypeId_A));
+            const min = Big(await stm.fee_ccyType_Min(ccyTypeId_A));
+            if (fee_ccy_A.gt(max) && max.gt(0)) fee_ccy_A = max;
+            if (fee_ccy_A.lt(min) && min.gt(0)) fee_ccy_A = min;
+
             //console.log('fee_ccy_A', fee_ccy_A.toFixed());
         }
         var fee_ccy_B = 0;
         if (ccy_amount_B > 0 && applyFees) {
-            fee_ccy_B =  Big(Math.floor(
+            fee_ccy_B = Big(Math.floor(
                             Big(await stm.fee_ccyType_Fix(ccyTypeId_B)) // ccy fee paid by B
-                          .plus(((Big(ccy_amount_B).div(10000)).times(Big(await stm.fee_ccyType_Bps(ccyTypeId_B)))))
-                        ))
-                        ;
+                          .plus(((Big(ccy_amount_B).div(10000)).times(Big(await stm.fee_ccyType_Bps(ccyTypeId_B)))))));
+            
+            const max = Big(await stm.fee_ccyType_Max(ccyTypeId_B));
+            const min = Big(await stm.fee_ccyType_Min(ccyTypeId_B));
+            if (fee_ccy_B.gt(max) && max.gt(0)) fee_ccy_B = max;
+            if (fee_ccy_B.lt(min) && min.gt(0)) fee_ccy_B = min;
+              
             //console.log('fee_ccy_B', fee_ccy_B.toFixed());
         }
 
@@ -284,9 +292,14 @@ module.exports = {
         var totalqty_AllSecSecTokenTypes_fees = new BN(0);
         if (qty_A > 0) {
             var netKg_tfd = 0;
-            const eeuFee_A = Math.floor(
+
+            var eeuFee_A = Math.floor(
                                 Number(await stm.fee_tokType_Fix(tokenTypeId_A))  // EEU fee paid by A
                               + Number((qty_A / 10000) * Number(await stm.fee_tokType_Bps(tokenTypeId_A))));
+            const max = Big(await stm.fee_tokType_Max(tokenTypeId_A));
+            const min = Big(await stm.fee_tokType_Min(tokenTypeId_A));
+            if (Big(eeuFee_A).gt(max) && max.gt(0)) eeuFee_A = max.toFixed();
+            if (Big(eeuFee_A).lt(min) && min.gt(0)) eeuFee_A = min.toFixed();                              
             //console.log('eeuFee_A', eeuFee_A);
 
             totalKg_tfd_incFees = totalKg_tfd_incFees.add(new BN(eeuFee_A));
@@ -298,9 +311,13 @@ module.exports = {
         }
         if (qty_B > 0) {
             var netKg_tfd = 0;
-            const eeuFee_B = Math.floor(
+            var eeuFee_B = Math.floor(
                                 Number(await stm.fee_tokType_Fix(tokenTypeId_B)) // EEU fee paid by B
                               + Number((qty_B / 10000) * Number(await stm.fee_tokType_Bps(tokenTypeId_B)))); 
+            const max = Big(await stm.fee_tokType_Max(tokenTypeId_B));
+            const min = Big(await stm.fee_tokType_Min(tokenTypeId_B));
+            if (Big(eeuFee_B).gt(max) && max.gt(0)) eeuFee_B = max.toFixed();
+            if (Big(eeuFee_B).lt(min) && min.gt(0)) eeuFee_B = min.toFixed();                             
             //console.log('eeuFee_B', eeuFee_B);
 
             totalKg_tfd_incFees = totalKg_tfd_incFees.add(new BN(eeuFee_B));
