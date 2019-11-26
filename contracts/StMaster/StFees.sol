@@ -9,13 +9,18 @@ import "../Libs/StructLib.sol";
 contract StFees is Owned, StLedger {
     event SetFeeTokFix(uint256 tokenTypeId, uint256 fee_tokenQty_Fixed);
     event SetFeeCcyFix(uint256 ccyTypeId, uint256 fee_ccy_Fixed);
-    
+
     event SetFeeTokBps(uint256 tokenTypeId, uint256 fee_token_PercBips);
     event SetFeeCcyBps(uint256 ccyTypeId, uint256 fee_ccy_PercBips);
 
+    event SetFeeTokMin(uint256 tokenTypeId, uint256 fee_token_Min);
+    event SetFeeCcyMin(uint256 ccyTypeId, uint256 fee_ccy_Min);
+
+    event SetFeeTokMax(uint256 tokenTypeId, uint256 fee_token_Max);
+    event SetFeeCcyMax(uint256 ccyTypeId, uint256 fee_ccy_Max);
+
     //
     // PRI 1
-    // TODO: fees - MULTI-FEES tests, i.e. fixed + at same time...
     // TODO: fees - CAP/COLLAR + tests...
     //
     // TODO: fees - structure override on ledger level...
@@ -39,8 +44,8 @@ contract StFees is Owned, StLedger {
     struct Fee { // TODO: move this to StructLib, so it can also be used on the ledger
         uint256 fee_fixed;      // apply fixed fee, if any
         uint256 fee_percBips;   // add a basis points fee, if any - in basis points, i.e. minimum % = 1bp = 1/100 of 1% = 0.0001x
-        uint256 fee_min;        // collar
-        uint256 fee_max;        // and cap
+        uint256 fee_min;        // collar for fee (if >0)
+        uint256 fee_max;        // and cap for fee, (if >0)
     }
     /**
      * Global Fee Structure
@@ -60,7 +65,12 @@ contract StFees is Owned, StLedger {
             emit SetFeeTokBps(tokenTypeId, fee.fee_percBips);
         globalFees.fee_tokType_Bps[tokenTypeId] = fee.fee_percBips;
 
+        if (globalFees.fee_tokType_Min[tokenTypeId] != fee.fee_min || fee.fee_min != 0)
+            emit SetFeeTokMin(tokenTypeId, fee.fee_min);
         globalFees.fee_tokType_Min[tokenTypeId] = fee.fee_min;
+
+        if (globalFees.fee_tokType_Max[tokenTypeId] != fee.fee_max || fee.fee_max != 0)
+            emit SetFeeTokMax(tokenTypeId, fee.fee_max);
         globalFees.fee_tokType_Max[tokenTypeId] = fee.fee_max;
     }
     function setGlobalFee_CcyType(uint256 ccyTypeId, Fee memory fee) public {
@@ -76,52 +86,14 @@ contract StFees is Owned, StLedger {
             emit SetFeeCcyBps(ccyTypeId, fee.fee_percBips);
         globalFees.fee_ccyType_Bps[ccyTypeId] = fee.fee_percBips;
 
+        if (globalFees.fee_ccyType_Min[ccyTypeId] != fee.fee_min || fee.fee_min != 0)
+            emit SetFeeCcyMin(ccyTypeId, fee.fee_min);
         globalFees.fee_ccyType_Min[ccyTypeId] = fee.fee_min;
+        
+        if (globalFees.fee_ccyType_Max[ccyTypeId] != fee.fee_max || fee.fee_max != 0)
+            emit SetFeeCcyMax(ccyTypeId, fee.fee_max);
         globalFees.fee_ccyType_Max[ccyTypeId] = fee.fee_max;
     }
-
-    // TODO: -ve tests for % fees on balance exceeded (test ccy & token balance validations)
-    // TODO: tests for multi-fees (fixed + basis) and tests for capped and collared...
-   
-    // FIXED FEES - TOKENS
-    // function setFee_SecTokenType_Fixed(uint256 tokenTypeId, uint256 fee_tokenQty_Fixed) public {
-    //     require(msg.sender == owner, "Restricted method");
-    //     require(_readOnly == false, "Contract is read only");
-    //     require(tokenTypeId >= 0 && tokenTypeId < stTypesData._count_tokenTypes, "Invalid ST type");
-    //     globalFees.fee_tokType_Fix[tokenTypeId] = fee_tokenQty_Fixed;
-    //     globalFees.fee_tokType_Bps[tokenTypeId] = 0;
-    //     emit SetFeeTokFix(tokenTypeId, fee_tokenQty_Fixed);
-    // }
-    // // FIXED FEES - CCY
-    // function setFee_CcyType_Fixed(uint256 ccyTypeId, uint256 fee_ccy_Fixed) public {
-    //     require(msg.sender == owner, "Restricted method");
-    //     require(_readOnly == false, "Contract is read only");
-    //     require(ccyTypeId >= 0 && ccyTypeId < ccyTypesData._count_ccyTypes, "Invalid currency type");
-    //     globalFees.fee_ccyType_Fix[ccyTypeId] = fee_ccy_Fixed;
-    //     globalFees.fee_ccyType_Bps[ccyTypeId] = 0;
-    //     emit SetFeeCcyFix(ccyTypeId, fee_ccy_Fixed);
-    // }
-
-    // // PERCENTAGE FEES (BASIS POINTS, 1/100 of 1%) - TOKENS
-    // function setFee_SecTokenType_PercBips(uint256 tokenTypeId, uint256 fee_token_PercBips) public {
-    //     require(msg.sender == owner, "Restricted method");
-    //     require(_readOnly == false, "Contract is read only");
-    //     require(tokenTypeId >= 0 && tokenTypeId < stTypesData._count_tokenTypes, "Invalid ST type");
-    //     require(fee_token_PercBips < 10000, "Invalid fee basis points");
-    //     globalFees.fee_tokType_Bps[tokenTypeId] = fee_token_PercBips;
-    //     globalFees.fee_tokType_Fix[tokenTypeId] = 0;
-    //     emit SetFeeTokBps(tokenTypeId, fee_token_PercBips);
-    // }
-    // // PERCENTAGE FEES (BASIS POINTS, 1/100 of 1%) - CCY
-    // function setFee_CcyType_PercBips(uint256 ccyTypeId, uint256 fee_ccy_PercBips) public {
-    //     require(msg.sender == owner, "Restricted method");
-    //     require(_readOnly == false, "Contract is read only");
-    //     require(ccyTypeId >= 0 && ccyTypeId < ccyTypesData._count_ccyTypes, "Invalid currency type");
-    //     require(fee_ccy_PercBips < 10000, "Invalid fee percentage");
-    //     globalFees.fee_ccyType_Bps[ccyTypeId] = fee_ccy_PercBips;
-    //     globalFees.fee_ccyType_Fix[ccyTypeId] = 0;
-    //     emit SetFeeCcyBps(ccyTypeId, fee_ccy_PercBips);
-    // }
 
     /**
      * @dev Returns the global total quantity of token fees paid, in the contract base unit
