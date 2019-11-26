@@ -12,6 +12,8 @@
   > runs with a large number of accounts (the tests require way more than 10 built into `truffle develop`)
   > runs with custom network ID 888
   > runs with InstaMining by default
+Or, better (for individual dev account separation), from repo root:
+- `yarn ganache_dom` or `yarn ganache_dung`, etc.
 
 ## Run Tests
 
