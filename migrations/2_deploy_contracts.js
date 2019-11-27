@@ -56,13 +56,16 @@ module.exports = async function (deployer) {
                 const contractName = "SecTok_Master";
                 const contractVer = "0.4";
 
+                var ip = "unknown";
+                publicIp.v4().then(p => ip = p).catch(e => { console.log('warn: could not get IP'); });
+
                 await db.SaveDeployment({
                     contractName: contractName,
                      contractVer: contractVer,
                        networkId: deployer.network_id,
                  deployedAddress: stm.address,
                 deployerHostName: os.hostname(),
-                    deployerIpv4: await publicIp.v4(),
+                    deployerIpv4: ip,
                      deployedAbi: JSON.stringify(stm.abi)
                 });
             }

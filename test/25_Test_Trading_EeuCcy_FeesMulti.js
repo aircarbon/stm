@@ -23,8 +23,8 @@ contract("StMaster", accounts => {
         // set fee structure VCS: 1% + 1 KG
         const feeBps = 100; // 100 bp = 1%
         const feeFix = 1;   // 1 kg
-        const setEeuFeeTx = await stm.setGlobalFee_TokType(CONST.tokenType.VCS, { fee_fixed: feeFix, fee_percBips: feeBps, fee_min: 0, fee_max: 0 } );
-        const setCcyFeeTx = await stm.setGlobalFee_CcyType(CONST.ccyType.ETH,   { fee_fixed: 0,      fee_percBips: 0,      fee_min: 0, fee_max: 0 } );
+        const setEeuFeeTx = await stm.setGlobalFee_TokType(CONST.tokenType.VCS, "0x0000000000000000000000000000000000000000", { fee_fixed: feeFix, fee_percBips: feeBps, fee_min: 0, fee_max: 0 } );
+        const setCcyFeeTx = await stm.setGlobalFee_CcyType(CONST.ccyType.ETH, "0x0000000000000000000000000000000000000000",   { fee_fixed: 0,      fee_percBips: 0,      fee_min: 0, fee_max: 0 } );
         truffleAssert.eventEmitted(setEeuFeeTx, 'SetFeeTokBps', ev => ev.tokenTypeId == CONST.tokenType.VCS && ev.fee_token_PercBips == feeBps);
         truffleAssert.eventEmitted(setEeuFeeTx, 'SetFeeTokFix', ev => ev.tokenTypeId == CONST.tokenType.VCS && ev.fee_tokenQty_Fixed == feeFix);
 
@@ -58,8 +58,8 @@ contract("StMaster", accounts => {
         // set fee structure VCS: 10% + 1000 KG
         const feeBps = 1000; // 1000 bp = 10%
         const feeFix = 1000; // 1000 kg
-        const setEeuFeeTx = await stm.setGlobalFee_TokType(CONST.tokenType.VCS, { fee_fixed: feeFix, fee_percBips: feeBps, fee_min: 0, fee_max: 0 } );
-        const setCcyFeeTx = await stm.setGlobalFee_CcyType(CONST.ccyType.ETH,   { fee_fixed: 0,      fee_percBips: 0,      fee_min: 0, fee_max: 0 } );
+        const setEeuFeeTx = await stm.setGlobalFee_TokType(CONST.tokenType.VCS, "0x0000000000000000000000000000000000000000", { fee_fixed: feeFix, fee_percBips: feeBps, fee_min: 0, fee_max: 0 } );
+        const setCcyFeeTx = await stm.setGlobalFee_CcyType(CONST.ccyType.ETH, "0x0000000000000000000000000000000000000000",   { fee_fixed: 0,      fee_percBips: 0,      fee_min: 0, fee_max: 0 } );
         truffleAssert.eventEmitted(setEeuFeeTx, 'SetFeeTokBps', ev => ev.tokenTypeId == CONST.tokenType.VCS && ev.fee_token_PercBips == feeBps);
         truffleAssert.eventEmitted(setEeuFeeTx, 'SetFeeTokFix', ev => ev.tokenTypeId == CONST.tokenType.VCS && ev.fee_tokenQty_Fixed == feeFix);
 
@@ -94,8 +94,8 @@ contract("StMaster", accounts => {
         // set fee structure ETH: 1% + 1 Wei fixed
         const ethFeeBps = 100; // 100 bp = 1%
         const ethFeeFix = CONST.hundredthEth_wei;
-        const setCcyFeeTx = await stm.setGlobalFee_CcyType(CONST.ccyType.ETH,   { fee_fixed: ethFeeFix, fee_percBips: ethFeeBps, fee_min: 0, fee_max: 0 } );
-        const setEeuFeeTx = await stm.setGlobalFee_TokType(CONST.tokenType.VCS, { fee_fixed: 0,         fee_percBips: 0,         fee_min: 0, fee_max: 0 } );
+        const setCcyFeeTx = await stm.setGlobalFee_CcyType(CONST.ccyType.ETH, "0x0000000000000000000000000000000000000000",   { fee_fixed: ethFeeFix, fee_percBips: ethFeeBps, fee_min: 0, fee_max: 0 } );
+        const setEeuFeeTx = await stm.setGlobalFee_TokType(CONST.tokenType.VCS, "0x0000000000000000000000000000000000000000", { fee_fixed: 0,         fee_percBips: 0,         fee_min: 0, fee_max: 0 } );
         truffleAssert.eventEmitted(setCcyFeeTx, 'SetFeeCcyBps', ev => ev.ccyTypeId == CONST.ccyType.ETH && ev.fee_ccy_PercBips == ethFeeBps);
         truffleAssert.eventEmitted(setCcyFeeTx, 'SetFeeCcyFix', ev => ev.ccyTypeId == CONST.ccyType.ETH && ev.fee_ccy_Fixed == ethFeeFix);
         assert(await stm.fee_ccyType_Bps(CONST.ccyType.ETH) == ethFeeBps, 'unexpected ETH percentage fee after setting ETH fee structure');
@@ -126,8 +126,8 @@ contract("StMaster", accounts => {
         // set fee structure ETH: 10% + 1000 ETH fixed
         const ethFeeBps = 1000; // 1000 bp
         const ethFeeFix = CONST.thousandEth_wei;
-        const setCcyFeeTx = await stm.setGlobalFee_CcyType(CONST.ccyType.ETH,   { fee_fixed: ethFeeFix, fee_percBips: ethFeeBps, fee_min: 0, fee_max: 0 } );
-        const setEeuFeeTx = await stm.setGlobalFee_TokType(CONST.tokenType.VCS, { fee_fixed: 0,         fee_percBips: 0,         fee_min: 0, fee_max: 0 } );
+        const setCcyFeeTx = await stm.setGlobalFee_CcyType(CONST.ccyType.ETH, "0x0000000000000000000000000000000000000000",   { fee_fixed: ethFeeFix, fee_percBips: ethFeeBps, fee_min: 0, fee_max: 0 } );
+        const setEeuFeeTx = await stm.setGlobalFee_TokType(CONST.tokenType.VCS, "0x0000000000000000000000000000000000000000", { fee_fixed: 0,         fee_percBips: 0,         fee_min: 0, fee_max: 0 } );
         truffleAssert.eventEmitted(setCcyFeeTx, 'SetFeeCcyBps', ev => ev.ccyTypeId == CONST.ccyType.ETH && ev.fee_ccy_PercBips == ethFeeBps);
         truffleAssert.eventEmitted(setCcyFeeTx, 'SetFeeCcyFix', ev => ev.ccyTypeId == CONST.ccyType.ETH && ev.fee_ccy_Fixed == ethFeeFix);
         assert(await stm.fee_ccyType_Bps(CONST.ccyType.ETH) == ethFeeBps, 'unexpected ETH percentage fee after setting ETH fee structure');
@@ -159,7 +159,7 @@ contract("StMaster", accounts => {
         // set fee structure ETH: 10% + 1000 ETH fixed
         const ethFeeBps = 1000; // 1000 bp 
         const ethFeeFix = CONST.thousandEth_wei;
-        const setCcyFeeTx = await stm.setGlobalFee_CcyType(CONST.ccyType.ETH,   { fee_fixed: ethFeeFix, fee_percBips: ethFeeBps, fee_min: 0, fee_max: 0 } );
+        const setCcyFeeTx = await stm.setGlobalFee_CcyType(CONST.ccyType.ETH, "0x0000000000000000000000000000000000000000",   { fee_fixed: ethFeeFix, fee_percBips: ethFeeBps, fee_min: 0, fee_max: 0 } );
         truffleAssert.eventEmitted(setCcyFeeTx, 'SetFeeCcyBps', ev => ev.ccyTypeId == CONST.ccyType.ETH && ev.fee_ccy_PercBips == ethFeeBps);
         truffleAssert.eventEmitted(setCcyFeeTx, 'SetFeeCcyFix', ev => ev.ccyTypeId == CONST.ccyType.ETH && ev.fee_ccy_Fixed == ethFeeFix);
         assert(await stm.fee_ccyType_Bps(CONST.ccyType.ETH) == ethFeeBps, 'unexpected ETH percentage fee after setting ETH fee structure');
@@ -168,7 +168,7 @@ contract("StMaster", accounts => {
         // set fee structure VCS: 10% + 1000 KG fixed
         const eeuFeeBps = 1000; // 1000 bp
         const eeuFeeFix = CONST.tonCarbon;
-        const setEeuFeeTx = await stm.setGlobalFee_TokType(CONST.tokenType.VCS, { fee_fixed: eeuFeeFix, fee_percBips: eeuFeeBps, fee_min: 0, fee_max: 0 } );
+        const setEeuFeeTx = await stm.setGlobalFee_TokType(CONST.tokenType.VCS, "0x0000000000000000000000000000000000000000", { fee_fixed: eeuFeeFix, fee_percBips: eeuFeeBps, fee_min: 0, fee_max: 0 } );
         truffleAssert.eventEmitted(setEeuFeeTx, 'SetFeeTokBps', ev => ev.tokenTypeId == CONST.tokenType.VCS && ev.fee_token_PercBips == eeuFeeBps);
         truffleAssert.eventEmitted(setEeuFeeTx, 'SetFeeTokFix', ev => ev.tokenTypeId == CONST.tokenType.VCS && ev.fee_tokenQty_Fixed == eeuFeeFix);
 
@@ -206,8 +206,8 @@ contract("StMaster", accounts => {
         // set fee structure ETH: 1% + 1 Wei fixed
         const ethFeeBps = 100; // 100 bp = 1%
         const ethFeeFix = 1;
-        await stm.setGlobalFee_CcyType(CONST.ccyType.ETH,   { fee_fixed: ethFeeFix, fee_percBips: ethFeeBps, fee_min: 0, fee_max: 0 } );
-        await stm.setGlobalFee_TokType(CONST.tokenType.VCS, { fee_fixed: 0,         fee_percBips: 0,         fee_min: 0, fee_max: 0 } );
+        await stm.setGlobalFee_CcyType(CONST.ccyType.ETH, "0x0000000000000000000000000000000000000000",   { fee_fixed: ethFeeFix, fee_percBips: ethFeeBps, fee_min: 0, fee_max: 0 } );
+        await stm.setGlobalFee_TokType(CONST.tokenType.VCS, "0x0000000000000000000000000000000000000000", { fee_fixed: 0,         fee_percBips: 0,         fee_min: 0, fee_max: 0 } );
 
         try {
             const transferAmountCcy = new BN(100);
@@ -232,8 +232,8 @@ contract("StMaster", accounts => {
         // set fee structure: 1% + 1,000 ETH
         const ethFeeBps = 100; 
         const ethFeeFix = "1000000000000000000000";
-        await stm.setGlobalFee_CcyType(CONST.ccyType.ETH,   { fee_fixed: ethFeeFix, fee_percBips: ethFeeBps, fee_min: 0, fee_max: 0 } );
-        await stm.setGlobalFee_TokType(CONST.tokenType.VCS, { fee_fixed: 0,         fee_percBips: 0,         fee_min: 0, fee_max: 0 } );
+        await stm.setGlobalFee_CcyType(CONST.ccyType.ETH, "0x0000000000000000000000000000000000000000",   { fee_fixed: ethFeeFix, fee_percBips: ethFeeBps, fee_min: 0, fee_max: 0 } );
+        await stm.setGlobalFee_TokType(CONST.tokenType.VCS, "0x0000000000000000000000000000000000000000", { fee_fixed: 0,         fee_percBips: 0,         fee_min: 0, fee_max: 0 } );
 
         try {
             const transferAmountCcy = new BN("100000000000000000000000"); // 100,000 ETH
@@ -258,8 +258,8 @@ contract("StMaster", accounts => {
         // set fee structure VCS: 2% + 1m tons
         const feeBps = 200; 
         const feeFix = 1000000000;
-        await stm.setGlobalFee_TokType(CONST.tokenType.VCS, { fee_fixed: feeFix, fee_percBips: feeBps, fee_min: 0, fee_max: 0 } );
-        await stm.setGlobalFee_CcyType(CONST.ccyType.ETH,   { fee_fixed: 0,      fee_percBips: 0,      fee_min: 0, fee_max: 0 } );
+        await stm.setGlobalFee_TokType(CONST.tokenType.VCS, "0x0000000000000000000000000000000000000000", { fee_fixed: feeFix, fee_percBips: feeBps, fee_min: 0, fee_max: 0 } );
+        await stm.setGlobalFee_CcyType(CONST.ccyType.ETH, "0x0000000000000000000000000000000000000000",   { fee_fixed: 0,      fee_percBips: 0,      fee_min: 0, fee_max: 0 } );
 
         try {
             const transferAmountKg = new BN(100000000000);
@@ -284,8 +284,8 @@ contract("StMaster", accounts => {
         // set fee structure VCS: 2% + 1m tons
         const feeBps = 200; 
         const feeFix = 1000000000;
-        await stm.setGlobalFee_TokType(CONST.tokenType.VCS, { fee_fixed: feeFix, fee_percBips: feeBps, fee_min: 0, fee_max: 0 } );
-        await stm.setGlobalFee_CcyType(CONST.ccyType.ETH,   { fee_fixed: 0,      fee_percBips: 0,      fee_min: 0, fee_max: 0 } );
+        await stm.setGlobalFee_TokType(CONST.tokenType.VCS, "0x0000000000000000000000000000000000000000", { fee_fixed: feeFix, fee_percBips: feeBps, fee_min: 0, fee_max: 0 } );
+        await stm.setGlobalFee_CcyType(CONST.ccyType.ETH, "0x0000000000000000000000000000000000000000",   { fee_fixed: 0,      fee_percBips: 0,      fee_min: 0, fee_max: 0 } );
 
         try {
             const transferAmountKg = new BN(100000000000);
