@@ -66,7 +66,8 @@ library CcyLib {
         // create ledger entry as required
         if (ledgerData._ledger[ledgerOwner].exists == false) {
             ledgerData._ledger[ledgerOwner] = StructLib.Ledger({
-                  exists: true
+                      exists: true,
+                  customFees: StructLib.FeeStruct()
             });
             ledgerData._ledgerOwners.push(ledgerOwner);
         }

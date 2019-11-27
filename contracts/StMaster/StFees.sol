@@ -7,17 +7,17 @@ import "./StLedger.sol";
 import "../Libs/StructLib.sol";
 
 contract StFees is Owned, StLedger {
-    event SetFeeTokFix(uint256 tokenTypeId, uint256 fee_tokenQty_Fixed);
-    event SetFeeCcyFix(uint256 ccyTypeId, uint256 fee_ccy_Fixed);
+    event SetFeeTokFix(uint256 tokenTypeId, address ledgerOwner, uint256 fee_tokenQty_Fixed);
+    event SetFeeCcyFix(uint256 ccyTypeId, address ledgerOwner, uint256 fee_ccy_Fixed);
 
-    event SetFeeTokBps(uint256 tokenTypeId, uint256 fee_token_PercBips);
-    event SetFeeCcyBps(uint256 ccyTypeId, uint256 fee_ccy_PercBips);
+    event SetFeeTokBps(uint256 tokenTypeId, address ledgerOwner, uint256 fee_token_PercBips);
+    event SetFeeCcyBps(uint256 ccyTypeId, address ledgerOwner, uint256 fee_ccy_PercBips);
 
-    event SetFeeTokMin(uint256 tokenTypeId, uint256 fee_token_Min);
-    event SetFeeCcyMin(uint256 ccyTypeId, uint256 fee_ccy_Min);
+    event SetFeeTokMin(uint256 tokenTypeId, address ledgerOwner, uint256 fee_token_Min);
+    event SetFeeCcyMin(uint256 ccyTypeId, address ledgerOwner, uint256 fee_ccy_Min);
 
-    event SetFeeTokMax(uint256 tokenTypeId, uint256 fee_token_Max);
-    event SetFeeCcyMax(uint256 ccyTypeId, uint256 fee_ccy_Max);
+    event SetFeeTokMax(uint256 tokenTypeId, address ledgerOwner, uint256 fee_token_Max);
+    event SetFeeCcyMax(uint256 ccyTypeId, address ledgerOwner, uint256 fee_ccy_Max);
 
     //
     // PRI 1
@@ -63,23 +63,23 @@ contract StFees is Owned, StLedger {
         StructLib.FeeStruct storage feeStruct = globalFees;
         if (ledgerOwner != address(0x0)) {
             require(ledgerData._ledger[ledgerOwner].exists == true, "Invalid ledger owner");
-            //...
+            feeStruct = ledgerData._ledger[ledgerOwner].customFees;
         }
 
         if (feeStruct.fee_tokType_Fix[tokenTypeId] != fee.fee_fixed || fee.fee_fixed != 0)
-            emit SetFeeTokFix(tokenTypeId, fee.fee_fixed);
+            emit SetFeeTokFix(tokenTypeId, ledgerOwner, fee.fee_fixed);
         feeStruct.fee_tokType_Fix[tokenTypeId] = fee.fee_fixed;
 
         if (feeStruct.fee_tokType_Bps[tokenTypeId] != fee.fee_percBips || fee.fee_percBips != 0)
-            emit SetFeeTokBps(tokenTypeId, fee.fee_percBips);
+            emit SetFeeTokBps(tokenTypeId, ledgerOwner, fee.fee_percBips);
         feeStruct.fee_tokType_Bps[tokenTypeId] = fee.fee_percBips;
 
         if (feeStruct.fee_tokType_Min[tokenTypeId] != fee.fee_min || fee.fee_min != 0)
-            emit SetFeeTokMin(tokenTypeId, fee.fee_min);
+            emit SetFeeTokMin(tokenTypeId, ledgerOwner, fee.fee_min);
         feeStruct.fee_tokType_Min[tokenTypeId] = fee.fee_min;
 
         if (feeStruct.fee_tokType_Max[tokenTypeId] != fee.fee_max || fee.fee_max != 0)
-            emit SetFeeTokMax(tokenTypeId, fee.fee_max);
+            emit SetFeeTokMax(tokenTypeId, ledgerOwner, fee.fee_max);
         feeStruct.fee_tokType_Max[tokenTypeId] = fee.fee_max;
     }
 
@@ -101,19 +101,19 @@ contract StFees is Owned, StLedger {
         }
 
         if (feeStruct.fee_ccyType_Fix[ccyTypeId] != fee.fee_fixed || fee.fee_fixed != 0)
-            emit SetFeeCcyFix(ccyTypeId, fee.fee_fixed);
+            emit SetFeeCcyFix(ccyTypeId, ledgerOwner, fee.fee_fixed);
         feeStruct.fee_ccyType_Fix[ccyTypeId] = fee.fee_fixed;
 
         if (feeStruct.fee_ccyType_Bps[ccyTypeId] != fee.fee_percBips || fee.fee_percBips != 0)
-            emit SetFeeCcyBps(ccyTypeId, fee.fee_percBips);
+            emit SetFeeCcyBps(ccyTypeId, ledgerOwner, fee.fee_percBips);
         feeStruct.fee_ccyType_Bps[ccyTypeId] = fee.fee_percBips;
 
         if (feeStruct.fee_ccyType_Min[ccyTypeId] != fee.fee_min || fee.fee_min != 0)
-            emit SetFeeCcyMin(ccyTypeId, fee.fee_min);
+            emit SetFeeCcyMin(ccyTypeId, ledgerOwner, fee.fee_min);
         feeStruct.fee_ccyType_Min[ccyTypeId] = fee.fee_min;
 
         if (feeStruct.fee_ccyType_Max[ccyTypeId] != fee.fee_max || fee.fee_max != 0)
-            emit SetFeeCcyMax(ccyTypeId, fee.fee_max);
+            emit SetFeeCcyMax(ccyTypeId, ledgerOwner, fee.fee_max);
         feeStruct.fee_ccyType_Max[ccyTypeId] = fee.fee_max;
     }
 

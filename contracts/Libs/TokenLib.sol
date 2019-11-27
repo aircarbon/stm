@@ -91,7 +91,8 @@ library TokenLib {
         // create ledger entry as required
         if (ledgerData._ledger[a.batchOwner].exists == false) {
             ledgerData._ledger[a.batchOwner] = StructLib.Ledger({
-                  exists: true
+                    exists: true,
+                customFees: StructLib.FeeStruct()
             });
             ledgerData._ledgerOwners.push(a.batchOwner);
         }

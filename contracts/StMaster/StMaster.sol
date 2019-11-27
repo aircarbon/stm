@@ -53,7 +53,8 @@ contract StMaster is StMintable, StBurnable, CcyFundable, CcyWithdrawable, StTra
 
          // create ledger entry for contract owner - transfer fees are paid to this ledger entry
         ledgerData._ledger[owner] = StructLib.Ledger({
-            exists: true
+            exists: true,
+        customFees: StructLib.FeeStruct()
         });
         ledgerData._ledgerOwners.push(owner);
     }

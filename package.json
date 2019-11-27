@@ -32,7 +32,7 @@
         "mssql": "^5.1.0",
         "public-ip": "3.2.0",
         "rimraf": "^3.0.0",
-        "truffle": "^5.0.27",
+        "truffle": "5.1.1",
         "truffle-assertions": "^0.9.1",
         "web3": "^2.0.0-alpha"
     },

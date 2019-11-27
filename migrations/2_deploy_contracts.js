@@ -57,7 +57,7 @@ module.exports = async function (deployer) {
                 const contractVer = "0.4";
 
                 var ip = "unknown";
-                publicIp.v4().then(p => ip = p).catch(e => { console.log('warn: could not get IP'); });
+                publicIp.v4().then(p => ip = p).catch(e => { console.log("WARN: could not get IP - will write 'unknown'"); });
 
                 await db.SaveDeployment({
                     contractName: contractName,

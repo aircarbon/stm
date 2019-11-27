@@ -59,6 +59,8 @@ library StructLib {
         mapping(uint256 => uint256[]) tokenType_stIds;          // SecTokenTypeId -> stId[] of all owned STs
       //mapping(uint256 => uint256)   tokenType_sumQty;         // SecTokenTypeId -> sum of token qty's across all owned STs
         mapping(uint256 => int256)    ccyType_balance;          // CcyTypeId -> balance -- SIGNED! WE MAY WANT TO SUPPORT -VE BALANCES LATER...
+
+        StructLib.FeeStruct           customFees;               // global fee override - per ledger entry
     }
 
     struct LedgerSecTokenReturn {                               // ledger return structure
@@ -104,14 +106,13 @@ library StructLib {
         uint256 _tokens_totalTransferedQty;
         uint256 _tokens_totalFeesPaidQty;
         uint256 _tokens_currentMax_id;                          // 1-based - updated by Mint() and by transferSplitSecTokens()
-
         mapping(uint256 => uint256) _ccyType_totalFunded;
         mapping(uint256 => uint256) _ccyType_totalWithdrawn;
         mapping(uint256 => uint256) _ccyType_totalTransfered;
         mapping(uint256 => uint256) _ccyType_totalFeesPaid;
     }
 
-    // FEE TYPES
+    // FEE STRUCTURE -- ledger or global
     struct FeeStruct {
         mapping(uint256 => uint256) fee_tokType_Fix; // fixed token qty fee per transfer
         mapping(uint256 => uint256) fee_ccyType_Fix; // fixed currency fee per transfer
