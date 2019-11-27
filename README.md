@@ -13,7 +13,7 @@
   > runs with custom network ID 888
   > runs with InstaMining by default
 Or, better (for individual dev account separation), from repo root:
-- `yarn ganache_dom` or `yarn ganache_dung`, etc.
+- `yarn ganache` after change NETWORK_ID=888 or NETWORK_ID=889 on .env files.
 
 ## Run Tests
 
