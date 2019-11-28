@@ -17,7 +17,7 @@ Or, better (for individual dev account separation), from repo root:
 
 ## Run Tests
 
-- `truffle compile`
+- `truffle compile` or (undocumented) `truffle compile --reset` if it keeps recompiling when there aren't any changes in the Solidity
 - `truffle test --network development`
 
 ## Migrate (Deploy) Contracts

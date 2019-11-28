@@ -44,15 +44,29 @@ module.exports = {
         deltaCcy_fromA[ccyTypeId_A] -= ccy_amount_A;
         deltaCcy_fromA[ccyTypeId_B] += ccy_amount_B;
         
-        // expected currency fees paid by A and B
+        // expected currency fees paid by A and B - ledger fees >0 override global fees
         var fee_ccy_A = 0;
         if (ccy_amount_A > 0 && applyFees) {
+            const globalFee_Fix = Big(await stm.globalFee_ccyType_Fix(ccyTypeId_A));
+            const ledgerFee_Fix = Big(await stm.ledgerFee_ccyType_Fix(ccyTypeId_A, ledger_A));
+            const globalFee_Bps = Big(await stm.globalFee_ccyType_Bps(ccyTypeId_A));
+            const ledgerFee_Bps = Big(await stm.ledgerFee_ccyType_Bps(ccyTypeId_A, ledger_A));
+            const globalFee_Min = Big(await stm.globalFee_ccyType_Min(ccyTypeId_A));
+            const ledgerFee_Min = Big(await stm.ledgerFee_ccyType_Min(ccyTypeId_A, ledger_A));
+            const globalFee_Max = Big(await stm.globalFee_ccyType_Max(ccyTypeId_A));
+            const ledgerFee_Max = Big(await stm.ledgerFee_ccyType_Max(ccyTypeId_A, ledger_A));
+
+            const fix = ledgerFee_Fix.gt(0) ? ledgerFee_Fix : globalFee_Fix;
+            const bps = ledgerFee_Bps.gt(0) ? ledgerFee_Bps : globalFee_Bps;
+            const min = ledgerFee_Min.gt(0) ? ledgerFee_Min : globalFee_Min;
+            const max = ledgerFee_Max.gt(0) ? ledgerFee_Max : globalFee_Max;
+ 
             fee_ccy_A = Big(Math.floor(
-                            Big(await stm.fee_ccyType_Fix(ccyTypeId_A)) // ccy fee paid by A
-                          .plus(((Big(ccy_amount_A).div(10000)).times(Big(await stm.fee_ccyType_Bps(ccyTypeId_A)))))));
+                            fix
+                          .plus(((Big(ccy_amount_A).div(10000)).times(bps)))));
             
-            const max = Big(await stm.fee_ccyType_Max(ccyTypeId_A));
-            const min = Big(await stm.fee_ccyType_Min(ccyTypeId_A));
+            //const max = Big(await stm.globalFee_ccyType_Max(ccyTypeId_A));
+            //const min = Big(await stm.globalFee_ccyType_Min(ccyTypeId_A));
             if (fee_ccy_A.gt(max) && max.gt(0)) fee_ccy_A = max;
             if (fee_ccy_A.lt(min) && min.gt(0)) fee_ccy_A = min;
 
@@ -60,12 +74,25 @@ module.exports = {
         }
         var fee_ccy_B = 0;
         if (ccy_amount_B > 0 && applyFees) {
+            const globalFee_Fix = Big(await stm.globalFee_ccyType_Fix(ccyTypeId_B));
+            const ledgerFee_Fix = Big(await stm.ledgerFee_ccyType_Fix(ccyTypeId_B, ledger_B));
+            const globalFee_Bps = Big(await stm.globalFee_ccyType_Bps(ccyTypeId_B));
+            const ledgerFee_Bps = Big(await stm.ledgerFee_ccyType_Bps(ccyTypeId_B, ledger_B));
+            const globalFee_Min = Big(await stm.globalFee_ccyType_Min(ccyTypeId_B));
+            const ledgerFee_Min = Big(await stm.ledgerFee_ccyType_Min(ccyTypeId_B, ledger_B));
+            const globalFee_Max = Big(await stm.globalFee_ccyType_Max(ccyTypeId_B));
+            const ledgerFee_Max = Big(await stm.ledgerFee_ccyType_Max(ccyTypeId_B, ledger_B));
+            const fix = ledgerFee_Fix.gt(0) ? ledgerFee_Fix : globalFee_Fix;
+            const bps = ledgerFee_Bps.gt(0) ? ledgerFee_Bps : globalFee_Bps;
+            const min = ledgerFee_Min.gt(0) ? ledgerFee_Min : globalFee_Min;
+            const max = ledgerFee_Max.gt(0) ? ledgerFee_Max : globalFee_Max;
+
             fee_ccy_B = Big(Math.floor(
-                            Big(await stm.fee_ccyType_Fix(ccyTypeId_B)) // ccy fee paid by B
-                          .plus(((Big(ccy_amount_B).div(10000)).times(Big(await stm.fee_ccyType_Bps(ccyTypeId_B)))))));
+                            fix
+                          .plus(((Big(ccy_amount_B).div(10000)).times(bps)))));
             
-            const max = Big(await stm.fee_ccyType_Max(ccyTypeId_B));
-            const min = Big(await stm.fee_ccyType_Min(ccyTypeId_B));
+            //const max = Big(await stm.globalFee_ccyType_Max(ccyTypeId_B));
+            //const min = Big(await stm.globalFee_ccyType_Min(ccyTypeId_B));
             if (fee_ccy_B.gt(max) && max.gt(0)) fee_ccy_B = max;
             if (fee_ccy_B.lt(min) && min.gt(0)) fee_ccy_B = min;
               
@@ -293,11 +320,24 @@ module.exports = {
         if (qty_A > 0) {
             var netKg_tfd = 0;
 
+            const globalFee_Fix = Big(await stm.globalFee_tokType_Fix(tokenTypeId_A));
+            const ledgerFee_Fix = Big(await stm.ledgerFee_tokType_Fix(tokenTypeId_A, ledger_A));
+            const globalFee_Bps = Big(await stm.globalFee_tokType_Bps(tokenTypeId_A));
+            const ledgerFee_Bps = Big(await stm.ledgerFee_tokType_Bps(tokenTypeId_A, ledger_A));
+            const globalFee_Min = Big(await stm.globalFee_tokType_Min(tokenTypeId_A));
+            const ledgerFee_Min = Big(await stm.ledgerFee_tokType_Min(tokenTypeId_A, ledger_A));
+            const globalFee_Max = Big(await stm.globalFee_tokType_Max(tokenTypeId_A));
+            const ledgerFee_Max = Big(await stm.ledgerFee_tokType_Max(tokenTypeId_A, ledger_A));
+            const fix = ledgerFee_Fix.gt(0) ? ledgerFee_Fix : globalFee_Fix;
+            const bps = ledgerFee_Bps.gt(0) ? ledgerFee_Bps : globalFee_Bps;
+            const min = ledgerFee_Min.gt(0) ? ledgerFee_Min : globalFee_Min;
+            const max = ledgerFee_Max.gt(0) ? ledgerFee_Max : globalFee_Max;
+
             var eeuFee_A = Math.floor(
-                                Number(await stm.fee_tokType_Fix(tokenTypeId_A))  // EEU fee paid by A
-                              + Number((qty_A / 10000) * Number(await stm.fee_tokType_Bps(tokenTypeId_A))));
-            const max = Big(await stm.fee_tokType_Max(tokenTypeId_A));
-            const min = Big(await stm.fee_tokType_Min(tokenTypeId_A));
+                                Number(/*await stm.globalFee_tokType_Fix(tokenTypeId_A)*/fix)  // EEU fee paid by A
+                              + Number((qty_A / 10000) * Number(/*await stm.globalFee_tokType_Bps(tokenTypeId_A)*/bps)));
+            //const max = Big(await stm.globalFee_tokType_Max(tokenTypeId_A));
+            //const min = Big(await stm.globalFee_tokType_Min(tokenTypeId_A));
             if (Big(eeuFee_A).gt(max) && max.gt(0)) eeuFee_A = max.toFixed();
             if (Big(eeuFee_A).lt(min) && min.gt(0)) eeuFee_A = min.toFixed();                              
             //console.log('eeuFee_A', eeuFee_A);
@@ -311,11 +351,38 @@ module.exports = {
         }
         if (qty_B > 0) {
             var netKg_tfd = 0;
+
+            // console.log('globalFee_tokType_Fix B', await stm.globalFee_tokType_Fix(tokenTypeId_B));
+            // console.log('ledgerFee_tokType_Fix B', await stm.ledgerFee_tokType_Fix(tokenTypeId_B, ledger_B));
+            // console.log('globalFee_tokType_Bps B', await stm.globalFee_tokType_Bps(tokenTypeId_B));
+            // console.log('ledgerFee_tokType_Bps B', await stm.ledgerFee_tokType_Bps(tokenTypeId_B, ledger_B));
+            // console.log('globalFee_tokType_Min B', await stm.globalFee_tokType_Min(tokenTypeId_B));
+            // console.log('ledgerFee_tokType_Min B', await stm.ledgerFee_tokType_Min(tokenTypeId_B, ledger_B));
+            // console.log('globalFee_tokType_Max B', await stm.globalFee_tokType_Max(tokenTypeId_B));
+            // console.log('ledgerFee_tokType_Max B', await stm.ledgerFee_tokType_Max(tokenTypeId_B, ledger_B));
+
+            const globalFee_Fix = Big(await stm.globalFee_tokType_Fix(tokenTypeId_B));
+            const ledgerFee_Fix = Big(await stm.ledgerFee_tokType_Fix(tokenTypeId_B, ledger_B));
+            const globalFee_Bps = Big(await stm.globalFee_tokType_Bps(tokenTypeId_B));
+            const ledgerFee_Bps = Big(await stm.ledgerFee_tokType_Bps(tokenTypeId_B, ledger_B));
+            const globalFee_Min = Big(await stm.globalFee_tokType_Min(tokenTypeId_B));
+            const ledgerFee_Min = Big(await stm.ledgerFee_tokType_Min(tokenTypeId_B, ledger_B));
+            const globalFee_Max = Big(await stm.globalFee_tokType_Max(tokenTypeId_B));
+            const ledgerFee_Max = Big(await stm.ledgerFee_tokType_Max(tokenTypeId_B, ledger_B));
+            const fix = ledgerFee_Fix.gt(0) ? ledgerFee_Fix : globalFee_Fix;
+            const bps = ledgerFee_Bps.gt(0) ? ledgerFee_Bps : globalFee_Bps;
+            const min = ledgerFee_Min.gt(0) ? ledgerFee_Min : globalFee_Min;
+            const max = ledgerFee_Max.gt(0) ? ledgerFee_Max : globalFee_Max;
+            // console.log('fix', fix.toFixed());
+            // console.log('bps', bps.toFixed());
+            // console.log('min', min.toFixed());
+            // console.log('max', max.toFixed());
+
             var eeuFee_B = Math.floor(
-                                Number(await stm.fee_tokType_Fix(tokenTypeId_B)) // EEU fee paid by B
-                              + Number((qty_B / 10000) * Number(await stm.fee_tokType_Bps(tokenTypeId_B)))); 
-            const max = Big(await stm.fee_tokType_Max(tokenTypeId_B));
-            const min = Big(await stm.fee_tokType_Min(tokenTypeId_B));
+                                Number(/*await stm.globalFee_tokType_Fix(tokenTypeId_B)*/fix) // EEU fee paid by B
+                              + Number((qty_B / 10000) * Number(/*await stm.globalFee_tokType_Bps(tokenTypeId_B)*/bps))); 
+            //const max = Big(await stm.globalFee_tokType_Max(tokenTypeId_B));
+            //const min = Big(await stm.globalFee_tokType_Min(tokenTypeId_B));
             if (Big(eeuFee_B).gt(max) && max.gt(0)) eeuFee_B = max.toFixed();
             if (Big(eeuFee_B).lt(min) && min.gt(0)) eeuFee_B = min.toFixed();                             
             //console.log('eeuFee_B', eeuFee_B);

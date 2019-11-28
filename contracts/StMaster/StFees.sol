@@ -1,4 +1,4 @@
-pragma solidity 0.5.8;
+pragma solidity 0.5.13;
 pragma experimental ABIEncoderV2;
 
 import "./Owned.sol";
@@ -21,7 +21,12 @@ contract StFees is Owned, StLedger {
 
     //
     // PRI 1
-    // TODO: fees - structure override on ledger level...
+    // TODO: fees - ledger fees: read in transferLib
+    // TODO: test clearing ledger fees
+    // TODO: ledger fees one side, global fees other side
+    //
+    // TODO: UI/UX in admin...
+    //
     // TODO: fees - getFees (for pre-trade)...
     // TODO: fees - additional set of fees to originator on each trade (i.e. data on batch struct)...
     //
@@ -29,15 +34,25 @@ contract StFees is Owned, StLedger {
     // GLOBAL FEES
     StructLib.FeeStruct globalFees;
 
-    function fee_tokType_Fix(uint256 tokenTypeId) public  view returns (uint256) { return globalFees.fee_tokType_Fix[tokenTypeId]; }
-    function fee_tokType_Bps(uint256 tokenTypeId) public  view returns (uint256) { return globalFees.fee_tokType_Bps[tokenTypeId]; }
-    function fee_tokType_Min(uint256 tokenTypeId) public  view returns (uint256) { return globalFees.fee_tokType_Min[tokenTypeId]; }
-    function fee_tokType_Max(uint256 tokenTypeId) public  view returns (uint256) { return globalFees.fee_tokType_Max[tokenTypeId]; }
+    // accessors - global fees (can't return mappings)
+    function globalFee_tokType_Fix(uint256 tokenTypeId) public  view returns (uint256) { return globalFees.tokType_Fix[tokenTypeId]; }
+    function globalFee_tokType_Bps(uint256 tokenTypeId) public  view returns (uint256) { return globalFees.tokType_Bps[tokenTypeId]; }
+    function globalFee_tokType_Min(uint256 tokenTypeId) public  view returns (uint256) { return globalFees.tokType_Min[tokenTypeId]; }
+    function globalFee_tokType_Max(uint256 tokenTypeId) public  view returns (uint256) { return globalFees.tokType_Max[tokenTypeId]; }
+    function globalFee_ccyType_Fix(uint256 ccyTypeId)   public  view returns (uint256) { return globalFees.ccyType_Fix[ccyTypeId]; }
+    function globalFee_ccyType_Bps(uint256 ccyTypeId)   public  view returns (uint256) { return globalFees.ccyType_Bps[ccyTypeId]; }
+    function globalFee_ccyType_Min(uint256 ccyTypeId)   public  view returns (uint256) { return globalFees.ccyType_Min[ccyTypeId]; }
+    function globalFee_ccyType_Max(uint256 ccyTypeId)   public  view returns (uint256) { return globalFees.ccyType_Max[ccyTypeId]; }
 
-    function fee_ccyType_Fix(uint256 ccyTypeId)   public  view returns (uint256) { return globalFees.fee_ccyType_Fix[ccyTypeId]; }
-    function fee_ccyType_Bps(uint256 ccyTypeId)   public  view returns (uint256) { return globalFees.fee_ccyType_Bps[ccyTypeId]; }
-    function fee_ccyType_Min(uint256 ccyTypeId)   public  view returns (uint256) { return globalFees.fee_ccyType_Min[ccyTypeId]; }
-    function fee_ccyType_Max(uint256 ccyTypeId)   public  view returns (uint256) { return globalFees.fee_ccyType_Max[ccyTypeId]; }
+    // accessors - ledger owner fees (can't return mappings)
+    function ledgerFee_tokType_Fix(uint256 tokenTypeId, address ledgerOwner) public  view returns (uint256) { return ledgerData._ledger[ledgerOwner].customFees.tokType_Fix[tokenTypeId]; }
+    function ledgerFee_tokType_Bps(uint256 tokenTypeId, address ledgerOwner) public  view returns (uint256) { return ledgerData._ledger[ledgerOwner].customFees.tokType_Bps[tokenTypeId]; }
+    function ledgerFee_tokType_Min(uint256 tokenTypeId, address ledgerOwner) public  view returns (uint256) { return ledgerData._ledger[ledgerOwner].customFees.tokType_Min[tokenTypeId]; }
+    function ledgerFee_tokType_Max(uint256 tokenTypeId, address ledgerOwner) public  view returns (uint256) { return ledgerData._ledger[ledgerOwner].customFees.tokType_Max[tokenTypeId]; }
+    function ledgerFee_ccyType_Fix(uint256 ccyTypeId, address ledgerOwner)   public  view returns (uint256) { return ledgerData._ledger[ledgerOwner].customFees.ccyType_Fix[ccyTypeId]; }
+    function ledgerFee_ccyType_Bps(uint256 ccyTypeId, address ledgerOwner)   public  view returns (uint256) { return ledgerData._ledger[ledgerOwner].customFees.ccyType_Bps[ccyTypeId]; }
+    function ledgerFee_ccyType_Min(uint256 ccyTypeId, address ledgerOwner)   public  view returns (uint256) { return ledgerData._ledger[ledgerOwner].customFees.ccyType_Min[ccyTypeId]; }
+    function ledgerFee_ccyType_Max(uint256 ccyTypeId, address ledgerOwner)   public  view returns (uint256) { return ledgerData._ledger[ledgerOwner].customFees.ccyType_Max[ccyTypeId]; }
 
     struct FeeArgs {
         uint256 fee_fixed;      // apply fixed fee, if any
@@ -55,7 +70,7 @@ contract StFees is Owned, StLedger {
      * @param ledgerOwner The ledger address for which to set fee structure, or 0x0 to set global fee structure
      * @param fee The fee structure to assign to the supplied leder entry address, or to the global fee structure
      */
-    function setGlobalFee_TokType(uint256 tokenTypeId, address ledgerOwner, FeeArgs memory fee) public {
+    function setFee_TokType(uint256 tokenTypeId, address ledgerOwner, FeeArgs memory fee) public {
         require(msg.sender == owner, "Restricted method");
         require(_readOnly == false, "Contract is read only");
         require(tokenTypeId >= 0 && tokenTypeId < stTypesData._count_tokenTypes, "Invalid ST type");
@@ -64,23 +79,24 @@ contract StFees is Owned, StLedger {
         if (ledgerOwner != address(0x0)) {
             require(ledgerData._ledger[ledgerOwner].exists == true, "Invalid ledger owner");
             feeStruct = ledgerData._ledger[ledgerOwner].customFees;
+            feeStruct.tokType_Set[tokenTypeId] = fee.fee_fixed != 0 || fee.fee_percBips != 0 || fee.fee_min != 0 || fee.fee_max != 0;
         }
 
-        if (feeStruct.fee_tokType_Fix[tokenTypeId] != fee.fee_fixed || fee.fee_fixed != 0)
+        if (feeStruct.tokType_Fix[tokenTypeId] != fee.fee_fixed || fee.fee_fixed != 0)
             emit SetFeeTokFix(tokenTypeId, ledgerOwner, fee.fee_fixed);
-        feeStruct.fee_tokType_Fix[tokenTypeId] = fee.fee_fixed;
+        feeStruct.tokType_Fix[tokenTypeId] = fee.fee_fixed;
 
-        if (feeStruct.fee_tokType_Bps[tokenTypeId] != fee.fee_percBips || fee.fee_percBips != 0)
+        if (feeStruct.tokType_Bps[tokenTypeId] != fee.fee_percBips || fee.fee_percBips != 0)
             emit SetFeeTokBps(tokenTypeId, ledgerOwner, fee.fee_percBips);
-        feeStruct.fee_tokType_Bps[tokenTypeId] = fee.fee_percBips;
+        feeStruct.tokType_Bps[tokenTypeId] = fee.fee_percBips;
 
-        if (feeStruct.fee_tokType_Min[tokenTypeId] != fee.fee_min || fee.fee_min != 0)
+        if (feeStruct.tokType_Min[tokenTypeId] != fee.fee_min || fee.fee_min != 0)
             emit SetFeeTokMin(tokenTypeId, ledgerOwner, fee.fee_min);
-        feeStruct.fee_tokType_Min[tokenTypeId] = fee.fee_min;
+        feeStruct.tokType_Min[tokenTypeId] = fee.fee_min;
 
-        if (feeStruct.fee_tokType_Max[tokenTypeId] != fee.fee_max || fee.fee_max != 0)
+        if (feeStruct.tokType_Max[tokenTypeId] != fee.fee_max || fee.fee_max != 0)
             emit SetFeeTokMax(tokenTypeId, ledgerOwner, fee.fee_max);
-        feeStruct.fee_tokType_Max[tokenTypeId] = fee.fee_max;
+        feeStruct.tokType_Max[tokenTypeId] = fee.fee_max;
     }
 
     /**
@@ -89,7 +105,7 @@ contract StFees is Owned, StLedger {
      * @param ledgerOwner The ledger address for which to set fee structure, or 0x0 to set global fee structure
      * @param fee The fee structure to assign to the supplied leder entry address, or to the global fee structure
      */
-    function setGlobalFee_CcyType(uint256 ccyTypeId, address ledgerOwner, FeeArgs memory fee) public {
+    function setFee_CcyType(uint256 ccyTypeId, address ledgerOwner, FeeArgs memory fee) public {
         require(msg.sender == owner, "Restricted method");
         require(_readOnly == false, "Contract is read only");
         require(ccyTypeId >= 0 && ccyTypeId < ccyTypesData._count_ccyTypes, "Invalid currency type");
@@ -97,24 +113,25 @@ contract StFees is Owned, StLedger {
         StructLib.FeeStruct storage feeStruct = globalFees;
         if (ledgerOwner != address(0x0)) {
             require(ledgerData._ledger[ledgerOwner].exists == true, "Invalid ledger owner");
-            //...
+            feeStruct = ledgerData._ledger[ledgerOwner].customFees;
+            feeStruct.ccyType_Set[ccyTypeId] = fee.fee_fixed != 0 || fee.fee_percBips != 0 || fee.fee_min != 0 || fee.fee_max != 0;
         }
 
-        if (feeStruct.fee_ccyType_Fix[ccyTypeId] != fee.fee_fixed || fee.fee_fixed != 0)
+        if (feeStruct.ccyType_Fix[ccyTypeId] != fee.fee_fixed || fee.fee_fixed != 0)
             emit SetFeeCcyFix(ccyTypeId, ledgerOwner, fee.fee_fixed);
-        feeStruct.fee_ccyType_Fix[ccyTypeId] = fee.fee_fixed;
+        feeStruct.ccyType_Fix[ccyTypeId] = fee.fee_fixed;
 
-        if (feeStruct.fee_ccyType_Bps[ccyTypeId] != fee.fee_percBips || fee.fee_percBips != 0)
+        if (feeStruct.ccyType_Bps[ccyTypeId] != fee.fee_percBips || fee.fee_percBips != 0)
             emit SetFeeCcyBps(ccyTypeId, ledgerOwner, fee.fee_percBips);
-        feeStruct.fee_ccyType_Bps[ccyTypeId] = fee.fee_percBips;
+        feeStruct.ccyType_Bps[ccyTypeId] = fee.fee_percBips;
 
-        if (feeStruct.fee_ccyType_Min[ccyTypeId] != fee.fee_min || fee.fee_min != 0)
+        if (feeStruct.ccyType_Min[ccyTypeId] != fee.fee_min || fee.fee_min != 0)
             emit SetFeeCcyMin(ccyTypeId, ledgerOwner, fee.fee_min);
-        feeStruct.fee_ccyType_Min[ccyTypeId] = fee.fee_min;
+        feeStruct.ccyType_Min[ccyTypeId] = fee.fee_min;
 
-        if (feeStruct.fee_ccyType_Max[ccyTypeId] != fee.fee_max || fee.fee_max != 0)
+        if (feeStruct.ccyType_Max[ccyTypeId] != fee.fee_max || fee.fee_max != 0)
             emit SetFeeCcyMax(ccyTypeId, ledgerOwner, fee.fee_max);
-        feeStruct.fee_ccyType_Max[ccyTypeId] = fee.fee_max;
+        feeStruct.ccyType_Max[ccyTypeId] = fee.fee_max;
     }
 
     /**

@@ -1,4 +1,4 @@
-pragma solidity 0.5.8;
+pragma solidity 0.5.13;
 pragma experimental ABIEncoderV2;
 
 import "./StructLib.sol";
@@ -33,9 +33,9 @@ library TransferLib {
     }
     function transfer(
         StructLib.LedgerStruct storage ledgerData,
-        StructLib.FeeStruct storage fs,     // fee structure to apply
-        TransferLib.TransferArgs memory a,  // args
-        address feeAddrOwner)               // exchange fees: receive address
+        StructLib.FeeStruct storage globalFees,     // global fee structure
+        TransferLib.TransferArgs memory a,          // args
+        address feeAddrOwner)                       // exchange fees: receive address
     public {
         require(ledgerData._ledger[a.ledger_A].exists == true, "Invalid ledger owner A");
         require(ledgerData._ledger[a.ledger_B].exists == true, "Invalid ledger owner B");
@@ -46,38 +46,44 @@ library TransferLib {
         // disallow single origin multiple asset type movement
         require(!((a.qty_A > 0 && a.ccy_amount_A > 0) || (a.qty_B > 0 && a.ccy_amount_B > 0)), "Same origin multiple asset transfer disallowed");
 
+        // get fee structure for each side
+        StructLib.FeeStruct storage feeStructA_ccy = ledgerData._ledger[a.ledger_A].customFees.ccyType_Set[a.ccyTypeId_A]   ? ledgerData._ledger[a.ledger_A].customFees : globalFees;
+        StructLib.FeeStruct storage feeStructA_tok = ledgerData._ledger[a.ledger_A].customFees.tokType_Set[a.tokenTypeId_A] ? ledgerData._ledger[a.ledger_A].customFees : globalFees;
+        StructLib.FeeStruct storage feeStructB_ccy = ledgerData._ledger[a.ledger_B].customFees.ccyType_Set[a.ccyTypeId_B]   ? ledgerData._ledger[a.ledger_B].customFees : globalFees;
+        StructLib.FeeStruct storage feeStructB_tok = ledgerData._ledger[a.ledger_B].customFees.tokType_Set[a.tokenTypeId_B] ? ledgerData._ledger[a.ledger_B].customFees : globalFees;
+
         // calc total fees payable (fixed + basis points)
         FeePayable memory feePayable = FeePayable({
-            fee_ccy_A: (fs.fee_ccyType_Fix[a.ccyTypeId_A]) + (((uint256(a.ccy_amount_A)*1000000 / 10000) * fs.fee_ccyType_Bps[a.ccyTypeId_A]) / 1000000),
-            fee_ccy_B: (fs.fee_ccyType_Fix[a.ccyTypeId_B]) + (((uint256(a.ccy_amount_B)*1000000 / 10000) * fs.fee_ccyType_Bps[a.ccyTypeId_B]) / 1000000),
-            fee_tok_A: fs.fee_tokType_Fix[a.tokenTypeId_A] + ((uint256(a.qty_A)*1000000 / 10000) * fs.fee_tokType_Bps[a.tokenTypeId_A]) / 1000000,
-            fee_tok_B: fs.fee_tokType_Fix[a.tokenTypeId_B] + ((uint256(a.qty_B)*1000000 / 10000) * fs.fee_tokType_Bps[a.tokenTypeId_B]) / 1000000
+            fee_ccy_A: (feeStructA_ccy.ccyType_Fix[a.ccyTypeId_A]) + (((uint256(a.ccy_amount_A)*1000000 / 10000) * feeStructA_ccy.ccyType_Bps[a.ccyTypeId_A]) / 1000000),
+            fee_ccy_B: (feeStructB_ccy.ccyType_Fix[a.ccyTypeId_B]) + (((uint256(a.ccy_amount_B)*1000000 / 10000) * feeStructB_ccy.ccyType_Bps[a.ccyTypeId_B]) / 1000000),
+            fee_tok_A: feeStructA_tok.tokType_Fix[a.tokenTypeId_A] + ((uint256(a.qty_A)*1000000 / 10000) * feeStructA_tok.tokType_Bps[a.tokenTypeId_A]) / 1000000,
+            fee_tok_B: feeStructB_tok.tokType_Fix[a.tokenTypeId_B] + ((uint256(a.qty_B)*1000000 / 10000) * feeStructB_tok.tokType_Bps[a.tokenTypeId_B]) / 1000000
         });
 
         // cap & collar fees
         if (a.ccy_amount_A > 0) {
-            if (feePayable.fee_ccy_A > fs.fee_ccyType_Max[a.ccyTypeId_A] && fs.fee_ccyType_Max[a.ccyTypeId_A] > 0)
-                feePayable.fee_ccy_A = fs.fee_ccyType_Max[a.ccyTypeId_A];
-            if (feePayable.fee_ccy_A < fs.fee_ccyType_Min[a.ccyTypeId_A] && fs.fee_ccyType_Min[a.ccyTypeId_A] > 0)
-                feePayable.fee_ccy_A = fs.fee_ccyType_Min[a.ccyTypeId_A];
+            if (feePayable.fee_ccy_A > feeStructA_ccy.ccyType_Max[a.ccyTypeId_A] && feeStructA_ccy.ccyType_Max[a.ccyTypeId_A] > 0)
+                feePayable.fee_ccy_A = feeStructA_ccy.ccyType_Max[a.ccyTypeId_A];
+            if (feePayable.fee_ccy_A < feeStructA_ccy.ccyType_Min[a.ccyTypeId_A] && feeStructA_ccy.ccyType_Min[a.ccyTypeId_A] > 0)
+                feePayable.fee_ccy_A = feeStructA_ccy.ccyType_Min[a.ccyTypeId_A];
         }
         if (a.ccy_amount_B > 0) {
-            if (feePayable.fee_ccy_B > fs.fee_ccyType_Max[a.ccyTypeId_B] && fs.fee_ccyType_Max[a.ccyTypeId_B] > 0)
-                feePayable.fee_ccy_B = fs.fee_ccyType_Max[a.ccyTypeId_B];
-            if (feePayable.fee_ccy_B < fs.fee_ccyType_Min[a.ccyTypeId_B] && fs.fee_ccyType_Min[a.ccyTypeId_B] > 0)
-                feePayable.fee_ccy_B = fs.fee_ccyType_Min[a.ccyTypeId_B];
+            if (feePayable.fee_ccy_B > feeStructB_ccy.ccyType_Max[a.ccyTypeId_B] && feeStructB_ccy.ccyType_Max[a.ccyTypeId_B] > 0)
+                feePayable.fee_ccy_B = feeStructB_ccy.ccyType_Max[a.ccyTypeId_B];
+            if (feePayable.fee_ccy_B < feeStructB_ccy.ccyType_Min[a.ccyTypeId_B] && feeStructB_ccy.ccyType_Min[a.ccyTypeId_B] > 0)
+                feePayable.fee_ccy_B = feeStructB_ccy.ccyType_Min[a.ccyTypeId_B];
         }
         if (a.qty_A > 0) {
-            if (feePayable.fee_tok_A > fs.fee_tokType_Max[a.tokenTypeId_A] && fs.fee_tokType_Max[a.tokenTypeId_A] > 0)
-                feePayable.fee_tok_A = fs.fee_tokType_Max[a.tokenTypeId_A];
-            if (feePayable.fee_tok_A < fs.fee_tokType_Min[a.tokenTypeId_A] && fs.fee_tokType_Min[a.tokenTypeId_A] > 0)
-                feePayable.fee_tok_A = fs.fee_tokType_Min[a.tokenTypeId_A];
+            if (feePayable.fee_tok_A > feeStructA_tok.tokType_Max[a.tokenTypeId_A] && feeStructA_tok.tokType_Max[a.tokenTypeId_A] > 0)
+                feePayable.fee_tok_A = feeStructA_tok.tokType_Max[a.tokenTypeId_A];
+            if (feePayable.fee_tok_A < feeStructA_tok.tokType_Min[a.tokenTypeId_A] && feeStructA_tok.tokType_Min[a.tokenTypeId_A] > 0)
+                feePayable.fee_tok_A = feeStructA_tok.tokType_Min[a.tokenTypeId_A];
         }
         if (a.qty_B > 0) {
-            if (feePayable.fee_tok_B > fs.fee_tokType_Max[a.tokenTypeId_B] && fs.fee_tokType_Max[a.tokenTypeId_B] > 0)
-                feePayable.fee_tok_B = fs.fee_tokType_Max[a.tokenTypeId_B];
-            if (feePayable.fee_tok_B < fs.fee_tokType_Min[a.tokenTypeId_B] && fs.fee_tokType_Min[a.tokenTypeId_B] > 0)
-                feePayable.fee_tok_B = fs.fee_tokType_Min[a.tokenTypeId_B];
+            if (feePayable.fee_tok_B > feeStructB_tok.tokType_Max[a.tokenTypeId_B] && feeStructB_tok.tokType_Max[a.tokenTypeId_B] > 0)
+                feePayable.fee_tok_B = feeStructB_tok.tokType_Max[a.tokenTypeId_B];
+            if (feePayable.fee_tok_B < feeStructB_tok.tokType_Min[a.tokenTypeId_B] && feeStructB_tok.tokType_Min[a.tokenTypeId_B] > 0)
+                feePayable.fee_tok_B = feeStructB_tok.tokType_Min[a.tokenTypeId_B];
         }
 
         // validate currency balances

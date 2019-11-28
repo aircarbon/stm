@@ -9,6 +9,8 @@ const web3 = new Web3();
 module.exports = {
     logTestAccountUsage: false,
 
+    nullAddr: "0x0000000000000000000000000000000000000000",
+
     // types
     tokenType: Object.freeze({
         UNFCCC: 0,
@@ -31,6 +33,7 @@ module.exports = {
     thousandUsd_cents: Big(1000 * 100).toFixed(),
      millionUsd_cents: Big(1000 * 1000 * 100).toFixed(),
      billionUsd_cents: Big(1000).times(1000).times(1000).times(100).toFixed(),
+    thousandthEth_wei: Big(web3.utils.toWei("1", "ether") / 1000).toFixed(),                  // "1000000000000000", 
      hundredthEth_wei: Big(web3.utils.toWei("1", "ether") / 100).toFixed(),                   // "10000000000000000", 
          tenthEth_wei: Big(web3.utils.toWei("1", "ether") / 10).toFixed(),                    // "100000000000000000", 
            oneEth_wei: Big(web3.utils.toWei("1", "ether")).toFixed(),                         // "1000000000000000000", 

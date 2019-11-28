@@ -1,4 +1,4 @@
-pragma solidity 0.5.8;
+pragma solidity 0.5.13;
 
 library StructLib {
 
@@ -59,7 +59,6 @@ library StructLib {
         mapping(uint256 => uint256[]) tokenType_stIds;          // SecTokenTypeId -> stId[] of all owned STs
       //mapping(uint256 => uint256)   tokenType_sumQty;         // SecTokenTypeId -> sum of token qty's across all owned STs
         mapping(uint256 => int256)    ccyType_balance;          // CcyTypeId -> balance -- SIGNED! WE MAY WANT TO SUPPORT -VE BALANCES LATER...
-
         StructLib.FeeStruct           customFees;               // global fee override - per ledger entry
     }
 
@@ -114,17 +113,20 @@ library StructLib {
 
     // FEE STRUCTURE -- ledger or global
     struct FeeStruct {
-        mapping(uint256 => uint256) fee_tokType_Fix; // fixed token qty fee per transfer
-        mapping(uint256 => uint256) fee_ccyType_Fix; // fixed currency fee per transfer
+        mapping(uint256 => bool) tokType_Set;    // bool - values are set for the token type
+        mapping(uint256 => bool) ccyType_Set;    // bool - values are set for the currency type
 
-        mapping(uint256 => uint256) fee_tokType_Bps; // bips (0-10000) token qty fee per transfer
-        mapping(uint256 => uint256) fee_ccyType_Bps; // bips (0-10000) currency fee per transfer
+        mapping(uint256 => uint256) tokType_Fix; // fixed token qty fee per transfer
+        mapping(uint256 => uint256) ccyType_Fix; // fixed currency fee per transfer
 
-        mapping(uint256 => uint256) fee_tokType_Min; // if gt-zero: collar (min) token qty fee per transfer
-        mapping(uint256 => uint256) fee_ccyType_Min; // if gt-zero: collar (min) currency fee per transfer
+        mapping(uint256 => uint256) tokType_Bps; // bips (0-10000) token qty fee per transfer
+        mapping(uint256 => uint256) ccyType_Bps; // bips (0-10000) currency fee per transfer
 
-        mapping(uint256 => uint256) fee_tokType_Max; // if gt-zero: cap (max) token qty fee per transfer
-        mapping(uint256 => uint256) fee_ccyType_Max; // if gt-zero: cap (max) currency fee per transfer
+        mapping(uint256 => uint256) tokType_Min; // if gt-zero: collar (min) token qty fee per transfer
+        mapping(uint256 => uint256) ccyType_Min; // if gt-zero: collar (min) currency fee per transfer
+
+        mapping(uint256 => uint256) tokType_Max; // if gt-zero: cap (max) token qty fee per transfer
+        mapping(uint256 => uint256) ccyType_Max; // if gt-zero: cap (max) currency fee per transfer
     }
 
     /**
