@@ -10,6 +10,13 @@ module.exports = {
 
     nullAddr: "0x0000000000000000000000000000000000000000",
 
+    nullOrigFees: {
+        fee_fixed: 0,
+        fee_percBips: 0,
+        fee_min: 0,
+        fee_max: 0,
+    },
+
     // types
     tokenType: Object.freeze({
         UNFCCC: 0,

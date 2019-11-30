@@ -24,8 +24,11 @@ contract StFees is Owned, StLedger {
     // event SetFeeCcyMax(uint256 ccyTypeId, address ledgerOwner, uint256 fee_ccy_Max);
 
     //
-    // TODO: fees - getFees (for pre-trade)...
     // TODO: fees - additional set of fees to originator on each trade (i.e. data on batch struct)...
+    //  > BatchFees - on minting
+    //  > UpdateBatchFees - post minting
+    //
+    // TODO: fees - getFees (for pre-trade)...
     //
     // TODO: fees (trade fn + setting ledger & setting global): UI/UX in admin...
     //
@@ -52,13 +55,6 @@ contract StFees is Owned, StLedger {
     function ledgerFee_ccyType_Bps(uint256 ccyTypeId, address ledgerOwner)   public  view returns (uint256) { return ledgerData._ledger[ledgerOwner].customFees.ccyType_Bps[ccyTypeId]; }
     function ledgerFee_ccyType_Min(uint256 ccyTypeId, address ledgerOwner)   public  view returns (uint256) { return ledgerData._ledger[ledgerOwner].customFees.ccyType_Min[ccyTypeId]; }
     function ledgerFee_ccyType_Max(uint256 ccyTypeId, address ledgerOwner)   public  view returns (uint256) { return ledgerData._ledger[ledgerOwner].customFees.ccyType_Max[ccyTypeId]; }
-
-    // struct FeeArgs {
-    //     uint256 fee_fixed;      // apply fixed fee, if any
-    //     uint256 fee_percBips;   // add a basis points fee, if any - in basis points, i.e. minimum % = 1bp = 1/100 of 1% = 0.0001x
-    //     uint256 fee_min;        // collar for fee (if >0)
-    //     uint256 fee_max;        // and cap for fee, (if >0)
-    // }
 
     /**
      * @dev Define fee structure for token type - global or per ledger entry

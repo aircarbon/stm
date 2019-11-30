@@ -209,7 +209,7 @@ contract("StMaster", accounts => {
     });
 
     async function mintBatchWithMetadata({ tokenType, qtyUnit, qtySecTokens, receiver, metaKeys, metaValues }) {
-        const mintTx = await stm.mintSecTokenBatch(tokenType, qtyUnit, qtySecTokens, receiver, metaKeys, metaValues, { from: accounts[0] });
+        const mintTx = await stm.mintSecTokenBatch(tokenType, qtyUnit, qtySecTokens, receiver, CONST.nullOrigFees, metaKeys, metaValues, { from: accounts[0] });
         //console.log(`\t>>> gasUsed - Mint 1 vEEU w/ ${metaKeys.length} metadata keys: ${mintTx.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * mintTx.receipt.gasUsed).toFixed(4)} (USD ${(CONST.gasPriceEth * mintTx.receipt.gasUsed * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
 
         const batchId = (await stm.getSecTokenBatchCount.call()).toNumber();
@@ -220,8 +220,8 @@ contract("StMaster", accounts => {
         
         // console.dir(metaKeys);
         // console.dir(metaValues);
-        //console.dir(batchKeys);
-        //console.dir(batchValues);
+        // console.dir(batchKeys);
+        // console.dir(batchValues);
 
         assert(batchKeys.length == metaKeys.length, 'batch/supplied meta keys length mismatch');
         assert(batchValues.length == metaValues.length, 'batch/supplied meta values length mismatch');

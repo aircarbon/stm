@@ -42,7 +42,7 @@ contract("StMaster", accounts => {
     });
 
     it('funding - should allow minting and funding on same ledger entry', async () => {
-        await stm.mintSecTokenBatch(CONST.tokenType.VCS, CONST.mtCarbon, 1, accounts[global.accountNdx], [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.VCS, CONST.mtCarbon, 1, accounts[global.accountNdx], CONST.nullOrigFees, [], [], { from: accounts[0] });
         await stm.fund(CONST.ccyType.USD, CONST.thousandUsd_cents, accounts[global.accountNdx],           { from: accounts[0] });
         const ledgerEntryAfter = await stm.getLedgerEntry(accounts[global.accountNdx]);
 

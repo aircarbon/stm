@@ -2,6 +2,7 @@ pragma solidity 0.5.13;
 pragma experimental ABIEncoderV2;
 
 import "./StructLib.sol";
+import "./FeeLib.sol";
 
 library TokenLib {
     event AddedSecTokenType(uint256 id, string name);
@@ -48,12 +49,17 @@ library TokenLib {
 
     // MINTING
     struct MintSecTokenBatchArgs {
-        uint256 tokenTypeId;
-        int256  mintQty;
-        int256  mintSecTokenCount;
-        address batchOwner;
-        string[] metaKeys;
-        string[] metaValues;
+        uint256           tokenTypeId;
+        int256            mintQty;
+        int256            mintSecTokenCount;
+        address           batchOwner;
+
+        // TODO: this struct moves to StructLib, so it can be saved in SecTokenBatch...
+        // TODO: transferLib refactoring for combined fees (exchange + originator)...
+        FeeLib.SetFeeArgs originatorTokFee;
+
+        string[]          metaKeys;
+        string[]          metaValues;
     }
     function mintSecTokenBatch(
         StructLib.LedgerStruct storage ledgerData,
