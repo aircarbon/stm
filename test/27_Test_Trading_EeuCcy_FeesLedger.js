@@ -17,7 +17,7 @@ contract("StMaster", accounts => {
     });
 
     // EEU MULTI FEES: LEDGER OVERRIDE
-    it('trading fees (ledger) - apply VCS carbon ledger override fee 1000 BP + 5 KG fixed (cap 10 KG) on a small trade (fee on A)', async () => {
+    /*it('trading fees (ledger) - apply VCS carbon ledger override fee 1000 BP + 5 KG fixed (cap 10 KG) on a small trade (fee on A)', async () => {
         const A = accounts[global.accountNdx + 0];
         const B = accounts[global.accountNdx + 1];
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      A, [], [], { from: accounts[0] });
@@ -436,34 +436,69 @@ contract("StMaster", accounts => {
         const B_balBefore = data.ledgerB_before.ccys.filter(p => p.ccyTypeId == CONST.ccyType.ETH).map(p => p.balance).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
         const B_balAfter  =  data.ledgerB_after.ccys.filter(p => p.ccyTypeId == CONST.ccyType.ETH).map(p => p.balance).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
         assert(Big(B_balAfter).eq(Big(B_balBefore).minus(Big(expectedFeeCcy)).minus(Big(transferAmountCcy))), 'unexpected fee payer currency balance after transfer');
-    });
+    });*/
 
     // TODO: two-sided: global fee on one side, ledger fee on other - roll these into:
 
-    /*it('trading fees (multi-capcol) - should allow a capped transfer with otherwise insufficient carbon to cover fees (fee on A)', async () => {
+    it('trading fees (ledger) - should allow a ledger fee-capped transfer from A with otherwise insufficient carbon to cover fees (ledger fee on A, global fee on B)', async () => {
+        const A = accounts[global.accountNdx + 0];
+        const B = accounts[global.accountNdx + 1];
+
         // 102,999,999 tons
-        await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], [], [], { from: accounts[0] });
-        await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        accounts[global.accountNdx + 1],         { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      A, [], [], { from: accounts[0] });
+        await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        B,         { from: accounts[0] });
 
-        // set fee structure VCS: 10% + 50kg, max 50kg
-        const feeBps = 1000; 
-        const feeFix = 50;
-        const feeMax = 50; // cap fee: 50 kg
-        await stm.setFee_TokType(CONST.tokenType.VCS, CONST.nullAddr, { fee_fixed: feeFix, fee_percBips: feeBps, fee_min: 0, fee_max: feeMax } );
-        await stm.setFee_CcyType(CONST.ccyType.ETH, CONST.nullAddr,   { fee_fixed: 0,      fee_percBips: 0,      fee_min: 0, fee_max: 0 } );
+        // set ledger fee structure VCS (A): 10% + 50kg, max 50kg
+        const ledgerFeeBps = 1000;
+        const ledgerFeeFix = 50;
+        const ledgerFeeMax = 50; // cap fee: 50 kg
+        await stm.setFee_TokType(CONST.tokenType.VCS, A, { fee_fixed: ledgerFeeFix, fee_percBips: ledgerFeeBps, fee_min: 0, fee_max: ledgerFeeMax } );
 
+        // set global fee structure ETH (B): fixed 0.1 ETH
+        const globalFeeFix = 0;
+        const globalFeeBps = 142;
+        const globalFeeMax = CONST.tenthEth_wei;
+        await stm.setFee_CcyType(CONST.ccyType.ETH, CONST.nullAddr, { fee_fixed: globalFeeFix, fee_percBips: globalFeeBps, fee_min: 0, fee_max: globalFeeMax } );
+
+        // A - carbon transfer amount & exepcted ledger fee
         const transferAmountKg = new BN(950); // not enough carbon for this trade, without the fee cap
+        const expectedFeeKg = Math.min(Math.floor(Number(transferAmountKg.toString()) * (ledgerFeeBps/10000)) + Number(ledgerFeeFix), ledgerFeeMax);
+
+        // B - ccy transfer amount & expected global fee
+        const transferAmountEth = new BN(CONST.tenthEth_wei);
+        const expectedFeeEth = Math.min(Math.floor(Number(transferAmountEth.toString()) * (globalFeeBps/10000)) + Number(globalFeeFix), globalFeeMax);
+
         const data = await helper.transferLedger({ stm, accounts, 
-            ledger_A: accounts[global.accountNdx + 0],     ledger_B: accounts[global.accountNdx + 1],
+            ledger_A: A,                                   ledger_B: B,
                qty_A: transferAmountKg,               tokenTypeId_A: CONST.tokenType.VCS,
                qty_B: 0,                              tokenTypeId_B: 0,
         ccy_amount_A: 0,                                ccyTypeId_A: 0,
-        ccy_amount_B: CONST.oneEth_wei,                 ccyTypeId_B: CONST.ccyType.ETH,
+        ccy_amount_B: transferAmountEth,                ccyTypeId_B: CONST.ccyType.ETH,
            applyFees: true,
         });
+
+        // contract owner has received expected carbon fee
+        const owner_balBeforeKg = data.ledgerContractOwner_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
+        const owner_balAfterKg  =  data.ledgerContractOwner_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
+        assert(Big(owner_balAfterKg).eq(Big(owner_balBeforeKg).plus(Big(expectedFeeKg))), 'unexpected fee receiver carbon balance after transfer');
+        
+        // carbon sender has sent expected carbon quantity and paid exepcted carbon fee
+        const A_balBefore = data.ledgerA_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
+        const A_balAfter  =  data.ledgerA_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
+        assert(Big(A_balAfter).eq(Big(A_balBefore).minus(Big(expectedFeeKg)).minus(Big(transferAmountKg))), 'unexpected fee payer carbon balance after transfer');
+
+        // contract owner has received expected ccy fee
+        const owner_balBeforeCcy = data.ledgerContractOwner_before.ccys.filter(p => p.ccyTypeId == CONST.ccyType.ETH).map(p => p.balance).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
+        const owner_balAfterCcy  =  data.ledgerContractOwner_after.ccys.filter(p => p.ccyTypeId == CONST.ccyType.ETH).map(p => p.balance).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
+        assert(Big(owner_balAfterCcy).eq(Big(owner_balBeforeCcy).plus(Big(expectedFeeEth))), 'unexpected fee receiver currency balance after transfer');
+
+        // ccy sender has send expected ccy amount and paid expected ccy fee
+        const B_balBefore = data.ledgerB_before.ccys.filter(p => p.ccyTypeId == CONST.ccyType.ETH).map(p => p.balance).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
+        const B_balAfter  =  data.ledgerB_after.ccys.filter(p => p.ccyTypeId == CONST.ccyType.ETH).map(p => p.balance).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
+        assert(Big(B_balAfter).eq(Big(B_balBefore).minus(Big(expectedFeeEth)).minus(Big(transferAmountEth))), 'unexpected fee payer currency balance after transfer');
     });
 
-    it('trading fees (multi-capcol) - should not allow a transfer with insufficient carbon to cover collared fees (fee on B)', async () => {
+    /*it('trading fees (multi-capcol) - should not allow a transfer with insufficient carbon to cover collared fees (fee on B)', async () => {
         // 102,999,999 tons
         await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        accounts[global.accountNdx + 0],         { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], [], [], { from: accounts[0] });
