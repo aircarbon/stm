@@ -33,21 +33,21 @@ library FeeLib {
             feeStruct.tokType_Set[tokenTypeId] = a.fee_fixed != 0 || a.fee_percBips != 0 || a.fee_min != 0 || a.fee_max != 0;
         }
 
-        if (feeStruct.tokType_Fix[tokenTypeId] != a.fee_fixed || a.fee_fixed != 0)
+        if (feeStruct.tok[tokenTypeId].fee_fixed != a.fee_fixed || a.fee_fixed != 0)
             emit SetFeeTokFix(tokenTypeId, ledgerOwner, a.fee_fixed);
-        feeStruct.tokType_Fix[tokenTypeId] = a.fee_fixed;
+        feeStruct.tok[tokenTypeId].fee_fixed = a.fee_fixed;
 
-        if (feeStruct.tokType_Bps[tokenTypeId] != a.fee_percBips || a.fee_percBips != 0)
+        if (feeStruct.tok[tokenTypeId].fee_percBips != a.fee_percBips || a.fee_percBips != 0)
             emit SetFeeTokBps(tokenTypeId, ledgerOwner, a.fee_percBips);
-        feeStruct.tokType_Bps[tokenTypeId] = a.fee_percBips;
+        feeStruct.tok[tokenTypeId].fee_percBips = a.fee_percBips;
 
-        if (feeStruct.tokType_Min[tokenTypeId] != a.fee_min || a.fee_min != 0)
+        if (feeStruct.tok[tokenTypeId].fee_min != a.fee_min || a.fee_min != 0)
             emit SetFeeTokMin(tokenTypeId, ledgerOwner, a.fee_min);
-        feeStruct.tokType_Min[tokenTypeId] = a.fee_min;
+        feeStruct.tok[tokenTypeId].fee_min = a.fee_min;
 
-        if (feeStruct.tokType_Max[tokenTypeId] != a.fee_max || a.fee_max != 0)
+        if (feeStruct.tok[tokenTypeId].fee_max != a.fee_max || a.fee_max != 0)
             emit SetFeeTokMax(tokenTypeId, ledgerOwner, a.fee_max);
-        feeStruct.tokType_Max[tokenTypeId] = a.fee_max;
+        feeStruct.tok[tokenTypeId].fee_max = a.fee_max;
     }
 
     function setFee_CcyType(
@@ -67,20 +67,20 @@ library FeeLib {
             feeStruct.ccyType_Set[ccyTypeId] = a.fee_fixed != 0 || a.fee_percBips != 0 || a.fee_min != 0 || a.fee_max != 0;
         }
 
-        if (feeStruct.ccyType_Fix[ccyTypeId] != a.fee_fixed || a.fee_fixed != 0)
+        if (feeStruct.ccy[ccyTypeId].fee_fixed != a.fee_fixed || a.fee_fixed != 0)
             emit SetFeeCcyFix(ccyTypeId, ledgerOwner, a.fee_fixed);
-        feeStruct.ccyType_Fix[ccyTypeId] = a.fee_fixed;
+        feeStruct.ccy[ccyTypeId].fee_fixed = a.fee_fixed;
 
-        if (feeStruct.ccyType_Bps[ccyTypeId] != a.fee_percBips || a.fee_percBips != 0)
+        if (feeStruct.ccy[ccyTypeId].fee_percBips != a.fee_percBips || a.fee_percBips != 0)
             emit SetFeeCcyBps(ccyTypeId, ledgerOwner, a.fee_percBips);
-        feeStruct.ccyType_Bps[ccyTypeId] = a.fee_percBips;
+        feeStruct.ccy[ccyTypeId].fee_percBips = a.fee_percBips;
 
-        if (feeStruct.ccyType_Min[ccyTypeId] != a.fee_min || a.fee_min != 0)
+        if (feeStruct.ccy[ccyTypeId].fee_min != a.fee_min || a.fee_min != 0)
             emit SetFeeCcyMin(ccyTypeId, ledgerOwner, a.fee_min);
-        feeStruct.ccyType_Min[ccyTypeId] = a.fee_min;
+        feeStruct.ccy[ccyTypeId].fee_min = a.fee_min;
 
-        if (feeStruct.ccyType_Max[ccyTypeId] != a.fee_max || a.fee_max != 0)
+        if (feeStruct.ccy[ccyTypeId].fee_max != a.fee_max || a.fee_max != 0)
             emit SetFeeCcyMax(ccyTypeId, ledgerOwner, a.fee_max);
-        feeStruct.ccyType_Max[ccyTypeId] = a.fee_max;
+        feeStruct.ccy[ccyTypeId].fee_max = a.fee_max;
     }
 }

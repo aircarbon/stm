@@ -346,6 +346,12 @@ module.exports = {
             totalqty_AllSecSecTokenTypes_fees = totalqty_AllSecSecTokenTypes_fees.add(new BN(eeuFee_A));
             netKg_tfd += qty_A; // transfered by A
             netKg_tfd -= qty_B; // received from B
+
+            // console.log('ledgerA_after.tokens_sumQty', ledgerA_after.tokens_sumQty);
+            // console.log('ledgerA_before.tokens_sumQty', ledgerA_before.tokens_sumQty);
+            // console.log('netKg_tfd', netKg_tfd);
+            // console.log('eeuFee_A', eeuFee_A);
+
             assert(ledgerA_after.tokens_sumQty == Number(ledgerA_before.tokens_sumQty) - netKg_tfd - eeuFee_A, 'unexpected ledger A tonnage sum after transfer A -> B');
             assert(ledgerB_after.tokens_sumQty == Number(ledgerB_before.tokens_sumQty) + netKg_tfd, 'unexpected ledger B tonnage sum after transfer A -> B');
         }

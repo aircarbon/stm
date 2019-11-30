@@ -15,7 +15,7 @@ contract StMintable is Owned, StLedger {
      * @param mintQty quantity in contact base unit (e.g. KG) to mint across the supplied no. of STs
      * @param mintSecTokenCount Number of STs to mint - enforced: due to memory & gas cost, always set to 1
      * @param batchOwner Ledger owner to assign the minted ST(s) to
-     * @param origTokFee Originator (batch ledger owner) token fee structure to apply on all token transfers from this batch
+     * @param originatorFee Originator (batch ledger owner) token fee structure to apply on all token transfers from this batch
      * @param metaKeys Batch metadata keys
      * @param metaValues Batch metadata values
      */
@@ -24,7 +24,7 @@ contract StMintable is Owned, StLedger {
         int256                      mintQty,
         int256                      mintSecTokenCount,
         address                     batchOwner,
-        StructLib.SetFeeArgs memory origTokFee,
+        StructLib.SetFeeArgs memory originatorFee,
         string[] memory             metaKeys,
         string[] memory             metaValues)
     public {
@@ -36,13 +36,19 @@ contract StMintable is Owned, StLedger {
                 mintQty: mintQty,
       mintSecTokenCount: mintSecTokenCount,
              batchOwner: batchOwner,
-             origTokFee: origTokFee,
+             origTokFee: originatorFee,
                metaKeys: metaKeys,
              metaValues: metaValues
         });
         TokenLib.mintSecTokenBatch(ledgerData, stTypesData, args);
     }
 
+    /**
+     * @dev Adds a new KVP metadata to the batch
+     * @param batchId ID of the batch
+     * @param metaKeyNew New metadata key - must not already exist in the batch
+     * @param metaValueNew New metadata value
+     */
     function addMetaSecTokenBatch(
         uint256 batchId,
         string memory metaKeyNew,
@@ -51,6 +57,20 @@ contract StMintable is Owned, StLedger {
         require(msg.sender == owner, "Restricted method");
         require(_readOnly == false, "Contract is read only");
         TokenLib.addMetaSecTokenBatch(ledgerData, batchId, metaKeyNew, metaValueNew);
+    }
+
+    /**
+     * @dev Sets (overwrites if present) the originator fee structure for the batch
+     * @param batchId ID of the batch
+     * @param originatorFee Originator fee structure for the batch's tokens
+     */
+    function setOriginatorFeeTokenBatch(
+        uint256 batchId,
+        StructLib.SetFeeArgs memory originatorFee)
+    public {
+        require(msg.sender == owner, "Restricted method");
+        require(_readOnly == false, "Contract is read only");
+        TokenLib.setOriginatorFeeTokenBatch(ledgerData, batchId, originatorFee);
     }
 
     /**

@@ -11,6 +11,7 @@ library TokenLib {
     event MintedSecTokenBatch(uint256 batchId, uint256 tokenTypeId, address batchOwner, uint256 mintQty, uint256 mintSecTokenCount);
     event MintedSecToken(uint256 stId, uint256 batchId, uint256 tokenTypeId, address ledgerOwner, uint256 mintedQty);
     event AddedBatchMetadata(uint256 batchId, string key, string value);
+    event SetBatchOriginatorFee(uint256 batchId, StructLib.SetFeeArgs originatorFee);
 
     // TOKEN TYPES
     function addSecTokenType(
@@ -77,7 +78,6 @@ library TokenLib {
             require(bytes(metaKeys[i]).length == 0 || bytes(metaValues[i]).length == 0, "Zero-length metadata key or value supplied");
         }*/
 
-        // TODO: save origTokFee here...
         StructLib.SecTokenBatch memory newBatch = StructLib.SecTokenBatch({
                          id: ledgerData._batches_currentMax_id + 1,
             mintedTimestamp: block.timestamp,
@@ -85,7 +85,8 @@ library TokenLib {
                   mintedQty: uint256(a.mintQty),
                   burnedQty: 0,
                    metaKeys: a.metaKeys,
-                 metaValues: a.metaValues
+                 metaValues: a.metaValues,
+                 origTokFee: a.origTokFee
         });
         ledgerData._batches[newBatch.id] = newBatch;
         ledgerData._batches_currentMax_id++;
@@ -126,7 +127,7 @@ library TokenLib {
         ledgerData._tokens_totalMintedQty += uint256(a.mintQty);
     }
 
-    // ADDING METADATA
+    // POST-MINTING
     function addMetaSecTokenBatch(
         StructLib.LedgerStruct storage ledgerData,
         uint256 batchId,
@@ -144,6 +145,16 @@ library TokenLib {
         ledgerData._batches[batchId].metaKeys.push(metaKeyNew);
         ledgerData._batches[batchId].metaValues.push(metaValueNew);
         emit AddedBatchMetadata(batchId, metaKeyNew, metaValueNew);
+    }
+
+    function setOriginatorFeeTokenBatch(
+        StructLib.LedgerStruct storage ledgerData,
+        uint256 batchId,
+        StructLib.SetFeeArgs memory originatorFeeNew)
+    public {
+        require(batchId >= 1 && batchId <= ledgerData._batches_currentMax_id, "Invalid batchId");
+        ledgerData._batches[batchId].origTokFee = originatorFeeNew;
+        emit SetBatchOriginatorFee(batchId, originatorFeeNew);
     }
 
     // BURNING

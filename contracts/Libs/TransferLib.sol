@@ -11,21 +11,18 @@ library TransferLib {
     struct TransferArgs {
         address ledger_A;
         address ledger_B;
-
         uint256 qty_A;           // ST quantity moving from A (excluding fees, if any)
         uint256 tokenTypeId_A;   // ST type moving from A
         uint256 qty_B;           // " from B
         uint256 tokenTypeId_B;   // " from B
-
         int256  ccy_amount_A;    // currency amount moving from A (excluding fees, if any) -- (signed value: ledger ccyType_balance supports (theoretical) -ve balances)
         uint256 ccyTypeId_A;     // currency type moving from A
         int256  ccy_amount_B;    // " from B                                               -- (signed value: ledger ccyType_balance supports (theoretical) -ve balances)
         uint256 ccyTypeId_B;     // " from B
-
         bool    applyFees;       // apply global fee structure to the transfer (both legs)
     }
 
-    struct FeePayable {
+    struct FeesCalc {
         uint256 fee_ccy_A;
         uint256 fee_ccy_B;
         uint256 fee_tok_A;
@@ -46,64 +43,52 @@ library TransferLib {
         // disallow single origin multiple asset type movement
         require(!((a.qty_A > 0 && a.ccy_amount_A > 0) || (a.qty_B > 0 && a.ccy_amount_B > 0)), "Same origin multiple asset transfer disallowed");
 
-        // get fee structure for each side
-        StructLib.FeeStruct storage feeStructA_ccy = ledgerData._ledger[a.ledger_A].customFees.ccyType_Set[a.ccyTypeId_A]   ? ledgerData._ledger[a.ledger_A].customFees : globalFees;
-        StructLib.FeeStruct storage feeStructA_tok = ledgerData._ledger[a.ledger_A].customFees.tokType_Set[a.tokenTypeId_A] ? ledgerData._ledger[a.ledger_A].customFees : globalFees;
-        StructLib.FeeStruct storage feeStructB_ccy = ledgerData._ledger[a.ledger_B].customFees.ccyType_Set[a.ccyTypeId_B]   ? ledgerData._ledger[a.ledger_B].customFees : globalFees;
-        StructLib.FeeStruct storage feeStructB_tok = ledgerData._ledger[a.ledger_B].customFees.tokType_Set[a.tokenTypeId_B] ? ledgerData._ledger[a.ledger_B].customFees : globalFees;
-
-        // calc total fees payable (fixed + basis points)
-        FeePayable memory feePayable = FeePayable({
-            fee_ccy_A: (feeStructA_ccy.ccyType_Fix[a.ccyTypeId_A]) + (((uint256(a.ccy_amount_A)*1000000 / 10000) * feeStructA_ccy.ccyType_Bps[a.ccyTypeId_A]) / 1000000),
-            fee_ccy_B: (feeStructB_ccy.ccyType_Fix[a.ccyTypeId_B]) + (((uint256(a.ccy_amount_B)*1000000 / 10000) * feeStructB_ccy.ccyType_Bps[a.ccyTypeId_B]) / 1000000),
-            fee_tok_A: feeStructA_tok.tokType_Fix[a.tokenTypeId_A] + ((uint256(a.qty_A)*1000000 / 10000) * feeStructA_tok.tokType_Bps[a.tokenTypeId_A]) / 1000000,
-            fee_tok_B: feeStructB_tok.tokType_Fix[a.tokenTypeId_B] + ((uint256(a.qty_B)*1000000 / 10000) * feeStructB_tok.tokType_Bps[a.tokenTypeId_B]) / 1000000
+        // exchange fees - calc total payable (fixed + basis points), cap & collar
+        StructLib.FeeStruct storage exFeeStruct_ccy_A = ledgerData._ledger[a.ledger_A].customFees.ccyType_Set[a.ccyTypeId_A]   ? ledgerData._ledger[a.ledger_A].customFees : globalFees;
+        StructLib.FeeStruct storage exFeeStruct_tok_A = ledgerData._ledger[a.ledger_A].customFees.tokType_Set[a.tokenTypeId_A] ? ledgerData._ledger[a.ledger_A].customFees : globalFees;
+        StructLib.FeeStruct storage exFeeStruct_ccy_B = ledgerData._ledger[a.ledger_B].customFees.ccyType_Set[a.ccyTypeId_B]   ? ledgerData._ledger[a.ledger_B].customFees : globalFees;
+        StructLib.FeeStruct storage exFeeStruct_tok_B = ledgerData._ledger[a.ledger_B].customFees.tokType_Set[a.tokenTypeId_B] ? ledgerData._ledger[a.ledger_B].customFees : globalFees;
+        FeesCalc memory exFees = FeesCalc({
+            fee_ccy_A: applyCapCollar(exFeeStruct_ccy_A.ccy, a.ccyTypeId_A, uint256(a.ccy_amount_A), calcFee(exFeeStruct_ccy_A.ccy, a.ccyTypeId_A, uint256(a.ccy_amount_A))),
+            fee_ccy_B: applyCapCollar(exFeeStruct_ccy_B.ccy, a.ccyTypeId_B, uint256(a.ccy_amount_B), calcFee(exFeeStruct_ccy_B.ccy, a.ccyTypeId_B, uint256(a.ccy_amount_B))),
+            fee_tok_A: applyCapCollar(exFeeStruct_tok_A.tok, a.tokenTypeId_A, a.qty_A,               calcFee(exFeeStruct_tok_A.tok, a.tokenTypeId_A, a.qty_A)),
+            fee_tok_B: applyCapCollar(exFeeStruct_tok_B.tok, a.tokenTypeId_B, a.qty_B,               calcFee(exFeeStruct_tok_B.tok, a.tokenTypeId_B, a.qty_B))
         });
 
-        // cap & collar fees
-        if (a.ccy_amount_A > 0) {
-            if (feePayable.fee_ccy_A > feeStructA_ccy.ccyType_Max[a.ccyTypeId_A] && feeStructA_ccy.ccyType_Max[a.ccyTypeId_A] > 0)
-                feePayable.fee_ccy_A = feeStructA_ccy.ccyType_Max[a.ccyTypeId_A];
-            if (feePayable.fee_ccy_A < feeStructA_ccy.ccyType_Min[a.ccyTypeId_A] && feeStructA_ccy.ccyType_Min[a.ccyTypeId_A] > 0)
-                feePayable.fee_ccy_A = feeStructA_ccy.ccyType_Min[a.ccyTypeId_A];
-        }
-        if (a.ccy_amount_B > 0) {
-            if (feePayable.fee_ccy_B > feeStructB_ccy.ccyType_Max[a.ccyTypeId_B] && feeStructB_ccy.ccyType_Max[a.ccyTypeId_B] > 0)
-                feePayable.fee_ccy_B = feeStructB_ccy.ccyType_Max[a.ccyTypeId_B];
-            if (feePayable.fee_ccy_B < feeStructB_ccy.ccyType_Min[a.ccyTypeId_B] && feeStructB_ccy.ccyType_Min[a.ccyTypeId_B] > 0)
-                feePayable.fee_ccy_B = feeStructB_ccy.ccyType_Min[a.ccyTypeId_B];
-        }
-        if (a.qty_A > 0) {
-            if (feePayable.fee_tok_A > feeStructA_tok.tokType_Max[a.tokenTypeId_A] && feeStructA_tok.tokType_Max[a.tokenTypeId_A] > 0)
-                feePayable.fee_tok_A = feeStructA_tok.tokType_Max[a.tokenTypeId_A];
-            if (feePayable.fee_tok_A < feeStructA_tok.tokType_Min[a.tokenTypeId_A] && feeStructA_tok.tokType_Min[a.tokenTypeId_A] > 0)
-                feePayable.fee_tok_A = feeStructA_tok.tokType_Min[a.tokenTypeId_A];
-        }
-        if (a.qty_B > 0) {
-            if (feePayable.fee_tok_B > feeStructB_tok.tokType_Max[a.tokenTypeId_B] && feeStructB_tok.tokType_Max[a.tokenTypeId_B] > 0)
-                feePayable.fee_tok_B = feeStructB_tok.tokType_Max[a.tokenTypeId_B];
-            if (feePayable.fee_tok_B < feeStructB_tok.tokType_Min[a.tokenTypeId_B] && feeStructB_tok.tokType_Min[a.tokenTypeId_B] > 0)
-                feePayable.fee_tok_B = feeStructB_tok.tokType_Min[a.tokenTypeId_B];
-        }
+        //
+        // calc originator fees
+        // TODO: need to call transferSplitSecTokens() in preview mode, to return list of n transfer-from batchIds and transfer amounts from each batch
+        //       we then have n sets of potential originator SetFeeArgs from the transfer-from batches...
+        //       we then can make n StructLib.FeeStruct's derived from the transfer-from batch tokenType & the SetFeeArgs's
+        //
+        // StructLib.FeeStruct storage exFeeStruct_tok_A = ledgerData._batches[]
+        // StructLib.FeeStruct storage exFeeStruct_tok_B = //...
+        // FeesCalc memory exFees = FeesCalc({
+        //     fee_ccy_A: 0, // originator fees are only in tokens
+        //     fee_ccy_B: 0,
+        //     fee_tok_A: applyCapCollar(exFeeStruct_tok_A.tok, a.tokenTypeId_A, a.qty_A,               calcFee(exFeeStruct_tok_A.tok, a.tokenTypeId_A, a.qty_A)),
+        // });
+
+        // sum them for validation...
 
         // validate currency balances
         require(StructLib.sufficientCcy(ledgerData, a.ledger_A, a.ccyTypeId_A, a.ccy_amount_A,
-                    int256(feePayable.fee_ccy_A) * (a.applyFees && a.ccy_amount_A > 0 ? 1 : 0)), "Insufficient currency held by ledger owner A");
+                    int256(exFees.fee_ccy_A) * (a.applyFees && a.ccy_amount_A > 0 ? 1 : 0)), "Insufficient currency held by ledger owner A");
         require(StructLib.sufficientCcy(ledgerData, a.ledger_B, a.ccyTypeId_B, a.ccy_amount_B,
-                    int256(feePayable.fee_ccy_B) * (a.applyFees && a.ccy_amount_B > 0 ? 1 : 0)), "Insufficient currency held by ledger owner B");
+                    int256(exFees.fee_ccy_B) * (a.applyFees && a.ccy_amount_B > 0 ? 1 : 0)), "Insufficient currency held by ledger owner B");
 
         // validate token balances
         require(StructLib.sufficientTokens(ledgerData, a.ledger_A, a.tokenTypeId_A, a.qty_A,
-                    feePayable.fee_tok_A * (a.applyFees && a.qty_A > 0 ? 1 : 0)), "Insufficient tokens held by ledger owner A");
+                    exFees.fee_tok_A * (a.applyFees && a.qty_A > 0 ? 1 : 0)), "Insufficient tokens held by ledger owner A");
         require(StructLib.sufficientTokens(ledgerData, a.ledger_B, a.tokenTypeId_B, a.qty_B,
-                    feePayable.fee_tok_B * (a.applyFees && a.qty_B > 0 ? 1 : 0)), "Insufficient tokens held by ledger owner B");
+                    exFees.fee_tok_B * (a.applyFees && a.qty_B > 0 ? 1 : 0)), "Insufficient tokens held by ledger owner B");
 
         // transfer currencies
         if (a.ccy_amount_A > 0) {
             if (a.applyFees) {
-                if (feePayable.fee_ccy_A > 0) {
+                if (exFees.fee_ccy_A > 0) { // exchange fees
                     transferCcy(ledgerData, TransferCcyArgs({ from: a.ledger_A, to: feeAddrOwner, ccyTypeId: a.ccyTypeId_A,
-                        amount: feePayable.fee_ccy_A,
+                        amount: exFees.fee_ccy_A,
                          isFee: true }));
                 }
             }
@@ -111,9 +96,9 @@ library TransferLib {
         }
         if (a.ccy_amount_B > 0) {
             if (a.applyFees) {
-                if (feePayable.fee_ccy_B > 0) {
+                if (exFees.fee_ccy_B > 0) { // exchange fees
                     transferCcy(ledgerData, TransferCcyArgs({ from: a.ledger_B, to: feeAddrOwner, ccyTypeId: a.ccyTypeId_B,
-                        amount: feePayable.fee_ccy_B,
+                        amount: exFees.fee_ccy_B,
                          isFee: true }));
                 }
             }
@@ -123,9 +108,9 @@ library TransferLib {
         // transfer tokens
         if (a.qty_A > 0) {
             if (a.applyFees) {
-                if (feePayable.fee_tok_A > 0) {
+                if (exFees.fee_tok_A > 0) { // exchange fees
                     transferSplitSecTokens(ledgerData, TransferSplitArgs({ from: a.ledger_A, to: feeAddrOwner, tokenTypeId: a.tokenTypeId_A,
-                        qtyUnit: feePayable.fee_tok_A,
+                        qtyUnit: exFees.fee_tok_A,
                           isFee: true }));
                 }
             }
@@ -134,15 +119,54 @@ library TransferLib {
         }
         if (a.qty_B > 0) {
             if (a.applyFees) {
-                if (feePayable.fee_tok_B > 0) {
+                if (exFees.fee_tok_B > 0) { // exchange fees
                     transferSplitSecTokens(ledgerData, TransferSplitArgs({ from: a.ledger_B, to: feeAddrOwner, tokenTypeId: a.tokenTypeId_B,
-                        qtyUnit: feePayable.fee_tok_B,
+                        qtyUnit: exFees.fee_tok_B,
                           isFee: true }));
                 }
             }
             transferSplitSecTokens(ledgerData,
                 TransferSplitArgs({ from: a.ledger_B, to: a.ledger_A, tokenTypeId: a.tokenTypeId_B, qtyUnit: a.qty_B, isFee: false }));
         }
+    }
+
+    /**
+     * @dev Calculates fixed + basis points total fee based on the fee structure of the supplied currency or token type
+     * @param feeStructure Token or currency type fee structure mapping
+     * @param typeId Token or currency type ID
+     * @param transferAmount Currency amount or token quantity
+     * @return Total fee
+     */
+    function calcFee(
+        mapping(uint256 => StructLib.SetFeeArgs) storage feeStructure,
+        uint256 typeId,
+        uint256 transferAmount)
+    private returns(uint256 totalFee) {
+        return // fixed fee + basis point fee
+            feeStructure[typeId].fee_fixed
+            + ((transferAmount * 1000000/*precision*/ / 10000/*basis points*/) * feeStructure[typeId].fee_percBips) / 1000000/*precision*/;
+    }
+
+    /**
+     * @dev Caps and collars (max and min) the supplied fee based on the fee structure of the supplied currency or token type
+     * @param feeStructure Token or currency type fee structure mapping
+     * @param typeId Token or currency type ID
+     * @param feeAmount Uncapped/uncollared fee
+     * @return Capped or collared fee
+     */
+    function applyCapCollar(
+        mapping(uint256 => StructLib.SetFeeArgs) storage feeStructure,
+        uint256 typeId,
+        uint256 transferAmount,
+        uint256 feeAmount)
+    private returns(uint256 totalFee) {
+        if (transferAmount > 0) {
+            if (feeAmount > feeStructure[typeId].fee_max && feeStructure[typeId].fee_max > 0)
+                return feeStructure[typeId].fee_max;
+            if (feeAmount < feeStructure[typeId].fee_min && feeStructure[typeId].fee_min > 0)
+                return feeStructure[typeId].fee_min;
+        }
+        return feeAmount;
     }
 
     /**
@@ -259,23 +283,23 @@ library TransferLib {
                     }
                     // SOFT-MINT - if no existing destination ST from same batch
                     if (!mergedExisting) {
-                        uint256 newId = ledgerData._tokens_currentMax_id + 1;
-                        ledgerData._sts_batchId[newId] = ledgerData._sts_batchId[stId];             // inherit batch from parent ST  // TODO gas - pack/combine
-                        ledgerData._sts_currentQty[newId] = remainingToTransfer;                    // TODO gas - pack/combine
-                        ledgerData._sts_mintedQty[newId] = remainingToTransfer;                     // TODO gas - pack/combine
-                        //ledgerData._sts_mintedTimestamp[newId] = block.timestamp;                 // gas - DROP DONE - can fetch from events
-                        //ledgerData._sts_splitFrom_id[newId] = stId;                               // gas - DROP DONE - can fetch from events
-                        to_stIds.push(newId);
+                        uint256 newStId = ledgerData._tokens_currentMax_id + 1;
+                        ledgerData._sts_batchId[newStId] = ledgerData._sts_batchId[stId];           // inherit batch from parent ST  // TODO gas - pack/combine
+                        ledgerData._sts_currentQty[newStId] = remainingToTransfer;                  // TODO gas - pack/combine
+                        ledgerData._sts_mintedQty[newStId] = remainingToTransfer;                   // TODO gas - pack/combine
+                        //ledgerData._sts_mintedTimestamp[newStId] = block.timestamp;               // gas - DROP DONE - can fetch from events
+                        //ledgerData._sts_splitFrom_id[newStId] = stId;                             // gas - DROP DONE - can fetch from events
+                        to_stIds.push(newStId);
                         ledgerData._tokens_currentMax_id++;
                         //ledgerData._ledger[to].tokenType_sumQty[tokenTypeId] += remainingToTransfer;    // gas - DROP DONE - only used internally, validation params
 
-                        emit TransferedPartialSecToken(a.from, a.to, stId, newId, 0, /*a.tokenTypeId,*/ remainingToTransfer, a.isFee);
+                        emit TransferedPartialSecToken(a.from, a.to, stId, newStId, 0, /*a.tokenTypeId,*/ remainingToTransfer, a.isFee);
                     }
 
                 // resize (shrink) the origin ST
                 ledgerData._sts_currentQty[stId] -= remainingToTransfer;                            // TODO gas - pack/combine
                 ledgerData._sts_mintedQty[stId] -= remainingToTransfer;                             // TODO gas - pack/combine
-                //ledgerData._sts_splitTo_id[stId] = newId;                                         // gas - DROP DONE - can index from events
+                //ledgerData._sts_splitTo_id[stId] = newStId;                                         // gas - DROP DONE - can index from events
                 //ledgerData._ledger[from].tokenType_sumQty[tokenTypeId] -= remainingToTransfer;    // gas - DROP DONE - only used internally, validation params
 
                 remainingToTransfer = 0;

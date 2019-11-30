@@ -34,13 +34,14 @@ library StructLib {
 
     // LEDGER TYPES
     struct SecTokenBatch {
-        uint256 id;                                             // global sequential id: 1-based
-        uint256 mintedTimestamp;                                // minting block.timestamp
-        uint256 tokenTypeId;                                    // token type of the batch
-        uint256 mintedQty;                                      // total unit qty minted in the batch
-        uint256 burnedQty;                                      // total unit qty burned from the batch
-        string[] metaKeys;                                      // metadata keys
-        string[] metaValues;                                    // metadata values
+        uint256    id;                                          // global sequential id: 1-based
+        uint256    mintedTimestamp;                             // minting block.timestamp
+        uint256    tokenTypeId;                                 // token type of the batch
+        uint256    mintedQty;                                   // total unit qty minted in the batch
+        uint256    burnedQty;                                   // total unit qty burned from the batch
+        string[]   metaKeys;                                    // metadata keys
+        string[]   metaValues;                                  // metadata values
+        SetFeeArgs origTokFee;                                  // batch originator fees on all transfers of tokens from this batch
     }
 
     struct SecTokenReturn {
@@ -115,19 +116,8 @@ library StructLib {
     struct FeeStruct {
         mapping(uint256 => bool) tokType_Set;    // bool - values are set for the token type
         mapping(uint256 => bool) ccyType_Set;    // bool - values are set for the currency type
-
-        // TODO: refactor these to two mappings of SetFeeArgs:
-        mapping(uint256 => uint256) tokType_Fix; // fixed token qty fee per transfer
-        mapping(uint256 => uint256) ccyType_Fix; // fixed currency fee per transfer
-
-        mapping(uint256 => uint256) tokType_Bps; // bips (0-10000) token qty fee per transfer
-        mapping(uint256 => uint256) ccyType_Bps; // bips (0-10000) currency fee per transfer
-
-        mapping(uint256 => uint256) tokType_Min; // if gt-zero: collar (min) token qty fee per transfer
-        mapping(uint256 => uint256) ccyType_Min; // if gt-zero: collar (min) currency fee per transfer
-
-        mapping(uint256 => uint256) tokType_Max; // if gt-zero: cap (max) token qty fee per transfer
-        mapping(uint256 => uint256) ccyType_Max; // if gt-zero: cap (max) currency fee per transfer
+        mapping(uint256 => SetFeeArgs) tok;      // fee structure by token type
+        mapping(uint256 => SetFeeArgs) ccy;      // fee structure by currency type
     }
     struct SetFeeArgs { // fee for a specific ccy or token type
         uint256 fee_fixed;      // apply fixed a, if any
