@@ -192,6 +192,22 @@ contract("StMaster", accounts => {
         assert.fail('expected restriction exception');
     });
 
+    it('post-minting metadata - should not allow adding of a existing KVP after minting', async () => {
+        const batchId = await mintBatchWithMetadata( 
+            { tokenType: CONST.tokenType.UNFCCC, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.accountNdx],
+             metaKeys: unfccc_ExampleKvps.map(p => p.k),
+           metaValues: unfccc_ExampleKvps.map(p => p.v),
+        }, { from: accounts[0] } );
+
+        const batchBefore = await stm.getSecTokenBatch(batchId);
+
+        const testKey = unfccc_ExampleKvps[0].k, testValue = unfccc_ExampleKvps[0].v;
+        try {
+            await stm.addMetaSecTokenBatch(batchId, testKey, testValue);
+        } catch (ex) { return; }
+        assert.fail('expected restriction exception');
+    });
+
     async function mintBatchWithMetadata({ tokenType, qtyUnit, qtySecTokens, receiver, metaKeys, metaValues }) {
         const mintTx = await stm.mintSecTokenBatch(tokenType, qtyUnit, qtySecTokens, receiver, metaKeys, metaValues, { from: accounts[0] });
         //console.log(`\t>>> gasUsed - Mint 1 vEEU w/ ${metaKeys.length} metadata keys: ${mintTx.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * mintTx.receipt.gasUsed).toFixed(4)} (USD ${(CONST.gasPriceEth * mintTx.receipt.gasUsed * CONST.ethUsd).toFixed(4)}) ETH TX COST`);

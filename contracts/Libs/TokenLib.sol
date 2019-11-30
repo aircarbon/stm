@@ -131,6 +131,13 @@ library TokenLib {
         string memory metaValueNew)
     public {
         require(batchId >= 1 && batchId <= ledgerData._batches_currentMax_id, "Invalid batchId");
+
+        for (uint256 kvpNdx = 0; kvpNdx < ledgerData._batches[batchId].metaKeys.length; kvpNdx++) {
+            require(keccak256(abi.encodePacked(ledgerData._batches[batchId].metaKeys[kvpNdx])) !=
+                    keccak256(abi.encodePacked(metaKeyNew)),
+                    "KVP key already exists in batch");
+        }
+
         ledgerData._batches[batchId].metaKeys.push(metaKeyNew);
         ledgerData._batches[batchId].metaValues.push(metaValueNew);
         emit AddedBatchMetadata(batchId, metaKeyNew, metaValueNew);
