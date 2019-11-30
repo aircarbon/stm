@@ -147,7 +147,6 @@ contract("StMaster", accounts => {
     });
 
     it('trading fees (multi-capcol) - should allow a capped transfer with otherwise insufficient carbon to cover fees (fee on A)', async () => {
-        // 102,999,999 tons
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], [], [], { from: accounts[0] });
         await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        accounts[global.accountNdx + 1],         { from: accounts[0] });
 
@@ -170,7 +169,6 @@ contract("StMaster", accounts => {
     });
 
     it('trading fees (multi-capcol) - should not allow a transfer with insufficient carbon to cover collared fees (fee on B)', async () => {
-        // 102,999,999 tons
         await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        accounts[global.accountNdx + 0],         { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], [], [], { from: accounts[0] });
 
