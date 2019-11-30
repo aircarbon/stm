@@ -7,6 +7,7 @@ const CcyLib = artifacts.require('./CcyLib.sol');
 const TokenLib = artifacts.require('./TokenLib.sol');
 const LedgerLib = artifacts.require('./LedgerLib.sol');
 const TransferLib = artifacts.require('./TransferLib.sol');
+const FeeLib = artifacts.require('./FeeLib.sol');
 
 //const StMintable = artifacts.require('./StMintable.sol');
 //const StLedger = artifacts.require('./StLedger.sol');
@@ -29,6 +30,7 @@ module.exports = async function (deployer) {
         deployer.link(StructLib, TokenLib);
         deployer.link(StructLib, LedgerLib);
         deployer.link(StructLib, TransferLib);
+        deployer.link(StructLib, FeeLib);
 
         deployer.link(StructLib, StMaster);
 
@@ -44,6 +46,9 @@ module.exports = async function (deployer) {
     return deployer.deploy(TransferLib).then(async transferLib => { 
         deployer.link(TransferLib, StMaster);
     
+    return deployer.deploy(FeeLib).then(async feeLib => { 
+        deployer.link(FeeLib, StMaster);
+
         // StMaster
         return deployer.deploy(StMaster/*, st2x.address*/).then(async stm => {
             
@@ -54,7 +59,7 @@ module.exports = async function (deployer) {
                 global.configContext = 'erc20';
 
                 const contractName = "SecTok_Master";
-                const contractVer = "0.4";
+                const contractVer = "0.5";
 
                 var ip = "unknown";
                 publicIp.v4().then(p => ip = p).catch(e => { console.log("WARN: could not get IP - will write 'unknown'"); });
@@ -71,6 +76,7 @@ module.exports = async function (deployer) {
             }
         }).catch(err => { console.error('failed deployment: StMaster', err); });
     
+    }).catch(err => { console.error('failed deployment: FeeLib', err); });
     }).catch(err => { console.error('failed deployment: TransferLib', err); });
     }).catch(err => { console.error('failed deployment: StLib', err); });
     }).catch(err => { console.error('failed deployment: CcyLib', err); });
