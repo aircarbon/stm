@@ -24,11 +24,14 @@ contract StFees is Owned, StLedger {
     // event SetFeeCcyMax(uint256 ccyTypeId, address ledgerOwner, uint256 fee_ccy_Max);
 
     //
-    // TODO: fees - additional set of fees to originator on each trade (i.e. data on batch struct)...
+    // TODO: origFees - additional set of fees to originator on each trade (i.e. data on batch struct)...
+    //  > refactor FeeStruct to two mappings of SetFeeArgs...
     //  > BatchFees - on minting
     //  > UpdateBatchFees - post minting
     //
-    // TODO: fees - getFees (for pre-trade)...
+    //  > refactor transferLib - for combined fees (checks) + 2x ops (ex + orig fees)
+    //
+    // TODO: fees - getFees (ex + orig) (for pre-trade)...
     //
     // TODO: fees (trade fn + setting ledger & setting global): UI/UX in admin...
     //
@@ -62,7 +65,7 @@ contract StFees is Owned, StLedger {
      * @param ledgerOwner The ledger address for which to set fee structure, or 0x0 to set global fee structure
      * @param feeArgs The fee structure to assign to the supplied leder entry address, or to the global fee structure
      */
-    function setFee_TokType(uint256 tokenTypeId, address ledgerOwner, FeeLib.SetFeeArgs memory feeArgs) public {
+    function setFee_TokType(uint256 tokenTypeId, address ledgerOwner, StructLib.SetFeeArgs memory feeArgs) public {
         require(msg.sender == owner, "Restricted method");
         require(_readOnly == false, "Contract is read only");
         FeeLib.setFee_TokType(ledgerData, stTypesData, globalFees, tokenTypeId, ledgerOwner, feeArgs);
@@ -74,7 +77,7 @@ contract StFees is Owned, StLedger {
      * @param ledgerOwner The ledger address for which to set fee structure, or 0x0 to set global fee structure
      * @param feeArgs The fee structure to assign to the supplied leder entry address, or to the global fee structure
      */
-    function setFee_CcyType(uint256 ccyTypeId, address ledgerOwner, FeeLib.SetFeeArgs memory feeArgs) public {
+    function setFee_CcyType(uint256 ccyTypeId, address ledgerOwner, StructLib.SetFeeArgs memory feeArgs) public {
         require(msg.sender == owner, "Restricted method");
         require(_readOnly == false, "Contract is read only");
         FeeLib.setFee_CcyType(ledgerData, ccyTypesData, globalFees, ccyTypeId, ledgerOwner, feeArgs);

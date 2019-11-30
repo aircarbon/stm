@@ -111,11 +111,12 @@ library StructLib {
         mapping(uint256 => uint256) _ccyType_totalFeesPaid;
     }
 
-    // FEE STRUCTURE -- ledger or global
+    // FEE STRUCTURE -- (ledger or global) fees for all ccy's and token types
     struct FeeStruct {
         mapping(uint256 => bool) tokType_Set;    // bool - values are set for the token type
         mapping(uint256 => bool) ccyType_Set;    // bool - values are set for the currency type
 
+        // TODO: refactor these to two mappings of SetFeeArgs:
         mapping(uint256 => uint256) tokType_Fix; // fixed token qty fee per transfer
         mapping(uint256 => uint256) ccyType_Fix; // fixed currency fee per transfer
 
@@ -127,6 +128,12 @@ library StructLib {
 
         mapping(uint256 => uint256) tokType_Max; // if gt-zero: cap (max) token qty fee per transfer
         mapping(uint256 => uint256) ccyType_Max; // if gt-zero: cap (max) currency fee per transfer
+    }
+    struct SetFeeArgs { // fee for a specific ccy or token type
+        uint256 fee_fixed;      // apply fixed a, if any
+        uint256 fee_percBips;   // add a basis points a, if any - in basis points, i.e. minimum % = 1bp = 1/100 of 1% = 0.0001x
+        uint256 fee_min;        // collar for a (if >0)
+        uint256 fee_max;        // and cap for a, (if >0)
     }
 
     /**

@@ -49,17 +49,13 @@ library TokenLib {
 
     // MINTING
     struct MintSecTokenBatchArgs {
-        uint256           tokenTypeId;
-        int256            mintQty;
-        int256            mintSecTokenCount;
-        address           batchOwner;
-
-        // TODO: this struct moves to StructLib, so it can be saved in SecTokenBatch...
-        // TODO: transferLib refactoring for combined fees (exchange + originator)...
-        FeeLib.SetFeeArgs originatorTokFee;
-
-        string[]          metaKeys;
-        string[]          metaValues;
+        uint256              tokenTypeId;
+        int256               mintQty;
+        int256               mintSecTokenCount;
+        address              batchOwner;
+        StructLib.SetFeeArgs origTokFee;
+        string[]             metaKeys;
+        string[]             metaValues;
     }
     function mintSecTokenBatch(
         StructLib.LedgerStruct storage ledgerData,
@@ -81,6 +77,7 @@ library TokenLib {
             require(bytes(metaKeys[i]).length == 0 || bytes(metaValues[i]).length == 0, "Zero-length metadata key or value supplied");
         }*/
 
+        // TODO: save origTokFee here...
         StructLib.SecTokenBatch memory newBatch = StructLib.SecTokenBatch({
                          id: ledgerData._batches_currentMax_id + 1,
             mintedTimestamp: block.timestamp,

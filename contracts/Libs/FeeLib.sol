@@ -16,20 +16,13 @@ library FeeLib {
     event SetFeeTokMax(uint256 tokenTypeId, address ledgerOwner, uint256 fee_token_Max);
     event SetFeeCcyMax(uint256 ccyTypeId, address ledgerOwner, uint256 fee_ccy_Max);
 
-    struct SetFeeArgs {
-        uint256 fee_fixed;      // apply fixed a, if any
-        uint256 fee_percBips;   // add a basis points a, if any - in basis points, i.e. minimum % = 1bp = 1/100 of 1% = 0.0001x
-        uint256 fee_min;        // collar for a (if >0)
-        uint256 fee_max;        // and cap for a, (if >0)
-    }
-
     function setFee_TokType(
         StructLib.LedgerStruct storage ledgerData,
         StructLib.StTypesStruct storage stTypesData,
         StructLib.FeeStruct storage globalFees,
         uint256 tokenTypeId,
         address ledgerOwner,
-        SetFeeArgs memory a)
+        StructLib.SetFeeArgs memory a)
     public {
         require(tokenTypeId >= 0 && tokenTypeId < stTypesData._count_tokenTypes, "Invalid ST type");
 
@@ -63,7 +56,7 @@ library FeeLib {
         StructLib.FeeStruct storage globalFees,
         uint256 ccyTypeId,
         address ledgerOwner,
-        FeeLib.SetFeeArgs memory a)
+        StructLib.SetFeeArgs memory a)
     public {
         require(ccyTypeId >= 0 && ccyTypeId < ccyTypesData._count_ccyTypes, "Invalid currency type");
 

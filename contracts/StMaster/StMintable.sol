@@ -15,18 +15,18 @@ contract StMintable is Owned, StLedger {
      * @param mintQty quantity in contact base unit (e.g. KG) to mint across the supplied no. of STs
      * @param mintSecTokenCount Number of STs to mint - enforced: due to memory & gas cost, always set to 1
      * @param batchOwner Ledger owner to assign the minted ST(s) to
-     * @param originatorTokFee Originator (batch ledger owner) token fee structure to apply on all token transfers from this batch
+     * @param origTokFee Originator (batch ledger owner) token fee structure to apply on all token transfers from this batch
      * @param metaKeys Batch metadata keys
      * @param metaValues Batch metadata values
      */
     function mintSecTokenBatch(
-        uint256                  tokenTypeId,
-        int256                   mintQty,
-        int256                   mintSecTokenCount,
-        address                  batchOwner,
-        FeeLib.SetFeeArgs memory originatorTokFee,
-        string[] memory          metaKeys,
-        string[] memory          metaValues)
+        uint256                     tokenTypeId,
+        int256                      mintQty,
+        int256                      mintSecTokenCount,
+        address                     batchOwner,
+        StructLib.SetFeeArgs memory origTokFee,
+        string[] memory             metaKeys,
+        string[] memory             metaValues)
     public {
         require(msg.sender == owner, "Restricted method");
         require(_readOnly == false, "Contract is read only");
@@ -36,7 +36,7 @@ contract StMintable is Owned, StLedger {
                 mintQty: mintQty,
       mintSecTokenCount: mintSecTokenCount,
              batchOwner: batchOwner,
-       originatorTokFee: originatorTokFee,
+             origTokFee: origTokFee,
                metaKeys: metaKeys,
              metaValues: metaValues
         });
