@@ -13,6 +13,19 @@ contract("StMaster", accounts => {
             console.log(`global.accountNdx: ${global.accountNdx} - contract @ ${stm.address} (owner: ${accounts[0]}) - getSecTokenBatchCount: ${(await stm.getSecTokenBatchCount.call()).toString()}`);
     });
 
+    it('transferring eeu - should have reasonable gas cost for one-sided 0.5 vEEU transfer (A -> B), aka. carbon movement', async () => {
+        await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], CONST.nullOrigFees, [], [], { from: accounts[0] });
+        await stm.fund(CONST.ccyType.ETH,                   0,                                  accounts[global.accountNdx + 1],         { from: accounts[0] });
+        const data = await helper.transferLedger({ stm, accounts, 
+                ledger_A: accounts[global.accountNdx + 0],       ledger_B: accounts[global.accountNdx + 1],
+                   qty_A: 750,                              tokenTypeId_A: CONST.tokenType.VCS,
+                   qty_B: 0,                                tokenTypeId_B: 0,
+            ccy_amount_A: 0,                                  ccyTypeId_A: 0,
+            ccy_amount_B: 0,                                  ccyTypeId_B: 0,
+        });
+        console.log(`\t>>> gasUsed - 0.5 vEEU one-way (A -> B): ${data.transferTx.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * data.transferTx.receipt.gasUsed).toFixed(4)} (USD ${(CONST.gasPriceEth * data.transferTx.receipt.gasUsed * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
+    });
+
     // one-sided kg transfer, no consideration, 1 full EEU
     it('transferring eeu - should allow one-sided transfer (A -> B) of 1.0 vEEU (VCS) across ledger entries', async () => {
         await stm.mintSecTokenBatch(CONST.tokenType.VCS, CONST.ktCarbon, 1,       accounts[global.accountNdx + 0], CONST.nullOrigFees, [], [], { from: accounts[0] });
@@ -90,6 +103,7 @@ contract("StMaster", accounts => {
     });
 
     // one-sided kg transfer, no consideration, 1 full + 1 partial EEU (split)
+    // deprecated - no multi-vEEU minting
     // it('transferring eeu - should allow one-sided transfer (A -> B) of 1.5 vEEUs (VCS) across ledger entries', async () => {
     //     await stm.mintSecTokenBatch(CONST.tokenType.VCS, CONST.tonCarbon, 2,      accounts[global.accountNdx + 0], CONST.nullOrigFees, [], [], { from: accounts[0] });
     //     await stm.fund        (CONST.ccyType.USD, CONST.thousandUsd_cents, accounts[global.accountNdx + 1],         { from: accounts[0] });
@@ -315,19 +329,6 @@ contract("StMaster", accounts => {
             assert(data.ledgerA_after.tokens.length == data.ledgerA_before.tokens.length, 'ledger A was not merged');
             assert(data.eeuPartialEvents.some(p => data.ledgerA_before.tokens.some(p2 => p2.stId == p.mergedToSecTokenId)), 'unexpected merge event data for ledger A');
         }
-    });
-
-    it('transferring eeu - should have reasonable gas cost for one-sided 0.5 vEEU transfer (A -> B), aka. carbon movement', async () => {
-        await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], CONST.nullOrigFees, [], [], { from: accounts[0] });
-        await stm.fund(CONST.ccyType.ETH,                   0,                                  accounts[global.accountNdx + 1],         { from: accounts[0] });
-        const data = await helper.transferLedger({ stm, accounts, 
-                ledger_A: accounts[global.accountNdx + 0],  ledger_B: accounts[global.accountNdx + 1],
-                   qty_A: 750,                              tokenTypeId_A: CONST.tokenType.VCS,
-                   qty_B: 0,                                tokenTypeId_B: 0,
-            ccy_amount_A: 0,                                ccyTypeId_A: 0,
-            ccy_amount_B: 0,                                ccyTypeId_B: 0,
-        });
-        console.log(`\t>>> gasUsed - 0.5 vEEU one-way (A -> B): ${data.transferTx.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * data.transferTx.receipt.gasUsed).toFixed(4)} (USD ${(CONST.gasPriceEth * data.transferTx.receipt.gasUsed * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
     });
 
     it('transferring eeu - should not allow one-sided transfer (A -> B) of an invalid tonnage', async () => {

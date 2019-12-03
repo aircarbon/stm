@@ -2,6 +2,7 @@ const st = artifacts.require('StMaster');
 const truffleAssert = require('truffle-assertions');
 const BN = require('bn.js');
 const Big = require('big.js');
+const CONST = require('../const.js');
 
 module.exports = {
 
@@ -481,9 +482,12 @@ async function transferWrapped({
                    qty_B: qty_B.toString(),        tokenTypeId_B, 
             ccy_amount_A: ccy_amount_A.toString(), ccyTypeId_A, 
             ccy_amount_B: ccy_amount_B.toString(), ccyTypeId_B, 
-            applyFees, 
+               applyFees,
+            feeAddrOwner: CONST.nullAddr,
         },
         from //{ from: accounts[0] }
     );
+    //console.log('stm.transfer', tx.args);
+    //console.dir(tx);
     return tx;
 }

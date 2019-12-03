@@ -6,20 +6,30 @@ import "./StructLib.sol";
 library TransferLib {
     event TransferedLedgerCcy(address from, address to, uint256 ccyTypeId, uint256 amount, bool isFee);
     event TransferedFullSecToken(address from, address to, uint256 stId, uint256 mergedToSecTokenId, /*uint256 tokenTypeId,*/ uint256 qty, bool isFee);
-    event TransferedPartialSecToken(address from, address to, uint256 splitFromSecTokenId, uint256 newSecTokenId, uint256 mergedToSecTokenId, /*uint256 tokenTypeId,*/ uint256 qty, bool isFee);
+    event TransferedPartialSecToken(address from, address to, uint256 splitFromSecTokenId, uint256 newSecTokenId, uint256 newOrMergeSecTokenId, /*uint256 tokenTypeId,*/ uint256 qty, bool isFee);
+
+    uint256 constant MAX_BATCHES = 100; // max distinct batch IDs that can participate in a trade
 
     struct TransferArgs {
         address ledger_A;
         address ledger_B;
+
         uint256 qty_A;           // ST quantity moving from A (excluding fees, if any)
         uint256 tokenTypeId_A;   // ST type moving from A
-        uint256 qty_B;           // " from B
-        uint256 tokenTypeId_B;   // " from B
-        int256  ccy_amount_A;    // currency amount moving from A (excluding fees, if any) -- (signed value: ledger ccyType_balance supports (theoretical) -ve balances)
+
+        uint256 qty_B;           // ST quantity moving from B (excluding fees, if any)
+        uint256 tokenTypeId_B;   // ST type moving from B
+
+        int256  ccy_amount_A;    // currency amount moving from A (excluding fees, if any)
+                                 // (signed value: ledger ccyType_balance supports (theoretical) -ve balances)
         uint256 ccyTypeId_A;     // currency type moving from A
-        int256  ccy_amount_B;    // " from B                                               -- (signed value: ledger ccyType_balance supports (theoretical) -ve balances)
-        uint256 ccyTypeId_B;     // " from B
+
+        int256  ccy_amount_B;    // currency amount moving from B (excluding fees, if any)
+                                 // (signed value: ledger ccyType_balance supports (theoretical) -ve balances)
+        uint256 ccyTypeId_B;     // currency type moving from B
+
         bool    applyFees;       // apply global fee structure to the transfer (both legs)
+        address feeAddrOwner;
     }
 
     struct FeesCalc {
@@ -31,9 +41,12 @@ library TransferLib {
     function transfer(
         StructLib.LedgerStruct storage ledgerData,
         StructLib.FeeStruct storage globalFees,     // global fee structure
-        TransferLib.TransferArgs memory a,          // args
-        address feeAddrOwner)                       // exchange fees: receive address
-    public {
+        TransferLib.TransferArgs memory a           // args
+        //address feeAddrOwner                        // exchange fees: receive address
+    )
+    public
+    //returns(TransferSplitPreviewReturn[2] memory previews)
+    {
         require(ledgerData._ledger[a.ledger_A].exists == true, "Invalid ledger owner A");
         require(ledgerData._ledger[a.ledger_B].exists == true, "Invalid ledger owner B");
         require(a.ledger_A != a.ledger_B, "Self transfer disallowed");
@@ -87,47 +100,66 @@ library TransferLib {
         if (a.ccy_amount_A > 0) {
             if (a.applyFees) {
                 if (exFees.fee_ccy_A > 0) { // exchange fees
-                    transferCcy(ledgerData, TransferCcyArgs({ from: a.ledger_A, to: feeAddrOwner, ccyTypeId: a.ccyTypeId_A,
-                        amount: exFees.fee_ccy_A,
-                         isFee: true }));
+                    transferCcy(ledgerData,
+                        TransferCcyArgs({ from: a.ledger_A, to: a.feeAddrOwner, ccyTypeId: a.ccyTypeId_A, amount: exFees.fee_ccy_A, isFee: true }));
                 }
             }
+            // A_B
             transferCcy(ledgerData, TransferCcyArgs({ from: a.ledger_A, to: a.ledger_B, ccyTypeId: a.ccyTypeId_A, amount: uint256(a.ccy_amount_A), isFee: false }));
         }
         if (a.ccy_amount_B > 0) {
             if (a.applyFees) {
                 if (exFees.fee_ccy_B > 0) { // exchange fees
-                    transferCcy(ledgerData, TransferCcyArgs({ from: a.ledger_B, to: feeAddrOwner, ccyTypeId: a.ccyTypeId_B,
-                        amount: exFees.fee_ccy_B,
-                         isFee: true }));
+                    transferCcy(ledgerData,
+                        TransferCcyArgs({ from: a.ledger_B, to: a.feeAddrOwner, ccyTypeId: a.ccyTypeId_B, amount: exFees.fee_ccy_B, isFee: true }));
                 }
             }
+            // B_A
             transferCcy(ledgerData, TransferCcyArgs({ from: a.ledger_B, to: a.ledger_A, ccyTypeId: a.ccyTypeId_B, amount: uint256(a.ccy_amount_B), isFee: false }));
         }
 
         // transfer tokens
+        TransferSplitPreviewReturn[2] memory previews;
         if (a.qty_A > 0) {
             if (a.applyFees) {
                 if (exFees.fee_tok_A > 0) { // exchange fees
-                    transferSplitSecTokens(ledgerData, TransferSplitArgs({ from: a.ledger_A, to: feeAddrOwner, tokenTypeId: a.tokenTypeId_A,
-                        qtyUnit: exFees.fee_tok_A,
-                          isFee: true }));
+                    transferSplitSecTokens(ledgerData,
+                        TransferSplitArgs({ from: a.ledger_A, to: a.feeAddrOwner, tokenTypeId: a.tokenTypeId_A, qtyUnit: exFees.fee_tok_A, isFee: true }));
                 }
             }
-            transferSplitSecTokens(ledgerData,
-                TransferSplitArgs({ from: a.ledger_A, to: a.ledger_B, tokenTypeId: a.tokenTypeId_A, qtyUnit: a.qty_A, isFee: false }));
+            // A_B
+            TransferSplitArgs memory A_B = TransferSplitArgs({ from: a.ledger_A, to: a.ledger_B, tokenTypeId: a.tokenTypeId_A, qtyUnit: a.qty_A, isFee: false });
+
+            previews[0] = transferSplitSecTokens_Preview(ledgerData, A_B);
+            require(previews[0].batchCount > 0, "err1");
+            require(previews[0].batchIds[0] > 0, "err1.1");
+            uint totalQty = 0;
+            for (uint i=0; i < previews[0].batchCount; i++) totalQty += previews[0].transferQty[i];
+            require(totalQty == a.qty_A, "err1.2");
+
+            transferSplitSecTokens(ledgerData, A_B);
         }
         if (a.qty_B > 0) {
             if (a.applyFees) {
                 if (exFees.fee_tok_B > 0) { // exchange fees
-                    transferSplitSecTokens(ledgerData, TransferSplitArgs({ from: a.ledger_B, to: feeAddrOwner, tokenTypeId: a.tokenTypeId_B,
-                        qtyUnit: exFees.fee_tok_B,
-                          isFee: true }));
+                    transferSplitSecTokens(ledgerData,
+                        TransferSplitArgs({ from: a.ledger_B, to: a.feeAddrOwner, tokenTypeId: a.tokenTypeId_B, qtyUnit: exFees.fee_tok_B, isFee: true }));
                 }
             }
-            transferSplitSecTokens(ledgerData,
-                TransferSplitArgs({ from: a.ledger_B, to: a.ledger_A, tokenTypeId: a.tokenTypeId_B, qtyUnit: a.qty_B, isFee: false }));
+            // B_A
+            TransferSplitArgs memory B_A = TransferSplitArgs({ from: a.ledger_B, to: a.ledger_A, tokenTypeId: a.tokenTypeId_B, qtyUnit: a.qty_B, isFee: false });
+
+            previews[1] = transferSplitSecTokens_Preview(ledgerData, B_A);
+            require(previews[1].batchCount > 0, "err2");
+            require(previews[1].batchIds[0] > 0, "err2.1");
+            uint totalQty = 0;
+            for (uint i=0; i < previews[1].batchCount; i++) totalQty += previews[1].transferQty[i];
+            require(totalQty == a.qty_B, "err2.2");
+
+            transferSplitSecTokens(ledgerData, B_A);
         }
+
+        //return (previews);
     }
 
     /**
@@ -141,7 +173,7 @@ library TransferLib {
         mapping(uint256 => StructLib.SetFeeArgs) storage feeStructure,
         uint256 typeId,
         uint256 transferAmount)
-    private returns(uint256 totalFee) {
+    private view returns(uint256 totalFee) {
         return // fixed fee + basis point fee
             feeStructure[typeId].fee_fixed
             + ((transferAmount * 1000000/*precision*/ / 10000/*basis points*/) * feeStructure[typeId].fee_percBips) / 1000000/*precision*/;
@@ -159,7 +191,7 @@ library TransferLib {
         uint256 typeId,
         uint256 transferAmount,
         uint256 feeAmount)
-    private returns(uint256 totalFee) {
+    private view returns(uint256 totalFee) {
         if (transferAmount > 0) {
             if (feeAmount > feeStructure[typeId].fee_max && feeStructure[typeId].fee_max > 0)
                 return feeStructure[typeId].fee_max;
@@ -195,6 +227,71 @@ library TransferLib {
     }
 
     /**
+     * @dev Previews ST transfer across ledger owners
+     * @param a TransferSplitArgs args
+     * @return The distinct transfer-from batch IDs and the total quantity of tokens that would be transfered from each batch
+     */
+    struct TransferSplitPreviewReturn {
+        uint256[MAX_BATCHES] batchIds; // TODO: pack these - quadratic gas cost for fixed memory
+        uint256[MAX_BATCHES] transferQty;
+        uint256 batchCount;
+    }
+    function transferSplitSecTokens_Preview(
+        StructLib.LedgerStruct storage ledgerData,
+        TransferSplitArgs memory a)
+    private view
+    returns(TransferSplitPreviewReturn memory ret)
+    {
+        // init ret - grotesque, but can't return (or have as local var) a dynamic array
+        uint256[MAX_BATCHES] memory batchIds;
+        uint256[MAX_BATCHES] memory transferQty;
+        ret = TransferSplitPreviewReturn({
+            batchIds: batchIds,
+            transferQty: transferQty,
+            batchCount: 0
+        });
+
+        // walk 1 - get distinct batches affected - needed for fixed-size return array declaration
+        uint256[] memory from_stIds = ledgerData._ledger[a.from].tokenType_stIds[a.tokenTypeId]; // assignment of storage[] to memory[] is a copy
+        uint256 from_stIds_length = from_stIds.length;
+        uint256 remainingToTransfer = uint256(a.qtyUnit);
+        while (remainingToTransfer > 0) {
+            uint256 stId = from_stIds[0];
+            uint256 stQty = ledgerData._sts_currentQty[stId];
+            uint256 fromBatchId = ledgerData._sts_batchId[stId];
+
+            // add to list of distinct batches, maintain transfer quantity from each batch
+            bool knownBatch = false;
+            for (uint i = 0; i < ret.batchCount; i++) {
+                if (ret.batchIds[i] == fromBatchId) {
+                    ret.transferQty[i] += remainingToTransfer >= stQty ? stQty : remainingToTransfer;
+                    knownBatch = true;
+                    break;
+                }
+            }
+            if (!knownBatch) {
+                require (ret.batchCount < MAX_BATCHES, "Maximum batch count exceeded for transfer");
+                ret.batchIds[ret.batchCount] = fromBatchId;
+                ret.transferQty[ret.batchCount] = remainingToTransfer >= stQty ? stQty : remainingToTransfer;
+                ret.batchCount++;
+            }
+
+            if (remainingToTransfer >= stQty) { // full ST transfer
+                //require(from_stIds_length > 1, "Unexpected: insufficient tokens of supplied type");
+                from_stIds[0] = from_stIds[from_stIds_length - 1]; // replace in origin copy (ndx++, in effect)
+                //from_stIds.length--;  // memory array can't be resized
+                from_stIds_length--;    // so instead
+                remainingToTransfer -= stQty;
+            }
+            else { // partial ST transfer
+                remainingToTransfer = 0;
+            }
+        }
+
+        return ret;
+    }
+
+    /**
      * @dev Transfers STs across ledger owners, splitting (soft-minting) the last ST as necessary
      * @dev (the residual amount left in the origin's last ST after splitting is similar to a UTXO change output)
      * @param a args
@@ -204,26 +301,26 @@ library TransferLib {
         address to;
         uint256 tokenTypeId;
         uint256 qtyUnit;
-        bool isFee;
+        bool    isFee;
     }
     function transferSplitSecTokens(
         StructLib.LedgerStruct storage ledgerData,
         TransferSplitArgs memory a)
     private {
+        uint256[] storage from_stIds = ledgerData._ledger[a.from].tokenType_stIds[a.tokenTypeId];
+        uint256[] storage to_stIds = ledgerData._ledger[a.to].tokenType_stIds[a.tokenTypeId];
 
-        // transfer sufficient STs (last one may get split)
+        // walk tokens - transfer sufficient STs (last one may get split)
         uint256 ndx = 0;
         uint256 remainingToTransfer = uint256(a.qtyUnit);
         while (remainingToTransfer > 0) {
-            uint256[] storage from_stIds = ledgerData._ledger[a.from].tokenType_stIds[a.tokenTypeId];
-            uint256[] storage to_stIds = ledgerData._ledger[a.to].tokenType_stIds[a.tokenTypeId];
             uint256 stId = from_stIds[ndx];
             uint256 stQty = ledgerData._sts_currentQty[stId];
 
             if (remainingToTransfer >= stQty) {
                 // reassign the full ST across the ledger entries
 
-                // remove from origin
+                // remove from origin - replace hot index 0 with value at last (ndx++, in effect)
                 from_stIds[ndx] = from_stIds[from_stIds.length - 1];
                 from_stIds.length--;
                 //ledgerData._ledger[from].tokenType_sumQty[a.tokenTypeId] -= stQty;            //* gas - DROP DONE - only used internally, validation params

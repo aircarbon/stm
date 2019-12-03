@@ -26,7 +26,7 @@ module.exports = {
     ccyType: Object.freeze({
         USD: 0,
         ETH: 1,
-    }),
+    }), 
 
     // eeu kg constants
     tonCarbon: 1000,                      // one ton carbon in kg

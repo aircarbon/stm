@@ -11,30 +11,19 @@ contract StFees is Owned, StLedger {
     // NOTE: fees are applied ON TOP OF the supplied transfer amounts to the transfer() fn.
     //       i.e. transfer amounts are not inclusive of fees, they are additional
 
-    // event SetFeeTokFix(uint256 tokenTypeId, address ledgerOwner, uint256 fee_tokenQty_Fixed);
-    // event SetFeeCcyFix(uint256 ccyTypeId, address ledgerOwner, uint256 fee_ccy_Fixed);
-
-    // event SetFeeTokBps(uint256 tokenTypeId, address ledgerOwner, uint256 fee_token_PercBips);
-    // event SetFeeCcyBps(uint256 ccyTypeId, address ledgerOwner, uint256 fee_ccy_PercBips);
-
-    // event SetFeeTokMin(uint256 tokenTypeId, address ledgerOwner, uint256 fee_token_Min);
-    // event SetFeeCcyMin(uint256 ccyTypeId, address ledgerOwner, uint256 fee_ccy_Min);
-
-    // event SetFeeTokMax(uint256 tokenTypeId, address ledgerOwner, uint256 fee_token_Max);
-    // event SetFeeCcyMax(uint256 ccyTypeId, address ledgerOwner, uint256 fee_ccy_Max);
-
     //
     // TODO: origFees
-    //  > transferLib - ## need a preview mode for transferSplitSecTokens()...
+    //
+    //  > transferLib - ## need a preview mode for transferSplitSecTokens()... (output batches & qty's)
     //  > tests...
+    //   >> set MAX_BATCHES to 1, try >1 batch (test require(...MAX_BATCHES))
     //   >> transfer across multiple batches (multiple originator fees)
     //   > global + originator
     //   > ledger + originator
     //   > originator only
     //
-    // TODO: fees - getFees (ex + orig) (for pre-trade)...
-    //
-    // TODO: fees (trade fn + setting ledger & setting global): UI/UX in admin...
+    // TODO: post-minting orig fees (Thom): only can revise downwards...
+    // TODO: fees - getFees (ex + orig) (for pre-trade, preview)...
     //
 
     // GLOBAL FEES
