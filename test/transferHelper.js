@@ -136,7 +136,7 @@ module.exports = {
             eventCcy_fees[ccyTypeId_B] = new BN(0);
             //console.log(JSON.stringify(transferTx, null, 2));
             truffleAssert.eventEmitted(transferTx, 'TransferedLedgerCcy', ev => { 
-                if (ev.isFee) { 
+                if (ev.transferType != CONST.transferType.USER) { 
                     //console.dir(ev);
                     //console.log(`FEE: ${ev.from} --> ${ev.to} ccyTypeId=${ev.ccyTypeId} ... amount=${Number(ev.amount)}`);
                     eventCcy_fees[ev.ccyTypeId] = eventCcy_fees[ev.ccyTypeId].add(ev.amount);
@@ -156,12 +156,12 @@ module.exports = {
             var eventKg_fees = new BN(0);
             try {
                 truffleAssert.eventEmitted(transferTx, 'TransferedFullSecToken', ev => { 
-                    if (ev.isFee) eventKg_fees = eventKg_fees.add(ev.qty); return true;
+                    if (ev.transferType != CONST.transferType.USER) eventKg_fees = eventKg_fees.add(ev.qty); return true;
                 });
             } catch {}
             try {
                 truffleAssert.eventEmitted(transferTx, 'TransferedPartialSecToken', ev => { 
-                    if (ev.isFee) eventKg_fees = eventKg_fees.add(ev.qty); return true;
+                    if (ev.transferType != CONST.transferType.USER) eventKg_fees = eventKg_fees.add(ev.qty); return true;
                 });
             } catch {}
             //console.log('totalKg_fees_before', totalKg_fees_before.toString());

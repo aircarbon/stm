@@ -17,12 +17,20 @@ module.exports = {
         fee_max: 0,
     },
 
-    // types
+    // transfer types (event data)
+    transferType: Object.freeze({
+        USER: 0,
+EXCHANGE_FEE: 1,
+    ORIG_FEE: 2,
+    }),
+
+    // token types (contract data)
     tokenType: Object.freeze({
         UNFCCC: 0,
            VCS: 1,
     }),
 
+    // ccy types (contract data)
     ccyType: Object.freeze({
         USD: 0,
         ETH: 1,

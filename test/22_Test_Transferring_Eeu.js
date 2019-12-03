@@ -27,7 +27,7 @@ contract("StMaster", accounts => {
     });
 
     // one-sided kg transfer, no consideration, 1 full EEU
-    it('transferring eeu - should allow one-sided transfer (A -> B) of 1.0 vEEU (VCS) across ledger entries', async () => {
+    /*it('transferring eeu - should allow one-sided transfer (A -> B) of 1.0 vEEU (VCS) across ledger entries', async () => {
         await stm.mintSecTokenBatch(CONST.tokenType.VCS, CONST.ktCarbon, 1,       accounts[global.accountNdx + 0], CONST.nullOrigFees, [], [], { from: accounts[0] });
         await stm.fund(CONST.ccyType.USD,                CONST.thousandUsd_cents, accounts[global.accountNdx + 1],         { from: accounts[0] });
         
@@ -431,5 +431,5 @@ contract("StMaster", accounts => {
                 { from: accounts[0] });
         } catch (ex) { return; }
         assert.fail('expected restriction exception');
-    });
+    });*/
 });

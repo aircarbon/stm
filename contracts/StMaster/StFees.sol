@@ -14,15 +14,17 @@ contract StFees is Owned, StLedger {
     //
     // TODO: origFees
     //
-    //  > transferLib - ## need a preview mode for transferSplitSecTokens()... (output batches & qty's)
-    //  > tests...
+    //  > transferLib - w/ preview
+    //  > TESTS:
     //   >> set MAX_BATCHES to 1, try >1 batch (test require(...MAX_BATCHES))
     //   >> transfer across multiple batches (multiple originator fees)
     //   > global + originator
     //   > ledger + originator
     //   > originator only
     //
+    // TODO: global orig. fee counts...
     // TODO: post-minting orig fees (Thom): only can revise downwards...
+    //
     // TODO: fees - getFees (ex + orig) (for pre-trade, preview)...
     //
 

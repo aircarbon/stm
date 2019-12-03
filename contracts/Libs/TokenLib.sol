@@ -86,7 +86,8 @@ library TokenLib {
                   burnedQty: 0,
                    metaKeys: a.metaKeys,
                  metaValues: a.metaValues,
-                 origTokFee: a.origTokFee
+                 origTokFee: a.origTokFee,
+                 originator: a.batchOwner
         });
         ledgerData._batches[newBatch.id] = newBatch;
         ledgerData._batches_currentMax_id++;

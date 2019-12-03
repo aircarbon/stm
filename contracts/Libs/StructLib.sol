@@ -42,6 +42,7 @@ library StructLib {
         string[]   metaKeys;                                    // metadata keys
         string[]   metaValues;                                  // metadata values
         SetFeeArgs origTokFee;                                  // batch originator fees on all transfers of tokens from this batch
+        address    originator;                                  // original owner (minter) of the batch
     }
 
     struct SecTokenReturn {
