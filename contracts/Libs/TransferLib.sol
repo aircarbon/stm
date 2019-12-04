@@ -9,7 +9,7 @@ library TransferLib {
     event TransferedFullSecToken(address from, address to, uint256 stId, uint256 mergedToSecTokenId, /*uint256 tokenTypeId,*/ uint256 qty, TransferType transferType);
     event TransferedPartialSecToken(address from, address to, uint256 splitFromSecTokenId, uint256 newSecTokenId, uint256 mergedToSecTokenId, /*uint256 tokenTypeId,*/ uint256 qty, TransferType transferType);
 
-    uint256 constant MAX_BATCHES = 2; // max distinct batch IDs that can participate in one side of a trade
+    uint256 constant MAX_BATCHES_PREVIEW = 2; // for fee previews: max distinct batch IDs that can participate in one side of a trade fee preview
 
     struct TransferArgs {
         address ledger_A;
@@ -174,8 +174,8 @@ library TransferLib {
         TransferLib.TransferArgs memory a
     )
     internal view
-    // 1 exchange fee (single destination) + maximum of MAX_BATCHES of originator fees on each side (x2) of the transfer
-    returns (TransferLib.FeesCalc[1 + MAX_BATCHES * 2] memory feesAll) {
+    // 1 exchange fee (single destination) + maximum of MAX_BATCHES_PREVIEW of originator fees on each side (x2) of the transfer
+    returns (TransferLib.FeesCalc[1 + MAX_BATCHES_PREVIEW * 2] memory feesAll) {
         uint ndx = 0;
 
         // exchange fee
@@ -304,8 +304,8 @@ library TransferLib {
      * @return The distinct transfer-from batch IDs and the total quantity of tokens that would be transfered from each batch
      */
     struct TransferSplitPreviewReturn {
-        uint256[MAX_BATCHES] batchIds; // TODO: pack these - quadratic gas cost for fixed memory
-        uint256[MAX_BATCHES] transferQty;
+        uint256[MAX_BATCHES_PREVIEW] batchIds; // TODO: pack these - quadratic gas cost for fixed memory
+        uint256[MAX_BATCHES_PREVIEW] transferQty;
         uint256 batchCount;
     }
     function transferSplitSecTokens_Preview(
@@ -315,16 +315,18 @@ library TransferLib {
     returns(TransferSplitPreviewReturn memory ret)
     {
         // init ret - grotesque, but can't return (or have as local var) a dynamic array
-        uint256[MAX_BATCHES] memory batchIds;
-        uint256[MAX_BATCHES] memory transferQty;
+        uint256[MAX_BATCHES_PREVIEW] memory batchIds;
+        uint256[MAX_BATCHES_PREVIEW] memory transferQty;
         ret = TransferSplitPreviewReturn({
-            batchIds: batchIds,
+               batchIds: batchIds,
             transferQty: transferQty,
-            batchCount: 0
+             batchCount: 0
         });
 
         // walk 1 - get distinct batches affected - needed for fixed-size return array declaration
         uint256[] memory from_stIds = ledgerData._ledger[a.from].tokenType_stIds[a.tokenTypeId]; // assignment of storage[] to memory[] is a copy
+        require(from_stIds.length > 0, "No tokens of supplied type");
+
         uint256 from_stIds_length = from_stIds.length;
         uint256 remainingToTransfer = uint256(a.qtyUnit);
         while (remainingToTransfer > 0) {
@@ -342,20 +344,23 @@ library TransferLib {
                 }
             }
             if (!knownBatch) {
-                require (ret.batchCount < MAX_BATCHES, "Maximum batch count exceeded for transfer");
+                require(ret.batchCount < MAX_BATCHES_PREVIEW, "Maximum batch count exceeded for transfer");
                 ret.batchIds[ret.batchCount] = fromBatchId;
                 ret.transferQty[ret.batchCount] = remainingToTransfer >= stQty ? stQty : remainingToTransfer;
                 ret.batchCount++;
             }
 
-            if (remainingToTransfer >= stQty) { // full ST transfer
-                //require(from_stIds_length > 1, "Unexpected: insufficient tokens of supplied type");
+            if (remainingToTransfer >= stQty) { // full ST transfer, and more needed
+
                 from_stIds[0] = from_stIds[from_stIds_length - 1]; // replace in origin copy (ndx++, in effect)
                 //from_stIds.length--;  // memory array can't be resized
                 from_stIds_length--;    // so instead
+
                 remainingToTransfer -= stQty;
+                if (remainingToTransfer > 0)
+                    require(from_stIds_length > 0, "Insufficient tokens of supplied type");
             }
-            else { // partial ST transfer
+            else { // partial ST transfer, and no more needed
                 remainingToTransfer = 0;
             }
         }
@@ -427,6 +432,9 @@ library TransferLib {
                 //ledgerData._ledger[to].tokenType_sumQty[tokenTypeId] += stQty;                //* gas - DROP DONE - only used internally, validation params
 
                 remainingToTransfer -= stQty;
+
+                if (remainingToTransfer > 0)
+                    require(from_stIds.length > 0, "Insufficient tokens of supplied type");
             }
             else {
                 // split the last ST across the ledger entries, soft-minting a new ST in the destination

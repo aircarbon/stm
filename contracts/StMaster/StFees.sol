@@ -17,8 +17,8 @@ contract StFees is Owned, StLedger {
     //  > transferLib - w/ preview
     //  > TESTS:
     //
-    //   >> set MAX_BATCHES to 1, try >1 batch (test require(...MAX_BATCHES))
-    //   >> set MAX_BATCHES to ~3, try getting 3 + 3 sets of orig fees in preview (each side has 3) on a carbon/carbon swap
+    //   >> set MAX_BATCHES_PREVIEW to 1, try >1 batch (test require(...MAX_BATCHES_PREVIEW))
+    //   >> set MAX_BATCHES_PREVIEW to ~3, try getting 3 + 3 sets of orig fees in preview (each side has 3) on a carbon/carbon swap
     //   >> transfer across multiple batches (multiple originator fees)
     //   >> insufficient carbons for batch fees
     //
