@@ -100,6 +100,18 @@ module.exports = {
             //console.log('fee_ccy_B', fee_ccy_B.toFixed());
         }
 
+        // fee preview
+        const feesPreview = await stm.transfer_feePreview({ 
+                ledger_A,                             ledger_B, 
+                   qty_A: qty_A.toString(),           tokenTypeId_A, 
+                   qty_B: qty_B.toString(),           tokenTypeId_B, 
+            ccy_amount_A: ccy_amount_A.toString(),    ccyTypeId_A, 
+            ccy_amount_B: ccy_amount_B.toString(),    ccyTypeId_B, 
+            applyFees,
+            feeAddrOwner: CONST.nullAddr,
+        });
+        console.log('feesPreview', feesPreview);
+
         // transfer
         //console.log('qty_A', qty_A);
         //console.log('qty_B', qty_B);
@@ -334,17 +346,17 @@ module.exports = {
             const min = ledgerFee_Min.gt(0) ? ledgerFee_Min : globalFee_Min;
             const max = ledgerFee_Max.gt(0) ? ledgerFee_Max : globalFee_Max;
 
-            var eeuFee_A = Math.floor(
-                                Number(/*await stm.globalFee_tokType_Fix(tokenTypeId_A)*/fix)  // EEU fee paid by A
-                              + Number((qty_A / 10000) * Number(/*await stm.globalFee_tokType_Bps(tokenTypeId_A)*/bps)));
-            //const max = Big(await stm.globalFee_tokType_Max(tokenTypeId_A));
-            //const min = Big(await stm.globalFee_tokType_Min(tokenTypeId_A));
-            if (Big(eeuFee_A).gt(max) && max.gt(0)) eeuFee_A = max.toFixed();
-            if (Big(eeuFee_A).lt(min) && min.gt(0)) eeuFee_A = min.toFixed();                              
-            //console.log('eeuFee_A', eeuFee_A);
+            // exchange fee
+            var ex_eeuFee_A = Math.floor(Number(fix) + Number((qty_A / 10000) * Number(bps)));
+            if (Big(ex_eeuFee_A).gt(max) && max.gt(0)) ex_eeuFee_A = max.toFixed();
+            if (Big(ex_eeuFee_A).lt(min) && min.gt(0)) ex_eeuFee_A = min.toFixed();
+            //console.log('ex_eeuFee_A', ex_eeuFee_A);
 
-            totalKg_tfd_incFees = totalKg_tfd_incFees.add(new BN(eeuFee_A));
-            totalqty_AllSecSecTokenTypes_fees = totalqty_AllSecSecTokenTypes_fees.add(new BN(eeuFee_A));
+            // batch fee -- TODO: need a getFees() fn. on the contract for this (n batch fees!)
+            //var orig_eeuFee_A = ...
+
+            totalKg_tfd_incFees = totalKg_tfd_incFees.add(new BN(ex_eeuFee_A));
+            totalqty_AllSecSecTokenTypes_fees = totalqty_AllSecSecTokenTypes_fees.add(new BN(ex_eeuFee_A));
             netKg_tfd += qty_A; // transfered by A
             netKg_tfd -= qty_B; // received from B
 
@@ -353,7 +365,7 @@ module.exports = {
             // console.log('netKg_tfd', netKg_tfd);
             // console.log('eeuFee_A', eeuFee_A);
 
-            assert(ledgerA_after.tokens_sumQty == Number(ledgerA_before.tokens_sumQty) - netKg_tfd - eeuFee_A, 'unexpected ledger A tonnage sum after transfer A -> B');
+            assert(ledgerA_after.tokens_sumQty == Number(ledgerA_before.tokens_sumQty) - netKg_tfd - ex_eeuFee_A, 'unexpected ledger A tonnage sum after transfer A -> B');
             assert(ledgerB_after.tokens_sumQty == Number(ledgerB_before.tokens_sumQty) + netKg_tfd, 'unexpected ledger B tonnage sum after transfer A -> B');
         }
         if (qty_B > 0) {
@@ -385,20 +397,17 @@ module.exports = {
             // console.log('min', min.toFixed());
             // console.log('max', max.toFixed());
 
-            var eeuFee_B = Math.floor(
-                                Number(/*await stm.globalFee_tokType_Fix(tokenTypeId_B)*/fix) // EEU fee paid by B
-                              + Number((qty_B / 10000) * Number(/*await stm.globalFee_tokType_Bps(tokenTypeId_B)*/bps))); 
-            //const max = Big(await stm.globalFee_tokType_Max(tokenTypeId_B));
-            //const min = Big(await stm.globalFee_tokType_Min(tokenTypeId_B));
-            if (Big(eeuFee_B).gt(max) && max.gt(0)) eeuFee_B = max.toFixed();
-            if (Big(eeuFee_B).lt(min) && min.gt(0)) eeuFee_B = min.toFixed();                             
-            //console.log('eeuFee_B', eeuFee_B);
+            // exchange fee
+            var ex_eeuFee_B = Math.floor(Number(fix) + Number((qty_B / 10000) * Number(bps))); 
+            if (Big(ex_eeuFee_B).gt(max) && max.gt(0)) ex_eeuFee_B = max.toFixed();
+            if (Big(ex_eeuFee_B).lt(min) && min.gt(0)) ex_eeuFee_B = min.toFixed();                             
+            //console.log('ex_eeuFee_B', ex_eeuFee_B);
 
-            totalKg_tfd_incFees = totalKg_tfd_incFees.add(new BN(eeuFee_B));
-            totalqty_AllSecSecTokenTypes_fees = totalqty_AllSecSecTokenTypes_fees.add(new BN(eeuFee_B));
+            totalKg_tfd_incFees = totalKg_tfd_incFees.add(new BN(ex_eeuFee_B));
+            totalqty_AllSecSecTokenTypes_fees = totalqty_AllSecSecTokenTypes_fees.add(new BN(ex_eeuFee_B));
             netKg_tfd += qty_B; // transfered by B
             netKg_tfd -= qty_A; // received from A
-            assert(ledgerB_after.tokens_sumQty == Number(ledgerB_before.tokens_sumQty) - netKg_tfd - eeuFee_B, 'unexpected ledger B tonnage sum after transfer B -> A');
+            assert(ledgerB_after.tokens_sumQty == Number(ledgerB_before.tokens_sumQty) - netKg_tfd - ex_eeuFee_B, 'unexpected ledger B tonnage sum after transfer B -> A');
             assert(ledgerA_after.tokens_sumQty == Number(ledgerA_before.tokens_sumQty) + netKg_tfd, 'unexpected ledger A tonnage sum after transfer B -> A');
         }
 

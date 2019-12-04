@@ -1,3 +1,4 @@
+const truffleAssert = require('truffle-assertions');
 const st = artifacts.require('StMaster');
 const CONST = require('../const.js');
 const helper = require('./transferHelper.js');
@@ -27,16 +28,16 @@ contract("StMaster", accounts => {
     });
 
     // one-sided kg transfer, no consideration, 1 full EEU
-    /*it('transferring eeu - should allow one-sided transfer (A -> B) of 1.0 vEEU (VCS) across ledger entries', async () => {
+    it('transferring eeu - should allow one-sided transfer (A -> B) of 1.0 vEEU (VCS) across ledger entries', async () => {
         await stm.mintSecTokenBatch(CONST.tokenType.VCS, CONST.ktCarbon, 1,       accounts[global.accountNdx + 0], CONST.nullOrigFees, [], [], { from: accounts[0] });
         await stm.fund(CONST.ccyType.USD,                CONST.thousandUsd_cents, accounts[global.accountNdx + 1],         { from: accounts[0] });
         
         const data = await helper.transferLedger({ stm, accounts, 
-                ledger_A: accounts[global.accountNdx + 0],  ledger_B: accounts[global.accountNdx + 1],
+                ledger_A: accounts[global.accountNdx + 0],       ledger_B: accounts[global.accountNdx + 1],
                     qty_A: CONST.ktCarbon,                  tokenTypeId_A: CONST.tokenType.VCS,
                     qty_B: 0,                               tokenTypeId_B: 0,
-            ccy_amount_A: 0,                                ccyTypeId_A: 0,
-            ccy_amount_B: 0,                                ccyTypeId_B: 0,
+            ccy_amount_A: 0,                                  ccyTypeId_A: 0,
+            ccy_amount_B: 0,                                  ccyTypeId_B: 0,
         });
         assert(data.eeuFullEvents.length == 1 && data.eeuPartialEvents == 0, 'unexpected event composition');
         assert(data.eeuFullEvents[0].stId == data.ledgerA_before.tokens[0].stId, 'unexpected event eeu id vs. ledger A before');
@@ -50,11 +51,11 @@ contract("StMaster", accounts => {
         await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.ktCarbon, 1,       accounts[global.accountNdx + 1], CONST.nullOrigFees, [], [], { from: accounts[0] });
         
         const data = await helper.transferLedger({ stm, accounts, 
-                ledger_A: accounts[global.accountNdx + 0],  ledger_B: accounts[global.accountNdx + 1],
+                ledger_A: accounts[global.accountNdx + 0],       ledger_B: accounts[global.accountNdx + 1],
                    qty_A: 0,                                tokenTypeId_A: 0,
                    qty_B: CONST.ktCarbon,                   tokenTypeId_B: CONST.tokenType.UNFCCC,
-            ccy_amount_A: 0,                                ccyTypeId_A: 0,
-            ccy_amount_B: 0,                                ccyTypeId_B: 0,
+            ccy_amount_A: 0,                                  ccyTypeId_A: 0,
+            ccy_amount_B: 0,                                  ccyTypeId_B: 0,
         });
         assert(data.eeuFullEvents.length == 1 && data.eeuPartialEvents == 0, 'unexpected event composition');
         assert(data.eeuFullEvents[0].stId == data.ledgerB_before.tokens[0].stId, 'unexpected event eeu id vs. ledger B before');
@@ -69,11 +70,11 @@ contract("StMaster", accounts => {
         await stm.fund(CONST.ccyType.USD,                CONST.thousandUsd_cents, accounts[global.accountNdx + 1],         { from: accounts[0] });
         
         const data = await helper.transferLedger({ stm, accounts, 
-                ledger_A: accounts[global.accountNdx + 0],  ledger_B: accounts[global.accountNdx + 1],
+                ledger_A: accounts[global.accountNdx + 0],       ledger_B: accounts[global.accountNdx + 1],
                    qty_A: CONST.ktCarbon / 2,               tokenTypeId_A: CONST.tokenType.VCS,
                    qty_B: 0,                                tokenTypeId_B: 0,
-            ccy_amount_A: 0,                                ccyTypeId_A: 0,
-            ccy_amount_B: 0,                                ccyTypeId_B: 0,
+            ccy_amount_A: 0,                                  ccyTypeId_A: 0,
+            ccy_amount_B: 0,                                  ccyTypeId_B: 0,
         });
         assert(data.eeuFullEvents.length == 0 && data.eeuPartialEvents.length == 1, 'unexpected event composition');
         assert(data.eeuPartialEvents[0].splitFromSecTokenId == data.ledgerA_before.tokens[0].stId, 'unexpected event parent eeu id vs. ledger A before');
@@ -88,11 +89,11 @@ contract("StMaster", accounts => {
         await stm.mintSecTokenBatch(CONST.tokenType.VCS, CONST.ktCarbon, 1,       accounts[global.accountNdx + 1], CONST.nullOrigFees, [], [], { from: accounts[0] });
         
         const data = await helper.transferLedger({ stm, accounts, 
-                ledger_A: accounts[global.accountNdx + 0],  ledger_B: accounts[global.accountNdx + 1],
+                ledger_A: accounts[global.accountNdx + 0],       ledger_B: accounts[global.accountNdx + 1],
                    qty_A: 0,                                tokenTypeId_A: 0,
                    qty_B: CONST.ktCarbon / 2,               tokenTypeId_B: CONST.tokenType.VCS,
-            ccy_amount_A: 0,                                ccyTypeId_A: 0,
-            ccy_amount_B: 0,                                ccyTypeId_B: 0,
+            ccy_amount_A: 0,                                  ccyTypeId_A: 0,
+            ccy_amount_B: 0,                                  ccyTypeId_B: 0,
         });
         assert(data.eeuFullEvents.length == 0 && data.eeuPartialEvents.length == 1, 'unexpected event composition');
         assert(data.eeuPartialEvents[0].splitFromSecTokenId == data.ledgerB_before.tokens[0].stId, 'unexpected event parent eeu id vs. ledger B before');
@@ -147,11 +148,11 @@ contract("StMaster", accounts => {
         await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], CONST.nullOrigFees, [], [], { from: accounts[0] });
         
         const data = await helper.transferLedger({ stm, accounts, 
-                ledger_A: accounts[global.accountNdx + 0],  ledger_B: accounts[global.accountNdx + 1],
+                ledger_A: accounts[global.accountNdx + 0],       ledger_B: accounts[global.accountNdx + 1],
                    qty_A: 500,                              tokenTypeId_A: CONST.tokenType.VCS,
                    qty_B: 0,                                tokenTypeId_B: 0,
-            ccy_amount_A: 0,                                ccyTypeId_A: 0,
-            ccy_amount_B: 0,                                ccyTypeId_B: 0,
+            ccy_amount_A: 0,                                  ccyTypeId_A: 0,
+            ccy_amount_B: 0,                                  ccyTypeId_B: 0,
         });
         helper.assert_nFull_1Partial({
                        fullEvents: data.eeuFullEvents,
@@ -169,11 +170,11 @@ contract("StMaster", accounts => {
         await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], CONST.nullOrigFees, [], [], { from: accounts[0] });
         
         const data = await helper.transferLedger({ stm, accounts, 
-                ledger_A: accounts[global.accountNdx + 0],  ledger_B: accounts[global.accountNdx + 1],
+                ledger_A: accounts[global.accountNdx + 0],       ledger_B: accounts[global.accountNdx + 1],
                    qty_A: 1500,                             tokenTypeId_A: CONST.tokenType.VCS,
                    qty_B: 0,                                tokenTypeId_B: 0,
-            ccy_amount_A: 0,                                ccyTypeId_A: 0,
-            ccy_amount_B: 0,                                ccyTypeId_B: 0,
+            ccy_amount_A: 0,                                  ccyTypeId_A: 0,
+            ccy_amount_B: 0,                                  ccyTypeId_B: 0,
         });
         helper.assert_nFull_1Partial({
                        fullEvents: data.eeuFullEvents,
@@ -190,11 +191,11 @@ contract("StMaster", accounts => {
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], CONST.nullOrigFees, [], [], { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], CONST.nullOrigFees, [], [], { from: accounts[0] });
         const data = await helper.transferLedger({ stm, accounts, 
-                ledger_A: accounts[global.accountNdx + 0],  ledger_B: accounts[global.accountNdx + 1],
+                ledger_A: accounts[global.accountNdx + 0],       ledger_B: accounts[global.accountNdx + 1],
                    qty_A: 1500,                             tokenTypeId_A: CONST.tokenType.VCS,
                    qty_B: 0,                                tokenTypeId_B: 0,
-            ccy_amount_A: 0,                                ccyTypeId_A: 0,
-            ccy_amount_B: 0,                                ccyTypeId_B: 0,
+            ccy_amount_A: 0,                                  ccyTypeId_A: 0,
+            ccy_amount_B: 0,                                  ccyTypeId_B: 0,
         });
         //console.log('data.eeuFullEvents', data.eeuFullEvents);
         //console.log('data.eeuPartialEvents', data.eeuPartialEvents);
@@ -213,11 +214,11 @@ contract("StMaster", accounts => {
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], CONST.nullOrigFees, [], [], { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], CONST.nullOrigFees, [], [], { from: accounts[0] });
         const data = await helper.transferLedger({ stm, accounts, 
-                ledger_A: accounts[global.accountNdx + 0],  ledger_B: accounts[global.accountNdx + 1],
+                ledger_A: accounts[global.accountNdx + 0],       ledger_B: accounts[global.accountNdx + 1],
                    qty_A: 750,                              tokenTypeId_A: CONST.tokenType.VCS,
                    qty_B: 250,                              tokenTypeId_B: CONST.tokenType.VCS,
-            ccy_amount_A: 0,                                ccyTypeId_A: 0,
-            ccy_amount_B: 0,                                ccyTypeId_B: 0,
+            ccy_amount_A: 0,                                  ccyTypeId_A: 0,
+            ccy_amount_B: 0,                                  ccyTypeId_B: 0,
         });
     });
 
@@ -228,11 +229,11 @@ contract("StMaster", accounts => {
         await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], CONST.nullOrigFees, [], [], { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], CONST.nullOrigFees, [], [], { from: accounts[0] });
         const data = await helper.transferLedger({ stm, accounts, 
-                ledger_A: accounts[global.accountNdx + 0],  ledger_B: accounts[global.accountNdx + 1],
+                ledger_A: accounts[global.accountNdx + 0],       ledger_B: accounts[global.accountNdx + 1],
                    qty_A: 750,                              tokenTypeId_A: CONST.tokenType.VCS,
                    qty_B: 250,                              tokenTypeId_B: CONST.tokenType.UNFCCC,
-            ccy_amount_A: 0,                                ccyTypeId_A: 0,
-            ccy_amount_B: 0,                                ccyTypeId_B: 0,
+            ccy_amount_A: 0,                                  ccyTypeId_A: 0,
+            ccy_amount_B: 0,                                  ccyTypeId_B: 0,
         });
         // console.log('ledgerA_before.tokens', data.ledgerA_before.tokens);
         // console.log('ledgerB_before.tokens', data.ledgerB_before.tokens);
@@ -248,20 +249,20 @@ contract("StMaster", accounts => {
         
         // setup: transfer 0.5, from batch 1 
         await helper.transferLedger({ stm, accounts, 
-                ledger_A: accounts[global.accountNdx + 0],  ledger_B: accounts[global.accountNdx + 1],
+                ledger_A: accounts[global.accountNdx + 0],       ledger_B: accounts[global.accountNdx + 1],
                    qty_A: 500,                              tokenTypeId_A: CONST.tokenType.VCS,
                    qty_B: 0,                                tokenTypeId_B: 0,
-            ccy_amount_A: 0,                                ccyTypeId_A: 0,
-            ccy_amount_B: 0,                                ccyTypeId_B: 0,
+            ccy_amount_A: 0,                                  ccyTypeId_A: 0,
+            ccy_amount_B: 0,                                  ccyTypeId_B: 0,
         });
 
         // transfer 0.25, also from batch 1 -- expect merge on existing destination eeu of same batch
         const data = await helper.transferLedger({ stm, accounts, 
-                ledger_A: accounts[global.accountNdx + 0],  ledger_B: accounts[global.accountNdx + 1],
+                ledger_A: accounts[global.accountNdx + 0],       ledger_B: accounts[global.accountNdx + 1],
                    qty_A: 250,                              tokenTypeId_A: CONST.tokenType.VCS,
                    qty_B: 0,                                tokenTypeId_B: 0,
-            ccy_amount_A: 0,                                ccyTypeId_A: 0,
-            ccy_amount_B: 0,                                ccyTypeId_B: 0,
+            ccy_amount_A: 0,                                  ccyTypeId_A: 0,
+            ccy_amount_B: 0,                                  ccyTypeId_B: 0,
         });
         assert(data.ledgerB_after.tokens.length == 1, 'ledger B was not merged');
         assert(data.eeuPartialEvents.some(p => p.mergedToSecTokenId == data.ledgerB_before.tokens[0].stId), 'unexpected merge event data');
@@ -275,11 +276,11 @@ contract("StMaster", accounts => {
         
         // setup: transfer 0.1, split batch 1 to receiver
         await helper.transferLedger({ stm, accounts, 
-                ledger_A: accounts[global.accountNdx + 0],  ledger_B: accounts[global.accountNdx + 1],
+                ledger_A: accounts[global.accountNdx + 0],       ledger_B: accounts[global.accountNdx + 1],
                    qty_A: 100,                              tokenTypeId_A: CONST.tokenType.UNFCCC,
                    qty_B: 0,                                tokenTypeId_B: 0,
-            ccy_amount_A: 0,                                ccyTypeId_A: 0,
-            ccy_amount_B: 0,                                ccyTypeId_B: 0,
+            ccy_amount_A: 0,                                  ccyTypeId_A: 0,
+            ccy_amount_B: 0,                                  ccyTypeId_B: 0,
         });
 
         // repeated transfers -- expect consistent merge of existing destination eeu of the same batch
@@ -307,21 +308,21 @@ contract("StMaster", accounts => {
         // setup A: transfer 0.1 from B, split batch 2 to A
         // setup B: transfer 0.1 from A, split batch 1 to B
         await helper.transferLedger({ stm, accounts, 
-                ledger_A: accounts[global.accountNdx + 0],  ledger_B: accounts[global.accountNdx + 1],
+                ledger_A: accounts[global.accountNdx + 0],       ledger_B: accounts[global.accountNdx + 1],
                    qty_A: 100,                              tokenTypeId_A: CONST.tokenType.UNFCCC,
                    qty_B: 100,                              tokenTypeId_B: CONST.tokenType.VCS,
-            ccy_amount_A: 0,                                ccyTypeId_A: 0,
-            ccy_amount_B: 0,                                ccyTypeId_B: 0,
+            ccy_amount_A: 0,                                  ccyTypeId_A: 0,
+            ccy_amount_B: 0,                                  ccyTypeId_B: 0,
         });
 
         // repeated transfers -- expect consistent merge of existing destination eeu of the same batch
         for (var i = 0; i < 3 ; i++) {
             const data = await helper.transferLedger({ stm, accounts, 
-                ledger_A: accounts[global.accountNdx + 0],  ledger_B: accounts[global.accountNdx + 1],
+                ledger_A: accounts[global.accountNdx + 0],       ledger_B: accounts[global.accountNdx + 1],
                    qty_A: 1,                                tokenTypeId_A: CONST.tokenType.UNFCCC,
                    qty_B: 1,                                tokenTypeId_B: CONST.tokenType.VCS,
-            ccy_amount_A: 0,                                ccyTypeId_A: 0,
-            ccy_amount_B: 0,                                ccyTypeId_B: 0,
+            ccy_amount_A: 0,                                  ccyTypeId_A: 0,
+            ccy_amount_B: 0,                                  ccyTypeId_B: 0,
             });
             assert(data.ledgerB_after.tokens.length == data.ledgerB_before.tokens.length, 'ledger B was not merged');
             assert(data.eeuPartialEvents.some(p => data.ledgerB_before.tokens.some(p2 => p2.stId == p.mergedToSecTokenId)), 'unexpected merge event data for ledger B');
@@ -431,5 +432,5 @@ contract("StMaster", accounts => {
                 { from: accounts[0] });
         } catch (ex) { return; }
         assert.fail('expected restriction exception');
-    });*/
+    });
 });
