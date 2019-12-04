@@ -289,7 +289,7 @@ module.exports = {
         // validate EEU events
         const eeuFullEvents = [];
         const eeuPartialEvents = [];
-        const contractOwnerIsTransfering = ledger_A == accounts[0] || ledger_B == accounts[1];
+        const contractOwnerIsTransfering = ledger_A == accounts[0] || ledger_B == accounts[0];
         if (qty_A > 0 || qty_B > 0) {
             //truffleAssert.prettyPrintEmittedEvents(transferTx);
             

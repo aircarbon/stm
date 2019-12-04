@@ -45,11 +45,8 @@ library TransferLib {
         StructLib.LedgerStruct storage ledgerData,
         StructLib.FeeStruct storage globalFees,
         TransferLib.TransferArgs memory a
-        //address feeAddrOwner
     )
-    public
-    //returns(TransferSplitPreviewReturn[2] memory ts_previews)
-    {
+    public {
         require(ledgerData._ledger[a.ledger_A].exists == true, "Invalid ledger owner A");
         require(ledgerData._ledger[a.ledger_B].exists == true, "Invalid ledger owner B");
         require(a.ledger_A != a.ledger_B, "Self transfer disallowed");
@@ -65,15 +62,11 @@ library TransferLib {
         StructLib.FeeStruct storage exFeeStruct_ccy_B = ledgerData._ledger[a.ledger_B].customFees.ccyType_Set[a.ccyTypeId_B]   ? ledgerData._ledger[a.ledger_B].customFees : globalFees;
         StructLib.FeeStruct storage exFeeStruct_tok_B = ledgerData._ledger[a.ledger_B].customFees.tokType_Set[a.tokenTypeId_B] ? ledgerData._ledger[a.ledger_B].customFees : globalFees;
 
-        //
-        // TODO: disable fees if fee-reciever == fee-payer; -ve tests for this
-        // TODO: for batch fees...
-        //
-        FeesCalc memory exFees = FeesCalc({ // exchange fees
-            fee_ccy_A: /*a.ledger_A != a.feeAddrOwner ?*/ applyCapCollar(exFeeStruct_ccy_A.ccy, a.ccyTypeId_A, uint256(a.ccy_amount_A), calcFee(exFeeStruct_ccy_A.ccy, a.ccyTypeId_A, uint256(a.ccy_amount_A))) ,//: 0,
-            fee_ccy_B: /*a.ledger_B != a.feeAddrOwner ?*/ applyCapCollar(exFeeStruct_ccy_B.ccy, a.ccyTypeId_B, uint256(a.ccy_amount_B), calcFee(exFeeStruct_ccy_B.ccy, a.ccyTypeId_B, uint256(a.ccy_amount_B))) ,//: 0,
-            fee_tok_A: /*a.ledger_A != a.feeAddrOwner ?*/ applyCapCollar(exFeeStruct_tok_A.tok, a.tokenTypeId_A, a.qty_A,               calcFee(exFeeStruct_tok_A.tok, a.tokenTypeId_A, a.qty_A)) ,//: 0,
-            fee_tok_B: /*a.ledger_B != a.feeAddrOwner ?*/ applyCapCollar(exFeeStruct_tok_B.tok, a.tokenTypeId_B, a.qty_B,               calcFee(exFeeStruct_tok_B.tok, a.tokenTypeId_B, a.qty_B)) ,//: 0,
+        FeesCalc memory exFees = FeesCalc({ // exchange fees (disabled if fee-reciever == fee-payer)
+            fee_ccy_A: a.ledger_A != a.feeAddrOwner ? applyCapCollar(exFeeStruct_ccy_A.ccy, a.ccyTypeId_A, uint256(a.ccy_amount_A), calcFee(exFeeStruct_ccy_A.ccy, a.ccyTypeId_A, uint256(a.ccy_amount_A))) : 0,
+            fee_ccy_B: a.ledger_B != a.feeAddrOwner ? applyCapCollar(exFeeStruct_ccy_B.ccy, a.ccyTypeId_B, uint256(a.ccy_amount_B), calcFee(exFeeStruct_ccy_B.ccy, a.ccyTypeId_B, uint256(a.ccy_amount_B))) : 0,
+            fee_tok_A: a.ledger_A != a.feeAddrOwner ? applyCapCollar(exFeeStruct_tok_A.tok, a.tokenTypeId_A, a.qty_A,               calcFee(exFeeStruct_tok_A.tok, a.tokenTypeId_A, a.qty_A)) : 0,
+            fee_tok_B: a.ledger_B != a.feeAddrOwner ? applyCapCollar(exFeeStruct_tok_B.tok, a.tokenTypeId_B, a.qty_B,               calcFee(exFeeStruct_tok_B.tok, a.tokenTypeId_B, a.qty_B)) : 0,
                fee_to: a.feeAddrOwner
         });
 
@@ -83,8 +76,9 @@ library TransferLib {
         require(StructLib.sufficientCcy(ledgerData, a.ledger_B, a.ccyTypeId_B, a.ccy_amount_B,
                     int256(exFees.fee_ccy_B) * (a.applyFees && a.ccy_amount_B > 0 ? 1 : 0)), "Insufficient currency held by ledger owner B");
 
-        // calc originator token fees - potentially multiple (up to one originator fee per distinct token batch)
-        TransferSplitPreviewReturn[2] memory ts_previews;   // stack slots: [0] = A->B, [1] = B->A
+        // calc batch originator token fees (disabled if fee-reciever[batch originator] == fee-payer)
+        // potentially multiple: up to one originator fee per distinct token batch
+        TransferSplitPreviewReturn[2] memory ts_previews; // stack slots: [0] = A->B, [1] = B->A
         TransferSplitArgs[2] memory ts_args;
         uint256[2] memory totalOrigFee;
         if (a.qty_A > 0) {
@@ -92,7 +86,7 @@ library TransferLib {
             ts_previews[0] = transferSplitSecTokens_Preview(ledgerData, ts_args[0]);
             for (uint i = 0; i < ts_previews[0].batchCount ; i++) {
                 StructLib.SecTokenBatch storage batch = ledgerData._batches[ts_previews[0].batchIds[i]];
-                uint256 tokFee = applyCapCollar(batch.origTokFee, ts_previews[0].transferQty[i], calcFee(batch.origTokFee, ts_previews[0].transferQty[i]));
+                uint256 tokFee = a.ledger_A != batch.originator ? applyCapCollar(batch.origTokFee, ts_previews[0].transferQty[i], calcFee(batch.origTokFee, ts_previews[0].transferQty[i])) : 0;
                 totalOrigFee[0] += tokFee;
             }
         }
@@ -101,7 +95,7 @@ library TransferLib {
             ts_previews[1] = transferSplitSecTokens_Preview(ledgerData, ts_args[1]);
             for (uint i = 0; i < ts_previews[1].batchCount ; i++) {
                 StructLib.SecTokenBatch storage batch = ledgerData._batches[ts_previews[1].batchIds[i]];
-                uint256 tokFee = applyCapCollar(batch.origTokFee, ts_previews[1].transferQty[i], calcFee(batch.origTokFee, ts_previews[1].transferQty[i]));
+                uint256 tokFee = a.ledger_A != batch.originator ? applyCapCollar(batch.origTokFee, ts_previews[1].transferQty[i], calcFee(batch.origTokFee, ts_previews[1].transferQty[i])) : 0;
                 totalOrigFee[1] += tokFee;
             }
         }
@@ -138,7 +132,7 @@ library TransferLib {
 
                 for (uint i = 0; i < ts_previews[0].batchCount ; i++) {
                     StructLib.SecTokenBatch storage batch = ledgerData._batches[ts_previews[0].batchIds[i]];
-                    uint256 tokFee = applyCapCollar(batch.origTokFee, ts_previews[0].transferQty[i], calcFee(batch.origTokFee, ts_previews[0].transferQty[i]));
+                    uint256 tokFee = a.ledger_A != batch.originator ? applyCapCollar(batch.origTokFee, ts_previews[0].transferQty[i], calcFee(batch.origTokFee, ts_previews[0].transferQty[i])) : 0;
                     if (tokFee > 0) { // originator fee
                         transferSplitSecTokens(ledgerData, TransferSplitArgs({ from: a.ledger_A, to: batch.originator, tokenTypeId: a.tokenTypeId_A, qtyUnit: tokFee, transferType: TransferType.OriginatorFee }));
                     }
@@ -159,7 +153,7 @@ library TransferLib {
 
                 for (uint i = 0; i < ts_previews[1].batchCount ; i++) {
                     StructLib.SecTokenBatch storage batch = ledgerData._batches[ts_previews[1].batchIds[i]];
-                    uint256 tokFee = applyCapCollar(batch.origTokFee, ts_previews[1].transferQty[i], calcFee(batch.origTokFee, ts_previews[1].transferQty[i]));
+                    uint256 tokFee = a.ledger_B != batch.originator ? applyCapCollar(batch.origTokFee, ts_previews[1].transferQty[i], calcFee(batch.origTokFee, ts_previews[1].transferQty[i])) : 0;
                     if (tokFee > 0) { // originator fee
                         transferSplitSecTokens(ledgerData, TransferSplitArgs({ from: a.ledger_B, to: batch.originator, tokenTypeId: a.tokenTypeId_B, qtyUnit: tokFee, transferType: TransferType.OriginatorFee }));
                     }
@@ -167,8 +161,6 @@ library TransferLib {
             }
             transferSplitSecTokens(ledgerData, ts_args[1]);
         }
-
-        //return (ts_previews);
     }
 
     /**
@@ -193,10 +185,10 @@ library TransferLib {
         StructLib.FeeStruct storage exFeeStruct_tok_B = ledgerData._ledger[a.ledger_B].customFees.tokType_Set[a.tokenTypeId_B] ? ledgerData._ledger[a.ledger_B].customFees : globalFees;
 
         feesAll[ndx++] = TransferLib.FeesCalc({
-            fee_ccy_A: applyCapCollar(exFeeStruct_ccy_A.ccy, a.ccyTypeId_A, uint256(a.ccy_amount_A), calcFee(exFeeStruct_ccy_A.ccy, a.ccyTypeId_A, uint256(a.ccy_amount_A))),
-            fee_ccy_B: applyCapCollar(exFeeStruct_ccy_B.ccy, a.ccyTypeId_B, uint256(a.ccy_amount_B), calcFee(exFeeStruct_ccy_B.ccy, a.ccyTypeId_B, uint256(a.ccy_amount_B))),
-            fee_tok_A: applyCapCollar(exFeeStruct_tok_A.tok, a.tokenTypeId_A, a.qty_A,               calcFee(exFeeStruct_tok_A.tok, a.tokenTypeId_A, a.qty_A)),
-            fee_tok_B: applyCapCollar(exFeeStruct_tok_B.tok, a.tokenTypeId_B, a.qty_B,               calcFee(exFeeStruct_tok_B.tok, a.tokenTypeId_B, a.qty_B)),
+            fee_ccy_A: a.ledger_A != a.feeAddrOwner ? applyCapCollar(exFeeStruct_ccy_A.ccy, a.ccyTypeId_A, uint256(a.ccy_amount_A), calcFee(exFeeStruct_ccy_A.ccy, a.ccyTypeId_A, uint256(a.ccy_amount_A))) : 0,
+            fee_ccy_B: a.ledger_B != a.feeAddrOwner ? applyCapCollar(exFeeStruct_ccy_B.ccy, a.ccyTypeId_B, uint256(a.ccy_amount_B), calcFee(exFeeStruct_ccy_B.ccy, a.ccyTypeId_B, uint256(a.ccy_amount_B))) : 0,
+            fee_tok_A: a.ledger_A != a.feeAddrOwner ? applyCapCollar(exFeeStruct_tok_A.tok, a.tokenTypeId_A, a.qty_A,               calcFee(exFeeStruct_tok_A.tok, a.tokenTypeId_A, a.qty_A)) : 0,
+            fee_tok_B: a.ledger_B != a.feeAddrOwner ? applyCapCollar(exFeeStruct_tok_B.tok, a.tokenTypeId_B, a.qty_B,               calcFee(exFeeStruct_tok_B.tok, a.tokenTypeId_B, a.qty_B)) : 0,
                fee_to: a.feeAddrOwner
         });
 
@@ -205,26 +197,30 @@ library TransferLib {
             TransferSplitPreviewReturn memory preview = transferSplitSecTokens_Preview(ledgerData, TransferSplitArgs({ from: a.ledger_A, to: a.ledger_B, tokenTypeId: a.tokenTypeId_A, qtyUnit: a.qty_A, transferType: TransferType.User }));
             for (uint i = 0; i < preview.batchCount ; i++) {
                 StructLib.SecTokenBatch storage batch = ledgerData._batches[preview.batchIds[i]];
-                feesAll[ndx++] = TransferLib.FeesCalc({
-                    fee_ccy_A: 0,
-                    fee_ccy_B: 0,
-                    fee_tok_A: applyCapCollar(batch.origTokFee, preview.transferQty[i], calcFee(batch.origTokFee, preview.transferQty[i])),
-                    fee_tok_B: 0,
-                       fee_to: batch.originator
-                });
+                if (a.ledger_A != batch.originator) {
+                    feesAll[ndx++] = TransferLib.FeesCalc({
+                        fee_ccy_A: 0,
+                        fee_ccy_B: 0,
+                        fee_tok_A: applyCapCollar(batch.origTokFee, preview.transferQty[i], calcFee(batch.origTokFee, preview.transferQty[i])),
+                        fee_tok_B: 0,
+                        fee_to: batch.originator
+                    });
+                }
             }
         }
         if (a.qty_B > 0) {
             TransferSplitPreviewReturn memory preview = transferSplitSecTokens_Preview(ledgerData, TransferSplitArgs({ from: a.ledger_B, to: a.ledger_A, tokenTypeId: a.tokenTypeId_B, qtyUnit: a.qty_B, transferType: TransferType.User }));
             for (uint i = 0; i < preview.batchCount ; i++) {
                 StructLib.SecTokenBatch storage batch = ledgerData._batches[preview.batchIds[i]];
-                feesAll[ndx++] = TransferLib.FeesCalc({
-                    fee_ccy_A: 0,
-                    fee_ccy_B: 0,
-                    fee_tok_A: 0,
-                    fee_tok_B: applyCapCollar(batch.origTokFee, preview.transferQty[i], calcFee(batch.origTokFee, preview.transferQty[i])),
-                       fee_to: batch.originator
-                });
+                if (a.ledger_B != batch.originator) {
+                    feesAll[ndx++] = TransferLib.FeesCalc({
+                        fee_ccy_A: 0,
+                        fee_ccy_B: 0,
+                        fee_tok_A: 0,
+                        fee_tok_B: applyCapCollar(batch.origTokFee, preview.transferQty[i], calcFee(batch.origTokFee, preview.transferQty[i])),
+                        fee_to: batch.originator
+                    });
+                }
             }
         }
     }
