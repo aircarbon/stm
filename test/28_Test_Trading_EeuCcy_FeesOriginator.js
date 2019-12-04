@@ -20,19 +20,22 @@ contract("StMaster", accounts => {
 
     // EEU ORIGINATOR FEES
 
-    it('trading fees (originator) - apply VCS carbon originator fee 1000 BP + 5 KG fixed (cap 10 KG) + ledger x2, on a small trade (fee on A)', async () => {
+    it('trading fees (originator) - apply VCS carbon originator fee (+ ledger x2), on a 1.5 EEU trade (fee on A)', async () => {
         const A = accounts[global.accountNdx + 0];
         const B = accounts[global.accountNdx + 1];
 
-        // mint with originator (batch) fee
-        var origFees = {
-            fee_fixed: 5,
-            fee_percBips: 1000,
-            fee_min: 0,
-            fee_max: 10,
-        };
-        await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      A, origFees, [], [], { from: accounts[0] });
-        await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        B,                   { from: accounts[0] });
+        //
+        // TODO: should mint first to M
+        //       then transfer from M to A 
+        //       >> gas: fees shouldn't apply if fee-receiver == fee-payer! (even if ApplyFees==true)
+        //
+
+        // mint with batch originator fee
+        var origFees1 = { fee_fixed: 5, fee_percBips: 1000, fee_min: 0, fee_max: 10 };
+        var origFees2 = { fee_fixed: 5, fee_percBips: 1000, fee_min: 0, fee_max: 0 };
+        await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      A, origFees1, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      A, origFees2, [], [], { from: accounts[0] });
+        await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        B,                    { from: accounts[0] });
 
         // set global fee structure: 0
         await stm.setFee_TokType(CONST.tokenType.VCS, CONST.nullAddr, { fee_fixed: 0, fee_percBips: 0, fee_min: 0, fee_max: 0 } );
@@ -40,17 +43,17 @@ contract("StMaster", accounts => {
 
         // set ledger fee structure VCS for A: 0x batch fee
         var ledgerFees = {
-               fee_fixed: origFees.fee_fixed    * 0,
-            fee_percBips: origFees.fee_percBips * 0,
-                 fee_min: origFees.fee_min      * 0,
-                 fee_max: origFees.fee_max      * 0,
+               fee_fixed: origFees1.fee_fixed    * 2,
+            fee_percBips: origFees1.fee_percBips * 2,
+                 fee_min: origFees1.fee_min      * 2,
+                 fee_max: origFees1.fee_max      * 2,
         };
         const setLedgerFeeTx = await stm.setFee_TokType(CONST.tokenType.VCS, A, ledgerFees);
 
         // transfer
-        const transferAmountKg = new BN(100); // 100 kg
+        const transferAmountKg = new BN(1500); // 1.5 EEUs
         const expectedFeeKg = // batch fee + ledger fee
-            Math.min(Math.floor(Number(transferAmountKg.toString()) * (origFees.fee_percBips/10000)) + origFees.fee_fixed, origFees.fee_max) 
+            Math.min(Math.floor(Number(transferAmountKg.toString()) * (origFees1.fee_percBips/10000)) + origFees1.fee_fixed, origFees1.fee_max) 
             +
             Math.min(Math.floor(Number(transferAmountKg.toString()) * (ledgerFees.fee_percBips/10000)) + ledgerFees.fee_fixed, ledgerFees.fee_max)
             ;
