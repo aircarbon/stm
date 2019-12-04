@@ -16,7 +16,7 @@ contract("StMaster", accounts => {
     // *** why burn 0.5 eeu costs more gas than burn 1.5 ?
 
     it('burning - should allow owner to burn half a vEEU', async () => {
-        await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.ktCarbon, 1, accounts[global.accountNdx], CONST.nullOrigFees, [], [], { from: accounts[0], });
+        await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.ktCarbon, 1, accounts[global.accountNdx], CONST.nullFees, [], [], { from: accounts[0], });
         const ledgerBefore = await stm.getLedgerEntry(accounts[global.accountNdx]);
         const stId = ledgerBefore.tokens[0].stId;
         const eeuBefore = await stm.getSecToken(stId);
@@ -57,7 +57,7 @@ contract("StMaster", accounts => {
     });
 
     it('burning - should allow owner to burn a single full vEEU', async () => {
-        await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.ktCarbon, 1, accounts[global.accountNdx], CONST.nullOrigFees, [], [], { from: accounts[0], });
+        await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.ktCarbon, 1, accounts[global.accountNdx], CONST.nullFees, [], [], { from: accounts[0], });
         const ledgerBefore = await stm.getLedgerEntry(accounts[global.accountNdx]);
         assert(ledgerBefore.tokens.length == 1, `unexpected ledger EEU entry before burn (${ledgerBefore.tokens.length})`);
         const stId = ledgerBefore.tokens[0].stId;
@@ -100,8 +100,8 @@ contract("StMaster", accounts => {
     });
 
     it('burning - should allow owner to burn 1.5 vEEUs', async () => {
-        await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.ktCarbon / 2, 1, accounts[global.accountNdx], CONST.nullOrigFees, [], [], { from: accounts[0], });
-        await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.ktCarbon / 2, 1, accounts[global.accountNdx], CONST.nullOrigFees, [], [], { from: accounts[0], });
+        await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.ktCarbon / 2, 1, accounts[global.accountNdx], CONST.nullFees, [], [], { from: accounts[0], });
+        await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.ktCarbon / 2, 1, accounts[global.accountNdx], CONST.nullFees, [], [], { from: accounts[0], });
         const ledgerBefore = await stm.getLedgerEntry(accounts[global.accountNdx]);
         //console.dir(ledgerBefore);
         assert(ledgerBefore.tokens.length == 2, `unexpected ledger EEU entry before burn (${ledgerBefore.tokens.length})`);
@@ -161,12 +161,12 @@ contract("StMaster", accounts => {
     });
 
     it('burning - should allow owner to burn multiple vEEUs of the correct type', async () => {
-        await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.ktCarbon, 1, accounts[global.accountNdx], CONST.nullOrigFees, [], [], { from: accounts[0], });
-        await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.ktCarbon, 1, accounts[global.accountNdx], CONST.nullOrigFees, [], [], { from: accounts[0], });
-        await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.ktCarbon, 1, accounts[global.accountNdx], CONST.nullOrigFees, [], [], { from: accounts[0], });
-        await stm.mintSecTokenBatch(CONST.tokenType.VCS, CONST.ktCarbon, 1, accounts[global.accountNdx], CONST.nullOrigFees, [], [], { from: accounts[0], });
-        await stm.mintSecTokenBatch(CONST.tokenType.VCS, CONST.ktCarbon, 1, accounts[global.accountNdx], CONST.nullOrigFees, [], [], { from: accounts[0], });
-        await stm.mintSecTokenBatch(CONST.tokenType.VCS, CONST.ktCarbon, 1, accounts[global.accountNdx], CONST.nullOrigFees, [], [], { from: accounts[0], });
+        await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.ktCarbon, 1, accounts[global.accountNdx], CONST.nullFees, [], [], { from: accounts[0], });
+        await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.ktCarbon, 1, accounts[global.accountNdx], CONST.nullFees, [], [], { from: accounts[0], });
+        await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.ktCarbon, 1, accounts[global.accountNdx], CONST.nullFees, [], [], { from: accounts[0], });
+        await stm.mintSecTokenBatch(CONST.tokenType.VCS, CONST.ktCarbon, 1, accounts[global.accountNdx], CONST.nullFees, [], [], { from: accounts[0], });
+        await stm.mintSecTokenBatch(CONST.tokenType.VCS, CONST.ktCarbon, 1, accounts[global.accountNdx], CONST.nullFees, [], [], { from: accounts[0], });
+        await stm.mintSecTokenBatch(CONST.tokenType.VCS, CONST.ktCarbon, 1, accounts[global.accountNdx], CONST.nullFees, [], [], { from: accounts[0], });
         
         const ledgerBefore = await stm.getLedgerEntry(accounts[global.accountNdx]);
         assert(ledgerBefore.tokens.length == 6, `unexpected ledger EEU entry before burn (${ledgerBefore.tokens.length})`);
@@ -229,7 +229,7 @@ contract("StMaster", accounts => {
     });
 
     it('burning - should not allow non-owner to burn EEUs', async () => {
-        await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.ktCarbon, 1, accounts[global.accountNdx], CONST.nullOrigFees, [], [], { from: accounts[0], });
+        await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.ktCarbon, 1, accounts[global.accountNdx], CONST.nullFees, [], [], { from: accounts[0], });
         const a0_le = await stm.getLedgerEntry(accounts[global.accountNdx]);
         try {
             await stm.burnTokens(accounts[global.accountNdx], CONST.tokenType.UNFCCC, CONST.ktCarbon, { from: accounts[1], });
@@ -238,7 +238,7 @@ contract("StMaster", accounts => {
     });
 
     it('burning - should not allow burning for non-existent ledger owner', async () => {
-        await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.ktCarbon, 1, accounts[global.accountNdx], CONST.nullOrigFees, [], [], { from: accounts[0], });
+        await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.ktCarbon, 1, accounts[global.accountNdx], CONST.nullFees, [], [], { from: accounts[0], });
         const a9_le = await stm.getLedgerEntry(accounts[9]);
         assert(a9_le.exists == false, 'expected non-existent ledger entry');
         try {
@@ -248,7 +248,7 @@ contract("StMaster", accounts => {
     });
 
     it('burning - should not allow too small a tonnage', async () => {
-        await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.ktCarbon, 1, accounts[global.accountNdx], CONST.nullOrigFees, [], [], { from: accounts[0], });
+        await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.ktCarbon, 1, accounts[global.accountNdx], CONST.nullFees, [], [], { from: accounts[0], });
         const a0_le = await stm.getLedgerEntry(accounts[global.accountNdx]);
         try {
             await stm.burnTokens(accounts[global.accountNdx], CONST.tokenType.UNFCCC, 0);
@@ -257,7 +257,7 @@ contract("StMaster", accounts => {
     });
 
     it('burning - should not allow invalid tonnage', async () => {
-        await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.ktCarbon, 1, accounts[global.accountNdx], CONST.nullOrigFees, [], [], { from: accounts[0], });
+        await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.ktCarbon, 1, accounts[global.accountNdx], CONST.nullFees, [], [], { from: accounts[0], });
         try {
             await stm.burnTokens(accounts[global.accountNdx], CONST.tokenType.UNFCCC, -1);
         } catch (ex) { return; }
@@ -265,7 +265,7 @@ contract("StMaster", accounts => {
     });
 
     it('burning - should not allow non-existent tonnage (1)', async () => {
-        await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.ktCarbon, 1, accounts[global.accountNdx], CONST.nullOrigFees, [], [], { from: accounts[0], });
+        await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.ktCarbon, 1, accounts[global.accountNdx], CONST.nullFees, [], [], { from: accounts[0], });
         try {
             await stm.burnTokens(accounts[global.accountNdx], CONST.tokenType.VCS, CONST.ktCarbon);
         } catch (ex) { return; }
@@ -273,7 +273,7 @@ contract("StMaster", accounts => {
     });
 
     it('burning - should not allow non-existent tonnage (2)', async () => {
-        await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.ktCarbon, 1, accounts[global.accountNdx], CONST.nullOrigFees, [], [], { from: accounts[0], });
+        await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.ktCarbon, 1, accounts[global.accountNdx], CONST.nullFees, [], [], { from: accounts[0], });
         await stm.burnTokens(accounts[global.accountNdx], CONST.tokenType.UNFCCC, CONST.ktCarbon);
         var ledger = await stm.getLedgerEntry(accounts[global.accountNdx]);
         try {
@@ -283,7 +283,7 @@ contract("StMaster", accounts => {
     });
 
     it('burning - should not allow burning when contract is read only', async () => {
-        await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.ktCarbon, 1, accounts[global.accountNdx], CONST.nullOrigFees, [], [], { from: accounts[0], });
+        await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.ktCarbon, 1, accounts[global.accountNdx], CONST.nullFees, [], [], { from: accounts[0], });
         const a0_le = await stm.getLedgerEntry(accounts[global.accountNdx]);
         try {
             await stm.setReadOnly(true, { from: accounts[0] });

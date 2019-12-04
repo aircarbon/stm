@@ -10,7 +10,7 @@ module.exports = {
 
     nullAddr: "0x0000000000000000000000000000000000000000",
 
-    nullOrigFees: {
+    nullFees: {
         fee_fixed: 0,
         fee_percBips: 0,
         fee_min: 0,

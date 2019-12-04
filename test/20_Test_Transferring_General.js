@@ -61,9 +61,9 @@ contract("StMaster", accounts => {
 
     it('transferring - should not allow single-origin multiple-asset transfers (1)', async () => {
         await stm.fund(CONST.ccyType.USD,                CONST.thousandUsd_cents,       accounts[global.accountNdx + 0],         { from: accounts[0] });
-        await stm.mintSecTokenBatch(CONST.tokenType.VCS, CONST.ktCarbon, 1,             accounts[global.accountNdx + 0], CONST.nullOrigFees, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.VCS, CONST.ktCarbon, 1,             accounts[global.accountNdx + 0], CONST.nullFees, [], [], { from: accounts[0] });
         await stm.fund(CONST.ccyType.USD,                CONST.thousandUsd_cents,       accounts[global.accountNdx + 1],         { from: accounts[0] });
-        await stm.mintSecTokenBatch(CONST.tokenType.VCS, CONST.ktCarbon, 1,             accounts[global.accountNdx + 1], CONST.nullOrigFees, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.VCS, CONST.ktCarbon, 1,             accounts[global.accountNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
         try {
             await helper.transferWrapper(stm, accounts, accounts[global.accountNdx + 0], accounts[global.accountNdx + 1], 
                 CONST.ktCarbon,              // qty_A
@@ -82,9 +82,9 @@ contract("StMaster", accounts => {
 
     it('transferring - should not allow single-origin multiple-asset transfers (2)', async () => {
         await stm.fund(CONST.ccyType.USD,                CONST.thousandUsd_cents,       accounts[global.accountNdx + 0],         { from: accounts[0] });
-        await stm.mintSecTokenBatch(CONST.tokenType.VCS, CONST.ktCarbon, 1,             accounts[global.accountNdx + 0], CONST.nullOrigFees, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.VCS, CONST.ktCarbon, 1,             accounts[global.accountNdx + 0], CONST.nullFees, [], [], { from: accounts[0] });
         await stm.fund(CONST.ccyType.USD,                CONST.thousandUsd_cents,       accounts[global.accountNdx + 1],         { from: accounts[0] });
-        await stm.mintSecTokenBatch(CONST.tokenType.VCS, CONST.ktCarbon, 1,             accounts[global.accountNdx + 1], CONST.nullOrigFees, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.VCS, CONST.ktCarbon, 1,             accounts[global.accountNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
         try {
             await helper.transferWrapper(stm, accounts, accounts[global.accountNdx + 0], accounts[global.accountNdx + 1], 
                 0,                           // qty_A
@@ -103,9 +103,9 @@ contract("StMaster", accounts => {
 
     it('transferring - should not allow single-origin multiple-asset transfers (3)', async () => {
         await stm.fund(CONST.ccyType.USD,                CONST.thousandUsd_cents,       accounts[global.accountNdx + 0],         { from: accounts[0] });
-        await stm.mintSecTokenBatch(CONST.tokenType.VCS, CONST.ktCarbon, 1,             accounts[global.accountNdx + 0], CONST.nullOrigFees, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.VCS, CONST.ktCarbon, 1,             accounts[global.accountNdx + 0], CONST.nullFees, [], [], { from: accounts[0] });
         await stm.fund(CONST.ccyType.USD,                CONST.thousandUsd_cents,       accounts[global.accountNdx + 1],         { from: accounts[0] });
-        await stm.mintSecTokenBatch(CONST.tokenType.VCS, CONST.ktCarbon, 1,             accounts[global.accountNdx + 1], CONST.nullOrigFees, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.VCS, CONST.ktCarbon, 1,             accounts[global.accountNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
         try {
             await helper.transferWrapper(stm, accounts, accounts[global.accountNdx + 0], accounts[global.accountNdx + 1], 
                 CONST.ktCarbon,              // qty_A

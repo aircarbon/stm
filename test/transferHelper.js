@@ -45,9 +45,9 @@ module.exports = {
         deltaCcy_fromA[ccyTypeId_A] -= ccy_amount_A;
         deltaCcy_fromA[ccyTypeId_B] += ccy_amount_B;
         
-        // expected currency fees paid by A and B - ledger fees >0 override global fees
+        // expected currency fees paid by A and B - (ledger fees >0 overrides global fees)
         var fee_ccy_A = 0;
-        if (ccy_amount_A > 0 && applyFees) {
+        if (ccy_amount_A > 0 && applyFees && ledger_A != accounts[0]) { // fees not applied by contract if fee-sender == fee-receiver
             const globalFee_Fix = Big(await stm.globalFee_ccyType_Fix(ccyTypeId_A));
             const ledgerFee_Fix = Big(await stm.ledgerFee_ccyType_Fix(ccyTypeId_A, ledger_A));
             const globalFee_Bps = Big(await stm.globalFee_ccyType_Bps(ccyTypeId_A));
@@ -62,9 +62,7 @@ module.exports = {
             const min = ledgerFee_Min.gt(0) ? ledgerFee_Min : globalFee_Min;
             const max = ledgerFee_Max.gt(0) ? ledgerFee_Max : globalFee_Max;
  
-            fee_ccy_A = Big(Math.floor(
-                            fix
-                          .plus(((Big(ccy_amount_A).div(10000)).times(bps)))));
+            fee_ccy_A = Big(Math.floor(fix.plus(((Big(ccy_amount_A).div(10000)).times(bps)))));
             
             //const max = Big(await stm.globalFee_ccyType_Max(ccyTypeId_A));
             //const min = Big(await stm.globalFee_ccyType_Min(ccyTypeId_A));
@@ -74,7 +72,7 @@ module.exports = {
             //console.log('fee_ccy_A', fee_ccy_A.toFixed());
         }
         var fee_ccy_B = 0;
-        if (ccy_amount_B > 0 && applyFees) {
+        if (ccy_amount_B > 0 && applyFees && ledger_B != accounts[0]) { // fees not applied by contract if fee-sender == fee-receiver
             const globalFee_Fix = Big(await stm.globalFee_ccyType_Fix(ccyTypeId_B));
             const ledgerFee_Fix = Big(await stm.ledgerFee_ccyType_Fix(ccyTypeId_B, ledger_B));
             const globalFee_Bps = Big(await stm.globalFee_ccyType_Bps(ccyTypeId_B));
@@ -88,9 +86,7 @@ module.exports = {
             const min = ledgerFee_Min.gt(0) ? ledgerFee_Min : globalFee_Min;
             const max = ledgerFee_Max.gt(0) ? ledgerFee_Max : globalFee_Max;
 
-            fee_ccy_B = Big(Math.floor(
-                            fix
-                          .plus(((Big(ccy_amount_B).div(10000)).times(bps)))));
+            fee_ccy_B = Big(Math.floor(fix.plus(((Big(ccy_amount_B).div(10000)).times(bps)))));
             
             //const max = Big(await stm.globalFee_ccyType_Max(ccyTypeId_B));
             //const min = Big(await stm.globalFee_ccyType_Min(ccyTypeId_B));
@@ -100,7 +96,7 @@ module.exports = {
             //console.log('fee_ccy_B', fee_ccy_B.toFixed());
         }
 
-        // fee preview
+        // fee preview - WIP/TODO: for expected n batch fees...
         const feesPreview = await stm.transfer_feePreview({ 
                 ledger_A,                             ledger_B, 
                    qty_A: qty_A.toString(),           tokenTypeId_A, 
@@ -110,7 +106,7 @@ module.exports = {
             applyFees,
             feeAddrOwner: CONST.nullAddr,
         });
-        console.log('feesPreview', feesPreview);
+        //console.log('feesPreview', feesPreview);
 
         // transfer
         //console.log('qty_A', qty_A);
@@ -285,7 +281,7 @@ module.exports = {
         // console.log('totalCcy_tfd_before[ccyTypeId_A]', totalCcy_tfd_before[ccyTypeId_A].toString());
         // console.log('    expectedCcy_tfd[ccyTypeId_A]', expectedCcy_tfd[ccyTypeId_A].toString());
         assert(Big(totalCcy_tfd_after[ccyTypeId_A]).minus(totalCcy_tfd_before[ccyTypeId_A]).eq(expectedCcy_tfd[ccyTypeId_A]),
-               `unexpected total transfered delta after, ccy A`);
+            `unexpected total transfered delta after, ccy A`);
                
         assert(Big(totalCcy_tfd_after[ccyTypeId_B]).minus(totalCcy_tfd_before[ccyTypeId_B]).eq(expectedCcy_tfd[ccyTypeId_B]),
                `unexpected total transfered delta after, ccy B`);
@@ -293,6 +289,7 @@ module.exports = {
         // validate EEU events
         const eeuFullEvents = [];
         const eeuPartialEvents = [];
+        const contractOwnerIsTransfering = ledger_A == accounts[0] || ledger_B == accounts[1];
         if (qty_A > 0 || qty_B > 0) {
             //truffleAssert.prettyPrintEmittedEvents(transferTx);
             
@@ -322,8 +319,17 @@ module.exports = {
             }
             
             // validate that total tonnage across A, B and contract owner (fee receiver) is unchanged
-            assert(Number(ledgerA_before.tokens_sumQty) + Number(ledgerB_before.tokens_sumQty) + Number(ledgerContractOwner_before.tokens_sumQty) ==
-                   Number(ledgerA_after.tokens_sumQty)  + Number(ledgerB_after.tokens_sumQty)  + Number(ledgerContractOwner_after.tokens_sumQty),
+            // console.log('            ledgerA_before.tokens_sumQty', ledgerA_before.tokens_sumQty);
+            // console.log('            ledgerB_before.tokens_sumQty', ledgerB_before.tokens_sumQty);
+            // console.log('ledgerContractOwner_before.tokens_sumQty', ledgerContractOwner_before.tokens_sumQty);
+
+            // console.log('             ledgerA_after.tokens_sumQty', ledgerA_after.tokens_sumQty);
+            // console.log('             ledgerB_after.tokens_sumQty', ledgerB_after.tokens_sumQty);
+            // console.log(' ledgerContractOwner_after.tokens_sumQty', ledgerContractOwner_after.tokens_sumQty);
+
+            // don't double count sender/receiver and master exchange account, if the exchange account is on one side of the transfer
+            assert(Number(ledgerA_before.tokens_sumQty) + Number(ledgerB_before.tokens_sumQty) + (contractOwnerIsTransfering ? 0 : Number(ledgerContractOwner_before.tokens_sumQty)) ==
+                   Number(ledgerA_after.tokens_sumQty)  + Number(ledgerB_after.tokens_sumQty)  + (contractOwnerIsTransfering ? 0 : Number(ledgerContractOwner_after.tokens_sumQty)),
                   'unexpected total tonnage sum across ledger before vs. after');
         }
 
@@ -347,9 +353,12 @@ module.exports = {
             const max = ledgerFee_Max.gt(0) ? ledgerFee_Max : globalFee_Max;
 
             // exchange fee
-            var ex_eeuFee_A = Math.floor(Number(fix) + Number((qty_A / 10000) * Number(bps)));
-            if (Big(ex_eeuFee_A).gt(max) && max.gt(0)) ex_eeuFee_A = max.toFixed();
-            if (Big(ex_eeuFee_A).lt(min) && min.gt(0)) ex_eeuFee_A = min.toFixed();
+            var ex_eeuFee_A = 0;
+            if (ledger_A != accounts[0]) { // fees not applied by contract if fee-sender == fee-receiver
+                ex_eeuFee_A = Math.floor(Number(fix) + Number((qty_A / 10000) * Number(bps)));
+                if (Big(ex_eeuFee_A).gt(max) && max.gt(0)) ex_eeuFee_A = max.toFixed();
+                if (Big(ex_eeuFee_A).lt(min) && min.gt(0)) ex_eeuFee_A = min.toFixed();
+            }
             //console.log('ex_eeuFee_A', ex_eeuFee_A);
 
             // batch fee -- TODO: need a getFees() fn. on the contract for this (n batch fees!)
@@ -398,9 +407,12 @@ module.exports = {
             // console.log('max', max.toFixed());
 
             // exchange fee
-            var ex_eeuFee_B = Math.floor(Number(fix) + Number((qty_B / 10000) * Number(bps))); 
-            if (Big(ex_eeuFee_B).gt(max) && max.gt(0)) ex_eeuFee_B = max.toFixed();
-            if (Big(ex_eeuFee_B).lt(min) && min.gt(0)) ex_eeuFee_B = min.toFixed();                             
+            var ex_eeuFee_B = 0;
+            if (ledger_B != accounts[0]) { // fees not applied by contract if fee-sender == fee-receiver
+                ex_eeuFee_B = Math.floor(Number(fix) + Number((qty_B / 10000) * Number(bps))); 
+                if (Big(ex_eeuFee_B).gt(max) && max.gt(0)) ex_eeuFee_B = max.toFixed();
+                if (Big(ex_eeuFee_B).lt(min) && min.gt(0)) ex_eeuFee_B = min.toFixed();                     
+            }        
             //console.log('ex_eeuFee_B', ex_eeuFee_B);
 
             totalKg_tfd_incFees = totalKg_tfd_incFees.add(new BN(ex_eeuFee_B));
@@ -412,8 +424,13 @@ module.exports = {
         }
 
         // validate carbon fee sum tonnage in contract owner
-        assert(new BN(ledgerContractOwner_after.tokens_sumQty).sub(new BN(ledgerContractOwner_before.tokens_sumQty))
-                .eq(totalqty_AllSecSecTokenTypes_fees), 'unexpected contract owner (fee receiver) tonnage after transfer');
+        // console.log(' ledgerContractOwner_after.tokens_sumQty', ledgerContractOwner_after.tokens_sumQty);
+        // console.log('ledgerContractOwner_before.tokens_sumQty', ledgerContractOwner_before.tokens_sumQty);
+        // console.log('       totalqty_AllSecSecTokenTypes_fees', totalqty_AllSecSecTokenTypes_fees);
+        if (!contractOwnerIsTransfering) {
+            assert(new BN(ledgerContractOwner_after.tokens_sumQty).sub(new BN(ledgerContractOwner_before.tokens_sumQty))
+                    .eq(totalqty_AllSecSecTokenTypes_fees), 'unexpected contract owner (fee receiver) tonnage after transfer');
+        }
 
         // validate carbon global totals
         assert(totalKg_tfd_after.sub(totalKg_tfd_before).eq(totalKg_tfd_incFees), 'unexpected total tonnage carbon after transfer');
