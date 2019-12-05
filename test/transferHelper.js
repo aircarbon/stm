@@ -301,13 +301,13 @@ module.exports = {
 
             // validate main (non-fee) EEU transfer event counts
             if (qty_A > 0) {
-                assert(eeuFullEvents.filter(p => p.from == ledger_A && p.to != accounts[0]).length > 0 ||
-                       eeuPartialEvents.filter(p => p.from == ledger_A && p.to != accounts[0]).length == 1,
+                assert(eeuFullEvents.filter(p => p.from == ledger_A /*&& p.to != accounts[0]*/ && p.transferType == CONST.transferType.USER).length > 0 ||
+                       eeuPartialEvents.filter(p => p.from == ledger_A /*&& p.to != accounts[0]*/ && p.transferType == CONST.transferType.USER).length == 1,
                        'unexpected transfer full vs. partial event count after transfer for ledger A');
             }
             if (qty_B > 0) {
-                assert(eeuFullEvents.filter(p => p.from == ledger_B && p.to != accounts[0]).length > 0 ||
-                       eeuPartialEvents.filter(p => p.from == ledger_B && p.to != accounts[0]).length == 1,
+                assert(eeuFullEvents.filter(p => p.from == ledger_B /*&& p.to != accounts[0]*/ && p.transferType == CONST.transferType.USER).length > 0 ||
+                       eeuPartialEvents.filter(p => p.from == ledger_B /*&& p.to != accounts[0]*/ && p.transferType == CONST.transferType.USER).length == 1,
                        'unexpected transfer full vs. partial event count after transfer for ledger B');
             }
             
