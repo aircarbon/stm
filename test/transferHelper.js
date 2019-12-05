@@ -106,7 +106,7 @@ module.exports = {
             applyFees,
             feeAddrOwner: CONST.nullAddr,
         });
-        //console.log('feesPreview', feesPreview);
+        console.log('feesPreview', feesPreview);
 
         // transfer
         //console.log('qty_A', qty_A);

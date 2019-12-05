@@ -20,7 +20,7 @@ contract("StMaster", accounts => {
 
     // NO FEES IF FEE RECEIVER = FEE SENDER
 
-    it('trading fees (general) - global/ledger/batch carbon fee should not be applied when fee sender is fee receiver (fee on A)', async () => {
+    it('trading fees (general) - global/ledger/originator carbon fee should not be applied when fee sender is fee receiver (fee on A)', async () => {
         const A = accounts[0]; // sender is exchange account, exchange fee receiver, and batch originator fee receiver
         const B = accounts[global.accountNdx + 1];
         const allFees = { fee_fixed: 0, fee_percBips: 100, fee_min: 0, fee_max: 0 };
@@ -59,7 +59,7 @@ contract("StMaster", accounts => {
         assert(Big(receiver_balAfter).eq(Big(receiver_balBefore).plus(Big(transferAmountKg))), 'unexpected receiver carbon after transfer');
     });
 
-    it('trading fees (general) - global/ledger/batch carbon fee should not be applied when fee sender is fee receiver (fee on B)', async () => {
+    it('trading fees (general) - global/ledger/originator carbon fee should not be applied when fee sender is fee receiver (fee on B)', async () => {
         const A = accounts[global.accountNdx + 0];
         const B = accounts[0]; // sender is exchange account, exchange fee receiver, and batch originator fee receiver
         const allFees = { fee_fixed: 0, fee_percBips: 100, fee_min: 0, fee_max: 0 };
