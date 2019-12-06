@@ -43,6 +43,9 @@ contract("StMaster", accounts => {
         });
         const MA_B_balAfter = data_MA.ledgerB_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
         assert(Big(MA_B_balAfter).eq(Big(MA_qty)), 'test setup failed');
+
+        // B: fund, so ready to trade from A
+        await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        B,                    { from: accounts[0] });
     });
 
     // EEU ORIGINATOR FEES
@@ -73,7 +76,7 @@ contract("StMaster", accounts => {
             Math.min(Math.floor(Number(transferAmountKg.toString()) * (ledgerFees.fee_percBips/10000)) + ledgerFees.fee_fixed, ledgerFees.fee_max)
             ;
 
-        // TODO:  helper needs to use preview fees in its calcs... (non-zero orig fees, now moved from M->A)
+        // TODO: helper needs to use preview fees in its calcs... (non-zero orig fees, now moved from M->A)
         const data = await helper.transferLedger({ stm, accounts, 
                 ledger_A: A,                                   ledger_B: B,
                    qty_A: transferAmountKg,               tokenTypeId_A: CONST.tokenType.VCS,

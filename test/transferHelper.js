@@ -34,9 +34,10 @@ module.exports = {
         var totalKg_fees_before, totalKg_fees_after;
         const totalCcy_fees_before = [];
         const totalCcy_fees_after = [];
-        totalKg_fees_before = await stm.getSecToken_totalFeesPaidQty.call();
-        totalCcy_fees_before[ccyTypeId_A] = await stm.getCcy_totalFeesPaidAmount.call(ccyTypeId_A);
-        totalCcy_fees_before[ccyTypeId_B] = await stm.getCcy_totalFeesPaidAmount.call(ccyTypeId_B);
+        totalKg_fees_before = await stm.getSecToken_totalExchangeFeesPaidQty.call()
+                             .add(await stm.getSecToken_totalOrigiantorFeesPaidQty.call());
+        totalCcy_fees_before[ccyTypeId_A] = await stm.getCcy_totalExchangeFeesPaid.call(ccyTypeId_A);
+        totalCcy_fees_before[ccyTypeId_B] = await stm.getCcy_totalExchangeFeesPaid.call(ccyTypeId_B);
 
         // expected net delta per currency, wrt. account A
         const deltaCcy_fromA = [];
@@ -133,8 +134,8 @@ module.exports = {
 
         // global totals: fees after
         totalKg_fees_after = await stm.getSecToken_totalFeesPaidQty.call();
-        totalCcy_fees_after[ccyTypeId_A] = await stm.getCcy_totalFeesPaidAmount.call(ccyTypeId_A);
-        totalCcy_fees_after[ccyTypeId_B] = await stm.getCcy_totalFeesPaidAmount.call(ccyTypeId_B);
+        totalCcy_fees_after[ccyTypeId_A] = await stm.getCcy_totalExchangeFeesPaid.call(ccyTypeId_A);
+        totalCcy_fees_after[ccyTypeId_B] = await stm.getCcy_totalExchangeFeesPaid.call(ccyTypeId_B);
 
         // validate fees
         if (applyFees) {
@@ -164,17 +165,23 @@ module.exports = {
             var eventKg_fees = new BN(0);
             try {
                 truffleAssert.eventEmitted(transferTx, 'TransferedFullSecToken', ev => { 
-                    if (ev.transferType != CONST.transferType.USER) eventKg_fees = eventKg_fees.add(ev.qty); return true;
+                    if (ev.transferType != CONST.transferType.USER) {
+                        console.log(`    TransferedFullSecToken - ev.transferType=${ev.transferType}: ev.qty=${ev.qty}`);
+                        eventKg_fees = eventKg_fees.add(ev.qty); return true;
+                    }
                 });
             } catch {}
             try {
                 truffleAssert.eventEmitted(transferTx, 'TransferedPartialSecToken', ev => { 
-                    if (ev.transferType != CONST.transferType.USER) eventKg_fees = eventKg_fees.add(ev.qty); return true;
+                    if (ev.transferType != CONST.transferType.USER) { 
+                        console.log(`TransferedPartialSecToken - ev.transferType=${ev.transferType}: ev.qty=${ev.qty}`);
+                        eventKg_fees = eventKg_fees.add(ev.qty); return true;
+                    }
                 });
             } catch {}
-            //console.log('totalKg_fees_before', totalKg_fees_before.toString());
-            //console.log('eventKg_fees', eventKg_fees.toString());
-            //console.log('totalKg_fees_after', totalKg_fees_after.toString());
+            console.log('totalKg_fees_before', totalKg_fees_before.toString());
+            console.log('       eventKg_fees', eventKg_fees.toString());
+            console.log(' totalKg_fees_after', totalKg_fees_after.toString());
             assert(totalKg_fees_after.sub(totalKg_fees_before).eq(eventKg_fees), `unexpected global total carbon fees before/after vs. events`);
         }
 

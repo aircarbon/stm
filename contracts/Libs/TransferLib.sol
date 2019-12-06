@@ -292,10 +292,8 @@ library TransferLib {
         emit TransferedLedgerCcy(a.from, a.to, a.ccyTypeId, a.amount, a.transferType);
 
         if (a.transferType == TransferType.ExchangeFee) {
-            ledgerData._ccyType_totalFeesPaid[a.ccyTypeId] += a.amount;
+            ledgerData._ccyType_totalExchangeFeesPaid[a.ccyTypeId] += a.amount;
         }
-
-        // TODO: global originator fees...
     }
 
     /**

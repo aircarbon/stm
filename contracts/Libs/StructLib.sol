@@ -102,15 +102,15 @@ library StructLib {
         address[] _ledgerOwners;                                // list of ledger owners (accounts)
 
         // global totals
-        uint256 _tokens_totalMintedQty;
-        uint256 _tokens_totalBurnedQty;
-        uint256 _tokens_totalTransferedQty;
-        uint256 _tokens_totalFeesPaidQty;
         uint256 _tokens_currentMax_id;                          // 1-based - updated by Mint() and by transferSplitSecTokens()
+        uint256 _tokens_totalMintedQty;                         // TODO: split by tokenType
+        uint256 _tokens_totalBurnedQty;                         // TODO: split by tokenType
+        uint256 _tokens_totalTransferedQty;                     // TODO: split by tokenType
+        uint256 _tokens_totalExchangeFeesPaidQty;               // TODO: split by tokenType
+        uint256 _tokens_totalOriginatorFeesPaidQty;             // TODO: split by tokenType
         mapping(uint256 => uint256) _ccyType_totalFunded;
         mapping(uint256 => uint256) _ccyType_totalWithdrawn;
         mapping(uint256 => uint256) _ccyType_totalTransfered;
-        mapping(uint256 => uint256) _ccyType_totalFeesPaid;
     }
 
     // FEE STRUCTURE -- (ledger or global) fees for all ccy's and token types

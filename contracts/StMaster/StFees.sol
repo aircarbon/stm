@@ -80,18 +80,18 @@ contract StFees is Owned, StLedger {
     }
 
     /**
-     * @dev Returns the global total quantity of token fees paid, in the contract base unit
+     * @dev Returns the global total quantity of token exchange fees paid, in the contract base unit
      */
-    function getSecToken_totalFeesPaidQty() external view returns (uint256) {
+    function getSecToken_totalExchangeFeesPaidQty() external view returns (uint256) {
         require(msg.sender == owner, "Restricted method");
-        return ledgerData._tokens_totalFeesPaidQty;
+        return ledgerData._tokens_totalExchangeFeesPaidQty;
     }
 
     /**
-     * @dev Returns the global total amount of currency fees paid, for the supplied currency
+     * @dev Returns the global total amount of currency exchange fees paid, for the supplied currency
      */
-    function getCcy_totalFeesPaidAmount(uint256 ccyTypeId) external view returns (uint256) {
+    function getCcy_totalExchangeFeesPaid(uint256 ccyTypeId) external view returns (uint256) {
         require(msg.sender == owner, "Restricted method");
-        return ledgerData._ccyType_totalFeesPaid[ccyTypeId];
+        return ledgerData._ccyType_totalExchangeFeesPaid[ccyTypeId];
     }
 }
