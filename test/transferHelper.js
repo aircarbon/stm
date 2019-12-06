@@ -35,7 +35,7 @@ module.exports = {
         const totalCcy_fees_before = [];
         const totalCcy_fees_after = [];
         totalKg_fees_before = await stm.getSecToken_totalExchangeFeesPaidQty.call()
-                             .add(await stm.getSecToken_totalOrigiantorFeesPaidQty.call());
+                             .add(await stm.getSecToken_totalOriginatorFeesPaidQty.call());
         totalCcy_fees_before[ccyTypeId_A] = await stm.getCcy_totalExchangeFeesPaid.call(ccyTypeId_A);
         totalCcy_fees_before[ccyTypeId_B] = await stm.getCcy_totalExchangeFeesPaid.call(ccyTypeId_B);
 
@@ -133,7 +133,8 @@ module.exports = {
         totalCcy_tfd_after[ccyTypeId_B] = await stm.getCcy_totalTransfered.call(ccyTypeId_B);
 
         // global totals: fees after
-        totalKg_fees_after = await stm.getSecToken_totalFeesPaidQty.call();
+        totalKg_fees_after = await stm.getSecToken_totalExchangeFeesPaidQty.call()
+                            .add(await stm.getSecToken_totalOriginatorFeesPaidQty.call());
         totalCcy_fees_after[ccyTypeId_A] = await stm.getCcy_totalExchangeFeesPaid.call(ccyTypeId_A);
         totalCcy_fees_after[ccyTypeId_B] = await stm.getCcy_totalExchangeFeesPaid.call(ccyTypeId_B);
 

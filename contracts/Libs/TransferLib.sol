@@ -292,7 +292,7 @@ library TransferLib {
         emit TransferedLedgerCcy(a.from, a.to, a.ccyTypeId, a.amount, a.transferType);
 
         if (a.transferType == TransferType.ExchangeFee) {
-            ledgerData._ccyType_totalExchangeFeesPaid[a.ccyTypeId] += a.amount;
+            ledgerData._ccyType_totalFeesPaid[a.ccyTypeId] += a.amount;
         }
     }
 
@@ -483,9 +483,10 @@ library TransferLib {
         ledgerData._tokens_totalTransferedQty += a.qtyUnit;
 
         if (a.transferType == TransferType.ExchangeFee) {
-            ledgerData._tokens_totalFeesPaidQty += a.qtyUnit;
+            ledgerData._tokens_totalExchangeFeesPaidQty += a.qtyUnit;
         }
-
-        // TODO: global originator fees...
+        else if (a.transferType == TransferType.OriginatorFee) {
+            ledgerData._tokens_totalOriginatorFeesPaidQty += a.qtyUnit;
+        }
     }
 }
