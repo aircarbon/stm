@@ -35,7 +35,7 @@ contract StTransferable is Owned, StLedger, StFees {
     external view
     returns (TransferLib.FeesCalc[1 + MAX_BATCHES_PREVIEW * 2] memory feesAll) {
         require(msg.sender == owner, "Restricted method");
-        return TransferLib.transfer_feePreview(ledgerData, globalFees, a);
+        return TransferLib.transfer_feePreview(ledgerData, globalFees, owner, a);
     }
 
     /**

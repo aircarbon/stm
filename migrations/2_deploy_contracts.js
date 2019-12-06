@@ -59,7 +59,7 @@ module.exports = async function (deployer) {
                 global.configContext = 'erc20';
 
                 const contractName = "SecTok_Master";
-                const contractVer = "0.5";
+                const contractVer = "0.6";
 
                 var ip = "unknown";
                 publicIp.v4().then(p => ip = p).catch(e => { console.log("WARN: could not get IP - will write 'unknown'"); });

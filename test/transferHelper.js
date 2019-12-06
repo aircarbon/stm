@@ -97,7 +97,7 @@ module.exports = {
             //console.log('fee_ccy_B', fee_ccy_B.toFixed());
         }
 
-        // fee preview - WIP/TODO: for expected n batch fees...
+        // fee preview
         const feesPreview = await stm.transfer_feePreview({ 
                 ledger_A,                             ledger_B, 
                    qty_A: qty_A.toString(),           tokenTypeId_A, 
@@ -107,11 +107,29 @@ module.exports = {
             applyFees,
             feeAddrOwner: CONST.nullAddr,
         });
-        console.log('feesPreview', feesPreview);
+        //console.log('feesPreview', feesPreview);
+        const sumFees_tok_A = feesPreview.map(p => p.fee_tok_A).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
+        const sumFees_tok_B = feesPreview.map(p => p.fee_tok_B).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
+        const sumFees_ccy_A = feesPreview.map(p => p.fee_ccy_A).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
+        const sumFees_ccy_B = feesPreview.map(p => p.fee_ccy_B).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
+        // console.log('sumFees_tok_A', sumFees_tok_A.toFixed());
+        // console.log('sumFees_tok_B', sumFees_tok_B.toFixed());
+        // console.log('sumFees_ccy_A', sumFees_ccy_A.toFixed());
+        // console.log('sumFees_ccy_B', sumFees_ccy_B.toFixed());
+        const originatorFees_tok_A = feesPreview.slice(1).map(p => p.fee_tok_A).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
+        const originatorFees_tok_B = feesPreview.slice(1).map(p => p.fee_tok_B).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
+        // console.log('originatorFees_tok_A', originatorFees_tok_A.toFixed());
+        // console.log('originatorFees_tok_B', originatorFees_tok_B.toFixed());
+        const originatorFeeData = feesPreview.slice(1).map(p => { return {
+            fee_tok_A: p.fee_tok_A,
+            fee_tok_B: p.fee_tok_B,
+               fee_to: p.fee_to
+        }});
+        //console.log('originatorFeeData', originatorFeeData);
+        for (let i = 0; i < originatorFeeData.length; i++)
+            originatorFeeData[i].ledgerBefore = await stm.getLedgerEntry(originatorFeeData[i].fee_to);
 
-        // transfer
-        //console.log('qty_A', qty_A);
-        //console.log('qty_B', qty_B);
+        // ** TRANSFER **
         const transferTx = await transferWrapped( { stm, accounts,
                     ledger_A, ledger_B, 
                        qty_A, tokenTypeId_A, 
@@ -126,6 +144,9 @@ module.exports = {
         ledgerA_after = await stm.getLedgerEntry(ledger_A);
         ledgerB_after = await stm.getLedgerEntry(ledger_B);
         ledgerContractOwner_after = await stm.getLedgerEntry(accounts[0]);
+        for (let i = 0; i < originatorFeeData.length; i++)
+            originatorFeeData[i].ledgerAfter = await stm.getLedgerEntry(originatorFeeData[i].fee_to);
+        //console.log('originatorFeeData', originatorFeeData);
 
         // global totals: transferred after
         totalKg_tfd_after = await stm.getSecToken_totalTransfered.call();
@@ -140,11 +161,11 @@ module.exports = {
 
         // validate fees
         if (applyFees) {
+
             // validate ccy fee events & global totals
             const eventCcy_fees = []
             eventCcy_fees[ccyTypeId_A] = new BN(0);
             eventCcy_fees[ccyTypeId_B] = new BN(0);
-            //console.log(JSON.stringify(transferTx, null, 2));
             truffleAssert.eventEmitted(transferTx, 'TransferedLedgerCcy', ev => { 
                 if (ev.transferType != CONST.transferType.USER) { 
                     //console.dir(ev);
@@ -167,7 +188,7 @@ module.exports = {
             try {
                 truffleAssert.eventEmitted(transferTx, 'TransferedFullSecToken', ev => { 
                     if (ev.transferType != CONST.transferType.USER) {
-                        console.log(`    TransferedFullSecToken - ev.transferType=${ev.transferType}: ev.qty=${ev.qty}`);
+                        //console.log(`    TransferedFullSecToken - ev.transferType=${ev.transferType}: ev.qty=${ev.qty}`);
                         eventKg_fees = eventKg_fees.add(ev.qty); return true;
                     }
                 });
@@ -175,14 +196,14 @@ module.exports = {
             try {
                 truffleAssert.eventEmitted(transferTx, 'TransferedPartialSecToken', ev => { 
                     if (ev.transferType != CONST.transferType.USER) { 
-                        console.log(`TransferedPartialSecToken - ev.transferType=${ev.transferType}: ev.qty=${ev.qty}`);
+                        //console.log(`TransferedPartialSecToken - ev.transferType=${ev.transferType}: ev.qty=${ev.qty}`);
                         eventKg_fees = eventKg_fees.add(ev.qty); return true;
                     }
                 });
             } catch {}
-            console.log('totalKg_fees_before', totalKg_fees_before.toString());
-            console.log('       eventKg_fees', eventKg_fees.toString());
-            console.log(' totalKg_fees_after', totalKg_fees_after.toString());
+            // console.log('totalKg_fees_before', totalKg_fees_before.toString());
+            // console.log('       eventKg_fees', eventKg_fees.toString());
+            // console.log(' totalKg_fees_after', totalKg_fees_after.toString());
             assert(totalKg_fees_after.sub(totalKg_fees_before).eq(eventKg_fees), `unexpected global total carbon fees before/after vs. events`);
         }
 
@@ -218,7 +239,7 @@ module.exports = {
                 // main transfer events
                 (ccy_amount_A > 0 && ev.from == ledger_A && ev.to == ledger_B && ev.ccyTypeId == ccyTypeId_A && ev.amount.eq(new BN(ccy_amount_A)))
              || (ccy_amount_B > 0 && ev.from == ledger_B && ev.to == ledger_A && ev.ccyTypeId == ccyTypeId_B && ev.amount.eq(new BN(ccy_amount_B)))
-                // fee transfer events
+                // exchange fee transfer events
              || (ccy_amount_A > 0 && ev.from == ledger_A && ev.to == accounts[0] && ev.ccyTypeId == ccyTypeId_A)
              || (ccy_amount_B > 0 && ev.from == ledger_B && ev.to == accounts[0] && ev.ccyTypeId == ccyTypeId_B)
                 );
@@ -307,24 +328,38 @@ module.exports = {
             try { truffleAssert.eventEmitted(transferTx, 'TransferedPartialSecToken', ev => { eeuPartialEvents.push(ev); return true; }); }
             catch {}
 
-            // validate main (non-fee) EEU transfer event counts
+            // user token events (non-fees)
             if (qty_A > 0) {
-                assert(eeuFullEvents.filter(p => p.from == ledger_A /*&& p.to != accounts[0]*/ && p.transferType == CONST.transferType.USER).length > 0 ||
-                       eeuPartialEvents.filter(p => p.from == ledger_A /*&& p.to != accounts[0]*/ && p.transferType == CONST.transferType.USER).length == 1,
+                assert(eeuFullEvents.filter(p => p.from == ledger_A && p.transferType == CONST.transferType.USER).length > 0 ||
+                       eeuPartialEvents.filter(p => p.from == ledger_A && p.transferType == CONST.transferType.USER).length == 1,
                        'unexpected transfer full vs. partial event count after transfer for ledger A');
             }
             if (qty_B > 0) {
-                assert(eeuFullEvents.filter(p => p.from == ledger_B /*&& p.to != accounts[0]*/ && p.transferType == CONST.transferType.USER).length > 0 ||
-                       eeuPartialEvents.filter(p => p.from == ledger_B /*&& p.to != accounts[0]*/ && p.transferType == CONST.transferType.USER).length == 1,
+                assert(eeuFullEvents.filter(p => p.from == ledger_B && p.transferType == CONST.transferType.USER).length > 0 ||
+                       eeuPartialEvents.filter(p => p.from == ledger_B && p.transferType == CONST.transferType.USER).length == 1,
                        'unexpected transfer full vs. partial event count after transfer for ledger B');
             }
-            
             if ((qty_A > 0 && qty_B == 0) || (qty_B > 0 && qty_A == 0)) {
-                assert(eeuPartialEvents.length <= (!applyFees ? 1 : 2), 'unexpected transfer partial event count after single-sided eeu transfer');
+                assert(eeuPartialEvents.filter(p => p.transferType == CONST.transferType.USER).length <= (!applyFees ? 1 : 2), 'unexpected transfer partial event count after single-sided eeu transfer');
             }
             else {
-                assert(eeuPartialEvents.length <= (!applyFees ? 2 : 3), 'unexpected transfer partial event count after two-sided eeu transfer');
+                assert(eeuPartialEvents.filter(p => p.transferType == CONST.transferType.USER).length <= (!applyFees ? 2 : 3), 'unexpected transfer partial event count after two-sided eeu transfer');
             }
+
+            // originator token fee events
+            originatorFeeData.forEach(p => {
+                const minFeeEventsToOrigLedger = originatorFeeData.filter(p2 => p2.fee_to == p.fee_to).length;
+                if (p.fee_tok_A > 0) {
+                    assert(eeuFullEvents.filter(p => p.from == ledger_A && p.transferType == CONST.transferType.ORIG_FEE).length > 0 ||
+                           eeuPartialEvents.filter(p => p.from == ledger_A && p.transferType == CONST.transferType.ORIG_FEE).length == minFeeEventsToOrigLedger,
+                           'unexpected originator fee transfer full vs. partial event count after transfer for ledger A');
+                }
+                if (p.fee_tok_B > 0) {
+                    assert(eeuFullEvents.filter(p => p.from == ledger_B && p.transferType == CONST.transferType.ORIG_FEE).length > 0 ||
+                           eeuPartialEvents.filter(p => p.from == ledger_B && p.transferType == CONST.transferType.ORIG_FEE).length == minFeeEventsToOrigLedger,
+                           'unexpected originator fee transfer full vs. partial event count after transfer for ledger B');
+                }
+            });
             
             // validate that total tonnage across A, B and contract owner (fee receiver) is unchanged
             // console.log('            ledgerA_before.tokens_sumQty', ledgerA_before.tokens_sumQty);
@@ -336,10 +371,32 @@ module.exports = {
             // console.log(' ledgerContractOwner_after.tokens_sumQty', ledgerContractOwner_after.tokens_sumQty);
 
             // don't double count sender/receiver and master exchange account, if the exchange account is on one side of the transfer
-            assert(Number(ledgerA_before.tokens_sumQty) + Number(ledgerB_before.tokens_sumQty) + (contractOwnerIsTransfering ? 0 : Number(ledgerContractOwner_before.tokens_sumQty)) ==
-                   Number(ledgerA_after.tokens_sumQty)  + Number(ledgerB_after.tokens_sumQty)  + (contractOwnerIsTransfering ? 0 : Number(ledgerContractOwner_after.tokens_sumQty)),
-                  'unexpected total tonnage sum across ledger before vs. after');
+            assert(Number(ledgerA_before.tokens_sumQty) + 
+                   Number(ledgerB_before.tokens_sumQty) + 
+                   (contractOwnerIsTransfering ? 0 : Number(ledgerContractOwner_before.tokens_sumQty)) // exchange fee receiver before
+                   ==
+                   Number(ledgerA_after.tokens_sumQty)  + 
+                   Number(ledgerB_after.tokens_sumQty)  + 
+                   (contractOwnerIsTransfering ? 0 : Number(ledgerContractOwner_after.tokens_sumQty)) + // exchange fee receiver after
+                   originatorFeeData.map(p => p.fee_tok_A).reduce((a,b) => Number(a) + Number(b), Number(0)) + // originator fees paid by A
+                   originatorFeeData.map(p => p.fee_tok_B).reduce((a,b) => Number(a) + Number(b), Number(0))   // originator fees paid by B
+                   , 'unexpected total tonnage sum across ledger before vs. after');
         }
+
+        // validate originator fees are moved
+        originatorFeeData.forEach(p => {
+            const allOriginatorFeesPaidToLedger = 
+                Big(originatorFeeData.filter(p2 => p2.fee_to == p.fee_to).map(p2 => p2.fee_tok_A).reduce((a,b) => Big(a).plus(Big(b)), Big(0)))
+          .plus(Big(originatorFeeData.filter(p2 => p2.fee_to == p.fee_to).map(p2 => p2.fee_tok_B).reduce((a,b) => Big(a).plus(Big(b)), Big(0))))
+
+        //   console.log(' p.ledgerBefore.tokens_sumQty', p.ledgerBefore.tokens_sumQty.toString());
+        //   console.log('  p.ledgerAfter.tokens_sumQty', p.ledgerAfter.tokens_sumQty.toString());
+        //   console.log('allOriginatorFeesPaidToLedger', allOriginatorFeesPaidToLedger.toFixed());
+
+            // originator ledger after = ledger before + all originator fees paid to that ledger
+            assert(Big(p.ledgerAfter.tokens_sumQty.toString()).eq(Big(p.ledgerBefore.tokens_sumQty.toString()).plus(allOriginatorFeesPaidToLedger))
+                , `unexpected originator ${p.fee_to} token sum across ledger before vs. after`);
+        });
 
         // validate EEUs are moved        
         var totalKg_tfd_incFees = new BN(qty_A).add(new BN(qty_B));
@@ -382,8 +439,10 @@ module.exports = {
             // console.log('netKg_tfd', netKg_tfd);
             // console.log('eeuFee_A', eeuFee_A);
 
-            assert(ledgerA_after.tokens_sumQty == Number(ledgerA_before.tokens_sumQty) - netKg_tfd - ex_eeuFee_A, 'unexpected ledger A tonnage sum after transfer A -> B');
+            assert(ledgerA_after.tokens_sumQty == Number(ledgerA_before.tokens_sumQty) - netKg_tfd - ex_eeuFee_A - Number(originatorFees_tok_A.toFixed()), 'unexpected ledger A tonnage sum after transfer A -> B');
             assert(ledgerB_after.tokens_sumQty == Number(ledgerB_before.tokens_sumQty) + netKg_tfd, 'unexpected ledger B tonnage sum after transfer A -> B');
+
+            totalKg_tfd_incFees = totalKg_tfd_incFees.add(new BN(originatorFees_tok_A.toFixed()));
         }
         if (qty_B > 0) {
             var netKg_tfd = 0;
@@ -427,8 +486,10 @@ module.exports = {
             totalqty_AllSecSecTokenTypes_fees = totalqty_AllSecSecTokenTypes_fees.add(new BN(ex_eeuFee_B));
             netKg_tfd += qty_B; // transfered by B
             netKg_tfd -= qty_A; // received from A
-            assert(ledgerB_after.tokens_sumQty == Number(ledgerB_before.tokens_sumQty) - netKg_tfd - ex_eeuFee_B, 'unexpected ledger B tonnage sum after transfer B -> A');
+            assert(ledgerB_after.tokens_sumQty == Number(ledgerB_before.tokens_sumQty) - netKg_tfd - ex_eeuFee_B - Number(originatorFees_tok_B.toFixed()), 'unexpected ledger B tonnage sum after transfer B -> A');
             assert(ledgerA_after.tokens_sumQty == Number(ledgerA_before.tokens_sumQty) + netKg_tfd, 'unexpected ledger A tonnage sum after transfer B -> A');
+            
+            totalKg_tfd_incFees = totalKg_tfd_incFees.add(new BN(originatorFees_tok_B.toFixed()));
         }
 
         // validate carbon fee sum tonnage in contract owner
@@ -437,7 +498,7 @@ module.exports = {
         // console.log('       totalqty_AllSecSecTokenTypes_fees', totalqty_AllSecSecTokenTypes_fees);
         if (!contractOwnerIsTransfering) {
             assert(new BN(ledgerContractOwner_after.tokens_sumQty).sub(new BN(ledgerContractOwner_before.tokens_sumQty))
-                    .eq(totalqty_AllSecSecTokenTypes_fees), 'unexpected contract owner (fee receiver) tonnage after transfer');
+                    .eq(totalqty_AllSecSecTokenTypes_fees), 'unexpected contract owner (exchange fee receiver) tonnage after transfer');
         }
 
         // validate carbon global totals

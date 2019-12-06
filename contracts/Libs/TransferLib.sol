@@ -171,6 +171,7 @@ library TransferLib {
     function transfer_feePreview(
         StructLib.LedgerStruct storage ledgerData,
         StructLib.FeeStruct storage globalFees,
+        address feeAddrOwner,
         TransferLib.TransferArgs memory a
     )
     internal view
@@ -189,7 +190,7 @@ library TransferLib {
             fee_ccy_B: a.ledger_B != a.feeAddrOwner ? applyCapCollar(exFeeStruct_ccy_B.ccy, a.ccyTypeId_B, uint256(a.ccy_amount_B), calcFee(exFeeStruct_ccy_B.ccy, a.ccyTypeId_B, uint256(a.ccy_amount_B))) : 0,
             fee_tok_A: a.ledger_A != a.feeAddrOwner ? applyCapCollar(exFeeStruct_tok_A.tok, a.tokenTypeId_A, a.qty_A,               calcFee(exFeeStruct_tok_A.tok, a.tokenTypeId_A, a.qty_A)) : 0,
             fee_tok_B: a.ledger_B != a.feeAddrOwner ? applyCapCollar(exFeeStruct_tok_B.tok, a.tokenTypeId_B, a.qty_B,               calcFee(exFeeStruct_tok_B.tok, a.tokenTypeId_B, a.qty_B)) : 0,
-               fee_to: a.feeAddrOwner
+               fee_to: feeAddrOwner
         });
 
         // originator fee(s)

@@ -49,7 +49,7 @@ contract StMaster is StMintable, StBurnable, CcyFundable, CcyWithdrawable, StTra
     constructor() public {
         // set contract properties
         name = "SecTok_Master";
-        version = "0.5";
+        version = "0.6";
         unit = "KG";
 
         // params - token types
