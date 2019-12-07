@@ -31,10 +31,10 @@ contract("StMaster", accounts => {
         await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        B,                  { from: accounts[0] });
 
         // set global fee & ledger fee
-        await stm.setFee_TokType(CONST.tokenType.VCS, A,              allFees );
-        await stm.setFee_TokType(CONST.tokenType.VCS, CONST.nullAddr, allFees );
-        await stm.setFee_CcyType(CONST.ccyType.ETH,   A,              CONST.nullFees );
-        await stm.setFee_CcyType(CONST.ccyType.ETH,   CONST.nullAddr, CONST.nullFees );
+        await stm.setFee_TokType(CONST.tokenType.VCS, A,              allFees);
+        await stm.setFee_TokType(CONST.tokenType.VCS, CONST.nullAddr, allFees);
+        await stm.setFee_CcyType(CONST.ccyType.ETH,   A,              CONST.nullFees);
+        await stm.setFee_CcyType(CONST.ccyType.ETH,   CONST.nullAddr, CONST.nullFees);
 
         // transfer
         const transferAmountKg = new BN(1500);

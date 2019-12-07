@@ -6,14 +6,19 @@ const CONST = require('../const.js');
 
 module.exports = {
 
-    transferLedger: async ({ stm, accounts,
-        ledger_A,     ledger_B, 
-        qty_A,        tokenTypeId_A,
-        qty_B,        tokenTypeId_B,
-        ccy_amount_A, ccyTypeId_A,
-        ccy_amount_B, ccyTypeId_B,
-        applyFees,
-    }) => {
+    transferLedger: async (a) => {
+        const { stm, accounts,
+            ledger_A,     ledger_B, 
+            qty_A,        tokenTypeId_A,
+            qty_B,        tokenTypeId_B,
+            ccy_amount_A, ccyTypeId_A,
+            ccy_amount_B, ccyTypeId_B,
+            applyFees,
+        } = a;
+        // console.dir(a);
+        // console.log('ccyTypeId_A', ccyTypeId_A);
+        // console.log('ccyTypeId_B', ccyTypeId_B);
+
         // ledger entries before
         var ledgerA_before, ledgerA_after;
         var ledgerB_before, ledgerB_after;
@@ -32,12 +37,14 @@ module.exports = {
 
         // global totals: fees before
         var totalKg_fees_before, totalKg_fees_after;
-        const totalCcy_fees_before = [];
-        const totalCcy_fees_after = [];
+        const totalCcy_ExFees_before = [];
+        const totalCcy_ExFees_after = [];
         totalKg_fees_before = (await stm.getSecToken_totalExchangeFeesPaidQty.call())
                           .add(await stm.getSecToken_totalOriginatorFeesPaidQty.call());
-        totalCcy_fees_before[ccyTypeId_A] = await stm.getCcy_totalExchangeFeesPaid.call(ccyTypeId_A);
-        totalCcy_fees_before[ccyTypeId_B] = await stm.getCcy_totalExchangeFeesPaid.call(ccyTypeId_B);
+        totalCcy_ExFees_before[ccyTypeId_A] = await stm.getCcy_totalExchangeFeesPaid.call(ccyTypeId_A);
+        totalCcy_ExFees_before[ccyTypeId_B] = await stm.getCcy_totalExchangeFeesPaid.call(ccyTypeId_B);
+        // console.log(`ccyTypeId_A=${ccyTypeId_A} totalCcy_ExFees_before[ccyTypeId_A]=${totalCcy_ExFees_before[ccyTypeId_A]}`);
+        // console.log(`ccyTypeId_B=${ccyTypeId_B} totalCcy_ExFees_before[ccyTypeId_B]=${totalCcy_ExFees_before[ccyTypeId_B]}`);
 
         // expected net delta per currency, wrt. account A
         const deltaCcy_fromA = [];
@@ -104,8 +111,8 @@ module.exports = {
                    qty_B: qty_B.toString(),           tokenTypeId_B, 
             ccy_amount_A: ccy_amount_A.toString(),    ccyTypeId_A, 
             ccy_amount_B: ccy_amount_B.toString(),    ccyTypeId_B, 
-            applyFees,
-            feeAddrOwner: CONST.nullAddr,
+               applyFees,
+            feeAddrOwner: accounts[0], 
         });
         //console.log('feesPreview', feesPreview);
         const sumFees_tok_A = feesPreview.map(p => p.fee_tok_A).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
@@ -116,6 +123,10 @@ module.exports = {
         // console.log('sumFees_tok_B', sumFees_tok_B.toFixed());
         // console.log('sumFees_ccy_A', sumFees_ccy_A.toFixed());
         // console.log('sumFees_ccy_B', sumFees_ccy_B.toFixed());
+        const exchangeFee_tok_A = Big(feesPreview[0].fee_tok_A);
+        const exchangeFee_tok_B = Big(feesPreview[0].fee_tok_B);
+        const exchangeFee_ccy_A = Big(feesPreview[0].fee_ccy_A);
+        const exchangeFee_ccy_B = Big(feesPreview[0].fee_ccy_B);
         const originatorFees_tok_A = feesPreview.slice(1).map(p => p.fee_tok_A).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
         const originatorFees_tok_B = feesPreview.slice(1).map(p => p.fee_tok_B).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
         // console.log('originatorFees_tok_A', originatorFees_tok_A.toFixed());
@@ -156,8 +167,10 @@ module.exports = {
         // global totals: fees after
         totalKg_fees_after = (await stm.getSecToken_totalExchangeFeesPaidQty())
                          .add(await stm.getSecToken_totalOriginatorFeesPaidQty());
-        totalCcy_fees_after[ccyTypeId_A] = await stm.getCcy_totalExchangeFeesPaid.call(ccyTypeId_A);
-        totalCcy_fees_after[ccyTypeId_B] = await stm.getCcy_totalExchangeFeesPaid.call(ccyTypeId_B);
+        totalCcy_ExFees_after[ccyTypeId_A] = await stm.getCcy_totalExchangeFeesPaid.call(ccyTypeId_A);
+        totalCcy_ExFees_after[ccyTypeId_B] = await stm.getCcy_totalExchangeFeesPaid.call(ccyTypeId_B);
+        // console.log(`ccyTypeId_A=${ccyTypeId_A} totalCcy_ExFees_after[ccyTypeId_A]=${totalCcy_ExFees_after[ccyTypeId_A]}`);
+        // console.log(`ccyTypeId_B=${ccyTypeId_B} totalCcy_ExFees_after[ccyTypeId_B]=${totalCcy_ExFees_after[ccyTypeId_B]}`);
 
         // validate fees
         if (applyFees) {
@@ -180,8 +193,28 @@ module.exports = {
             //console.log('eventCcy_fees[ccyTypeId_B]', eventCcy_fees[ccyTypeId_B].toString());
             //console.log('totalCcy_fees_after[ccyTypeId_A]', totalCcy_fees_after[ccyTypeId_A].toString());
             //console.log('totalCcy_fees_after[ccyTypeId_B]', totalCcy_fees_after[ccyTypeId_B].toString());
-            assert(totalCcy_fees_after[ccyTypeId_A].sub(totalCcy_fees_before[ccyTypeId_A]).eq(eventCcy_fees[ccyTypeId_A]), `unexpected global total ccy fees before/after vs. events ccy type ${ccyTypeId_A}`);
-            assert(totalCcy_fees_after[ccyTypeId_B].sub(totalCcy_fees_before[ccyTypeId_B]).eq(eventCcy_fees[ccyTypeId_B]), `unexpected global total ccy fees before/after vs. events ccy type ${ccyTypeId_B}`);
+            assert(totalCcy_ExFees_after[ccyTypeId_A].sub(totalCcy_ExFees_before[ccyTypeId_A]).eq(eventCcy_fees[ccyTypeId_A]),
+                `unexpected global total ccy exchange fees before/after vs. events ccy type ${ccyTypeId_A}`);
+            assert(totalCcy_ExFees_after[ccyTypeId_B].sub(totalCcy_ExFees_before[ccyTypeId_B]).eq(eventCcy_fees[ccyTypeId_B]),
+                `unexpected global total ccy exchange fees before/after vs. events ccy type ${ccyTypeId_B}`);
+
+            // console.log('                  exchangeFee_ccy_A', exchangeFee_ccy_A.toFixed());
+            // console.log(' totalCcy_ExFees_after[ccyTypeId_A]', totalCcy_ExFees_after[ccyTypeId_A]);
+            // console.log('totalCcy_ExFees_before[ccyTypeId_A]', totalCcy_ExFees_before[ccyTypeId_A]);
+           
+            // console.log('                  exchangeFee_ccy_B', exchangeFee_ccy_B.toFixed());
+            // console.log(' totalCcy_ExFees_after[ccyTypeId_B]', totalCcy_ExFees_after[ccyTypeId_B]);
+            // console.log('totalCcy_ExFees_before[ccyTypeId_B]', totalCcy_ExFees_before[ccyTypeId_B]);
+
+            if (ccy_amount_A > 0 && applyFees) {
+                assert(exchangeFee_ccy_A.eq(Big(totalCcy_ExFees_after[ccyTypeId_A].sub(totalCcy_ExFees_before[ccyTypeId_A]))),
+                    'unexpected global total ccy exchange fees (delta) vs. fee preview expected (A)');
+            }
+
+            if (ccy_amount_B > 0 && applyFees) {
+                assert(exchangeFee_ccy_B.eq(Big(totalCcy_ExFees_after[ccyTypeId_B].sub(totalCcy_ExFees_before[ccyTypeId_B]))),
+                    'unexpected global total ccy exchange fees (delta) vs. fee preview expected (B)');
+            }
 
             // validate eeu fee events & global totals
             var eventKg_fees = new BN(0);
@@ -425,9 +458,7 @@ module.exports = {
                 if (Big(ex_eeuFee_A).lt(min) && min.gt(0)) ex_eeuFee_A = min.toFixed();
             }
             //console.log('ex_eeuFee_A', ex_eeuFee_A);
-
-            // batch fee -- TODO: need a getFees() fn. on the contract for this (n batch fees!)
-            //var orig_eeuFee_A = ...
+            assert(exchangeFee_tok_A.eq(Big(ex_eeuFee_A)), 'unexpected fee preview exchange token fee (A)');
 
             totalKg_tfd_incFees = totalKg_tfd_incFees.add(new BN(ex_eeuFee_A));
             totalqty_AllSecSecTokenTypes_fees = totalqty_AllSecSecTokenTypes_fees.add(new BN(ex_eeuFee_A));
@@ -481,6 +512,7 @@ module.exports = {
                 if (Big(ex_eeuFee_B).lt(min) && min.gt(0)) ex_eeuFee_B = min.toFixed();                     
             }        
             //console.log('ex_eeuFee_B', ex_eeuFee_B);
+            assert(exchangeFee_tok_B.eq(Big(ex_eeuFee_B)), 'unexpected fee preview exchange token fee (B)');
 
             totalKg_tfd_incFees = totalKg_tfd_incFees.add(new BN(ex_eeuFee_B));
             totalqty_AllSecSecTokenTypes_fees = totalqty_AllSecSecTokenTypes_fees.add(new BN(ex_eeuFee_B));
@@ -510,6 +542,9 @@ module.exports = {
             ledgerA_before,             ledgerA_after,  
             ledgerB_before,             ledgerB_after,
             ledgerContractOwner_before, ledgerContractOwner_after,
+            originatorFees_tok_A,       originatorFees_tok_B,
+            exchangeFee_tok_A,          exchangeFee_tok_B,
+            exchangeFee_ccy_A,          exchangeFee_ccy_B,
         };
     },
 
