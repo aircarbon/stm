@@ -73,21 +73,30 @@ contract("StMaster", accounts => {
     it('minting - should not allow non-owner to mint vEEU batches', async () => {
         try {
             await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.tonCarbon, 1, accounts[global.accountNdx], CONST.nullFees, [], [], { from: accounts[1], });
-        } catch (ex) { return; }
+        } catch (ex) { 
+            assert(ex.reason == 'Restricted', `unexpected: ${ex.reason}`);
+            return;
+        }
         assert.fail('expected contract exception');
     });
 
     it('minting - should not allow non-existent vEEU-type to be minted', async () => {
         try {
             await stm.mintSecTokenBatch(999, CONST.tonCarbon, 1, accounts[global.accountNdx], CONST.nullFees, [], [], { from: accounts[0] });
-        } catch (ex) { return; }
+        } catch (ex) { 
+            assert(ex.reason == 'Bad tokenTypeId', `unexpected: ${ex.reason}`);
+            return;
+        }
         assert.fail('expected contract exception');
     });
 
     it('minting - should not allow multi-vEEU minting', async () => {
         try {
             await mintBatch({ tokenType: CONST.tokenType.UNFCCC, qtyUnit: CONST.tonCarbon, qtySecTokens: 2, receiver: accounts[global.accountNdx], }, { from: accounts[0] } );
-        } catch (ex) { return; }
+        } catch (ex) { 
+            assert(ex.reason == 'Set mintSecTokenCount 1', `unexpected: ${ex.reason}`);
+            return;
+        }
         assert.fail('expected contract exception');
     });    
 
@@ -101,21 +110,30 @@ contract("StMaster", accounts => {
     it('minting - should not allow too small a tonnage', async () => {
         try {
             await mintBatch( { tokenType: CONST.tokenType.UNFCCC, qtyUnit: 0, qtySecTokens: 1, receiver: accounts[global.accountNdx] }, { from: accounts[0] } );
-        } catch (ex) { return; }
+        } catch (ex) { 
+            assert(ex.reason == 'Min. mintQty 1', `unexpected: ${ex.reason}`);
+            return;
+        }
         assert.fail('expected contract exception');
     });
 
     it('minting - should not allow invalid tonnage', async () => {
         try {
             await mintBatch( { tokenType: CONST.tokenType.UNFCCC, qtyUnit: -1, qtySecTokens: 1, receiver: accounts[global.accountNdx] }, { from: accounts[0] } );
-        } catch (ex) { return; }
+        } catch (ex) { 
+            assert(ex.reason == 'Min. mintQty 1', `unexpected: ${ex.reason}`);
+            return;
+        }
         assert.fail('expected contract exception');
     });
 
     it('minting - should not allow invalid vEEU quantities (1)', async () => {
         try {
             await mintBatch({ tokenType: CONST.tokenType.UNFCCC, qtyUnit: CONST.tonCarbon, qtySecTokens: 0, receiver: accounts[global.accountNdx], }, { from: accounts[0] });
-        } catch (ex) { return; }
+        } catch (ex) { 
+            assert(ex.reason == 'Set mintSecTokenCount 1', `unexpected: ${ex.reason}`);
+            return;
+        }
         assert.fail('expected contract exception');
     });
 
@@ -123,6 +141,7 @@ contract("StMaster", accounts => {
         try {
             await mintBatch({ tokenType: CONST.tokenType.UNFCCC, qtyUnit: CONST.tonCarbon, qtySecTokens: -1, receiver: accounts[global.accountNdx], }, { from: accounts[0] });
         } catch (ex) {
+            assert(ex.reason == 'Set mintSecTokenCount 1', `unexpected: ${ex.reason}`);
             return;
         }
         assert.fail('expected contract exception');
@@ -133,6 +152,7 @@ contract("StMaster", accounts => {
             await stm.setReadOnly(true, { from: accounts[0] });
             await mintBatch({ tokenType: CONST.tokenType.UNFCCC, qtyUnit: CONST.tonCarbon, qtySecTokens: 1, receiver: accounts[global.accountNdx], }, { from: accounts[0] });
         } catch (ex) {
+            assert(ex.reason == 'Read-only', `unexpected: ${ex.reason}`);
             await stm.setReadOnly(false, { from: accounts[0] });
             return;
         }

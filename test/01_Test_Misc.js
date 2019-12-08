@@ -27,6 +27,7 @@ contract("StMaster", accounts => {
         try {
             await stm.setReadOnly(true, { from: accounts[1] });
         } catch (ex) {
+            assert(ex.reason == 'Restricted', `unexpected: ${ex.reason}`);
             return;
         }
         assert.fail('expected contract exception');

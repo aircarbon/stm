@@ -188,7 +188,10 @@ contract("StMaster", accounts => {
         try {
             const testKey = 'TEST_NEW_KEY', testValue = 'TEST_NEW_VALUE';
             const addKvpTx = await stm.addMetaSecTokenBatch(batchId, 'testKey', testValue, {from: accounts[1] });
-        } catch (ex) { return; }
+        } catch (ex) { 
+            assert(ex.reason == 'Restricted', `unexpected: ${ex.reason}`);
+            return;
+        }
         assert.fail('expected contract exception');
     });
 
@@ -204,7 +207,10 @@ contract("StMaster", accounts => {
         const testKey = unfccc_ExampleKvps[0].k, testValue = unfccc_ExampleKvps[0].v;
         try {
             await stm.addMetaSecTokenBatch(batchId, testKey, testValue);
-        } catch (ex) { return; }
+        } catch (ex) {
+            assert(ex.reason == 'Duplicate key', `unexpected: ${ex.reason}`);
+            return;
+        }
         assert.fail('expected contract exception');
     });
 
