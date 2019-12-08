@@ -188,7 +188,7 @@ contract("StMaster", accounts => {
                        qty_B: 750,                                                 tokenTypeId_B: CONST.tokenType.VCS,
                 ccy_amount_A: transferAmountCcy,                                     ccyTypeId_A: CONST.ccyType.ETH,
                 ccy_amount_B: 0,                                                     ccyTypeId_B: 0,
-                applyFees: true,
+                   applyFees: true,
             });
         }
         catch (ex) { 

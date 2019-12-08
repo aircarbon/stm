@@ -24,7 +24,7 @@ contract("StMaster", accounts => {
         const A = accounts[global.accountNdx + 0];
         const B = accounts[global.accountNdx + 1];
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      A, CONST.nullFees, [], [], { from: accounts[0] });
-        await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        B,         { from: accounts[0] });
+        await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        B,                         { from: accounts[0] });
 
         // set global fee structure (zero)
         await stm.setFee_TokType(CONST.tokenType.VCS, CONST.nullAddr, { fee_fixed: 0, fee_percBips: 0, fee_min: 0, fee_max: 0 } );
@@ -72,7 +72,7 @@ contract("StMaster", accounts => {
         const A = accounts[global.accountNdx + 0];
         const B = accounts[global.accountNdx + 1];
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      A, CONST.nullFees, [], [], { from: accounts[0] });
-        await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        B,         { from: accounts[0] });
+        await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        B,                         { from: accounts[0] });
 
         // set global fee structure (non-zero)
         const globalFeeBps = 100, globalFeeFix = 1, globalFeeCap = 5;
@@ -177,7 +177,7 @@ contract("StMaster", accounts => {
         const A = accounts[global.accountNdx + 0];
         const B = accounts[global.accountNdx + 1];
 
-        await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        A,         { from: accounts[0] });
+        await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        A,                         { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.gtCarbon, 1,       B, CONST.nullFees, [], [], { from: accounts[0] });
 
         // set global fee structure (non-zero)
@@ -235,7 +235,7 @@ contract("StMaster", accounts => {
     it('trading fees (ledger) - apply ETH ccy override fee 2500 BP + 0.01 ETH fixed (collar 0.2 ETH), on a small trade (fee on A)', async () => {
         const A = accounts[global.accountNdx + 0];
         const B = accounts[global.accountNdx + 1];
-        await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        A,         { from: accounts[0] });
+        await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        A,                         { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      B, CONST.nullFees, [], [], { from: accounts[0] });
 
         // set global fee structure (zero)
@@ -283,7 +283,7 @@ contract("StMaster", accounts => {
     it('trading fees (ledger) - apply then clear ETH ccy override fee 2500 BP + 0.01 ETH fixed (collar 0.2 ETH), on a small trade (fee on A)', async () => {
         const A = accounts[global.accountNdx + 0];
         const B = accounts[global.accountNdx + 1];
-        await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        A,         { from: accounts[0] });
+        await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        A,                         { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      B, CONST.nullFees, [], [], { from: accounts[0] });
 
         // set global fee structure (non-zero)
@@ -340,7 +340,7 @@ contract("StMaster", accounts => {
         const B = accounts[global.accountNdx + 1];
 
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      A, CONST.nullFees, [], [], { from: accounts[0] });
-        await stm.fund(CONST.ccyType.ETH,                   CONST.millionEth_wei,    B,         { from: accounts[0] });
+        await stm.fund(CONST.ccyType.ETH,                   CONST.millionEth_wei,    B,                         { from: accounts[0] });
 
         // set global fee structure (zero)
         await stm.setFee_CcyType(CONST.ccyType.ETH, CONST.nullAddr,   { fee_fixed: 0, fee_percBips: 0, fee_min: 0, fee_max: 0 } );
@@ -390,7 +390,7 @@ contract("StMaster", accounts => {
         const B = accounts[global.accountNdx + 1];
 
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      A, CONST.nullFees, [], [], { from: accounts[0] });
-        await stm.fund(CONST.ccyType.ETH,                   CONST.millionEth_wei,    B,         { from: accounts[0] });
+        await stm.fund(CONST.ccyType.ETH,                   CONST.millionEth_wei,    B,                         { from: accounts[0] });
 
         // set global fee structure (non-zero)
         const globalFeeBps = 100, globalFeeFix = 100, globalFeeMax = 100;
@@ -450,7 +450,7 @@ contract("StMaster", accounts => {
 
         // 102,999,999 tons
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      A, CONST.nullFees, [], [], { from: accounts[0] });
-        await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        B,         { from: accounts[0] });
+        await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        B,                         { from: accounts[0] });
 
         // set ledger fee structure VCS (A): 10% + 50kg, max 50kg
         const ledgerFeeBps = 1000;
@@ -508,7 +508,7 @@ contract("StMaster", accounts => {
 
         // 102,999,999 tons
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      A, CONST.nullFees, [], [], { from: accounts[0] });
-        await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        B,         { from: accounts[0] });
+        await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        B,                         { from: accounts[0] });
 
         // set global fee structure VCS (A)
         const globalFeeFix = 0;
@@ -564,7 +564,7 @@ contract("StMaster", accounts => {
         const A = accounts[global.accountNdx + 0];
         const B = accounts[global.accountNdx + 1];
 
-        await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        A,         { from: accounts[0] });
+        await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        A,                         { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      B, CONST.nullFees, [], [], { from: accounts[0] });
 
         // set fee structure VCS (B): 1% + 1kg, min 101kg
@@ -572,6 +572,7 @@ contract("StMaster", accounts => {
         const feeFix = 1;
         const feeMin = 101;
         await stm.setFee_TokType(CONST.tokenType.VCS, B, { fee_fixed: feeFix, fee_percBips: feeBps, fee_min: feeMin, fee_max: 0 } );
+        await stm.setFee_CcyType(CONST.ccyType.ETH,   A, CONST.nullFees);
 
         try {
             const transferAmountKg = new BN(900);
@@ -584,7 +585,10 @@ contract("StMaster", accounts => {
                applyFees: true,
             });
         }
-        catch (ex) { return; }
+        catch (ex) {
+            assert(ex.reason == 'Insufficient tokens held by ledger owner B', `unexpected: ${ex.reason}`);
+            return;
+        }
         assert.fail('expected contract exception');
     });
 
@@ -593,13 +597,14 @@ contract("StMaster", accounts => {
         const B = accounts[global.accountNdx + 1];
 
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      A, CONST.nullFees, [], [], { from: accounts[0] });
-        await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        B,         { from: accounts[0] });
+        await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        B,                         { from: accounts[0] });
 
         // set fee structure VCS (A): 1% + 1kg, min 101kg
         const feeBps = 100; 
         const feeFix = 1;
         const feeMin = 101;
         await stm.setFee_TokType(CONST.tokenType.VCS, A, { fee_fixed: feeFix, fee_percBips: feeBps, fee_min: feeMin, fee_max: 0 } );
+        await stm.setFee_CcyType(CONST.ccyType.ETH,   B, CONST.nullFees);
 
         try {
             const transferAmountKg = new BN(900);
@@ -612,7 +617,10 @@ contract("StMaster", accounts => {
                applyFees: true,
             });
         }
-        catch (ex) { return; }
+        catch (ex) { 
+            assert(ex.reason == 'Insufficient tokens held by ledger owner A', `unexpected: ${ex.reason}`);
+            return;
+        }
         assert.fail('expected contract exception');
     });
 });
