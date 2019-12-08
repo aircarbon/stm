@@ -64,7 +64,7 @@ contract("StMaster", accounts => {
         try {
             await stm.addSecTokenType('NEW_TYPE_NAME_3', { from: accounts[1] });
         } catch (ex) { 
-            assert(ex.reason == 'Restricted method', `unexpected: ${ex.reason}`);
+            assert(ex.reason == 'Restricted', `unexpected: ${ex.reason}`);
             return; 
         }
         assert.fail('expected contract exception');
@@ -75,7 +75,7 @@ contract("StMaster", accounts => {
             const types = (await stm.getSecTokenTypes()).tokenTypes;
             await stm.addSecTokenType(types[0].name, { from: accounts[0] });
         } catch (ex) { 
-            assert(ex.reason == 'ST type name already exists', `unexpected: ${ex.reason}`);
+            assert(ex.reason == 'Duplicate name', `unexpected: ${ex.reason}`);
             return; 
         }
         assert.fail('expected contract exception');
@@ -86,7 +86,7 @@ contract("StMaster", accounts => {
             await stm.setReadOnly(true, { from: accounts[0] });
             await stm.addSecTokenType('NEW_TYPE_NAME_4', { from: accounts[0] });
         } catch (ex) { 
-            assert(ex.reason == 'Contract is read only', `unexpected: ${ex.reason}`);
+            assert(ex.reason == 'Read-only', `unexpected: ${ex.reason}`);
             await stm.setReadOnly(false, { from: accounts[0] });
             return;
         }

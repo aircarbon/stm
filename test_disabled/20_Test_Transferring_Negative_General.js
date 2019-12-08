@@ -17,7 +17,7 @@ contract("StMaster", accounts => {
         try {
             await helper.transferWrapper(stm, accounts, accounts[global.accountNdx + 0], accounts[global.accountNdx + 1], 0, 0, 0, 0, 0, 0, 0, 0, false, { from: accounts[1] });
         } catch (ex) { 
-            assert(ex.reason == 'Restricted method', `unexpected: ${ex.reason}`);
+            assert(ex.reason == 'Restricted', `unexpected: ${ex.reason}`);
             return;
         }
         assert.fail('expected contract exception');
@@ -29,7 +29,7 @@ contract("StMaster", accounts => {
         try {
             await helper.transferWrapper(stm, accounts, accounts[global.accountNdx + 0], accounts[global.accountNdx + 1], 0, 0, 0, 0, 0, 0, 0, 0, false, { from: accounts[0] });
         } catch (ex) {
-            assert(ex.reason == 'Invalid null transfer', `unexpected: ${ex.reason}`);
+            assert(ex.reason == 'Bad null transfer', `unexpected: ${ex.reason}`);
             return;
         }
         assert.fail('expected contract exception');
@@ -47,7 +47,7 @@ contract("StMaster", accounts => {
                 false,
                 { from: accounts[0] });
         } catch (ex) { 
-            assert(ex.reason == 'Invalid ledger owner B', `unexpected: ${ex.reason}`);
+            assert(ex.reason == 'Bad ledger_B', `unexpected: ${ex.reason}`);
             return; 
         }
         assert.fail('expected contract exception');
@@ -65,7 +65,7 @@ contract("StMaster", accounts => {
                 false,                       // applyFees
                 { from: accounts[0] });
         } catch (ex) {  
-            assert(ex.reason == 'Invalid ledger owner A', `unexpected: ${ex.reason}`);
+            assert(ex.reason == 'Bad ledger_A', `unexpected: ${ex.reason}`);
             return;
         }
         assert.fail('expected contract exception');
@@ -89,7 +89,7 @@ contract("StMaster", accounts => {
                 false,
                 { from: accounts[0] });
         } catch (ex) { 
-            assert(ex.reason == 'Same origin multiple asset transfer disallowed', `unexpected: ${ex.reason}`);
+            assert(ex.reason == 'Bad transfer types', `unexpected: ${ex.reason}`);
             return;
         }
         assert.fail('expected contract exception');
@@ -113,7 +113,7 @@ contract("StMaster", accounts => {
                 false,                       // applyFees
                 { from: accounts[0] });
         } catch (ex) { 
-            assert(ex.reason == 'Same origin multiple asset transfer disallowed', `unexpected: ${ex.reason}`);
+            assert(ex.reason == 'Bad transfer types', `unexpected: ${ex.reason}`);
             return;
         }
         assert.fail('expected contract exception');
@@ -137,7 +137,7 @@ contract("StMaster", accounts => {
                 false,                       // applyFees
                 { from: accounts[0] });
         } catch (ex) { 
-            assert(ex.reason == 'Same origin multiple asset transfer disallowed', `unexpected: ${ex.reason}`);
+            assert(ex.reason == 'Bad transfer types', `unexpected: ${ex.reason}`);
             return; 
         }
         assert.fail('expected contract exception');
@@ -156,7 +156,7 @@ contract("StMaster", accounts => {
                 false,                       // applyFees
                 { from: accounts[0] });
         } catch (ex) { 
-            assert(ex.reason == 'Self transfer disallowed', `unexpected: ${ex.reason}`);
+            assert(ex.reason == 'Bad transfer', `unexpected: ${ex.reason}`);
             return; 
         }
         assert.fail('expected contract exception');
@@ -177,7 +177,7 @@ contract("StMaster", accounts => {
                 { from: accounts[0] });
         } catch (ex) { 
             await stm.setReadOnly(false, { from: accounts[0] });
-            assert(ex.reason == 'Contract is read only', `unexpected: ${ex.reason}`);
+            assert(ex.reason == 'Read-only', `unexpected: ${ex.reason}`);
             return;
         }
         await stm.setReadOnly(false, { from: accounts[0] });
@@ -197,7 +197,7 @@ contract("StMaster", accounts => {
                 false,                       // applyFees
                 { from: accounts[0] });
         } catch (ex) { 
-            assert(ex.reason == 'Invalid currency type A', `unexpected: ${ex.reason}`);
+            assert(ex.reason == 'Bad ccyTypeId A', `unexpected: ${ex.reason}`);
             return; 
         }
         assert.fail('expected contract exception');
@@ -216,7 +216,7 @@ contract("StMaster", accounts => {
                 false,                       // applyFees
                 { from: accounts[0] });
         } catch (ex) { 
-            assert(ex.reason == 'Invalid currency type B', `unexpected: ${ex.reason}`);
+            assert(ex.reason == 'Bad ccyTypeId B', `unexpected: ${ex.reason}`);
             return; 
         }
         assert.fail('expected contract exception');
@@ -235,7 +235,7 @@ contract("StMaster", accounts => {
                 false,                       // applyFees
                 { from: accounts[0] });
         } catch (ex) { 
-            assert(ex.reason == 'Invalid token type A', `unexpected: ${ex.reason}`);
+            assert(ex.reason == 'Bad tokenTypeId_A', `unexpected: ${ex.reason}`);
             return; 
         }
         assert.fail('expected contract exception');
@@ -254,7 +254,7 @@ contract("StMaster", accounts => {
                 false,                       // applyFees
                 { from: accounts[0] });
         } catch (ex) { 
-            assert(ex.reason == 'Invalid token type B', `unexpected: ${ex.reason}`);
+            assert(ex.reason == 'Bad tokenTypeId_B', `unexpected: ${ex.reason}`);
             return; 
         }
         assert.fail('expected contract exception');

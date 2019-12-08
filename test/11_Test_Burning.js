@@ -193,7 +193,7 @@ contract("StMaster", accounts => {
         const burnKg = CONST.ktCarbon * 3;
         const expectRemainKg = CONST.ktCarbon * 6 - burnKg;
         const burnTx = await stm.burnTokens(accounts[global.accountNdx], CONST.tokenType.VCS, burnKg);
-        console.log(`gasUsed - Burn 5.0 vEEU: ${burnTx.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * burnTx.receipt.gasUsed).toFixed(4)} (USD ${((CONST.gasPriceEth * burnTx.receipt.gasUsed).toFixed(4) * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
+        console.log(`\t>>> gasUsed - Burn 5.0 vEEU: ${burnTx.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * burnTx.receipt.gasUsed).toFixed(4)} (USD ${((CONST.gasPriceEth * burnTx.receipt.gasUsed).toFixed(4) * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
 
         // validate burn full EEU event
         const burnedFullSecTokenEvents = []
@@ -233,7 +233,10 @@ contract("StMaster", accounts => {
         const a0_le = await stm.getLedgerEntry(accounts[global.accountNdx]);
         try {
             await stm.burnTokens(accounts[global.accountNdx], CONST.tokenType.UNFCCC, CONST.ktCarbon, { from: accounts[1], });
-        } catch (ex) { return; }
+        } catch (ex) { 
+            assert(ex.reason == 'Restricted', `unexpected: ${ex.reason}`);
+            return;
+        }
         assert.fail('expected contract exception');
     });
 
@@ -243,7 +246,10 @@ contract("StMaster", accounts => {
         assert(a9_le.exists == false, 'expected non-existent ledger entry');
         try {
             await stm.burnTokens(accounts[9], CONST.tokenType.UNFCCC, CONST.ktCarbon);
-        } catch (ex) { return; }
+        } catch (ex) { 
+            assert(ex.reason == 'Bad ledgerOwner', `unexpected: ${ex.reason}`);
+            return;
+        }
         assert(false, 'expected contract exception');
     });
 
@@ -252,7 +258,10 @@ contract("StMaster", accounts => {
         const a0_le = await stm.getLedgerEntry(accounts[global.accountNdx]);
         try {
             await stm.burnTokens(accounts[global.accountNdx], CONST.tokenType.UNFCCC, 0);
-        } catch (ex) { return; }
+        } catch (ex) { 
+            assert(ex.reason == 'Min. burnQty 1', `unexpected: ${ex.reason}`);
+            return;
+        }
         assert(false, 'expected contract exception');
     });
 
@@ -260,7 +269,10 @@ contract("StMaster", accounts => {
         await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.ktCarbon, 1, accounts[global.accountNdx], CONST.nullFees, [], [], { from: accounts[0], });
         try {
             await stm.burnTokens(accounts[global.accountNdx], CONST.tokenType.UNFCCC, -1);
-        } catch (ex) { return; }
+        } catch (ex) { 
+            assert(ex.reason == 'Min. burnQty 1', `unexpected: ${ex.reason}`);
+            return;
+        }
         assert.fail('expected contract exception');
     });
 
@@ -268,7 +280,10 @@ contract("StMaster", accounts => {
         await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.ktCarbon, 1, accounts[global.accountNdx], CONST.nullFees, [], [], { from: accounts[0], });
         try {
             await stm.burnTokens(accounts[global.accountNdx], CONST.tokenType.VCS, CONST.ktCarbon);
-        } catch (ex) { return; }
+        } catch (ex) { 
+            assert(ex.reason == 'Insufficient tokens', `unexpected: ${ex.reason}`);
+            return;
+        }
         assert(false, 'expected contract exception');
     });
 
@@ -278,7 +293,10 @@ contract("StMaster", accounts => {
         var ledger = await stm.getLedgerEntry(accounts[global.accountNdx]);
         try {
             await stm.burnTokens(accounts[global.accountNdx], CONST.tokenType.UNFCCC, CONST.ktCarbon);
-        } catch (ex) { return; }
+        } catch (ex) { 
+            assert(ex.reason == 'Insufficient tokens', `unexpected: ${ex.reason}`);
+            return;
+        }
         assert(false, 'expected contract exception');
     });
 
@@ -289,6 +307,7 @@ contract("StMaster", accounts => {
             await stm.setReadOnly(true, { from: accounts[0] });
             await stm.burnTokens(accounts[global.accountNdx], CONST.tokenType.UNFCCC, CONST.ktCarbon, { from: accounts[0], });
         } catch (ex) { 
+            assert(ex.reason == 'Read-only', `unexpected: ${ex.reason}`);
             await stm.setReadOnly(false, { from: accounts[0] });
             return;
         }

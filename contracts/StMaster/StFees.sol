@@ -12,11 +12,9 @@ contract StFees is Owned, StLedger {
     //       i.e. transfer amounts are not inclusive of fees, they are additional
 
     //
-    // TODO: origFees
+    // TODO: de-dupe read-only & owner-only modifiers
     //
-    // TODO: make ccy types & st types 1-based (so can pass zero with more meaning into transfer() + can do better validation in transfer() [ccy_amount vs. type id])
-    // TODO: specific tests for type 0 (invalid) transfers
-    //
+    // origFees
     // TODO: tests - fee-receiver==fee-sender; more tests for accounts other than accounts[0]
     //
     //  > origFees - TESTS:
@@ -64,9 +62,8 @@ contract StFees is Owned, StLedger {
      * @param ledgerOwner The ledger address for which to set fee structure, or 0x0 to set global fee structure
      * @param feeArgs The fee structure to assign to the supplied leder entry address, or to the global fee structure
      */
-    function setFee_TokType(uint256 tokenTypeId, address ledgerOwner, StructLib.SetFeeArgs memory feeArgs) public {
-        require(msg.sender == owner, "Restricted method");
-        require(_readOnly == false, "Contract is read only");
+    function setFee_TokType(uint256 tokenTypeId, address ledgerOwner, StructLib.SetFeeArgs memory feeArgs)
+    public onlyOwner() onlyWhenReadWrite() {
         FeeLib.setFee_TokType(ledgerData, stTypesData, globalFees, tokenTypeId, ledgerOwner, feeArgs);
     }
 
@@ -76,33 +73,32 @@ contract StFees is Owned, StLedger {
      * @param ledgerOwner The ledger address for which to set fee structure, or 0x0 to set global fee structure
      * @param feeArgs The fee structure to assign to the supplied leder entry address, or to the global fee structure
      */
-    function setFee_CcyType(uint256 ccyTypeId, address ledgerOwner, StructLib.SetFeeArgs memory feeArgs) public {
-        require(msg.sender == owner, "Restricted method");
-        require(_readOnly == false, "Contract is read only");
+    function setFee_CcyType(uint256 ccyTypeId, address ledgerOwner, StructLib.SetFeeArgs memory feeArgs)
+    public onlyOwner() onlyWhenReadWrite() {
         FeeLib.setFee_CcyType(ledgerData, ccyTypesData, globalFees, ccyTypeId, ledgerOwner, feeArgs);
     }
 
     /**
      * @dev Returns the global total quantity of token exchange fees paid, in the contract base unit
      */
-    function getSecToken_totalExchangeFeesPaidQty() external view returns (uint256) {
-        require(msg.sender == owner, "Restricted method");
+    function getSecToken_totalExchangeFeesPaidQty()
+    external view onlyOwner() returns (uint256) {
         return ledgerData._tokens_totalExchangeFeesPaidQty;
     }
 
     /**
      * @dev Returns the global total quantity of token originator fees paid, in the contract base unit
      */
-    function getSecToken_totalOriginatorFeesPaidQty() external view returns (uint256) {
-        require(msg.sender == owner, "Restricted method");
+    function getSecToken_totalOriginatorFeesPaidQty()
+    external view onlyOwner() returns (uint256) {
         return ledgerData._tokens_totalOriginatorFeesPaidQty;
     }
 
     /**
      * @dev Returns the global total amount of currency exchange fees paid, for the supplied currency
      */
-    function getCcy_totalExchangeFeesPaid(uint256 ccyTypeId) external view returns (uint256) {
-        require(msg.sender == owner, "Restricted method");
+    function getCcy_totalExchangeFeesPaid(uint256 ccyTypeId)
+    external view onlyOwner() returns (uint256) {
         return ledgerData._ccyType_totalFeesPaid[ccyTypeId];
     }
 }

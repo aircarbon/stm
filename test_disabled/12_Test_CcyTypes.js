@@ -61,7 +61,7 @@ contract("StMaster", accounts => {
         try {
             await stm.addCcyType('NEW_TYPE_ID_3', 'test_unit', { from: accounts[1] });
         } catch (ex) { 
-            assert(ex.reason == 'Restricted method', `unexpected: ${ex.reason}`);
+            assert(ex.reason == 'Restricted', `unexpected: ${ex.reason}`);
             return;
         }
         assert.fail('expected contract exception');
@@ -82,7 +82,7 @@ contract("StMaster", accounts => {
             await stm.setReadOnly(true, { from: accounts[0] }); 
             await stm.addCcyType('NEW_TYPE_ID_4', 'test_unit', { from: accounts[0] });
         } catch (ex) { 
-            assert(ex.reason == 'Contract is read only', `unexpected: ${ex.reason}`);
+            assert(ex.reason == 'Read-only', `unexpected: ${ex.reason}`);
             await stm.setReadOnly(false, { from: accounts[0] });
             return;
         }

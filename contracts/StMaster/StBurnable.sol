@@ -19,24 +19,23 @@ contract StBurnable is Owned, StLedger {
      * @param tokenTypeId ST type to burn
      * @param burnQty Quantity of contact base token units to burn
      */
-    function burnTokens(address ledgerOwner, uint256 tokenTypeId, int256 burnQty) public {
-        require(msg.sender == owner, "Restricted method");
-        require(_readOnly == false, "Contract is read only");
+    function burnTokens(address ledgerOwner, uint256 tokenTypeId, int256 burnQty)
+    public onlyOwner() onlyWhenReadWrite() {
 
         TokenLib.burnTokens(ledgerData, stTypesData, ledgerOwner, tokenTypeId, burnQty);
 
-        // require(ledgerData._ledger[ledgerOwner].exists == true, "Invalid ledger owner");
-        // require(burnQty >= 1, "Minimum burnQty one unit");
-        // require(tokenTypeId >= 1 && tokenTypeId <= stTypesData._count_tokenTypes, "Invalid ST type");
+        // require(ledgerData._ledger[ledgerOwner].exists == true, "Bad ledgerOwner");
+        // require(burnQty >= 1, "Min. burnQty 1");
+        // require(tokenTypeId >= 1 && tokenTypeId <= stTypesData._count_tokenTypes, "Bad tokenTypeId");
 
         // // check ledger owner has sufficient carbon tonnage of supplied type
-        // require(StructLib.sufficientTokens(ledgerData, ledgerOwner, tokenTypeId, uint256(burnQty), 0) == true, "Insufficient carbon held by ledger owner");
+        // require(StructLib.sufficientTokens(ledgerData, ledgerOwner, tokenTypeId, uint256(burnQty), 0) == true, "Insufficient tokens");
         // // uint256 kgAvailable = 0;
         // // for (uint i = 0; i < ledgerData._ledger[ledgerOwner].tokenType_stIds[tokenTypeId].length; i++) {
         // //     kgAvailable += ledgerData._sts_currentQty[ledgerData._ledger[ledgerOwner].tokenType_stIds[tokenTypeId][i]];
         // // }
-        // // require(kgAvailable >= uint256(burnQty), "Insufficient carbon held by ledger owner");
-        // //require(ledgerData._ledger[ledgerOwner].tokenType_sumQty[tokenTypeId] >= uint256(burnQty), "Insufficient carbon held by ledger owner");
+        // // require(kgAvailable >= uint256(burnQty), "Insufficient tokens");
+        // //require(ledgerData._ledger[ledgerOwner].tokenType_sumQty[tokenTypeId] >= uint256(burnQty), "Insufficient tokens");
 
         // // burn (i.e. delete or resize) sufficient ST(s)
         // uint256 ndx = 0;
@@ -81,8 +80,8 @@ contract StBurnable is Owned, StLedger {
     /**
      * @dev Returns the total global contract base unit quantities in all ST tokens burned, or partially burned
      */
-    function getSecToken_totalBurnedQty() external view returns (uint256 count) {
-        require(msg.sender == owner, "Restricted method");
+    function getSecToken_totalBurnedQty()
+    external view onlyOwner() returns (uint256 count) {
         return ledgerData._tokens_totalBurnedQty;
     }
 }

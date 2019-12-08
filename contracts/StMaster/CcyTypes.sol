@@ -17,10 +17,8 @@ contract CcyTypes is Owned {
      * @param name New currency type name
      * @param unit Base unit of the new currency type
      */
-    function addCcyType(string memory name, string memory unit) public {
-        require(msg.sender == owner, "Restricted method");
-        require(_readOnly == false, "Contract is read only");
-
+    function addCcyType(string memory name, string memory unit)
+    public onlyOwner() onlyWhenReadWrite() {
         CcyLib.addCcyType(ccyTypesData, name, unit);
     }
 

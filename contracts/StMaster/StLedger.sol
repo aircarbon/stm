@@ -16,7 +16,7 @@ contract StLedger is Owned, StTypes, CcyTypes {
      * @dev Returns all accounts in the ledger
      */
     function getLedgerOwners() external view returns (address[] memory) {
-        require(msg.sender == owner, "Restricted method");
+        require(msg.sender == owner, "Restricted");
         return ledgerData._ledgerOwners;
     }
 
@@ -54,7 +54,7 @@ contract StLedger is Owned, StTypes, CcyTypes {
      * @dev Returns an ST batch by ID
      */
     function getSecTokenBatch(uint256 batchId) external view returns (StructLib.SecTokenBatch memory) {
-        require(batchId >= 1 && batchId <= ledgerData._batches_currentMax_id, "Invalid batchId");
+        require(batchId >= 1 && batchId <= ledgerData._batches_currentMax_id, "Bad batchId");
         return ledgerData._batches[batchId];
     }
 }

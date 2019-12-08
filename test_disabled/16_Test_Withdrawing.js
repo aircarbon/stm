@@ -95,28 +95,50 @@ contract("StMaster", accounts => {
     it('withdrawing - should not allow non-owner to withdrawing from a ledger entry', async () => {
         try {
             await stm.withdraw(CONST.ccyType.USD, 100, accounts[global.accountNdx], { from: accounts[1] });
-        } catch (ex) { return; }
+        } catch (ex) { 
+            assert(ex.reason == 'Restricted', `unexpected: ${ex.reason}`);
+            return;
+        }
         assert.fail('expected contract exception');
     });
 
-    it('withdrawing - should not allow non-existent currency types', async () => {
+    it('withdrawing - should not allow non-existent currency types (1)', async () => {
         try {
             await stm.withdraw(9999, 100, accounts[global.accountNdx], { from: accounts[0] });
-        } catch (ex) { return; }
+        } catch (ex) { 
+            assert(ex.reason == 'Bad ccyTypeId', `unexpected: ${ex.reason}`);
+            return;
+        }
+        assert.fail('expected contract exception');
+    });
+
+    it('withdrawing - should not allow non-existent currency types (2)', async () => {
+        try {
+            await stm.withdraw(0, 100, accounts[global.accountNdx], { from: accounts[0] });
+        } catch (ex) { 
+            assert(ex.reason == 'Bad ccyTypeId', `unexpected: ${ex.reason}`);
+            return;
+        }
         assert.fail('expected contract exception');
     });
 
     it('withdrawing - should not allow invalid amounts (1)', async () => {
         try {
             await stm.withdraw(CONST.ccyType.USD, 0, accounts[global.accountNdx], { from: accounts[0] });
-        } catch (ex) { return; }
+        } catch (ex) { 
+            assert(ex.reason == 'Min. amount 1', `unexpected: ${ex.reason}`);
+            return; 
+        }
         assert.fail('expected contract exception');
     });
 
     it('withdrawing - should not allow invalid amounts (2)', async () => {
         try {
             await stm.withdraw(CONST.ccyType.USD, -1, accounts[global.accountNdx], { from: accounts[0] });
-        } catch (ex) { return; }
+        } catch (ex) { 
+            assert(ex.reason == 'Min. amount 1', `unexpected: ${ex.reason}`);
+            return;
+        }
         assert.fail('expected contract exception');
     });
 
@@ -124,7 +146,10 @@ contract("StMaster", accounts => {
         await stm.fund(CONST.ccyType.USD, 100, accounts[global.accountNdx], { from: accounts[0] });
         try {
             await withdrawLedger({ ccyTypeId: CONST.ccyType.USD, amount: 101, withdrawer: accounts[global.accountNdx]});
-        } catch (ex) { return; }
+        } catch (ex) { 
+            assert(ex.reason == 'Insufficient balance', `unexpected: ${ex.reason}`);
+            return;
+        }
         assert.fail('expected contract exception');
     });
 
@@ -134,6 +159,7 @@ contract("StMaster", accounts => {
             await stm.setReadOnly(true, { from: accounts[0] });
             await withdrawLedger({ ccyTypeId: CONST.ccyType.USD, amount: 50, withdrawer: accounts[global.accountNdx]});
         } catch (ex) { 
+            assert(ex.reason == 'Read-only', `unexpected: ${ex.reason}`);
             await stm.setReadOnly(false, { from: accounts[0] });
             return;
         }

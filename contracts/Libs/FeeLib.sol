@@ -24,11 +24,11 @@ library FeeLib {
         address ledgerOwner,
         StructLib.SetFeeArgs memory a)
     public {
-        require(tokenTypeId >= 1 && tokenTypeId <= stTypesData._count_tokenTypes, "Invalid ST type");
+        require(tokenTypeId >= 1 && tokenTypeId <= stTypesData._count_tokenTypes, "Bad tokenTypeId");
 
         StructLib.FeeStruct storage feeStruct = globalFees;
         if (ledgerOwner != address(0x0)) {
-            require(ledgerData._ledger[ledgerOwner].exists == true, "Invalid ledger owner");
+            require(ledgerData._ledger[ledgerOwner].exists == true, "Bad ledgerOwner");
             feeStruct = ledgerData._ledger[ledgerOwner].customFees;
             feeStruct.tokType_Set[tokenTypeId] = a.fee_fixed != 0 || a.fee_percBips != 0 || a.fee_min != 0 || a.fee_max != 0;
         }
@@ -58,11 +58,11 @@ library FeeLib {
         address ledgerOwner,
         StructLib.SetFeeArgs memory a)
     public {
-        require(ccyTypeId >= 1 && ccyTypeId <= ccyTypesData._count_ccyTypes, "Invalid currency type");
+        require(ccyTypeId >= 1 && ccyTypeId <= ccyTypesData._count_ccyTypes, "Bad ccyTypeId");
 
         StructLib.FeeStruct storage feeStruct = globalFees;
         if (ledgerOwner != address(0x0)) {
-            require(ledgerData._ledger[ledgerOwner].exists == true, "Invalid ledger owner");
+            require(ledgerData._ledger[ledgerOwner].exists == true, "Bad ledgerOwner");
             feeStruct = ledgerData._ledger[ledgerOwner].customFees;
             feeStruct.ccyType_Set[ccyTypeId] = a.fee_fixed != 0 || a.fee_percBips != 0 || a.fee_min != 0 || a.fee_max != 0;
         }

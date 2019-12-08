@@ -19,12 +19,10 @@ contract CcyFundable is Owned, StLedger {
     function fund(uint256 ccyTypeId,
                   int256  amount, // signed value: ledger ccyType_balance supports (theoretical) -ve balances
                   address ledgerOwner)
-    public {
-        require(msg.sender == owner, "Restricted method");
-        require(_readOnly == false, "Contract is read only");
+    public onlyOwner() onlyWhenReadWrite() {
 
         CcyLib.fund(ledgerData, ccyTypesData, ccyTypeId, amount, ledgerOwner);
-        // require(ccyTypeId >= 1 && ccyTypeId <= ccyTypesData._count_ccyTypes, "Invalid currency type");
+        // require(ccyTypeId >= 1 && ccyTypeId <= ccyTypesData._count_ccyTypes, "Bad ccyTypeId");
         // require(amount >= 0, "Invalid amount"); // allow funding zero (initializes empty ledger entry), disallow negative funding
 
         // // we keep amount as signed value - ledger allows -ve balances (currently unused capability)
@@ -50,8 +48,8 @@ contract CcyFundable is Owned, StLedger {
     /**
      * @dev Returns the total global amount funded for the supplied currency
      */
-    function getTotalCcyFunded(uint256 ccyTypeId) external view returns (uint256) {
-        require(msg.sender == owner, "Restricted method");
+    function getTotalCcyFunded(uint256 ccyTypeId)
+    external view onlyOwner() returns (uint256) {
         return ledgerData._ccyType_totalFunded[ccyTypeId];
     }
 }

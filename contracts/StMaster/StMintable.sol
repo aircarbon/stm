@@ -27,10 +27,7 @@ contract StMintable is Owned, StLedger {
         StructLib.SetFeeArgs memory originatorFee,
         string[] memory             metaKeys,
         string[] memory             metaValues)
-    public {
-        require(msg.sender == owner, "Restricted method");
-        require(_readOnly == false, "Contract is read only");
-
+    public onlyOwner() onlyWhenReadWrite() {
         TokenLib.MintSecTokenBatchArgs memory args = TokenLib.MintSecTokenBatchArgs({
             tokenTypeId: tokenTypeId,
                 mintQty: mintQty,
@@ -53,9 +50,7 @@ contract StMintable is Owned, StLedger {
         uint256 batchId,
         string memory metaKeyNew,
         string memory metaValueNew)
-    public {
-        require(msg.sender == owner, "Restricted method");
-        require(_readOnly == false, "Contract is read only");
+    public onlyOwner() onlyWhenReadWrite() {
         TokenLib.addMetaSecTokenBatch(ledgerData, batchId, metaKeyNew, metaValueNew);
     }
 
@@ -67,25 +62,23 @@ contract StMintable is Owned, StLedger {
     function setOriginatorFeeTokenBatch(
         uint256 batchId,
         StructLib.SetFeeArgs memory originatorFee)
-    public {
-        require(msg.sender == owner, "Restricted method");
-        require(_readOnly == false, "Contract is read only");
+    public onlyOwner() onlyWhenReadWrite() {
         TokenLib.setOriginatorFeeTokenBatch(ledgerData, batchId, originatorFee);
     }
 
     /**
      * @dev Returns the global ST count (variable-sized: ST count != total ST quantities)
      */
-    function getSecToken_countMinted() external view returns (uint256) {
-        require(msg.sender == owner, "Restricted method");
+    function getSecToken_countMinted()
+    external view onlyOwner() returns (uint256) {
         return ledgerData._tokens_currentMax_id; // 1-based
     }
 
     /**
      * @dev Returns the global sum of total quantities in all STs minted, in the contract base unit
      */
-    function getSecToken_totalMintedQty() external view returns (uint256) {
-        require(msg.sender == owner, "Restricted method");
+    function getSecToken_totalMintedQty()
+    external view onlyOwner() returns (uint256) {
         return ledgerData._tokens_totalMintedQty;
     }
 }

@@ -572,7 +572,8 @@ contract("StMaster", accounts => {
         const feeFix = 1;
         const feeMin = 101;
         await stm.setFee_TokType(CONST.tokenType.VCS, B, { fee_fixed: feeFix, fee_percBips: feeBps, fee_min: feeMin, fee_max: 0 } );
-        await stm.setFee_CcyType(CONST.ccyType.ETH,   A, CONST.nullFees);
+        await stm.setFee_CcyType(CONST.ccyType.ETH,   A,              CONST.nullFees);
+        await stm.setFee_CcyType(CONST.ccyType.ETH,   CONST.nullAddr, CONST.nullFees);
 
         try {
             const transferAmountKg = new BN(900);
@@ -586,7 +587,7 @@ contract("StMaster", accounts => {
             });
         }
         catch (ex) {
-            assert(ex.reason == 'Insufficient tokens held by ledger owner B', `unexpected: ${ex.reason}`);
+            assert(ex.reason == 'Insufficient tokens B', `unexpected: ${ex.reason}`);
             return;
         }
         assert.fail('expected contract exception');
@@ -604,7 +605,8 @@ contract("StMaster", accounts => {
         const feeFix = 1;
         const feeMin = 101;
         await stm.setFee_TokType(CONST.tokenType.VCS, A, { fee_fixed: feeFix, fee_percBips: feeBps, fee_min: feeMin, fee_max: 0 } );
-        await stm.setFee_CcyType(CONST.ccyType.ETH,   B, CONST.nullFees);
+        await stm.setFee_CcyType(CONST.ccyType.ETH,   B,              CONST.nullFees);
+        await stm.setFee_CcyType(CONST.ccyType.ETH,   CONST.nullAddr, CONST.nullFees);
 
         try {
             const transferAmountKg = new BN(900);
@@ -618,7 +620,7 @@ contract("StMaster", accounts => {
             });
         }
         catch (ex) { 
-            assert(ex.reason == 'Insufficient tokens held by ledger owner A', `unexpected: ${ex.reason}`);
+            assert(ex.reason == 'Insufficient tokens A', `unexpected: ${ex.reason}`);
             return;
         }
         assert.fail('expected contract exception');

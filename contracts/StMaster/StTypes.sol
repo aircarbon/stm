@@ -16,16 +16,16 @@ contract StTypes is Owned {
      * @dev Adds a new ST type
      * @param name New ST type name
      */
-    function addSecTokenType(string memory name) public {
-        require(msg.sender == owner, "Restricted method");
-        require(_readOnly == false, "Contract is read only");
+    function addSecTokenType(string memory name)
+    public onlyOwner() onlyWhenReadWrite() {
         TokenLib.addSecTokenType(stTypesData, name);
     }
 
     /**
      * @dev Returns current ST types
      */
-    function getSecTokenTypes() external view returns (StructLib.GetSecTokenTypesReturn memory) {
+    function getSecTokenTypes()
+    external view returns (StructLib.GetSecTokenTypesReturn memory) {
         return TokenLib.getSecTokenTypes(stTypesData);
     }
 }

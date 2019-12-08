@@ -9,12 +9,21 @@ contract Owned {
         _readOnly = false;
     }
 
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Restricted");
+        _; // required magic
+    }
+    modifier onlyWhenReadWrite() {
+        require(_readOnly == false, "Read-only");
+        _;
+    }
+
     /**
      * @dev Sets the contract-wide read only state
      * @param readOnly State to set
      */
-    function setReadOnly(bool readOnly) public {
-        require(msg.sender == owner, "Restricted method");
+    function setReadOnly(bool readOnly)
+    public onlyOwner() {
         _readOnly = readOnly;
     }
 }

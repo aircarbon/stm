@@ -340,7 +340,7 @@ contract("StMaster", accounts => {
                 false,                       // applyFees
                 { from: accounts[0] });
         } catch (ex) { 
-            assert(ex.reason == 'Insufficient tokens of supplied type', `unexpected: ${ex.reason}`);
+            assert(ex.reason == 'Insufficient tokens', `unexpected: ${ex.reason}`);
             return;
         }
         assert.fail('expected contract exception');
@@ -360,7 +360,7 @@ contract("StMaster", accounts => {
                 false,                       // applyFees
                 { from: accounts[0] });
         } catch (ex) { 
-            assert(ex.reason == 'No tokens of supplied type', `unexpected: ${ex.reason}`);
+            assert(ex.reason == 'No tokens', `unexpected: ${ex.reason}`);
             return;
         }
         assert.fail('expected contract exception');
@@ -380,7 +380,7 @@ contract("StMaster", accounts => {
                 false,                       // applyFees
                 { from: accounts[0] });
         } catch (ex) { 
-            assert(ex.reason == 'Insufficient tokens of supplied type', `unexpected: ${ex.reason}`);
+            assert(ex.reason == 'Insufficient tokens', `unexpected: ${ex.reason}`);
             return;
         }
         assert.fail('expected contract exception');
@@ -400,7 +400,7 @@ contract("StMaster", accounts => {
                 false,                       // applyFees
                 { from: accounts[0] });
         } catch (ex) { 
-            assert(ex.reason == 'No tokens of supplied type', `unexpected: ${ex.reason}`);
+            assert(ex.reason == 'No tokens', `unexpected: ${ex.reason}`);
             return;
         }
         assert.fail('expected contract exception');
@@ -420,7 +420,7 @@ contract("StMaster", accounts => {
                 false,                       // applyFees
                 { from: accounts[0] });
         } catch (ex) { 
-            assert(ex.reason == 'Insufficient tokens of supplied type', `unexpected: ${ex.reason}`);
+            assert(ex.reason == 'Insufficient tokens', `unexpected: ${ex.reason}`);
             return;
         }
         assert.fail('expected contract exception');
@@ -440,7 +440,7 @@ contract("StMaster", accounts => {
                 false,                       // applyFees
                 { from: accounts[0] });
         } catch (ex) { 
-            assert(ex.reason == 'No tokens of supplied type', `unexpected: ${ex.reason}`);
+            assert(ex.reason == 'No tokens', `unexpected: ${ex.reason}`);
             return;
         }
         assert.fail('expected contract exception');

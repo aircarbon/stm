@@ -47,16 +47,16 @@ library TransferLib {
         TransferLib.TransferArgs memory a
     )
     public {
-        require(ledgerData._ledger[a.ledger_A].exists == true, "Invalid ledger owner A");
-        require(ledgerData._ledger[a.ledger_B].exists == true, "Invalid ledger owner B");
-        require(a.ledger_A != a.ledger_B, "Self transfer disallowed");
-        require(a.qty_A > 0 || a.qty_B > 0 || a.ccy_amount_A > 0 || a.ccy_amount_B > 0, "Invalid null transfer");
+        require(ledgerData._ledger[a.ledger_A].exists == true, "Bad ledger_A");
+        require(ledgerData._ledger[a.ledger_B].exists == true, "Bad ledger_B");
+        require(a.ledger_A != a.ledger_B, "Bad transfer");
+        require(a.qty_A > 0 || a.qty_B > 0 || a.ccy_amount_A > 0 || a.ccy_amount_B > 0, "Bad null transfer");
         require(!((a.qty_A > 0 && a.ccy_amount_A > 0) || (a.qty_B > 0 && a.ccy_amount_B > 0)),
-            "Same origin multiple asset transfer disallowed"); // disallow single origin multiple asset type transfers
-        if (a.ccy_amount_A > 0) require(a.ccyTypeId_A > 0, "Invalid currency type A");
-        if (a.ccy_amount_B > 0) require(a.ccyTypeId_B > 0, "Invalid currency type B");
-        if (a.qty_A > 0) require(a.tokenTypeId_A > 0, "Invalid token type A");
-        if (a.qty_B > 0) require(a.tokenTypeId_B > 0, "Invalid token type B");
+            "Bad transfer types"); // disallow single origin multiple asset type transfers
+        if (a.ccy_amount_A > 0) require(a.ccyTypeId_A > 0, "Bad ccyTypeId A");
+        if (a.ccy_amount_B > 0) require(a.ccyTypeId_B > 0, "Bad ccyTypeId B");
+        if (a.qty_A > 0) require(a.tokenTypeId_A > 0, "Bad tokenTypeId_A");
+        if (a.qty_B > 0) require(a.tokenTypeId_B > 0, "Bad tokenTypeId_B");
 
         // exchange fees - calc total payable (fixed + basis points), cap & collar
         StructLib.FeeStruct storage exFeeStruct_ccy_A = ledgerData._ledger[a.ledger_A].customFees.ccyType_Set[a.ccyTypeId_A]   ? ledgerData._ledger[a.ledger_A].customFees : globalFees;
@@ -74,9 +74,9 @@ library TransferLib {
 
         // validate currency balances - transfer amount & exchange fee
         require(StructLib.sufficientCcy(ledgerData, a.ledger_A, a.ccyTypeId_A, a.ccy_amount_A,
-                    int256(exFees.fee_ccy_A) * (a.applyFees && a.ccy_amount_A > 0 ? 1 : 0)), "Insufficient currency held by ledger owner A");
+                    int256(exFees.fee_ccy_A) * (a.applyFees && a.ccy_amount_A > 0 ? 1 : 0)), "Insufficient currency A");
         require(StructLib.sufficientCcy(ledgerData, a.ledger_B, a.ccyTypeId_B, a.ccy_amount_B,
-                    int256(exFees.fee_ccy_B) * (a.applyFees && a.ccy_amount_B > 0 ? 1 : 0)), "Insufficient currency held by ledger owner B");
+                    int256(exFees.fee_ccy_B) * (a.applyFees && a.ccy_amount_B > 0 ? 1 : 0)), "Insufficient currency B");
 
         // calc batch originator token fees (disabled if fee-reciever[batch originator] == fee-payer)
         // potentially multiple: up to one originator fee per distinct token batch
@@ -104,9 +104,9 @@ library TransferLib {
 
         // validate token balances - sum exchange fee + originator fee(s)
         require(StructLib.sufficientTokens(ledgerData, a.ledger_A, a.tokenTypeId_A, a.qty_A,
-                    (exFees.fee_tok_A + totalOrigFee[0]) * (a.applyFees && a.qty_A > 0 ? 1 : 0)), "Insufficient tokens held by ledger owner A");
+                    (exFees.fee_tok_A + totalOrigFee[0]) * (a.applyFees && a.qty_A > 0 ? 1 : 0)), "Insufficient tokens A");
         require(StructLib.sufficientTokens(ledgerData, a.ledger_B, a.tokenTypeId_B, a.qty_B,
-                    (exFees.fee_tok_B + totalOrigFee[1]) * (a.applyFees && a.qty_B > 0 ? 1 : 0)), "Insufficient tokens held by ledger owner B");
+                    (exFees.fee_tok_B + totalOrigFee[1]) * (a.applyFees && a.qty_B > 0 ? 1 : 0)), "Insufficient tokens B");
 
         // transfer currencies
         if (a.ccy_amount_A > 0) {
@@ -324,9 +324,9 @@ library TransferLib {
              batchCount: 0
         });
 
-        // walk 1 - get distinct batches affected - needed for fixed-size return array declaration
+        // get distinct batches affected - needed for fixed-size return array declaration
         uint256[] memory from_stIds = ledgerData._ledger[a.from].tokenType_stIds[a.tokenTypeId]; // assignment of storage[] to memory[] is a copy
-        require(from_stIds.length > 0, "No tokens of supplied type");
+        require(from_stIds.length > 0, "No tokens");
 
         uint256 from_stIds_length = from_stIds.length;
         uint256 remainingToTransfer = uint256(a.qtyUnit);
@@ -345,7 +345,7 @@ library TransferLib {
                 }
             }
             if (!knownBatch) {
-                require(ret.batchCount < MAX_BATCHES_PREVIEW, "Maximum batch count exceeded for transfer");
+                require(ret.batchCount < MAX_BATCHES_PREVIEW, "Excessive batches");
                 ret.batchIds[ret.batchCount] = fromBatchId;
                 ret.transferQty[ret.batchCount] = remainingToTransfer >= stQty ? stQty : remainingToTransfer;
                 ret.batchCount++;
@@ -359,7 +359,7 @@ library TransferLib {
 
                 remainingToTransfer -= stQty;
                 if (remainingToTransfer > 0)
-                    require(from_stIds_length > 0, "Insufficient tokens of supplied type");
+                    require(from_stIds_length > 0, "Insufficient tokens");
             }
             else { // partial ST transfer, and no more needed
                 remainingToTransfer = 0;
@@ -435,7 +435,7 @@ library TransferLib {
                 remainingToTransfer -= stQty;
 
                 if (remainingToTransfer > 0)
-                    require(from_stIds.length > 0, "Insufficient tokens of supplied type");
+                    require(from_stIds.length > 0, "Insufficient tokens");
             }
             else {
                 // split the last ST across the ledger entries, soft-minting a new ST in the destination

@@ -19,8 +19,7 @@ library TokenLib {
         string memory name)
     public {
         for (uint256 tokenTypeId = 1; tokenTypeId <= stTypesData._count_tokenTypes; tokenTypeId++) {
-            require(keccak256(abi.encodePacked(stTypesData._tokenTypeNames[tokenTypeId])) != keccak256(abi.encodePacked(name)),
-                    "ST type name already exists");
+            require(keccak256(abi.encodePacked(stTypesData._tokenTypeNames[tokenTypeId])) != keccak256(abi.encodePacked(name)), "Duplicate name");
         }
 
         stTypesData._count_tokenTypes++;
@@ -63,11 +62,11 @@ library TokenLib {
         MintSecTokenBatchArgs memory a)
     public {
 
-        require(a.tokenTypeId >= 1 && a.tokenTypeId <= stTypesData._count_tokenTypes, "Invalid ST type");
+        require(a.tokenTypeId >= 1 && a.tokenTypeId <= stTypesData._count_tokenTypes, "Bad tokenTypeId");
         //require(a.mintSecTokenCount >= 1, "Minimum one ST required");
-        require(a.mintSecTokenCount == 1, "Exactly one ST required");
-        require(a.mintQty >= 1, "Minimum one mintQty required");
-        require(a.mintQty % a.mintSecTokenCount == 0, "mintQty must divide evenly into mintSecTokenCount");
+        //require(a.mintQty % a.mintSecTokenCount == 0, "mintQty must divide evenly into mintSecTokenCount");
+        require(a.mintSecTokenCount == 1, "Set mintSecTokenCount 1");
+        require(a.mintQty >= 1, "Min. mintQty 1");
 
         // ### string[] param lengths are reported as zero!
         /*require(metaKeys.length == 0, "At least one metadata key must be provided");
@@ -134,12 +133,12 @@ library TokenLib {
         string memory metaKeyNew,
         string memory metaValueNew)
     public {
-        require(batchId >= 1 && batchId <= ledgerData._batches_currentMax_id, "Invalid batchId");
+        require(batchId >= 1 && batchId <= ledgerData._batches_currentMax_id, "Bad batchId");
 
         for (uint256 kvpNdx = 0; kvpNdx < ledgerData._batches[batchId].metaKeys.length; kvpNdx++) {
             require(keccak256(abi.encodePacked(ledgerData._batches[batchId].metaKeys[kvpNdx])) !=
                     keccak256(abi.encodePacked(metaKeyNew)),
-                    "KVP key already exists in batch");
+                    "Duplicate key");
         }
 
         ledgerData._batches[batchId].metaKeys.push(metaKeyNew);
@@ -152,7 +151,7 @@ library TokenLib {
         uint256 batchId,
         StructLib.SetFeeArgs memory originatorFeeNew)
     public {
-        require(batchId >= 1 && batchId <= ledgerData._batches_currentMax_id, "Invalid batchId");
+        require(batchId >= 1 && batchId <= ledgerData._batches_currentMax_id, "Bad batchId");
         ledgerData._batches[batchId].origTokFee = originatorFeeNew;
         emit SetBatchOriginatorFee(batchId, originatorFeeNew);
     }
@@ -165,18 +164,18 @@ library TokenLib {
         uint256 tokenTypeId,
         int256 burnQty)
     public {
-        require(ledgerData._ledger[ledgerOwner].exists == true, "Invalid ledger owner");
-        require(burnQty >= 1, "Minimum burnQty one unit");
-        require(tokenTypeId >= 1 && tokenTypeId <= stTypesData._count_tokenTypes, "Invalid ST type");
+        require(ledgerData._ledger[ledgerOwner].exists == true, "Bad ledgerOwner");
+        require(burnQty >= 1, "Min. burnQty 1");
+        require(tokenTypeId >= 1 && tokenTypeId <= stTypesData._count_tokenTypes, "Bad tokenTypeId");
 
         // check ledger owner has sufficient carbon tonnage of supplied type
-        require(StructLib.sufficientTokens(ledgerData, ledgerOwner, tokenTypeId, uint256(burnQty), 0) == true, "Insufficient carbon held by ledger owner");
+        require(StructLib.sufficientTokens(ledgerData, ledgerOwner, tokenTypeId, uint256(burnQty), 0) == true, "Insufficient tokens");
         // uint256 kgAvailable = 0;
         // for (uint i = 0; i < ledgerData._ledger[ledgerOwner].tokenType_stIds[tokenTypeId].length; i++) {
         //     kgAvailable += ledgerData._sts_currentQty[ledgerData._ledger[ledgerOwner].tokenType_stIds[tokenTypeId][i]];
         // }
-        // require(kgAvailable >= uint256(burnQty), "Insufficient carbon held by ledger owner");
-        //require(ledgerData._ledger[ledgerOwner].tokenType_sumQty[tokenTypeId] >= uint256(burnQty), "Insufficient carbon held by ledger owner");
+        // require(kgAvailable >= uint256(burnQty), "Insufficient tokens");
+        //require(ledgerData._ledger[ledgerOwner].tokenType_sumQty[tokenTypeId] >= uint256(burnQty), "Insufficient tokens");
 
         // burn (i.e. delete or resize) sufficient ST(s)
         uint256 ndx = 0;

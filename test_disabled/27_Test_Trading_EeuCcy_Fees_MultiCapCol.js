@@ -192,7 +192,7 @@ contract("StMaster", accounts => {
             });
         }
         catch (ex) { 
-            assert(ex.reason == 'Insufficient currency held by ledger owner A', `unexpected: ${ex.reason}`);
+            assert(ex.reason == 'Insufficient currency A', `unexpected: ${ex.reason}`);
             return;
         }
         assert.fail('expected contract exception');
@@ -221,7 +221,7 @@ contract("StMaster", accounts => {
             });
         }
         catch (ex) { 
-            assert(ex.reason == 'Insufficient tokens held by ledger owner B', `unexpected: ${ex.reason}`);
+            assert(ex.reason == 'Insufficient tokens B', `unexpected: ${ex.reason}`);
             return;
         }
         assert.fail('expected contract exception');
