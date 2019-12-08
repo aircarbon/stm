@@ -56,34 +56,28 @@ contract("StMaster", accounts => {
         const promiseFundTx = new Promise((resolve, reject) =>  {
             web3.eth.sendSignedTransaction(raw)
             .on("receipt", receipt => {
-                console.log('receipt', receipt);
             })
             .on("transactionHash", hash => {
-                console.log('hash', hash);
             })
             .on("confirmation", confirmation => {
-                console.log('confirmation', confirmation);
                 return resolve(confirmation);
             })
             .on("error", error => {
-                console.log('error', error);
+                return reject(error);
             });
         });
         const data = await promiseFundTx;
-        //console.log('data', data);
 
         // getLedgerEntry - truffle
         const truffle_ledgerEntry = await stm.getLedgerEntry(A);
         const truffle_balance = truffle_ledgerEntry.ccys.find(p => p.ccyTypeId == CONST.ccyType.SGD).balance;
-        //console.log('truffle_ledgerEntry', truffle_ledgerEntry);
         console.log('truffle_balance', truffle_balance);
         assert(truffle_balance == 10000, 'unexpected truffle balance after funding');
         
         // getLedgerEntry - web3
         const web3_ledgerEntry = await contract.methods.getLedgerEntry(A).call();
         const web3_balance = web3_ledgerEntry.ccys.find(p => p.ccyTypeId == CONST.ccyType.SGD).balance;
-        //console.log('web3_ledgerEntry', web3_ledgerEntry);
-        console.log('web3_balance', web3_balance);
+        console.log('web3_balance (BN)', web3_balance);
         console.log('web3_balance.toString()', web3_balance.toString());
 
         assert(web3_balance.toString() == '10000', 'unexpected web3 balance after funding');
