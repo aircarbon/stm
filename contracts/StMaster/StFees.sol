@@ -12,10 +12,7 @@ contract StFees is Owned, StLedger {
     //       i.e. transfer amounts are not inclusive of fees, they are additional
 
     //
-    // TODO: de-dupe read-only & owner-only modifiers
-    //
     // origFees
-    // TODO: tests - fee-receiver==fee-sender; more tests for accounts other than accounts[0]
     //
     //  > origFees - TESTS:
     //   >> set MAX_BATCHES_PREVIEW to 1, try >1 batch (test require(...MAX_BATCHES_PREVIEW))

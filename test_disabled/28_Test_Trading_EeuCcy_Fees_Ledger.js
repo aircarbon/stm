@@ -57,7 +57,7 @@ contract("StMaster", accounts => {
                applyFees: true,
         });
 
-        // contract owner has received expected carbon fees
+        // contract owner has received expected token fees
         const owner_balBefore = data.ledgerContractOwner_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
         const owner_balAfter  =  data.ledgerContractOwner_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
         assert(Big(owner_balAfter).eq(Big(owner_balBefore).plus(Big(expectedFeeKg))), 'unexpected fee receiver carbon balance after transfer');
@@ -112,7 +112,7 @@ contract("StMaster", accounts => {
                applyFees: true,
         });
 
-        // contract owner has received expected carbon fees
+        // contract owner has received expected token fees
         const owner_balBefore = data.ledgerContractOwner_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
         const owner_balAfter  =  data.ledgerContractOwner_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
         assert(Big(owner_balAfter).eq(Big(owner_balBefore).plus(Big(expectedFeeKg))), 'unexpected fee receiver carbon balance after transfer');
@@ -162,7 +162,7 @@ contract("StMaster", accounts => {
                applyFees: true,
         });
 
-        // contract owner has received expected carbon fees
+        // contract owner has received expected token fees
         const owner_balBefore = data.ledgerContractOwner_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
         const owner_balAfter  =  data.ledgerContractOwner_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
         assert(Big(owner_balAfter).eq(Big(owner_balBefore).plus(Big(expectedFeeKg))), 'unexpected fee receiver carbon balance after transfer');
@@ -219,7 +219,7 @@ contract("StMaster", accounts => {
                applyFees: true,
         });
 
-        // contract owner has received expected carbon fees
+        // contract owner has received expected token fees
         const owner_balBefore = data.ledgerContractOwner_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
         const owner_balAfter  =  data.ledgerContractOwner_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
         assert(Big(owner_balAfter).eq(Big(owner_balBefore).plus(Big(expectedFeeKg))), 'unexpected fee receiver carbon balance after transfer');
@@ -481,12 +481,12 @@ contract("StMaster", accounts => {
            applyFees: true,
         });
 
-        // contract owner has received expected carbon fee
+        // contract owner has received expected token fee
         const owner_balBeforeKg = data.ledgerContractOwner_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
         const owner_balAfterKg  =  data.ledgerContractOwner_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
         assert(Big(owner_balAfterKg).eq(Big(owner_balBeforeKg).plus(Big(expectedFeeKg))), 'unexpected fee receiver carbon balance after transfer');
         
-        // carbon sender has sent expected carbon quantity and paid exepcted carbon fee
+        // carbon sender has sent expected carbon quantity and paid exepcted token fee
         const A_balBefore = data.ledgerA_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
         const A_balAfter  =  data.ledgerA_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
         assert(Big(A_balAfter).eq(Big(A_balBefore).minus(Big(expectedFeeKg)).minus(Big(transferAmountKg))), 'unexpected fee payer carbon balance after transfer');
@@ -539,12 +539,12 @@ contract("StMaster", accounts => {
            applyFees: true,
         });
 
-        // contract owner has received expected carbon fee
+        // contract owner has received expected token fee
         const owner_balBeforeKg = data.ledgerContractOwner_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
         const owner_balAfterKg  =  data.ledgerContractOwner_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
         assert(Big(owner_balAfterKg).eq(Big(owner_balBeforeKg).plus(Big(expectedFeeKg))), 'unexpected fee receiver carbon balance after transfer');
         
-        // carbon sender has sent expected carbon quantity and paid exepcted carbon fee
+        // carbon sender has sent expected carbon quantity and paid exepcted token fee
         const A_balBefore = data.ledgerA_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
         const A_balAfter  =  data.ledgerA_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
         assert(Big(A_balAfter).eq(Big(A_balBefore).minus(Big(expectedFeeKg)).minus(Big(transferAmountKg))), 'unexpected fee payer carbon balance after transfer');

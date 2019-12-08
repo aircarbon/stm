@@ -237,7 +237,7 @@ module.exports = {
             // console.log('totalKg_fees_before', totalKg_fees_before.toString());
             // console.log('       eventKg_fees', eventKg_fees.toString());
             // console.log(' totalKg_fees_after', totalKg_fees_after.toString());
-            assert(totalKg_fees_after.sub(totalKg_fees_before).eq(eventKg_fees), `unexpected global total carbon fees before/after vs. events`);
+            assert(totalKg_fees_after.sub(totalKg_fees_before).eq(eventKg_fees), `unexpected global total token fees before/after vs. events`);
         }
 
         // validate currency transfer events
@@ -403,7 +403,7 @@ module.exports = {
             // console.log('             ledgerB_after.tokens_sumQty', ledgerB_after.tokens_sumQty);
             // console.log(' ledgerContractOwner_after.tokens_sumQty', ledgerContractOwner_after.tokens_sumQty);
 
-            // don't double count sender/receiver and master exchange account, if the exchange account is on one side of the transfer
+            // don't double count sender/receiver and master contract owner, if the contract owner is on one side of the transfer
             assert(Number(ledgerA_before.tokens_sumQty) + 
                    Number(ledgerB_before.tokens_sumQty) + 
                    (contractOwnerIsTransfering ? 0 : Number(ledgerContractOwner_before.tokens_sumQty)) // exchange fee receiver before
@@ -524,7 +524,7 @@ module.exports = {
             totalKg_tfd_incFees = totalKg_tfd_incFees.add(new BN(originatorFees_tok_B.toFixed()));
         }
 
-        // validate carbon fee sum tonnage in contract owner
+        // validate token fee sum tonnage in contract owner
         // console.log(' ledgerContractOwner_after.tokens_sumQty', ledgerContractOwner_after.tokens_sumQty);
         // console.log('ledgerContractOwner_before.tokens_sumQty', ledgerContractOwner_before.tokens_sumQty);
         // console.log('       totalqty_AllSecSecTokenTypes_fees', totalqty_AllSecSecTokenTypes_fees);
