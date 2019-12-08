@@ -16,7 +16,7 @@ contract("StMaster", accounts => {
     });
 
     // EEU FEES
-    it('trading fees (fixed) - apply VCS token fee on a trade (fee on A)', async () => {
+    it('trading fees (fixed) - apply VCS carbon fee on a trade (fee on A)', async () => {
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], CONST.nullFees, [], [], { from: accounts[0] });
         await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        accounts[global.accountNdx + 1],                         { from: accounts[0] });
 
@@ -54,7 +54,7 @@ contract("StMaster", accounts => {
         assert(ledgerA_VcsKgAfter == Number(ledgerA_VcsKgBefore) - Number(carbonKgFixedFee) - Number(carbonKgTransferAmount), 'unexpected ledger A (fee payer) VCS EEU tonnage after transfer');
     });
 
-    it('trading fees (fixed) - apply UNFCCC token fee on a trade (fee on B)', async () => {
+    it('trading fees (fixed) - apply UNFCCC carbon fee on a trade (fee on B)', async () => {
         await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        accounts[global.accountNdx + 0],                         { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
 
@@ -90,7 +90,7 @@ contract("StMaster", accounts => {
         assert(contractOwnerVcsKgAfter == Number(contractOwnerVcsKgBefore), 'unexpected contract owner (fee receiver) VCS EEU tonnage after transfer');
     });
 
-    it('trading fees (fixed) - apply large (>1 batch EEU size) token fee on a trade on a newly added EEU type', async () => {
+    it('trading fees (fixed) - apply large (>1 batch EEU size) carbon fee on a trade on a newly added EEU type', async () => {
         await stm.addSecTokenType('TEST_EEU_TYPE');
         const types = (await stm.getSecTokenTypes()).tokenTypes;
         const newTypeId = types.filter(p => p.name == 'TEST_EEU_TYPE')[0].id;
@@ -116,7 +116,7 @@ contract("StMaster", accounts => {
                applyFees: true,
         });
 
-        // test contract owner has received expected new EEU type token fee
+        // test contract owner has received expected new EEU type carbon fee
         const owner_balBefore = data.ledgerContractOwner_before.tokens.filter(p => p.tokenTypeId == newTypeId).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
         const owner_balAfter  =  data.ledgerContractOwner_after.tokens.filter(p => p.tokenTypeId == newTypeId).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
         assert(owner_balAfter == Number(owner_balBefore) + Number(newSecTokenTypeFixedFee), 'unexpected contract owner (fee receiver) new EEU type tonnage after transfer');
@@ -329,7 +329,7 @@ contract("StMaster", accounts => {
         const owner_balAfter  =  data.ledgerContractOwner_after.ccys.filter(p => p.ccyTypeId == newCcyTypeId).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
         assert(owner_balAfter == Number(owner_balBefore) + Number(ccyFeeFixed_units), 'unexpected contract owner (fee receiver) newly added ccy balance after transfer');
         
-        // test contract owner has received expected token fee
+        // test contract owner has received expected carbon fee
         const contractOwnerSecTokenKgBefore = data.ledgerContractOwner_before.tokens.filter(p => p.tokenTypeId == newSecTokenTypeId).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
         const contractOwnerSecTokenKgAfter  =  data.ledgerContractOwner_after.tokens.filter(p => p.tokenTypeId == newSecTokenTypeId).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
         assert(contractOwnerSecTokenKgAfter == Number(contractOwnerSecTokenKgBefore) + Number(newSecTokenTypeKgFeeFixed), 'unexpected contract owner (fee receiver) newly added EEU type tonnage after transfer');    

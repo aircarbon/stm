@@ -32,7 +32,7 @@ EXCHANGE_FEE: 1,
 
     // ccy types (contract data)
     ccyType: Object.freeze({
-        USD: 1,
+        SGD: 1,
         ETH: 2,
     }), 
 
@@ -44,6 +44,7 @@ EXCHANGE_FEE: 1,
 
     // ccy constants
          oneUsd_cents: Big(1 * 100).toFixed(),
+     hundredUsd_cents: Big(100 * 100).toFixed(),
     thousandUsd_cents: Big(1000 * 100).toFixed(),
      millionUsd_cents: Big(1000 * 1000 * 100).toFixed(),
      billionUsd_cents: Big(1000).times(1000).times(1000).times(100).toFixed(),

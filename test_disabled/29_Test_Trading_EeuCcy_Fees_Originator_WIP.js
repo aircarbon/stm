@@ -27,7 +27,7 @@ contract("StMaster", accounts => {
 
     // EEU ORIGINATOR FEES
 
-    /*it('trading fees (originator) - apply VCS token originator fees (+ ledger @ x4), on a 1.5 EEU trade (fee on A)', async () => {
+    it('trading fees (originator) - apply VCS token originator fees (+ ledger @ x4), on a 1.5 EEU trade (fee on A)', async () => {
         // SETUP - mint for M ([+0]), move all to A ([+1]) 
         const M = accounts[global.accountNdx + 0];
         const A = accounts[global.accountNdx + 1];
@@ -56,7 +56,7 @@ contract("StMaster", accounts => {
         await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        B,                    { from: accounts[0] });        
 
         // TEST - set global fee structure: 0
-        await stm.setFee_TokType(CONST.tokenType.VCS, CONST.nullAddr, CONST.nullAddr);
+        await stm.setFee_TokType(CONST.tokenType.VCS, CONST.nullAddr, CONST.nullFees);
         //await stm.setFee_CcyType(CONST.ccyType.ETH, CONST.nullAddr,   CONST.nullAddr);
 
         // TEST - set ledger fee structure VCS for A
@@ -95,7 +95,7 @@ contract("StMaster", accounts => {
         const A_balBefore = data.ledgerA_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
         const A_balAfter  =  data.ledgerA_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
         assert(Big(A_balAfter).eq(Big(A_balBefore).minus(Big(data.originatorFees_tok_A)).minus(Big(data.exchangeFee_tok_A)).minus(Big(transferAmountKg))), 'unexpected fee payer token balance after transfer');
-    });*/
+    });
 
     it('trading fees (originator) - apply UNFCCC token originator fees (+ global @ x8), on a 2.5 EEU trade (fee on B)', async () => {
         // SETUP - mint for M ([+0]), move all to B ([+2]) 
