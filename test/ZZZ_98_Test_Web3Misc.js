@@ -3,9 +3,13 @@ const CONST = require('../const.js');
 const acmJson = require('../build/contracts/StMaster.json');
 const abi = acmJson['abi'];
 const Web3 = require('web3');
+const ejs = require('ethereumjs-tx');
 
 contract("StMaster", accounts => {
     var stm;
+
+    const account = "0xf57B0adC78461888BF32d5FB92784CF3FC8f9956"; // dev contract owner
+    const privateKey = "0CF8F198ACE6D2D92A2C1CD7F3FC9B42E2AF3B7FD7E64371922CB73A81493C1A"; // dev contract owner privkey
 
     beforeEach(async () => {
         stm = await st.deployed();
@@ -22,25 +26,67 @@ contract("StMaster", accounts => {
     //     console.log('events', events);
     // })
 
-    it("web3 - numeric types - should be BN", async () => {
+    it("web3 - fund/getLedgerEntry - numeric types are BN", async () => {
         var address = stm.address;
-        var account = "0xf57B0adC78461888BF32d5FB92784CF3FC8f9956"; // owner
-        var privateKey = "0CF8F198ACE6D2D92A2C1CD7F3FC9B42E2AF3B7FD7E64371922CB73A81493C1A"; // owner privkey
         const web3 = new Web3('http://127.0.0.1:8545');
         var contract = new web3.eth.Contract(abi, stm.address);
-
         const A = accounts[0];
-        const truffle_fundTx = await stm.fund(CONST.ccyType.SGD, CONST.hundredUsd_cents, A, { from: accounts[0] });
+        
+        // fund with truffle
+        //const truffle_fundTx = await stm.fund(CONST.ccyType.SGD, CONST.hundredUsd_cents, A, { from: accounts[0] });
+
+        // fund $100 - web3
+        var paramsData = contract.methods
+            .fund(CONST.ccyType.SGD, CONST.hundredUsd_cents, A)
+            .encodeABI(); 
+        var web3_fundTx = new ejs.Transaction({
+               nonce: await web3.eth.getTransactionCount(account, "pending"),
+            gasPrice: web3.utils.toHex(web3.utils.toWei('20', 'gwei')),
+            gasLimit: 500000,
+                  to: address,
+               value: 0,
+                data: paramsData,
+                from: account, // owner only
+        }, //{ chain: 'rinkeby', hardfork: 'petersburg' }
+        );
+        web3_fundTx.sign(Buffer.from(privateKey, 'hex'));
+        var raw = '0x' + web3_fundTx.serialize().toString('hex');
+        console.log('sendSignedTransaction...');
+        
+        const promiseFundTx = new Promise((resolve, reject) =>  {
+            web3.eth.sendSignedTransaction(raw)
+            .on("receipt", receipt => {
+                console.log('receipt', receipt);
+            })
+            .on("transactionHash", hash => {
+                console.log('hash', hash);
+            })
+            .on("confirmation", confirmation => {
+                console.log('confirmation', confirmation);
+                return resolve(confirmation);
+            })
+            .on("error", error => {
+                console.log('error', error);
+            });
+        });
+        const data = await promiseFundTx;
+        //console.log('data', data);
+
+        // getLedgerEntry - truffle
         const truffle_ledgerEntry = await stm.getLedgerEntry(A);
         const truffle_balance = truffle_ledgerEntry.ccys.find(p => p.ccyTypeId == CONST.ccyType.SGD).balance;
-        console.log('truffle_ledgerEntry', truffle_ledgerEntry);
+        //console.log('truffle_ledgerEntry', truffle_ledgerEntry);
         console.log('truffle_balance', truffle_balance);
+        assert(truffle_balance == 10000, 'unexpected truffle balance after funding');
         
+        // getLedgerEntry - web3
         const web3_ledgerEntry = await contract.methods.getLedgerEntry(A).call();
         const web3_balance = web3_ledgerEntry.ccys.find(p => p.ccyTypeId == CONST.ccyType.SGD).balance;
-        console.log('web3_ledgerEntry', web3_ledgerEntry);
+        //console.log('web3_ledgerEntry', web3_ledgerEntry);
         console.log('web3_balance', web3_balance);
         console.log('web3_balance.toString()', web3_balance.toString());
+
+        assert(web3_balance.toString() == '10000', 'unexpected web3 balance after funding');
     });
 
     // it("web3 - get accounts", async () => {
@@ -111,7 +157,6 @@ contract("StMaster", accounts => {
     //         .on("receipt", receipt2 => {
     //             console.log('receipt2', receipt2);
     //             // + DB txid ...
-                
     //         });
     //         console.log('receipt1', receipt1);
     //     //});

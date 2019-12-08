@@ -20,7 +20,6 @@ contract CcyWithdrawable is Owned, StLedger {
                       int256  amount, // signed value: ledger ccyType_balance supports (theoretical) -ve balances
                       address ledgerOwner)
     public onlyOwner() onlyWhenReadWrite() {
-
         CcyLib.withdraw(ledgerData, ccyTypesData, ccyTypeId, amount, ledgerOwner);
 
         // require(ccyTypeId >= 1 && ccyTypeId <= ccyTypesData._count_ccyTypes, "Bad ccyTypeId");
