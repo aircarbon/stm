@@ -19,8 +19,12 @@ contract("StMaster", accounts => {
         global.accountNdx += 3;
         if (CONST.logTestAccountUsage)
             console.log(`global.accountNdx: ${global.accountNdx} - contract @ ${stm.address} (owner: ${accounts[0]}) - getSecTokenBatchCount: ${(await stm.getSecTokenBatchCount.call()).toString()}`);
+    });
 
-        // mint for M ([0]), move all to A ([1]) for test setup
+    // EEU ORIGINATOR FEES
+
+    it('trading fees (originator) - apply VCS carbon originator fees (+ ledger @ x4), on a 1.5 EEU trade (fee on A)', async () => {
+        // SETUP - mint for M ([0]), move all to A ([1]) 
         const M = accounts[global.accountNdx + 0];
         const A = accounts[global.accountNdx + 1];
         const B = accounts[global.accountNdx + 2];
@@ -28,7 +32,7 @@ contract("StMaster", accounts => {
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      M, ORIG_FEES_VCS_B1, [], [], { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      M, ORIG_FEES_VCS_B2, [], [], { from: accounts[0] });
 
-        // M -> A: no fees
+        // SETUP - M -> A: no fees
         const MA_qty = 2000;
         await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        A,                    { from: accounts[0] });
         await stm.setFee_TokType(CONST.tokenType.VCS,       CONST.nullAddr,          CONST.nullFees);
@@ -44,21 +48,14 @@ contract("StMaster", accounts => {
         const MA_B_balAfter = data_MA.ledgerB_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
         assert(Big(MA_B_balAfter).eq(Big(MA_qty)), 'test setup failed');
 
-        // B: fund, so ready to trade from A
-        await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        B,                    { from: accounts[0] });
-    });
+        // SETUP - B: fund, so ready to trade from A
+        await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        B,                    { from: accounts[0] });        
 
-    // EEU ORIGINATOR FEES
-
-    it('trading fees (originator) - apply VCS carbon originator fees (+ ledger @ x4), on a 1.5 EEU trade (fee on A)', async () => {
-        const A = accounts[global.accountNdx + 1]; // ...M = ndx+0
-        const B = accounts[global.accountNdx + 2];
-
-        // set global fee structure: 0
+        // TEST - set global fee structure: 0
         await stm.setFee_TokType(CONST.tokenType.VCS, CONST.nullAddr, { fee_fixed: 0, fee_percBips: 0, fee_min: 0, fee_max: 0 } );
         await stm.setFee_CcyType(CONST.ccyType.ETH, CONST.nullAddr,   { fee_fixed: 0, fee_percBips: 0, fee_min: 0, fee_max: 0 } );
 
-        // set ledger fee structure VCS for A
+        // TEST - set ledger fee structure VCS for A
         var ledgerFees = {
                fee_fixed: ORIG_FEES_VCS_B1.fee_fixed    * 4,
             fee_percBips: ORIG_FEES_VCS_B1.fee_percBips * 4,
@@ -67,7 +64,7 @@ contract("StMaster", accounts => {
         };
         await stm.setFee_TokType(CONST.tokenType.VCS, A, ledgerFees);
 
-        // transfer
+        // TEST - transfer
         const transferAmountKg = new BN(1500);
 
         const data = await helper.transferLedger({ stm, accounts, 
@@ -79,14 +76,18 @@ contract("StMaster", accounts => {
                applyFees: true,
         });
 
-        // contract owner has received expected carbon exchange fees
+        // TEST - contract owner has received expected carbon exchange fees
         const owner_balBefore = data.ledgerContractOwner_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
         const owner_balAfter  =  data.ledgerContractOwner_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
         assert(Big(owner_balAfter).eq(Big(owner_balBefore).plus(Big(data.exchangeFee_tok_A))), 'unexpected fee receiver carbon balance after transfer');
         
-        // sender has sent expected quantity and all fees
+        // TEST - sender has sent expected quantity and all fees, inc. originator carbon fee(s)
         const A_balBefore = data.ledgerA_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
         const A_balAfter  =  data.ledgerA_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
         assert(Big(A_balAfter).eq(Big(A_balBefore).minus(Big(data.originatorFees_tok_A)).minus(Big(data.exchangeFee_tok_A)).minus(Big(transferAmountKg))), 'unexpected fee payer carbon balance after transfer');
     });
+
+    // TODO: ccy end st type [0] "UNDEFINED" (1-based) + validation ccy_amount vs ccy_type in transfer etc.
+    // TODO: mixed fees both sides (carbon/ccy swap)
+    // TODO: orig both sides (carbon/carbon swap)
 });

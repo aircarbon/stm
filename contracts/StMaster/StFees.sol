@@ -15,6 +15,9 @@ contract StFees is Owned, StLedger {
     // TODO: origFees
     //
     // TODO: make ccy types & st types 1-based (so can pass zero with more meaning into transfer() + can do better validation in transfer() [ccy_amount vs. type id])
+    // TODO: specific tests for type 0 (invalid) transfers
+    //
+    // TODO: tests - fee-receiver==fee-sender; more tests for accounts other than accounts[0]
     //
     //  > origFees - TESTS:
     //   >> set MAX_BATCHES_PREVIEW to 1, try >1 batch (test require(...MAX_BATCHES_PREVIEW))

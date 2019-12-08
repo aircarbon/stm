@@ -20,6 +20,8 @@ contract("StMaster", accounts => {
 
     // NO FEES IF FEE RECEIVER = FEE SENDER
 
+    // TODO: same/more for when fee-sender/receiver != accounts[0]
+
     it('trading fees (general) - global/ledger/originator carbon fee should not be applied when fee sender is fee receiver (fee on A)', async () => {
         const A = accounts[0]; // sender is exchange account, exchange fee receiver, and batch originator fee receiver
         const B = accounts[global.accountNdx + 1];

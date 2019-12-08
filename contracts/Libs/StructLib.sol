@@ -14,7 +14,7 @@ library StructLib {
     }
 
     struct CcyTypesStruct {
-        mapping(uint256 => Ccy) _ccyTypes; // typeId -> ccy
+        mapping(uint256 => Ccy) _ccyTypes;                     // typeId (1-based) -> ccy
         uint256 _count_ccyTypes;
     }
 
@@ -28,7 +28,7 @@ library StructLib {
     }
 
     struct StTypesStruct {
-        mapping(uint256 => string) _tokenTypeNames; // typeId -> typeName
+        mapping(uint256 => string) _tokenTypeNames;             // typeId (1-based) -> typeName
         uint256 _count_tokenTypes;
     }
 

@@ -96,28 +96,28 @@ contract("StMaster", accounts => {
         try {
             await stm.withdraw(CONST.ccyType.USD, 100, accounts[global.accountNdx], { from: accounts[1] });
         } catch (ex) { return; }
-        assert.fail('expected restriction exception');
+        assert.fail('expected contract exception');
     });
 
     it('withdrawing - should not allow non-existent currency types', async () => {
         try {
             await stm.withdraw(9999, 100, accounts[global.accountNdx], { from: accounts[0] });
         } catch (ex) { return; }
-        assert.fail('expected restriction exception');
+        assert.fail('expected contract exception');
     });
 
     it('withdrawing - should not allow invalid amounts (1)', async () => {
         try {
             await stm.withdraw(CONST.ccyType.USD, 0, accounts[global.accountNdx], { from: accounts[0] });
         } catch (ex) { return; }
-        assert.fail('expected restriction exception');
+        assert.fail('expected contract exception');
     });
 
     it('withdrawing - should not allow invalid amounts (2)', async () => {
         try {
             await stm.withdraw(CONST.ccyType.USD, -1, accounts[global.accountNdx], { from: accounts[0] });
         } catch (ex) { return; }
-        assert.fail('expected restriction exception');
+        assert.fail('expected contract exception');
     });
 
     it('withdrawing - should not allow withdrawing beyond available balance', async () => {
@@ -125,7 +125,7 @@ contract("StMaster", accounts => {
         try {
             await withdrawLedger({ ccyTypeId: CONST.ccyType.USD, amount: 101, withdrawer: accounts[global.accountNdx]});
         } catch (ex) { return; }
-        assert.fail('expected restriction exception');
+        assert.fail('expected contract exception');
     });
 
     it('withdrawing - should not allow withdrawing when contract is read only', async () => {
@@ -138,6 +138,6 @@ contract("StMaster", accounts => {
             return;
         }
         await stm.setReadOnly(false, { from: accounts[0] });
-        assert.fail('expected restriction exception');
+        assert.fail('expected contract exception');
     });
 });

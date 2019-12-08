@@ -119,7 +119,7 @@ contract("StMaster", accounts => {
     //           metaValues: [],
     //         }, { from: accounts[0] } );
     //     } catch (ex) { return; }
-    //     assert.fail('expected restriction exception');
+    //     assert.fail('expected contract exception');
     // });
     
     // it('minting - should not allow minting with zero-length metadata keys or values', async () => {
@@ -129,7 +129,7 @@ contract("StMaster", accounts => {
     //           metaValues: ['testValue'],
     //         }, { from: accounts[0] } );
     //     } catch (ex) { return; }
-    //     assert.fail('expected restriction exception');
+    //     assert.fail('expected contract exception');
     // });
 
     // it('minting - should not allow minting with mismatched metadata KVP list lengths', async () => {
@@ -139,7 +139,7 @@ contract("StMaster", accounts => {
     //           metaValues: [],
     //         }, { from: accounts[0] } );
     //     } catch (ex) { return; }
-    //     assert.fail('expected restriction exception');
+    //     assert.fail('expected contract exception');
     // });
 
     // it('minting - should not allow minting batches with excessive KVP metadata', async () => {
@@ -153,7 +153,7 @@ contract("StMaster", accounts => {
     //             metaKeys, metaValues
     //         }, { from: accounts[0] } );
     //     } catch (ex) { return; }
-    //     assert.fail('expected restriction exception');
+    //     assert.fail('expected contract exception');
     // });
 
     it('post-minting metadata - should allow adding of a new KVP after minting', async () => {
@@ -189,7 +189,7 @@ contract("StMaster", accounts => {
             const testKey = 'TEST_NEW_KEY', testValue = 'TEST_NEW_VALUE';
             const addKvpTx = await stm.addMetaSecTokenBatch(batchId, 'testKey', testValue, {from: accounts[1] });
         } catch (ex) { return; }
-        assert.fail('expected restriction exception');
+        assert.fail('expected contract exception');
     });
 
     it('post-minting metadata - should not allow adding of a existing KVP after minting', async () => {
@@ -205,7 +205,7 @@ contract("StMaster", accounts => {
         try {
             await stm.addMetaSecTokenBatch(batchId, testKey, testValue);
         } catch (ex) { return; }
-        assert.fail('expected restriction exception');
+        assert.fail('expected contract exception');
     });
 
     async function mintBatchWithMetadata({ tokenType, qtyUnit, qtySecTokens, receiver, metaKeys, metaValues }) {

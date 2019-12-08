@@ -16,14 +16,14 @@ library LedgerLib {
 
         // count total # of tokens across all types
         uint256 countAllSecTokens = 0;
-        for (uint256 tokenTypeId = 0; tokenTypeId < stTypesData._count_tokenTypes; tokenTypeId++) {
+        for (uint256 tokenTypeId = 1; tokenTypeId <= stTypesData._count_tokenTypes; tokenTypeId++) {
             countAllSecTokens += ledgerData._ledger[account].tokenType_stIds[tokenTypeId].length;
         }
 
         // flatten ST IDs and sum sizes across types
         tokens = new StructLib.LedgerSecTokenReturn[](countAllSecTokens);
         uint256 flatSecTokenNdx = 0;
-        for (uint256 tokenTypeId = 0; tokenTypeId < stTypesData._count_tokenTypes; tokenTypeId++) {
+        for (uint256 tokenTypeId = 1; tokenTypeId <= stTypesData._count_tokenTypes; tokenTypeId++) {
             uint256[] memory tokenType_stIds = ledgerData._ledger[account].tokenType_stIds[tokenTypeId];
             for (uint256 ndx = 0; ndx < tokenType_stIds.length; ndx++) {
                 uint256 stId = tokenType_stIds[ndx];
@@ -47,9 +47,9 @@ library LedgerLib {
         }
 
         // populate balances for each currency type
-        ccys = new StructLib.LedgerCcyReturn[](ccyTypesData._count_ccyTypes);
-        for (uint256 ccyTypeId = 0; ccyTypeId < ccyTypesData._count_ccyTypes; ccyTypeId++) {
-            ccys[ccyTypeId] = StructLib.LedgerCcyReturn({
+        ccys = new StructLib.LedgerCcyReturn[](ccyTypesData._count_ccyTypes + 1);
+        for (uint256 ccyTypeId = 1; ccyTypeId <= ccyTypesData._count_ccyTypes; ccyTypeId++) {
+            ccys[ccyTypeId - 1] = StructLib.LedgerCcyReturn({
                    ccyTypeId: ccyTypeId,
                         name: ccyTypesData._ccyTypes[ccyTypeId].name,
                         unit: ccyTypesData._ccyTypes[ccyTypeId].unit,

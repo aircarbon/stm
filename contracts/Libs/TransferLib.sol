@@ -50,11 +50,13 @@ library TransferLib {
         require(ledgerData._ledger[a.ledger_A].exists == true, "Invalid ledger owner A");
         require(ledgerData._ledger[a.ledger_B].exists == true, "Invalid ledger owner B");
         require(a.ledger_A != a.ledger_B, "Self transfer disallowed");
-        require(a.qty_A > 0 || a.qty_B > 0 || a.ccy_amount_A > 0 || a.ccy_amount_B > 0, "Invalid transfer");
-        require(!(a.ccy_amount_A < 0 || a.ccy_amount_B < 0), "Invalid currency amounts"); // disallow negative ccy transfers
-
-        // disallow single origin multiple asset type movement
-        require(!((a.qty_A > 0 && a.ccy_amount_A > 0) || (a.qty_B > 0 && a.ccy_amount_B > 0)), "Same origin multiple asset transfer disallowed");
+        require(a.qty_A > 0 || a.qty_B > 0 || a.ccy_amount_A > 0 || a.ccy_amount_B > 0, "Invalid null transfer");
+        require(!((a.qty_A > 0 && a.ccy_amount_A > 0) || (a.qty_B > 0 && a.ccy_amount_B > 0)),
+            "Same origin multiple asset transfer disallowed"); // disallow single origin multiple asset type transfers
+        if (a.ccy_amount_A > 0) require(a.ccyTypeId_A > 0, "Invalid currency type A");
+        if (a.ccy_amount_B > 0) require(a.ccyTypeId_B > 0, "Invalid currency type B");
+        if (a.qty_A > 0) require(a.tokenTypeId_A > 0, "Invalid token type A");
+        if (a.qty_B > 0) require(a.tokenTypeId_B > 0, "Invalid token type B");
 
         // exchange fees - calc total payable (fixed + basis points), cap & collar
         StructLib.FeeStruct storage exFeeStruct_ccy_A = ledgerData._ledger[a.ledger_A].customFees.ccyType_Set[a.ccyTypeId_A]   ? ledgerData._ledger[a.ledger_A].customFees : globalFees;

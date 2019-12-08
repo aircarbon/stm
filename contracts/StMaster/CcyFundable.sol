@@ -24,7 +24,7 @@ contract CcyFundable is Owned, StLedger {
         require(_readOnly == false, "Contract is read only");
 
         CcyLib.fund(ledgerData, ccyTypesData, ccyTypeId, amount, ledgerOwner);
-        // require(ccyTypeId >= 0 && ccyTypeId < ccyTypesData._count_ccyTypes, "Invalid currency type");
+        // require(ccyTypeId >= 1 && ccyTypeId <= ccyTypesData._count_ccyTypes, "Invalid currency type");
         // require(amount >= 0, "Invalid amount"); // allow funding zero (initializes empty ledger entry), disallow negative funding
 
         // // we keep amount as signed value - ledger allows -ve balances (currently unused capability)

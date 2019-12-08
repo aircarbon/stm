@@ -29,6 +29,6 @@ contract("StMaster", accounts => {
         } catch (ex) {
             return;
         }
-        assert.fail('expected restriction exception');
+        assert.fail('expected contract exception');
     });
 });

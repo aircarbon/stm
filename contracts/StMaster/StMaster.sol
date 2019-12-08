@@ -53,13 +53,13 @@ contract StMaster is StMintable, StBurnable, CcyFundable, CcyWithdrawable, StTra
         unit = "KG";
 
         // params - token types
-        stTypesData._tokenTypeNames[0] = 'CER - UNFCCC - Certified Emission Reduction';
-        stTypesData._tokenTypeNames[1] = 'VCS - VERRA - Verified Carbon Standard';
+        stTypesData._tokenTypeNames[1] = 'CER - UNFCCC - Certified Emission Reduction';
+        stTypesData._tokenTypeNames[2] = 'VCS - VERRA - Verified Carbon Standard';
         stTypesData._count_tokenTypes = 2;
 
         // params - currency types
-        ccyTypesData._ccyTypes[0] = StructLib.Ccy({ id: 0, name: 'SGD', unit: 'cents' });
-        ccyTypesData._ccyTypes[1] = StructLib.Ccy({ id: 1, name: 'ETH', unit: 'Wei'   });
+        ccyTypesData._ccyTypes[1] = StructLib.Ccy({ id: 1, name: 'SGD', unit: 'cents' });
+        ccyTypesData._ccyTypes[2] = StructLib.Ccy({ id: 2, name: 'ETH', unit: 'Wei'   });
         ccyTypesData._count_ccyTypes = 2;
 
          // create ledger entry for contract owner - transfer fees are paid to this ledger entry

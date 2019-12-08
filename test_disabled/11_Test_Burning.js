@@ -234,7 +234,7 @@ contract("StMaster", accounts => {
         try {
             await stm.burnTokens(accounts[global.accountNdx], CONST.tokenType.UNFCCC, CONST.ktCarbon, { from: accounts[1], });
         } catch (ex) { return; }
-        assert.fail('expected restriction exception');
+        assert.fail('expected contract exception');
     });
 
     it('burning - should not allow burning for non-existent ledger owner', async () => {
@@ -244,7 +244,7 @@ contract("StMaster", accounts => {
         try {
             await stm.burnTokens(accounts[9], CONST.tokenType.UNFCCC, CONST.ktCarbon);
         } catch (ex) { return; }
-        assert(false, 'expected restriction exception');
+        assert(false, 'expected contract exception');
     });
 
     it('burning - should not allow too small a tonnage', async () => {
@@ -253,7 +253,7 @@ contract("StMaster", accounts => {
         try {
             await stm.burnTokens(accounts[global.accountNdx], CONST.tokenType.UNFCCC, 0);
         } catch (ex) { return; }
-        assert(false, 'expected restriction exception');
+        assert(false, 'expected contract exception');
     });
 
     it('burning - should not allow invalid tonnage', async () => {
@@ -261,7 +261,7 @@ contract("StMaster", accounts => {
         try {
             await stm.burnTokens(accounts[global.accountNdx], CONST.tokenType.UNFCCC, -1);
         } catch (ex) { return; }
-        assert.fail('expected restriction exception');
+        assert.fail('expected contract exception');
     });
 
     it('burning - should not allow non-existent tonnage (1)', async () => {
@@ -269,7 +269,7 @@ contract("StMaster", accounts => {
         try {
             await stm.burnTokens(accounts[global.accountNdx], CONST.tokenType.VCS, CONST.ktCarbon);
         } catch (ex) { return; }
-        assert(false, 'expected restriction exception');
+        assert(false, 'expected contract exception');
     });
 
     it('burning - should not allow non-existent tonnage (2)', async () => {
@@ -279,7 +279,7 @@ contract("StMaster", accounts => {
         try {
             await stm.burnTokens(accounts[global.accountNdx], CONST.tokenType.UNFCCC, CONST.ktCarbon);
         } catch (ex) { return; }
-        assert(false, 'expected restriction exception');
+        assert(false, 'expected contract exception');
     });
 
     it('burning - should not allow burning when contract is read only', async () => {
@@ -293,6 +293,6 @@ contract("StMaster", accounts => {
             return;
         }
         await stm.setReadOnly(false, { from: accounts[0] });
-        assert.fail('expected restriction exception');
+        assert.fail('expected contract exception');
     });
 });

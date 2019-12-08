@@ -104,7 +104,7 @@ contract("StMaster", accounts => {
     });
 
     // one-sided kg transfer, no consideration, 1 full + 1 partial EEU (split)
-    // deprecated - no multi-vEEU minting
+    // DEPRECATED - no multi-vEEU minting
     // it('transferring eeu - should allow one-sided transfer (A -> B) of 1.5 vEEUs (VCS) across ledger entries', async () => {
     //     await stm.mintSecTokenBatch(CONST.tokenType.VCS, CONST.tonCarbon, 2,      accounts[global.accountNdx + 0], CONST.nullFees, [], [], { from: accounts[0] });
     //     await stm.fund        (CONST.ccyType.USD, CONST.thousandUsd_cents, accounts[global.accountNdx + 1],         { from: accounts[0] });
@@ -235,10 +235,6 @@ contract("StMaster", accounts => {
             ccy_amount_A: 0,                                  ccyTypeId_A: 0,
             ccy_amount_B: 0,                                  ccyTypeId_B: 0,
         });
-        // console.log('ledgerA_before.tokens', data.ledgerA_before.tokens);
-        // console.log('ledgerB_before.tokens', data.ledgerB_before.tokens);
-        // console.log('ledgerA_after.tokens', data.ledgerA_after.tokens);
-        // console.log('ledgerB_after.tokens', data.ledgerB_after.tokens);
     });
 
     // merge test
@@ -294,8 +290,6 @@ contract("StMaster", accounts => {
             });
             assert(data.ledgerB_after.tokens.length == data.ledgerB_before.tokens.length, 'ledger B was not merged');
             assert(data.eeuPartialEvents.some(p => data.ledgerB_before.tokens.some(p2 => p2.stId == p.mergedToSecTokenId)), 'unexpected merge event data');
-            //console.log(`i=${i} data.ledgerA_after.tokens`, data.ledgerA_after.tokens);
-            //console.log(`i=${i} data.ledgerB_after.tokens`, data.ledgerB_after.tokens);
         }
     });
 
@@ -338,15 +332,18 @@ contract("StMaster", accounts => {
         try {
             await helper.transferWrapper(stm, accounts,
                 accounts[global.accountNdx + 0], accounts[global.accountNdx + 1],
-                -1,                          // qty_A
+                -1,                          // qty_A --> ## UNSIGNED VALUE, will wrap to large uint; expect "insufficient tokens"
                 CONST.tokenType.VCS,         // tokenTypeId_A
                 0,                           // qty_B
                 0,                           // tokenTypeId_B
                 0, 0, 0, 0, 
                 false,                       // applyFees
                 { from: accounts[0] });
-        } catch (ex) { return; }
-        assert.fail('expected restriction exception');
+        } catch (ex) { 
+            assert(ex.reason == 'Insufficient tokens of supplied type', `unexpected: ${ex.reason}`);
+            return;
+        }
+        assert.fail('expected contract exception');
     });
 
     it('transferring eeu - should not allow one-sided transfer (B -> A) of an invalid tonnage', async () => {
@@ -357,13 +354,16 @@ contract("StMaster", accounts => {
                 accounts[global.accountNdx + 0], accounts[global.accountNdx + 1],
                 0,                           // qty_A
                 0,                           // tokenTypeId_A
-                -1,                          // qty_B
+                -1,                          // qty_B --> ## UNSIGNED VALUE, will wrap to large uint, and B has no VCS; expect "no tokens"
                 CONST.tokenType.VCS,         // tokenTypeId_B
                 0, 0, 0, 0, 
                 false,                       // applyFees
                 { from: accounts[0] });
-        } catch (ex) { return; }
-        assert.fail('expected restriction exception');
+        } catch (ex) { 
+            assert(ex.reason == 'No tokens of supplied type', `unexpected: ${ex.reason}`);
+            return;
+        }
+        assert.fail('expected contract exception');
     });    
 
     it('transferring eeu - should not allow one-sided transfer (A -> B) of a tonnage in excess of the amount held, correct type held', async () => {
@@ -379,8 +379,11 @@ contract("StMaster", accounts => {
                 0, 0, 0, 0, 
                 false,                       // applyFees
                 { from: accounts[0] });
-        } catch (ex) { return; }
-        assert.fail('expected restriction exception');
+        } catch (ex) { 
+            assert(ex.reason == 'Insufficient tokens of supplied type', `unexpected: ${ex.reason}`);
+            return;
+        }
+        assert.fail('expected contract exception');
     });
 
     it('transferring eeu - should not allow one-sided transfer (A -> B) of a tonnage in excess of the amount held, incorrect type held', async () => {
@@ -396,8 +399,11 @@ contract("StMaster", accounts => {
                 0, 0, 0, 0, 
                 false,                       // applyFees
                 { from: accounts[0] });
-        } catch (ex) { return; }
-        assert.fail('expected restriction exception');
+        } catch (ex) { 
+            assert(ex.reason == 'No tokens of supplied type', `unexpected: ${ex.reason}`);
+            return;
+        }
+        assert.fail('expected contract exception');
     });    
 
     it('transferring eeu - should not allow one-sided transfer (B -> A) of a tonnage in excess of the amount held, correct type held', async () => {
@@ -413,8 +419,11 @@ contract("StMaster", accounts => {
                 0, 0, 0, 0, 
                 false,                       // applyFees
                 { from: accounts[0] });
-        } catch (ex) { return; }
-        assert.fail('expected restriction exception');
+        } catch (ex) { 
+            assert(ex.reason == 'Insufficient tokens of supplied type', `unexpected: ${ex.reason}`);
+            return;
+        }
+        assert.fail('expected contract exception');
     });
     
     it('transferring eeu - should not allow one-sided transfer (B -> A) of a tonnage in excess of the amount held, incorrect type held', async () => {
@@ -430,7 +439,10 @@ contract("StMaster", accounts => {
                 0, 0, 0, 0, 
                 false,                       // applyFees
                 { from: accounts[0] });
-        } catch (ex) { return; }
-        assert.fail('expected restriction exception');
+        } catch (ex) { 
+            assert(ex.reason == 'No tokens of supplied type', `unexpected: ${ex.reason}`);
+            return;
+        }
+        assert.fail('expected contract exception');
     });
 });

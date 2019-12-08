@@ -16,20 +16,26 @@ contract("StMaster", accounts => {
     it('transferring - should not allow non-owner to transfer across ledger entries', async () => {
         try {
             await helper.transferWrapper(stm, accounts, accounts[global.accountNdx + 0], accounts[global.accountNdx + 1], 0, 0, 0, 0, 0, 0, 0, 0, false, { from: accounts[1] });
-        } catch (ex) { return; }
-        assert.fail('expected restriction exception');
+        } catch (ex) { 
+            assert(ex.reason == 'Restricted method', `unexpected: ${ex.reason}`);
+            return;
+        }
+        assert.fail('expected contract exception');
     });
 
     it('transferring - should not allow a null transfer', async () => {
         await stm.fund(CONST.ccyType.USD, CONST.thousandUsd_cents,       accounts[global.accountNdx + 0], { from: accounts[0] });
         await stm.fund(CONST.ccyType.USD, CONST.thousandUsd_cents,       accounts[global.accountNdx + 1], { from: accounts[0] });
         try {
-            await helper.transferWrapper(stm, accounts, ccounts[global.accountNdx + 0], accounts[global.accountNdx + 1], 0, 0, 0, 0, 0, 0, 0, 0, false, { from: accounts[0] });
-        } catch (ex) { return; }
-        assert.fail('expected restriction exception');
+            await helper.transferWrapper(stm, accounts, accounts[global.accountNdx + 0], accounts[global.accountNdx + 1], 0, 0, 0, 0, 0, 0, 0, 0, false, { from: accounts[0] });
+        } catch (ex) {
+            assert(ex.reason == 'Invalid null transfer', `unexpected: ${ex.reason}`);
+            return;
+        }
+        assert.fail('expected contract exception');
     });
     
-    it('transferring - should not allow a transfer to an unkown ledger entry', async () => {
+    it('transferring - should not allow a transfer to an unkown ledger entry (B)', async () => {
         await stm.fund(CONST.ccyType.USD, CONST.thousandUsd_cents,       accounts[global.accountNdx + 0], { from: accounts[0] });
         try {
             await helper.transferWrapper(stm, accounts, accounts[global.accountNdx + 0], accounts[global.accountNdx + 1], 
@@ -40,11 +46,14 @@ contract("StMaster", accounts => {
                 0,                           // ccyTypeId_B
                 false,
                 { from: accounts[0] });
-        } catch (ex) { return; }
-        assert.fail('expected restriction exception');
+        } catch (ex) { 
+            assert(ex.reason == 'Invalid ledger owner B', `unexpected: ${ex.reason}`);
+            return; 
+        }
+        assert.fail('expected contract exception');
     });
 
-    it('transferring - should not allow a transfer from an unkown ledger entry', async () => {
+    it('transferring - should not allow a transfer from an unkown ledger entry (A)', async () => {
         await stm.fund(CONST.ccyType.USD, CONST.thousandUsd_cents,       accounts[global.accountNdx + 1], { from: accounts[0] });
         try {
             await helper.transferWrapper(stm, accounts, accounts[global.accountNdx + 0], accounts[global.accountNdx + 1], 
@@ -55,8 +64,11 @@ contract("StMaster", accounts => {
                 0,                           // ccyTypeId_B
                 false,                       // applyFees
                 { from: accounts[0] });
-        } catch (ex) { return; }
-        assert.fail('expected restriction exception');
+        } catch (ex) {  
+            assert(ex.reason == 'Invalid ledger owner A', `unexpected: ${ex.reason}`);
+            return;
+        }
+        assert.fail('expected contract exception');
     });
 
     it('transferring - should not allow single-origin multiple-asset transfers (1)', async () => {
@@ -76,8 +88,11 @@ contract("StMaster", accounts => {
                 0,                           // ccyTypeId_B
                 false,
                 { from: accounts[0] });
-        } catch (ex) { return; }
-        assert.fail('expected restriction exception');
+        } catch (ex) { 
+            assert(ex.reason == 'Same origin multiple asset transfer disallowed', `unexpected: ${ex.reason}`);
+            return;
+        }
+        assert.fail('expected contract exception');
     });
 
     it('transferring - should not allow single-origin multiple-asset transfers (2)', async () => {
@@ -97,8 +112,11 @@ contract("StMaster", accounts => {
                 CONST.ccyType.USD,           // ccyTypeId_B
                 false,                       // applyFees
                 { from: accounts[0] });
-        } catch (ex) { return; }
-        assert.fail('expected restriction exception');
+        } catch (ex) { 
+            assert(ex.reason == 'Same origin multiple asset transfer disallowed', `unexpected: ${ex.reason}`);
+            return;
+        }
+        assert.fail('expected contract exception');
     });
 
     it('transferring - should not allow single-origin multiple-asset transfers (3)', async () => {
@@ -118,8 +136,11 @@ contract("StMaster", accounts => {
                 CONST.ccyType.USD,           // ccyTypeId_B
                 false,                       // applyFees
                 { from: accounts[0] });
-        } catch (ex) { return; }
-        assert.fail('expected restriction exception');
+        } catch (ex) { 
+            assert(ex.reason == 'Same origin multiple asset transfer disallowed', `unexpected: ${ex.reason}`);
+            return; 
+        }
+        assert.fail('expected contract exception');
     });
 
     it('transferring - should not allow transfer to self', async () => {
@@ -134,8 +155,11 @@ contract("StMaster", accounts => {
                 0,                           // ccyTypeId_B
                 false,                       // applyFees
                 { from: accounts[0] });
-        } catch (ex) { return; }
-        assert.fail('expected restriction exception');
+        } catch (ex) { 
+            assert(ex.reason == 'Self transfer disallowed', `unexpected: ${ex.reason}`);
+            return; 
+        }
+        assert.fail('expected contract exception');
     });
 
     it('transferring - should not allow transfers when contract is read only', async () => {
@@ -153,10 +177,86 @@ contract("StMaster", accounts => {
                 { from: accounts[0] });
         } catch (ex) { 
             await stm.setReadOnly(false, { from: accounts[0] });
+            assert(ex.reason == 'Contract is read only', `unexpected: ${ex.reason}`);
             return;
         }
         await stm.setReadOnly(false, { from: accounts[0] });
-        assert.fail('expected restriction exception');
+        assert.fail('expected contract exception');
     });
 
+    it('transferring - should not allow mismatched ccy type/amount transfers (ccy A)', async () => {
+        await stm.fund(CONST.ccyType.USD, CONST.thousandUsd_cents,       accounts[global.accountNdx + 0],         { from: accounts[0] });
+        await stm.fund(CONST.ccyType.ETH, CONST.oneEth_wei,              accounts[global.accountNdx + 1],         { from: accounts[0] });
+        try {
+            await helper.transferWrapper(stm, accounts, accounts[global.accountNdx + 0], accounts[global.accountNdx + 1], 
+                0, 0, 0, 0, 
+                CONST.thousandUsd_cents,     // ccy_amount_A
+                0,                           // ccyTypeId_A --> ###
+                CONST.oneEth_wei,            // ccy_amount_B
+                CONST.ccyType.ETH,           // ccyTypeId_B
+                false,                       // applyFees
+                { from: accounts[0] });
+        } catch (ex) { 
+            assert(ex.reason == 'Invalid currency type A', `unexpected: ${ex.reason}`);
+            return; 
+        }
+        assert.fail('expected contract exception');
+    });
+
+    it('transferring - should not allow mismatched ccy type/amount transfers (ccy B)', async () => {
+        await stm.fund(CONST.ccyType.USD, CONST.thousandUsd_cents,       accounts[global.accountNdx + 0],         { from: accounts[0] });
+        await stm.fund(CONST.ccyType.ETH, CONST.oneEth_wei,              accounts[global.accountNdx + 1],         { from: accounts[0] });
+        try {
+            await helper.transferWrapper(stm, accounts, accounts[global.accountNdx + 0], accounts[global.accountNdx + 1], 
+                0, 0, 0, 0, 
+                CONST.thousandUsd_cents,     // ccy_amount_A
+                CONST.ccyType.USD,           // ccyTypeId_A
+                CONST.oneEth_wei,            // ccy_amount_B
+                0,                           // ccyTypeId_B --> ###
+                false,                       // applyFees
+                { from: accounts[0] });
+        } catch (ex) { 
+            assert(ex.reason == 'Invalid currency type B', `unexpected: ${ex.reason}`);
+            return; 
+        }
+        assert.fail('expected contract exception');
+    });
+
+    it('transferring - should not allow mismatched ccy type/amount transfers (tok A)', async () => {
+        await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.ktCarbon, 1, accounts[global.accountNdx + 0], CONST.nullFees, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.ktCarbon, 1, accounts[global.accountNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
+        try {
+            await helper.transferWrapper(stm, accounts, accounts[global.accountNdx + 0], accounts[global.accountNdx + 1], 
+                CONST.ktCarbon,              // qty_A
+                0,                           // tokenTypeId_A --> ###
+                CONST.ktCarbon,              // qty_B
+                CONST.tokenType.VCS,         // tokenTypeId_B
+                0, 0, 0, 0,
+                false,                       // applyFees
+                { from: accounts[0] });
+        } catch (ex) { 
+            assert(ex.reason == 'Invalid token type A', `unexpected: ${ex.reason}`);
+            return; 
+        }
+        assert.fail('expected contract exception');
+    });
+
+    it('transferring - should not allow mismatched ccy type/amount transfers (tok B)', async () => {
+        await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.ktCarbon, 1, accounts[global.accountNdx + 0], CONST.nullFees, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.ktCarbon, 1, accounts[global.accountNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
+        try {
+            await helper.transferWrapper(stm, accounts, accounts[global.accountNdx + 0], accounts[global.accountNdx + 1], 
+                CONST.ktCarbon,              // qty_A
+                CONST.tokenType.VCS,         // tokenTypeId_A 
+                CONST.ktCarbon,              // qty_B
+                0,                           // tokenTypeId_B --> ###
+                0, 0, 0, 0,
+                false,                       // applyFees
+                { from: accounts[0] });
+        } catch (ex) { 
+            assert(ex.reason == 'Invalid token type B', `unexpected: ${ex.reason}`);
+            return; 
+        }
+        assert.fail('expected contract exception');
+    });
 });

@@ -27,7 +27,7 @@ contract StBurnable is Owned, StLedger {
 
         // require(ledgerData._ledger[ledgerOwner].exists == true, "Invalid ledger owner");
         // require(burnQty >= 1, "Minimum burnQty one unit");
-        // require(tokenTypeId >= 0 && tokenTypeId < stTypesData._count_tokenTypes, "Invalid ST type");
+        // require(tokenTypeId >= 1 && tokenTypeId <= stTypesData._count_tokenTypes, "Invalid ST type");
 
         // // check ledger owner has sufficient carbon tonnage of supplied type
         // require(StructLib.sufficientTokens(ledgerData, ledgerOwner, tokenTypeId, uint256(burnQty), 0) == true, "Insufficient carbon held by ledger owner");

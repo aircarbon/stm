@@ -24,7 +24,7 @@ library FeeLib {
         address ledgerOwner,
         StructLib.SetFeeArgs memory a)
     public {
-        require(tokenTypeId >= 0 && tokenTypeId < stTypesData._count_tokenTypes, "Invalid ST type");
+        require(tokenTypeId >= 1 && tokenTypeId <= stTypesData._count_tokenTypes, "Invalid ST type");
 
         StructLib.FeeStruct storage feeStruct = globalFees;
         if (ledgerOwner != address(0x0)) {
@@ -58,7 +58,7 @@ library FeeLib {
         address ledgerOwner,
         StructLib.SetFeeArgs memory a)
     public {
-        require(ccyTypeId >= 0 && ccyTypeId < ccyTypesData._count_ccyTypes, "Invalid currency type");
+        require(ccyTypeId >= 1 && ccyTypeId <= ccyTypesData._count_ccyTypes, "Invalid currency type");
 
         StructLib.FeeStruct storage feeStruct = globalFees;
         if (ledgerOwner != address(0x0)) {

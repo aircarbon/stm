@@ -18,15 +18,14 @@ library TokenLib {
         StructLib.StTypesStruct storage stTypesData,
         string memory name)
     public {
-        for (uint256 tokenTypeId = 0; tokenTypeId < stTypesData._count_tokenTypes; tokenTypeId++) {
+        for (uint256 tokenTypeId = 1; tokenTypeId <= stTypesData._count_tokenTypes; tokenTypeId++) {
             require(keccak256(abi.encodePacked(stTypesData._tokenTypeNames[tokenTypeId])) != keccak256(abi.encodePacked(name)),
                     "ST type name already exists");
         }
 
+        stTypesData._count_tokenTypes++;
         stTypesData._tokenTypeNames[stTypesData._count_tokenTypes] = name;
         emit AddedSecTokenType(stTypesData._count_tokenTypes, name);
-
-        stTypesData._count_tokenTypes++;
     }
 
     function getSecTokenTypes(
@@ -35,8 +34,8 @@ library TokenLib {
         StructLib.SecTokenTypeReturn[] memory tokenTypes;
         tokenTypes = new StructLib.SecTokenTypeReturn[](stTypesData._count_tokenTypes);
 
-        for (uint256 tokenTypeId = 0; tokenTypeId < stTypesData._count_tokenTypes; tokenTypeId++) {
-            tokenTypes[tokenTypeId] = StructLib.SecTokenTypeReturn({
+        for (uint256 tokenTypeId = 1; tokenTypeId <= stTypesData._count_tokenTypes; tokenTypeId++) {
+            tokenTypes[tokenTypeId - 1] = StructLib.SecTokenTypeReturn({
                 id: tokenTypeId,
               name: stTypesData._tokenTypeNames[tokenTypeId]
             });
@@ -64,7 +63,7 @@ library TokenLib {
         MintSecTokenBatchArgs memory a)
     public {
 
-        require(a.tokenTypeId >= 0 && a.tokenTypeId < stTypesData._count_tokenTypes, "Invalid ST type");
+        require(a.tokenTypeId >= 1 && a.tokenTypeId <= stTypesData._count_tokenTypes, "Invalid ST type");
         //require(a.mintSecTokenCount >= 1, "Minimum one ST required");
         require(a.mintSecTokenCount == 1, "Exactly one ST required");
         require(a.mintQty >= 1, "Minimum one mintQty required");
@@ -168,7 +167,7 @@ library TokenLib {
     public {
         require(ledgerData._ledger[ledgerOwner].exists == true, "Invalid ledger owner");
         require(burnQty >= 1, "Minimum burnQty one unit");
-        require(tokenTypeId >= 0 && tokenTypeId < stTypesData._count_tokenTypes, "Invalid ST type");
+        require(tokenTypeId >= 1 && tokenTypeId <= stTypesData._count_tokenTypes, "Invalid ST type");
 
         // check ledger owner has sufficient carbon tonnage of supplied type
         require(StructLib.sufficientTokens(ledgerData, ledgerOwner, tokenTypeId, uint256(burnQty), 0) == true, "Insufficient carbon held by ledger owner");

@@ -14,29 +14,29 @@ library CcyLib {
         string memory name,
         string memory unit)
     public {
-        for (uint256 ccyTypeId = 0; ccyTypeId < ccyTypesData._count_ccyTypes; ccyTypeId++) {
+        for (uint256 ccyTypeId = 1; ccyTypeId <= ccyTypesData._count_ccyTypes; ccyTypeId++) {
             require(keccak256(abi.encodePacked(ccyTypesData._ccyTypes[ccyTypeId].name)) != keccak256(abi.encodePacked(name)),
                     "Currency type name already exists");
         }
 
+        ccyTypesData._count_ccyTypes++;
         ccyTypesData._ccyTypes[ccyTypesData._count_ccyTypes] = StructLib.Ccy({
               id: ccyTypesData._count_ccyTypes,
             name: name,
             unit: unit
         });
         emit AddedCcyType(ccyTypesData._count_ccyTypes, name, unit);
-
-        ccyTypesData._count_ccyTypes++;
     }
 
     function getCcyTypes(
         StructLib.CcyTypesStruct storage ccyTypesData)
-    public view returns (StructLib.GetCcyTypesReturn memory) {
+    public view
+    returns (StructLib.GetCcyTypesReturn memory) {
         StructLib.Ccy[] memory ccyTypes;
         ccyTypes = new StructLib.Ccy[](ccyTypesData._count_ccyTypes);
 
-        for (uint256 ccyTypeId = 0; ccyTypeId < ccyTypesData._count_ccyTypes; ccyTypeId++) {
-            ccyTypes[ccyTypeId] = StructLib.Ccy({
+        for (uint256 ccyTypeId = 1; ccyTypeId <= ccyTypesData._count_ccyTypes; ccyTypeId++) {
+            ccyTypes[ccyTypeId - 1] = StructLib.Ccy({
                     id: ccyTypesData._ccyTypes[ccyTypeId].id,
                   name: ccyTypesData._ccyTypes[ccyTypeId].name,
                   unit: ccyTypesData._ccyTypes[ccyTypeId].unit
@@ -57,7 +57,7 @@ library CcyLib {
         int256  amount, // signed value: ledger ccyType_balance supports (theoretical) -ve balances
         address ledgerOwner)
     public {
-        require(ccyTypeId >= 0 && ccyTypeId < ccyTypesData._count_ccyTypes, "Invalid currency type");
+        require(ccyTypeId >= 1 && ccyTypeId <= ccyTypesData._count_ccyTypes, "Invalid currency type");
         require(amount >= 0, "Invalid amount"); // allow funding zero (initializes empty ledger entry), disallow negative funding
 
         // we keep amount as signed value - ledger allows -ve balances (currently unused capability)
@@ -89,7 +89,7 @@ library CcyLib {
         int256  amount, // signed value: ledger ccyType_balance supports (theoretical) -ve balances
         address ledgerOwner)
     public {
-        require(ccyTypeId >= 0 && ccyTypeId < ccyTypesData._count_ccyTypes, "Invalid currency type");
+        require(ccyTypeId >= 1 && ccyTypeId <= ccyTypesData._count_ccyTypes, "Invalid currency type");
         require(amount > 0, "Minimum one currency unit required"); // disallow negative withdrawing
         require(ledgerData._ledger[ledgerOwner].exists == true, "Invalid ledger owner");
         require(ledgerData._ledger[ledgerOwner].ccyType_balance[ccyTypeId] >= amount, "Insufficient ledger owner balance");

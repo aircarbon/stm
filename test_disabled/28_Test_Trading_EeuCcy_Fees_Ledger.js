@@ -585,7 +585,7 @@ contract("StMaster", accounts => {
             });
         }
         catch (ex) { return; }
-        assert.fail('expected restriction exception');
+        assert.fail('expected contract exception');
     });
 
     it('trading fees (ledger) - should not allow a transfer with insufficient carbon to cover collared ledger fee (fee on A)', async () => {
@@ -613,6 +613,6 @@ contract("StMaster", accounts => {
             });
         }
         catch (ex) { return; }
-        assert.fail('expected restriction exception');
+        assert.fail('expected contract exception');
     });
 });

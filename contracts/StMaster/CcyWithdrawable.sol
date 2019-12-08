@@ -25,7 +25,7 @@ contract CcyWithdrawable is Owned, StLedger {
 
         CcyLib.withdraw(ledgerData, ccyTypesData, ccyTypeId, amount, ledgerOwner);
 
-        // require(ccyTypeId >= 0 && ccyTypeId < ccyTypesData._count_ccyTypes, "Invalid currency type");
+        // require(ccyTypeId >= 1 && ccyTypeId <= ccyTypesData._count_ccyTypes, "Invalid currency type");
         // require(amount > 0, "Minimum one currency unit required"); // disallow negative withdrawing
         // require(ledgerData._ledger[ledgerOwner].exists == true, "Invalid ledger owner");
         // require(ledgerData._ledger[ledgerOwner].ccyType_balance[ccyTypeId] >= amount, "Insufficient ledger owner balance");

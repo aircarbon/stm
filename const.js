@@ -26,14 +26,14 @@ EXCHANGE_FEE: 1,
 
     // token types (contract data)
     tokenType: Object.freeze({
-        UNFCCC: 0,
-           VCS: 1,
+        UNFCCC: 1,
+           VCS: 2,
     }),
 
     // ccy types (contract data)
     ccyType: Object.freeze({
-        USD: 0,
-        ETH: 1,
+        USD: 1,
+        ETH: 2,
     }), 
 
     // eeu kg constants
