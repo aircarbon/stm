@@ -20,7 +20,7 @@ contract("StMaster", accounts => {
 
     // EEU MULTI FEES: LEDGER OVERRIDE
 
-    it('trading fees (ledger) - apply VCS carbon ledger override fee 1000 BP + 5 KG fixed (cap 10 KG) on a small trade (fee on A)', async () => {
+    it('trading fees (ledger) - apply VCS token ledger override fee 1000 BP + 5 KG fixed (cap 10 KG) on a small trade (fee on A)', async () => {
         const A = accounts[global.accountNdx + 0];
         const B = accounts[global.accountNdx + 1];
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      A, CONST.nullFees, [], [], { from: accounts[0] });
@@ -60,15 +60,15 @@ contract("StMaster", accounts => {
         // contract owner has received expected token fees
         const owner_balBefore = data.ledgerContractOwner_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
         const owner_balAfter  =  data.ledgerContractOwner_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
-        assert(Big(owner_balAfter).eq(Big(owner_balBefore).plus(Big(expectedFeeKg))), 'unexpected fee receiver carbon balance after transfer');
+        assert(Big(owner_balAfter).eq(Big(owner_balBefore).plus(Big(expectedFeeKg))), 'unexpected fee receiver token balance after transfer');
         
         // sender has sent expected quantity and fees
         const A_balBefore = data.ledgerA_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
         const A_balAfter  =  data.ledgerA_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
-        assert(Big(A_balAfter).eq(Big(A_balBefore).minus(Big(expectedFeeKg)).minus(Big(transferAmountKg))), 'unexpected fee payer carbon balance after transfer');
+        assert(Big(A_balAfter).eq(Big(A_balBefore).minus(Big(expectedFeeKg)).minus(Big(transferAmountKg))), 'unexpected fee payer token balance after transfer');
     });
 
-    it('trading fees (ledger) - apply then clear VCS carbon ledger override fee 1000 BP + 5 KG fixed (cap 10 KG) on a small trade (fee on A)', async () => {
+    it('trading fees (ledger) - apply then clear VCS token ledger override fee 1000 BP + 5 KG fixed (cap 10 KG) on a small trade (fee on A)', async () => {
         const A = accounts[global.accountNdx + 0];
         const B = accounts[global.accountNdx + 1];
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      A, CONST.nullFees, [], [], { from: accounts[0] });
@@ -115,15 +115,15 @@ contract("StMaster", accounts => {
         // contract owner has received expected token fees
         const owner_balBefore = data.ledgerContractOwner_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
         const owner_balAfter  =  data.ledgerContractOwner_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
-        assert(Big(owner_balAfter).eq(Big(owner_balBefore).plus(Big(expectedFeeKg))), 'unexpected fee receiver carbon balance after transfer');
+        assert(Big(owner_balAfter).eq(Big(owner_balBefore).plus(Big(expectedFeeKg))), 'unexpected fee receiver token balance after transfer');
         
         // sender has sent expected quantity and fees
         const A_balBefore = data.ledgerA_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
         const A_balAfter  =  data.ledgerA_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
-        assert(Big(A_balAfter).eq(Big(A_balBefore).minus(Big(expectedFeeKg)).minus(Big(transferAmountKg))), 'unexpected fee payer carbon balance after transfer');
+        assert(Big(A_balAfter).eq(Big(A_balBefore).minus(Big(expectedFeeKg)).minus(Big(transferAmountKg))), 'unexpected fee payer token balance after transfer');
     });
 
-    it('trading fees (ledger) - apply VCS carbon ledger override fee 1000 BP + 1000 KG fixed (collar 100m tons), on a large (0.5 GT) trade (fee on B)', async () => {
+    it('trading fees (ledger) - apply VCS token ledger override fee 1000 BP + 1000 KG fixed (collar 100m tons), on a large (0.5 GT) trade (fee on B)', async () => {
         const A = accounts[global.accountNdx + 0];
         const B = accounts[global.accountNdx + 1];
 
@@ -165,15 +165,15 @@ contract("StMaster", accounts => {
         // contract owner has received expected token fees
         const owner_balBefore = data.ledgerContractOwner_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
         const owner_balAfter  =  data.ledgerContractOwner_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
-        assert(Big(owner_balAfter).eq(Big(owner_balBefore).plus(Big(expectedFeeKg))), 'unexpected fee receiver carbon balance after transfer');
+        assert(Big(owner_balAfter).eq(Big(owner_balBefore).plus(Big(expectedFeeKg))), 'unexpected fee receiver token balance after transfer');
         
         // sender has sent expected quantity and fees
         const B_balBefore = data.ledgerB_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
         const B_balAfter  =  data.ledgerB_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
-        assert(Big(B_balAfter).eq(Big(B_balBefore).minus(Big(expectedFeeKg)).minus(Big(transferAmountKg))), 'unexpected fee payer carbon balance after transfer');
+        assert(Big(B_balAfter).eq(Big(B_balBefore).minus(Big(expectedFeeKg)).minus(Big(transferAmountKg))), 'unexpected fee payer token balance after transfer');
     });
 
-    it('trading fees (ledger) - apply then clear VCS carbon ledger override fee 1000 BP + 1000 KG fixed (collar 100m tons), on a large (0.5 GT) trade (fee on B)', async () => {
+    it('trading fees (ledger) - apply then clear VCS token ledger override fee 1000 BP + 1000 KG fixed (collar 100m tons), on a large (0.5 GT) trade (fee on B)', async () => {
         const A = accounts[global.accountNdx + 0];
         const B = accounts[global.accountNdx + 1];
 
@@ -222,12 +222,12 @@ contract("StMaster", accounts => {
         // contract owner has received expected token fees
         const owner_balBefore = data.ledgerContractOwner_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
         const owner_balAfter  =  data.ledgerContractOwner_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
-        assert(Big(owner_balAfter).eq(Big(owner_balBefore).plus(Big(expectedFeeKg))), 'unexpected fee receiver carbon balance after transfer');
+        assert(Big(owner_balAfter).eq(Big(owner_balBefore).plus(Big(expectedFeeKg))), 'unexpected fee receiver token balance after transfer');
         
         // sender has sent expected quantity and fees
         const B_balBefore = data.ledgerB_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
         const B_balAfter  =  data.ledgerB_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
-        assert(Big(B_balAfter).eq(Big(B_balBefore).minus(Big(expectedFeeKg)).minus(Big(transferAmountKg))), 'unexpected fee payer carbon balance after transfer');
+        assert(Big(B_balAfter).eq(Big(B_balBefore).minus(Big(expectedFeeKg)).minus(Big(transferAmountKg))), 'unexpected fee payer token balance after transfer');
     });
 
     // CCY MULTI FEES: LEDGER OVERRIDE
@@ -484,12 +484,12 @@ contract("StMaster", accounts => {
         // contract owner has received expected token fee
         const owner_balBeforeKg = data.ledgerContractOwner_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
         const owner_balAfterKg  =  data.ledgerContractOwner_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
-        assert(Big(owner_balAfterKg).eq(Big(owner_balBeforeKg).plus(Big(expectedFeeKg))), 'unexpected fee receiver carbon balance after transfer');
+        assert(Big(owner_balAfterKg).eq(Big(owner_balBeforeKg).plus(Big(expectedFeeKg))), 'unexpected fee receiver token balance after transfer');
         
         // carbon sender has sent expected carbon quantity and paid exepcted token fee
         const A_balBefore = data.ledgerA_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
         const A_balAfter  =  data.ledgerA_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
-        assert(Big(A_balAfter).eq(Big(A_balBefore).minus(Big(expectedFeeKg)).minus(Big(transferAmountKg))), 'unexpected fee payer carbon balance after transfer');
+        assert(Big(A_balAfter).eq(Big(A_balBefore).minus(Big(expectedFeeKg)).minus(Big(transferAmountKg))), 'unexpected fee payer token balance after transfer');
 
         // contract owner has received expected ccy fee
         const owner_balBeforeCcy = data.ledgerContractOwner_before.ccys.filter(p => p.ccyTypeId == CONST.ccyType.ETH).map(p => p.balance).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
@@ -542,12 +542,12 @@ contract("StMaster", accounts => {
         // contract owner has received expected token fee
         const owner_balBeforeKg = data.ledgerContractOwner_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
         const owner_balAfterKg  =  data.ledgerContractOwner_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
-        assert(Big(owner_balAfterKg).eq(Big(owner_balBeforeKg).plus(Big(expectedFeeKg))), 'unexpected fee receiver carbon balance after transfer');
+        assert(Big(owner_balAfterKg).eq(Big(owner_balBeforeKg).plus(Big(expectedFeeKg))), 'unexpected fee receiver token balance after transfer');
         
         // carbon sender has sent expected carbon quantity and paid exepcted token fee
         const A_balBefore = data.ledgerA_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
         const A_balAfter  =  data.ledgerA_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
-        assert(Big(A_balAfter).eq(Big(A_balBefore).minus(Big(expectedFeeKg)).minus(Big(transferAmountKg))), 'unexpected fee payer carbon balance after transfer');
+        assert(Big(A_balAfter).eq(Big(A_balBefore).minus(Big(expectedFeeKg)).minus(Big(transferAmountKg))), 'unexpected fee payer token balance after transfer');
 
         // contract owner has received expected ccy fee
         const owner_balBeforeCcy = data.ledgerContractOwner_before.ccys.filter(p => p.ccyTypeId == CONST.ccyType.ETH).map(p => p.balance).reduce((a,b) => Big(a).plus(Big(b)), Big(0));

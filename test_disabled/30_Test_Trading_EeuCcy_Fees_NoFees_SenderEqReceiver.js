@@ -51,7 +51,7 @@ contract("StMaster", accounts => {
         // contract owner (A) has paid no fees
         const owner_balBefore = data.ledgerContractOwner_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
         const owner_balAfter  =  data.ledgerContractOwner_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
-        assert(Big(owner_balAfter).eq(Big(owner_balBefore).minus(Big(transferAmountKg)).plus(Big(expectedFeeKg))), 'unexpected fee receiver carbon balance after transfer');
+        assert(Big(owner_balAfter).eq(Big(owner_balBefore).minus(Big(transferAmountKg)).plus(Big(expectedFeeKg))), 'unexpected fee receiver token balance after transfer');
         
         // receiver (B) has received expected quantity
         const receiver_balBefore = data.ledgerB_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
@@ -90,7 +90,7 @@ contract("StMaster", accounts => {
         // contract owner (B) has paid no fees
         const owner_balBefore = data.ledgerContractOwner_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
         const owner_balAfter  =  data.ledgerContractOwner_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
-        assert(Big(owner_balAfter).eq(Big(owner_balBefore).minus(Big(transferAmountKg)).plus(Big(expectedFeeKg))), 'unexpected fee receiver carbon balance after transfer');
+        assert(Big(owner_balAfter).eq(Big(owner_balBefore).minus(Big(transferAmountKg)).plus(Big(expectedFeeKg))), 'unexpected fee receiver token balance after transfer');
         
         // receiver (A) has received expected quantity
         const receiver_balBefore = data.ledgerA_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
