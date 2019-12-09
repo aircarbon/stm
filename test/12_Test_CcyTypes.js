@@ -30,7 +30,7 @@ contract("StMaster", accounts => {
 
     it('ccy types - should make visible newly added currency types in the ledger', async () => {
         // add new ccy type
-        const addCcyTx = await stm.addCcyType('TEST_COIN', 'TEST_UNIT');
+        const addCcyTx = await stm.addCcyType('TEST_COIN', 'TEST_UNIT', 2);
         const types = (await stm.getCcyTypes()).ccyTypes;
 
         const newTypeId = types.filter(p => p.name == 'TEST_COIN')[0].id;
@@ -47,9 +47,10 @@ contract("StMaster", accounts => {
 
     it('ccy types - should allow funding of newly added currency types', async () => {
         // add new ccy type
-        await stm.addCcyType('TEST_COIN2', 'TEST_UNIT');
+        await stm.addCcyType('TEST_COIN2', 'TEST_UNIT', 42);
         const types = (await stm.getCcyTypes()).ccyTypes;
         const newTypeId = types.filter(p => p.name == 'TEST_COIN2')[0].id;
+        assert(types.filter(p => p.name == 'TEST_COIN2')[0].decimals == 42, 'unexpected # decimal places on new currency type');
 
         // fund new ccy type & validate
         await stm.fund(newTypeId, 424242, accounts[global.accountNdx], { from: accounts[0] });
@@ -59,7 +60,7 @@ contract("StMaster", accounts => {
 
     it('ccy types - should not allow non-owner to add a currency type', async () => {
         try {
-            await stm.addCcyType('NEW_TYPE_ID_3', 'test_unit', { from: accounts[1] });
+            await stm.addCcyType('NEW_TYPE_ID_3', 'test_unit', 2, { from: accounts[1] });
         } catch (ex) { 
             assert(ex.reason == 'Restricted', `unexpected: ${ex.reason}`);
             return;
@@ -69,7 +70,7 @@ contract("StMaster", accounts => {
 
     it('ccy types - should not allow adding an existing currency type name', async () => {
         try {
-            await stm.addCcyType('ETH', 'test_unit', { from: accounts[0] });
+            await stm.addCcyType('ETH', 'test_unit', 2, { from: accounts[0] });
         } catch (ex) { 
             assert(ex.reason == 'Currency type name already exists', `unexpected: ${ex.reason}`);
             return; 
@@ -80,7 +81,7 @@ contract("StMaster", accounts => {
     it('ccy types - should not allow adding a currency type when contract is read only', async () => {
         try {
             await stm.setReadOnly(true, { from: accounts[0] }); 
-            await stm.addCcyType('NEW_TYPE_ID_4', 'test_unit', { from: accounts[0] });
+            await stm.addCcyType('NEW_TYPE_ID_4', 'test_unit', 2, { from: accounts[0] });
         } catch (ex) { 
             assert(ex.reason == 'Read-only', `unexpected: ${ex.reason}`);
             await stm.setReadOnly(false, { from: accounts[0] });

@@ -189,7 +189,7 @@ contract("StMaster", accounts => {
     });
 
     it('trading fees (percentage) - apply ccy fee 50 BP on a trade on a newly added ccy', async () => {
-        await stm.addCcyType('TEST_CCY_TYPE', 'TEST_UNIT');
+        await stm.addCcyType('TEST_CCY_TYPE', 'TEST_UNIT', 2);
         const types = (await stm.getCcyTypes()).ccyTypes;
         const newCcyTypeId = types.filter(p => p.name == 'TEST_CCY_TYPE')[0].id;
 
@@ -451,14 +451,14 @@ contract("StMaster", accounts => {
         try {
             const tx1 = await setFee_CcyType(CONST.ccyType.SGD, { fee_fixed: 0, fee_percBips: 1, fee_min: 0, fee_max: 0 }, { from: accounts[1] });
         } catch (ex) { return; }
-        assert.fail('expected contract exception');
+        assert.fail('expected restriction exception');
     });
 
     it('trading fees (percentage) - should not allow non-owner to set global fee structure (carbon)', async () => {
         try {
             const tx1 = await setFee_TokType(CONST.tokenType.UNFCCC, { fee_fixed: 0, fee_percBips: 1, fee_min: 0, fee_max: 0 }, { from: accounts[1] });
         } catch (ex) { return; }
-        assert.fail('expected contract exception');
+        assert.fail('expected restriction exception');
     });
 
     it('trading fees (percentage) - should not allow a transfer with insufficient ccy to cover fees', async () => {
@@ -480,7 +480,7 @@ contract("StMaster", accounts => {
             //truffleAssert.prettyPrintEmittedEvents(data.transferTx);
         }
         catch (ex) { return; }
-        assert.fail('expected contract exception');
+        assert.fail('expected restriction exception');
     });
 
     it('trading fees (percentage) - should not allow a transfer with insufficient carbon to cover fees', async () => {
@@ -501,6 +501,6 @@ contract("StMaster", accounts => {
             });
         }
         catch (ex) { return; }
-        assert.fail('expected contract exception');
+        assert.fail('expected restriction exception');
     });
 });

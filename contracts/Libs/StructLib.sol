@@ -7,6 +7,7 @@ library StructLib {
         uint256 id;
         string  name; // e.g. "USD", "BTC"
         string  unit; // e.g. "cents", "satoshi"
+        uint16  decimals;
     }
 
     struct GetCcyTypesReturn {

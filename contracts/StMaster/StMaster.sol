@@ -58,8 +58,8 @@ contract StMaster is StMintable, StBurnable, CcyFundable, CcyWithdrawable, StTra
         stTypesData._count_tokenTypes = 2;
 
         // params - currency types
-        ccyTypesData._ccyTypes[1] = StructLib.Ccy({ id: 1, name: 'SGD', unit: 'cents' });
-        ccyTypesData._ccyTypes[2] = StructLib.Ccy({ id: 2, name: 'ETH', unit: 'Wei'   });
+        ccyTypesData._ccyTypes[1] = StructLib.Ccy({ id: 1, name: 'SGD', unit: 'cents', decimals: 3 });
+        ccyTypesData._ccyTypes[2] = StructLib.Ccy({ id: 2, name: 'ETH', unit: 'Wei',   decimals: 18 });
         ccyTypesData._count_ccyTypes = 2;
 
          // create ledger entry for contract owner - transfer fees are paid to this ledger entry

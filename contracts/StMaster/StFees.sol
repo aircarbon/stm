@@ -29,11 +29,14 @@ contract StFees is Owned, StLedger {
     //          (no global updates at end: 406000 - cost 50k per update)
     //
     //      moved _tokens_currentMax_id++ into local var: ** 442365 ** -- GAIN 25%
-    //
     //      RETEST ALL: OK
 
-    //      TODO: pack ST.currentQty / ST.mintedQty into nested struct (saves one update)...?
+    //      TODO: pack ST.currentQty / ST.mintedQty into nested struct (saves one update)...? OR SHOULD BE PACKING ALREADY INTO ONE UPDATE?
+    //          without both: 433000 (??)
+
     //      TODO: pack globals into a struct, worst case is 3x 50k updates down to one 50k update)...
+    //          without both: 409000
+
     //      TODO: token Qty on transfer/mint/burn now is max. 2^64 -- how to enforce check on params into contract? -ve tests needed
     //      TODO: batchId now is max 2^64 -- need to test on mintBatch for exceeded, also getBatch -ve tests
 

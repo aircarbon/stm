@@ -16,10 +16,11 @@ contract CcyTypes is Owned {
      * @dev Adds a new currency type
      * @param name New currency type name
      * @param unit Base unit of the new currency type
+     * @param decimals Number of decimal places in smallest unit
      */
-    function addCcyType(string memory name, string memory unit)
+    function addCcyType(string memory name, string memory unit, uint16 decimals)
     public onlyOwner() onlyWhenReadWrite() {
-        CcyLib.addCcyType(ccyTypesData, name, unit);
+        CcyLib.addCcyType(ccyTypesData, name, unit, decimals);
     }
 
     /**

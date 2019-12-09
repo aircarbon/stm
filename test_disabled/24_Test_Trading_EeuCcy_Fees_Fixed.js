@@ -180,7 +180,7 @@ contract("StMaster", accounts => {
     });
 
     it('trading fees (fixed) - apply ccy fee on a max. trade on a newly added ccy', async () => {
-        await stm.addCcyType('TEST_CCY_TYPE', 'TEST_UNIT');
+        await stm.addCcyType('TEST_CCY_TYPE', 'TEST_UNIT', 2);
         const types = (await stm.getCcyTypes()).ccyTypes;
         const newCcyTypeId = types.filter(p => p.name == 'TEST_CCY_TYPE')[0].id;
 
@@ -290,7 +290,7 @@ contract("StMaster", accounts => {
     });
 
     it('trading fees (fixed) - apply newly added ccy & newly added ST type fee on a max. trade (fees on both sides)', async () => {
-        await stm.addCcyType('TEST_CCY_TYPE_2', 'TEST_UNIT');
+        await stm.addCcyType('TEST_CCY_TYPE_2', 'TEST_UNIT', 2);
         const ccyTypes = (await stm.getCcyTypes()).ccyTypes;
         const newCcyTypeId = ccyTypes.filter(p => p.name == 'TEST_CCY_TYPE_2')[0].id;
 

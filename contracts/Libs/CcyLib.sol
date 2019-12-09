@@ -12,7 +12,8 @@ library CcyLib {
     function addCcyType(
         StructLib.CcyTypesStruct storage ccyTypesData,
         string memory name,
-        string memory unit)
+        string memory unit,
+        uint16 decimals)
     public {
         for (uint256 ccyTypeId = 1; ccyTypeId <= ccyTypesData._count_ccyTypes; ccyTypeId++) {
             require(keccak256(abi.encodePacked(ccyTypesData._ccyTypes[ccyTypeId].name)) != keccak256(abi.encodePacked(name)),
@@ -23,7 +24,8 @@ library CcyLib {
         ccyTypesData._ccyTypes[ccyTypesData._count_ccyTypes] = StructLib.Ccy({
               id: ccyTypesData._count_ccyTypes,
             name: name,
-            unit: unit
+            unit: unit,
+        decimals: decimals
         });
         emit AddedCcyType(ccyTypesData._count_ccyTypes, name, unit);
     }
@@ -39,7 +41,8 @@ library CcyLib {
             ccyTypes[ccyTypeId - 1] = StructLib.Ccy({
                     id: ccyTypesData._ccyTypes[ccyTypeId].id,
                   name: ccyTypesData._ccyTypes[ccyTypeId].name,
-                  unit: ccyTypesData._ccyTypes[ccyTypeId].unit
+                  unit: ccyTypesData._ccyTypes[ccyTypeId].unit,
+              decimals: ccyTypesData._ccyTypes[ccyTypeId].decimals
             });
         }
 
