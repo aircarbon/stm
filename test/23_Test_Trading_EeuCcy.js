@@ -13,7 +13,7 @@ contract("StMaster", accounts => {
             console.log(`global.accountNdx: ${global.accountNdx} - contract @ ${stm.address} (owner: ${accounts[0]}) - getSecTokenBatchCount: ${(await stm.getSecTokenBatchCount.call()).toString()}`);
     });
 
-    it('trading - should allow two-sided (vEEU <-> ccy) transfer (A <-> B) across ledger entries', async () => {
+    it('trading - should allow two-sided (vST <-> ccy) transfer (A <-> B) across ledger entries', async () => {
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], CONST.nullFees, [], [], { from: accounts[0] });
         await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        accounts[global.accountNdx + 1],                         { from: accounts[0] });
         const data = await helper.transferLedger({ stm, accounts, 
@@ -25,11 +25,11 @@ contract("StMaster", accounts => {
         });
         assert(data.ledgerA_before.ccys.find(p => p.ccyTypeId == CONST.ccyType.ETH).balance == 0, 'unexpected ledger A currency before');
         assert(data.ledgerA_after.ccys.find(p => p.ccyTypeId == CONST.ccyType.ETH).balance > 0, 'unexpected ledger A currency after');
-        assert(data.ledgerB_before.tokens_sumQty == 0, 'unexpected ledger B EEU tonnage before');
-        assert(data.ledgerB_after.tokens_sumQty > 0, 'unexpected ledger B EEU tonnage after');
+        assert(data.ledgerB_before.tokens_sumQty == 0, 'unexpected ledger B ST tonnage before');
+        assert(data.ledgerB_after.tokens_sumQty > 0, 'unexpected ledger B ST tonnage after');
     });
 
-    it('trading - should allow two-sided (ccy <-> vEEU) transfer (A <-> B) across ledger entries', async () => {
+    it('trading - should allow two-sided (ccy <-> vST) transfer (A <-> B) across ledger entries', async () => {
         await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        accounts[global.accountNdx + 0],                         { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
         const data = await helper.transferLedger({ stm, accounts, 
@@ -39,8 +39,8 @@ contract("StMaster", accounts => {
              ccy_amount_A: CONST.oneEth_wei,                   ccyTypeId_A: CONST.ccyType.ETH,
              ccy_amount_B: 0,                                  ccyTypeId_B: 0,
         });
-        assert(data.ledgerA_before.tokens_sumQty == 0, 'unexpected ledger A EEU tonnage before');
-        assert(data.ledgerA_after.tokens_sumQty > 0, 'unexpected ledger A EEU tonnage after');
+        assert(data.ledgerA_before.tokens_sumQty == 0, 'unexpected ledger A ST tonnage before');
+        assert(data.ledgerA_after.tokens_sumQty > 0, 'unexpected ledger A ST tonnage after');
         assert(data.ledgerB_before.ccys.find(p => p.ccyTypeId == CONST.ccyType.ETH).balance == 0, 'unexpected ledger B currency before');
         assert(data.ledgerB_after.ccys.find(p => p.ccyTypeId == CONST.ccyType.ETH).balance > 0, 'unexpected ledger B currency after');
     });
@@ -55,6 +55,6 @@ contract("StMaster", accounts => {
              ccy_amount_A: 0,                                  ccyTypeId_A: 0,
              ccy_amount_B: CONST.oneEth_wei,                   ccyTypeId_B: CONST.ccyType.ETH,
         });
-        console.log(`\t>>> gasUsed - 0.5 vEEU trade eeu/ccy (A <-> B): ${data.transferTx.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * data.transferTx.receipt.gasUsed).toFixed(4)} (USD ${(CONST.gasPriceEth * data.transferTx.receipt.gasUsed * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
+        console.log(`\t>>> gasUsed - 0.5 vST trade eeu/ccy (A <-> B): ${data.transferTx.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * data.transferTx.receipt.gasUsed).toFixed(4)} (USD ${(CONST.gasPriceEth * data.transferTx.receipt.gasUsed * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
     });
 });

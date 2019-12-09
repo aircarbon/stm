@@ -18,7 +18,7 @@ contract("StMaster", accounts => {
             console.log(`global.accountNdx: ${global.accountNdx} - contract @ ${stm.address} (owner: ${accounts[0]}) - getSecTokenBatchCount: ${(await stm.getSecTokenBatchCount.call()).toString()}`);
     });
 
-    // EEU MULTI FEES: LEDGER OVERRIDE
+    // ST MULTI FEES: LEDGER OVERRIDE
 
     it('trading fees (ledger) - apply VCS token ledger override fee 1000 BP + 5 KG fixed (cap 10 KG) on a small trade (fee on A)', async () => {
         const A = accounts[global.accountNdx + 0];
@@ -442,7 +442,7 @@ contract("StMaster", accounts => {
         assert(Big(B_balAfter).eq(Big(B_balBefore).minus(Big(expectedFeeCcy)).minus(Big(transferAmountCcy))), 'unexpected fee payer currency balance after transfer');
     });
 
-    // CCY & EEU MULTI FEES + GLOBAL FEES: LEDGER OVERRIDE
+    // CCY & ST MULTI FEES + GLOBAL FEES: LEDGER OVERRIDE
 
     it('trading fees (ledger) - should allow a ledger fee-capped transfer from A with otherwise insufficient carbon to cover fees (ledger fee on A, global fee on B)', async () => {
         const A = accounts[global.accountNdx + 0];

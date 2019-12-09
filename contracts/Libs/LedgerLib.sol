@@ -29,15 +29,15 @@ library LedgerLib {
                 uint256 stId = tokenType_stIds[ndx];
 
                 // sum ST sizes - convenience for caller
-                tokens_sumQty += ledgerData._sts_currentQty[stId];
+                tokens_sumQty += ledgerData._sts[stId].currentQty; //ledgerData._sts_currentQty[stId];
 
                 // STs by type
                 tokens[flatSecTokenNdx] = StructLib.LedgerSecTokenReturn({
                            stId: stId,
                     tokenTypeId: tokenTypeId,
                   tokenTypeName: stTypesData._tokenTypeNames[tokenTypeId],
-                        batchId: ledgerData._sts_batchId[stId],
-                     currentQty: ledgerData._sts_currentQty[stId]
+                        batchId: ledgerData._sts[stId].batchId, //ledgerData._sts_batchId[stId],
+                     currentQty: ledgerData._sts[stId].currentQty //ledgerData._sts_currentQty[stId]
               //mintedTimestamp: ledgerData._sts_mintedTimestamp[stId],
                  //splitFrom_id: ledgerData._sts_splitFrom_id[stId],
                    //splitTo_id: ledgerData._sts_splitTo_id[stId]

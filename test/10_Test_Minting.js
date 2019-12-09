@@ -13,11 +13,11 @@ contract("StMaster", accounts => {
             console.log(`global.accountNdx: ${global.accountNdx} - contract @ ${stm.address} (owner: ${accounts[0]}) - getSecTokenBatchCount: ${(await stm.getSecTokenBatchCount.call()).toString()}`);
     });
 
-    it('minting - should allow owner to mint a single-vEEU batch', async () => {
+    it('minting - should allow owner to mint a single-vST batch', async () => {
         await mintBatch({ tokenType: CONST.tokenType.UNFCCC, qtyUnit: CONST.ktCarbon * 100, qtySecTokens: 1, receiver: accounts[global.accountNdx], }, { from: accounts[0] });
     });
 
-    //it('minting - should allow owner to mint a multi-vEEU (2) batch', async () => {
+    //it('minting - should allow owner to mint a multi-vST (2) batch', async () => {
     //    await mintBatch({ tokenType: CONST.tokenType.UNFCCC, qtyUnit: CONST.ktCarbon * 100, qtySecTokens: 2, receiver: accounts[global.accountNdx], },{ from: accounts[0] });
     //});
 
@@ -29,7 +29,7 @@ contract("StMaster", accounts => {
         await mintBatch({ tokenType: CONST.tokenType.UNFCCC, qtyUnit: CONST.gtCarbon * 10, qtySecTokens: 1, receiver: accounts[global.accountNdx], }, { from: accounts[0] });
     });
 
-    it('minting - should allow owner to mint different vEEU-types', async () => {
+    it('minting - should allow owner to mint different vST-types', async () => {
         await mintBatch({ tokenType: CONST.tokenType.UNFCCC, qtyUnit: CONST.ktCarbon * 100, qtySecTokens: 1, receiver: accounts[global.accountNdx], }, { from: accounts[0] });
         await mintBatch({ tokenType: CONST.tokenType.VCS, qtyUnit: CONST.ktCarbon * 100, qtySecTokens: 1, receiver: accounts[global.accountNdx], }, { from: accounts[0] });
     });
@@ -59,18 +59,18 @@ contract("StMaster", accounts => {
         assert(ledgerEntryAfter.tokens.length == totalMintedSecTokens, 'invalid eeu qty in ledger entry');
     });
 
-    it('minting - should have reasonable gas cost for minting of multi-vEEU batches', async () => {
+    it('minting - should have reasonable gas cost for minting of multi-vST batches', async () => {
         mintTx = await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.ktCarbon, 1, accounts[global.accountNdx], CONST.nullFees, [], [], { from: accounts[0], });
-        console.log(`\t>>> gasUsed - Mint  1 vEEU: ${mintTx.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * mintTx.receipt.gasUsed).toFixed(4)} (USD ${(CONST.gasPriceEth * mintTx.receipt.gasUsed * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
+        console.log(`\t>>> gasUsed - Mint  1 vST: ${mintTx.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * mintTx.receipt.gasUsed).toFixed(4)} (USD ${(CONST.gasPriceEth * mintTx.receipt.gasUsed * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
 
         // mintTx = await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.ktCarbon, 5, accounts[global.accountNdx], { from: accounts[0], });
-        // console.log(`\t>>> gasUsed - Mint  5 vEEU: ${mintTx.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * mintTx.receipt.gasUsed).toFixed(4)} (USD ${(CONST.gasPriceEth * mintTx.receipt.gasUsed * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
+        // console.log(`\t>>> gasUsed - Mint  5 vST: ${mintTx.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * mintTx.receipt.gasUsed).toFixed(4)} (USD ${(CONST.gasPriceEth * mintTx.receipt.gasUsed * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
 
         // var mintTx = await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.ktCarbon, 10, accounts[global.accountNdx], { from: accounts[0] });
-        // console.log(`\t>>> gasUsed - Mint 10 vEEU: ${mintTx.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * mintTx.receipt.gasUsed).toFixed(4)} (USD ${(CONST.gasPriceEth * mintTx.receipt.gasUsed * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
+        // console.log(`\t>>> gasUsed - Mint 10 vST: ${mintTx.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * mintTx.receipt.gasUsed).toFixed(4)} (USD ${(CONST.gasPriceEth * mintTx.receipt.gasUsed * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
     });
 
-    it('minting - should not allow non-owner to mint vEEU batches', async () => {
+    it('minting - should not allow non-owner to mint vST batches', async () => {
         try {
             await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.tonCarbon, 1, accounts[global.accountNdx], CONST.nullFees, [], [], { from: accounts[1], });
         } catch (ex) { 
@@ -80,7 +80,7 @@ contract("StMaster", accounts => {
         assert.fail('expected contract exception');
     });
 
-    it('minting - should not allow non-existent vEEU-type to be minted', async () => {
+    it('minting - should not allow non-existent vST-type to be minted', async () => {
         try {
             await stm.mintSecTokenBatch(999, CONST.tonCarbon, 1, accounts[global.accountNdx], CONST.nullFees, [], [], { from: accounts[0] });
         } catch (ex) { 
@@ -90,7 +90,7 @@ contract("StMaster", accounts => {
         assert.fail('expected contract exception');
     });
 
-    it('minting - should not allow multi-vEEU minting', async () => {
+    it('minting - should not allow multi-vST minting', async () => {
         try {
             await mintBatch({ tokenType: CONST.tokenType.UNFCCC, qtyUnit: CONST.tonCarbon, qtySecTokens: 2, receiver: accounts[global.accountNdx], }, { from: accounts[0] } );
         } catch (ex) { 
@@ -100,7 +100,7 @@ contract("StMaster", accounts => {
         assert.fail('expected contract exception');
     });    
 
-    // it('minting - should not allow non-integer KG carbon in an vEEU', async () => {
+    // it('minting - should not allow non-integer KG carbon in an vST', async () => {
     //     try {
     //         await mintBatch({ tokenType: CONST.tokenType.UNFCCC, qtyUnit: CONST.tonCarbon, qtySecTokens: 3, receiver: accounts[global.accountNdx], }, { from: accounts[0] } );
     //     } catch (ex) { return; }
@@ -127,7 +127,7 @@ contract("StMaster", accounts => {
         assert.fail('expected contract exception');
     });
 
-    it('minting - should not allow invalid vEEU quantities (1)', async () => {
+    it('minting - should not allow invalid vST quantities (1)', async () => {
         try {
             await mintBatch({ tokenType: CONST.tokenType.UNFCCC, qtyUnit: CONST.tonCarbon, qtySecTokens: 0, receiver: accounts[global.accountNdx], }, { from: accounts[0] });
         } catch (ex) { 
@@ -137,7 +137,7 @@ contract("StMaster", accounts => {
         assert.fail('expected contract exception');
     });
 
-    it('minting - should not allow invalid vEEU quantities (2)', async () => {
+    it('minting - should not allow invalid vST quantities (2)', async () => {
         try {
             await mintBatch({ tokenType: CONST.tokenType.UNFCCC, qtyUnit: CONST.tonCarbon, qtySecTokens: -1, receiver: accounts[global.accountNdx], }, { from: accounts[0] });
         } catch (ex) {
@@ -166,7 +166,7 @@ contract("StMaster", accounts => {
         const ledgerEntryBefore = await stm.getLedgerEntry(receiver);
         const ledgerOwnersBefore = await stm.getLedgerOwners();
 
-        // mint new vEEU match
+        // mint new vST match
         const maxBatchIdBefore = (await stm.getSecTokenBatchCount.call()).toNumber();
         const mintTx = await stm.mintSecTokenBatch(
             tokenType, 
@@ -194,7 +194,7 @@ contract("StMaster", accounts => {
         assert(batch.mintedQty == qtyUnit, 'invalid batch minted kg');
         assert(batch.tokenTypeId == tokenType, 'invalid batch eeu-type');
 
-        // validate vEEU(s) minted events
+        // validate vST(s) minted events
         const curMaxSecTokenId = (await stm.getSecToken_countMinted.call()).toNumber();
         for (var eeuCount = 1; eeuCount < 1 + qtySecTokens; eeuCount++) {
             truffleAssert.eventEmitted(mintTx, 'MintedSecToken', ev => {
@@ -221,15 +221,15 @@ contract("StMaster", accounts => {
                'invalid kg in ledger entry eeus');
         assert(Number(ledgerEntryAfter.tokens_sumQty) == Number(ledgerEntryBefore.tokens_sumQty) + qtyUnit, 'invalid kg sum ledger entry');
 
-        // validate EEUs minted
+        // validate STs minted
         for (var ndx = ledgerEntryBefore.tokens.length; ndx < ledgerEntryAfter.tokens.length; ndx++) {
             const stId = ledgerEntryAfter.tokens[ndx].stId;
             const eeu = await stm.getSecToken(stId);
-            assert(eeu.exists == true, 'missing vEEU after minting');
-            assert(eeu.batchId == batchId, 'unexpected vEEU batch after minting');
-            assert(eeu.mintedTimestamp != 0, 'missing mint timestamp on vEEU after minting');
-            assert(eeu.mintedQty == qtyUnit / qtySecTokens, 'unexpected vEEU minted KG value after minting');
-            assert(eeu.currentQty == qtyUnit / qtySecTokens, 'unexpected vEEU remaining (unburned) KG value after minting');
+            assert(eeu.exists == true, 'missing vST after minting');
+            assert(eeu.batchId == batchId, 'unexpected vST batch after minting');
+            assert(eeu.mintedTimestamp != 0, 'missing mint timestamp on vST after minting');
+            assert(eeu.mintedQty == qtyUnit / qtySecTokens, 'unexpected vST minted KG value after minting');
+            assert(eeu.currentQty == qtyUnit / qtySecTokens, 'unexpected vST remaining (unburned) KG value after minting');
         }
 
         return batchId;

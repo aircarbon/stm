@@ -18,7 +18,7 @@ contract("StMaster", accounts => {
             console.log(`global.accountNdx: ${global.accountNdx} - contract @ ${stm.address} (owner: ${accounts[0]}) - getSecTokenBatchCount: ${(await stm.getSecTokenBatchCount.call()).toString()}`);
     });
 
-    // EEUs: NO FEES IF FEE RECEIVER = FEE SENDER (contract owner or batch originator)
+    // STs: NO FEES IF FEE RECEIVER = FEE SENDER (contract owner or batch originator)
 
     it('trading fees (fee payer=receiver) - global/ledger/originator token fees should not be applied when fee sender is fee receiver (fee on A, contract owner & batch originator)', async () => {
         const A = accounts[0]; // sender is contract owner, exchange fee receiver, and batch originator fee receiver

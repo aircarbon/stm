@@ -34,7 +34,7 @@ library StructLib {
 
     // LEDGER TYPES
     struct SecTokenBatch {
-        uint256    id;                                          // global sequential id: 1-based
+        uint64     id;                                          // global sequential id: 1-based
         uint256    mintedTimestamp;                             // minting block.timestamp
         uint256    tokenTypeId;                                 // token type of the batch
         uint256    mintedQty;                                   // total unit qty minted in the batch
@@ -50,7 +50,7 @@ library StructLib {
         uint256 id;                                             // global sequential id: 1-based
         uint256 mintedQty;                                      // initial unit qty minted in the ST
         uint256 currentQty;                                     // current (variable) unit qty in the ST (i.e. burned = currentQty - mintedQty)
-        uint256 batchId;                                        // parent batch of the ST
+        uint64 batchId;                                         // parent batch of the ST
         //uint256 mintedTimestamp;                              // minting block.timestamp
         //uint256 splitFrom_id;                                 // the parent ST (if any)
         //uint256 splitTo_id;                                   // the child ST (if any)
@@ -68,7 +68,7 @@ library StructLib {
         uint256 stId;
         uint256 tokenTypeId;
         string  tokenTypeName;
-        uint256 batchId;
+        uint64  batchId;
         uint256 currentQty;
         //uint256 mintedTimestamp;
         //uint256 splitFrom_id;
@@ -87,15 +87,27 @@ library StructLib {
         LedgerCcyReturn[]      ccys;                            // currency balances
     }
 
+    // *** PACKED SECURITY TOKEN ***
+    // uint32 - 4.2 billion
+    // uint40 - 1.0 trillion
+    // uint64 - 1.8e19
+    // 64 x3 = 192 bits
+    struct PackedSt {
+        uint64 batchId;
+        uint64 mintedQty;
+        uint64 currentQty;
+    }
+
     struct LedgerStruct {
         // *** Batch LIST
         mapping(uint256 => SecTokenBatch) _batches;             // main batch list: all ST batches, by batch ID
-        uint256 _batches_currentMax_id;                         // 1-based
+        uint64 _batches_currentMax_id;                          // 1-based
 
         // *** SecTokens LIST (slightly more gas effecient than mapping(uint/*SecTokenId*/ => St/*{struct}*/))
-        mapping(uint256 => uint256) _sts_batchId;
-        mapping(uint256 => uint256) _sts_mintedQty;
-        mapping(uint256 => uint256) _sts_currentQty;            // == 0 indicates fully burned, != _sts_mintedQty indicates partially burned
+        mapping(uint256 => PackedSt) _sts;
+        //mapping(uint256 => uint256) _sts_batchId;
+        //mapping(uint256 => uint256) _sts_mintedQty;
+        //mapping(uint256 => uint256) _sts_currentQty;            // == 0 indicates fully burned, != _sts_mintedQty indicates partially burned
 
         // *** LEDGER
         mapping(address => Ledger) _ledger;                     // main ledger list: all entries, by account
@@ -140,7 +152,8 @@ library StructLib {
     ) public view returns (bool) {
         uint256 qtyAvailable = 0;
         for (uint i = 0; i < ledgerData._ledger[ledger].tokenType_stIds[tokenTypeId].length; i++) {
-            qtyAvailable += ledgerData._sts_currentQty[ledgerData._ledger[ledger].tokenType_stIds[tokenTypeId][i]];
+            //qtyAvailable += ledgerData._sts_currentQty[ledgerData._ledger[ledger].tokenType_stIds[tokenTypeId][i]];
+            qtyAvailable += ledgerData._sts[ledgerData._ledger[ledger].tokenType_stIds[tokenTypeId][i]].currentQty;
         }
         return qtyAvailable >= qty + fee;
     }

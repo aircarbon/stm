@@ -1,4 +1,4 @@
-# AirCarbon - ERC20 AirCarbon EEU Contract
+# AirCarbon - ERC20 AirCarbon ST Contract
 
 ## Setup
 
@@ -55,8 +55,8 @@ Or, better (for individual dev account separation), from repo root:
 
     ### contract - ERC721-compat
     * ERC721 interface/compat: https://github.com/ethereum/EIPs/blob/master/EIPS/eip-721.md
-    * ** one vEEU = one ("size/KG-mutable") NFT **
-    * (more like "semi-fungable token" (i.e. IFF sizes of two same-type NFT-EEUs are same, they are actually fungible while sizes are the same))
+    * ** one vST = one ("size/KG-mutable") NFT **
+    * (more like "semi-fungable token" (i.e. IFF sizes of two same-type NFT-STs are same, they are actually fungible while sizes are the same))
 
     ### contract - security
     * global contract-paused flag (admin)

@@ -25,9 +25,9 @@ contract("StMaster", accounts => {
             console.log(`global.accountNdx: ${global.accountNdx} - contract @ ${stm.address} (owner: ${accounts[0]}) - getSecTokenBatchCount: ${(await stm.getSecTokenBatchCount.call()).toString()}`);
     });
 
-    // EEU ORIGINATOR FEES - SINGLE ORIGINATOR
+    // ST ORIGINATOR FEES - SINGLE ORIGINATOR
 
-    it('trading fees (originator) - apply VCS token single originator fees (+ ledger @ x4), on a 1.5 EEU trade (fee on A)', async () => {
+    it('trading fees (originator) - apply VCS token single originator fees (+ ledger @ x4), on a 1.5 ST trade (fee on A)', async () => {
         // SETUP - mint for M ([+0]), move all to A ([+1]) 
         const M = accounts[global.accountNdx + 0];
         const A = accounts[global.accountNdx + 1];
@@ -96,7 +96,7 @@ contract("StMaster", accounts => {
         assert(Big(A_balAfter).eq(Big(A_balBefore).minus(Big(data.originatorFees_tok_A)).minus(Big(data.exchangeFee_tok_A)).minus(Big(transferAmountKg))), 'unexpected fee payer token balance after transfer');
     });
 
-    it('trading fees (originator) - apply UNFCCC token single originator fees (+ global @ x8), on a 2.5 EEU trade (fee on B)', async () => {
+    /*it('trading fees (originator) - apply UNFCCC token single originator fees (+ global @ x8), on a 2.5 ST trade (fee on B)', async () => {
         // SETUP - mint for M ([+0]), move all to B ([+2])
         const M = accounts[global.accountNdx + 0];
         const A = accounts[global.accountNdx + 1];
@@ -164,9 +164,9 @@ contract("StMaster", accounts => {
         assert(Big(sender_balAfter).eq(Big(sender_balBefore).minus(Big(data.originatorFees_tok_B)).minus(Big(data.exchangeFee_tok_B)).minus(Big(transferAmountKg))), 'unexpected fee payer token balance after transfer');
     });
 
-    // EEU ORIGINATOR FEES - MULTIPLE ORIGINATORS
+    // ST ORIGINATOR FEES - MULTIPLE ORIGINATORS
 
-    it('trading fees (originator) - apply VCS token multiple [3] originator fees (+ ledger @ x4), on a 3.5 EEU trade (fee on A)', async () => {
+    it('trading fees (originator) - apply VCS token multiple [3] originator fees (+ ledger @ x4), on a 3.5 ST trade (fee on A)', async () => {
         // SETUP - mint for M[] ([+0], [+1], [+2]), move all to A ([+3]) 
         const M_multi = [ 
             { account: accounts[global.accountNdx + 0] }, 
@@ -241,7 +241,7 @@ contract("StMaster", accounts => {
         for (var i = 0 ; i < M_multi.length ; i++) {
             M_multi[i].ledgerAfter = await stm.getLedgerEntry(M_multi[i].account);
         }
-        console.log(`\t>>> gasUsed - Multi Orig Fees: ${data.transferTx.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * data.transferTx.receipt.gasUsed).toFixed(4)} (USD ${(CONST.gasPriceEth * data.transferTx.receipt.gasUsed * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
+        console.log(`\t>>> gasUsed - Multi Orig Fees ${M_multi.length}: ${data.transferTx.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * data.transferTx.receipt.gasUsed).toFixed(4)} (USD ${(CONST.gasPriceEth * data.transferTx.receipt.gasUsed * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
         //console.log('feesPreview', data.feesPreview);
 
         // TEST - contract owner has received exchange fee
@@ -267,7 +267,7 @@ contract("StMaster", accounts => {
         const B_balBefore = data.ledgerB_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
         const B_balAfter  =  data.ledgerB_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
         assert(Big(B_balAfter).eq(Big(B_balBefore).plus(Big(transferAmountKg))), 'unexpected receiver token balance after transfer');
-    });
+    });*/
 
     // TODO: multi, side B
 

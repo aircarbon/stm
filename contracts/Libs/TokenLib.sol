@@ -49,8 +49,12 @@ library TokenLib {
     // MINTING
     struct MintSecTokenBatchArgs {
         uint256              tokenTypeId;
-        int256               mintQty;
-        int256               mintSecTokenCount;
+
+        int64                mintQty;
+        int64                mintSecTokenCount;
+      //int256               mintQty;
+      //int256               mintSecTokenCount;
+
         address              batchOwner;
         StructLib.SetFeeArgs origTokFee;
         string[]             metaKeys;
@@ -105,10 +109,11 @@ library TokenLib {
             uint256 newId = ledgerData._tokens_currentMax_id + 1 + uint256(ndx);
 
             // mint ST
-            uint256 stQty = uint256(a.mintQty) / uint256(a.mintSecTokenCount);
-            ledgerData._sts_batchId[newId] = newBatch.id;
-            ledgerData._sts_mintedQty[newId] = stQty;
-            ledgerData._sts_currentQty[newId] = stQty;
+            //uint256 stQty = uint256(a.mintQty) / uint256(a.mintSecTokenCount);
+            uint64 stQty = uint64(a.mintQty) / uint64(a.mintSecTokenCount);
+            ledgerData._sts[newId].batchId = uint64(newBatch.id); //ledgerData._sts_batchId[newId] = newBatch.id;
+            ledgerData._sts[newId].mintedQty = stQty; //ledgerData._sts_mintedQty[newId] = stQty;
+            ledgerData._sts[newId].currentQty = stQty; //ledgerData._sts_currentQty[newId] = stQty;
             //ledgerData._sts_mintedTimestamp[newId] = block.timestamp;
 
             emit MintedSecToken(newId, newBatch.id, a.tokenTypeId, a.batchOwner, stQty);
@@ -179,16 +184,19 @@ library TokenLib {
 
         // burn (i.e. delete or resize) sufficient ST(s)
         uint256 ndx = 0;
-        uint256 remainingToBurn = uint256(burnQty);
+        //uint256 remainingToBurn = uint256(burnQty);
+        uint64 remainingToBurn = uint64(burnQty);
+
         while (remainingToBurn > 0) {
             uint256[] storage tokenType_stIds = ledgerData._ledger[ledgerOwner].tokenType_stIds[tokenTypeId];
             uint256 stId = tokenType_stIds[ndx];
-            uint256 stQty = ledgerData._sts_currentQty[stId];
-            uint256 batchId = ledgerData._sts_batchId[stId];
+            uint64 stQty = ledgerData._sts[stId].currentQty; //ledgerData._sts_currentQty[stId];
+            uint64 batchId = ledgerData._sts[stId].batchId; //ledgerData._sts_batchId[stId];
 
             if (remainingToBurn >= stQty) {
                 // burn the full ST
-                ledgerData._sts_currentQty[stId] = 0;
+                //ledgerData._sts_currentQty[stId] = 0;
+                ledgerData._sts[stId].currentQty = 0;
 
                 // remove from ledger
                 tokenType_stIds[ndx] = tokenType_stIds[tokenType_stIds.length - 1];
@@ -202,7 +210,8 @@ library TokenLib {
                 emit BurnedFullSecToken(stId, tokenTypeId, ledgerOwner, stQty);
             } else {
                 // resize the ST (partial burn)
-                ledgerData._sts_currentQty[stId] -= remainingToBurn;
+                //ledgerData._sts_currentQty[stId] -= remainingToBurn;
+                ledgerData._sts[stId].currentQty -= remainingToBurn;
 
                 // retain on ledger
                 //ledgerData._ledger[ledgerOwner].tokenType_sumQty[tokenTypeId] -= remainingToBurn;

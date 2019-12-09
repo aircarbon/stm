@@ -6,8 +6,8 @@ import "./StructLib.sol";
 library TransferLib {
     enum TransferType { User, ExchangeFee, OriginatorFee }
     event TransferedLedgerCcy(address from, address to, uint256 ccyTypeId, uint256 amount, TransferType transferType);
-    event TransferedFullSecToken(address from, address to, uint256 stId, uint256 mergedToSecTokenId, /*uint256 tokenTypeId,*/ uint256 qty, TransferType transferType);
-    event TransferedPartialSecToken(address from, address to, uint256 splitFromSecTokenId, uint256 newSecTokenId, uint256 mergedToSecTokenId, /*uint256 tokenTypeId,*/ uint256 qty, TransferType transferType);
+    event TransferedFullSecToken(address from, address to, uint256 stId, uint256 mergedToSecTokenId, /*uint256 qty,*/ TransferType transferType);
+    event TransferedPartialSecToken(address from, address to, uint256 splitFromSecTokenId, uint256 newSecTokenId, uint256 mergedToSecTokenId, /*uint256 qty,*/ TransferType transferType);
 
     uint256 constant MAX_BATCHES_PREVIEW = 4; // for fee previews: max distinct batch IDs that can participate in one side of a trade fee preview
 
@@ -332,8 +332,8 @@ library TransferLib {
         uint256 remainingToTransfer = uint256(a.qtyUnit);
         while (remainingToTransfer > 0) {
             uint256 stId = from_stIds[0];
-            uint256 stQty = ledgerData._sts_currentQty[stId];
-            uint256 fromBatchId = ledgerData._sts_batchId[stId];
+            uint64 stQty = ledgerData._sts[stId].currentQty; //ledgerData._sts_currentQty[stId];
+            uint64 fromBatchId = ledgerData._sts[stId].batchId; //ledgerData._sts_batchId[stId];
 
             // add to list of distinct batches, maintain transfer quantity from each batch
             bool knownBatch = false;
@@ -390,12 +390,16 @@ library TransferLib {
 
         // walk tokens - transfer sufficient STs (last one may get split)
         uint256 ndx = 0;
-        uint256 remainingToTransfer = uint256(a.qtyUnit);
+        //uint256 remainingToTransfer = uint256(a.qtyUnit);
+        uint64 remainingToTransfer = uint64(a.qtyUnit);
+
+        uint256 nextStId = ledgerData._tokens_currentMax_id + 1;
         while (remainingToTransfer > 0) {
             uint256 stId = from_stIds[ndx];
-            uint256 stQty = ledgerData._sts_currentQty[stId];
+            uint64 stQty = ledgerData._sts[stId].currentQty; //ledgerData._sts_currentQty[stId];
 
             if (remainingToTransfer >= stQty) {
+
                 // reassign the full ST across the ledger entries
 
                 // remove from origin - replace hot index 0 with value at last (ndx++, in effect)
@@ -405,7 +409,6 @@ library TransferLib {
 
                 // assign to destination
                 // while minting >1 ST is disallowed, the merge condition below can never be true:
-
                     // MERGE - if any existing destination ST is from same batch
                     // bool mergedExisting = false;
                     // for (uint i = 0; i < to_stIds.length; i++) {
@@ -420,20 +423,18 @@ library TransferLib {
                     //         _sts_mintedQty[stId] = 0;
 
                     //         mergedExisting = true;
-                    //         emit TransferedFullSecToken(a.from, a.to, stId, to_stIds[i], stQty/*, a.tokenTypeId*/, transferType);
+                    //         emit TransferedFullSecToken(a.from, a.to, stId, to_stIds[i], stQty, transferType);
                     //         break;
                     //     }
                     // }
                     // TRANSFER - if no existing destination ST from same batch
                     //if (!mergedExisting) {
                         to_stIds.push(stId);
-                        emit TransferedFullSecToken(a.from, a.to, stId, 0, /*a.tokenTypeId,*/ stQty, a.transferType);
+                        emit TransferedFullSecToken(a.from, a.to, stId, 0, /*stQty,*/ a.transferType);
                     //}
-
                 //ledgerData._ledger[to].tokenType_sumQty[tokenTypeId] += stQty;                //* gas - DROP DONE - only used internally, validation params
 
                 remainingToTransfer -= stQty;
-
                 if (remainingToTransfer > 0)
                     require(from_stIds.length > 0, "Insufficient tokens");
             }
@@ -449,40 +450,57 @@ library TransferLib {
                     // MERGE - if any existing destination ST is from same batch
                     bool mergedExisting = false;
                     for (uint i = 0; i < to_stIds.length; i++) {
-                        if (ledgerData._sts_batchId[to_stIds[i]] == ledgerData._sts_batchId[stId]) {
+
+                        //if (ledgerData._sts_batchId[to_stIds[i]] == ledgerData._sts_batchId[stId]) {
+                        if (ledgerData._sts[to_stIds[i]].batchId == ledgerData._sts[stId].batchId) {
+
                             // resize (grow) the destination ST
-                            ledgerData._sts_currentQty[to_stIds[i]] += remainingToTransfer;         // TODO gas - pack/combine
-                            ledgerData._sts_mintedQty[to_stIds[i]] += remainingToTransfer;          // TODO gas - pack/combine
+                            //ledgerData._sts_currentQty[to_stIds[i]] += remainingToTransfer;         // TODO gas - pack/combine
+                            ledgerData._sts[to_stIds[i]].currentQty += remainingToTransfer;
+
+                            //ledgerData._sts_mintedQty[to_stIds[i]] += remainingToTransfer;          // TODO gas - pack/combine
+                            ledgerData._sts[to_stIds[i]].mintedQty += remainingToTransfer;
 
                             mergedExisting = true;
-                            emit TransferedPartialSecToken(a.from, a.to, stId, 0, to_stIds[i], /*a.tokenTypeId,*/ remainingToTransfer, a.transferType);
+
+                            emit TransferedPartialSecToken(a.from, a.to, stId, 0, to_stIds[i], /*remainingToTransfer,*/ a.transferType);
                             break;
                         }
                     }
-                    // SOFT-MINT - if no existing destination ST from same batch
+                    // SOFT-MINT - if no existing destination ST from same batch; inherit batch ID from parent ST
                     if (!mergedExisting) {
-                        uint256 newStId = ledgerData._tokens_currentMax_id + 1;
-                        ledgerData._sts_batchId[newStId] = ledgerData._sts_batchId[stId];           // inherit batch from parent ST  // TODO gas - pack/combine
-                        ledgerData._sts_currentQty[newStId] = remainingToTransfer;                  // TODO gas - pack/combine
-                        ledgerData._sts_mintedQty[newStId] = remainingToTransfer;                   // TODO gas - pack/combine
-                        //ledgerData._sts_mintedTimestamp[newStId] = block.timestamp;               // gas - DROP DONE - can fetch from events
-                        //ledgerData._sts_splitFrom_id[newStId] = stId;                             // gas - DROP DONE - can fetch from events
-                        to_stIds.push(newStId);
-                        ledgerData._tokens_currentMax_id++;
-                        //ledgerData._ledger[to].tokenType_sumQty[tokenTypeId] += remainingToTransfer;    // gas - DROP DONE - only used internally, validation params
+                        //uint256 newStId = ledgerData._tokens_currentMax_id + 1;
 
-                        emit TransferedPartialSecToken(a.from, a.to, stId, newStId, 0, /*a.tokenTypeId,*/ remainingToTransfer, a.transferType);
+                        // gas: 50k
+                        ledgerData._sts[nextStId].batchId = ledgerData._sts[stId].batchId; // PACKED
+                        ledgerData._sts[nextStId].currentQty = remainingToTransfer; // PACKED
+                        ledgerData._sts[nextStId].mintedQty = remainingToTransfer; // PACKED
+
+                        //ledgerData._sts_mintedTimestamp[nextStId] = block.timestamp;                  // gas - DROP DONE - can fetch from events
+                        //ledgerData._sts_splitFrom_id[nextStId] = stId;                                // gas - DROP DONE - can fetch from events
+                        //ledgerData._ledger[to].tokenType_sumQty[tokenTypeId] += remainingToTransfer; // gas - DROP DONE - only used internally, validation params
+
+                        to_stIds.push(nextStId); // gas: 94k
+                        //ledgerData._tokens_currentMax_id++; // gas: 50k
+
+                        emit TransferedPartialSecToken(a.from, a.to, stId, nextStId, 0, /*remainingToTransfer,*/ a.transferType); // gas: 11k
+                        nextStId++;
                     }
 
                 // resize (shrink) the origin ST
-                ledgerData._sts_currentQty[stId] -= remainingToTransfer;                            // TODO gas - pack/combine
-                ledgerData._sts_mintedQty[stId] -= remainingToTransfer;                             // TODO gas - pack/combine
-                //ledgerData._sts_splitTo_id[stId] = newStId;                                         // gas - DROP DONE - can index from events
-                //ledgerData._ledger[from].tokenType_sumQty[tokenTypeId] -= remainingToTransfer;    // gas - DROP DONE - only used internally, validation params
+                // TODO: pack current/minted into nested struct (?) (for one update here instead of two)
+                ledgerData._sts[stId].currentQty -= remainingToTransfer; // PACKED
+                ledgerData._sts[stId].mintedQty -= remainingToTransfer; // PACKED
+
+                //ledgerData._sts_splitTo_id[stId] = newStId;                                          // gas - DROP DONE - can index from events
+                //ledgerData._ledger[from].tokenType_sumQty[tokenTypeId] -= remainingToTransfer;       // gas - DROP DONE - only used internally, validation params
 
                 remainingToTransfer = 0;
             }
         }
+        ledgerData._tokens_currentMax_id = nextStId;
+
+        // TODO: pack 3 updates into struct
         ledgerData._tokens_totalTransferedQty += a.qtyUnit;
 
         if (a.transferType == TransferType.ExchangeFee) {

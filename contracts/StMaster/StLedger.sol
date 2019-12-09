@@ -25,11 +25,12 @@ contract StLedger is Owned, StTypes, CcyTypes {
      */
     function getSecToken(uint256 id) external view returns (StructLib.SecTokenReturn memory) {
         return StructLib.SecTokenReturn({
-                exists: ledgerData._sts_batchId[id] != 0,
+                exists: ledgerData._sts[id].batchId != 0, //ledgerData._sts_batchId[id] != 0,
                     id: id,
-             mintedQty: ledgerData._sts_mintedQty[id],
-            currentQty: ledgerData._sts_currentQty[id],
-               batchId: ledgerData._sts_batchId[id]
+             mintedQty: ledgerData._sts[id].mintedQty, //ledgerData._sts_mintedQty[id],
+            currentQty: ledgerData._sts[id].currentQty, //ledgerData._sts_currentQty[id],
+               batchId: ledgerData._sts[id].batchId //ledgerData._sts_batchId[id]
+
      //mintedTimestamp: ledgerData._sts_mintedTimestamp[id],
         //splitFrom_id: ledgerData._sts_splitFrom_id[id],
           //splitTo_id: ledgerData._sts_splitTo_id[id]

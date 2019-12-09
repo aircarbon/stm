@@ -150,6 +150,7 @@ module.exports = {
                    applyFees
         }, { from: accounts[0] }
         );
+        console.log(`\t>>> gasUsed - ${transferTx.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * transferTx.receipt.gasUsed).toFixed(4)} (USD ${(CONST.gasPriceEth * transferTx.receipt.gasUsed * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
 
         // ledger entries after
         ledgerA_after = await stm.getLedgerEntry(ledger_A);
@@ -217,27 +218,28 @@ module.exports = {
             }
 
             // validate eeu fee events & global totals
-            var eventKg_fees = new BN(0);
-            try {
-                truffleAssert.eventEmitted(transferTx, 'TransferedFullSecToken', ev => { 
-                    if (ev.transferType != CONST.transferType.USER) {
-                        //console.log(`    TransferedFullSecToken - ev.transferType=${ev.transferType}: ev.qty=${ev.qty}`);
-                        eventKg_fees = eventKg_fees.add(ev.qty); return true;
-                    }
-                });
-            } catch {}
-            try {
-                truffleAssert.eventEmitted(transferTx, 'TransferedPartialSecToken', ev => { 
-                    if (ev.transferType != CONST.transferType.USER) { 
-                        //console.log(`TransferedPartialSecToken - ev.transferType=${ev.transferType}: ev.qty=${ev.qty}`);
-                        eventKg_fees = eventKg_fees.add(ev.qty); return true;
-                    }
-                });
-            } catch {}
-            // console.log('totalKg_fees_before', totalKg_fees_before.toString());
-            // console.log('       eventKg_fees', eventKg_fees.toString());
-            // console.log(' totalKg_fees_after', totalKg_fees_after.toString());
-            assert(totalKg_fees_after.sub(totalKg_fees_before).eq(eventKg_fees), `unexpected global total token fees before/after vs. events`);
+            // stack too deep - had to drop qty from event
+            // var eventKg_fees = new BN(0);
+            // try {
+            //     truffleAssert.eventEmitted(transferTx, 'TransferedFullSecToken', ev => { 
+            //         if (ev.transferType != CONST.transferType.USER) {
+            //             //console.log(`    TransferedFullSecToken - ev.transferType=${ev.transferType}: ev.qty=${ev.qty}`);
+            //             eventKg_fees = eventKg_fees.add(ev.qty); return true;
+            //         }
+            //     });
+            // } catch {}
+            // try {
+            //     truffleAssert.eventEmitted(transferTx, 'TransferedPartialSecToken', ev => { 
+            //         if (ev.transferType != CONST.transferType.USER) { 
+            //             //console.log(`TransferedPartialSecToken - ev.transferType=${ev.transferType}: ev.qty=${ev.qty}`);
+            //             eventKg_fees = eventKg_fees.add(ev.qty); return true;
+            //         }
+            //     });
+            // } catch {}
+            // // console.log('totalKg_fees_before', totalKg_fees_before.toString());
+            // // console.log('       eventKg_fees', eventKg_fees.toString());
+            // // console.log(' totalKg_fees_after', totalKg_fees_after.toString());
+            // assert(totalKg_fees_after.sub(totalKg_fees_before).eq(eventKg_fees), `unexpected global total token fees before/after vs. events`);
         }
 
         // validate currency transfer events
@@ -348,7 +350,7 @@ module.exports = {
         assert(Big(totalCcy_tfd_after[ccyTypeId_B]).minus(totalCcy_tfd_before[ccyTypeId_B]).eq(expectedCcy_tfd[ccyTypeId_B]),
                `unexpected total transfered delta after, ccy B`);
 
-        // validate EEU events
+        // validate ST events
         const eeuFullEvents = [];
         const eeuPartialEvents = [];
         const contractOwnerIsTransfering = ledger_A == accounts[0] || ledger_B == accounts[0];
@@ -433,7 +435,7 @@ module.exports = {
                 , `unexpected originator ${p.fee_to} token sum across ledger before vs. after`);
         });
 
-        // validate EEUs are moved        
+        // validate STs are moved        
         var totalKg_tfd_incFees = new BN(qty_A).add(new BN(qty_B));
         var totalqty_AllSecSecTokenTypes_fees = new BN(0);
         if (qty_A > 0) {

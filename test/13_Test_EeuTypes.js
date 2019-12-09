@@ -26,8 +26,8 @@ contract("StMaster", accounts => {
         assert(types[1].id == 2, 'unexpected default eeu type id 2');
     });
 
-    it('eeu types - should be able to use newly added EEU types', async () => {
-        // add new EEU type
+    it('eeu types - should be able to use newly added ST types', async () => {
+        // add new ST type
         const addSecTokenTx = await stm.addSecTokenType('NEW_TYPE_NAME_2');
         const types = (await stm.getSecTokenTypes()).tokenTypes;
         assert(types.filter(p => p.name == 'NEW_TYPE_NAME_2')[0].id == countDefaultSecSecTokenTypes + 1, 'unexpected/missing new eeu type (2)');
@@ -40,27 +40,27 @@ contract("StMaster", accounts => {
         const batchCountBefore = (await stm.getSecTokenBatchCount.call()).toNumber(); 
         //console.log(`batchCountBefore`, batchCountBefore);
         
-        // mint new EEU type: 2 batches 
+        // mint new ST type: 2 batches 
         for (var i=0 ; i < 2 ; i++) {
             await stm.mintSecTokenBatch(newTypeId, CONST.ktCarbon * 100, 1, accounts[global.accountNdx], CONST.nullFees, [], [], { from: accounts[0] });
         }
         const batchCountAfter_Mint1 = (await stm.getSecTokenBatchCount.call()).toNumber(); 
         assert(batchCountAfter_Mint1 == batchCountBefore + 2, `unexpected max batch id ${batchCountAfter_Mint1} after minting (1)`);
 
-        // mint default EEU type: 4 batches 
+        // mint default ST type: 4 batches 
         for (var i=0 ; i < 4 ; i++) {
             await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.ktCarbon * 100, 1, accounts[global.accountNdx], CONST.nullFees, [], [], { from: accounts[0] });
         }
         const batchCountAfter_Mint2 = (await stm.getSecTokenBatchCount.call()).toNumber();
         assert(batchCountAfter_Mint2 == batchCountBefore + 6, `unexpected max batch id ${batchCountAfter_Mint2} after minting (2)`);
 
-        // validate ledger: 6 vEEUs, 2 of new type
+        // validate ledger: 6 vSTs, 2 of new type
         const ledgerEntryAfter = await stm.getLedgerEntry(accounts[global.accountNdx]);
         assert(ledgerEntryAfter.tokens.length == 6, 'unexpected eeu count in ledger');
         assert(ledgerEntryAfter.tokens.filter(p => p.tokenTypeId == newTypeId).length == 2, 'unexpected new eeu type in ledger');
     });
 
-    it('eeu types - should not allow non-owner to add an EEU type', async () => {
+    it('eeu types - should not allow non-owner to add an ST type', async () => {
         try {
             await stm.addSecTokenType('NEW_TYPE_NAME_3', { from: accounts[1] });
         } catch (ex) { 
@@ -70,7 +70,7 @@ contract("StMaster", accounts => {
         assert.fail('expected contract exception');
     });
 
-    it('eeu types - should not allow adding an existing EEU type name', async () => {
+    it('eeu types - should not allow adding an existing ST type name', async () => {
         try {
             const types = (await stm.getSecTokenTypes()).tokenTypes;
             await stm.addSecTokenType(types[0].name, { from: accounts[0] });
@@ -81,7 +81,7 @@ contract("StMaster", accounts => {
         assert.fail('expected contract exception');
     });
 
-    it('eeu types - should not allow adding an EEU type when contract is read only', async () => {
+    it('eeu types - should not allow adding an ST type when contract is read only', async () => {
         try {
             await stm.setReadOnly(true, { from: accounts[0] });
             await stm.addSecTokenType('NEW_TYPE_NAME_4', { from: accounts[0] });

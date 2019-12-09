@@ -12,23 +12,44 @@ contract StFees is Owned, StLedger {
     //       i.e. transfer amounts are not inclusive of fees, they are additional
 
     //
+    // tuning - ST packing ...
+    //
+
+    // tuning - orig-fees (1 orig, 1.5 STs)
+    //
+    //      start gas cost: ## 591590 ##
+    //          (no token transfer: 103715 !!)
+    //          (no full ST transfer: 127925 !! >> i.e. almost all gas cost is in partial transfer)
+    //
+    //      packing ST 64 bits x3 mapping: ** 453026 ** -- GAIN 23%
+    //          (no update of ST mapping: 409000 - cost of mapping update ~50k)
+    //          (no count++ in partial: 407000 - 50k access cost)
+    //          (no push in partial: 359000 - 94k access cost)
+    //          (no emit partial event: 442088 - cost of emit: 11k)
+    //          (no global updates at end: 406000 - cost 50k per update)
+    //
+    //      moved _tokens_currentMax_id++ into local var: ** 442365 ** -- GAIN 25%
+    //
+    //      RETEST ALL: OK
+
+    //      TODO: pack ST.currentQty / ST.mintedQty into nested struct (saves one update)...?
+    //      TODO: pack globals into a struct, worst case is 3x 50k updates down to one 50k update)...
+    //      TODO: token Qty on transfer/mint/burn now is max. 2^64 -- how to enforce check on params into contract? -ve tests needed
+    //      TODO: batchId now is max 2^64 -- need to test on mintBatch for exceeded, also getBatch -ve tests
+
+    //
     // origFees
+    //  ** fee-preview: returns enough data (qty?) for an orchestrator to split up a large multi-batch transfer TX into separate components?
+    //  ** fee-preview: tests general / using it for splitting multi-batch transfers
     //
     //  > origFees - TESTS:
-    //   >> MULTI-BATCH SEND FROM DIFFERENT ORGINATORS
-    //   >> set MAX_BATCHES_PREVIEW to 1, try >1 batch (test require(...MAX_BATCHES_PREVIEW))
-    //   >> set MAX_BATCHES_PREVIEW to ~3, try getting 3 + 3 sets of orig fees in preview (each side has 3) on a carbon/carbon swap
-    //   >> transfer across multiple batches (multiple originator fees)
+    //   >> MULTI-BATCH TRANSER MULTI-ORIG -- SIDE B
+    //   >> TWO-SIDED CARBON TRANSFER - MULTI-ORIG BOTH SIDES (e.g. max 3+3 orig fee previews +1 exchange fee) [show it can be split up]
+    //   >> with MAX_BATCHES_PREVIEW exceeded ...
     //   >> insufficient carbons for batch fees
-    //
-    //   > global + originator
-    //   > ledger + originator
-    //   > originator only
     //
     // TODO: global originator batch fee counts...
     // TODO: post-minting orig fees (Thom): only can revise downwards...
-    //
-    // TODO: fees - getFees (ex + orig) (for pre-trade, preview)...
     //
 
     // GLOBAL FEES
