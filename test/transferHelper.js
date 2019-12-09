@@ -380,16 +380,18 @@ module.exports = {
             }
 
             // originator token fee events
-            originatorFeeData.forEach(p => {
-                const minFeeEventsToOrigLedger = originatorFeeData.filter(p2 => p2.fee_to == p.fee_to).length;
-                if (p.fee_tok_A > 0) {
-                    assert(eeuFullEvents.filter(p => p.from == ledger_A && p.transferType == CONST.transferType.ORIG_FEE).length > 0 ||
-                           eeuPartialEvents.filter(p => p.from == ledger_A && p.transferType == CONST.transferType.ORIG_FEE).length == minFeeEventsToOrigLedger,
+            originatorFeeData.forEach(of => {
+                const expectedFeeEventCount = originatorFeeData.filter(p2 => p2.fee_to == of.fee_to).length;
+                if (of.fee_tok_A > 0) {
+                    const fullCount = eeuFullEvents.filter(p => p.from == ledger_A && p.to == of.fee_to && p.transferType == CONST.transferType.ORIG_FEE).length;
+                    const partialCount = eeuPartialEvents.filter(p => p.from == ledger_A && p.to == of.fee_to && p.transferType == CONST.transferType.ORIG_FEE).length;
+                    assert(fullCount > 0 || partialCount == expectedFeeEventCount,
                            'unexpected originator fee transfer full vs. partial event count after transfer for ledger A');
                 }
-                if (p.fee_tok_B > 0) {
-                    assert(eeuFullEvents.filter(p => p.from == ledger_B && p.transferType == CONST.transferType.ORIG_FEE).length > 0 ||
-                           eeuPartialEvents.filter(p => p.from == ledger_B && p.transferType == CONST.transferType.ORIG_FEE).length == minFeeEventsToOrigLedger,
+                if (of.fee_tok_B > 0) {
+                    const fullCount = eeuFullEvents.filter(p => p.from == ledger_B && p.to == of.fee_to && p.transferType == CONST.transferType.ORIG_FEE).length;
+                    const partialCount = eeuPartialEvents.filter(p => p.from == ledger_B && p.to == of.fee_to && p.transferType == CONST.transferType.ORIG_FEE).length;
+                    assert(fullCount > 0 || partialCount == expectedFeeEventCount,
                            'unexpected originator fee transfer full vs. partial event count after transfer for ledger B');
                 }
             });
@@ -545,6 +547,7 @@ module.exports = {
             originatorFees_tok_A,       originatorFees_tok_B,
             exchangeFee_tok_A,          exchangeFee_tok_B,
             exchangeFee_ccy_A,          exchangeFee_ccy_B,
+            feesPreview,
         };
     },
 
