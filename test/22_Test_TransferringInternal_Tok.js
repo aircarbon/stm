@@ -14,7 +14,7 @@ contract("StMaster", accounts => {
             console.log(`global.accountNdx: ${global.accountNdx} - contract @ ${stm.address} (owner: ${accounts[0]}) - getSecTokenBatchCount: ${(await stm.getSecTokenBatchCount.call()).toString()}`);
     });
 
-    it('transferring eeu - should have reasonable gas cost for one-sided 0.5 vST transfer (A -> B), aka. carbon movement', async () => {
+    it('transferring ST - should have reasonable gas cost for one-sided 0.5 vST transfer (A -> B), aka. carbon movement', async () => {
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], CONST.nullFees, [], [], { from: accounts[0] });
         await stm.fund(CONST.ccyType.ETH,                   0,                                  accounts[global.accountNdx + 1],         { from: accounts[0] });
         const data = await helper.transferLedger({ stm, accounts, 
@@ -28,7 +28,7 @@ contract("StMaster", accounts => {
     });
 
     // one-sided kg transfer, no consideration, 1 full ST
-    it('transferring eeu - should allow one-sided transfer (A -> B) of 1.0 vST (VCS) across ledger entries', async () => {
+    it('transferring ST - should allow one-sided transfer (A -> B) of 1.0 vST (VCS) across ledger entries', async () => {
         await stm.mintSecTokenBatch(CONST.tokenType.VCS, CONST.ktCarbon, 1,       accounts[global.accountNdx + 0], CONST.nullFees, [], [], { from: accounts[0] });
         await stm.fund(CONST.ccyType.SGD,                CONST.thousandCcy_cents, accounts[global.accountNdx + 1],         { from: accounts[0] });
         
@@ -46,7 +46,7 @@ contract("StMaster", accounts => {
         assert(data.ledgerB_after.tokens[0].stId == data.ledgerA_before.tokens[0].stId, 'unexpected eeu id ledger B after vs. ledger A before');
     });
 
-    it('transferring eeu - should allow one-sided transfer (B -> A) of 1.0 vST (UNFCCC) across ledger entries', async () => {
+    it('transferring ST - should allow one-sided transfer (B -> A) of 1.0 vST (UNFCCC) across ledger entries', async () => {
         await stm.fund(CONST.ccyType.SGD,                   CONST.thousandCcy_cents, accounts[global.accountNdx + 0],         { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.ktCarbon, 1,       accounts[global.accountNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
         
@@ -65,7 +65,7 @@ contract("StMaster", accounts => {
     });
 
     // one-sided kg transfer, no consideration, 0.5 ST (split)
-    it('transferring eeu - should allow one-sided transfer (A -> B) of 0.5 vST (VCS) across ledger entries', async () => {
+    it('transferring ST - should allow one-sided transfer (A -> B) of 0.5 vST (VCS) across ledger entries', async () => {
         await stm.mintSecTokenBatch(CONST.tokenType.VCS, CONST.ktCarbon, 1,       accounts[global.accountNdx + 0], CONST.nullFees, [], [], { from: accounts[0] });
         await stm.fund(CONST.ccyType.SGD,                CONST.thousandCcy_cents, accounts[global.accountNdx + 1],         { from: accounts[0] });
         
@@ -84,7 +84,7 @@ contract("StMaster", accounts => {
         assert(data.ledgerB_after.tokens[0].stId != data.ledgerA_after.tokens[0].stId, 'unexpected eeu id ledger B after vs. ledger A after');
     });
 
-    it('transferring eeu - should allow one-sided transfer (B -> A) of 0.5 vST (VCS) across ledger entries', async () => {
+    it('transferring ST - should allow one-sided transfer (B -> A) of 0.5 vST (VCS) across ledger entries', async () => {
         await stm.fund(CONST.ccyType.SGD,                CONST.thousandCcy_cents, accounts[global.accountNdx + 0],         { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.VCS, CONST.ktCarbon, 1,       accounts[global.accountNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
         
@@ -105,7 +105,7 @@ contract("StMaster", accounts => {
 
     // one-sided kg transfer, no consideration, 1 full + 1 partial ST (split)
     // DEPRECATED - no multi-vST minting
-    // it('transferring eeu - should allow one-sided transfer (A -> B) of 1.5 vSTs (VCS) across ledger entries', async () => {
+    // it('transferring ST - should allow one-sided transfer (A -> B) of 1.5 vSTs (VCS) across ledger entries', async () => {
     //     await stm.mintSecTokenBatch(CONST.tokenType.VCS, CONST.tonCarbon, 2,      accounts[global.accountNdx + 0], CONST.nullFees, [], [], { from: accounts[0] });
     //     await stm.fund        (CONST.ccyType.USD, CONST.thousandCcy_cents, accounts[global.accountNdx + 1],         { from: accounts[0] });
     //     const data = await helper.transferLedger({ stm, accounts, 
@@ -123,7 +123,7 @@ contract("StMaster", accounts => {
     //         ledgerReceiver_before: data.ledgerB_before, ledgerReceiver_after: data.ledgerB_after,
     //     });
     // });
-    // it('transferring eeu - should allow one-sided transfer (B -> A) of 1.5 vSTs (UNFCCC) across ledger entries', async () => {
+    // it('transferring ST - should allow one-sided transfer (B -> A) of 1.5 vSTs (UNFCCC) across ledger entries', async () => {
     //     await stm.fund        (CONST.ccyType.USD,    CONST.thousandCcy_cents, accounts[global.accountNdx + 0],         { from: accounts[0] });
     //     await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.tonCarbon, 2,      accounts[global.accountNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
     //     const data = await helper.transferLedger({ stm, accounts, 
@@ -143,7 +143,7 @@ contract("StMaster", accounts => {
     // });
 
     // one-sided kg transfer, no consideration, partial ST (split), receiver owns other type
-    it('transferring eeu - should allow one-sided transfer (A -> B) of 0.5 vST (VCS) across ledger entries, receiver owns other type', async () => {
+    it('transferring ST - should allow one-sided transfer (A -> B) of 0.5 vST (VCS) across ledger entries, receiver owns other type', async () => {
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], CONST.nullFees, [], [], { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
         
@@ -164,7 +164,7 @@ contract("StMaster", accounts => {
     });
 
     // one-sided kg transfer, no consideration, full + partial ST (split), receiver owns other type
-    it('transferring eeu - should allow one-sided transfer (A -> B) of 1.5 vSTs (VCS) across ledger entries, receiver owns other type', async () => {
+    it('transferring ST - should allow one-sided transfer (A -> B) of 1.5 vSTs (VCS) across ledger entries, receiver owns other type', async () => {
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], CONST.nullFees, [], [], { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], CONST.nullFees, [], [], { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
@@ -186,7 +186,7 @@ contract("StMaster", accounts => {
     });
 
     // one-sided kg transfer, no consideration, full + partial ST (split), receiver owns same type
-    it('transferring eeu - should allow one-sided transfer (A -> B) of 1.5 vSTs (VCS) across ledger entries, receiver owns same type', async () => {
+    it('transferring ST - should allow one-sided transfer (A -> B) of 1.5 vSTs (VCS) across ledger entries, receiver owns same type', async () => {
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], CONST.nullFees, [], [], { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], CONST.nullFees, [], [], { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
@@ -209,7 +209,7 @@ contract("StMaster", accounts => {
     });
 
     // two-sided kg transfer / kg consideration, 1 full + 1 partial ST (split), receiver owns and sends same type
-    it('transferring eeu - should allow two-sided transfer (A <-> B) 1.5 vSTs (VCS) across ledger entries, receiver owns same type', async () => {
+    it('transferring ST - should allow two-sided transfer (A <-> B) 1.5 vSTs (VCS) across ledger entries, receiver owns same type', async () => {
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], CONST.nullFees, [], [], { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], CONST.nullFees, [], [], { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
@@ -223,7 +223,7 @@ contract("StMaster", accounts => {
     });
 
     // two-sided kg transfer / kg consideration, 1 full + 1 partial ST (split), receiver owns and sends different type
-    it('transferring eeu - should allow two-sided transfer (A <-> B) 1.5 vSTs of different ST types across ledger entries', async () => {
+    it('transferring ST - should allow two-sided transfer (A <-> B) 1.5 vSTs of different ST types across ledger entries', async () => {
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], CONST.nullFees, [], [], { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], CONST.nullFees, [], [], { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
@@ -239,7 +239,7 @@ contract("StMaster", accounts => {
 
     // merge test
     // one-sided kg transfer, no consideration, partial ST (split), receiver owns same type, same batch (merge)
-    it('transferring eeu - should allow one-sided transfer (A -> B) of 0.5 + 0.25 vSTs (VCS) across ledger entries, receiver owns same type, same batch', async () => {
+    it('transferring ST - should allow one-sided transfer (A -> B) of 0.5 + 0.25 vSTs (VCS) across ledger entries, receiver owns same type, same batch', async () => {
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], CONST.nullFees, [], [], { from: accounts[0] });
         await stm.fund(CONST.ccyType.SGD,                   0,                       accounts[global.accountNdx + 1],         { from: accounts[0] });
         
@@ -266,7 +266,7 @@ contract("StMaster", accounts => {
 
     // merge test
     // one-sided kg transfer, no consideration, partial ST (split), receiver owns same type, same and different batches (merge)
-    it('transferring eeu - should allow one-sided transfer (A -> B) of 0.1 + 0.001, 0.001... vSTs (UNFCCC) across ledger entries, receiver owns same type, same batch', async () => {
+    it('transferring ST - should allow one-sided transfer (A -> B) of 0.1 + 0.001, 0.001... vSTs (UNFCCC) across ledger entries, receiver owns same type, same batch', async () => {
         await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC,    CONST.tonCarbon, 1,   accounts[global.accountNdx + 0], CONST.nullFees, [], [], { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC,    CONST.tonCarbon, 1,   accounts[global.accountNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
         
@@ -295,7 +295,7 @@ contract("StMaster", accounts => {
 
     // merge test
     // two-sided kg / kg transfer, partial ST (split), receiver owns same type, same batch (merge)
-    it('transferring eeu - should allow two-sided transfer (A <-> B) of 0.1 + 0.001, 0.001... vSTs (UNFCCC) across ledger entries, receiver owns same type, same batch', async () => {
+    it('transferring ST - should allow two-sided transfer (A <-> B) of 0.1 + 0.001, 0.001... vSTs (UNFCCC) across ledger entries, receiver owns same type, same batch', async () => {
         await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC,    CONST.tonCarbon, 1,   accounts[global.accountNdx + 0], CONST.nullFees, [], [], { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,       CONST.tonCarbon, 1,   accounts[global.accountNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
         
@@ -326,13 +326,13 @@ contract("StMaster", accounts => {
         }
     });
 
-    it('transferring eeu - should not allow one-sided transfer (A -> B) of an invalid tonnage', async () => {
+    it('transferring ST - should not allow one-sided transfer (A -> B) of an invalid (-1) token unit quantity', async () => {
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], CONST.nullFees, [], [], { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
         try {
             await helper.transferWrapper(stm, accounts,
                 accounts[global.accountNdx + 0], accounts[global.accountNdx + 1],
-                -1,                          // qty_A --> ## UNSIGNED VALUE, will wrap to large uint; expect "insufficient tokens"
+                -1,                          // qty_A
                 CONST.tokenType.VCS,         // tokenTypeId_A
                 0,                           // qty_B
                 0,                           // tokenTypeId_B
@@ -340,13 +340,13 @@ contract("StMaster", accounts => {
                 false,                       // applyFees
                 { from: accounts[0] });
         } catch (ex) { 
-            assert(ex.reason == 'Insufficient tokens', `unexpected: ${ex.reason}`);
+            assert(ex.reason == 'Bad qty_A', `unexpected: ${ex.reason}`);
             return;
         }
         assert.fail('expected contract exception');
     });
 
-    it('transferring eeu - should not allow one-sided transfer (B -> A) of an invalid tonnage', async () => {
+    it('transferring ST - should not allow one-sided transfer (B -> A) of an invalid (-1) token unit quantity', async () => {
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], CONST.nullFees, [], [], { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
         try {
@@ -354,19 +354,19 @@ contract("StMaster", accounts => {
                 accounts[global.accountNdx + 0], accounts[global.accountNdx + 1],
                 0,                           // qty_A
                 0,                           // tokenTypeId_A
-                -1,                          // qty_B --> ## UNSIGNED VALUE, will wrap to large uint, and B has no VCS; expect "no tokens"
+                -1,                          // qty_B 
                 CONST.tokenType.VCS,         // tokenTypeId_B
                 0, 0, 0, 0, 
                 false,                       // applyFees
                 { from: accounts[0] });
         } catch (ex) { 
-            assert(ex.reason == 'No tokens', `unexpected: ${ex.reason}`);
+            assert(ex.reason == 'Bad qty_B', `unexpected: ${ex.reason}`);
             return;
         }
         assert.fail('expected contract exception');
     });    
 
-    it('transferring eeu - should not allow one-sided transfer (A -> B) of tokens in excess of the amount held, correct type held', async () => {
+    it('transferring ST - should not allow one-sided transfer (A -> B) of tokens in excess of the amount held, correct type held', async () => {
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], CONST.nullFees, [], [], { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.mtCarbon,  1,      accounts[global.accountNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
         try {
@@ -386,7 +386,7 @@ contract("StMaster", accounts => {
         assert.fail('expected contract exception');
     });
 
-    it('transferring eeu - should not allow one-sided transfer (A -> B) of tokens in excess of the amount held, incorrect type held', async () => {
+    it('transferring ST - should not allow one-sided transfer (A -> B) of tokens in excess of the amount held, incorrect type held', async () => {
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], CONST.nullFees, [], [], { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.mtCarbon,  1,      accounts[global.accountNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
         try {
@@ -406,7 +406,7 @@ contract("StMaster", accounts => {
         assert.fail('expected contract exception');
     });    
 
-    it('transferring eeu - should not allow one-sided transfer (B -> A) of tokens in excess of the amount held, correct type held', async () => {
+    it('transferring ST - should not allow one-sided transfer (B -> A) of tokens in excess of the amount held, correct type held', async () => {
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], CONST.nullFees, [], [], { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
         try {
@@ -426,7 +426,7 @@ contract("StMaster", accounts => {
         assert.fail('expected contract exception');
     });
     
-    it('transferring eeu - should not allow one-sided transfer (B -> A) of tokens in excess of the amount held, incorrect type held', async () => {
+    it('transferring ST - should not allow one-sided transfer (B -> A) of tokens in excess of the amount held, incorrect type held', async () => {
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], CONST.nullFees, [], [], { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
         try {

@@ -14,10 +14,9 @@ contract("StMaster", accounts => {
             console.log(`global.accountNdx: ${global.accountNdx} - contract @ ${stm.address} (owner: ${accounts[0]}) - getSecTokenBatchCount: ${(await stm.getSecTokenBatchCount.call()).toString()}`);
     });
     
-    it('funding - should allow funding of USD', async () => {
+    it('funding - should allow funding of SGD', async () => {
         await fundLedger({ ccyTypeId: CONST.ccyType.SGD, amount: CONST.thousandCcy_cents, receiver: accounts[global.accountNdx]});
     });
-
     it('funding - should allow funding of extreme values of USD', async () => {
         await fundLedger({ ccyTypeId: CONST.ccyType.SGD, amount: CONST.millionCcy_cents * 1000 * 1000, receiver: accounts[global.accountNdx]});
     });
@@ -25,9 +24,28 @@ contract("StMaster", accounts => {
     it('funding - should allow funding of ETH', async () => {
         await fundLedger({ ccyTypeId: CONST.ccyType.ETH, amount: CONST.oneEth_wei, receiver: accounts[global.accountNdx]});
     });
-
     it('funding - should allow funding of extreme values of ETH', async () => {
         await fundLedger({ ccyTypeId: CONST.ccyType.ETH, amount: CONST.millionEth_wei, receiver: accounts[global.accountNdx]});
+    });
+
+    it('funding - should allow funding of BTC', async () => {
+        await fundLedger({ ccyTypeId: CONST.ccyType.BTC, amount: CONST.oneBtc_sat, receiver: accounts[global.accountNdx]});
+    });
+    it('funding - should allow funding of extreme values of BTC', async () => {
+        await fundLedger({ ccyTypeId: CONST.ccyType.BTC, amount: CONST.millionBtc_sat, receiver: accounts[global.accountNdx]});
+    });
+
+    it('funding - should allow funding of USD', async () => {
+        await fundLedger({ ccyTypeId: CONST.ccyType.USD, amount: CONST.thousandCcy_cents, receiver: accounts[global.accountNdx]});
+    });
+    it('funding - should allow funding of EUR', async () => {
+        await fundLedger({ ccyTypeId: CONST.ccyType.EUR, amount: CONST.thousandCcy_cents, receiver: accounts[global.accountNdx]});
+    });
+    it('funding - should allow funding of HKD', async () => {
+        await fundLedger({ ccyTypeId: CONST.ccyType.HKD, amount: CONST.thousandCcy_cents, receiver: accounts[global.accountNdx]});
+    });
+    it('funding - should allow funding of GBP', async () => {
+        await fundLedger({ ccyTypeId: CONST.ccyType.GBP, amount: CONST.thousandCcy_cents, receiver: accounts[global.accountNdx]});
     });
 
     it('funding - should allow repeated funding', async () => {

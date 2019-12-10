@@ -49,7 +49,7 @@ contract StMaster is StMintable, StBurnable, CcyFundable, CcyWithdrawable, StTra
     constructor() public {
         // set contract properties
         name = "SecTok_Master";
-        version = "0.6";
+        version = "0.7";
         unit = "KG";
 
         // params - token types
@@ -58,9 +58,14 @@ contract StMaster is StMintable, StBurnable, CcyFundable, CcyWithdrawable, StTra
         stTypesData._count_tokenTypes = 2;
 
         // params - currency types
-        ccyTypesData._ccyTypes[1] = StructLib.Ccy({ id: 1, name: 'SGD', unit: 'cents', decimals: 3 });
-        ccyTypesData._ccyTypes[2] = StructLib.Ccy({ id: 2, name: 'ETH', unit: 'Wei',   decimals: 18 });
-        ccyTypesData._count_ccyTypes = 2;
+        ccyTypesData._ccyTypes[1] = StructLib.Ccy({ id: 1, name: 'SGD', unit: 'cents',      decimals: 2 });
+        ccyTypesData._ccyTypes[2] = StructLib.Ccy({ id: 2, name: 'ETH', unit: 'Wei',        decimals: 18 });
+        ccyTypesData._ccyTypes[3] = StructLib.Ccy({ id: 3, name: 'BTC', unit: 'Satoshi',    decimals: 8 });
+        ccyTypesData._ccyTypes[4] = StructLib.Ccy({ id: 4, name: 'USD', unit: 'cents',      decimals: 2 });
+        ccyTypesData._ccyTypes[5] = StructLib.Ccy({ id: 5, name: 'EUR', unit: 'euro cents', decimals: 2 });
+        ccyTypesData._ccyTypes[6] = StructLib.Ccy({ id: 6, name: 'HKD', unit: 'cents',      decimals: 2 });
+        ccyTypesData._ccyTypes[7] = StructLib.Ccy({ id: 7, name: 'GBP', unit: 'pence',      decimals: 2 });
+        ccyTypesData._count_ccyTypes = 7;
 
          // create ledger entry for contract owner - transfer fees are paid to this ledger entry
         ledgerData._ledger[owner] = StructLib.Ledger({

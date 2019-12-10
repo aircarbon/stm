@@ -34,6 +34,11 @@ EXCHANGE_FEE: 1,
     ccyType: Object.freeze({
         SGD: 1,
         ETH: 2,
+        BTC: 3,
+        USD: 4,
+        EUR: 5,
+        HKD: 6,
+        GBP: 7
     }), 
 
     // eeu kg constants
@@ -54,6 +59,12 @@ EXCHANGE_FEE: 1,
            oneEth_wei: Big(web3.utils.toWei("1", "ether")).toFixed(),                         // "1000000000000000000", 
       thousandEth_wei: Big(web3.utils.toWei("1", "ether") * 1000).toFixed(),                  // "1000000000000000000000", 
        millionEth_wei: Big(web3.utils.toWei("1", "ether")).times(1000).times(1000).toFixed(), // "1000000000000000000000000", 
+     hundredthBtc_sat: Big(1000000).toFixed(),
+         tenthBtc_sat: Big(10000000).toFixed(),
+           oneBtc_sat: Big(100000000).toFixed(),
+      thousandBtc_sat: Big(100000000).times(1000).toFixed(),
+       millionBtc_sat: Big(100000000).times(1000000).toFixed(),
+
 
     // gas approx values - for cost estimations
     gasPriceEth: web3.utils.fromWei(web3.utils.toWei("20", "gwei"), 'ether'),
