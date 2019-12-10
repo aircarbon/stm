@@ -14,22 +14,29 @@ contract StFees is Owned, StLedger {
     //
     // origFees
     //
+    // TODO: drop fee_fixed completely (it's == fee_min)
+    //
     //  > origFees - TESTS:
-    //   >> MULTI-BATCH TRANSER MULTI-ORIG -- SIDE B
-    //   >> TWO-SIDED CARBON TRANSFER - MULTI-ORIG BOTH SIDES (e.g. max 3+3 orig fee previews +1 exchange fee) [show it can be split up]
-    //   >> with MAX_BATCHES_PREVIEW exceeded ...
     //   >> insufficient carbons for batch fees
     //
+    // TODO:
     //  ** fee-preview: returns enough data (qty?) for an orchestrator to split up a large multi-batch transfer TX into separate components?
+    //    >> with MAX_BATCHES_PREVIEW exceeded ... change to more(bool) ... ?
     //  ** fee-preview: tests general / using it for splitting multi-batch transfers
     //
-    // TODO: post-minting orig fees (Thom): only can revise downwards...
-    //
+
     // TODO: global originator batch fee counts...?
+    //
+    // ** ERC20 ** >> pre-calcing/storing whitelisting addr's is the problem; if we dynamically add, we can add external addresses to whitelist at will, not secure
+    //    mapping(address=>bool)
+    //    for(;;) { addWhitelist(addr) ... }
+    //    sealWhitelist(); // can't addWhitelist after sealing
     //
 
     // GLOBAL FEES
     StructLib.FeeStruct globalFees;
+
+    // TODO: return struct, reduce # methods (to 4)
 
     // accessors - global fees (can't return mappings)
     function globalFee_tokType_Fix(uint256 tokenTypeId) public  view returns (uint256) { return globalFees.tok[tokenTypeId].fee_fixed; }

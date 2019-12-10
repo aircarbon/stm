@@ -24,7 +24,7 @@ contract("StMaster", accounts => {
         // SETUP - setup M[] mint originators, with varying no. of batches & qty's
         const M_multi = [];
         for (var i=0; i < originatorCount ; i++) {
-            M_multi.push({ account: accounts[global.accountNdx++] });
+            M_multi.push({ account: accounts[++global.accountNdx] });
         }
         var totalTokQty = 0;
         for (var i = 0 ; i < M_multi.length ; i++) {
@@ -65,8 +65,8 @@ contract("StMaster", accounts => {
     // ST ORIGINATOR FEES - MULTIPLE ORIGINATORS
 
     it('fees (orig/orig) - apply VCS token M originator fees (+ ledger fee) / UNFCCC token M originator fees (+ global fee), on a 1.5 ST trade (tok fee on A / tok fee on B)', async () => {
-        const A = accounts[global.accountNdx++];
-        const B = accounts[global.accountNdx++];
+        const A = accounts[++global.accountNdx];
+        const B = accounts[++global.accountNdx];
 
         const tokType_A = CONST.tokenType.VCS;
         const tokType_B = CONST.tokenType.UNFCCC;
@@ -79,13 +79,13 @@ contract("StMaster", accounts => {
 
         // TEST - set ledger fee structure A
         var ledgerFee_A = { fee_fixed: 100, fee_percBips: 10, fee_min: 100, fee_max: 200 };
-        await stm.setFee_TokType(tokType_A, A, ledgerFee_A);
+        await stm.setFee_TokType(tokType_A, A,              ledgerFee_A);
         await stm.setFee_TokType(tokType_A, CONST.nullAddr, CONST.nullFees);
 
         // TEST - set global fee structure B
         var globalFee_B = { fee_fixed: 50, fee_percBips: 5, fee_min: 50, fee_max: 100 };
         await stm.setFee_TokType(tokType_B, CONST.nullAddr, globalFee_B);
-        await stm.setFee_TokType(tokType_B, CONST.nullAddr, CONST.nullFees);
+        await stm.setFee_TokType(tokType_B, B,              CONST.nullFees);
 
         // TEST - transfer
         qty_A = qty_A.minus(Big(500)); // take off some for fees
@@ -104,35 +104,56 @@ contract("StMaster", accounts => {
         for (var i = 0 ; i < M_multi_A.length ; i++) M_multi_A[i].ledgerAfter = await stm.getLedgerEntry(M_multi_A[i].account);
         for (var i = 0 ; i < M_multi_B.length ; i++) M_multi_B[i].ledgerAfter = await stm.getLedgerEntry(M_multi_B[i].account);
         // console.log(`\t>>> gasUsed - Multi Orig Fees ${M_multi.length}: ${data.transferTx.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * data.transferTx.receipt.gasUsed).toFixed(4)} (USD ${(CONST.gasPriceEth * data.transferTx.receipt.gasUsed * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
-        // //console.log('feesPreview', data.feesPreview);
+        console.log('feesPreview', data.feesPreview);
 
-        // // TEST - contract owner has received exchange fee
-        // const owner_balBefore = data.owner_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
-        // const owner_balAfter  =  data.owner_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
-        // assert(Big(owner_balAfter).eq(Big(owner_balBefore).plus(Big(data.exchangeFee_tok_A))), 'unexpected contract owner token balance after transfer');
-        
-        // // TEST - originators (M[]) have each received their batch fee
-        // for (var i = 0 ; i < M_multi.length ; i++) {
-        //     const M = M_multi[i].account;
-        //     const expectedBatchFee = data.feesPreview.filter(p => p.fee_to == M).map(p => p.fee_tok_A).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
-        //     const M_balBefore = M_multi[i].ledgerBefore.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
-        //     const M_balAfter  =  M_multi[i].ledgerAfter.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
-        //     assert(Big(M_balAfter).eq(Big(M_balBefore).plus(Big(expectedBatchFee))), 'unexpected batch originator token balance after transfer');
-        // }
+        console.log('qty_A', qty_A.toString());
+        console.log('qty_B', qty_B.toString());
 
-        // // TEST - sender (A) has paid originator + exchange fees
-        // const A_balBefore = data.ledgerA_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
-        // const A_balAfter  =  data.ledgerA_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
-        // assert(Big(A_balAfter).eq(Big(A_balBefore).minus(Big(data.originatorFees_tok_A)).minus(Big(data.exchangeFee_tok_A)).minus(Big(transferAmountKg))), 'unexpected fee payer token balance after transfer');
+        // TEST - contract owner has received exchange fees
+        const owner_balBefore = data.owner_before.tokens.map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
+        const owner_balAfter  =  data.owner_after.tokens.map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
+        console.log('owner_balBefore', owner_balBefore.toString());
+        console.log('owner_balAfter', owner_balAfter.toString());
+        console.log('data.exchangeFee_tok_A', data.exchangeFee_tok_A.toString());
+        console.log('data.exchangeFee_tok_B', data.exchangeFee_tok_B.toString());
+        assert(Big(owner_balAfter).eq(Big(owner_balBefore).plus(Big(data.exchangeFee_tok_A)).plus(Big(data.exchangeFee_tok_B))), 'unexpected contract owner token balance after transfer');
         
-        // // TEST - receiver (B) has received transfer amount
-        // const B_balBefore = data.ledgerB_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
-        // const B_balAfter  =  data.ledgerB_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
-        // assert(Big(B_balAfter).eq(Big(B_balBefore).plus(Big(transferAmountKg))), 'unexpected receiver token balance after transfer');
+        // TEST - originators (M[]) have each received their batch fee
+        for (var i = 0 ; i < M_multi_A.length ; i++) {
+            const M = M_multi_A[i].account;
+            const expectedBatchFee = data.feesPreview.filter(p => p.fee_to == M).map(p => p.fee_tok_A).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
+            const M_balBefore = M_multi_A[i].ledgerBefore.tokens.map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
+            const M_balAfter  =  M_multi_A[i].ledgerAfter.tokens.map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
+            assert(Big(M_balAfter).eq(Big(M_balBefore).plus(Big(expectedBatchFee))), 'unexpected batch originator token balance after transfer (A)');
+        }
+        for (var i = 0 ; i < M_multi_B.length ; i++) {
+            const M = M_multi_B[i].account;
+            const expectedBatchFee = data.feesPreview.filter(p => p.fee_to == M).map(p => p.fee_tok_B).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
+            const M_balBefore = M_multi_B[i].ledgerBefore.tokens.map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
+            const M_balAfter  =  M_multi_B[i].ledgerAfter.tokens.map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
+            assert(Big(M_balAfter).eq(Big(M_balBefore).plus(Big(expectedBatchFee))), 'unexpected batch originator token balance after transfer (B)');
+        }
+
+        // TEST - A has paid originator + exchange fees, and received from B
+        var A_balBefore, A_balAfter;
+        A_balBefore = data.ledgerA_before.tokens.filter(p => p.tokenTypeId == tokType_A).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
+        A_balAfter  =  data.ledgerA_after.tokens.filter(p => p.tokenTypeId == tokType_A).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
+        assert(Big(A_balAfter).eq(Big(A_balBefore).minus(Big(data.originatorFees_tok_A)).minus(Big(data.exchangeFee_tok_A)).minus(Big(qty_A))), 'unexpected A (type A) token balance after transfer');
+        
+        A_balBefore = data.ledgerA_before.tokens.filter(p => p.tokenTypeId == tokType_B).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
+        A_balAfter  =  data.ledgerA_after.tokens.filter(p => p.tokenTypeId == tokType_B).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
+        assert(Big(A_balAfter).eq(Big(A_balBefore).plus(qty_B)), 'unexpected A (type B) token balance after transfer');
+
+        // TEST - B has paid originator + exchange fees, and received from A
+        var B_balBefore, B_balAfter;
+        B_balBefore = data.ledgerB_before.tokens.filter(p => p.tokenTypeId == tokType_B).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
+        B_balAfter  =  data.ledgerB_after.tokens.filter(p => p.tokenTypeId == tokType_B).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
+        assert(Big(B_balAfter).eq(Big(B_balBefore).minus(Big(data.originatorFees_tok_B)).minus(Big(data.exchangeFee_tok_B)).minus(Big(qty_B))), 'unexpected B (type B) token balance after transfer');
+
+        B_balBefore = data.ledgerB_before.tokens.filter(p => p.tokenTypeId == tokType_A).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
+        B_balAfter  =  data.ledgerB_after.tokens.filter(p => p.tokenTypeId == tokType_A).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
+        assert(Big(B_balAfter).eq(Big(B_balBefore).plus(qty_A)), 'unexpected B (type A) token balance after transfer');
     });
-
-    // TODO: drop fee_fixed completely (it's == fee_min)
-
 
     // TODO: multi-split (new test file) multi-extreme A (~100 batches?)/ multi-extreme (~100 batches?) :: pathological case for orchestrator to use fee-previews for splitting logic...
 });

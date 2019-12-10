@@ -12,7 +12,7 @@
  * to sign your transactions before they're sent to a remote public node. Infura accounts
  * are available for free at: infura.io/register.
  *
- * You'll also need a mnemonic - the twelve word phrase the wallet uses to generate
+ * You'll also need a MNEMONIC - the twelve word phrase the wallet uses to generate
  * public/private key pairs. If you're publishing your code to GitHub make sure you load this
  * phrase from a file you've .gitignored so it doesn't accidentally become public.
  *
@@ -24,10 +24,8 @@ const web3 = new Web3();
 const HDWalletProvider = require("@truffle/hdwallet-provider");
 
 // wallet seed (only needed for public testnets: ropsten & rinkeby - manage wallet with MetaMask)
-const rootPackageJson = require("../../package.json");
-const mnemonic = rootPackageJson.config.mnemonic;
-
-const gweiDeployment = "20";
+const MNEMONIC = 'educate school blast ability display bleak club soon curve car oil ostrich';
+const gweiDeployment = "40";
 
 module.exports = {
   /**
@@ -69,7 +67,7 @@ module.exports = {
 
     // aircarbon ropsten geth node -- a bit faster than infura, but representative of mainnet
     ropsten_ac: {
-      provider: () => new HDWalletProvider(mnemonic, "https://ac-dev0.net:9545",
+      provider: () => new HDWalletProvider(MNEMONIC, "https://ac-dev0.net:9545",
                       0, 888), // # test accounts
       network_id: "*",  
       gas: 6000000,
@@ -78,7 +76,7 @@ module.exports = {
 
     // aircarbon private testnet geth node
     testnet_ace: {
-      provider: () => new HDWalletProvider(mnemonic, "https://ac-dev1.net:9545",
+      provider: () => new HDWalletProvider(MNEMONIC, "https://ac-dev1.net:9545",
                       0, 888), // # test accounts
       network_id: "*",
       gas: 6000000,
@@ -87,7 +85,7 @@ module.exports = {
 
     // ropsten infura -- much slower than rinkeby infura
     ropsten_infura: {
-      provider: () => new HDWalletProvider(mnemonic, "https://ropsten.infura.io/v3/93db2c7fd899496d8400e86100058297",
+      provider: () => new HDWalletProvider(MNEMONIC, "https://ropsten.infura.io/v3/93db2c7fd899496d8400e86100058297",
                       0, 888), // # test accounts
       network_id: "*",
       gas: 6000000,
@@ -95,7 +93,7 @@ module.exports = {
     },
 
     rinkeby_infura: {
-      provider: () => new HDWalletProvider(mnemonic, "https://rinkeby.infura.io/v3/93db2c7fd899496d8400e86100058297",
+      provider: () => new HDWalletProvider(MNEMONIC, "https://rinkeby.infura.io/v3/93db2c7fd899496d8400e86100058297",
                       0, 888), // # test accounts
       network_id: "*",
       gas: 6000000,
@@ -115,7 +113,7 @@ module.exports = {
     // Useful for deploying to a public network.
     // NB: It's important to wrap the provider as a function.
     // ropsten: {
-    // provider: () => new HDWalletProvider(mnemonic, `https://ropsten.infura.io/v3/YOUR-PROJECT-ID`),
+    // provider: () => new HDWalletProvider(MNEMONIC, `https://ropsten.infura.io/v3/YOUR-PROJECT-ID`),
     // network_id: 3,       // Ropsten's id
     // gas: 5500000,        // Ropsten has a lower block limit than mainnet
     // confirmations: 2,    // # of confs to wait between deployments. (default: 0)
@@ -125,7 +123,7 @@ module.exports = {
 
     // Useful for private networks
     // private: {
-    // provider: () => new HDWalletProvider(mnemonic, `https://network.io`),
+    // provider: () => new HDWalletProvider(MNEMONIC, `https://network.io`),
     // network_id: 2111,   // This network is yours, in the cloud.
     // production: true    // Treats this network as if it was a public net. (default: false)
     // }

@@ -114,7 +114,7 @@ module.exports = {
                applyFees,
             feeAddrOwner: accounts[0], 
         });
-        console.log(`feesPreview.length=${feesPreview.length}`, feesPreview);
+        //console.log(`feesPreview.length=${feesPreview.length}`, feesPreview);
         const sumFees_tok_A = feesPreview.map(p => p.fee_tok_A).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
         const sumFees_tok_B = feesPreview.map(p => p.fee_tok_B).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
         const sumFees_ccy_A = feesPreview.map(p => p.fee_ccy_A).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
@@ -136,7 +136,7 @@ module.exports = {
             fee_tok_B: p.fee_tok_B,
                fee_to: p.fee_to
         }});
-        console.log(`originatorFeeData.length=${originatorFeeData.length}`, originatorFeeData);
+        //console.log(`originatorFeeData.length=${originatorFeeData.length}`, originatorFeeData);
         for (let i = 0; i < originatorFeeData.length; i++)
             originatorFeeData[i].ledgerBefore = await stm.getLedgerEntry(originatorFeeData[i].fee_to);
 
@@ -150,7 +150,7 @@ module.exports = {
                    applyFees
         }, { from: accounts[0] }
         );
-        console.log(`\t>>> gasUsed - ${transferTx.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * transferTx.receipt.gasUsed).toFixed(4)} (USD ${(CONST.gasPriceEth * transferTx.receipt.gasUsed * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
+        //console.log(`\t>>> gasUsed - ${transferTx.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * transferTx.receipt.gasUsed).toFixed(4)} (USD ${(CONST.gasPriceEth * transferTx.receipt.gasUsed * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
 
         // ledger entries after
         ledgerA_after = await stm.getLedgerEntry(ledger_A);
@@ -395,11 +395,11 @@ module.exports = {
                     const expectedFeeEventCount = originatorFeeData.filter(p2 => p2.fee_to == of.fee_to && p2.fee_tok_B > 0).length;
                     const fullCount = eeuFullEvents.filter(p => p.from == ledger_B && p.to == of.fee_to && p.transferType == CONST.transferType.ORIG_FEE).length;
                     const partialCount = eeuPartialEvents.filter(p => p.from == ledger_B && p.to == of.fee_to && p.transferType == CONST.transferType.ORIG_FEE).length;
-                    console.log('             ledger_B', ledger_B);
-                    console.log('          orig_fee.to', of.fee_to);
-                    console.log('          fullCount B', fullCount);
-                    console.log('       partialCount B', partialCount);
-                    console.log('expectedFeeEventCount', expectedFeeEventCount);
+                    // console.log('             ledger_B', ledger_B);
+                    // console.log('          orig_fee.to', of.fee_to);
+                    // console.log('          fullCount B', fullCount);
+                    // console.log('       partialCount B', partialCount);
+                    // console.log('expectedFeeEventCount', expectedFeeEventCount);
                     
                     assert(fullCount > 0 || partialCount == expectedFeeEventCount,
                            'unexpected originator fee transfer full vs. partial event count after transfer for ledger B');
