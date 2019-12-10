@@ -73,6 +73,9 @@ library TokenLib {
         require(a.mintQty >= 0x1 && a.mintQty <= 0xffffffffffffffff, "Bad mintQty"); // max uint64
         require(uint256(ledgerData._batches_currentMax_id) + 1 <= 0xffffffffffffffff, "Too many batches");
 
+        require(a.origTokFee.fee_max >= a.origTokFee.fee_min || a.origTokFee.fee_max == 0, "Bad fee args");
+        require(a.origTokFee.fee_percBips <= 10000, "Bad fee args");
+
         // ### string[] param lengths are reported as zero!
         /*require(metaKeys.length == 0, "At least one metadata key must be provided");
         require(metaKeys.length <= 42, "Maximum metadata KVP length is 42");
@@ -158,6 +161,14 @@ library TokenLib {
         StructLib.SetFeeArgs memory originatorFeeNew)
     public {
         require(batchId >= 1 && batchId <= ledgerData._batches_currentMax_id, "Bad batchId");
+        require(ledgerData._batches[batchId].origTokFee.fee_fixed >= originatorFeeNew.fee_fixed, "Bad fee args");
+        require(ledgerData._batches[batchId].origTokFee.fee_percBips >= originatorFeeNew.fee_percBips, "Bad fee args");
+        require(ledgerData._batches[batchId].origTokFee.fee_min >= originatorFeeNew.fee_min, "Bad fee args");
+        require(ledgerData._batches[batchId].origTokFee.fee_max >= originatorFeeNew.fee_max, "Bad fee args");
+
+        require(originatorFeeNew.fee_max >= originatorFeeNew.fee_min || originatorFeeNew.fee_max == 0, "Bad fee args");
+        require(originatorFeeNew.fee_percBips <= 10000, "Bad fee args");
+
         ledgerData._batches[batchId].origTokFee = originatorFeeNew;
         emit SetBatchOriginatorFee(batchId, originatorFeeNew);
     }

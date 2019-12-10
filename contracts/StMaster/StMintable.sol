@@ -48,7 +48,6 @@ contract StMintable is Owned, StLedger {
      */
     function addMetaSecTokenBatch(
         uint64 batchId,
-      //uint256 batchId,
         string memory metaKeyNew,
         string memory metaValueNew)
     public onlyOwner() onlyWhenReadWrite() {
@@ -62,7 +61,6 @@ contract StMintable is Owned, StLedger {
      */
     function setOriginatorFeeTokenBatch(
         uint64 batchId,
-      //uint256 batchId,
         StructLib.SetFeeArgs memory originatorFee)
     public onlyOwner() onlyWhenReadWrite() {
         TokenLib.setOriginatorFeeTokenBatch(ledgerData, batchId, originatorFee);

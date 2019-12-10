@@ -27,7 +27,7 @@ contract("StMaster", accounts => {
 
     // ST ORIGINATOR FEES - SINGLE ORIGINATOR
 
-    it('fees (originator) - apply VCS token 1 originator fee (+ ledger @ x4) / ETH global fee, on a 1.5 ST trade (tok fee on A / ccy fee on B)', async () => {
+    it('fees (orig/ccy) - apply VCS token 1 originator fee (+ ledger @ x4) / ETH global fee, on a 1.5 ST trade (tok fee on A / ccy fee on B)', async () => {
         // SETUP - mint for M ([+0]), move all to A ([+1]) 
         const M = accounts[global.accountNdx + 0];
         const A = accounts[global.accountNdx + 1];
@@ -109,7 +109,7 @@ contract("StMaster", accounts => {
         assert(Big(A_balAfter).eq(Big(A_balBefore).minus(Big(data.originatorFees_tok_A)).minus(Big(data.exchangeFee_tok_A)).minus(Big(transferAmountKg))), 'unexpected fee payer token balance after transfer');
     });
 
-    it('fees (originator) - apply UNFCCC token 1 originator fees (+ global @ x8) / SGD ledger fee, on a 2.5 ST trade (tok fee on B / ccy fee on A)', async () => {
+    it('fees (orig/ccy) - apply UNFCCC token 1 originator fees (+ global @ x8) / SGD ledger fee, on a 2.5 ST trade (tok fee on B / ccy fee on A)', async () => {
         // SETUP - mint for M ([+0]), move all to B ([+2])
         const M = accounts[global.accountNdx + 0];
         const A = accounts[global.accountNdx + 1];
@@ -194,7 +194,7 @@ contract("StMaster", accounts => {
 
     // ST ORIGINATOR FEES - MULTIPLE ORIGINATORS
 
-    it('fees (originator) - apply VCS token multiple [3] originator fees (+ ledger @ x4), on a 3.5 ST trade (fee on A)', async () => {
+    it('fees (orig/ccy) - apply VCS token multiple [3] originator fees (+ ledger @ x4), on a 3.5 ST trade (fee on A)', async () => {
         // SETUP - mint for M[] ([+0], [+1], [+2]), move all to A ([+3]) 
         const M_multi = [ 
             { account: accounts[global.accountNdx + 0] }, 
@@ -298,7 +298,7 @@ contract("StMaster", accounts => {
         assert(Big(B_balAfter).eq(Big(B_balBefore).plus(Big(transferAmountKg))), 'unexpected receiver token balance after transfer');
     });
 
-    it('fees (originator) - apply UNFCCC token multiple [3] originator fees (+ global @ x10), on a 3.5 ST trade (fee on B)', async () => {
+    it('fees (orig/ccy) - apply UNFCCC token multiple [3] originator fees (+ global @ x10), on a 3.5 ST trade (fee on B)', async () => {
         // SETUP - mint for M[] ([+0], [+1], [+2]), move all to B ([+3]) 
         const M_multi = [ 
             { account: accounts[global.accountNdx + 0] }, 
@@ -402,9 +402,4 @@ contract("StMaster", accounts => {
         const R_balAfter  =  data.ledgerA_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.UNFCCC).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
         assert(Big(R_balAfter).eq(Big(R_balBefore).plus(Big(transferAmountKg))), 'unexpected receiver token balance after transfer');
     });
-
-    // TODO: orig both sides (carbon/carbon swap) -- NEW FLE
-    // TODO: multi A, multi B (carbon type swap)
-    
-    // TODO: multi-split (new test file) multi-extreme A (~100 batches?)/ multi-extreme (~100 batches?) :: pathological case for orchestrator to use fee-previews for splitting logic...
 });
