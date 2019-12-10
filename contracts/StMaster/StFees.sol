@@ -12,29 +12,7 @@ contract StFees is Owned, StLedger {
     //       i.e. transfer amounts are not inclusive of fees, they are additional
 
     //
-    // tuning - ST packing ...
-    //
-
-    // tuning - orig-fees (1 orig, 1.5 STs)
-    //
-    //      start gas cost: ## 591590 ##
-    //          (no token transfer: 103715 !!)
-    //          (no full ST transfer: 127925 !! >> i.e. almost all gas cost is in partial transfer)
-    //
-    //      packing ST 64 bits x3 mapping: ** 453026 ** -- GAIN 23%
-    //          (no update of ST mapping: 409000 - cost of mapping update ~50k)
-    //          (no count++ in partial: 407000 - 50k access cost)
-    //          (no push in partial: 359000 - 94k access cost)
-    //          (no emit partial event: 442088 - cost of emit: 11k)
-    //          (no global updates at end: 406000 - cost 50k per update)
-    //
-    //      packed globals into a struct: ** 426053 **
-    //      RETEST ALL: OK
-
-    //
     // origFees
-    //  ** fee-preview: returns enough data (qty?) for an orchestrator to split up a large multi-batch transfer TX into separate components?
-    //  ** fee-preview: tests general / using it for splitting multi-batch transfers
     //
     //  > origFees - TESTS:
     //   >> MULTI-BATCH TRANSER MULTI-ORIG -- SIDE B
@@ -42,8 +20,12 @@ contract StFees is Owned, StLedger {
     //   >> with MAX_BATCHES_PREVIEW exceeded ...
     //   >> insufficient carbons for batch fees
     //
-    // TODO: global originator batch fee counts...
+    //  ** fee-preview: returns enough data (qty?) for an orchestrator to split up a large multi-batch transfer TX into separate components?
+    //  ** fee-preview: tests general / using it for splitting multi-batch transfers
+    //
     // TODO: post-minting orig fees (Thom): only can revise downwards...
+    //
+    // TODO: global originator batch fee counts...?
     //
 
     // GLOBAL FEES

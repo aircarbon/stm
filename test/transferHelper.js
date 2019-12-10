@@ -22,10 +22,10 @@ module.exports = {
         // ledger entries before
         var ledgerA_before, ledgerA_after;
         var ledgerB_before, ledgerB_after;
-        var ledgerContractOwner_before, ledgerContractOwner_after;
+        var owner_before, owner_after;
         ledgerA_before = await stm.getLedgerEntry(ledger_A);
         ledgerB_before = await stm.getLedgerEntry(ledger_B);
-        ledgerContractOwner_before = await stm.getLedgerEntry(accounts[0]);
+        owner_before = await stm.getLedgerEntry(accounts[0]);
         
         // global totals: transferred before
         var totalKg_tfd_before, totalKg_tfd_after;
@@ -155,7 +155,7 @@ module.exports = {
         // ledger entries after
         ledgerA_after = await stm.getLedgerEntry(ledger_A);
         ledgerB_after = await stm.getLedgerEntry(ledger_B);
-        ledgerContractOwner_after = await stm.getLedgerEntry(accounts[0]);
+        owner_after = await stm.getLedgerEntry(accounts[0]);
         for (let i = 0; i < originatorFeeData.length; i++)
             originatorFeeData[i].ledgerAfter = await stm.getLedgerEntry(originatorFeeData[i].fee_to);
         //console.log('originatorFeeData', originatorFeeData);
@@ -401,20 +401,20 @@ module.exports = {
             // validate that total tonnage across A, B and contract owner (fee receiver) is unchanged
             // console.log('            ledgerA_before.tokens_sumQty', ledgerA_before.tokens_sumQty);
             // console.log('            ledgerB_before.tokens_sumQty', ledgerB_before.tokens_sumQty);
-            // console.log('ledgerContractOwner_before.tokens_sumQty', ledgerContractOwner_before.tokens_sumQty);
+            // console.log('owner_before.tokens_sumQty', owner_before.tokens_sumQty);
 
             // console.log('             ledgerA_after.tokens_sumQty', ledgerA_after.tokens_sumQty);
             // console.log('             ledgerB_after.tokens_sumQty', ledgerB_after.tokens_sumQty);
-            // console.log(' ledgerContractOwner_after.tokens_sumQty', ledgerContractOwner_after.tokens_sumQty);
+            // console.log(' owner_after.tokens_sumQty', owner_after.tokens_sumQty);
 
             // don't double count sender/receiver and master contract owner, if the contract owner is on one side of the transfer
             assert(Number(ledgerA_before.tokens_sumQty) + 
                    Number(ledgerB_before.tokens_sumQty) + 
-                   (contractOwnerIsTransfering ? 0 : Number(ledgerContractOwner_before.tokens_sumQty)) // exchange fee receiver before
+                   (contractOwnerIsTransfering ? 0 : Number(owner_before.tokens_sumQty)) // exchange fee receiver before
                    ==
                    Number(ledgerA_after.tokens_sumQty)  + 
                    Number(ledgerB_after.tokens_sumQty)  + 
-                   (contractOwnerIsTransfering ? 0 : Number(ledgerContractOwner_after.tokens_sumQty)) + // exchange fee receiver after
+                   (contractOwnerIsTransfering ? 0 : Number(owner_after.tokens_sumQty)) + // exchange fee receiver after
                    originatorFeeData.map(p => p.fee_tok_A).reduce((a,b) => Number(a) + Number(b), Number(0)) + // originator fees paid by A
                    originatorFeeData.map(p => p.fee_tok_B).reduce((a,b) => Number(a) + Number(b), Number(0))   // originator fees paid by B
                    , 'unexpected total tonnage sum across ledger before vs. after');
@@ -529,11 +529,11 @@ module.exports = {
         }
 
         // validate token fee sum tonnage in contract owner
-        // console.log(' ledgerContractOwner_after.tokens_sumQty', ledgerContractOwner_after.tokens_sumQty);
-        // console.log('ledgerContractOwner_before.tokens_sumQty', ledgerContractOwner_before.tokens_sumQty);
+        // console.log(' owner_after.tokens_sumQty', owner_after.tokens_sumQty);
+        // console.log('owner_before.tokens_sumQty', owner_before.tokens_sumQty);
         // console.log('       totalqty_AllSecSecTokenTypes_fees', totalqty_AllSecSecTokenTypes_fees);
         if (!contractOwnerIsTransfering) {
-            assert(new BN(ledgerContractOwner_after.tokens_sumQty).sub(new BN(ledgerContractOwner_before.tokens_sumQty))
+            assert(new BN(owner_after.tokens_sumQty).sub(new BN(owner_before.tokens_sumQty))
                     .eq(totalqty_AllSecSecTokenTypes_fees), 'unexpected contract owner (exchange fee receiver) tonnage after transfer');
         }
 
@@ -545,7 +545,7 @@ module.exports = {
             eeuFullEvents,              eeuPartialEvents,
             ledgerA_before,             ledgerA_after,  
             ledgerB_before,             ledgerB_after,
-            ledgerContractOwner_before, ledgerContractOwner_after,
+            owner_before, owner_after,
             originatorFees_tok_A,       originatorFees_tok_B,
             exchangeFee_tok_A,          exchangeFee_tok_B,
             exchangeFee_ccy_A,          exchangeFee_ccy_B,

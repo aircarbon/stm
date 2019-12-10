@@ -16,7 +16,7 @@ contract("StMaster", accounts => {
     });
 
     // ST FEES
-    it('trading fees (percentage) - apply VCS token fee 100 BP on a trade (fee on A)', async () => {
+    it('fees (percentage) - apply VCS token fee 100 BP on a trade (fee on A)', async () => {
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], CONST.nullFees, [], [], { from: accounts[0] });
         await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        accounts[global.accountNdx + 1],                         { from: accounts[0] });
 
@@ -42,8 +42,8 @@ contract("StMaster", accounts => {
         });
 
         // test contract owner has received expected carbon VCS fee
-        const contractOwner_VcsKgBefore = data.ledgerContractOwner_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
-        const contractOwner_VcsKgAfter  =  data.ledgerContractOwner_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
+        const contractOwner_VcsKgBefore = data.owner_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
+        const contractOwner_VcsKgAfter  =  data.owner_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
         //console.log(`accountNdx=${global.accountNdx} contractOwner_VcsKgBefore`, contractOwner_VcsKgBefore);
         //console.log(`accountNdx=${global.accountNdx} contractOwner_VcsKgAfter`, contractOwner_VcsKgAfter);
         assert(contractOwner_VcsKgAfter == Number(contractOwner_VcsKgBefore) + Number(expectedFeeKg), 'unexpected contract owner (fee receiver) VCS ST tonnage after transfer');
@@ -56,7 +56,7 @@ contract("StMaster", accounts => {
         assert(ledgerA_VcsKgAfter == Number(ledgerA_VcsKgBefore) - Number(expectedFeeKg) - Number(transferAmountKg), 'unexpected ledger A (fee payer) VCS ST tonnage after transfer');
     });
 
-    it('trading fees (percentage) - apply UNFCCC token fee 1 BP (min) on a trade 1000 tons (min lot size) (fee on B)', async () => {
+    it('fees (percentage) - apply UNFCCC token fee 1 BP (min) on a trade 1000 tons (min lot size) (fee on B)', async () => {
         await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        accounts[global.accountNdx + 0],                         { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.mtCarbon, 1,       accounts[global.accountNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
 
@@ -80,17 +80,17 @@ contract("StMaster", accounts => {
         });
 
         // test contract owner has received expected carbon UNFCCC fee
-        const contractOwnerUnfcccKgBefore = data.ledgerContractOwner_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.UNFCCC).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
-        const contractOwnerUnfcccKgAfter  =  data.ledgerContractOwner_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.UNFCCC).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
+        const contractOwnerUnfcccKgBefore = data.owner_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.UNFCCC).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
+        const contractOwnerUnfcccKgAfter  =  data.owner_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.UNFCCC).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
         assert(contractOwnerUnfcccKgAfter == Number(contractOwnerUnfcccKgBefore) + Number(expectedFeeKg), 'unexpected contract owner (fee receiver) UNFCCC ST tonnage after transfer');
 
         // test contract owner has unchanged VCS balance (i.e. no VCS fees received)
-        const contractOwnerVcsKgBefore = data.ledgerContractOwner_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
-        const contractOwnerVcsKgAfter  =  data.ledgerContractOwner_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
+        const contractOwnerVcsKgBefore = data.owner_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
+        const contractOwnerVcsKgAfter  =  data.owner_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
         assert(contractOwnerVcsKgAfter == Number(contractOwnerVcsKgBefore), 'unexpected contract owner (fee receiver) VCS ST tonnage after transfer');
     })
 
-    it('trading fees (percentage) - apply large (>1 batch ST size) token fee 5000 BP on a trade on a newly added ST type', async () => {
+    it('fees (percentage) - apply large (>1 batch ST size) token fee 5000 BP on a trade on a newly added ST type', async () => {
         await stm.addSecTokenType('TEST_EEU_TYPE');
         const types = (await stm.getSecTokenTypes()).tokenTypes;
         const newTypeId = types.filter(p => p.name == 'TEST_EEU_TYPE')[0].id;
@@ -119,13 +119,13 @@ contract("StMaster", accounts => {
         });
 
         // test contract owner has received expected new ST type token fee
-        const owner_balBefore = data.ledgerContractOwner_before.tokens.filter(p => p.tokenTypeId == newTypeId).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
-        const owner_balAfter  =  data.ledgerContractOwner_after.tokens.filter(p => p.tokenTypeId == newTypeId).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
+        const owner_balBefore = data.owner_before.tokens.filter(p => p.tokenTypeId == newTypeId).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
+        const owner_balAfter  =  data.owner_after.tokens.filter(p => p.tokenTypeId == newTypeId).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
         assert(owner_balAfter == Number(owner_balBefore) + Number(expectedFeeKg), 'unexpected contract owner (fee receiver) new ST type tonnage after transfer');
     });
 
     // CCY FEES
-    it('trading fees (percentage) - apply ETH ccy fee 100 BP on a trade (fee on A)', async () => {
+    it('fees (percentage) - apply ETH ccy fee 100 BP on a trade (fee on A)', async () => {
         await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        accounts[global.accountNdx + 0],                         { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
 
@@ -151,15 +151,15 @@ contract("StMaster", accounts => {
         });
 
         // test contract owner has received expected ETH fee
-        const owner_balBefore = data.ledgerContractOwner_before.ccys.filter(p => p.ccyTypeId == CONST.ccyType.ETH).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
-        const owner_balAfter  =  data.ledgerContractOwner_after.ccys.filter(p => p.ccyTypeId == CONST.ccyType.ETH).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
+        const owner_balBefore = data.owner_before.ccys.filter(p => p.ccyTypeId == CONST.ccyType.ETH).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
+        const owner_balAfter  =  data.owner_after.ccys.filter(p => p.ccyTypeId == CONST.ccyType.ETH).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
         //console.log('owner_balBefore', owner_balBefore.toString());
         //console.log('owner_balAfter', owner_balAfter.toString());
         //console.log('expectedFeeCcy', expectedFeeCcy.toString());
         assert(owner_balAfter == Number(owner_balBefore) + Number(expectedFeeCcy), 'unexpected contract owner (fee receiver) ETH balance after transfer');
     });
 
-    it('trading fees (percentage) - apply USD ccy fee 1 BP on a trade (fee on B)', async () => {
+    it('fees (percentage) - apply USD ccy fee 1 BP on a trade (fee on B)', async () => {
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], CONST.nullFees, [], [], { from: accounts[0] });
         await stm.fund(CONST.ccyType.SGD,                   CONST.millionCcy_cents,  accounts[global.accountNdx + 1],                         { from: accounts[0] });
 
@@ -183,12 +183,12 @@ contract("StMaster", accounts => {
         });
 
         // test contract owner has received expected ETH fee
-        const owner_balBefore = data.ledgerContractOwner_before.ccys.filter(p => p.ccyTypeId == CONST.ccyType.SGD).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
-        const owner_balAfter  =  data.ledgerContractOwner_after.ccys.filter(p => p.ccyTypeId == CONST.ccyType.SGD).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
+        const owner_balBefore = data.owner_before.ccys.filter(p => p.ccyTypeId == CONST.ccyType.SGD).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
+        const owner_balAfter  =  data.owner_after.ccys.filter(p => p.ccyTypeId == CONST.ccyType.SGD).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
         assert(owner_balAfter == Number(owner_balBefore) + Number(expectedFeeCcy), 'unexpected contract owner (fee receiver) USD balance after transfer');
     });
 
-    it('trading fees (percentage) - apply ccy fee 50 BP on a trade on a newly added ccy', async () => {
+    it('fees (percentage) - apply ccy fee 50 BP on a trade on a newly added ccy', async () => {
         await stm.addCcyType('TEST_CCY_TYPE', 'TEST_UNIT', 2);
         const types = (await stm.getCcyTypes()).ccyTypes;
         const newCcyTypeId = types.filter(p => p.name == 'TEST_CCY_TYPE')[0].id;
@@ -215,8 +215,8 @@ contract("StMaster", accounts => {
         });
 
         // test contract owner has received expected ETH fee
-        const owner_balBefore = data.ledgerContractOwner_before.ccys.filter(p => p.ccyTypeId == newCcyTypeId).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
-        const owner_balAfter  =  data.ledgerContractOwner_after.ccys.filter(p => p.ccyTypeId == newCcyTypeId).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
+        const owner_balBefore = data.owner_before.ccys.filter(p => p.ccyTypeId == newCcyTypeId).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
+        const owner_balAfter  =  data.owner_after.ccys.filter(p => p.ccyTypeId == newCcyTypeId).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
         //console.log('owner_balBefore', owner_balBefore.toString());
         //console.log('owner_balAfter', owner_balAfter.toString());
         //console.log('expectedFeeCcy', expectedFeeCcy.toString());
@@ -224,7 +224,7 @@ contract("StMaster", accounts => {
     });
 
     // ST + CCY FEES
-    it('trading fees (percentage) - apply ETH ccy & VCS ST fee on a 0.5 ST trade (fees on both sides)', async () => {
+    it('fees (percentage) - apply ETH ccy & VCS ST fee on a 0.5 ST trade (fees on both sides)', async () => {
         await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        accounts[global.accountNdx + 0],                         { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
 
@@ -257,19 +257,19 @@ contract("StMaster", accounts => {
         });
 
         // test contract owner has received expected ETH fee
-        const owner_balBefore = data.ledgerContractOwner_before.ccys.filter(p => p.ccyTypeId == CONST.ccyType.ETH).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
-        const owner_balAfter  =  data.ledgerContractOwner_after.ccys.filter(p => p.ccyTypeId == CONST.ccyType.ETH).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
+        const owner_balBefore = data.owner_before.ccys.filter(p => p.ccyTypeId == CONST.ccyType.ETH).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
+        const owner_balAfter  =  data.owner_after.ccys.filter(p => p.ccyTypeId == CONST.ccyType.ETH).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
         //console.log(`expectedFeeCcy=${expectedFeeCcy}, ccyFeeBips=${ccyFeeBips}, transferAmountCcy=${transferAmountCcy}`);
         assert(owner_balAfter == Number(owner_balBefore) + Number(expectedFeeCcy), 'unexpected contract owner (fee receiver) ETH balance after transfer');
         
         // test contract owner has received expected carbon VCS fee
-        const contractOwnerVcsKgBefore = data.ledgerContractOwner_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
-        const contractOwnerVcsKgAfter  =  data.ledgerContractOwner_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
+        const contractOwnerVcsKgBefore = data.owner_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
+        const contractOwnerVcsKgAfter  =  data.owner_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
         //console.log(`expectedFeeCarbon=${expectedFeeCarbon}, carbonFeeBps=${carbonFeeBps}, transferAmountCarbon=${transferAmountCarbon}`);
         assert(contractOwnerVcsKgAfter == Number(contractOwnerVcsKgBefore) + Number(expectedFeeCarbon), 'unexpected contract owner (fee receiver) VCS ST tonnage after transfer');
     });
 
-    it('trading fees (percentage) - should have reasonable gas cost for two-sided USD ccy & UNFCCC ST transfer (fees on both sides)', async () => {
+    it('fees (percentage) - should have reasonable gas cost for two-sided USD ccy & UNFCCC ST transfer (fees on both sides)', async () => {
         await stm.fund(CONST.ccyType.SGD,                   CONST.millionCcy_cents,  accounts[global.accountNdx + 0],                         { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
 
@@ -302,21 +302,21 @@ contract("StMaster", accounts => {
         });
 
         // test contract owner has received expected USD fee
-        const owner_balBefore = data.ledgerContractOwner_before.ccys.filter(p => p.ccyTypeId == CONST.ccyType.SGD).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
-        const owner_balAfter  =  data.ledgerContractOwner_after.ccys.filter(p => p.ccyTypeId == CONST.ccyType.SGD).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
+        const owner_balBefore = data.owner_before.ccys.filter(p => p.ccyTypeId == CONST.ccyType.SGD).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
+        const owner_balAfter  =  data.owner_after.ccys.filter(p => p.ccyTypeId == CONST.ccyType.SGD).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
         //console.log(`expectedFeeCcy=${expectedFeeCcy}, ccyFeeBips=${ccyFeeBips}, transferAmountCcy=${transferAmountCcy}`);
         assert(owner_balAfter == Number(owner_balBefore) + Number(expectedFeeCcy), 'unexpected contract owner (fee receiver) USD balance after transfer');
         
         // test contract owner has received expected carbon UNFCCC fee
-        const contractOwnerCarbonKgBefore = data.ledgerContractOwner_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.UNFCCC).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
-        const contractOwnerCarbonKgAfter  =  data.ledgerContractOwner_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.UNFCCC).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
+        const contractOwnerCarbonKgBefore = data.owner_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.UNFCCC).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
+        const contractOwnerCarbonKgAfter  =  data.owner_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.UNFCCC).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
         //console.log(`expectedFeeCarbon=${expectedFeeCarbon}, carbonFeeBps=${carbonFeeBps}, transferAmountCarbon=${transferAmountCarbon}`);
         assert(contractOwnerCarbonKgAfter == Number(contractOwnerCarbonKgBefore) + Number(expectedFeeCarbon), 'unexpected contract owner (fee receiver) UNFCCC ST tonnage after transfer');
 
         console.log(`\t>>> gasUsed - 0.5 vST trade eeu/ccy (A <-> B) w/ fees on both: ${data.transferTx.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * data.transferTx.receipt.gasUsed).toFixed(4)} (USD ${(CONST.gasPriceEth * data.transferTx.receipt.gasUsed * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
     });
 
-    it('trading fees (percentage) - should have reasonable gas cost for two-sided transfer (eeu/ccy) (fee on ccy)', async () => {
+    it('fees (percentage) - should have reasonable gas cost for two-sided transfer (eeu/ccy) (fee on ccy)', async () => {
         await stm.fund(CONST.ccyType.SGD,                   CONST.millionCcy_cents,  accounts[global.accountNdx + 0],                         { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
 
@@ -349,21 +349,21 @@ contract("StMaster", accounts => {
         //truffleAssert.prettyPrintEmittedEvents(data.transferTx);
 
         // test contract owner has received expected USD fee
-        const owner_balBefore = data.ledgerContractOwner_before.ccys.filter(p => p.ccyTypeId == CONST.ccyType.SGD).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
-        const owner_balAfter  =  data.ledgerContractOwner_after.ccys.filter(p => p.ccyTypeId == CONST.ccyType.SGD).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
+        const owner_balBefore = data.owner_before.ccys.filter(p => p.ccyTypeId == CONST.ccyType.SGD).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
+        const owner_balAfter  =  data.owner_after.ccys.filter(p => p.ccyTypeId == CONST.ccyType.SGD).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
         //console.log(`expectedFeeCcy=${expectedFeeCcy}, ccyFeeBips=${ccyFeeBips}, transferAmountCcy=${transferAmountCcy}`);
         assert(owner_balAfter == Number(owner_balBefore) + Number(expectedFeeCcy), 'unexpected contract owner (fee receiver) USD balance after transfer');
         
         // test contract owner has received expected carbon UNFCCC fee
-        const contractOwnerCarbonKgBefore = data.ledgerContractOwner_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.UNFCCC).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
-        const contractOwnerCarbonKgAfter  =  data.ledgerContractOwner_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.UNFCCC).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
+        const contractOwnerCarbonKgBefore = data.owner_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.UNFCCC).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
+        const contractOwnerCarbonKgAfter  =  data.owner_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.UNFCCC).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
         //console.log(`expectedFeeCarbon=${expectedFeeCarbon}, carbonFeeBps=${carbonFeeBps}, transferAmountCarbon=${transferAmountCarbon}`);
         assert(contractOwnerCarbonKgAfter == Number(contractOwnerCarbonKgBefore) + Number(expectedFeeCarbon), 'unexpected contract owner (fee receiver) UNFCCC ST tonnage after transfer');
 
         console.log(`\t>>> gasUsed - 0.5 vST trade eeu/ccy (A <-> B) w/ fees on ccy: ${data.transferTx.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * data.transferTx.receipt.gasUsed).toFixed(4)} (USD ${(CONST.gasPriceEth * data.transferTx.receipt.gasUsed * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
     });
 
-    it('trading fees (percentage) - should have reasonable gas cost for two-sided transfer (eeu/ccy) (fee on eeu)', async () => {
+    it('fees (percentage) - should have reasonable gas cost for two-sided transfer (eeu/ccy) (fee on eeu)', async () => {
         await stm.fund(CONST.ccyType.SGD,                   CONST.millionCcy_cents,  accounts[global.accountNdx + 0],                         { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
 
@@ -397,21 +397,21 @@ contract("StMaster", accounts => {
         //truffleAssert.prettyPrintEmittedEvents(data.transferTx);
 
         // test contract owner has received expected USD fee
-        const owner_balBefore = data.ledgerContractOwner_before.ccys.filter(p => p.ccyTypeId == CONST.ccyType.SGD).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
-        const owner_balAfter  =  data.ledgerContractOwner_after.ccys.filter(p => p.ccyTypeId == CONST.ccyType.SGD).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
+        const owner_balBefore = data.owner_before.ccys.filter(p => p.ccyTypeId == CONST.ccyType.SGD).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
+        const owner_balAfter  =  data.owner_after.ccys.filter(p => p.ccyTypeId == CONST.ccyType.SGD).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
         //console.log(`expectedFeeCcy=${expectedFeeCcy}, ccyFeeBips=${ccyFeeBips}, transferAmountCcy=${transferAmountCcy}`);
         assert(owner_balAfter == Number(owner_balBefore) + Number(expectedFeeCcy), 'unexpected contract owner (fee receiver) USD balance after transfer');
         
         // test contract owner has received expected carbon UNFCCC fee
-        const contractOwnerCarbonKgBefore = data.ledgerContractOwner_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.UNFCCC).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
-        const contractOwnerCarbonKgAfter  =  data.ledgerContractOwner_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.UNFCCC).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
+        const contractOwnerCarbonKgBefore = data.owner_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.UNFCCC).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
+        const contractOwnerCarbonKgAfter  =  data.owner_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.UNFCCC).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
         //console.log(`expectedFeeCarbon=${expectedFeeCarbon}, carbonFeeBps=${carbonFeeBps}, transferAmountCarbon=${transferAmountCarbon}`);
         assert(contractOwnerCarbonKgAfter == Number(contractOwnerCarbonKgBefore) + Number(expectedFeeCarbon), 'unexpected contract owner (fee receiver) UNFCCC ST tonnage after transfer');
 
         console.log(`\t>>> gasUsed - 0.5 vST trade eeu/ccy (A <-> B) w/ fees on eeu: ${data.transferTx.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * data.transferTx.receipt.gasUsed).toFixed(4)} (USD ${(CONST.gasPriceEth * data.transferTx.receipt.gasUsed * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
     });
 
-    it('trading fees (percentage) - should round fees to zero for minimal transfers (ccy & carbon)', async () => {
+    it('fees (percentage) - should round fees to zero for minimal transfers (ccy & carbon)', async () => {
         await stm.fund(CONST.ccyType.SGD,                   CONST.millionCcy_cents,  accounts[global.accountNdx + 0],                         { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
 
@@ -435,19 +435,19 @@ contract("StMaster", accounts => {
                applyFees: true,
         });
 
-        const owner_balBefore = data.ledgerContractOwner_before.ccys.filter(p => p.ccyTypeId == CONST.ccyType.SGD).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
-        const owner_balAfter  =  data.ledgerContractOwner_after.ccys.filter(p => p.ccyTypeId == CONST.ccyType.SGD).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
+        const owner_balBefore = data.owner_before.ccys.filter(p => p.ccyTypeId == CONST.ccyType.SGD).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
+        const owner_balAfter  =  data.owner_after.ccys.filter(p => p.ccyTypeId == CONST.ccyType.SGD).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
         //console.log(`expectedFeeCcy=${expectedFeeCcy}, ccyFeeBips=${ccyFeeBips}, transferAmountCcy=${transferAmountCcy}`);
         assert(owner_balAfter == Number(owner_balBefore) + Number(expectedFeeCcy), 'unexpected contract owner (fee receiver) USD balance after transfer');
         
         // test contract owner has received expected carbon UNFCCC fee
-        const contractOwnerCarbonKgBefore = data.ledgerContractOwner_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.UNFCCC).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
-        const contractOwnerCarbonKgAfter  =  data.ledgerContractOwner_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.UNFCCC).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
+        const contractOwnerCarbonKgBefore = data.owner_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.UNFCCC).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
+        const contractOwnerCarbonKgAfter  =  data.owner_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.UNFCCC).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
         //console.log(`expectedFeeCarbon=${expectedFeeCarbon}, carbonFeeBps=${carbonFeeBps}, transferAmountCarbon=${transferAmountCarbon}`);
         assert(contractOwnerCarbonKgAfter == Number(contractOwnerCarbonKgBefore) + Number(expectedFeeCarbon), 'unexpected contract owner (fee receiver) UNFCCC ST tonnage after transfer');
     });
     
-    it('trading fees (percentage) - should not allow non-owner to set global fee structure (ccy)', async () => {
+    it('fees (percentage) - should not allow non-owner to set global fee structure (ccy)', async () => {
         try {
             const tx1 = await stm.setFee_CcyType(CONST.ccyType.SGD, CONST.nullAddr, { fee_fixed: 0, fee_percBips: 1, fee_min: 0, fee_max: 0 }, { from: accounts[1] });
         } catch (ex) { 
@@ -457,7 +457,7 @@ contract("StMaster", accounts => {
         assert.fail('expected contract exception');
     });
 
-    it('trading fees (percentage) - should not allow non-owner to set global fee structure (carbon)', async () => {
+    it('fees (percentage) - should not allow non-owner to set global fee structure (carbon)', async () => {
         try {
             const tx1 = await stm.setFee_TokType(CONST.tokenType.UNFCCC, CONST.nullAddr, { fee_fixed: 0, fee_percBips: 1, fee_min: 0, fee_max: 0 }, { from: accounts[1] });
         } catch (ex) { 
@@ -467,7 +467,7 @@ contract("StMaster", accounts => {
         assert.fail('expected contract exception');
     });
 
-    it('trading fees (percentage) - should not allow a transfer with insufficient ccy to cover fees', async () => {
+    it('fees (percentage) - should not allow a transfer with insufficient ccy to cover fees', async () => {
         await stm.fund(CONST.ccyType.SGD,                   CONST.millionCcy_cents,  accounts[global.accountNdx + 0],                         { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
 
@@ -492,7 +492,7 @@ contract("StMaster", accounts => {
         assert.fail('expected contract exception');
     });
 
-    it('trading fees (percentage) - should not allow a transfer with insufficient carbon to cover fees', async () => {
+    it('fees (percentage) - should not allow a transfer with insufficient carbon to cover fees', async () => {
         await stm.fund(CONST.ccyType.SGD,                   CONST.millionCcy_cents,  accounts[global.accountNdx + 0],                         { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.ktCarbon, 1,       accounts[global.accountNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
 
