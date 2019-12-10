@@ -33,11 +33,11 @@ contract("StMaster", accounts => {
         const A = accounts[0];
         
         // fund with truffle
-        //const truffle_fundTx = await stm.fund(CONST.ccyType.SGD, CONST.hundredUsd_cents, A, { from: accounts[0] });
+        //const truffle_fundTx = await stm.fund(CONST.ccyType.SGD, CONST.hundredCcy_cents, A, { from: accounts[0] });
 
         // fund $100 - web3
         var paramsData = contract.methods
-            .fund(CONST.ccyType.SGD, CONST.hundredUsd_cents, A)
+            .fund(CONST.ccyType.SGD, CONST.hundredCcy_cents, A)
             .encodeABI(); 
         var web3_fundTx = new ejs.Transaction({
                nonce: await web3.eth.getTransactionCount(account, "pending"),

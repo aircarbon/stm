@@ -50,7 +50,7 @@ library TokenLib {
     struct MintSecTokenBatchArgs {
         uint256              tokenTypeId;
 
-        int64                mintQty;
+        uint256              mintQty; // accept 256 bits, so we can downcast and test if in 64-bit range
         int64                mintSecTokenCount;
       //int256               mintQty;
       //int256               mintSecTokenCount;
@@ -70,7 +70,8 @@ library TokenLib {
         //require(a.mintSecTokenCount >= 1, "Minimum one ST required");
         //require(a.mintQty % a.mintSecTokenCount == 0, "mintQty must divide evenly into mintSecTokenCount");
         require(a.mintSecTokenCount == 1, "Set mintSecTokenCount 1");
-        require(a.mintQty >= 1, "Min. mintQty 1");
+        require(a.mintQty >= 0x1 && a.mintQty <= 0xffffffffffffffff, "Bad mintQty"); // max uint64
+        require(uint256(ledgerData._batches_currentMax_id) + 1 <= 0xffffffffffffffff, "Too many batches");
 
         // ### string[] param lengths are reported as zero!
         /*require(metaKeys.length == 0, "At least one metadata key must be provided");
@@ -167,13 +168,14 @@ library TokenLib {
         StructLib.StTypesStruct storage stTypesData,
         address ledgerOwner,
         uint256 tokenTypeId,
-        int256 burnQty)
+        uint256 burnQty // accept 256 bits, so we can downcast and test if in 64-bit range
+    )
     public {
         require(ledgerData._ledger[ledgerOwner].exists == true, "Bad ledgerOwner");
-        require(burnQty >= 1, "Min. burnQty 1");
+        require(burnQty >= 0x1 && burnQty <= 0xffffffffffffffff, "Bad burnQty"); // max uint64
         require(tokenTypeId >= 1 && tokenTypeId <= stTypesData._count_tokenTypes, "Bad tokenTypeId");
 
-        // check ledger owner has sufficient carbon tonnage of supplied type
+        // check ledger owner has sufficient tokens of supplied type
         require(StructLib.sufficientTokens(ledgerData, ledgerOwner, tokenTypeId, uint256(burnQty), 0) == true, "Insufficient tokens");
         // uint256 kgAvailable = 0;
         // for (uint i = 0; i < ledgerData._ledger[ledgerOwner].tokenType_stIds[tokenTypeId].length; i++) {

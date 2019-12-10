@@ -19,7 +19,10 @@ contract StBurnable is Owned, StLedger {
      * @param tokenTypeId ST type to burn
      * @param burnQty Quantity of contact base token units to burn
      */
-    function burnTokens(address ledgerOwner, uint256 tokenTypeId, int256 burnQty)
+    function burnTokens(
+        address ledgerOwner,
+        uint256 tokenTypeId,
+        uint256 burnQty)
     public onlyOwner() onlyWhenReadWrite() {
 
         TokenLib.burnTokens(ledgerData, stTypesData, ledgerOwner, tokenTypeId, burnQty);
@@ -28,7 +31,7 @@ contract StBurnable is Owned, StLedger {
         // require(burnQty >= 1, "Min. burnQty 1");
         // require(tokenTypeId >= 1 && tokenTypeId <= stTypesData._count_tokenTypes, "Bad tokenTypeId");
 
-        // // check ledger owner has sufficient carbon tonnage of supplied type
+        // // check ledger owner has sufficient tokens of supplied type
         // require(StructLib.sufficientTokens(ledgerData, ledgerOwner, tokenTypeId, uint256(burnQty), 0) == true, "Insufficient tokens");
         // // uint256 kgAvailable = 0;
         // // for (uint i = 0; i < ledgerData._ledger[ledgerOwner].tokenType_stIds[tokenTypeId].length; i++) {

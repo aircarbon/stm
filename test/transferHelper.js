@@ -474,7 +474,7 @@ module.exports = {
             // console.log('netKg_tfd', netKg_tfd);
             // console.log('eeuFee_A', eeuFee_A);
 
-            assert(ledgerA_after.tokens_sumQty == Number(ledgerA_before.tokens_sumQty) - netKg_tfd - ex_eeuFee_A - Number(originatorFees_tok_A.toFixed()), 'unexpected ledger A tonnage sum after transfer A -> B');
+            assert(ledgerA_after.tokens_sumQty == Number(ledgerA_before.tokens_sumQty) - netKg_tfd - ex_eeuFee_A - Number(originatorFees_tok_A.toFixed()), 'unexpected ledger tokens sum after transfer A -> B');
             assert(ledgerB_after.tokens_sumQty == Number(ledgerB_before.tokens_sumQty) + netKg_tfd, 'unexpected ledger B tonnage sum after transfer A -> B');
 
             totalKg_tfd_incFees = totalKg_tfd_incFees.add(new BN(originatorFees_tok_A.toFixed()));
@@ -523,7 +523,7 @@ module.exports = {
             netKg_tfd += qty_B; // transfered by B
             netKg_tfd -= qty_A; // received from A
             assert(ledgerB_after.tokens_sumQty == Number(ledgerB_before.tokens_sumQty) - netKg_tfd - ex_eeuFee_B - Number(originatorFees_tok_B.toFixed()), 'unexpected ledger B tonnage sum after transfer B -> A');
-            assert(ledgerA_after.tokens_sumQty == Number(ledgerA_before.tokens_sumQty) + netKg_tfd, 'unexpected ledger A tonnage sum after transfer B -> A');
+            assert(ledgerA_after.tokens_sumQty == Number(ledgerA_before.tokens_sumQty) + netKg_tfd, 'unexpected ledger tokens sum after transfer B -> A');
             
             totalKg_tfd_incFees = totalKg_tfd_incFees.add(new BN(originatorFees_tok_B.toFixed()));
         }

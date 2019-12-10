@@ -28,17 +28,8 @@ contract StFees is Owned, StLedger {
     //          (no emit partial event: 442088 - cost of emit: 11k)
     //          (no global updates at end: 406000 - cost 50k per update)
     //
-    //      moved _tokens_currentMax_id++ into local var: ** 442365 ** -- GAIN 25%
+    //      packed globals into a struct: ** 426053 **
     //      RETEST ALL: OK
-
-    //      TODO: pack ST.currentQty / ST.mintedQty into nested struct (saves one update)...? OR SHOULD BE PACKING ALREADY INTO ONE UPDATE?
-    //          without both: 433000 (??)
-
-    //      TODO: pack globals into a struct, worst case is 3x 50k updates down to one 50k update)...
-    //          without both: 409000
-
-    //      TODO: token Qty on transfer/mint/burn now is max. 2^64 -- how to enforce check on params into contract? -ve tests needed
-    //      TODO: batchId now is max 2^64 -- need to test on mintBatch for exceeded, also getBatch -ve tests
 
     //
     // origFees
@@ -105,7 +96,7 @@ contract StFees is Owned, StLedger {
      */
     function getSecToken_totalExchangeFeesPaidQty()
     external view onlyOwner() returns (uint256) {
-        return ledgerData._tokens_totalExchangeFeesPaidQty;
+        return ledgerData._tokens_total.exchangeFeesPaidQty;
     }
 
     /**
@@ -113,7 +104,7 @@ contract StFees is Owned, StLedger {
      */
     function getSecToken_totalOriginatorFeesPaidQty()
     external view onlyOwner() returns (uint256) {
-        return ledgerData._tokens_totalOriginatorFeesPaidQty;
+        return ledgerData._tokens_total.originatorFeesPaidQty;
     }
 
     /**

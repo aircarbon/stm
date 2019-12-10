@@ -15,11 +15,11 @@ contract("StMaster", accounts => {
     });
     
     it('funding - should allow funding of USD', async () => {
-        await fundLedger({ ccyTypeId: CONST.ccyType.SGD, amount: CONST.thousandUsd_cents, receiver: accounts[global.accountNdx]});
+        await fundLedger({ ccyTypeId: CONST.ccyType.SGD, amount: CONST.thousandCcy_cents, receiver: accounts[global.accountNdx]});
     });
 
     it('funding - should allow funding of extreme values of USD', async () => {
-        await fundLedger({ ccyTypeId: CONST.ccyType.SGD, amount: CONST.millionUsd_cents * 1000 * 1000, receiver: accounts[global.accountNdx]});
+        await fundLedger({ ccyTypeId: CONST.ccyType.SGD, amount: CONST.millionCcy_cents * 1000 * 1000, receiver: accounts[global.accountNdx]});
     });
 
     it('funding - should allow funding of ETH', async () => {
@@ -32,23 +32,23 @@ contract("StMaster", accounts => {
 
     it('funding - should allow repeated funding', async () => {
         for (var i=0 ; i < 10 ; i++) {
-            await fundLedger({ ccyTypeId: CONST.ccyType.SGD, amount: CONST.thousandUsd_cents, receiver: accounts[global.accountNdx]});
+            await fundLedger({ ccyTypeId: CONST.ccyType.SGD, amount: CONST.thousandCcy_cents, receiver: accounts[global.accountNdx]});
         }
     });
 
     it('funding - should have reasonable gas cost for funding', async () => {
-        const fundTx = await stm.fund(CONST.ccyType.SGD, CONST.thousandUsd_cents, accounts[global.accountNdx], { from: accounts[0] });
+        const fundTx = await stm.fund(CONST.ccyType.SGD, CONST.thousandCcy_cents, accounts[global.accountNdx], { from: accounts[0] });
         console.log(`\t>>> gasUsed - Funding: ${fundTx.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * fundTx.receipt.gasUsed).toFixed(4)} (USD ${(CONST.gasPriceEth * fundTx.receipt.gasUsed * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
     });
 
     it('funding - should allow minting and funding on same ledger entry', async () => {
         await stm.mintSecTokenBatch(CONST.tokenType.VCS, CONST.mtCarbon, 1, accounts[global.accountNdx], CONST.nullFees, [], [], { from: accounts[0] });
-        await stm.fund(CONST.ccyType.SGD, CONST.thousandUsd_cents, accounts[global.accountNdx],           { from: accounts[0] });
+        await stm.fund(CONST.ccyType.SGD, CONST.thousandCcy_cents, accounts[global.accountNdx],           { from: accounts[0] });
         const ledgerEntryAfter = await stm.getLedgerEntry(accounts[global.accountNdx]);
 
         assert(ledgerEntryAfter.tokens.length == 1, 'unexpected eeu count in ledger entry after minting & funding');
         assert(Number(ledgerEntryAfter.tokens_sumQty) == Number(CONST.mtCarbon), 'invalid kg sum in ledger entry after minting & funding');
-        assert(ledgerEntryAfter.ccys.find(p => p.ccyTypeId == CONST.ccyType.SGD).balance == CONST.thousandUsd_cents, 'unexpected usd balance in ledger entry after minting & funding');
+        assert(ledgerEntryAfter.ccys.find(p => p.ccyTypeId == CONST.ccyType.SGD).balance == CONST.thousandCcy_cents, 'unexpected usd balance in ledger entry after minting & funding');
     });
 
     it('funding - should not allow non-owner to fund a ledger entry', async () => {

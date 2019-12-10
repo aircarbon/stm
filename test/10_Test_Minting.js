@@ -1,5 +1,7 @@
 const st = artifacts.require('StMaster');
 const truffleAssert = require('truffle-assertions');
+const Big = require('big.js');
+const BN = require('bn.js');
 const CONST = require('../const.js');
 
 contract("StMaster", accounts => {
@@ -17,6 +19,7 @@ contract("StMaster", accounts => {
         await mintBatch({ tokenType: CONST.tokenType.UNFCCC, qtyUnit: CONST.ktCarbon * 100, qtySecTokens: 1, receiver: accounts[global.accountNdx], }, { from: accounts[0] });
     });
 
+    // DEPRECATD: no multi ST batch minting
     //it('minting - should allow owner to mint a multi-vST (2) batch', async () => {
     //    await mintBatch({ tokenType: CONST.tokenType.UNFCCC, qtyUnit: CONST.ktCarbon * 100, qtySecTokens: 2, receiver: accounts[global.accountNdx], },{ from: accounts[0] });
     //});
@@ -107,27 +110,39 @@ contract("StMaster", accounts => {
     //     assert.fail('expected contract exception');
     // });
 
-    it('minting - should not allow too small a tonnage', async () => {
+    it('minting - should not allow minting invalid (0) token units (1)', async () => {
         try {
             await mintBatch( { tokenType: CONST.tokenType.UNFCCC, qtyUnit: 0, qtySecTokens: 1, receiver: accounts[global.accountNdx] }, { from: accounts[0] } );
         } catch (ex) { 
-            assert(ex.reason == 'Min. mintQty 1', `unexpected: ${ex.reason}`);
+            assert(ex.reason == 'Bad mintQty', `unexpected: ${ex.reason}`);
             return;
         }
         assert.fail('expected contract exception');
     });
 
-    it('minting - should not allow invalid tonnage', async () => {
+    it('minting - should not allow minting invalid (-1) token units (2)', async () => {
         try {
             await mintBatch( { tokenType: CONST.tokenType.UNFCCC, qtyUnit: -1, qtySecTokens: 1, receiver: accounts[global.accountNdx] }, { from: accounts[0] } );
         } catch (ex) { 
-            assert(ex.reason == 'Min. mintQty 1', `unexpected: ${ex.reason}`);
+            assert(ex.reason == 'Bad mintQty', `unexpected: ${ex.reason}`);
             return;
         }
         assert.fail('expected contract exception');
     });
 
-    it('minting - should not allow invalid vST quantities (1)', async () => {
+    it('minting - should not allow minting invalid (2^64) token units (3)', async () => {
+        try {
+            const qty = Big(2).pow(64);//.minus(1);
+            const M = accounts[global.accountNdx];
+            await mintBatch({ tokenType: CONST.tokenType.UNFCCC, qtyUnit: qty.toString(), qtySecTokens: 1, receiver: accounts[global.accountNdx] }, { from: accounts[0] });
+        } catch (ex) {
+            assert(ex.reason == 'Bad mintQty', `unexpected: ${ex.reason}`);
+            return;
+        }
+        assert.fail('expected contract exception');
+    });
+
+    it('minting - should not allow minting invalid vST quantities (1)', async () => {
         try {
             await mintBatch({ tokenType: CONST.tokenType.UNFCCC, qtyUnit: CONST.tonCarbon, qtySecTokens: 0, receiver: accounts[global.accountNdx], }, { from: accounts[0] });
         } catch (ex) { 
@@ -137,7 +152,7 @@ contract("StMaster", accounts => {
         assert.fail('expected contract exception');
     });
 
-    it('minting - should not allow invalid vST quantities (2)', async () => {
+    it('minting - should not allow invalid minting vST quantities (2)', async () => {
         try {
             await mintBatch({ tokenType: CONST.tokenType.UNFCCC, qtyUnit: CONST.tonCarbon, qtySecTokens: -1, receiver: accounts[global.accountNdx], }, { from: accounts[0] });
         } catch (ex) {
@@ -198,7 +213,7 @@ contract("StMaster", accounts => {
         const curMaxSecTokenId = (await stm.getSecToken_countMinted.call()).toNumber();
         for (var eeuCount = 1; eeuCount < 1 + qtySecTokens; eeuCount++) {
             truffleAssert.eventEmitted(mintTx, 'MintedSecToken', ev => {
-                //console.log(`event: MintedSecToken ev.id=${ev.id} curMaxSecTokenId=${curMaxSecTokenId}`);
+                //console.log(`event: MintedSecToken ev.id=${ev.id} curMaxSecTokenId=${curMaxSecTokenId} ev.mintedQty=${ev.mintedQty}`);
                 return ev.stId > curMaxSecTokenId - qtySecTokens && ev.stId <= curMaxSecTokenId
                     && ev.batchId == batchId
                     && ev.tokenTypeId == tokenType

@@ -98,6 +98,11 @@ library StructLib {
         uint64 mintedQty;
         uint64 currentQty;
     }
+    struct PackedStTotals {
+        uint80 transferedQty;
+        uint80 exchangeFeesPaidQty;
+        uint80 originatorFeesPaidQty;
+    }
 
     struct LedgerStruct {
         // *** Batch LIST
@@ -118,9 +123,12 @@ library StructLib {
         uint256 _tokens_currentMax_id;                          // 1-based - updated by Mint() and by transferSplitSecTokens()
         uint256 _tokens_totalMintedQty;                         // TODO: split by type
         uint256 _tokens_totalBurnedQty;                         // TODO: split by type
-        uint256 _tokens_totalTransferedQty;                     // TODO: split by type
-        uint256 _tokens_totalExchangeFeesPaidQty;               // TODO: split by type
-        uint256 _tokens_totalOriginatorFeesPaidQty;             // TODO: split by type
+
+        PackedStTotals _tokens_total;
+        // uint256 _tokens_totalTransferedQty;                     // TODO: split by type
+        // uint256 _tokens_totalExchangeFeesPaidQty;               // TODO: split by type
+        // uint256 _tokens_totalOriginatorFeesPaidQty;             // TODO: split by type
+
         mapping(uint256 => uint256) _ccyType_totalFunded;
         mapping(uint256 => uint256) _ccyType_totalWithdrawn;
         mapping(uint256 => uint256) _ccyType_totalTransfered;

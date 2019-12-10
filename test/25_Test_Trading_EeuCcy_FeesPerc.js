@@ -161,7 +161,7 @@ contract("StMaster", accounts => {
 
     it('trading fees (percentage) - apply USD ccy fee 1 BP on a trade (fee on B)', async () => {
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], CONST.nullFees, [], [], { from: accounts[0] });
-        await stm.fund(CONST.ccyType.SGD,                   CONST.millionUsd_cents,  accounts[global.accountNdx + 1],         { from: accounts[0] });
+        await stm.fund(CONST.ccyType.SGD,                   CONST.millionCcy_cents,  accounts[global.accountNdx + 1],         { from: accounts[0] });
 
         // set fee structure USD: 0.01% 
         const usdFeePercBips = 1; // 1 bp = 0.01%
@@ -270,7 +270,7 @@ contract("StMaster", accounts => {
     });
 
     it('trading fees (percentage) - should have reasonable gas cost for two-sided USD ccy & UNFCCC ST transfer (fees on both sides)', async () => {
-        await stm.fund(CONST.ccyType.SGD,                   CONST.millionUsd_cents,  accounts[global.accountNdx + 0],         { from: accounts[0] });
+        await stm.fund(CONST.ccyType.SGD,                   CONST.millionCcy_cents,  accounts[global.accountNdx + 0],         { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
 
         // set fee structure USD: 100 bp (1%)
@@ -286,7 +286,7 @@ contract("StMaster", accounts => {
         assert(await stm.globalFee_tokType_Bps(CONST.tokenType.UNFCCC) == carbonFeeBps, 'unexpected UNFCCC basis points fee after setting UNFCCC fee structure');
 
         // transfer, with fee structure applied
-        const transferAmountCcy = new BN(CONST.millionUsd_cents / 2);
+        const transferAmountCcy = new BN(CONST.millionCcy_cents / 2);
         const expectedFeeCcy = Math.floor(Number(transferAmountCcy.toString()) * (ccyFeeBips/10000));
 
         const transferAmountCarbon = new BN(CONST.tonCarbon / 2);
@@ -317,7 +317,7 @@ contract("StMaster", accounts => {
     });
 
     it('trading fees (percentage) - should have reasonable gas cost for two-sided transfer (eeu/ccy) (fee on ccy)', async () => {
-        await stm.fund(CONST.ccyType.SGD,                   CONST.millionUsd_cents,  accounts[global.accountNdx + 0],         { from: accounts[0] });
+        await stm.fund(CONST.ccyType.SGD,                   CONST.millionCcy_cents,  accounts[global.accountNdx + 0],         { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
 
         // set fee structure USD: 100 bp (1%)
@@ -332,7 +332,7 @@ contract("StMaster", accounts => {
         assert(await stm.globalFee_tokType_Bps(CONST.tokenType.UNFCCC) == carbonFeeBps, 'unexpected UNFCCC basis points fee after setting UNFCCC fee structure');
 
         // transfer, with fee structure applied
-        const transferAmountCcy = new BN(CONST.millionUsd_cents / 2);
+        const transferAmountCcy = new BN(CONST.millionCcy_cents / 2);
         const expectedFeeCcy = Math.floor(Number(transferAmountCcy.toString()) * (ccyFeeBips/10000));
 
         const transferAmountCarbon = new BN(CONST.tonCarbon / 2);
@@ -364,7 +364,7 @@ contract("StMaster", accounts => {
     });
 
     it('trading fees (percentage) - should have reasonable gas cost for two-sided transfer (eeu/ccy) (fee on eeu)', async () => {
-        await stm.fund(CONST.ccyType.SGD,                   CONST.millionUsd_cents,  accounts[global.accountNdx + 0],         { from: accounts[0] });
+        await stm.fund(CONST.ccyType.SGD,                   CONST.millionCcy_cents,  accounts[global.accountNdx + 0],         { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
 
         // set fee structure USD: 0%
@@ -380,7 +380,7 @@ contract("StMaster", accounts => {
         assert(await stm.globalFee_tokType_Bps(CONST.tokenType.UNFCCC) == carbonFeeBps, 'unexpected UNFCCC basis points fee after setting UNFCCC fee structure');
 
         // transfer, with fee structure applied
-        const transferAmountCcy = new BN(CONST.millionUsd_cents / 2);
+        const transferAmountCcy = new BN(CONST.millionCcy_cents / 2);
         const expectedFeeCcy = Math.floor(Number(transferAmountCcy.toString()) * (ccyFeeBips/10000));
 
         const transferAmountCarbon = new BN(CONST.tonCarbon / 2);
@@ -412,7 +412,7 @@ contract("StMaster", accounts => {
     });
 
     it('trading fees (percentage) - should round fees to zero for minimal transfers (ccy & carbon)', async () => {
-        await stm.fund(CONST.ccyType.SGD,                   CONST.millionUsd_cents,  accounts[global.accountNdx + 0],         { from: accounts[0] });
+        await stm.fund(CONST.ccyType.SGD,                   CONST.millionCcy_cents,  accounts[global.accountNdx + 0],         { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
 
         // set % fees to 1bp = 0.01%
@@ -451,18 +451,18 @@ contract("StMaster", accounts => {
         try {
             const tx1 = await setFee_CcyType(CONST.ccyType.SGD, { fee_fixed: 0, fee_percBips: 1, fee_min: 0, fee_max: 0 }, { from: accounts[1] });
         } catch (ex) { return; }
-        assert.fail('expected contract exception');
+        assert.fail('expected restriction exception');
     });
 
     it('trading fees (percentage) - should not allow non-owner to set global fee structure (carbon)', async () => {
         try {
             const tx1 = await setFee_TokType(CONST.tokenType.UNFCCC, { fee_fixed: 0, fee_percBips: 1, fee_min: 0, fee_max: 0 }, { from: accounts[1] });
         } catch (ex) { return; }
-        assert.fail('expected contract exception');
+        assert.fail('expected restriction exception');
     });
 
     it('trading fees (percentage) - should not allow a transfer with insufficient ccy to cover fees', async () => {
-        await stm.fund(CONST.ccyType.SGD,                   CONST.millionUsd_cents,  accounts[global.accountNdx + 0],         { from: accounts[0] });
+        await stm.fund(CONST.ccyType.SGD,                   CONST.millionCcy_cents,  accounts[global.accountNdx + 0],         { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
 
         await stm.setFee_CcyType(CONST.ccyType.SGD, CONST.nullAddr,      { fee_fixed: 0, fee_percBips: 1, fee_min: 0, fee_max: 0 } );
@@ -473,18 +473,18 @@ contract("StMaster", accounts => {
                     ledger_A: accounts[global.accountNdx + 0],                                    ledger_B: accounts[global.accountNdx + 1],
                        qty_A: 0,                                                             tokenTypeId_A: 0,
                        qty_B: new BN(CONST.tonCarbon),                                       tokenTypeId_B: CONST.tokenType.UNFCCC,
-                ccy_amount_A: new BN(CONST.millionUsd_cents),                                  ccyTypeId_A: CONST.ccyType.SGD,
+                ccy_amount_A: new BN(CONST.millionCcy_cents),                                  ccyTypeId_A: CONST.ccyType.SGD,
                 ccy_amount_B: 0,                                                               ccyTypeId_B: 0,
                    applyFees: true,
             });
             //truffleAssert.prettyPrintEmittedEvents(data.transferTx);
         }
         catch (ex) { return; }
-        assert.fail('expected contract exception');
+        assert.fail('expected restriction exception');
     });
 
     it('trading fees (percentage) - should not allow a transfer with insufficient carbon to cover fees', async () => {
-        await stm.fund(CONST.ccyType.SGD,                   CONST.millionUsd_cents,  accounts[global.accountNdx + 0],         { from: accounts[0] });
+        await stm.fund(CONST.ccyType.SGD,                   CONST.millionCcy_cents,  accounts[global.accountNdx + 0],         { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.ktCarbon, 1,       accounts[global.accountNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
 
         await stm.setFee_CcyType(CONST.ccyType.SGD, CONST.nullAddr,      { fee_fixed: 0, fee_percBips: 0, fee_min: 0, fee_max: 0 } );
@@ -495,12 +495,12 @@ contract("StMaster", accounts => {
                     ledger_A: accounts[global.accountNdx + 0],                                    ledger_B: accounts[global.accountNdx + 1],
                        qty_A: 0,                                                             tokenTypeId_A: 0,
                        qty_B: new BN(CONST.ktCarbon),                                        tokenTypeId_B: CONST.tokenType.UNFCCC,
-                ccy_amount_A: new BN(CONST.millionUsd_cents),                                  ccyTypeId_A: CONST.ccyType.SGD,
+                ccy_amount_A: new BN(CONST.millionCcy_cents),                                  ccyTypeId_A: CONST.ccyType.SGD,
                 ccy_amount_B: 0,                                                               ccyTypeId_B: 0,
                    applyFees: true,
             });
         }
         catch (ex) { return; }
-        assert.fail('expected contract exception');
+        assert.fail('expected restriction exception');
     });
 });

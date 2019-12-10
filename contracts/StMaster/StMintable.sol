@@ -21,10 +21,8 @@ contract StMintable is Owned, StLedger {
      */
     function mintSecTokenBatch(
         uint256                     tokenTypeId,
-        int64                       mintQty,
-      //int256                      mintQty,
+        uint256                     mintQty,
         int64                       mintSecTokenCount,
-      //int256                      mintSecTokenCount,
         address                     batchOwner,
         StructLib.SetFeeArgs memory originatorFee,
         string[] memory             metaKeys,

@@ -1,5 +1,7 @@
 const st = artifacts.require('StMaster');
 const truffleAssert = require('truffle-assertions');
+const Big = require('big.js');
+const BN = require('bn.js');
 const CONST = require('../const.js');
 
 contract("StMaster", accounts => {
@@ -253,30 +255,42 @@ contract("StMaster", accounts => {
         assert(false, 'expected contract exception');
     });
 
-    it('burning - should not allow too small a tonnage', async () => {
+    it('burning - should not allow burning invalid (0) token units (1)', async () => {
         await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.ktCarbon, 1, accounts[global.accountNdx], CONST.nullFees, [], [], { from: accounts[0], });
         const a0_le = await stm.getLedgerEntry(accounts[global.accountNdx]);
         try {
             await stm.burnTokens(accounts[global.accountNdx], CONST.tokenType.UNFCCC, 0);
         } catch (ex) { 
-            assert(ex.reason == 'Min. burnQty 1', `unexpected: ${ex.reason}`);
+            assert(ex.reason == 'Bad burnQty', `unexpected: ${ex.reason}`);
             return;
         }
         assert(false, 'expected contract exception');
     });
 
-    it('burning - should not allow invalid tonnage', async () => {
+    it('burning - should not allow burning invalid (-1) token units (2)', async () => {
         await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.ktCarbon, 1, accounts[global.accountNdx], CONST.nullFees, [], [], { from: accounts[0], });
         try {
             await stm.burnTokens(accounts[global.accountNdx], CONST.tokenType.UNFCCC, -1);
         } catch (ex) { 
-            assert(ex.reason == 'Min. burnQty 1', `unexpected: ${ex.reason}`);
+            assert(ex.reason == 'Bad burnQty', `unexpected: ${ex.reason}`);
             return;
         }
         assert.fail('expected contract exception');
     });
 
-    it('burning - should not allow non-existent tonnage (1)', async () => {
+    it('burning - should not allow burning invalid (2^64) token units (3)', async () => {
+        await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.ktCarbon, 1, accounts[global.accountNdx], CONST.nullFees, [], [], { from: accounts[0], });
+        try {
+            const qty = Big(2).pow(64);//.minus(1);
+            await stm.burnTokens(accounts[global.accountNdx], CONST.tokenType.UNFCCC, qty.toString());
+        } catch (ex) { 
+            assert(ex.reason == 'Bad burnQty', `unexpected: ${ex.reason}`);
+            return;
+        }
+        assert.fail('expected contract exception');
+    });
+
+    it('burning - should not allow burning mismatched ST type (1)', async () => {
         await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.ktCarbon, 1, accounts[global.accountNdx], CONST.nullFees, [], [], { from: accounts[0], });
         try {
             await stm.burnTokens(accounts[global.accountNdx], CONST.tokenType.VCS, CONST.ktCarbon);
@@ -287,7 +301,7 @@ contract("StMaster", accounts => {
         assert(false, 'expected contract exception');
     });
 
-    it('burning - should not allow non-existent tonnage (2)', async () => {
+    it('burning - should not allow burning mismatched ST type (2)', async () => {
         await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.ktCarbon, 1, accounts[global.accountNdx], CONST.nullFees, [], [], { from: accounts[0], });
         await stm.burnTokens(accounts[global.accountNdx], CONST.tokenType.UNFCCC, CONST.ktCarbon);
         var ledger = await stm.getLedgerEntry(accounts[global.accountNdx]);

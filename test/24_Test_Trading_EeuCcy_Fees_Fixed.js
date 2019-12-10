@@ -154,10 +154,10 @@ contract("StMaster", accounts => {
 
     it('trading fees (fixed) - apply USD ccy fee on a max. trade (fee on B)', async () => {
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.accountNdx + 0], CONST.nullFees, [], [], { from: accounts[0] });
-        await stm.fund(CONST.ccyType.SGD,                   CONST.millionUsd_cents,  accounts[global.accountNdx + 1],                         { from: accounts[0] });
+        await stm.fund(CONST.ccyType.SGD,                   CONST.millionCcy_cents,  accounts[global.accountNdx + 1],                         { from: accounts[0] });
 
         // set fee structure USD: 1000 $ in cents
-        const usdFeeFixed_cents = CONST.thousandUsd_cents;
+        const usdFeeFixed_cents = CONST.thousandCcy_cents;
         //const setFeeTx = await stm.setFee_CcyType_Fixed(CONST.ccyType.USD, usdFeeFixed_cents);
         const setFeeTx = await stm.setFee_CcyType(CONST.ccyType.SGD, CONST.nullAddr, { fee_fixed: usdFeeFixed_cents, fee_percBips: 0, fee_min: 0, fee_max: 0 } );
         truffleAssert.eventEmitted(setFeeTx, 'SetFeeCcyFix', ev => ev.ccyTypeId == CONST.ccyType.SGD && ev.fee_ccy_Fixed == usdFeeFixed_cents && ev.ledgerOwner == CONST.nullAddr);
@@ -169,7 +169,7 @@ contract("StMaster", accounts => {
                    qty_A: 750,                                                           tokenTypeId_A: CONST.tokenType.VCS,
                    qty_B: 0,                                                             tokenTypeId_B: 0,
             ccy_amount_A: 0,                                                               ccyTypeId_A: 0,
-            ccy_amount_B: new BN(CONST.millionUsd_cents).sub(new BN(usdFeeFixed_cents)),   ccyTypeId_B: CONST.ccyType.SGD,
+            ccy_amount_B: new BN(CONST.millionCcy_cents).sub(new BN(usdFeeFixed_cents)),   ccyTypeId_B: CONST.ccyType.SGD,
                applyFees: true,
         });
 
@@ -251,11 +251,11 @@ contract("StMaster", accounts => {
     });
 
     it('trading fees (fixed) - apply USD ccy & UNFCCC ST fee on a max. trade (fees on both sides)', async () => {
-        await stm.fund(CONST.ccyType.SGD,                   CONST.millionUsd_cents,  accounts[global.accountNdx + 0],                         { from: accounts[0] });
+        await stm.fund(CONST.ccyType.SGD,                   CONST.millionCcy_cents,  accounts[global.accountNdx + 0],                         { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
 
         // set fee structure USD: 100 cents
-        const usdFeeFixed_cents = CONST.oneUsd_cents;
+        const usdFeeFixed_cents = CONST.oneCcy_cents;
         //const setUsdFeeTx = await stm.setFee_CcyType_Fixed(CONST.ccyType.USD, usdFeeFixed_cents);
         const setUsdFeeTx = await stm.setFee_CcyType(CONST.ccyType.SGD, CONST.nullAddr, { fee_fixed: usdFeeFixed_cents, fee_percBips: 0, fee_min: 0, fee_max: 0 } );
         truffleAssert.eventEmitted(setUsdFeeTx, 'SetFeeCcyFix', ev => ev.ccyTypeId == CONST.ccyType.SGD && ev.fee_ccy_Fixed == usdFeeFixed_cents && ev.ledgerOwner == CONST.nullAddr);
@@ -273,7 +273,7 @@ contract("StMaster", accounts => {
                 ledger_A: accounts[global.accountNdx + 0],                                    ledger_B: accounts[global.accountNdx + 1],
                    qty_A: 0,                                                             tokenTypeId_A: 0,
                    qty_B: new BN(CONST.tonCarbon).sub(new BN(unfcccKgFeeFixed)),         tokenTypeId_B: CONST.tokenType.UNFCCC,
-            ccy_amount_A: new BN(CONST.millionUsd_cents).sub(new BN(usdFeeFixed_cents)),   ccyTypeId_A: CONST.ccyType.SGD,
+            ccy_amount_A: new BN(CONST.millionCcy_cents).sub(new BN(usdFeeFixed_cents)),   ccyTypeId_A: CONST.ccyType.SGD,
             ccy_amount_B: 0,                                                               ccyTypeId_B: 0,
                applyFees: true,
         });
@@ -336,11 +336,11 @@ contract("StMaster", accounts => {
     });
 
     it('trading fees (fixed) - should have reasonable gas cost for two-sided transfer (eeu/ccy) (fees on both sides)', async () => {
-        await stm.fund(CONST.ccyType.SGD,                   CONST.millionUsd_cents,  accounts[global.accountNdx + 0],                         { from: accounts[0] });
+        await stm.fund(CONST.ccyType.SGD,                   CONST.millionCcy_cents,  accounts[global.accountNdx + 0],                         { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
 
         // set fee structure USD: 100 cents
-        const usdFeeFixed_cents = CONST.oneUsd_cents;
+        const usdFeeFixed_cents = CONST.oneCcy_cents;
         //const setUsdFeeTx = await stm.setFee_CcyType_Fixed(CONST.ccyType.USD, usdFeeFixed_cents);
         const setUsdFeeTx = await stm.setFee_CcyType(CONST.ccyType.SGD, CONST.nullAddr, { fee_fixed: usdFeeFixed_cents, fee_percBips: 0, fee_min: 0, fee_max: 0 } );
         truffleAssert.eventEmitted(setUsdFeeTx, 'SetFeeCcyFix', ev => ev.ccyTypeId == CONST.ccyType.SGD && ev.fee_ccy_Fixed == usdFeeFixed_cents && ev.ledgerOwner == CONST.nullAddr);
@@ -359,7 +359,7 @@ contract("StMaster", accounts => {
                 ledger_A: accounts[global.accountNdx + 0],                                    ledger_B: accounts[global.accountNdx + 1],
                    qty_A: 0,                                                             tokenTypeId_A: 0,
                    qty_B: new BN(CONST.tonCarbon).sub(new BN(unfcccKgFeeFixed)),         tokenTypeId_B: CONST.tokenType.UNFCCC,
-            ccy_amount_A: new BN(CONST.millionUsd_cents).sub(new BN(usdFeeFixed_cents)),   ccyTypeId_A: CONST.ccyType.SGD,
+            ccy_amount_A: new BN(CONST.millionCcy_cents).sub(new BN(usdFeeFixed_cents)),   ccyTypeId_A: CONST.ccyType.SGD,
             ccy_amount_B: 0,                                                               ccyTypeId_B: 0,
                applyFees: true,
         });
@@ -368,11 +368,11 @@ contract("StMaster", accounts => {
     });
 
     it('trading fees (fixed) - should have reasonable gas cost for two-sided transfer (eeu/ccy) (fee on ccy)', async () => {
-        await stm.fund(CONST.ccyType.SGD,                   CONST.millionUsd_cents,  accounts[global.accountNdx + 0],                         { from: accounts[0] });
+        await stm.fund(CONST.ccyType.SGD,                   CONST.millionCcy_cents,  accounts[global.accountNdx + 0],                         { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
 
         // set fee structure USD: 100 cents
-        const usdFeeFixed_cents = CONST.oneUsd_cents;
+        const usdFeeFixed_cents = CONST.oneCcy_cents;
         const setUsdFeeTx = await stm.setFee_CcyType(CONST.ccyType.SGD, CONST.nullAddr, { fee_fixed: usdFeeFixed_cents, fee_percBips: 0, fee_min: 0, fee_max: 0 } );
         truffleAssert.eventEmitted(setUsdFeeTx, 'SetFeeCcyFix', ev => ev.ccyTypeId == CONST.ccyType.SGD && ev.fee_ccy_Fixed == usdFeeFixed_cents && ev.ledgerOwner == CONST.nullAddr);
         assert(await stm.globalFee_ccyType_Fix(CONST.ccyType.SGD) == usdFeeFixed_cents, 'unexpected USD fixed cents fee after setting USD fee structure');
@@ -388,7 +388,7 @@ contract("StMaster", accounts => {
                 ledger_A: accounts[global.accountNdx + 0],                                    ledger_B: accounts[global.accountNdx + 1],
                    qty_A: 0,                                                             tokenTypeId_A: 0,
                    qty_B: new BN(CONST.tonCarbon).sub(new BN(unfcccKgFeeFixed)),         tokenTypeId_B: CONST.tokenType.UNFCCC,
-            ccy_amount_A: new BN(CONST.millionUsd_cents).sub(new BN(usdFeeFixed_cents)),   ccyTypeId_A: CONST.ccyType.SGD,
+            ccy_amount_A: new BN(CONST.millionCcy_cents).sub(new BN(usdFeeFixed_cents)),   ccyTypeId_A: CONST.ccyType.SGD,
             ccy_amount_B: 0,                                                               ccyTypeId_B: 0,
                applyFees: true,
         });
@@ -398,11 +398,11 @@ contract("StMaster", accounts => {
     });
 
     it('trading fees (fixed) - should have reasonable gas cost for two-sided transfer (eeu/ccy) (fee on eeu)', async () => {
-        await stm.fund(CONST.ccyType.SGD,                   CONST.millionUsd_cents,  accounts[global.accountNdx + 0],                         { from: accounts[0] });
+        await stm.fund(CONST.ccyType.SGD,                   CONST.millionCcy_cents,  accounts[global.accountNdx + 0],                         { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
 
         // set fee structure USD: 0 cents
-        const usdFeeFixed_cents = CONST.oneUsd_cents;
+        const usdFeeFixed_cents = CONST.oneCcy_cents;
         //const setUsdFeeTx = await stm.setFee_CcyType_Fixed(CONST.ccyType.USD, usdFeeFixed_cents);
         const setUsdFeeTx = await stm.setFee_CcyType(CONST.ccyType.SGD, CONST.nullAddr, { fee_fixed: usdFeeFixed_cents, fee_percBips: 0, fee_min: 0, fee_max: 0 } );
         truffleAssert.eventEmitted(setUsdFeeTx, 'SetFeeCcyFix', ev => ev.ccyTypeId == CONST.ccyType.SGD && ev.fee_ccy_Fixed == usdFeeFixed_cents) && ev.ledgerOwner == CONST.nullAddr;
@@ -420,7 +420,7 @@ contract("StMaster", accounts => {
                 ledger_A: accounts[global.accountNdx + 0],                                    ledger_B: accounts[global.accountNdx + 1],
                    qty_A: 0,                                                             tokenTypeId_A: 0,
                    qty_B: new BN(CONST.tonCarbon).sub(new BN(unfcccKgFeeFixed)),         tokenTypeId_B: CONST.tokenType.UNFCCC,
-            ccy_amount_A: new BN(CONST.millionUsd_cents).sub(new BN(usdFeeFixed_cents)),   ccyTypeId_A: CONST.ccyType.SGD,
+            ccy_amount_A: new BN(CONST.millionCcy_cents).sub(new BN(usdFeeFixed_cents)),   ccyTypeId_A: CONST.ccyType.SGD,
             ccy_amount_B: 0,                                                               ccyTypeId_B: 0,
                applyFees: true,
         });
@@ -429,11 +429,11 @@ contract("StMaster", accounts => {
     });
 
     it('trading fees (fixed) - should have reasonable gas cost for two-sided transfer (eeu/ccy) (base gas cost: no fees)', async () => {
-        await stm.fund(CONST.ccyType.SGD,                   CONST.millionUsd_cents,  accounts[global.accountNdx + 0],                         { from: accounts[0] });
+        await stm.fund(CONST.ccyType.SGD,                   CONST.millionCcy_cents,  accounts[global.accountNdx + 0],                         { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
 
         // set fee structure USD: 0 cents
-        const usdFeeFixed_cents = CONST.oneUsd_cents;
+        const usdFeeFixed_cents = CONST.oneCcy_cents;
         //const setUsdFeeTx = await stm.setFee_CcyType_Fixed(CONST.ccyType.USD, usdFeeFixed_cents);
         const setUsdFeeTx = await stm.setFee_CcyType(CONST.ccyType.SGD, CONST.nullAddr, { fee_fixed: usdFeeFixed_cents, fee_percBips: 0, fee_min: 0, fee_max: 0 } );
         truffleAssert.eventEmitted(setUsdFeeTx, 'SetFeeCcyFix', ev => ev.ccyTypeId == CONST.ccyType.SGD && ev.fee_ccy_Fixed == usdFeeFixed_cents && ev.ledgerOwner == CONST.nullAddr);
@@ -451,7 +451,7 @@ contract("StMaster", accounts => {
                 ledger_A: accounts[global.accountNdx + 0],                                    ledger_B: accounts[global.accountNdx + 1],
                    qty_A: 0,                                                             tokenTypeId_A: 0,
                    qty_B: new BN(CONST.tonCarbon).sub(new BN(unfcccKgFeeFixed)),         tokenTypeId_B: CONST.tokenType.UNFCCC,
-            ccy_amount_A: new BN(CONST.millionUsd_cents).sub(new BN(usdFeeFixed_cents)),   ccyTypeId_A: CONST.ccyType.SGD,
+            ccy_amount_A: new BN(CONST.millionCcy_cents).sub(new BN(usdFeeFixed_cents)),   ccyTypeId_A: CONST.ccyType.SGD,
             ccy_amount_B: 0,                                                               ccyTypeId_B: 0,
                applyFees: true,
         });
@@ -480,7 +480,7 @@ contract("StMaster", accounts => {
     });
 
     it('trading fees (fixed) - should not allow a transfer with insufficient ccy to cover fees (A)', async () => {
-        await stm.fund(CONST.ccyType.SGD,                   CONST.millionUsd_cents,  accounts[global.accountNdx + 0],                         { from: accounts[0] });
+        await stm.fund(CONST.ccyType.SGD,                   CONST.millionCcy_cents,  accounts[global.accountNdx + 0],                         { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
 
         await stm.setFee_CcyType(CONST.ccyType.SGD, CONST.nullAddr,      { fee_fixed: 1, fee_percBips: 0, fee_min: 0, fee_max: 0 } );
@@ -491,7 +491,7 @@ contract("StMaster", accounts => {
                     ledger_A: accounts[global.accountNdx + 0],                                    ledger_B: accounts[global.accountNdx + 1],
                        qty_A: 0,                                                             tokenTypeId_A: 0,
                        qty_B: new BN(CONST.tonCarbon),                                       tokenTypeId_B: CONST.tokenType.UNFCCC,
-                ccy_amount_A: new BN(CONST.millionUsd_cents),                                  ccyTypeId_A: CONST.ccyType.SGD,
+                ccy_amount_A: new BN(CONST.millionCcy_cents),                                  ccyTypeId_A: CONST.ccyType.SGD,
                 ccy_amount_B: 0,                                                               ccyTypeId_B: 0,
                    applyFees: true,
             });
@@ -504,7 +504,7 @@ contract("StMaster", accounts => {
     });
 
     it('trading fees (fixed) - should not allow a transfer with insufficient tokens to cover fees (B)', async () => {
-        await stm.fund(CONST.ccyType.SGD,                   CONST.millionUsd_cents,  accounts[global.accountNdx + 0],                         { from: accounts[0] });
+        await stm.fund(CONST.ccyType.SGD,                   CONST.millionCcy_cents,  accounts[global.accountNdx + 0],                         { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.tonCarbon, 1,      accounts[global.accountNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
 
         await stm.setFee_CcyType(CONST.ccyType.SGD, CONST.nullAddr,      CONST.nullFees );
@@ -515,7 +515,7 @@ contract("StMaster", accounts => {
                     ledger_A: accounts[global.accountNdx + 0],                                    ledger_B: accounts[global.accountNdx + 1],
                        qty_A: 0,                                                             tokenTypeId_A: 0,
                        qty_B: new BN(CONST.tonCarbon),                                       tokenTypeId_B: CONST.tokenType.UNFCCC,
-                ccy_amount_A: new BN(CONST.millionUsd_cents),                                  ccyTypeId_A: CONST.ccyType.SGD,
+                ccy_amount_A: new BN(CONST.millionCcy_cents),                                  ccyTypeId_A: CONST.ccyType.SGD,
                 ccy_amount_B: 0,                                                               ccyTypeId_B: 0,
                    applyFees: true,
             });

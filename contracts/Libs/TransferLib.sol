@@ -51,6 +51,8 @@ library TransferLib {
         require(ledgerData._ledger[a.ledger_B].exists == true, "Bad ledger_B");
         require(a.ledger_A != a.ledger_B, "Bad transfer");
         require(a.qty_A > 0 || a.qty_B > 0 || a.ccy_amount_A > 0 || a.ccy_amount_B > 0, "Bad null transfer");
+        require(a.qty_A <= 0xffffffffffffffff, "Bad qty_A");
+        require(a.qty_B <= 0xffffffffffffffff, "Bad qty_B");
         require(!((a.qty_A > 0 && a.ccy_amount_A > 0) || (a.qty_B > 0 && a.ccy_amount_B > 0)),
             "Bad transfer types"); // disallow single origin multiple asset type transfers
         if (a.ccy_amount_A > 0) require(a.ccyTypeId_A > 0, "Bad ccyTypeId A");
@@ -455,10 +457,7 @@ library TransferLib {
                         if (ledgerData._sts[to_stIds[i]].batchId == ledgerData._sts[stId].batchId) {
 
                             // resize (grow) the destination ST
-                            //ledgerData._sts_currentQty[to_stIds[i]] += remainingToTransfer;         // TODO gas - pack/combine
                             ledgerData._sts[to_stIds[i]].currentQty += remainingToTransfer;
-
-                            //ledgerData._sts_mintedQty[to_stIds[i]] += remainingToTransfer;          // TODO gas - pack/combine
                             ledgerData._sts[to_stIds[i]].mintedQty += remainingToTransfer;
 
                             mergedExisting = true;
@@ -476,8 +475,8 @@ library TransferLib {
                         ledgerData._sts[nextStId].currentQty = remainingToTransfer; // PACKED
                         ledgerData._sts[nextStId].mintedQty = remainingToTransfer; // PACKED
 
-                        //ledgerData._sts_mintedTimestamp[nextStId] = block.timestamp;                  // gas - DROP DONE - can fetch from events
-                        //ledgerData._sts_splitFrom_id[nextStId] = stId;                                // gas - DROP DONE - can fetch from events
+                        //ledgerData._sts_mintedTimestamp[nextStId] = block.timestamp;                 // gas - DROP DONE - can fetch from events
+                        //ledgerData._sts_splitFrom_id[nextStId] = stId;                               // gas - DROP DONE - can fetch from events
                         //ledgerData._ledger[to].tokenType_sumQty[tokenTypeId] += remainingToTransfer; // gas - DROP DONE - only used internally, validation params
 
                         to_stIds.push(nextStId); // gas: 94k
@@ -488,7 +487,6 @@ library TransferLib {
                     }
 
                 // resize (shrink) the origin ST
-                // TODO: pack current/minted into nested struct (?) (for one update here instead of two)
                 ledgerData._sts[stId].currentQty -= remainingToTransfer; // PACKED
                 ledgerData._sts[stId].mintedQty -= remainingToTransfer; // PACKED
 
@@ -501,13 +499,13 @@ library TransferLib {
         ledgerData._tokens_currentMax_id = nextStId;
 
         // TODO: pack 3 updates into struct
-        ledgerData._tokens_totalTransferedQty += a.qtyUnit;
+        ledgerData._tokens_total.transferedQty += uint80(a.qtyUnit);
 
         if (a.transferType == TransferType.ExchangeFee) {
-            ledgerData._tokens_totalExchangeFeesPaidQty += a.qtyUnit;
+            ledgerData._tokens_total.exchangeFeesPaidQty += uint80(a.qtyUnit);
         }
         else if (a.transferType == TransferType.OriginatorFee) {
-            ledgerData._tokens_totalOriginatorFeesPaidQty += a.qtyUnit;
+            ledgerData._tokens_total.originatorFeesPaidQty += uint80(a.qtyUnit);
         }
     }
 }
