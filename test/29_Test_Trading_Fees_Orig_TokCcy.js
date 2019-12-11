@@ -28,7 +28,7 @@ contract("StMaster", accounts => {
     // ST ORIGINATOR FEES - SINGLE ORIGINATOR
 
     it('fees (orig/ccy) - apply VCS token 1 originator fee (+ ledger @ x4) / ETH global fee, on a 1.5 ST trade (tok fee on A / ccy fee on B)', async () => {
-        // SETUP - mint for M ([+0]), move all to A ([+1]) 
+        // SETUP - mint for M ([+0]), move all to A ([+1])
         const M = accounts[global.accountNdx + 0];
         const A = accounts[global.accountNdx + 1];
         const B = accounts[global.accountNdx + 2];
@@ -86,6 +86,7 @@ contract("StMaster", accounts => {
             ccy_amount_B: CONST.tenthEth_wei,               ccyTypeId_B: CONST.ccyType.ETH,
                applyFees: true,
         });
+        console.log(`\t>>> gasUsed - Single Orig Fees ${1}: ${data.transferTx.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * data.transferTx.receipt.gasUsed).toFixed(4)} (USD ${(CONST.gasPriceEth * data.transferTx.receipt.gasUsed * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
         const M_ledgerAfter = await stm.getLedgerEntry(M);
 
         // TEST - contract owner has received exchange fees (tokens + currency)
@@ -169,6 +170,7 @@ contract("StMaster", accounts => {
             ccy_amount_B: 0,                                ccyTypeId_B: 0,
                applyFees: true,
         });
+        console.log(`\t>>> gasUsed - Single Orig Fees ${1}: ${data.transferTx.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * data.transferTx.receipt.gasUsed).toFixed(4)} (USD ${(CONST.gasPriceEth * data.transferTx.receipt.gasUsed * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
         const M_ledgerAfter = await stm.getLedgerEntry(M);
 
         // TEST - contract owner has received expected token exchange fees

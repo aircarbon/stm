@@ -545,6 +545,9 @@ module.exports = {
         }
 
         // validate carbon global totals
+        // console.log(' totalKg_tfd_before', totalKg_tfd_before.toString());
+        // console.log('  totalKg_tfd_after', totalKg_tfd_after.toString());
+        // console.log('totalKg_tfd_incFees', totalKg_tfd_incFees.toString());
         assert(totalKg_tfd_after.sub(totalKg_tfd_before).eq(totalKg_tfd_incFees), 'unexpected total tonnage carbon after transfer');
 
         return {
