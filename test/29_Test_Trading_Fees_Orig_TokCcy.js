@@ -27,7 +27,7 @@ contract("StMaster", accounts => {
 
     // ST ORIGINATOR FEES - SINGLE ORIGINATOR
 
-    it('fees (orig/ccy) - apply VCS token 1 originator fee (+ ledger @ x4) / ETH global fee, on a 1.5 ST trade (tok fee on A / ccy fee on B)', async () => {
+    it('fees (orig/ccy) - apply VCS token 1 originator fee (+ ledger @ x4) [/ ETH global fee], on a 1.5 ST trade (tok fee on A / ccy fee on B)', async () => {
         // SETUP - mint for M ([+0]), move all to A ([+1])
         const M = accounts[global.accountNdx + 0];
         const A = accounts[global.accountNdx + 1];
@@ -65,15 +65,16 @@ contract("StMaster", accounts => {
         await stm.setFee_TokType(CONST.tokenType.VCS, A,              ledgerFeeTok);
         await stm.setFee_TokType(CONST.tokenType.VCS, CONST.nullAddr, { fee_fixed: 1, fee_percBips: 0, fee_min: 0, fee_max: 0 }); // to test ledger override
 
-        // TEST - set global fee ETH
-        const globalFeeCcy = {
-            fee_fixed: CONST.hundredthEth_wei,
-         fee_percBips: 100,
-              fee_min: 1,
-              fee_max: CONST.tenthEth_wei
-        };
-        await stm.setFee_CcyType(CONST.ccyType.ETH, B,                CONST.nullFees);
-        await stm.setFee_CcyType(CONST.ccyType.ETH, CONST.nullAddr,   globalFeeCcy);
+        // tmp - removing ETH for direct perf before (591k) / after comparison
+        // // TEST - set global fee ETH
+        // const globalFeeCcy = {
+        //     fee_fixed: CONST.hundredthEth_wei,
+        //  fee_percBips: 100,
+        //       fee_min: 1,
+        //       fee_max: CONST.tenthEth_wei
+        // };
+        // await stm.setFee_CcyType(CONST.ccyType.ETH, B,                CONST.nullFees);
+        // await stm.setFee_CcyType(CONST.ccyType.ETH, CONST.nullAddr,   globalFeeCcy);
 
         // TEST - transfer
         const transferAmountKg = new BN(1500);

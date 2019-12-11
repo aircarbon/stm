@@ -52,8 +52,6 @@ library TokenLib {
 
         uint256              mintQty; // accept 256 bits, so we can downcast and test if in 64-bit range
         int64                mintSecTokenCount;
-      //int256               mintQty;
-      //int256               mintSecTokenCount;
 
         address              batchOwner;
         StructLib.SetFeeArgs origTokFee;
@@ -129,7 +127,6 @@ library TokenLib {
             // not currently used (was used when burning by stId)
             //ledgerData._ownsSecTokenId[keccak256(abi.encodePacked(a.batchOwner, newId))] = true;
         }
-        //ledgerData._ledger[a.batchOwner].tokenType_sumQty[a.tokenTypeId] += uint256(a.mintQty);
 
         ledgerData._tokens_currentMax_id += uint256(a.mintSecTokenCount);
         ledgerData._tokens_totalMintedQty += uint256(a.mintQty);

@@ -34,8 +34,8 @@ contract StMaster is StMintable, StBurnable, CcyFundable, CcyWithdrawable, StTra
     // TransferLib events
     enum TransferType { User, ExchangeFee, OriginatorFee }
     event TransferedLedgerCcy(address from, address to, uint256 ccyTypeId, uint256 amount, TransferType transferType);
-    event TransferedFullSecToken(address from, address to, uint256 stId, uint256 mergedToSecTokenId, /*uint256 qty,*/ TransferType transferType);
-    event TransferedPartialSecToken(address from, address to, uint256 splitFromSecTokenId, uint256 newSecTokenId, uint256 mergedToSecTokenId, /*uint256 qty,*/ TransferType transferType);
+    event TransferedFullSecToken(address from, address to, uint256 stId, uint256 mergedToSecTokenId, uint256 qty, TransferType transferType);
+    event TransferedPartialSecToken(address from, address to, uint256 splitFromSecTokenId, uint256 newSecTokenId, uint256 mergedToSecTokenId, uint256 qty, TransferType transferType);
     // FeeLib events
     event SetFeeTokFix(uint256 tokenTypeId, address ledgerOwner, uint256 fee_tokenQty_Fixed);
     event SetFeeCcyFix(uint256 ccyTypeId, address ledgerOwner, uint256 fee_ccy_Fixed);
@@ -45,6 +45,29 @@ contract StMaster is StMintable, StBurnable, CcyFundable, CcyWithdrawable, StTra
     event SetFeeCcyMin(uint256 ccyTypeId, address ledgerOwner, uint256 fee_ccy_Min);
     event SetFeeTokMax(uint256 tokenTypeId, address ledgerOwner, uint256 fee_token_Max);
     event SetFeeCcyMax(uint256 ccyTypeId, address ledgerOwner, uint256 fee_ccy_Max);
+
+    //
+    // LAUNCH LIST
+    //
+    // PRI 0 ** ERC20 ** >> SEALING of whitelist after population is the way. Once sealed, no more can be added.
+    //    mapping(address=>bool)
+    //    for(;;) { addWhitelist(addr) ... }
+    //    sealWhitelist(); // can't addWhitelist after sealing
+    //
+    // PRI 0 ** CASHFLOWS re. SD **
+    //   ....?!
+    //
+    // PRI 1 -- NEW-CONTRACT (DATA COPY) (so can defer splitting, and address anything else)
+    //   > just need to be able to read out *all* data from storage (new contract can then have writers)
+    //   > new Lib for this: DataReader -- needs to take paginated outputs
+    //
+    // ====== MAINNET ======
+    //
+    // SPLITTING TX'S - defer
+    //  ** fee-preview: returns enough data (qty?) for an orchestrator to split up a large multi-batch transfer TX into separate components?
+    //    >> with MAX_BATCHES_PREVIEW exceeded ... change to more(bool) ... ?
+    //  ** fee-preview: tests general / using it for splitting multi-batch transfers
+    //
 
     constructor() public {
         // set contract properties

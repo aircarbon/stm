@@ -6,8 +6,8 @@ import "./StructLib.sol";
 library TransferLib {
     enum TransferType { User, ExchangeFee, OriginatorFee }
     event TransferedLedgerCcy(address from, address to, uint256 ccyTypeId, uint256 amount, TransferType transferType);
-    event TransferedFullSecToken(address from, address to, uint256 stId, uint256 mergedToSecTokenId, /*uint256 qty,*/ TransferType transferType);
-    event TransferedPartialSecToken(address from, address to, uint256 splitFromSecTokenId, uint256 newSecTokenId, uint256 mergedToSecTokenId, /*uint256 qty,*/ TransferType transferType);
+    event TransferedFullSecToken(address from, address to, uint256 stId, uint256 mergedToSecTokenId, uint256 qty, TransferType transferType);
+    event TransferedPartialSecToken(address from, address to, uint256 splitFromSecTokenId, uint256 newSecTokenId, uint256 mergedToSecTokenId, uint256 qty, TransferType transferType);
 
     uint256 constant MAX_BATCHES_PREVIEW = 4; // for fee previews: max distinct batch IDs that can participate in one side of a trade fee preview
 
@@ -88,15 +88,11 @@ library TransferLib {
         require(StructLib.sufficientCcy(ledgerData, a.ledger_B, a.ccyTypeId_B, a.ccy_amount_B,
                     int256(exFees.fee_ccy_B) * (a.applyFees && a.ccy_amount_B > 0 ? 1 : 0)), "Insufficient currency B");
 
-        // calc batch originator token fees (disabled if fee-reciever[batch originator] == fee-payer)
-        // potentially multiple: up to one originator fee per distinct token batch
         TransferVars memory v;
-
         uint256 maxStId = ledgerData._tokens_currentMax_id;
 
-        // TransferSplitPreviewReturn[2] memory ts_previews; // stack slots: [0] = A->B, [1] = B->A
-        // TransferSplitArgs[2] memory ts_args;
-        // uint256[2] memory totalOrigFee;
+        // calc batch originator token fees (disabled if fee-reciever[batch originator] == fee-payer)
+        // potentially multiple: up to one originator fee per distinct token batch
         if (a.qty_A > 0) {
             v.ts_args[0] = TransferSplitArgs({ from: a.ledger_A, to: a.ledger_B, tokenTypeId: a.tokenTypeId_A, qtyUnit: a.qty_A, transferType: TransferType.User, maxStId: maxStId });
             v.ts_previews[0] = transferSplitSecTokens_Preview(ledgerData, v.ts_args[0]);
@@ -140,7 +136,6 @@ library TransferLib {
                 if (exFees.fee_tok_A > 0) { // exchange fee
                     maxStId = transferSplitSecTokens(ledgerData, TransferSplitArgs({ from: a.ledger_A, to: a.feeAddrOwner, tokenTypeId: a.tokenTypeId_A, qtyUnit: exFees.fee_tok_A, transferType: TransferType.ExchangeFee, maxStId: maxStId }));
                     v.exchangeFeesPaidQty += uint80(exFees.fee_tok_A);
-                    //require(ledgerData._tokens_currentMax_id == maxStId, 'failed 1');
                 }
 
                 for (uint i = 0; i < v.ts_previews[0].batchCount ; i++) { // originator fees
@@ -149,23 +144,19 @@ library TransferLib {
                     if (tokFee > 0) {
                         maxStId = transferSplitSecTokens(ledgerData, TransferSplitArgs({ from: a.ledger_A, to: batch.originator, tokenTypeId: a.tokenTypeId_A, qtyUnit: tokFee, transferType: TransferType.OriginatorFee, maxStId: maxStId }));
                         v.originatorFeesPaidQty += uint80(tokFee);
-                        //require(ledgerData._tokens_currentMax_id == maxStId, 'failed 2');
                     }
                 }
             }
-            //transferSplitSecTokens(ledgerData, v.ts_args[0]);
             maxStId = transferSplitSecTokens(ledgerData,
                 TransferSplitArgs({ from: v.ts_args[0].from, to: v.ts_args[0].to, tokenTypeId: v.ts_args[0].tokenTypeId, qtyUnit: v.ts_args[0].qtyUnit, transferType: v.ts_args[0].transferType, maxStId: maxStId })
             );
             v.transferedQty += uint80(v.ts_args[0].qtyUnit);
-            //require(ledgerData._tokens_currentMax_id == maxStId, 'failed 2.2');
         }
         if (a.qty_B > 0) {
             if (a.applyFees) {
                 if (exFees.fee_tok_B > 0) { // exchange fee
                     maxStId = transferSplitSecTokens(ledgerData, TransferSplitArgs({ from: a.ledger_B, to: a.feeAddrOwner, tokenTypeId: a.tokenTypeId_B, qtyUnit: exFees.fee_tok_B, transferType: TransferType.ExchangeFee, maxStId: maxStId }));
                     v.exchangeFeesPaidQty += uint80(exFees.fee_tok_B);
-                    //require(ledgerData._tokens_currentMax_id == maxStId, 'failed 3');
                 }
 
                 for (uint i = 0; i < v.ts_previews[1].batchCount ; i++) { // originator fees
@@ -174,20 +165,17 @@ library TransferLib {
                     if (tokFee > 0) {
                         maxStId = transferSplitSecTokens(ledgerData, TransferSplitArgs({ from: a.ledger_B, to: batch.originator, tokenTypeId: a.tokenTypeId_B, qtyUnit: tokFee, transferType: TransferType.OriginatorFee, maxStId: maxStId }));
                         v.originatorFeesPaidQty += uint80(tokFee);
-                        //require(ledgerData._tokens_currentMax_id == maxStId, 'failed 4');
                     }
                 }
             }
-            //transferSplitSecTokens(ledgerData, v.ts_args[1]);
             maxStId = transferSplitSecTokens(ledgerData,
                 TransferSplitArgs({ from: v.ts_args[1].from, to: v.ts_args[1].to, tokenTypeId: v.ts_args[1].tokenTypeId, qtyUnit: v.ts_args[1].qtyUnit, transferType: v.ts_args[1].transferType, maxStId: maxStId })
             );
             v.transferedQty += uint80(v.ts_args[1].qtyUnit);
-            //require(ledgerData._tokens_currentMax_id == maxStId, 'failed 4.2');
         }
 
         // set globals to final values
-        ledgerData._tokens_currentMax_id = maxStId;
+        ledgerData._tokens_currentMax_id = maxStId; // packing this as a uint64 (and the fields below) into _tokens_total struct *increases* gas cost! no idea why - reverted
         if (v.exchangeFeesPaidQty > 0) ledgerData._tokens_total.exchangeFeesPaidQty += v.exchangeFeesPaidQty;
         if (v.originatorFeesPaidQty > 0) ledgerData._tokens_total.originatorFeesPaidQty += v.originatorFeesPaidQty;
         ledgerData._tokens_total.transferedQty += v.transferedQty + v.exchangeFeesPaidQty + v.originatorFeesPaidQty;
@@ -234,6 +222,7 @@ library TransferLib {
     struct TransferSpltVars {
         uint256 ndx;
         uint64 remainingToTransfer;
+        bool mergedExisting;
     }
     function transferSplitSecTokens(
         StructLib.LedgerStruct storage ledgerData,
@@ -248,8 +237,6 @@ library TransferLib {
         v.remainingToTransfer = uint64(a.qtyUnit);
 
         uint256 maxStId = a.maxStId;
-        //uint256 maxStId = ledgerData._tokens_currentMax_id;
-
         while (v.remainingToTransfer > 0) {
             uint256 stId = from_stIds[v.ndx];
             uint64 stQty = ledgerData._sts[stId].currentQty;
@@ -269,15 +256,12 @@ library TransferLib {
                     // bool mergedExisting = false;
                     // for (uint i = 0; i < to_stIds.length; i++) {
                     //     if (_sts_batchId[to_stIds[i]] == batchId) {
-
                     //         // resize (grow) the destination ST
                     //         _sts_currentQty[to_stIds[i]] += stQty;                // TODO gas - pack/combine
                     //         _sts_mintedQty[to_stIds[i]] += stQty;                 // TODO gas - pack/combine
-
                     //         // retire the old ST from the main list
                     //         _sts_currentQty[stId] = 0;
                     //         _sts_mintedQty[stId] = 0;
-
                     //         mergedExisting = true;
                     //         emit TransferedFullSecToken(a.from, a.to, stId, to_stIds[i], stQty, transferType);
                     //         break;
@@ -286,7 +270,7 @@ library TransferLib {
                     // TRANSFER - if no existing destination ST from same batch
                     //if (!mergedExisting) {
                         to_stIds.push(stId);
-                        emit TransferedFullSecToken(a.from, a.to, stId, 0, /*stQty,*/ a.transferType);
+                        emit TransferedFullSecToken(a.from, a.to, stId, 0, stQty, a.transferType);
                     //}
                 //ledgerData._ledger[to].tokenType_sumQty[tokenTypeId] += stQty;                //* gas - DROP DONE - only used internally, validation params
 
@@ -304,25 +288,24 @@ library TransferLib {
                 // assign new ST to destination
 
                     // MERGE - if any existing destination ST is from same batch
-                    bool mergedExisting = false;
+                    v.mergedExisting = false;
                     for (uint i = 0; i < to_stIds.length; i++) {
 
                         //if (ledgerData._sts_batchId[to_stIds[i]] == ledgerData._sts_batchId[stId]) {
                         if (ledgerData._sts[to_stIds[i]].batchId == ledgerData._sts[stId].batchId) {
 
                             // resize (grow) the destination ST
-                            ledgerData._sts[to_stIds[i]].currentQty += v.remainingToTransfer;
-                            ledgerData._sts[to_stIds[i]].mintedQty += v.remainingToTransfer;
+                            ledgerData._sts[to_stIds[i]].currentQty += v.remainingToTransfer; // PACKED
+                            ledgerData._sts[to_stIds[i]].mintedQty += v.remainingToTransfer; // PACKED
 
-                            mergedExisting = true;
+                            v.mergedExisting = true;
 
-                            emit TransferedPartialSecToken(a.from, a.to, stId, 0, to_stIds[i], /*remainingToTransfer,*/ a.transferType);
+                            emit TransferedPartialSecToken(a.from, a.to, stId, 0, to_stIds[i], v.remainingToTransfer, a.transferType);
                             break;
                         }
                     }
                     // SOFT-MINT - if no existing destination ST from same batch; inherit batch ID from parent ST
-                    if (!mergedExisting) {
-                        //uint256 newStId = ledgerData._tokens_currentMax_id + 1;
+                    if (!v.mergedExisting) {
 
                         // gas: 50k
                         ledgerData._sts[maxStId + 1].batchId = ledgerData._sts[stId].batchId; // PACKED
@@ -334,9 +317,8 @@ library TransferLib {
                         //ledgerData._ledger[to].tokenType_sumQty[tokenTypeId] += remainingToTransfer; // gas - DROP DONE - only used internally, validation params
 
                         to_stIds.push(maxStId + 1); // gas: 94k
-                        //ledgerData._tokens_currentMax_id++; // gas: 50k
 
-                        emit TransferedPartialSecToken(a.from, a.to, stId, maxStId + 1, 0, /*remainingToTransfer,*/ a.transferType); // gas: 11k
+                        emit TransferedPartialSecToken(a.from, a.to, stId, maxStId + 1, 0, v.remainingToTransfer, a.transferType); // gas: 11k
 
                         maxStId++;
                     }
@@ -351,16 +333,6 @@ library TransferLib {
                 v.remainingToTransfer = 0;
             }
         }
-
-        // ledgerData._tokens_total.transferedQty += uint80(a.qtyUnit);
-        // if (a.transferType == TransferType.ExchangeFee) {
-        //     ledgerData._tokens_total.exchangeFeesPaidQty += uint80(a.qtyUnit);
-        // }
-        // else if (a.transferType == TransferType.OriginatorFee) {
-        //     ledgerData._tokens_total.originatorFeesPaidQty += uint80(a.qtyUnit);
-        // }
-
-        //ledgerData._tokens_currentMax_id = maxStId;
         return maxStId;
     }
 
@@ -377,7 +349,20 @@ library TransferLib {
     )
     internal view
     // 1 exchange fee (single destination) + maximum of MAX_BATCHES_PREVIEW of originator fees on each side (x2) of the transfer
-    returns (TransferLib.FeesCalc[1 + MAX_BATCHES_PREVIEW * 2] memory feesAll) {
+    returns (
+        TransferLib.FeesCalc[1 + MAX_BATCHES_PREVIEW * 2] memory feesAll
+        //
+        // SPLITTING
+        // want to *also* return the # of full & partial ST transfers, involved in *ALL* the transfer actions (not just fees)
+        // each set of { partialCount, fullCount } should be grouped by transfer-type: USER, EX_FEE, ORIG_FEE
+        // transfer could then take params: { transferType: partialStart, partialEnd, fullStart, fullEnd } -- basically pagination of the sub-transfers
+        //
+        // TEST SETUP COULD BE: ~100 minted batches 1 ton each, and move 99 tons A-B (type USER, multi-batch)
+        //       try to make orchestrator that batches by (eg.) 10...
+        //       (exactly the same for type ORIG_FEE multi-batch)
+        //
+    ) {
+
         uint ndx = 0;
 
         // exchange fee

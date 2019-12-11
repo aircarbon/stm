@@ -18,50 +18,6 @@ contract("StMaster", accounts => {
             console.log(`global.accountNdx: ${global.accountNdx} - contract @ ${stm.address} (owner: ${accounts[0]}) - getSecTokenBatchCount: ${(await stm.getSecTokenBatchCount.call()).toString()}`);
     });
 
-    async function MintAndTransfer(a) {
-        const { tokenType, originatorCount, batchesPerOriginator, transferTo } = a;
-
-        // SETUP - setup M[] mint originators, with varying no. of batches & qty's
-        const M_multi = [];
-        for (var i=0; i < originatorCount ; i++) {
-            M_multi.push({ account: accounts[++global.accountNdx] });
-        }
-        var totalTokQty = 0;
-        for (var i = 0 ; i < M_multi.length ; i++) {
-            const M = M_multi[i].account;
-            for (var j = 0 ; j < batchesPerOriginator ; j++) {
-                const origFee = { fee_fixed: (i+j), fee_percBips: (i+j) * 10, fee_min: (i+j) * 10, fee_max: (i+j) * 100 };
-                const qty = CONST.tonCarbon * (i + 1 + j + 1);
-                await stm.mintSecTokenBatch(tokenType, qty, 1, M, origFee, [], [], { from: accounts[0] });
-                totalTokQty += qty;
-            }
-        }
-
-        // SETUP - M[] -> A (no originator fees to self)
-        for (var i = 0 ; i < M_multi.length ; i++) {
-            const M = M_multi[i].account;
-            const le = await stm.getLedgerEntry(M);
-            const M_qty = le.tokens.filter(p => p.tokenTypeId == tokenType).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
-
-            await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        transferTo,    { from: accounts[0] });
-            await stm.setFee_TokType(tokenType,                 CONST.nullAddr,          CONST.nullFees); // no exchange fees
-            await stm.setFee_CcyType(CONST.ccyType.ETH,         CONST.nullAddr,          CONST.nullFees);
-            const data_MA = await helper.transferLedger({ stm, accounts, 
-                ledger_A: M,                                   ledger_B: transferTo,
-                   qty_A: new BN(M_qty.toString()),       tokenTypeId_A: tokenType,
-                   qty_B: 0,                              tokenTypeId_B: 0,
-            ccy_amount_A: 0,                                ccyTypeId_A: 0,
-            ccy_amount_B: CONST.oneEth_wei,                 ccyTypeId_B: CONST.ccyType.ETH,
-               applyFees: true,
-            });
-        }
-
-        const le = await stm.getLedgerEntry(transferTo);
-        const A_qty = le.tokens.filter(p => p.tokenTypeId == tokenType).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
-        assert(Big(totalTokQty).eq(Big(totalTokQty)), 'test setup failed');
-        return { qty: A_qty, M_multi };
-    }
-
     // ST ORIGINATOR FEES - MULTIPLE ORIGINATORS
 
     it('fees (orig/orig) - apply VCS token M originator fees (+ ledger fee) / UNFCCC token M originator fees (+ global fee), on a 1.5 ST trade (tok fee on A / tok fee on B)', async () => {
@@ -103,7 +59,7 @@ contract("StMaster", accounts => {
         });
         for (var i = 0 ; i < M_multi_A.length ; i++) M_multi_A[i].ledgerAfter = await stm.getLedgerEntry(M_multi_A[i].account);
         for (var i = 0 ; i < M_multi_B.length ; i++) M_multi_B[i].ledgerAfter = await stm.getLedgerEntry(M_multi_B[i].account);
-        // console.log(`\t>>> gasUsed - Multi Orig Fees ${M_multi.length}: ${data.transferTx.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * data.transferTx.receipt.gasUsed).toFixed(4)} (USD ${(CONST.gasPriceEth * data.transferTx.receipt.gasUsed * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
+        console.log(`\t>>> gasUsed - Multi Orig Fees ${M_multi_A.length + M_multi_B.length}: ${data.transferTx.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * data.transferTx.receipt.gasUsed).toFixed(4)} (USD ${(CONST.gasPriceEth * data.transferTx.receipt.gasUsed * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
         console.log('feesPreview', data.feesPreview);
 
         console.log('qty_A', qty_A.toString());
@@ -154,6 +110,50 @@ contract("StMaster", accounts => {
         B_balAfter  =  data.ledgerB_after.tokens.filter(p => p.tokenTypeId == tokType_A).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
         assert(Big(B_balAfter).eq(Big(B_balBefore).plus(qty_A)), 'unexpected B (type A) token balance after transfer');
     });
+
+    async function MintAndTransfer(a) {
+        const { tokenType, originatorCount, batchesPerOriginator, transferTo } = a;
+
+        // SETUP - setup M[] mint originators, with varying no. of batches & qty's
+        const M_multi = [];
+        for (var i=0; i < originatorCount ; i++) {
+            M_multi.push({ account: accounts[++global.accountNdx] });
+        }
+        var totalTokQty = 0;
+        for (var i = 0 ; i < M_multi.length ; i++) {
+            const M = M_multi[i].account;
+            for (var j = 0 ; j < batchesPerOriginator ; j++) {
+                const origFee = { fee_fixed: (i+j), fee_percBips: (i+j) * 10, fee_min: (i+j) * 10, fee_max: (i+j) * 100 };
+                const qty = CONST.tonCarbon * (i + 1 + j + 1);
+                await stm.mintSecTokenBatch(tokenType, qty, 1, M, origFee, [], [], { from: accounts[0] });
+                totalTokQty += qty;
+            }
+        }
+
+        // SETUP - M[] -> A (no originator fees to self)
+        for (var i = 0 ; i < M_multi.length ; i++) {
+            const M = M_multi[i].account;
+            const le = await stm.getLedgerEntry(M);
+            const M_qty = le.tokens.filter(p => p.tokenTypeId == tokenType).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
+
+            await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        transferTo,    { from: accounts[0] });
+            await stm.setFee_TokType(tokenType,                 CONST.nullAddr,          CONST.nullFees); // no exchange fees
+            await stm.setFee_CcyType(CONST.ccyType.ETH,         CONST.nullAddr,          CONST.nullFees);
+            const data_MA = await helper.transferLedger({ stm, accounts, 
+                ledger_A: M,                                   ledger_B: transferTo,
+                   qty_A: new BN(M_qty.toString()),       tokenTypeId_A: tokenType,
+                   qty_B: 0,                              tokenTypeId_B: 0,
+            ccy_amount_A: 0,                                ccyTypeId_A: 0,
+            ccy_amount_B: CONST.oneEth_wei,                 ccyTypeId_B: CONST.ccyType.ETH,
+               applyFees: true,
+            });
+        }
+
+        const le = await stm.getLedgerEntry(transferTo);
+        const A_qty = le.tokens.filter(p => p.tokenTypeId == tokenType).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
+        assert(Big(totalTokQty).eq(Big(totalTokQty)), 'test setup failed');
+        return { qty: A_qty, M_multi };
+    }
 
     // TODO: multi-split (new test file) multi-extreme A (~100 batches?)/ multi-extreme (~100 batches?) :: pathological case for orchestrator to use fee-previews for splitting logic...
 });

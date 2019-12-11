@@ -111,23 +111,17 @@ library StructLib {
 
         // *** SecTokens LIST (slightly more gas effecient than mapping(uint/*SecTokenId*/ => St/*{struct}*/))
         mapping(uint256 => PackedSt) _sts;
-        //mapping(uint256 => uint256) _sts_batchId;
-        //mapping(uint256 => uint256) _sts_mintedQty;
-        //mapping(uint256 => uint256) _sts_currentQty;            // == 0 indicates fully burned, != _sts_mintedQty indicates partially burned
 
         // *** LEDGER
         mapping(address => Ledger) _ledger;                     // main ledger list: all entries, by account
         address[] _ledgerOwners;                                // list of ledger owners (accounts)
 
         // global totals
-        uint256 _tokens_currentMax_id;                          // 1-based - updated by Mint() and by transferSplitSecTokens()
         uint256 _tokens_totalMintedQty;                         // TODO: split by type
         uint256 _tokens_totalBurnedQty;                         // TODO: split by type
 
+        uint256 _tokens_currentMax_id;                          // 1-based - updated by Mint() and by transferSplitSecTokens()
         PackedStTotals _tokens_total;
-        // uint256 _tokens_totalTransferedQty;                     // TODO: split by type
-        // uint256 _tokens_totalExchangeFeesPaidQty;               // TODO: split by type
-        // uint256 _tokens_totalOriginatorFeesPaidQty;             // TODO: split by type
 
         mapping(uint256 => uint256) _ccyType_totalFunded;
         mapping(uint256 => uint256) _ccyType_totalWithdrawn;

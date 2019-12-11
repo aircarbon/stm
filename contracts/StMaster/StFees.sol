@@ -11,25 +11,6 @@ contract StFees is Owned, StLedger {
     // NOTE: fees are applied ON TOP OF the supplied transfer amounts to the transfer() fn.
     //       i.e. transfer amounts are not inclusive of fees, they are additional
 
-    //
-    // origFees
-    //
-    //  > origFees - TESTS:
-    //   >> insufficient carbons for batch fees
-    //
-    // TODO:
-    //  ** fee-preview: returns enough data (qty?) for an orchestrator to split up a large multi-batch transfer TX into separate components?
-    //    >> with MAX_BATCHES_PREVIEW exceeded ... change to more(bool) ... ?
-    //  ** fee-preview: tests general / using it for splitting multi-batch transfers
-    //
-
-    //
-    // ** ERC20 ** >> SEALING of whitelist after population is the way. Once sealed, no more can be added.
-    //    mapping(address=>bool)
-    //    for(;;) { addWhitelist(addr) ... }
-    //    sealWhitelist(); // can't addWhitelist after sealing
-    //
-
     // GLOBAL FEES
     StructLib.FeeStruct globalFees;
 
