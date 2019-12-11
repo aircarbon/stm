@@ -5,7 +5,7 @@ const CONST = require('../const.js');
 contract("StMaster", accounts => {
     var stm;
 
-    const countDefaultCcyTypes = 2;
+    const countDefaultCcyTypes = 7;
 
     beforeEach(async () => {
         stm = await st.deployed();

@@ -22,12 +22,8 @@ contract("StMaster", accounts => {
 
         // set fee structure VCS: 1%
         const feeBips = 100; // 100 bp = 1%
-        //const setFeeTx = await stm.setFee_SecTokenType_PercBips(CONST.tokenType.VCS, feeBips);
         const setFeeTx = await stm.setFee_TokType(CONST.tokenType.VCS, CONST.nullAddr, { fee_fixed: 0, fee_percBips: feeBips, fee_min: 0, fee_max: 0 } );
         truffleAssert.eventEmitted(setFeeTx, 'SetFeeTokBps', ev => ev.tokenTypeId == CONST.tokenType.VCS && ev.fee_token_PercBips == feeBips && ev.ledgerOwner == CONST.nullAddr);
-        
-        //assert(await stm.globalFee_tokType_Bps(CONST.tokenType.VCS) == feeBips, 'unexpected VCS percentage fee after setting VCS fee structure');
-        //assert(await stm.globalFee_tokType_Bps(CONST.tokenType.UNFCCC) == 0, 'unexpected UNFCCC percentage fee after setting VCS fee structure');
 
         // transfer, with fee structure applied
         const transferAmountKg = new BN(100); // 100 kg
@@ -44,15 +40,11 @@ contract("StMaster", accounts => {
         // test contract owner has received expected carbon VCS fee
         const contractOwner_VcsKgBefore = data.owner_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
         const contractOwner_VcsKgAfter  =  data.owner_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
-        //console.log(`accountNdx=${global.accountNdx} contractOwner_VcsKgBefore`, contractOwner_VcsKgBefore);
-        //console.log(`accountNdx=${global.accountNdx} contractOwner_VcsKgAfter`, contractOwner_VcsKgAfter);
         assert(contractOwner_VcsKgAfter == Number(contractOwner_VcsKgBefore) + Number(expectedFeeKg), 'unexpected contract owner (fee receiver) VCS ST tonnage after transfer');
         
         // fees are *additional* to the supplied transfer KGs...
         const ledgerA_VcsKgBefore = data.ledgerA_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
         const ledgerA_VcsKgAfter  =  data.ledgerA_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
-        //console.log(`accountNdx=${global.accountNdx} ledgerA_VcsKgBefore`, ledgerA_VcsKgBefore);
-        //console.log(`accountNdx=${global.accountNdx} ledgerA_VcsKgAfter`, ledgerA_VcsKgAfter);
         assert(ledgerA_VcsKgAfter == Number(ledgerA_VcsKgBefore) - Number(expectedFeeKg) - Number(transferAmountKg), 'unexpected ledger A (fee payer) VCS ST tonnage after transfer');
     });
 
@@ -65,7 +57,7 @@ contract("StMaster", accounts => {
         //const setFeeTx = await stm.setFee_SecTokenType_PercBips(CONST.tokenType.UNFCCC, feeBips);
         const setFeeTx = await stm.setFee_TokType(CONST.tokenType.UNFCCC, CONST.nullAddr, { fee_fixed: 0, fee_percBips: feeBips, fee_min: 0, fee_max: 0 } );
         truffleAssert.eventEmitted(setFeeTx, 'SetFeeTokBps', ev => ev.tokenTypeId == CONST.tokenType.UNFCCC && ev.fee_token_PercBips == feeBips && ev.ledgerOwner == CONST.nullAddr);
-        assert(await stm.globalFee_tokType_Bps(CONST.tokenType.UNFCCC) == feeBips, 'unexpected UNFCCC percentage fee after setting UNFCCC fee structure');
+        assert((await stm.getFee(CONST.getFeeType.TOK, CONST.tokenType.UNFCCC, CONST.nullAddr)).fee_percBips == feeBips, 'unexpected UNFCCC percentage fee after setting UNFCCC fee structure');
 
         // transfer, with fee structure applied
         const transferAmountKg = new BN(CONST.ktCarbon); // 1000 tons: minimum lot size
@@ -104,7 +96,7 @@ contract("StMaster", accounts => {
         const feeBips = 5000;
         const setFeeTx = await stm.setFee_TokType(newTypeId, CONST.nullAddr, { fee_fixed: 0, fee_percBips: feeBips, fee_min: 0, fee_max: 0 } );
         truffleAssert.eventEmitted(setFeeTx, 'SetFeeTokBps', ev => ev.tokenTypeId == newTypeId && ev.fee_token_PercBips == feeBips && ev.ledgerOwner == CONST.nullAddr);
-        assert(await stm.globalFee_tokType_Bps(newTypeId) == feeBips, 'unexpected new eeu type percentage fee after setting fee structure');
+        assert((await stm.getFee(CONST.getFeeType.TOK, newTypeId, CONST.nullAddr)).fee_percBips == feeBips, 'unexpected new eeu type percentage fee after setting fee structure');
 
         // transfer, with fee structure applied
         const transferAmountKg = new BN(1500);
@@ -131,12 +123,12 @@ contract("StMaster", accounts => {
 
         // set fee structure ETH: 1%
         const ethFeePercBips = 100; // 100 bp = 1%
-        assert(await stm.globalFee_ccyType_Bps(CONST.ccyType.ETH) == 0, 'unexpected ETH percentage fee before setting ETH fee structure');
+        assert((await stm.getFee(CONST.getFeeType.CCY, CONST.ccyType.ETH, CONST.nullAddr)).fee_percBips == 0, 'unexpected ETH percentage fee before setting ETH fee structure');
         //const setFeeTx = await stm.setFee_CcyType_PercBips(CONST.ccyType.ETH, ethFeePercBips);
         const setFeeTx = await stm.setFee_CcyType(CONST.ccyType.ETH, CONST.nullAddr, { fee_fixed: 0, fee_percBips: ethFeePercBips, fee_min: 0, fee_max: 0 } );
         truffleAssert.eventEmitted(setFeeTx, 'SetFeeCcyBps', ev => ev.ccyTypeId == CONST.ccyType.ETH && ev.fee_ccy_PercBips == ethFeePercBips && ev.ledgerOwner == CONST.nullAddr);
-        assert(await stm.globalFee_ccyType_Bps(CONST.ccyType.ETH) == ethFeePercBips, 'unexpected ETH percentage fee after setting ETH fee structure');
-        assert(await stm.globalFee_ccyType_Bps(CONST.ccyType.SGD) == 0, 'unexpected USD percentage fee after setting ETH fee structure');
+        assert((await stm.getFee(CONST.getFeeType.CCY, CONST.ccyType.ETH, CONST.nullAddr)).fee_percBips == ethFeePercBips, 'unexpected ETH percentage fee after setting ETH fee structure');
+        assert((await stm.getFee(CONST.getFeeType.CCY, CONST.ccyType.SGD, CONST.nullAddr)).fee_percBips == 0, 'unexpected USD percentage fee after setting ETH fee structure');
 
         // transfer, with fee structure applied
         const transferAmountCcy = new BN(100); // Wei
@@ -153,9 +145,6 @@ contract("StMaster", accounts => {
         // test contract owner has received expected ETH fee
         const owner_balBefore = data.owner_before.ccys.filter(p => p.ccyTypeId == CONST.ccyType.ETH).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
         const owner_balAfter  =  data.owner_after.ccys.filter(p => p.ccyTypeId == CONST.ccyType.ETH).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
-        //console.log('owner_balBefore', owner_balBefore.toString());
-        //console.log('owner_balAfter', owner_balAfter.toString());
-        //console.log('expectedFeeCcy', expectedFeeCcy.toString());
         assert(owner_balAfter == Number(owner_balBefore) + Number(expectedFeeCcy), 'unexpected contract owner (fee receiver) ETH balance after transfer');
     });
 
@@ -168,7 +157,7 @@ contract("StMaster", accounts => {
         //const setFeeTx = await stm.setFee_CcyType_PercBips(CONST.ccyType.USD, usdFeePercBips);
         const setFeeTx = await stm.setFee_CcyType(CONST.ccyType.SGD, CONST.nullAddr, { fee_fixed: 0, fee_percBips: usdFeePercBips, fee_min: 0, fee_max: 0 } );
         truffleAssert.eventEmitted(setFeeTx, 'SetFeeCcyBps', ev => ev.ccyTypeId == CONST.ccyType.SGD && ev.fee_ccy_PercBips == usdFeePercBips && ev.ledgerOwner == CONST.nullAddr);
-        assert(await stm.globalFee_ccyType_Bps(CONST.ccyType.SGD) == usdFeePercBips, 'unexpected USD percentage fee after setting USD fee structure');
+        assert((await stm.getFee(CONST.getFeeType.CCY, CONST.ccyType.SGD, CONST.nullAddr)).fee_percBips == usdFeePercBips, 'unexpected USD percentage fee after setting USD fee structure');
 
         // transfer, with fee structure applied
         const transferAmountCcy = new BN(10000); // 100$ = 10,000 cents
@@ -200,7 +189,7 @@ contract("StMaster", accounts => {
         const feeBips = 50; // 50 bp = 0.5%
         const setFeeTx = await stm.setFee_CcyType(newCcyTypeId, CONST.nullAddr, { fee_fixed: 0, fee_percBips: feeBips, fee_min: 0, fee_max: 0 } );
         truffleAssert.eventEmitted(setFeeTx, 'SetFeeCcyBps', ev => ev.ccyTypeId == newCcyTypeId && ev.fee_ccy_PercBips == feeBips && ev.ledgerOwner == CONST.nullAddr);
-        assert(await stm.globalFee_ccyType_Bps(newCcyTypeId) == feeBips, 'unexpected new ccy percentage fee after setting fee structure');
+        assert((await stm.getFee(CONST.getFeeType.CCY, newCcyTypeId, CONST.nullAddr)).fee_percBips == feeBips, 'unexpected new ccy percentage fee after setting fee structure');
         
         // transfer, with fee structure applied
         const transferAmountCcy = new BN(500); // 500 new ccy units
@@ -217,9 +206,6 @@ contract("StMaster", accounts => {
         // test contract owner has received expected ETH fee
         const owner_balBefore = data.owner_before.ccys.filter(p => p.ccyTypeId == newCcyTypeId).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
         const owner_balAfter  =  data.owner_after.ccys.filter(p => p.ccyTypeId == newCcyTypeId).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
-        //console.log('owner_balBefore', owner_balBefore.toString());
-        //console.log('owner_balAfter', owner_balAfter.toString());
-        //console.log('expectedFeeCcy', expectedFeeCcy.toString());
         assert(owner_balAfter == Number(owner_balBefore) + Number(expectedFeeCcy), 'unexpected contract owner (fee receiver) new ccy balance after transfer');
     });
 
@@ -232,13 +218,13 @@ contract("StMaster", accounts => {
         const ccyFeeBips = 100;
         const setCcyFeeTx = await stm.setFee_CcyType(CONST.ccyType.ETH, CONST.nullAddr, { fee_fixed: 0, fee_percBips: ccyFeeBips, fee_min: 0, fee_max: 0 } );
         truffleAssert.eventEmitted(setCcyFeeTx, 'SetFeeCcyBps', ev => ev.ccyTypeId == CONST.ccyType.ETH && ev.fee_ccy_PercBips == ccyFeeBips && ev.ledgerOwner == CONST.nullAddr);
-        assert(await stm.globalFee_ccyType_Bps(CONST.ccyType.ETH) == ccyFeeBips, 'unexpected ETH basis points fee after setting ETH fee structure');
+        assert((await stm.getFee(CONST.getFeeType.CCY, CONST.ccyType.ETH, CONST.nullAddr)).fee_percBips == ccyFeeBips, 'unexpected ETH basis points fee after setting ETH fee structure');
 
         // set fee structure VCS: 100 bp (1%)
         const carbonFeeBps = 100;
         const setCarbonFeeTx = await stm.setFee_TokType(CONST.tokenType.VCS, CONST.nullAddr, { fee_fixed: 0, fee_percBips: carbonFeeBps, fee_min: 0, fee_max: 0 } );
         truffleAssert.eventEmitted(setCarbonFeeTx, 'SetFeeTokBps', ev => ev.tokenTypeId == CONST.tokenType.VCS && ev.fee_token_PercBips == carbonFeeBps);
-        assert(await stm.globalFee_tokType_Bps(CONST.tokenType.VCS) == carbonFeeBps, 'unexpected VCS basis points fee after setting VCS fee structure');
+        assert((await stm.getFee(CONST.getFeeType.TOK, CONST.tokenType.VCS, CONST.nullAddr)).fee_percBips == carbonFeeBps, 'unexpected VCS basis points fee after setting VCS fee structure');
 
         // transfer, with fee structure applied
         const transferAmountCcy = new BN(CONST.tenthEth_wei);
@@ -259,13 +245,11 @@ contract("StMaster", accounts => {
         // test contract owner has received expected ETH fee
         const owner_balBefore = data.owner_before.ccys.filter(p => p.ccyTypeId == CONST.ccyType.ETH).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
         const owner_balAfter  =  data.owner_after.ccys.filter(p => p.ccyTypeId == CONST.ccyType.ETH).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
-        //console.log(`expectedFeeCcy=${expectedFeeCcy}, ccyFeeBips=${ccyFeeBips}, transferAmountCcy=${transferAmountCcy}`);
         assert(owner_balAfter == Number(owner_balBefore) + Number(expectedFeeCcy), 'unexpected contract owner (fee receiver) ETH balance after transfer');
         
         // test contract owner has received expected carbon VCS fee
         const contractOwnerVcsKgBefore = data.owner_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
         const contractOwnerVcsKgAfter  =  data.owner_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
-        //console.log(`expectedFeeCarbon=${expectedFeeCarbon}, carbonFeeBps=${carbonFeeBps}, transferAmountCarbon=${transferAmountCarbon}`);
         assert(contractOwnerVcsKgAfter == Number(contractOwnerVcsKgBefore) + Number(expectedFeeCarbon), 'unexpected contract owner (fee receiver) VCS ST tonnage after transfer');
     });
 
@@ -277,13 +261,13 @@ contract("StMaster", accounts => {
         const ccyFeeBips = 100;
         const setCcyFeeTx = await stm.setFee_CcyType(CONST.ccyType.SGD, CONST.nullAddr, { fee_fixed: 0, fee_percBips: ccyFeeBips, fee_min: 0, fee_max: 0 } );
         truffleAssert.eventEmitted(setCcyFeeTx, 'SetFeeCcyBps', ev => ev.ccyTypeId == CONST.ccyType.SGD && ev.fee_ccy_PercBips == ccyFeeBips && ev.ledgerOwner == CONST.nullAddr);
-        assert(await stm.globalFee_ccyType_Bps(CONST.ccyType.SGD) == ccyFeeBips, 'unexpected USD basis points fee after setting USD fee structure');
+        assert((await stm.getFee(CONST.getFeeType.CCY, CONST.ccyType.SGD, CONST.nullAddr)).fee_percBips == ccyFeeBips, 'unexpected USD basis points fee after setting USD fee structure');
 
         // set fee structure UNFCCC: 100 bp (1%)
         const carbonFeeBps = 100;
         const setCarbonFeeTx = await stm.setFee_TokType(CONST.tokenType.UNFCCC, CONST.nullAddr, { fee_fixed: 0, fee_percBips: carbonFeeBps, fee_min: 0, fee_max: 0 } );
         truffleAssert.eventEmitted(setCarbonFeeTx, 'SetFeeTokBps', ev => ev.tokenTypeId == CONST.tokenType.UNFCCC && ev.fee_token_PercBips == carbonFeeBps);
-        assert(await stm.globalFee_tokType_Bps(CONST.tokenType.UNFCCC) == carbonFeeBps, 'unexpected UNFCCC basis points fee after setting UNFCCC fee structure');
+        assert((await stm.getFee(CONST.getFeeType.TOK, CONST.tokenType.UNFCCC, CONST.nullAddr)).fee_percBips == carbonFeeBps, 'unexpected UNFCCC basis points fee after setting UNFCCC fee structure');
 
         // transfer, with fee structure applied
         const transferAmountCcy = new BN(CONST.millionCcy_cents / 2);
@@ -304,13 +288,11 @@ contract("StMaster", accounts => {
         // test contract owner has received expected USD fee
         const owner_balBefore = data.owner_before.ccys.filter(p => p.ccyTypeId == CONST.ccyType.SGD).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
         const owner_balAfter  =  data.owner_after.ccys.filter(p => p.ccyTypeId == CONST.ccyType.SGD).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
-        //console.log(`expectedFeeCcy=${expectedFeeCcy}, ccyFeeBips=${ccyFeeBips}, transferAmountCcy=${transferAmountCcy}`);
         assert(owner_balAfter == Number(owner_balBefore) + Number(expectedFeeCcy), 'unexpected contract owner (fee receiver) USD balance after transfer');
         
         // test contract owner has received expected carbon UNFCCC fee
         const contractOwnerCarbonKgBefore = data.owner_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.UNFCCC).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
         const contractOwnerCarbonKgAfter  =  data.owner_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.UNFCCC).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
-        //console.log(`expectedFeeCarbon=${expectedFeeCarbon}, carbonFeeBps=${carbonFeeBps}, transferAmountCarbon=${transferAmountCarbon}`);
         assert(contractOwnerCarbonKgAfter == Number(contractOwnerCarbonKgBefore) + Number(expectedFeeCarbon), 'unexpected contract owner (fee receiver) UNFCCC ST tonnage after transfer');
 
         console.log(`\t>>> gasUsed - 0.5 vST trade eeu/ccy (A <-> B) w/ fees on both: ${data.transferTx.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * data.transferTx.receipt.gasUsed).toFixed(4)} (USD ${(CONST.gasPriceEth * data.transferTx.receipt.gasUsed * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
@@ -324,12 +306,12 @@ contract("StMaster", accounts => {
         const ccyFeeBips = 100;
         const setCcyFeeTx = await stm.setFee_CcyType(CONST.ccyType.SGD, CONST.nullAddr, { fee_fixed: 0, fee_percBips: ccyFeeBips, fee_min: 0, fee_max: 0 } );
         truffleAssert.eventEmitted(setCcyFeeTx, 'SetFeeCcyBps', ev => ev.ccyTypeId == CONST.ccyType.SGD && ev.fee_ccy_PercBips == ccyFeeBips && ev.ledgerOwner == CONST.nullAddr);
-        assert(await stm.globalFee_ccyType_Bps(CONST.ccyType.SGD) == ccyFeeBips, 'unexpected USD basis points fee after setting USD fee structure');
+        assert((await stm.getFee(CONST.getFeeType.CCY, CONST.ccyType.SGD, CONST.nullAddr)).fee_percBips == ccyFeeBips, 'unexpected USD basis points fee after setting USD fee structure');
 
         // set fee structure UNFCCC: 0 bp (0%)
         const carbonFeeBps = 0;
         const setCarbonFeeTx = await stm.setFee_TokType(CONST.tokenType.UNFCCC, CONST.nullAddr, { fee_fixed: 0, fee_percBips: carbonFeeBps, fee_min: 0, fee_max: 0 } );
-        assert(await stm.globalFee_tokType_Bps(CONST.tokenType.UNFCCC) == carbonFeeBps, 'unexpected UNFCCC basis points fee after setting UNFCCC fee structure');
+        assert((await stm.getFee(CONST.getFeeType.TOK, CONST.tokenType.UNFCCC, CONST.nullAddr)).fee_percBips == carbonFeeBps, 'unexpected UNFCCC basis points fee after setting UNFCCC fee structure');
 
         // transfer, with fee structure applied
         const transferAmountCcy = new BN(CONST.millionCcy_cents / 2);
@@ -351,13 +333,11 @@ contract("StMaster", accounts => {
         // test contract owner has received expected USD fee
         const owner_balBefore = data.owner_before.ccys.filter(p => p.ccyTypeId == CONST.ccyType.SGD).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
         const owner_balAfter  =  data.owner_after.ccys.filter(p => p.ccyTypeId == CONST.ccyType.SGD).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
-        //console.log(`expectedFeeCcy=${expectedFeeCcy}, ccyFeeBips=${ccyFeeBips}, transferAmountCcy=${transferAmountCcy}`);
         assert(owner_balAfter == Number(owner_balBefore) + Number(expectedFeeCcy), 'unexpected contract owner (fee receiver) USD balance after transfer');
         
         // test contract owner has received expected carbon UNFCCC fee
         const contractOwnerCarbonKgBefore = data.owner_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.UNFCCC).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
         const contractOwnerCarbonKgAfter  =  data.owner_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.UNFCCC).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
-        //console.log(`expectedFeeCarbon=${expectedFeeCarbon}, carbonFeeBps=${carbonFeeBps}, transferAmountCarbon=${transferAmountCarbon}`);
         assert(contractOwnerCarbonKgAfter == Number(contractOwnerCarbonKgBefore) + Number(expectedFeeCarbon), 'unexpected contract owner (fee receiver) UNFCCC ST tonnage after transfer');
 
         console.log(`\t>>> gasUsed - 0.5 vST trade eeu/ccy (A <-> B) w/ fees on ccy: ${data.transferTx.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * data.transferTx.receipt.gasUsed).toFixed(4)} (USD ${(CONST.gasPriceEth * data.transferTx.receipt.gasUsed * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
@@ -370,14 +350,13 @@ contract("StMaster", accounts => {
         // set fee structure USD: 0%
         const ccyFeeBips = 0;
         const setCcyFeeTx = await stm.setFee_CcyType(CONST.ccyType.SGD, CONST.nullAddr, { fee_fixed: 0, fee_percBips: ccyFeeBips, fee_min: 0, fee_max: 0 } );
-        //truffleAssert.eventEmitted(setCcyFeeTx, 'SetFeeCcyBps', ev => ev.ccyTypeId == CONST.ccyType.USD && ev.fee_ccy_PercBips == ccyFeeBips);
-        assert(await stm.globalFee_ccyType_Bps(CONST.ccyType.SGD) == ccyFeeBips, 'unexpected USD basis points fee after setting USD fee structure');
+        assert((await stm.getFee(CONST.getFeeType.CCY, CONST.ccyType.SGD, CONST.nullAddr)).fee_percBips == ccyFeeBips, 'unexpected USD basis points fee after setting USD fee structure');
 
         // set fee structure UNFCCC: 10 bp (0.1%)
         const carbonFeeBps = 10;
         const setCarbonFeeTx = await stm.setFee_TokType(CONST.tokenType.UNFCCC, CONST.nullAddr, { fee_fixed: 0, fee_percBips: carbonFeeBps, fee_min: 0, fee_max: 0 } );
         truffleAssert.eventEmitted(setCarbonFeeTx, 'SetFeeTokBps', ev => ev.tokenTypeId == CONST.tokenType.UNFCCC && ev.fee_token_PercBips == carbonFeeBps);
-        assert(await stm.globalFee_tokType_Bps(CONST.tokenType.UNFCCC) == carbonFeeBps, 'unexpected UNFCCC basis points fee after setting UNFCCC fee structure');
+        assert((await stm.getFee(CONST.getFeeType.TOK, CONST.tokenType.UNFCCC, CONST.nullAddr)).fee_percBips == carbonFeeBps, 'unexpected UNFCCC basis points fee after setting UNFCCC fee structure');
 
         // transfer, with fee structure applied
         const transferAmountCcy = new BN(CONST.millionCcy_cents / 2);
@@ -399,13 +378,11 @@ contract("StMaster", accounts => {
         // test contract owner has received expected USD fee
         const owner_balBefore = data.owner_before.ccys.filter(p => p.ccyTypeId == CONST.ccyType.SGD).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
         const owner_balAfter  =  data.owner_after.ccys.filter(p => p.ccyTypeId == CONST.ccyType.SGD).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
-        //console.log(`expectedFeeCcy=${expectedFeeCcy}, ccyFeeBips=${ccyFeeBips}, transferAmountCcy=${transferAmountCcy}`);
         assert(owner_balAfter == Number(owner_balBefore) + Number(expectedFeeCcy), 'unexpected contract owner (fee receiver) USD balance after transfer');
         
         // test contract owner has received expected carbon UNFCCC fee
         const contractOwnerCarbonKgBefore = data.owner_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.UNFCCC).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
         const contractOwnerCarbonKgAfter  =  data.owner_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.UNFCCC).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
-        //console.log(`expectedFeeCarbon=${expectedFeeCarbon}, carbonFeeBps=${carbonFeeBps}, transferAmountCarbon=${transferAmountCarbon}`);
         assert(contractOwnerCarbonKgAfter == Number(contractOwnerCarbonKgBefore) + Number(expectedFeeCarbon), 'unexpected contract owner (fee receiver) UNFCCC ST tonnage after transfer');
 
         console.log(`\t>>> gasUsed - 0.5 vST trade eeu/ccy (A <-> B) w/ fees on eeu: ${data.transferTx.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * data.transferTx.receipt.gasUsed).toFixed(4)} (USD ${(CONST.gasPriceEth * data.transferTx.receipt.gasUsed * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
@@ -437,13 +414,11 @@ contract("StMaster", accounts => {
 
         const owner_balBefore = data.owner_before.ccys.filter(p => p.ccyTypeId == CONST.ccyType.SGD).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
         const owner_balAfter  =  data.owner_after.ccys.filter(p => p.ccyTypeId == CONST.ccyType.SGD).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
-        //console.log(`expectedFeeCcy=${expectedFeeCcy}, ccyFeeBips=${ccyFeeBips}, transferAmountCcy=${transferAmountCcy}`);
         assert(owner_balAfter == Number(owner_balBefore) + Number(expectedFeeCcy), 'unexpected contract owner (fee receiver) USD balance after transfer');
         
         // test contract owner has received expected carbon UNFCCC fee
         const contractOwnerCarbonKgBefore = data.owner_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.UNFCCC).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
         const contractOwnerCarbonKgAfter  =  data.owner_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.UNFCCC).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
-        //console.log(`expectedFeeCarbon=${expectedFeeCarbon}, carbonFeeBps=${carbonFeeBps}, transferAmountCarbon=${transferAmountCarbon}`);
         assert(contractOwnerCarbonKgAfter == Number(contractOwnerCarbonKgBefore) + Number(expectedFeeCarbon), 'unexpected contract owner (fee receiver) UNFCCC ST tonnage after transfer');
     });
     

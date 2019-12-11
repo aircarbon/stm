@@ -17,6 +17,11 @@ module.exports = {
         fee_max: 0,
     },
 
+    getFeeType: Object.freeze({
+        CCY: 0,
+        TOK: 1,
+    }),
+
     // transfer types (event data)
     transferType: Object.freeze({
         USER: 0,
