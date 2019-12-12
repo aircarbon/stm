@@ -8,6 +8,7 @@ const TokenLib = artifacts.require('./TokenLib.sol');
 const LedgerLib = artifacts.require('./LedgerLib.sol');
 const TransferLib = artifacts.require('./TransferLib.sol');
 const FeeLib = artifacts.require('./FeeLib.sol');
+const Erc20Lib = artifacts.require('./Erc20Lib.sol');
 
 //const StMintable = artifacts.require('./StMintable.sol');
 //const StLedger = artifacts.require('./StLedger.sol');
@@ -49,8 +50,16 @@ module.exports = async function (deployer) {
     return deployer.deploy(FeeLib).then(async feeLib => { 
         deployer.link(FeeLib, StMaster);
 
+    return deployer.deploy(Erc20Lib).then(async feeLib => { 
+        deployer.link(Erc20Lib, StMaster);
+
         // StMaster
-        return deployer.deploy(StMaster/*, st2x.address*/).then(async stm => {
+        const contractName = "SecTok_Master";
+        const contractVer = "0.7";
+        const contractUnit = "KG";
+        const contractSymbol = "CCC";
+        const contractDecimals = 4;
+        return deployer.deploy(StMaster, contractName, contractVer, contractUnit, contractSymbol, contractDecimals).then(async stm => {
             
             //console.dir(stm.abi);
             //console.dir(deployer);
@@ -58,8 +67,6 @@ module.exports = async function (deployer) {
             if (!deployer.network.includes("-fork")) {
                 global.configContext = 'erc20';
 
-                const contractName = "SecTok_Master";
-                const contractVer = "0.7";
 
                 var ip = "unknown";
                 publicIp.v4().then(p => ip = p).catch(e => { console.log("WARN: could not get IP - will write 'unknown'"); });
@@ -76,6 +83,7 @@ module.exports = async function (deployer) {
             }
         }).catch(err => { console.error('failed deployment: StMaster', err); });
     
+    }).catch(err => { console.error('failed deployment: Erc20Lib', err); });
     }).catch(err => { console.error('failed deployment: FeeLib', err); });
     }).catch(err => { console.error('failed deployment: TransferLib', err); });
     }).catch(err => { console.error('failed deployment: StLib', err); });

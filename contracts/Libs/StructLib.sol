@@ -65,6 +65,12 @@ library StructLib {
         StructLib.FeeStruct           customFees;               // global fee override - per ledger entry
     }
 
+    struct LedgerReturn {
+        bool                   exists;
+        LedgerSecTokenReturn[] tokens;                          // STs with types & sizes (in contract base unit) information - v2
+        uint256                tokens_sumQty;                   // retained for caller convenience - v1
+        LedgerCcyReturn[]      ccys;                            // currency balances
+    }
     struct LedgerSecTokenReturn {                               // ledger return structure
         uint256 stId;
         uint256 tokenTypeId;
@@ -81,18 +87,7 @@ library StructLib {
         string  unit;
         int256  balance;
     }
-    struct LedgerReturn {
-        bool                   exists;
-        LedgerSecTokenReturn[] tokens;                          // STs with types & sizes (in contract base unit) information - v2
-        uint256                tokens_sumQty;                   // retained for caller convenience - v1
-        LedgerCcyReturn[]      ccys;                            // currency balances
-    }
-
     // *** PACKED SECURITY TOKEN ***
-    // uint32 - 4.2 billion
-    // uint40 - 1.0 trillion
-    // uint64 - 1.8e19
-    // 64 x3 = 192 bits
     struct PackedSt {
         uint64 batchId;
         uint64 mintedQty;
@@ -109,7 +104,7 @@ library StructLib {
         mapping(uint256 => SecTokenBatch) _batches;             // main batch list: all ST batches, by batch ID
         uint64 _batches_currentMax_id;                          // 1-based
 
-        // *** SecTokens LIST (slightly more gas effecient than mapping(uint/*SecTokenId*/ => St/*{struct}*/))
+        // *** SecTokens LIST
         mapping(uint256 => PackedSt) _sts;
 
         // *** LEDGER
@@ -141,6 +136,13 @@ library StructLib {
         uint256 fee_percBips;   // add a basis points a, if any - in basis points, i.e. minimum % = 1bp = 1/100 of 1% = 0.0001x
         uint256 fee_min;        // collar for a (if >0)
         uint256 fee_max;        // and cap for a, (if >0)
+    }
+
+    // ERC20 TYPES
+    struct Erc20Struct {
+        bool _whitelistClosed;
+        address[] _whitelist;
+        mapping(address => bool) _whitelisted;
     }
 
     /**

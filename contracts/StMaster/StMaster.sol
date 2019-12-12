@@ -1,18 +1,16 @@
 pragma solidity 0.5.13;
 pragma experimental ABIEncoderV2;
 
-import "./StMintable.sol";
-import "./StBurnable.sol";
 import "./CcyFundable.sol";
 import "./CcyWithdrawable.sol";
+import "./StMintable.sol";
+import "./StBurnable.sol";
 import "./StTransferable.sol";
+import "./StErc20.sol";
 
-// bytecode of libs get *removed* during LINKING (solc/truffle migrate)
-import "../Libs/StructLib.sol";
-//import "../Libs/CcyLib.sol";
-//import "../Libs/LedgerLib.sol";
+import "../Libs/StructLib.sol"; // bytecode of libs get *removed* during linking (solc/truffle migrate)
 
-contract StMaster is StMintable, StBurnable, CcyFundable, CcyWithdrawable, StTransferable {
+contract StMaster is StMintable, StBurnable, CcyFundable, CcyWithdrawable, StTransferable, StErc20 {
     // contact properties
     string public name;
     string public version;
@@ -69,11 +67,18 @@ contract StMaster is StMintable, StBurnable, CcyFundable, CcyWithdrawable, StTra
     //  ** fee-preview: tests general / using it for splitting multi-batch transfers
     //
 
-    constructor() public {
+    constructor(
+        string memory contractName,
+        string memory contractVer,
+        string memory contractUnit,
+        string memory contractSymbol,
+        uint8 contractDecimals
+    ) StErc20(contractSymbol, contractDecimals)
+    public {
         // set contract properties
-        name = "SecTok_Master";
-        version = "0.7";
-        unit = "KG";
+        name = contractName; //"SecTok_Master";
+        version = contractVer; //"0.7";
+        unit = contractUnit; //"KG";
 
         // params - token types
         stTypesData._tokenTypeNames[1] = 'CER - UNFCCC - Certified Emission Reduction';

@@ -11,6 +11,14 @@ library TransferLib {
 
     uint256 constant MAX_BATCHES_PREVIEW = 4; // for fee previews: max distinct batch IDs that can participate in one side of a trade fee preview
 
+    //
+    // ERC20
+    //
+    //...?
+
+    //
+    // INTERNAL
+    //
     struct TransferArgs {
         address ledger_A;
         address ledger_B;
@@ -181,10 +189,9 @@ library TransferLib {
         ledgerData._tokens_total.transferedQty += v.transferedQty + v.exchangeFeesPaidQty + v.originatorFeesPaidQty;
     }
 
-    /**
-     * @dev Transfers currency across ledger owners
-     * @param a args
-     */
+    //
+    // INTERNAL - CCY
+    //
     struct TransferCcyArgs {
         address      from;
         address      to;
@@ -206,11 +213,9 @@ library TransferLib {
         }
     }
 
-    /**
-     * @dev Transfers STs across ledger owners, splitting (soft-minting) the last ST as necessary
-     * @dev (the residual amount left in the origin's last ST after splitting is similar to a UTXO change output)
-     * @param a args
-     */
+    //
+    // INTERNAL - TOKENS
+    //
     struct TransferSplitArgs {
         address      from;
         address      to;
@@ -336,11 +341,9 @@ library TransferLib {
         return maxStId;
     }
 
-    /**
-     * @dev Returns fees in effect for a transfer
-     * @param a Transfer args
-     * @return All fees
-     */
+    //
+    // INTERNAL - FEE PREVIEW
+    //
     function transfer_feePreview(
         StructLib.LedgerStruct storage ledgerData,
         StructLib.FeeStruct storage globalFees,
@@ -414,52 +417,6 @@ library TransferLib {
     }
 
     /**
-     * @dev Calculates fixed + basis points total fee based on the fee structure of the supplied currency or token type
-     * @param feeStructure Token or currency type fee structure mapping
-     * @param typeId Token or currency type ID
-     * @param transferAmount Currency amount or token quantity
-     * @return Total fee
-     */
-    function calcFee(
-        mapping(uint256 => StructLib.SetFeeArgs) storage feeStructure,
-        uint256 typeId,
-        uint256 transferAmount)
-    internal view returns(uint256 totalFee) {
-        return calcFee(feeStructure[typeId], transferAmount); // gas!
-        //return feeStructure[typeId].fee_fixed + ((transferAmount * 1000000/*precision*/ / 10000/*basis points*/) * feeStructure[typeId].fee_percBips) / 1000000/*precision*/;
-    }
-    function calcFee(StructLib.SetFeeArgs storage feeStructure, uint256 transferAmount)
-    internal view returns(uint256 totalFee) {
-        return feeStructure.fee_fixed + ((transferAmount * 1000000/*precision*/ / 10000/*basis points*/) * feeStructure.fee_percBips) / 1000000/*precision*/;
-    }
-
-    /**
-     * @dev Caps and collars (max and min) the supplied fee based on the fee structure of the supplied currency or token type
-     * @param feeStructure Token or currency type fee structure mapping
-     * @param typeId Token or currency type ID
-     * @param feeAmount Uncapped/uncollared fee
-     * @return Capped or collared fee
-     */
-    function applyCapCollar(
-        mapping(uint256 => StructLib.SetFeeArgs) storage feeStructure,
-        uint256 typeId,
-        uint256 transferAmount,
-        uint256 feeAmount)
-    internal view returns(uint256 totalFee) {
-        return applyCapCollar(feeStructure[typeId], transferAmount, feeAmount); // gas!
-        // if (transferAmount > 0) {
-        //     if (feeAmount > feeStructure[typeId].fee_max && feeStructure[typeId].fee_max > 0) return feeStructure[typeId].fee_max;
-        //     if (feeAmount < feeStructure[typeId].fee_min && feeStructure[typeId].fee_min > 0) return feeStructure[typeId].fee_min;
-        // } return feeAmount;
-    }
-    function applyCapCollar(StructLib.SetFeeArgs storage feeStructure, uint256 transferAmount, uint256 feeAmount) internal view returns(uint256 totalFee) {
-        if (transferAmount > 0) {
-            if (feeAmount > feeStructure.fee_max && feeStructure.fee_max > 0) return feeStructure.fee_max;
-            if (feeAmount < feeStructure.fee_min && feeStructure.fee_min > 0) return feeStructure.fee_min;
-        } return feeAmount;
-    }
-
-    /**
      * @dev Previews ST transfer across ledger owners
      * @param a TransferSplitArgs args
      * @return The distinct transfer-from batch IDs and the total quantity of tokens that would be transfered from each batch
@@ -526,5 +483,51 @@ library TransferLib {
             }
         }
         return ret;
+    }
+
+    /**
+     * @dev Calculates fixed + basis points total fee based on the fee structure of the supplied currency or token type
+     * @param feeStructure Token or currency type fee structure mapping
+     * @param typeId Token or currency type ID
+     * @param transferAmount Currency amount or token quantity
+     * @return Total fee
+     */
+    function calcFee(
+        mapping(uint256 => StructLib.SetFeeArgs) storage feeStructure,
+        uint256 typeId,
+        uint256 transferAmount)
+    internal view returns(uint256 totalFee) {
+        return calcFee(feeStructure[typeId], transferAmount);
+        //return feeStructure[typeId].fee_fixed + ((transferAmount * 1000000/*precision*/ / 10000/*basis points*/) * feeStructure[typeId].fee_percBips) / 1000000/*precision*/;
+    }
+    function calcFee(StructLib.SetFeeArgs storage feeStructure, uint256 transferAmount)
+    internal view returns(uint256 totalFee) {
+        return feeStructure.fee_fixed + ((transferAmount * 1000000/*precision*/ / 10000/*basis points*/) * feeStructure.fee_percBips) / 1000000/*precision*/;
+    }
+
+    /**
+     * @dev Caps and collars (max and min) the supplied fee based on the fee structure of the supplied currency or token type
+     * @param feeStructure Token or currency type fee structure mapping
+     * @param typeId Token or currency type ID
+     * @param feeAmount Uncapped/uncollared fee
+     * @return Capped or collared fee
+     */
+    function applyCapCollar(
+        mapping(uint256 => StructLib.SetFeeArgs) storage feeStructure,
+        uint256 typeId,
+        uint256 transferAmount,
+        uint256 feeAmount)
+    internal view returns(uint256 totalFee) {
+        return applyCapCollar(feeStructure[typeId], transferAmount, feeAmount);
+        // if (transferAmount > 0) {
+        //     if (feeAmount > feeStructure[typeId].fee_max && feeStructure[typeId].fee_max > 0) return feeStructure[typeId].fee_max;
+        //     if (feeAmount < feeStructure[typeId].fee_min && feeStructure[typeId].fee_min > 0) return feeStructure[typeId].fee_min;
+        // } return feeAmount;
+    }
+    function applyCapCollar(StructLib.SetFeeArgs storage feeStructure, uint256 transferAmount, uint256 feeAmount) internal view returns(uint256 totalFee) {
+        if (transferAmount > 0) {
+            if (feeAmount > feeStructure.fee_max && feeStructure.fee_max > 0) return feeStructure.fee_max;
+            if (feeAmount < feeStructure.fee_min && feeStructure.fee_min > 0) return feeStructure.fee_min;
+        } return feeAmount;
     }
 }
