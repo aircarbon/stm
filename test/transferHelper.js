@@ -408,7 +408,7 @@ module.exports = {
                 }
             });
             
-            // validate that total tonnage across A, B and contract owner (fee receiver) is unchanged
+            // validate that total quantity across A, B and contract owner (fee receiver) is unchanged
             // console.log('            ledgerA_before.tokens_sumQty', ledgerA_before.tokens_sumQty);
             // console.log('            ledgerB_before.tokens_sumQty', ledgerB_before.tokens_sumQty);
             // console.log('owner_before.tokens_sumQty', owner_before.tokens_sumQty);
@@ -427,7 +427,7 @@ module.exports = {
                    (contractOwnerIsTransfering ? 0 : Number(owner_after.tokens_sumQty)) + // exchange fee receiver after
                    originatorFeeData.map(p => p.fee_tok_A).reduce((a,b) => Number(a) + Number(b), Number(0)) + // originator fees paid by A
                    originatorFeeData.map(p => p.fee_tok_B).reduce((a,b) => Number(a) + Number(b), Number(0))   // originator fees paid by B
-                   , 'unexpected total tonnage sum across ledger before vs. after');
+                   , 'unexpected total quantity sum across ledger before vs. after');
         }
 
         // validate originator fees are moved
@@ -519,7 +519,7 @@ module.exports = {
             // console.log('ledgerB_before.tokens_sumQty', ledgerB_before.tokens_sumQty.toString());
             // console.log('                 ex_eeuFee_B', ex_eeuFee_B.toString());
             // console.log('        originatorFees_tok_B', originatorFees_tok_B.toString());
-            assert(ledgerB_after.tokens_sumQty == Number(ledgerB_before.tokens_sumQty) + netKg_tfd - ex_eeuFee_B - Number(originatorFees_tok_B.toFixed()), 'unexpected ledger B tonnage sum after transfer A -> B');
+            assert(ledgerB_after.tokens_sumQty == Number(ledgerB_before.tokens_sumQty) + netKg_tfd - ex_eeuFee_B - Number(originatorFees_tok_B.toFixed()), 'unexpected ledger B quantity sum after transfer A -> B');
 
             totalKg_tfd_incFees = totalKg_tfd_incFees.add(new BN(originatorFees_tok_A.toFixed()));
         }
@@ -529,26 +529,26 @@ module.exports = {
             totalqty_AllSecSecTokenTypes_fees = totalqty_AllSecSecTokenTypes_fees.add(new BN(ex_eeuFee_B));
             netKg_tfd += qty_B; // transfered by B
             netKg_tfd -= qty_A; // received from A
-            assert(ledgerB_after.tokens_sumQty == Number(ledgerB_before.tokens_sumQty) - netKg_tfd - ex_eeuFee_B - Number(originatorFees_tok_B.toFixed()), 'unexpected ledger B tonnage sum after transfer B -> A');
+            assert(ledgerB_after.tokens_sumQty == Number(ledgerB_before.tokens_sumQty) - netKg_tfd - ex_eeuFee_B - Number(originatorFees_tok_B.toFixed()), 'unexpected ledger B quantity sum after transfer B -> A');
             assert(ledgerA_after.tokens_sumQty == Number(ledgerA_before.tokens_sumQty) + netKg_tfd - ex_eeuFee_A - Number(originatorFees_tok_A.toFixed()), 'unexpected ledger A tokens sum after transfer B -> A');
             
             totalKg_tfd_incFees = totalKg_tfd_incFees.add(new BN(originatorFees_tok_B.toFixed()));
         }
 
-        // validate token fee sum tonnage in contract owner
+        // validate token fee sum quantity in contract owner
         // console.log(' owner_after.tokens_sumQty', owner_after.tokens_sumQty);
         // console.log('owner_before.tokens_sumQty', owner_before.tokens_sumQty);
         // console.log('       totalqty_AllSecSecTokenTypes_fees', totalqty_AllSecSecTokenTypes_fees);
         if (!contractOwnerIsTransfering) {
             assert(new BN(owner_after.tokens_sumQty).sub(new BN(owner_before.tokens_sumQty))
-                    .eq(totalqty_AllSecSecTokenTypes_fees), 'unexpected contract owner (exchange fee receiver) tonnage after transfer');
+                    .eq(totalqty_AllSecSecTokenTypes_fees), 'unexpected contract owner (exchange fee receiver) quantity after transfer');
         }
 
         // validate carbon global totals
         // console.log(' totalKg_tfd_before', totalKg_tfd_before.toString());
         // console.log('  totalKg_tfd_after', totalKg_tfd_after.toString());
         // console.log('totalKg_tfd_incFees', totalKg_tfd_incFees.toString());
-        assert(totalKg_tfd_after.sub(totalKg_tfd_before).eq(totalKg_tfd_incFees), 'unexpected total tonnage carbon after transfer');
+        assert(totalKg_tfd_after.sub(totalKg_tfd_before).eq(totalKg_tfd_incFees), 'unexpected total quantity carbon after transfer');
 
         return {
             transferTx, 
@@ -620,7 +620,7 @@ async function transferWrapped({
     ccy_amount_B, ccyTypeId_B,
     applyFees
 }, from) {
-    const tx = await stm.transfer(
+    const tx = await stm.transferOrTrade(
         { 
                 ledger_A,                          ledger_B, 
                    qty_A: qty_A.toString(),        tokenTypeId_A, 

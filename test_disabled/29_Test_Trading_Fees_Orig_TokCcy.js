@@ -19,19 +19,26 @@ contract("StMaster", accounts => {
 
     beforeEach(async () => {
         stm = await st.deployed();
-        if (!global.accountNdx) global.accountNdx = 0;
-        global.accountNdx += 5;
+        if (!global.TaddrNdx) global.TaddrNdx = 0;
+        global.TaddrNdx += 5;
         if (CONST.logTestAccountUsage)
-            console.log(`global.accountNdx: ${global.accountNdx} - contract @ ${stm.address} (owner: ${accounts[0]}) - getSecTokenBatchCount: ${(await stm.getSecTokenBatchCount.call()).toString()}`);
+            console.log(`addrNdx: ${global.TaddrNdx} - contract @ ${stm.address} (owner: ${accounts[0]})`);
+        if (CONST.whitelistExchangeTestAcounts) {
+            await stm.whitelist(accounts[global.TaddrNdx + 0]);
+            await stm.whitelist(accounts[global.TaddrNdx + 1]);
+            await stm.whitelist(accounts[global.TaddrNdx + 2]);
+            await stm.whitelist(accounts[global.TaddrNdx + 3]);
+            await stm.whitelist(accounts[global.TaddrNdx + 4]);
+        }
     });
 
     // ST ORIGINATOR FEES - SINGLE ORIGINATOR
 
     it('fees (orig/ccy) - apply VCS token 1 originator fee (+ ledger @ x4) [/ ETH global fee], on a 1.5 ST trade (tok fee on A / ccy fee on B)', async () => {
         // SETUP - mint for M ([+0]), move all to A ([+1])
-        const M = accounts[global.accountNdx + 0];
-        const A = accounts[global.accountNdx + 1];
-        const B = accounts[global.accountNdx + 2];
+        const M = accounts[global.TaddrNdx + 0];
+        const A = accounts[global.TaddrNdx + 1];
+        const B = accounts[global.TaddrNdx + 2];
 
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      M, ORIG_FEES_VCS_B1, [], [], { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      M, ORIG_FEES_VCS_B2, [], [], { from: accounts[0] });
@@ -113,9 +120,9 @@ contract("StMaster", accounts => {
 
     it('fees (orig/ccy) - apply UNFCCC token 1 originator fees (+ global @ x8) / SGD ledger fee, on a 2.5 ST trade (tok fee on B / ccy fee on A)', async () => {
         // SETUP - mint for M ([+0]), move all to B ([+2])
-        const M = accounts[global.accountNdx + 0];
-        const A = accounts[global.accountNdx + 1];
-        const B = accounts[global.accountNdx + 2];
+        const M = accounts[global.TaddrNdx + 0];
+        const A = accounts[global.TaddrNdx + 1];
+        const B = accounts[global.TaddrNdx + 2];
 
         await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC,    CONST.tonCarbon, 1,      M, ORIG_FEES_UNFCCC_B1, [], [], { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC,    CONST.tonCarbon, 1,      M, ORIG_FEES_UNFCCC_B2, [], [], { from: accounts[0] });
@@ -200,12 +207,12 @@ contract("StMaster", accounts => {
     it('fees (orig/ccy) - apply VCS token multiple [3] originator fees (+ ledger @ x4), on a 3.5 ST trade (fee on A)', async () => {
         // SETUP - mint for M[] ([+0], [+1], [+2]), move all to A ([+3]) 
         const M_multi = [ 
-            { account: accounts[global.accountNdx + 0] }, 
-            { account: accounts[global.accountNdx + 1] },
-            { account: accounts[global.accountNdx + 2] }
+            { account: accounts[global.TaddrNdx + 0] }, 
+            { account: accounts[global.TaddrNdx + 1] },
+            { account: accounts[global.TaddrNdx + 2] }
         ];
-        const A = accounts[global.accountNdx + 3];
-        const B = accounts[global.accountNdx + 4];
+        const A = accounts[global.TaddrNdx + 3];
+        const B = accounts[global.TaddrNdx + 4];
 
         // SETUP - different originator fees
         var batchNo = 1;
@@ -304,12 +311,12 @@ contract("StMaster", accounts => {
     it('fees (orig/ccy) - apply UNFCCC token multiple [3] originator fees (+ global @ x10), on a 3.5 ST trade (fee on B)', async () => {
         // SETUP - mint for M[] ([+0], [+1], [+2]), move all to B ([+3]) 
         const M_multi = [ 
-            { account: accounts[global.accountNdx + 0] }, 
-            { account: accounts[global.accountNdx + 1] },
-            { account: accounts[global.accountNdx + 2] }
+            { account: accounts[global.TaddrNdx + 0] }, 
+            { account: accounts[global.TaddrNdx + 1] },
+            { account: accounts[global.TaddrNdx + 2] }
         ];
-        const A = accounts[global.accountNdx + 3];
-        const B = accounts[global.accountNdx + 4];
+        const A = accounts[global.TaddrNdx + 3];
+        const B = accounts[global.TaddrNdx + 4];
 
         // SETUP - different originator fees
         var batchNo = 1;

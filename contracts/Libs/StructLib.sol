@@ -33,7 +33,7 @@ library StructLib {
         uint256 _count_tokenTypes;
     }
 
-    // LEDGER TYPES
+    // TOKEN BATCH
     struct SecTokenBatch {
         uint64     id;                                          // global sequential id: 1-based
         uint256    mintedTimestamp;                             // minting block.timestamp
@@ -135,7 +135,7 @@ library StructLib {
         uint256 fee_fixed;      // apply fixed a, if any
         uint256 fee_percBips;   // add a basis points a, if any - in basis points, i.e. minimum % = 1bp = 1/100 of 1% = 0.0001x
         uint256 fee_min;        // collar for a (if >0)
-        uint256 fee_max;        // and cap for a, (if >0)
+        uint256 fee_max;        // and cap for a (if >0)
     }
 
     // ERC20 TYPES

@@ -8,6 +8,7 @@ import "./StErc20.sol";
 
 import "../Libs/StructLib.sol";
 import "../Libs/TransferLib.sol";
+import "../Libs/Erc20Lib.sol";
 
 contract StTransferable is Owned, StLedger, StFees, StErc20 {
     /**
@@ -17,14 +18,14 @@ contract StTransferable is Owned, StLedger, StFees, StErc20 {
      * @dev optionally applies: fees per the current fee structure, and paying them to contract owner's ledger entry
      * @param a TransferLib.TransferArgs arguments
      */
-    function transfer(TransferLib.TransferArgs memory a)
+    function transferOrTrade(TransferLib.TransferArgs memory a) // TODO: need to rename to avoid name collision with erc20 transfer?
     public onlyOwner() onlyWhenReadWrite() {
-        // abort unless both sides are exchange (whitelisted) accounts
-        if (!erc20Data._whitelisted[a.ledger_A] || !erc20Data._whitelisted[a.ledger_B])
-            revert("Access denied");
+        // abort if sending tokens from a non-whitelist account
+        require(!(a.qty_A > 0 && !erc20Data._whitelisted[a.ledger_A]), "Not whitelisted (A)");
+        require(!(a.qty_B > 0 && !erc20Data._whitelisted[a.ledger_B]), "Not whitelisted (B)");
 
         a.feeAddrOwner = owner;
-        TransferLib.transfer(ledgerData, globalFees, a);
+        TransferLib.transferOrTrade(ledgerData, globalFees, a);
     }
 
     /**
@@ -47,7 +48,7 @@ contract StTransferable is Owned, StLedger, StFees, StErc20 {
     }
 
     /**
-     * @dev Returns the total global tonnage of carbon transfered
+     * @dev Returns the total global quantity of carbon transfered
      */
     function getSecToken_totalTransfered()
     external view onlyOwner() returns (uint256) {

@@ -29,7 +29,6 @@ interface IErc20 {
     function balanceOf(address account) external view returns (uint256);
     function transfer(address recipient, uint256 amount) external returns (bool);
 
-
     // APPROVALS -- TODO/NOP: see https://docs.google.com/document/d/1YLPtQxZu1UAvO9cZ1O2RPXBbT0mooh4DYKjA_jp-RLM/edit
     function transferFrom(address sender, address recipient, uint256 amount) external returns (bool);
     function allowance(address owner, address spender) external view returns (uint256);

@@ -41,6 +41,17 @@ library TransferLib {
         address feeAddrOwner;    // exchange fees: receive address
     }
 
+    function initLedgerIfNew (
+        StructLib.LedgerStruct storage ledgerData,
+        address addr
+    ) 
+    private {
+        if (!ledgerData._ledger[addr].exists) {
+            ledgerData._ledger[addr] = StructLib.Ledger({ exists: true, customFees: StructLib.FeeStruct() });
+            ledgerData._ledgerOwners.push(addr);
+        }
+    }
+
     struct FeesCalc {
         uint256 fee_ccy_A;
         uint256 fee_ccy_B;
@@ -56,14 +67,13 @@ library TransferLib {
         uint80 exchangeFeesPaidQty;
         uint80 originatorFeesPaidQty;
     }
-    function transfer(
+    function transferOrTrade(
         StructLib.LedgerStruct storage ledgerData,
         StructLib.FeeStruct storage globalFees,
         TransferLib.TransferArgs memory a
-    )
-    public {
-        require(ledgerData._ledger[a.ledger_A].exists == true, "Bad ledger_A");
-        require(ledgerData._ledger[a.ledger_B].exists == true, "Bad ledger_B");
+    ) public {
+        //require(ledgerData._ledger[a.ledger_A].exists == true, "Bad ledger_A");
+        //require(ledgerData._ledger[a.ledger_B].exists == true, "Bad ledger_B");
         require(a.ledger_A != a.ledger_B, "Bad transfer");
         require(a.qty_A > 0 || a.qty_B > 0 || a.ccy_amount_A > 0 || a.ccy_amount_B > 0, "Bad null transfer");
         require(a.qty_A <= 0xffffffffffffffff, "Bad qty_A");
@@ -74,6 +84,10 @@ library TransferLib {
         if (a.ccy_amount_B > 0) require(a.ccyTypeId_B > 0, "Bad ccyTypeId B");
         if (a.qty_A > 0) require(a.tokenTypeId_A > 0, "Bad tokenTypeId_A");
         if (a.qty_B > 0) require(a.tokenTypeId_B > 0, "Bad tokenTypeId_B");
+
+        // erc20 support - initialize ledger entry if not known
+        initLedgerIfNew(ledgerData, a.ledger_A);
+        initLedgerIfNew(ledgerData, a.ledger_B);
 
         // exchange fees - calc total payable (fixed + basis points), cap & collar
         StructLib.FeeStruct storage exFeeStruct_ccy_A = ledgerData._ledger[a.ledger_A].customFees.ccyType_Set[a.ccyTypeId_A]   ? ledgerData._ledger[a.ledger_A].customFees : globalFees;

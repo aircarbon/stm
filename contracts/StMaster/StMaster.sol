@@ -51,9 +51,10 @@ contract StMaster is StMintable, StBurnable, CcyFundable, CcyWithdrawable, StTra
     // LAUNCH LIST
     //
     // PRI 0 ** ERC20 **
-    //      test: setup whitelist for accounts[ndx] < 100...
-    //      test sealing
-    //      test can't add more
+    //   main tests, re. permissions -- needs key derivation
+    //
+    // PERF/IDEA: change internalTransfer so it can operate on *any* stTypeId...? stTypeId is only a property of batch -- any good reason to restrict it?
+    //            (less operations if it worked on any type?)
     //
     // PRI 0 ** CASHFLOWS re. SD **
     //   ....?!
@@ -61,6 +62,8 @@ contract StMaster is StMintable, StBurnable, CcyFundable, CcyWithdrawable, StTra
     // PRI 1 -- NEW-CONTRACT (DATA COPY) (so can defer splitting, and address anything else)
     //   > just need to be able to read out *all* data from storage (new contract can then have writers)
     //   > new Lib for this: DataReader -- needs to take paginated outputs
+    //
+    // BONDING CURVES... can we use them?
     //
     // ====== MAINNET ======
     //

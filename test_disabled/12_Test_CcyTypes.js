@@ -9,10 +9,10 @@ contract("StMaster", accounts => {
 
     beforeEach(async () => {
         stm = await st.deployed();
-        if (!global.accountNdx) global.accountNdx = 0;
-        global.accountNdx++;
+        if (!global.TaddrNdx) global.TaddrNdx = 0;
+        global.TaddrNdx++;
         if (CONST.logTestAccountUsage)
-            console.log(`global.accountNdx: ${global.accountNdx} - contract @ ${stm.address} (owner: ${accounts[0]}) - getSecTokenBatchCount: ${(await stm.getSecTokenBatchCount.call()).toString()}`);
+            console.log(`addrNdx: ${global.TaddrNdx} - contract @ ${stm.address} (owner: ${accounts[0]})`);
     });
 
     it('ccy types - should have correct default (ID 1-based) values', async () => {
@@ -39,7 +39,7 @@ contract("StMaster", accounts => {
         truffleAssert.eventEmitted(addCcyTx, 'AddedCcyType', ev => ev.id == countDefaultCcyTypes + 1 && ev.name == 'TEST_COIN' && ev.unit == 'TEST_UNIT');
 
         // validate ledger entry (non-existent) has the new type
-        const ledgerEntryAfter = await stm.getLedgerEntry(accounts[global.accountNdx]);
+        const ledgerEntryAfter = await stm.getLedgerEntry(accounts[global.TaddrNdx]);
         assert(ledgerEntryAfter.ccys.some(p => p.ccyTypeId == newTypeId), 'missing new currency type id from ledger after minting');
         assert(ledgerEntryAfter.ccys.some(p => p.name == 'TEST_COIN'), 'missing/invalid new currency name from ledger after minting');
         assert(ledgerEntryAfter.ccys.some(p => p.unit == 'TEST_UNIT'), 'missing/invalid new currency unit from ledger after minting');
@@ -53,8 +53,8 @@ contract("StMaster", accounts => {
         assert(types.filter(p => p.name == 'TEST_COIN2')[0].decimals == 42, 'unexpected # decimal places on new currency type');
 
         // fund new ccy type & validate
-        await stm.fund(newTypeId, 424242, accounts[global.accountNdx], { from: accounts[0] });
-        ledgerEntryAfter = await stm.getLedgerEntry(accounts[global.accountNdx]);
+        await stm.fund(newTypeId, 424242, accounts[global.TaddrNdx], { from: accounts[0] });
+        ledgerEntryAfter = await stm.getLedgerEntry(accounts[global.TaddrNdx]);
         assert(ledgerEntryAfter.ccys.find(p => p.ccyTypeId == newTypeId).balance == 424242, 'unexpected ledger balance of new currency type after funding');
     });
 

@@ -64,7 +64,7 @@ library Erc20Lib {
                        applyFees: false,
                     feeAddrOwner: owner
                 });
-                TransferLib.transfer(ledgerData, globalFees, a);
+                TransferLib.transferOrTrade(ledgerData, globalFees, a);
                 remainingToTransfer -= qtyType;
             }
         }

@@ -12,17 +12,19 @@ contract("StMaster", accounts => {
 
     beforeEach(async () => {
         stm = await st.deployed();
-        if (!global.accountNdx) global.accountNdx = 0;
-        //global.accountNdx += 5; // tests increment this; they use varying #'s of accounts
+        if (!global.TaddrNdx) global.TaddrNdx = 0;
+        //global.TaddrNdx += 5; // tests increment this; they use varying #'s of accounts
         if (CONST.logTestAccountUsage)
-            console.log(`global.accountNdx: ${global.accountNdx} - contract @ ${stm.address} (owner: ${accounts[0]}) - getSecTokenBatchCount: ${(await stm.getSecTokenBatchCount.call()).toString()}`);
+            console.log(`addrNdx: ${global.TaddrNdx} - contract @ ${stm.address} (owner: ${accounts[0]})`);
     });
 
     // ST ORIGINATOR FEES - MULTIPLE ORIGINATORS
 
     it('fees (orig/orig) - apply VCS token M originator fees (+ ledger fee) / UNFCCC token M originator fees (+ global fee), on a 1.5 ST trade (tok fee on A / tok fee on B)', async () => {
-        const A = accounts[++global.accountNdx];
-        const B = accounts[++global.accountNdx];
+        const A = accounts[++global.TaddrNdx];
+        const B = accounts[++global.TaddrNdx];
+        await stm.whitelist(A);
+        await stm.whitelist(B);
 
         const tokType_A = CONST.tokenType.VCS;
         const tokType_B = CONST.tokenType.UNFCCC;
@@ -117,7 +119,9 @@ contract("StMaster", accounts => {
         // SETUP - setup M[] mint originators, with varying no. of batches & qty's
         const M_multi = [];
         for (var i=0; i < originatorCount ; i++) {
-            M_multi.push({ account: accounts[++global.accountNdx] });
+            const M = accounts[++global.TaddrNdx]
+            M_multi.push({ account: M });
+            await stm.whitelist(M);
         }
         var totalTokQty = 0;
         for (var i = 0 ; i < M_multi.length ; i++) {

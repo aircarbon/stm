@@ -22,13 +22,27 @@ contract StErc20 is StFees, IErc20 {
     StructLib.Erc20Struct erc20Data;
 
     // ERC20 - OPTIONAL
-    // stMaster: string public name();
+    // StMaster: string public name();
     string public symbol;
     uint8 public decimals;
 
     constructor(string memory _symbol, uint8 _decimals) public {
         symbol = _symbol;
         decimals = _decimals;
+    }
+
+    // WHITELIST
+    function whitelist(address addr) public {
+        Erc20Lib.whitelist(erc20Data, addr);
+    }
+    function getWhitelist() external view returns (address[] memory) {
+        return erc20Data._whitelist;
+    }
+    function getWhitelistSeal() external view returns (bool) {
+        return erc20Data._whitelistClosed;
+    }
+    function sealWhitelist() public {
+        Erc20Lib.seal(erc20Data);
     }
 
     // ERC20 - CORE
@@ -51,19 +65,9 @@ contract StErc20 is StFees, IErc20 {
         );
     }
 
-    // WHITELIST
-    function sealWhitelist() public {
-        Erc20Lib.seal(erc20Data);
-    }
-    function whitelist(address addr) public {
-        Erc20Lib.whitelist(erc20Data, addr);
-    }
-    function getWhitelist() external view returns (address[] memory) {
-        return erc20Data._whitelist;
-    }
-
     // ERC20 - APPROVALS: NOP for now
     function allowance(address owner, address spender) public view returns (uint256) { return 0; }
     function approve(address spender, uint256 amount) public returns (bool) { return false; }
     function transferFrom(address sender, address recipient, uint256 amount) public returns (bool) { return false; }
+
 }

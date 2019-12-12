@@ -1,12 +1,15 @@
 require('dotenv').config();
+const MNEMONIC = require('./dev_mnemonic.js').MNEMONIC;
 
 const shell = require('shelljs');
 const PORT = 8545;
 const TOTAL_ACCOUNTS = 888;
 const { NETWORK_ID } = process.env;
-const MNEMONIC = 'educate school blast ability display bleak club soon curve car oil ostrich';
 
-const command = `ganache-cli -p ${PORT} -a ${TOTAL_ACCOUNTS} --networkId ${NETWORK_ID} -m "${MNEMONIC}"`;
+// ropsten limit: 8m
+// mainnet limit: ~10m
+// ganache default limit: 6m
+const command = `ganache-cli --port ${PORT} --accounts ${TOTAL_ACCOUNTS} --networkId ${NETWORK_ID} --mnemonic "${MNEMONIC}" --gasLimit 8000000`;
 
 shell.echo(`Run: ${command}`);
 
@@ -15,6 +18,4 @@ if (shell.exec(command).code !== 0) {
   shell.exit(1);
 }
 
-module.exports = {
-  MNEMONIC,
-}
+

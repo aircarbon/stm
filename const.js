@@ -9,7 +9,9 @@ const _gasPriceEth = web3.utils.fromWei(web3.utils.toWei("20", "gwei"), 'ether')
 const _ethUsd = 150;
 
 module.exports = {
-    logTestAccountUsage: false,
+    //logTestAccountUsage: true,
+    
+    whitelistExchangeTestAcounts: true,
 
     nullAddr: "0x0000000000000000000000000000000000000000",
 
@@ -79,6 +81,8 @@ EXCHANGE_FEE: 1,
          ethUsd: _ethUsd,
 
     logGas: (tx, desc) => {
-        console.log(`\t>>> gasUsed - ${desc}: ${tx.receipt.gasUsed} @${_gasPriceEth} ETH/gas = ${(_gasPriceEth * tx.receipt.gasUsed).toFixed(4)} (USD ${(_gasPriceEth * tx.receipt.gasUsed * _ethUsd).toFixed(4)}) ETH TX COST`);
+        var usdCost = _gasPriceEth * tx.receipt.gasUsed * _ethUsd;
+        console.log(`\t>>> gasUsed - ${desc}: ${tx.receipt.gasUsed} @${_gasPriceEth} ETH/gas = Ξ${(_gasPriceEth * tx.receipt.gasUsed).toFixed(4)} ~= $${(usdCost).toFixed(4)}`);
+        return usdCost;
     }
 };

@@ -21,15 +21,15 @@ contract("StMaster", accounts => {
 
     beforeEach(async () => {
         stm = await st.deployed();
-        if (!global.accountNdx) global.accountNdx = 0;
-        global.accountNdx++;
+        if (!global.TaddrNdx) global.TaddrNdx = 0;
+        global.TaddrNdx++;
         if (CONST.logTestAccountUsage)
-            console.log(`global.accountNdx: ${global.accountNdx} - contract @ ${stm.address} (owner: ${accounts[0]}) - getSecTokenBatchCount: ${(await stm.getSecTokenBatchCount.call()).toString()}`);
+            console.log(`addrNdx: ${global.TaddrNdx} - contract @ ${stm.address} (owner: ${accounts[0]})`);
     });
 
     it('minting metadata - should allow metadata no KVP minting', async () => {
         const batchId = await mintBatchWithMetadata( 
-            { tokenType: CONST.tokenType.UNFCCC, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.accountNdx],
+            { tokenType: CONST.tokenType.UNFCCC, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.TaddrNdx],
              metaKeys: [],
            metaValues: []
         }, { from: accounts[0] } );
@@ -37,7 +37,7 @@ contract("StMaster", accounts => {
 
     it('minting metadata - should allow metadata single KVP minting', async () => {
         const batchId = await mintBatchWithMetadata( 
-            { tokenType: CONST.tokenType.UNFCCC, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.accountNdx],
+            { tokenType: CONST.tokenType.UNFCCC, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.TaddrNdx],
              metaKeys: ['testKey_A'],
            metaValues: ['testValue_A']
         }, { from: accounts[0] } );
@@ -51,7 +51,7 @@ contract("StMaster", accounts => {
             metaValues.push(`${i}`);
         }
         const batchId = await mintBatchWithMetadata( 
-            { tokenType: CONST.tokenType.UNFCCC, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.accountNdx],
+            { tokenType: CONST.tokenType.UNFCCC, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.TaddrNdx],
              metaKeys, metaValues
         }, { from: accounts[0] } );
     });
@@ -64,14 +64,14 @@ contract("StMaster", accounts => {
             metaValues.push(`testKey_LargerProjectValueString0000000000000000000000000000000000000000000000000000000000000000000000000001111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111_${i}`);
         }
         const batchId = await mintBatchWithMetadata( 
-            { tokenType: CONST.tokenType.UNFCCC, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.accountNdx],
+            { tokenType: CONST.tokenType.UNFCCC, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.TaddrNdx],
              metaKeys, metaValues
         }, { from: accounts[0] } );
     });
 
     it('minting metadata - should allow multiple metadata KVP minting, with null value', async () => {
         const batchId = await mintBatchWithMetadata( 
-            { tokenType: CONST.tokenType.UNFCCC, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.accountNdx],
+            { tokenType: CONST.tokenType.UNFCCC, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.TaddrNdx],
              metaKeys: ['testKey_A', 'testKey_B'],
            metaValues: ['', 'b']
         }, { from: accounts[0] } );
@@ -79,7 +79,7 @@ contract("StMaster", accounts => {
 
     it('minting metadata - should allow multiple metadata KVP minting, with null key', async () => {
         const batchId = await mintBatchWithMetadata( 
-            { tokenType: CONST.tokenType.UNFCCC, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.accountNdx],
+            { tokenType: CONST.tokenType.UNFCCC, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.TaddrNdx],
              metaKeys: ['', 'testKey_B'],
            metaValues: ['a', 'b']
         }, { from: accounts[0] } );
@@ -87,7 +87,7 @@ contract("StMaster", accounts => {
 
     it('minting metadata - should allow multiple metadata KVP minting, with mismatched key/value lengths (implied null values)', async () => {
         const batchId = await mintBatchWithMetadata( 
-            { tokenType: CONST.tokenType.UNFCCC, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.accountNdx],
+            { tokenType: CONST.tokenType.UNFCCC, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.TaddrNdx],
              metaKeys: ['testKey_A', 'testKey_B', 'testKey_C'],
            metaValues: ['a', 'b']
         }, { from: accounts[0] } );
@@ -95,7 +95,7 @@ contract("StMaster", accounts => {
 
     it('minting metadata - should allow metadata KVP minting for example VCS VCUs', async () => {
         const batchId = await mintBatchWithMetadata( 
-            { tokenType: CONST.tokenType.VCS, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.accountNdx],
+            { tokenType: CONST.tokenType.VCS, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.TaddrNdx],
              metaKeys: vcs_ExampleKvps.map(p => p.k),
            metaValues: vcs_ExampleKvps.map(p => p.v),
         }, { from: accounts[0] } );
@@ -103,7 +103,7 @@ contract("StMaster", accounts => {
 
     it('minting metadata - should allow metadata KVP minting for example UNFCCC CERs', async () => {
         const batchId = await mintBatchWithMetadata( 
-            { tokenType: CONST.tokenType.UNFCCC, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.accountNdx],
+            { tokenType: CONST.tokenType.UNFCCC, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.TaddrNdx],
              metaKeys: unfccc_ExampleKvps.map(p => p.k),
            metaValues: unfccc_ExampleKvps.map(p => p.v),
         }, { from: accounts[0] } );
@@ -114,7 +114,7 @@ contract("StMaster", accounts => {
     // will need to do this validation in the API...
     // it('minting - should not allow minting with empty metadata KVP lists', async () => {
     //     try {
-    //         await mintBatchWithMetadata( { tokenType: CONST.tokenType.UNFCCC, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.accountNdx], 
+    //         await mintBatchWithMetadata( { tokenType: CONST.tokenType.UNFCCC, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.TaddrNdx], 
     //             metaKeys: [],
     //           metaValues: [],
     //         }, { from: accounts[0] } );
@@ -124,7 +124,7 @@ contract("StMaster", accounts => {
     
     // it('minting - should not allow minting with zero-length metadata keys or values', async () => {
     //     try {
-    //         await mintBatchWithMetadata( { tokenType: CONST.tokenType.UNFCCC, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.accountNdx], 
+    //         await mintBatchWithMetadata( { tokenType: CONST.tokenType.UNFCCC, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.TaddrNdx], 
     //             metaKeys: [''],
     //           metaValues: ['testValue'],
     //         }, { from: accounts[0] } );
@@ -134,7 +134,7 @@ contract("StMaster", accounts => {
 
     // it('minting - should not allow minting with mismatched metadata KVP list lengths', async () => {
     //     try {
-    //         await mintBatchWithMetadata( { tokenType: CONST.tokenType.UNFCCC, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.accountNdx], 
+    //         await mintBatchWithMetadata( { tokenType: CONST.tokenType.UNFCCC, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.TaddrNdx], 
     //             metaKeys: ['testKey'],
     //           metaValues: [],
     //         }, { from: accounts[0] } );
@@ -149,7 +149,7 @@ contract("StMaster", accounts => {
     //         metaValues.push(`testValue_${i}`);
     //     }
     //     try {
-    //         await mintBatchWithMetadata( { tokenType: CONST.tokenType.UNFCCC, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.accountNdx], 
+    //         await mintBatchWithMetadata( { tokenType: CONST.tokenType.UNFCCC, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.TaddrNdx], 
     //             metaKeys, metaValues
     //         }, { from: accounts[0] } );
     //     } catch (ex) { return; }
@@ -158,7 +158,7 @@ contract("StMaster", accounts => {
 
     it('post-minting metadata - should allow adding of a new KVP after minting', async () => {
         const batchId = await mintBatchWithMetadata( 
-            { tokenType: CONST.tokenType.UNFCCC, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.accountNdx],
+            { tokenType: CONST.tokenType.UNFCCC, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.TaddrNdx],
              metaKeys: unfccc_ExampleKvps.map(p => p.k),
            metaValues: unfccc_ExampleKvps.map(p => p.v),
         }, { from: accounts[0] } );
@@ -180,7 +180,7 @@ contract("StMaster", accounts => {
 
     it('post-minting metadata - should not allow non-owner to add a new KVP after minting', async () => {
         const batchId = await mintBatchWithMetadata( 
-            { tokenType: CONST.tokenType.UNFCCC, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.accountNdx],
+            { tokenType: CONST.tokenType.UNFCCC, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.TaddrNdx],
              metaKeys: unfccc_ExampleKvps.map(p => p.k),
            metaValues: unfccc_ExampleKvps.map(p => p.v),
         }, { from: accounts[0] } );
@@ -197,7 +197,7 @@ contract("StMaster", accounts => {
 
     it('post-minting metadata - should not allow adding of a existing KVP after minting', async () => {
         const batchId = await mintBatchWithMetadata( 
-            { tokenType: CONST.tokenType.UNFCCC, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.accountNdx],
+            { tokenType: CONST.tokenType.UNFCCC, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.TaddrNdx],
              metaKeys: unfccc_ExampleKvps.map(p => p.k),
            metaValues: unfccc_ExampleKvps.map(p => p.v),
         }, { from: accounts[0] } );

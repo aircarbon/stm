@@ -10,19 +10,27 @@ const web3 = new Web3();
 contract("StMaster", accounts => {
     var stm;
 
-    beforeEach(async () => {
+    before(async () => {
         stm = await st.deployed();
-        if (!global.accountNdx) global.accountNdx = 0;
-        global.accountNdx += 2;
+        stm.whitelist(accounts[0]);
+    });
+
+    beforeEach(async () => {
+        if (!global.TaddrNdx) global.TaddrNdx = 0;
+        global.TaddrNdx += 2;
         if (CONST.logTestAccountUsage)
-            console.log(`global.accountNdx: ${global.accountNdx} - contract @ ${stm.address} (owner: ${accounts[0]}) - getSecTokenBatchCount: ${(await stm.getSecTokenBatchCount.call()).toString()}`);
+            console.log(`addrNdx: ${global.TaddrNdx} - contract @ ${stm.address} (owner: ${accounts[0]})`);
+        if (CONST.whitelistExchangeTestAcounts) {
+            await stm.whitelist(accounts[global.TaddrNdx + 0]);
+            await stm.whitelist(accounts[global.TaddrNdx + 1]);
+        }
     });
 
     // STs: NO FEES IF FEE RECEIVER = FEE SENDER (contract owner or batch originator)
 
     it('fees (fee payer=receiver) - global/ledger/originator token fees should not be applied when fee sender is fee receiver (fee on A, contract owner & batch originator)', async () => {
         const A = accounts[0]; // sender is contract owner, exchange fee receiver, and batch originator fee receiver
-        const B = accounts[global.accountNdx + 1];
+        const B = accounts[global.TaddrNdx + 1];
         const allFees = { fee_fixed: 0, fee_percBips: 100, fee_min: 0, fee_max: 0 };
 
         // mint
@@ -60,7 +68,7 @@ contract("StMaster", accounts => {
     });
 
     it('fees (fee payer=receiver) - global/ledger/originator token fees should not be applied when fee sender is fee receiver (fee on B, contract owner & batch originator)', async () => {
-        const A = accounts[global.accountNdx + 0];
+        const A = accounts[global.TaddrNdx + 0];
         const B = accounts[0]; // sender is contract owner, exchange fee receiver, and batch originator fee receiver
         const allFees = { fee_fixed: 0, fee_percBips: 100, fee_min: 0, fee_max: 0 };
 
@@ -99,8 +107,8 @@ contract("StMaster", accounts => {
     });
 
     it('fees (fee payer=receiver) - originator token fee should not be applied (global should be) when fee sender is fee receiver (fee on A, batch originator)', async () => {
-        const A = accounts[global.accountNdx + 0]; // sender is batch originator 
-        const B = accounts[global.accountNdx + 1];
+        const A = accounts[global.TaddrNdx + 0]; // sender is batch originator 
+        const B = accounts[global.TaddrNdx + 1];
         const origFees = { fee_fixed: 0, fee_percBips: 100, fee_min: 0, fee_max: 2 };
 
         // mint
@@ -144,8 +152,8 @@ contract("StMaster", accounts => {
     });
 
     it('fees (fee payer=receiver) - originator token fee should not be applied (ledger should be) when fee sender is fee receiver (fee on B, batch originator)', async () => {
-        const A = accounts[global.accountNdx + 0]; 
-        const B = accounts[global.accountNdx + 1]; // sender is batch originator 
+        const A = accounts[global.TaddrNdx + 0]; 
+        const B = accounts[global.TaddrNdx + 1]; // sender is batch originator 
         const origFees = { fee_fixed: 0, fee_percBips: 100, fee_min: 0, fee_max: 2 };
 
         // mint
@@ -192,7 +200,7 @@ contract("StMaster", accounts => {
 
     it('fees (fee payer=receiver) - global/ledger currency fee should not be applied when fee sender is fee receiver (fee on A, contract owner)', async () => {
         const A = accounts[0]; // sender is contract owner, exchange fee receiver
-        const B = accounts[global.accountNdx + 1];
+        const B = accounts[global.TaddrNdx + 1];
         const allFees = { fee_fixed: 0, fee_percBips: 100, fee_min: 0, fee_max: 0 };
 
         // mint
@@ -230,7 +238,7 @@ contract("StMaster", accounts => {
     });
 
     it('fees (fee payer=receiver) - global/ledger currency fee should not be applied when fee sender is fee receiver (fee on B, contract owner)', async () => {
-        const A = accounts[global.accountNdx + 1];
+        const A = accounts[global.TaddrNdx + 1];
         const B = accounts[0]; // sender is contract owner (exchange fee receiver)
         const allFees = { fee_fixed: 0, fee_percBips: 100, fee_min: 0, fee_max: 0 };
 

@@ -61,7 +61,7 @@ module.exports = {
       // for "truffle test" -- with manually launched "ganache-cli -a 1000" (1000 test accounts)
       host: process.env.GANACHE_HOST || "127.0.0.1",
       port: 8545,
-      gas: 6000000,
+      gas: 8000000,
       network_id: "*"
     },
 
@@ -70,7 +70,7 @@ module.exports = {
       provider: () => new HDWalletProvider(MNEMONIC, "https://ac-dev0.net:9545",
                       0, 888), // # test accounts
       network_id: "*",  
-      gas: 6000000,
+      gas: 8000000,
       gasPrice: web3.utils.toWei(gweiDeployment, "gwei")
     },
 
@@ -79,7 +79,7 @@ module.exports = {
       provider: () => new HDWalletProvider(MNEMONIC, "https://ac-dev1.net:9545",
                       0, 888), // # test accounts
       network_id: "*",
-      gas: 6000000,
+      gas: 8000000,
       gasPrice: web3.utils.toWei(gweiDeployment, "gwei")
     },
 
@@ -96,7 +96,7 @@ module.exports = {
       provider: () => new HDWalletProvider(MNEMONIC, "https://rinkeby.infura.io/v3/93db2c7fd899496d8400e86100058297",
                       0, 888), // # test accounts
       network_id: "*",
-      gas: 6000000,
+      gas: 8000000,
       gasPrice: web3.utils.toWei(gweiDeployment, "gwei")
     }
 

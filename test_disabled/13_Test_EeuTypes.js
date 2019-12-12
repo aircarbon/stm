@@ -9,10 +9,10 @@ contract("StMaster", accounts => {
 
     beforeEach(async () => {
         stm = await st.deployed();
-        if (!global.accountNdx) global.accountNdx = 0;
-        global.accountNdx++;
+        if (!global.TaddrNdx) global.TaddrNdx = 0;
+        global.TaddrNdx++;
         if (CONST.logTestAccountUsage)
-            console.log(`global.accountNdx: ${global.accountNdx} - contract @ ${stm.address} (owner: ${accounts[0]}) - getSecTokenBatchCount: ${(await stm.getSecTokenBatchCount.call()).toString()}`);
+            console.log(`addrNdx: ${global.TaddrNdx} - contract @ ${stm.address} (owner: ${accounts[0]})`);
     });
 
     it('eeu types - should have correct default values', async () => {
@@ -42,20 +42,20 @@ contract("StMaster", accounts => {
         
         // mint new ST type: 2 batches 
         for (var i=0 ; i < 2 ; i++) {
-            await stm.mintSecTokenBatch(newTypeId, CONST.ktCarbon * 100, 1, accounts[global.accountNdx], CONST.nullFees, [], [], { from: accounts[0] });
+            await stm.mintSecTokenBatch(newTypeId, CONST.ktCarbon * 100, 1, accounts[global.TaddrNdx], CONST.nullFees, [], [], { from: accounts[0] });
         }
         const batchCountAfter_Mint1 = (await stm.getSecTokenBatchCount.call()).toNumber(); 
         assert(batchCountAfter_Mint1 == batchCountBefore + 2, `unexpected max batch id ${batchCountAfter_Mint1} after minting (1)`);
 
         // mint default ST type: 4 batches 
         for (var i=0 ; i < 4 ; i++) {
-            await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.ktCarbon * 100, 1, accounts[global.accountNdx], CONST.nullFees, [], [], { from: accounts[0] });
+            await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.ktCarbon * 100, 1, accounts[global.TaddrNdx], CONST.nullFees, [], [], { from: accounts[0] });
         }
         const batchCountAfter_Mint2 = (await stm.getSecTokenBatchCount.call()).toNumber();
         assert(batchCountAfter_Mint2 == batchCountBefore + 6, `unexpected max batch id ${batchCountAfter_Mint2} after minting (2)`);
 
         // validate ledger: 6 vSTs, 2 of new type
-        const ledgerEntryAfter = await stm.getLedgerEntry(accounts[global.accountNdx]);
+        const ledgerEntryAfter = await stm.getLedgerEntry(accounts[global.TaddrNdx]);
         assert(ledgerEntryAfter.tokens.length == 6, 'unexpected eeu count in ledger');
         assert(ledgerEntryAfter.tokens.filter(p => p.tokenTypeId == newTypeId).length == 2, 'unexpected new eeu type in ledger');
     });

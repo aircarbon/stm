@@ -19,6 +19,7 @@
     "dependencies": {
         "@babel/runtime": "^7.6.3",
         "big.js": "^5.2.2",
+        "bip39": "^3.0.2",
         "bn.js": "^5.0.0",
         "dotenv": "^8.1.0",
         "lodash": "^4.17.15"

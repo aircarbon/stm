@@ -8,52 +8,52 @@ contract("StMaster", accounts => {
 
     beforeEach(async () => {
         stm = await st.deployed();
-        if (!global.accountNdx) global.accountNdx = 0;
-        global.accountNdx++;
+        if (!global.TaddrNdx) global.TaddrNdx = 0;
+        global.TaddrNdx++;
         if (CONST.logTestAccountUsage)
-            console.log(`global.accountNdx: ${global.accountNdx} - contract @ ${stm.address} (owner: ${accounts[0]}) - getSecTokenBatchCount: ${(await stm.getSecTokenBatchCount.call()).toString()}`);
+            console.log(`addrNdx: ${global.TaddrNdx} - contract @ ${stm.address} (owner: ${accounts[0]})`);
     });
 
     it('withdrawing - should allow withdrawing of USD', async () => {
-        await stm.fund(CONST.ccyType.SGD, CONST.thousandCcy_cents * 2, accounts[global.accountNdx], { from: accounts[0] });
-        await withdrawLedger({ ccyTypeId: CONST.ccyType.SGD, amount: CONST.thousandCcy_cents * 2, withdrawer: accounts[global.accountNdx]});
+        await stm.fund(CONST.ccyType.SGD, CONST.thousandCcy_cents * 2, accounts[global.TaddrNdx], { from: accounts[0] });
+        await withdrawLedger({ ccyTypeId: CONST.ccyType.SGD, amount: CONST.thousandCcy_cents * 2, withdrawer: accounts[global.TaddrNdx]});
     });
 
     it('withdrawing - should allow withdrawing of extreme values of USD', async () => {
-        await stm.fund(CONST.ccyType.SGD, CONST.millionCcy_cents * 1000 * 1000, accounts[global.accountNdx], { from: accounts[0] });
-        await withdrawLedger({ ccyTypeId: CONST.ccyType.SGD, amount: CONST.millionCcy_cents * 1000 * 1000, withdrawer: accounts[global.accountNdx] });
+        await stm.fund(CONST.ccyType.SGD, CONST.millionCcy_cents * 1000 * 1000, accounts[global.TaddrNdx], { from: accounts[0] });
+        await withdrawLedger({ ccyTypeId: CONST.ccyType.SGD, amount: CONST.millionCcy_cents * 1000 * 1000, withdrawer: accounts[global.TaddrNdx] });
     });
 
     it('withdrawing - should allow withdrawing of ETH', async () => {
-        await stm.fund(CONST.ccyType.ETH, CONST.oneEth_wei, accounts[global.accountNdx], { from: accounts[0] });
-        await withdrawLedger({ ccyTypeId: CONST.ccyType.ETH, amount: CONST.oneEth_wei, withdrawer: accounts[global.accountNdx] });
+        await stm.fund(CONST.ccyType.ETH, CONST.oneEth_wei, accounts[global.TaddrNdx], { from: accounts[0] });
+        await withdrawLedger({ ccyTypeId: CONST.ccyType.ETH, amount: CONST.oneEth_wei, withdrawer: accounts[global.TaddrNdx] });
     });
 
     it('withdrawing - should allow withdrawing of extreme values of ETH', async () => {
-        await stm.fund(CONST.ccyType.ETH, CONST.millionEth_wei, accounts[global.accountNdx], { from: accounts[0] });
-        await withdrawLedger({ ccyTypeId: CONST.ccyType.ETH, amount: CONST.millionEth_wei, withdrawer: accounts[global.accountNdx] });
+        await stm.fund(CONST.ccyType.ETH, CONST.millionEth_wei, accounts[global.TaddrNdx], { from: accounts[0] });
+        await withdrawLedger({ ccyTypeId: CONST.ccyType.ETH, amount: CONST.millionEth_wei, withdrawer: accounts[global.TaddrNdx] });
     });
 
     it('withdrawing - should allow repeated withdrawing', async () => {
-        await stm.fund(CONST.ccyType.SGD, 3, accounts[global.accountNdx]);
+        await stm.fund(CONST.ccyType.SGD, 3, accounts[global.TaddrNdx]);
         for (var i=0 ; i < 3 ; i++) {
-            await withdrawLedger({ ccyTypeId: CONST.ccyType.SGD, amount: 1, withdrawer: accounts[global.accountNdx] });
+            await withdrawLedger({ ccyTypeId: CONST.ccyType.SGD, amount: 1, withdrawer: accounts[global.TaddrNdx] });
         }
-        const ledger = await stm.getLedgerEntry(accounts[global.accountNdx]);
+        const ledger = await stm.getLedgerEntry(accounts[global.TaddrNdx]);
         assert(ledger.ccys.find(p => p.ccyTypeId == CONST.ccyType.SGD).balance == 0, 'unexpected ledger balance after repeated withdrawing');
     });
 
     it('withdrawing - should have reasonable gas cost for withdrawing', async () => {
-        await stm.fund(CONST.ccyType.SGD, CONST.thousandCcy_cents, accounts[global.accountNdx], { from: accounts[0] });
-        const withdrawTx = await stm.withdraw(CONST.ccyType.SGD, CONST.thousandCcy_cents, accounts[global.accountNdx], { from: accounts[0] });
+        await stm.fund(CONST.ccyType.SGD, CONST.thousandCcy_cents, accounts[global.TaddrNdx], { from: accounts[0] });
+        const withdrawTx = await stm.withdraw(CONST.ccyType.SGD, CONST.thousandCcy_cents, accounts[global.TaddrNdx], { from: accounts[0] });
         CONST.logGas(withdrawTx, `Withdrawing`);
     });
 
     it('withdrawing - should allow minting, funding and withdrawing on same ledger entry', async () => {
-        await stm.mintSecTokenBatch(CONST.tokenType.VCS, CONST.mtCarbon, 1, accounts[global.accountNdx], CONST.nullFees, [], [], { from: accounts[0] });
-        await stm.fund(CONST.ccyType.SGD, CONST.thousandCcy_cents, accounts[global.accountNdx],           { from: accounts[0] });
-        await withdrawLedger({ ccyTypeId: CONST.ccyType.SGD, amount: CONST.thousandCcy_cents / 2, withdrawer: accounts[global.accountNdx] });
-        const ledgerEntryAfter = await stm.getLedgerEntry(accounts[global.accountNdx]);
+        await stm.mintSecTokenBatch(CONST.tokenType.VCS, CONST.mtCarbon, 1, accounts[global.TaddrNdx], CONST.nullFees, [], [], { from: accounts[0] });
+        await stm.fund(CONST.ccyType.SGD, CONST.thousandCcy_cents, accounts[global.TaddrNdx],           { from: accounts[0] });
+        await withdrawLedger({ ccyTypeId: CONST.ccyType.SGD, amount: CONST.thousandCcy_cents / 2, withdrawer: accounts[global.TaddrNdx] });
+        const ledgerEntryAfter = await stm.getLedgerEntry(accounts[global.TaddrNdx]);
 
         assert(ledgerEntryAfter.tokens.length == 1, 'unexpected eeu count in ledger entry after minting, funding & withdrawing');
         assert(Number(ledgerEntryAfter.tokens_sumQty) == Number(CONST.mtCarbon), 'invalid kg sum in ledger entry after minting, funding & withdrawing');
@@ -94,7 +94,7 @@ contract("StMaster", accounts => {
 
     it('withdrawing - should not allow non-owner to withdrawing from a ledger entry', async () => {
         try {
-            await stm.withdraw(CONST.ccyType.SGD, 100, accounts[global.accountNdx], { from: accounts[1] });
+            await stm.withdraw(CONST.ccyType.SGD, 100, accounts[global.TaddrNdx], { from: accounts[1] });
         } catch (ex) { 
             assert(ex.reason == 'Restricted', `unexpected: ${ex.reason}`);
             return;
@@ -104,7 +104,7 @@ contract("StMaster", accounts => {
 
     it('withdrawing - should not allow non-existent currency types (1)', async () => {
         try {
-            await stm.withdraw(9999, 100, accounts[global.accountNdx], { from: accounts[0] });
+            await stm.withdraw(9999, 100, accounts[global.TaddrNdx], { from: accounts[0] });
         } catch (ex) { 
             assert(ex.reason == 'Bad ccyTypeId', `unexpected: ${ex.reason}`);
             return;
@@ -114,7 +114,7 @@ contract("StMaster", accounts => {
 
     it('withdrawing - should not allow non-existent currency types (2)', async () => {
         try {
-            await stm.withdraw(0, 100, accounts[global.accountNdx], { from: accounts[0] });
+            await stm.withdraw(0, 100, accounts[global.TaddrNdx], { from: accounts[0] });
         } catch (ex) { 
             assert(ex.reason == 'Bad ccyTypeId', `unexpected: ${ex.reason}`);
             return;
@@ -124,7 +124,7 @@ contract("StMaster", accounts => {
 
     it('withdrawing - should not allow invalid amounts (1)', async () => {
         try {
-            await stm.withdraw(CONST.ccyType.SGD, 0, accounts[global.accountNdx], { from: accounts[0] });
+            await stm.withdraw(CONST.ccyType.SGD, 0, accounts[global.TaddrNdx], { from: accounts[0] });
         } catch (ex) { 
             assert(ex.reason == 'Min. amount 1', `unexpected: ${ex.reason}`);
             return; 
@@ -134,7 +134,7 @@ contract("StMaster", accounts => {
 
     it('withdrawing - should not allow invalid amounts (2)', async () => {
         try {
-            await stm.withdraw(CONST.ccyType.SGD, -1, accounts[global.accountNdx], { from: accounts[0] });
+            await stm.withdraw(CONST.ccyType.SGD, -1, accounts[global.TaddrNdx], { from: accounts[0] });
         } catch (ex) { 
             assert(ex.reason == 'Min. amount 1', `unexpected: ${ex.reason}`);
             return;
@@ -143,9 +143,9 @@ contract("StMaster", accounts => {
     });
 
     it('withdrawing - should not allow withdrawing beyond available balance', async () => {
-        await stm.fund(CONST.ccyType.SGD, 100, accounts[global.accountNdx], { from: accounts[0] });
+        await stm.fund(CONST.ccyType.SGD, 100, accounts[global.TaddrNdx], { from: accounts[0] });
         try {
-            await withdrawLedger({ ccyTypeId: CONST.ccyType.SGD, amount: 101, withdrawer: accounts[global.accountNdx]});
+            await withdrawLedger({ ccyTypeId: CONST.ccyType.SGD, amount: 101, withdrawer: accounts[global.TaddrNdx]});
         } catch (ex) { 
             assert(ex.reason == 'Insufficient balance', `unexpected: ${ex.reason}`);
             return;
@@ -154,10 +154,10 @@ contract("StMaster", accounts => {
     });
 
     it('withdrawing - should not allow withdrawing when contract is read only', async () => {
-        await stm.fund(CONST.ccyType.SGD, 100, accounts[global.accountNdx], { from: accounts[0] });
+        await stm.fund(CONST.ccyType.SGD, 100, accounts[global.TaddrNdx], { from: accounts[0] });
         try {
             await stm.setReadOnly(true, { from: accounts[0] });
-            await withdrawLedger({ ccyTypeId: CONST.ccyType.SGD, amount: 50, withdrawer: accounts[global.accountNdx]});
+            await withdrawLedger({ ccyTypeId: CONST.ccyType.SGD, amount: 50, withdrawer: accounts[global.TaddrNdx]});
         } catch (ex) { 
             assert(ex.reason == 'Read-only', `unexpected: ${ex.reason}`);
             await stm.setReadOnly(false, { from: accounts[0] });
