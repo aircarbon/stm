@@ -39,7 +39,6 @@ library TransferLib {
 
         bool    applyFees;       // apply global fee structure to the transfer (both legs)
         address feeAddrOwner;    // exchange fees: receive address
-        bool    previewFees;     // true to return a fee preview for the transfer, false to execute the transfer
     }
 
     struct FeesCalc {
@@ -256,11 +255,13 @@ library TransferLib {
                 //ledgerData._ledger[from].tokenType_sumQty[a.tokenTypeId] -= stQty;            //* gas - DROP DONE - only used internally, validation params
 
                 // assign to destination
-                // while minting >1 ST is disallowed, the merge condition below can never be true:
+                //  IFF minting >1 ST is disallowed AND
+                //  IFF validation of available qty's is already performed,
+                //  THEN the merge condition below *** wrt. batchId can *never* be true:
                     // MERGE - if any existing destination ST is from same batch
                     // bool mergedExisting = false;
                     // for (uint i = 0; i < to_stIds.length; i++) {
-                    //     if (_sts_batchId[to_stIds[i]] == batchId) {
+                    //     if (_sts_batchId[to_stIds[i]] == batchId) { // ***
                     //         // resize (grow) the destination ST
                     //         _sts_currentQty[to_stIds[i]] += stQty;                // TODO gas - pack/combine
                     //         _sts_mintedQty[to_stIds[i]] += stQty;                 // TODO gas - pack/combine
@@ -284,7 +285,7 @@ library TransferLib {
                     require(from_stIds.length > 0, "Insufficient tokens");
             }
             else {
-                // split the last ST across the ledger entries, soft-minting a new ST in the destination
+                // split the ST across the ledger entries, soft-minting a new ST in the destination
                 // note: the parent (origin) ST's minted qty also gets split across the two ST;
                 //         this is so the total minted in the system is unchanged,
                 //         and also so the total burned amount in the ST can still be calculated by _sts_mintedQty[x] - _sts_currentQty[x]

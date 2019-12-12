@@ -350,7 +350,7 @@ contract("StMaster", accounts => {
         assert((await stm.getFee(CONST.getFeeType.TOK, CONST.tokenType.UNFCCC, CONST.nullAddr)).fee_fixed == unfcccKgFeeFixed, 'unexpected UNFCCC fixed KG fee after setting UNFCCC fee structure');
 
         // transfer, with fee structure applied
-        const tradeTx = await helper.transferLedger({ stm, accounts, 
+        const data = await helper.transferLedger({ stm, accounts, 
                 ledger_A: accounts[global.accountNdx + 0],                                    ledger_B: accounts[global.accountNdx + 1],
                    qty_A: 0,                                                             tokenTypeId_A: 0,
                    qty_B: new BN(CONST.tonCarbon).sub(new BN(unfcccKgFeeFixed)),         tokenTypeId_B: CONST.tokenType.UNFCCC,
@@ -359,7 +359,7 @@ contract("StMaster", accounts => {
                applyFees: true,
         });
 
-        console.log(`\t>>> gasUsed - 1.0 vST trade eeu/ccy (A <-> B) w/ fees on both: ${tradeTx.transferTx.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * tradeTx.transferTx.receipt.gasUsed).toFixed(4)} (USD ${(CONST.gasPriceEth * tradeTx.transferTx.receipt.gasUsed * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
+        CONST.logGas(data.transferTx, `1.0 vST trade eeu/ccy (A <-> B) w/ fees on both`);
     });
 
     it('fees (fixed) - should have reasonable gas cost for two-sided transfer (eeu/ccy) (fee on ccy)', async () => {
@@ -379,7 +379,7 @@ contract("StMaster", accounts => {
         assert((await stm.getFee(CONST.getFeeType.TOK, CONST.tokenType.UNFCCC, CONST.nullAddr)).fee_fixed == unfcccKgFeeFixed, 'unexpected UNFCCC fixed KG fee after setting UNFCCC fee structure');
 
         // transfer, with fee structure applied
-        const tradeTx = await helper.transferLedger({ stm, accounts, 
+        const data = await helper.transferLedger({ stm, accounts, 
                 ledger_A: accounts[global.accountNdx + 0],                                    ledger_B: accounts[global.accountNdx + 1],
                    qty_A: 0,                                                             tokenTypeId_A: 0,
                    qty_B: new BN(CONST.tonCarbon).sub(new BN(unfcccKgFeeFixed)),         tokenTypeId_B: CONST.tokenType.UNFCCC,
@@ -388,8 +388,7 @@ contract("StMaster", accounts => {
                applyFees: true,
         });
         //truffleAssert.prettyPrintEmittedEvents(tradeTx.transferTx);
-
-        console.log(`\t>>> gasUsed - 1.0 vST trade eeu/ccy (A <-> B) w/ fees on ccy: ${tradeTx.transferTx.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * tradeTx.transferTx.receipt.gasUsed).toFixed(4)} (USD ${(CONST.gasPriceEth * tradeTx.transferTx.receipt.gasUsed * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
+        CONST.logGas(data.transferTx, `1.0 vST trade eeu/ccy (A <-> B) w/ fees on ccy`);
     });
 
     it('fees (fixed) - should have reasonable gas cost for two-sided transfer (eeu/ccy) (fee on eeu)', async () => {
@@ -411,7 +410,7 @@ contract("StMaster", accounts => {
         assert((await stm.getFee(CONST.getFeeType.TOK, CONST.tokenType.UNFCCC, CONST.nullAddr)).fee_fixed == unfcccKgFeeFixed, 'unexpected UNFCCC fixed KG fee after setting UNFCCC fee structure');
 
         // transfer, with fee structure applied
-        const tradeTx = await helper.transferLedger({ stm, accounts, 
+        const data = await helper.transferLedger({ stm, accounts, 
                 ledger_A: accounts[global.accountNdx + 0],                                    ledger_B: accounts[global.accountNdx + 1],
                    qty_A: 0,                                                             tokenTypeId_A: 0,
                    qty_B: new BN(CONST.tonCarbon).sub(new BN(unfcccKgFeeFixed)),         tokenTypeId_B: CONST.tokenType.UNFCCC,
@@ -420,7 +419,7 @@ contract("StMaster", accounts => {
                applyFees: true,
         });
 
-        console.log(`\t>>> gasUsed - 1.0 vST trade eeu/ccy (A <-> B) w/ fees on eeu: ${tradeTx.transferTx.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * tradeTx.transferTx.receipt.gasUsed).toFixed(4)} (USD ${(CONST.gasPriceEth * tradeTx.transferTx.receipt.gasUsed * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
+        CONST.logGas(data.transferTx, `1.0 vST trade eeu/ccy (A <-> B) w/ fees on tok`);
     });
 
     it('fees (fixed) - should have reasonable gas cost for two-sided transfer (eeu/ccy) (base gas cost: no fees)', async () => {
@@ -442,7 +441,7 @@ contract("StMaster", accounts => {
         assert((await stm.getFee(CONST.getFeeType.TOK, CONST.tokenType.UNFCCC, CONST.nullAddr)).fee_fixed == unfcccKgFeeFixed, 'unexpected UNFCCC fixed KG fee after setting UNFCCC fee structure');
 
         // transfer, with fee structure applied
-        const tradeTx = await helper.transferLedger({ stm, accounts, 
+        const data = await helper.transferLedger({ stm, accounts, 
                 ledger_A: accounts[global.accountNdx + 0],                                    ledger_B: accounts[global.accountNdx + 1],
                    qty_A: 0,                                                             tokenTypeId_A: 0,
                    qty_B: new BN(CONST.tonCarbon).sub(new BN(unfcccKgFeeFixed)),         tokenTypeId_B: CONST.tokenType.UNFCCC,
@@ -451,7 +450,7 @@ contract("StMaster", accounts => {
                applyFees: true,
         });
 
-        console.log(`\t>>> gasUsed - 1.0 vST trade eeu/ccy (A <-> B) w/ no fees: ${tradeTx.transferTx.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * tradeTx.transferTx.receipt.gasUsed).toFixed(4)} (USD ${(CONST.gasPriceEth * tradeTx.transferTx.receipt.gasUsed * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
+        CONST.logGas(data.transferTx, `1.0 vST trade eeu/ccy (A <-> B) w/ no fees`);
     });
 
     it('fees (fixed) - should not allow non-owner to set global fee structure (ccy)', async () => {

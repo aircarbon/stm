@@ -12,11 +12,14 @@ contract StLedger is Owned, StTypes, CcyTypes {
 
     StructLib.LedgerStruct ledgerData;
 
+    //
+    // ACCESSORS -- ** PUBLIC ** LEDGER
+    //
+
     /**
      * @dev Returns all accounts in the ledger
      */
     function getLedgerOwners() external view returns (address[] memory) {
-        require(msg.sender == owner, "Restricted");
         return ledgerData._ledgerOwners;
     }
 

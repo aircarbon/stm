@@ -152,7 +152,7 @@ module.exports = {
                    applyFees
         }, { from: accounts[0] }
         );
-        //console.log(`\t>>> gasUsed - ${transferTx.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * transferTx.receipt.gasUsed).toFixed(4)} (USD ${(CONST.gasPriceEth * transferTx.receipt.gasUsed * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
+        //CONST.logGas(transferTx, `TransferHelper`);
 
         // ledger entries after
         ledgerA_after = await stm.getLedgerEntry(ledger_A);

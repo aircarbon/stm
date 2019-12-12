@@ -4,11 +4,12 @@ pragma experimental ABIEncoderV2;
 import "./Owned.sol";
 import "./StLedger.sol";
 import "./StFees.sol";
+import "./StErc20.sol";
 
 import "../Libs/StructLib.sol";
 import "../Libs/TransferLib.sol";
 
-contract StTransferable is Owned, StLedger, StFees {
+contract StTransferable is Owned, StLedger, StFees, StErc20 {
     /**
      * @dev Transfers or trades assets between ledger accounts
      * @dev allows: one-sided transfers, transfers of same asset types, and transfers (trades) of different asset types
@@ -18,8 +19,12 @@ contract StTransferable is Owned, StLedger, StFees {
      */
     function transfer(TransferLib.TransferArgs memory a)
     public onlyOwner() onlyWhenReadWrite() {
+        // abort unless both sides are exchange (whitelisted) accounts
+        if (!erc20Data._whitelisted[a.ledger_A] || !erc20Data._whitelisted[a.ledger_B])
+            revert("Access denied");
+
         a.feeAddrOwner = owner;
-        TransferLib.transfer(ledgerData, globalFees, a);//, owner);
+        TransferLib.transfer(ledgerData, globalFees, a);
     }
 
     /**

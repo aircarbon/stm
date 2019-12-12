@@ -5,6 +5,9 @@ const Big = require('big.js');
 const Web3 = require('web3');
 const web3 = new Web3();
 
+const _gasPriceEth = web3.utils.fromWei(web3.utils.toWei("20", "gwei"), 'ether');
+const _ethUsd = 150;
+
 module.exports = {
     logTestAccountUsage: false,
 
@@ -72,7 +75,10 @@ EXCHANGE_FEE: 1,
 
 
     // gas approx values - for cost estimations
-    gasPriceEth: web3.utils.fromWei(web3.utils.toWei("20", "gwei"), 'ether'),
-         ethUsd: 146
+    gasPriceEth: _gasPriceEth,
+         ethUsd: _ethUsd,
 
+    logGas: (tx, desc) => {
+        console.log(`\t>>> gasUsed - ${desc}: ${tx.receipt.gasUsed} @${_gasPriceEth} ETH/gas = ${(_gasPriceEth * tx.receipt.gasUsed).toFixed(4)} (USD ${(_gasPriceEth * tx.receipt.gasUsed * _ethUsd).toFixed(4)}) ETH TX COST`);
+    }
 };

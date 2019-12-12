@@ -59,7 +59,7 @@ contract("StMaster", accounts => {
         });
         for (var i = 0 ; i < M_multi_A.length ; i++) M_multi_A[i].ledgerAfter = await stm.getLedgerEntry(M_multi_A[i].account);
         for (var i = 0 ; i < M_multi_B.length ; i++) M_multi_B[i].ledgerAfter = await stm.getLedgerEntry(M_multi_B[i].account);
-        console.log(`\t>>> gasUsed - Multi Orig Fees ${M_multi_A.length + M_multi_B.length}: ${data.transferTx.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * data.transferTx.receipt.gasUsed).toFixed(4)} (USD ${(CONST.gasPriceEth * data.transferTx.receipt.gasUsed * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
+        CONST.logGas(data.transferTx, `Multi Orig Fees`);
         console.log('feesPreview', data.feesPreview);
 
         console.log('qty_A', qty_A.toString());

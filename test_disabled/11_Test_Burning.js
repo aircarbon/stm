@@ -29,7 +29,7 @@ contract("StMaster", accounts => {
         const burnedKgBefore = await stm.getSecToken_totalBurnedQty.call();
         const burnKg = CONST.ktCarbon / 2;
         const a0_burnTx1 = await stm.burnTokens(accounts[global.accountNdx], CONST.tokenType.UNFCCC, burnKg);
-        console.log(`\t>>> gasUsed - Burn 0.5 vST: ${a0_burnTx1.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * a0_burnTx1.receipt.gasUsed).toFixed(4)} (USD ${((CONST.gasPriceEth * a0_burnTx1.receipt.gasUsed).toFixed(4) * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
+        CONST.logGas(a0_burnTx1, `Burn 0.5 vST`);
 
         // validate burn partial ST event
         //truffleAssert.prettyPrintEmittedEvents(a0_burnTx1);
@@ -71,7 +71,7 @@ contract("StMaster", accounts => {
         const burnedKgBefore = await stm.getSecToken_totalBurnedQty.call();
         const burnKg = CONST.ktCarbon;
         const a0_burnTx1 = await stm.burnTokens(accounts[global.accountNdx], CONST.tokenType.UNFCCC, burnKg);
-        console.log(`\t>>> gasUsed - Burn 1.0 vST: ${a0_burnTx1.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * a0_burnTx1.receipt.gasUsed).toFixed(4)} (USD ${((CONST.gasPriceEth * a0_burnTx1.receipt.gasUsed).toFixed(4) * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
+        CONST.logGas(a0_burnTx1, `Burn 1.0 vST`);
 
         // validate burn full ST event
         //truffleAssert.prettyPrintEmittedEvents(a0_burnTx1);
@@ -119,7 +119,7 @@ contract("StMaster", accounts => {
         const burnKg = (CONST.ktCarbon / 4) * 3;
         const expectRemainKg = CONST.ktCarbon - burnKg;
         const a0_burnTx1 = await stm.burnTokens(accounts[global.accountNdx], CONST.tokenType.UNFCCC, burnKg);
-        console.log(`\t>>> gasUsed - Burn 1.5 vST: ${a0_burnTx1.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * a0_burnTx1.receipt.gasUsed).toFixed(4)} (USD ${((CONST.gasPriceEth * a0_burnTx1.receipt.gasUsed).toFixed(4) * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
+        CONST.logGas(a0_burnTx1, `Burn 1.5 vST`);
 
         // validate burn full ST event
         //truffleAssert.prettyPrintEmittedEvents(a0_burnTx1);
@@ -195,7 +195,7 @@ contract("StMaster", accounts => {
         const burnKg = CONST.ktCarbon * 3;
         const expectRemainKg = CONST.ktCarbon * 6 - burnKg;
         const burnTx = await stm.burnTokens(accounts[global.accountNdx], CONST.tokenType.VCS, burnKg);
-        console.log(`\t>>> gasUsed - Burn 5.0 vST: ${burnTx.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * burnTx.receipt.gasUsed).toFixed(4)} (USD ${((CONST.gasPriceEth * burnTx.receipt.gasUsed).toFixed(4) * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
+        CONST.logGas(burnTx, `Burn 5.0 vST`);
 
         // validate burn full ST event
         const burnedFullSecTokenEvents = []

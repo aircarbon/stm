@@ -10,8 +10,8 @@ import "./StErc20.sol";
 
 import "../Libs/StructLib.sol"; // bytecode of libs get *removed* during linking (solc/truffle migrate)
 
-contract StMaster is StMintable, StBurnable, CcyFundable, CcyWithdrawable, StTransferable, StErc20 {
-    // contact properties
+contract StMaster is StMintable, StBurnable, CcyFundable, CcyWithdrawable, StTransferable {
+    // contract properties
     string public name;
     string public version;
     string public unit; // the smallest (integer, non-divisible) security token unit, e.g. "KG"
@@ -43,14 +43,17 @@ contract StMaster is StMintable, StBurnable, CcyFundable, CcyWithdrawable, StTra
     event SetFeeCcyMin(uint256 ccyTypeId, address ledgerOwner, uint256 fee_ccy_Min);
     event SetFeeTokMax(uint256 tokenTypeId, address ledgerOwner, uint256 fee_token_Max);
     event SetFeeCcyMax(uint256 ccyTypeId, address ledgerOwner, uint256 fee_ccy_Max);
+    // Erc20Lib events
+    event Transfer(address indexed from, address indexed to, uint256 value);
+    event Approval(address indexed owner, address indexed spender, uint256 value);
 
     //
     // LAUNCH LIST
     //
-    // PRI 0 ** ERC20 ** >> SEALING of whitelist after population is the way. Once sealed, no more can be added.
-    //    mapping(address=>bool)
-    //    for(;;) { addWhitelist(addr) ... }
-    //    sealWhitelist(); // can't addWhitelist after sealing
+    // PRI 0 ** ERC20 **
+    //      test: setup whitelist for accounts[ndx] < 100...
+    //      test sealing
+    //      test can't add more
     //
     // PRI 0 ** CASHFLOWS re. SD **
     //   ....?!

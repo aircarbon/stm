@@ -295,7 +295,7 @@ contract("StMaster", accounts => {
         const contractOwnerCarbonKgAfter  =  data.owner_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.UNFCCC).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
         assert(contractOwnerCarbonKgAfter == Number(contractOwnerCarbonKgBefore) + Number(expectedFeeCarbon), 'unexpected contract owner (fee receiver) UNFCCC ST tonnage after transfer');
 
-        console.log(`\t>>> gasUsed - 0.5 vST trade eeu/ccy (A <-> B) w/ fees on both: ${data.transferTx.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * data.transferTx.receipt.gasUsed).toFixed(4)} (USD ${(CONST.gasPriceEth * data.transferTx.receipt.gasUsed * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
+        CONST.logGas(data.transferTx, `0.5 vST trade eeu/ccy (A <-> B) w/ fees on both`);
     });
 
     it('fees (percentage) - should have reasonable gas cost for two-sided transfer (eeu/ccy) (fee on ccy)', async () => {
@@ -340,7 +340,7 @@ contract("StMaster", accounts => {
         const contractOwnerCarbonKgAfter  =  data.owner_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.UNFCCC).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
         assert(contractOwnerCarbonKgAfter == Number(contractOwnerCarbonKgBefore) + Number(expectedFeeCarbon), 'unexpected contract owner (fee receiver) UNFCCC ST tonnage after transfer');
 
-        console.log(`\t>>> gasUsed - 0.5 vST trade eeu/ccy (A <-> B) w/ fees on ccy: ${data.transferTx.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * data.transferTx.receipt.gasUsed).toFixed(4)} (USD ${(CONST.gasPriceEth * data.transferTx.receipt.gasUsed * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
+        CONST.logGas(data.transferTx, `0.5 vST trade eeu/ccy (A <-> B) w/ fees on ccy`);
     });
 
     it('fees (percentage) - should have reasonable gas cost for two-sided transfer (eeu/ccy) (fee on eeu)', async () => {
@@ -385,7 +385,7 @@ contract("StMaster", accounts => {
         const contractOwnerCarbonKgAfter  =  data.owner_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.UNFCCC).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
         assert(contractOwnerCarbonKgAfter == Number(contractOwnerCarbonKgBefore) + Number(expectedFeeCarbon), 'unexpected contract owner (fee receiver) UNFCCC ST tonnage after transfer');
 
-        console.log(`\t>>> gasUsed - 0.5 vST trade eeu/ccy (A <-> B) w/ fees on eeu: ${data.transferTx.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * data.transferTx.receipt.gasUsed).toFixed(4)} (USD ${(CONST.gasPriceEth * data.transferTx.receipt.gasUsed * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
+        CONST.logGas(data.transferTx, `0.5 vST trade eeu/ccy (A <-> B) w/ fees on eeu`);
     });
 
     it('fees (percentage) - should round fees to zero for minimal transfers (ccy & carbon)', async () => {

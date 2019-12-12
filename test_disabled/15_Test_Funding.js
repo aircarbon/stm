@@ -56,7 +56,7 @@ contract("StMaster", accounts => {
 
     it('funding - should have reasonable gas cost for funding', async () => {
         const fundTx = await stm.fund(CONST.ccyType.SGD, CONST.thousandCcy_cents, accounts[global.accountNdx], { from: accounts[0] });
-        console.log(`\t>>> gasUsed - Funding: ${fundTx.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * fundTx.receipt.gasUsed).toFixed(4)} (USD ${(CONST.gasPriceEth * fundTx.receipt.gasUsed * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
+        CONST.logGas(fundTx, `Funding`);
     });
 
     it('funding - should allow minting and funding on same ledger entry', async () => {

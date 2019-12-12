@@ -5,21 +5,21 @@ import "./StructLib.sol";
 
 library LedgerLib {
 
-    // TODO (for erc20 transfer)
+    // returns minimal tokenID -> qty mapping, for erc20 transfer
     // function getLedgerTokenTypeCounts(
     //     StructLib.LedgerStruct storage ledgerData,
-    //     StructLib.StTypesStruct storage stTypesData
-    // )
-    // public view returns (mapping(uint256 => uint256) memory ret) {
-    //     for (uint256 tokenTypeId = 1; tokenTypeId <= stTypesData._count_tokenTypes; tokenTypeId++) {
-
+    //     StructLib.StTypesStruct storage stTypesData,
+    //     uint256 tokenTypeId,
+    //     address account)
+    // public view returns (uint256 ret) {
+    //     //for (uint256 tokenTypeId = 1; tokenTypeId <= stTypesData._count_tokenTypes; tokenTypeId++) {
     //         uint256[] memory tokenType_stIds = ledgerData._ledger[account].tokenType_stIds[tokenTypeId];
 
     //         for (uint256 ndx = 0; ndx < tokenType_stIds.length; ndx++) {
-
+    //             uint256 stId = tokenType_stIds[ndx];
     //             ret[tokenTypeId] += ledgerData._sts[stId].currentQty;
     //         }
-    //     }
+    //     //}
     // }
 
     // returns full (expensive) ledger information

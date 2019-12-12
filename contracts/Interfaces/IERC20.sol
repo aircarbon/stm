@@ -4,7 +4,7 @@ pragma solidity 0.5.13;
  * @dev Interface of the ERC20 standard as defined in the EIP. Does not include
  * the optional functions; to access them see {ERC20Detailed}.
  */
-interface IERC20 {
+interface IErc20 {
     /**
      * @dev Emitted when `value` tokens are moved from one account (`from`) to
      * another (`to`).
@@ -19,8 +19,6 @@ interface IERC20 {
      */
     event Approval(address indexed owner, address indexed spender, uint256 value);
 
-
-
     // OPTIONAL
     function name() external view returns (string memory);
     function symbol() external view returns (string memory);
@@ -32,7 +30,7 @@ interface IERC20 {
     function transfer(address recipient, uint256 amount) external returns (bool);
 
 
-    // APPROVALS -- see https://docs.google.com/document/d/1YLPtQxZu1UAvO9cZ1O2RPXBbT0mooh4DYKjA_jp-RLM/edit
+    // APPROVALS -- TODO/NOP: see https://docs.google.com/document/d/1YLPtQxZu1UAvO9cZ1O2RPXBbT0mooh4DYKjA_jp-RLM/edit
     function transferFrom(address sender, address recipient, uint256 amount) external returns (bool);
     function allowance(address owner, address spender) external view returns (uint256);
     function approve(address spender, uint256 amount) external returns (bool);

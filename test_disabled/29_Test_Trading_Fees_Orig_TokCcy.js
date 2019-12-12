@@ -87,7 +87,7 @@ contract("StMaster", accounts => {
             ccy_amount_B: CONST.tenthEth_wei,               ccyTypeId_B: CONST.ccyType.ETH,
                applyFees: true,
         });
-        console.log(`\t>>> gasUsed - Single Orig Fees ${1}: ${data.transferTx.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * data.transferTx.receipt.gasUsed).toFixed(4)} (USD ${(CONST.gasPriceEth * data.transferTx.receipt.gasUsed * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
+        CONST.logGas(data.transferTx, `Single Orig Fees ${1}`);
         const M_ledgerAfter = await stm.getLedgerEntry(M);
 
         // TEST - contract owner has received exchange fees (tokens + currency)
@@ -171,7 +171,7 @@ contract("StMaster", accounts => {
             ccy_amount_B: 0,                                ccyTypeId_B: 0,
                applyFees: true,
         });
-        console.log(`\t>>> gasUsed - Single Orig Fees ${1}: ${data.transferTx.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * data.transferTx.receipt.gasUsed).toFixed(4)} (USD ${(CONST.gasPriceEth * data.transferTx.receipt.gasUsed * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
+        CONST.logGas(data.transferTx, `Single Orig Fees ${1}`);
         const M_ledgerAfter = await stm.getLedgerEntry(M);
 
         // TEST - contract owner has received expected token exchange fees
@@ -273,7 +273,7 @@ contract("StMaster", accounts => {
         for (var i = 0 ; i < M_multi.length ; i++) {
             M_multi[i].ledgerAfter = await stm.getLedgerEntry(M_multi[i].account);
         }
-        console.log(`\t>>> gasUsed - Multi Orig Fees ${M_multi.length}: ${data.transferTx.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * data.transferTx.receipt.gasUsed).toFixed(4)} (USD ${(CONST.gasPriceEth * data.transferTx.receipt.gasUsed * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
+        CONST.logGas(data.transferTx, `Multi Orig Fees ${M_multi.length}`);
         //console.log('feesPreview', data.feesPreview);
 
         // TEST - contract owner has received exchange fee
@@ -378,7 +378,7 @@ contract("StMaster", accounts => {
         for (var i = 0 ; i < M_multi.length ; i++) {
             M_multi[i].ledgerAfter = await stm.getLedgerEntry(M_multi[i].account);
         }
-        console.log(`\t>>> gasUsed - Multi Orig Fees ${M_multi.length}: ${data.transferTx.receipt.gasUsed} @${CONST.gasPriceEth} ETH/gas = ${(CONST.gasPriceEth * data.transferTx.receipt.gasUsed).toFixed(4)} (USD ${(CONST.gasPriceEth * data.transferTx.receipt.gasUsed * CONST.ethUsd).toFixed(4)}) ETH TX COST`);
+        CONST.logGas(data.transferTx, `Multi Orig Fees ${M_multi.length}`);
         //console.log('feesPreview', data.feesPreview);
 
         // TEST - contract owner has received exchange fee
