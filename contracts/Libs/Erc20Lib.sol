@@ -39,6 +39,7 @@ library Erc20Lib {
 
         uint256 remainingToTransfer = amount;
         while (remainingToTransfer > 0) {
+            // iterate ST types
             for (uint256 tokenTypeId = 1; tokenTypeId <= stTypesData._count_tokenTypes; tokenTypeId++) {
 
                 // sum qty tokens of this type
@@ -48,24 +49,26 @@ library Erc20Lib {
                     qtyType += ledgerData._sts[tokenType_stIds[ndx]].currentQty;
                 }
 
-                // transfer
+                // transfer this type up to required amount
                 uint256 qtyTransfer = qtyType <= remainingToTransfer ? qtyType : remainingToTransfer;
-                TransferLib.TransferArgs memory a = TransferLib.TransferArgs({
-                        ledger_A: msg.sender,
-                        ledger_B: recipient,
-                           qty_A: qtyTransfer,
-                   tokenTypeId_A: tokenTypeId,
-                           qty_B: 0,
-                   tokenTypeId_B: 0,
-                    ccy_amount_A: 0,
-                     ccyTypeId_A: 0,
-                    ccy_amount_B: 0,
-                     ccyTypeId_B: 0,
-                       applyFees: false,
-                    feeAddrOwner: owner
-                });
-                TransferLib.transferOrTrade(ledgerData, globalFees, a);
-                remainingToTransfer -= qtyType;
+                if (qtyTransfer > 0) {
+                    TransferLib.TransferArgs memory a = TransferLib.TransferArgs({
+                            ledger_A: msg.sender,
+                            ledger_B: recipient,
+                               qty_A: qtyTransfer,
+                       tokenTypeId_A: tokenTypeId,
+                               qty_B: 0,
+                       tokenTypeId_B: 0,
+                        ccy_amount_A: 0,
+                         ccyTypeId_A: 0,
+                        ccy_amount_B: 0,
+                         ccyTypeId_B: 0,
+                           applyFees: false,
+                        feeAddrOwner: owner
+                    });
+                    TransferLib.transferOrTrade(ledgerData, globalFees, a);
+                    remainingToTransfer -= qtyType;
+                }
             }
         }
         emit Transfer(msg.sender, recipient, amount);

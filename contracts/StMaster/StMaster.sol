@@ -51,7 +51,7 @@ contract StMaster is StMintable, StBurnable, CcyFundable, CcyWithdrawable, StTra
     // LAUNCH LIST
     //
     // PRI 0 ** ERC20 **
-    //   main tests, re. permissions -- needs key derivation
+    //   main tests, re. permissions
     //
     // PERF/IDEA: change internalTransfer so it can operate on *any* stTypeId...? stTypeId is only a property of batch -- any good reason to restrict it?
     //            (less operations if it worked on any type?)
@@ -63,9 +63,11 @@ contract StMaster is StMintable, StBurnable, CcyFundable, CcyWithdrawable, StTra
     //   > just need to be able to read out *all* data from storage (new contract can then have writers)
     //   > new Lib for this: DataReader -- needs to take paginated outputs
     //
+    // ====== MAINNET ======
+    //
     // BONDING CURVES... can we use them?
     //
-    // ====== MAINNET ======
+    // WITHDRAW FEES - (whitelist => erc20) - defer
     //
     // SPLITTING TX'S - defer
     //  ** fee-preview: returns enough data (qty?) for an orchestrator to split up a large multi-batch transfer TX into separate components?
