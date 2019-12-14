@@ -1,19 +1,24 @@
-//const BigNumber = require('big-number');
 const Big = require('big.js');
-//const BN = require('bn.js');
 
 const Web3 = require('web3');
 const web3 = new Web3();
-
 const _gasPriceEth = web3.utils.fromWei(web3.utils.toWei("20", "gwei"), 'ether');
 const _ethUsd = 150;
 
+const bip39 = require('bip39');
+const hdkey = require('ethereumjs-wallet/hdkey');
+const EthereumJsTx = require('ethereumjs-tx');
+
 module.exports = {
     //logTestAccountUsage: true,
-    
+
     whitelistExchangeTestAcounts: true,
 
     nullAddr: "0x0000000000000000000000000000000000000000",
+
+    getTestContextWeb3: () => getTestContextWeb3(),
+    getAccountAndKey: async (accountNdx) => getAccountAndKey(accountNdx),
+    sendEthTestAddr: (sendFromNdx, sendToNdx, ethValue) => sendEthTestAddr(sendFromNdx, sendToNdx, ethValue),
 
     nullFees: {
         fee_fixed: 0,
@@ -86,3 +91,70 @@ EXCHANGE_FEE: 1,
         return usdCost;
     }
 };
+
+function getTestContextWeb3() {
+    return process.env.NETWORK == 'development'
+        ? { web3: new Web3('http://127.0.0.1:8545'), ethereumTxChain: {} }
+        : { web3: new Web3('https://ac-dev0.net:9545'), ethereumTxChain: { chain: 'ropsten', hardfork: 'petersburg' } }
+    ;
+}
+
+async function getAccountAndKey(accountNdx) {
+    const MNEMONIC = require('./dev_mnemonic.js').MNEMONIC;
+    //console.log('MNEMONIC: ', MNEMONIC);
+    const seed = await bip39.mnemonicToSeed(MNEMONIC);
+    const hdk = hdkey.fromMasterSeed(seed);
+    const addr_node = hdk.derivePath(`m/44'/60'/0'/0/${accountNdx}`);
+    const addr = addr_node.getWallet().getAddressString();
+    const privKeyBytes = addr_node.getWallet().getPrivateKey();        
+    //console.dir(privKeyBytes);
+    const privKeyHex = privKeyBytes.toString('hex');
+    //console.log('privKeyHex', privKeyHex);
+    return { addr, privKey: privKeyHex };
+}
+
+async function sendEthTestAddr(sendFromNdx, sendToNdx, ethValue) {
+    const { addr: fromAddr, privKey: fromPrivKey } = await getAccountAndKey(sendFromNdx);
+    const { addr: toAddr,   privKey: toPrivKey }   = await getAccountAndKey(sendToNdx);
+
+    // send signed tx
+    const { web3, ethereumTxChain } = getTestContextWeb3();
+    console.log('sendEthTestAddr: provdier.Host', web3.currentProvider.host);
+    const nonce = await web3.eth.getTransactionCount(fromAddr, "pending");
+    const EthereumTx = EthereumJsTx.Transaction
+    var tx = new EthereumTx({
+           nonce: nonce,
+        gasPrice: web3.utils.toHex(web3.utils.toWei('40', 'gwei')),
+        gasLimit: 500000,
+              to: toAddr,
+            from: fromAddr,
+           value: web3.utils.toHex(web3.utils.toWei(ethValue)),
+        },
+        ethereumTxChain,
+        //{ chain: 'ropsten', hardfork: 'petersburg' }
+        //{ chain: 'rinkeby', hardfork: 'petersburg' }
+    );
+    //console.dir(fromPrivKey);
+    tx.sign(Buffer.from(fromPrivKey, 'hex'));
+    const raw = '0x' + tx.serialize().toString('hex');
+    const txPromise = new Promise((resolve, reject) =>  {
+        var txHash;
+        web3.eth.sendSignedTransaction(raw)
+        .on("receipt", receipt => {
+            console.log('sendEthTestAddr: receipt', receipt);
+        })
+        .on("transactionHash", hash => {
+            txHash = hash;
+            console.log('sendEthTestAddr: hash', hash);
+        })
+        .on("confirmation", confirmation => {
+            console.log('sendEthTestAddr: confirmation', confirmation);
+            resolve(txHash);
+        })
+        .on("error", error => {
+            console.log('sendEthTestAddr: error', error);
+            reject(error);
+        });
+    });
+    return txPromise;
+}

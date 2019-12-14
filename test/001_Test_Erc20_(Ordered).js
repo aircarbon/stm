@@ -44,7 +44,13 @@ contract("StMaster", accounts => {
         assert(data.ledgerB_before.tokens_sumQty == 0, 'unexpected graylist ledger GRAY_1 quantity before');
         assert(data.ledgerB_after.tokens_sumQty > 0, 'unexpected graylist ledger GRAY_1 quantity after');    
     }
+
+    //
+    // TODO: use const.sendEthTestAddr() to fund erc20 addr with eth for these 2:
+    // (todo: get infura working)
+    //
     
+    // ## ropsten: Error: insufficient funds for gas * price + value
     it('erc20 - should be able to send from graylist addr to whitelist addr (i.e. DEPOSIT: erc20 => exchange)', async () => {
         const tx = await stm.transfer(WHITE, CONST.tonCarbon, { from: GRAY_1 } );
         const GRAY_after = await stm.getLedgerEntry(GRAY_1);
@@ -53,6 +59,7 @@ contract("StMaster", accounts => {
         assert(WHITE_after.tokens_sumQty == CONST.tonCarbon, 'unexpected whitelist ledger WHITE quantity after');     
     }); // state: 1000 STs back to WHITE
 
+    // ##...? should be same ropsten err as above...
     it('erc20 - should be able to send from graylist addr to graylist addr (i.e. erc20 => erc20)', async () => {
         await ex_to_erc20(); // state: 1000 STs in GRAY_1
         const tx = await stm.transfer(GRAY_2, CONST.tonCarbon, { from: GRAY_1 } );
@@ -62,7 +69,5 @@ contract("StMaster", accounts => {
         assert(GRAY2_after.tokens_sumQty == CONST.tonCarbon, 'unexpected graylist ledger GRAY_2 quantity after');     
     });
 
-    // SHOULD NOT have any fees on erc20.transfer()
-    // SHOULD NOT be able to send as owner (aka internal/exchange transfer) from gray
-    // SHOULD NOT be able to send from WL addr using gray's key
+    // SHOULD NOT have any fees on erc20.transfer() - can adapt above tests to include this
 });

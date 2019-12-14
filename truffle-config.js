@@ -134,11 +134,15 @@ module.exports = {
   mocha: {
     timeout: 0,
     enableTimeouts: false,
-    reporter: 'eth-gas-reporter',
+
+    // on ropsten:
+    // "ERROR: eth-gas-reporter was unable to resolve a client url from the provider available in your test context. Try setting the url as a mocha reporter option (ex: url='http://localhost:8545')"
+    //reporter: 'eth-gas-reporter',
+
     reporterOptions: {
       currency: 'usd',
       gasPrice: 20
-       //, url: 'https://ac-dev0.net:9545'
+     //, url: 'https://ac-dev0.net:9545'
     }
   },
 

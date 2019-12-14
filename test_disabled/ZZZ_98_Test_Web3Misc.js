@@ -1,9 +1,11 @@
 const st = artifacts.require("StMaster");
-const CONST = require('../const.js');
+
+const Web3 = require('web3');
 const acmJson = require('../build/contracts/StMaster.json');
 const abi = acmJson['abi'];
-const Web3 = require('web3');
 const ejs = require('ethereumjs-tx');
+
+const CONST = require('../const.js');
 
 contract("StMaster", accounts => {
     var stm;
@@ -15,79 +17,79 @@ contract("StMaster", accounts => {
         stm = await st.deployed();
     });
 
-    // it("web3 - events", async () => {
-    //     const web3 = new Web3('http://127.0.0.1:8545'); // ganache
+    it("web3 - events", async () => {
+        const web3 = new Web3('http://127.0.0.1:8545'); // ganache
 
-    //     var contract = new web3.eth.Contract(abi, stm.address);
-    //     const events =  await contract.getPastEvents('MintedSecToken', {
-    //         fromBlock: 0,
-    //         toBlock: "latest"
-    //     });
-    //     console.log('events', events);
-    // })
+        var contract = new web3.eth.Contract(abi, stm.address);
+        const events =  await contract.getPastEvents('MintedSecToken', {
+            fromBlock: 0,
+            toBlock: "latest"
+        });
+        console.log('events', events);
+    })
 
-    // it("web3 - fund/getLedgerEntry - numeric types are BN", async () => {
-    //     var address = stm.address;
-    //     const web3 = new Web3('http://127.0.0.1:8545');
-    //     var contract = new web3.eth.Contract(abi, stm.address);
-    //     const A = accounts[0];
+    it("web3 - fund/getLedgerEntry - numeric types are BN", async () => {
+        var address = stm.address;
+        const web3 = new Web3('http://127.0.0.1:8545');
+        var contract = new web3.eth.Contract(abi, stm.address);
+        const A = accounts[0];
         
-    //     // fund with truffle
-    //     //const truffle_fundTx = await stm.fund(CONST.ccyType.SGD, CONST.hundredCcy_cents, A, { from: accounts[0] });
+        // fund with truffle
+        //const truffle_fundTx = await stm.fund(CONST.ccyType.SGD, CONST.hundredCcy_cents, A, { from: accounts[0] });
 
-    //     // fund $100 - web3
-    //     var paramsData = contract.methods
-    //         .fund(CONST.ccyType.SGD, CONST.hundredCcy_cents, A)
-    //         .encodeABI(); 
-    //     var web3_fundTx = new ejs.Transaction({
-    //            nonce: await web3.eth.getTransactionCount(account, "pending"),
-    //         gasPrice: web3.utils.toHex(web3.utils.toWei('20', 'gwei')),
-    //         gasLimit: 500000,
-    //               to: address,
-    //            value: 0,
-    //             data: paramsData,
-    //             from: account, // owner only
-    //     }, //{ chain: 'rinkeby', hardfork: 'petersburg' }
-    //     );
-    //     web3_fundTx.sign(Buffer.from(privateKey, 'hex'));
-    //     var raw = '0x' + web3_fundTx.serialize().toString('hex');
-    //     console.log('sendSignedTransaction...');
+        // fund $100 - web3
+        var paramsData = contract.methods
+            .fund(CONST.ccyType.SGD, CONST.hundredCcy_cents, A)
+            .encodeABI(); 
+        var web3_fundTx = new ejs.Transaction({
+               nonce: await web3.eth.getTransactionCount(account, "pending"),
+            gasPrice: web3.utils.toHex(web3.utils.toWei('20', 'gwei')),
+            gasLimit: 500000,
+                  to: address,
+               value: 0,
+                data: paramsData,
+                from: account, // owner only
+        }, //{ chain: 'rinkeby', hardfork: 'petersburg' }
+        );
+        web3_fundTx.sign(Buffer.from(privateKey, 'hex'));
+        var raw = '0x' + web3_fundTx.serialize().toString('hex');
+        console.log('sendSignedTransaction...');
         
-    //     const promiseFundTx = new Promise((resolve, reject) =>  {
-    //         web3.eth.sendSignedTransaction(raw)
-    //         .on("receipt", receipt => {
-    //         })
-    //         .on("transactionHash", hash => {
-    //         })
-    //         .on("confirmation", confirmation => {
-    //             return resolve(confirmation);
-    //         })
-    //         .on("error", error => {
-    //             return reject(error);
-    //         });
-    //     });
-    //     const data = await promiseFundTx;
+        const promiseFundTx = new Promise((resolve, reject) =>  {
+            web3.eth.sendSignedTransaction(raw)
+            .on("receipt", receipt => {
+            })
+            .on("transactionHash", hash => {
+            })
+            .on("confirmation", confirmation => {
+                return resolve(confirmation);
+            })
+            .on("error", error => {
+                return reject(error);
+            });
+        });
+        const data = await promiseFundTx;
 
-    //     // getLedgerEntry - truffle
-    //     const truffle_ledgerEntry = await stm.getLedgerEntry(A);
-    //     const truffle_balance = truffle_ledgerEntry.ccys.find(p => p.ccyTypeId == CONST.ccyType.SGD).balance;
-    //     console.log('truffle_balance', truffle_balance);
-    //     assert(truffle_balance == 10000, 'unexpected truffle balance after funding');
+        // getLedgerEntry - truffle
+        const truffle_ledgerEntry = await stm.getLedgerEntry(A);
+        const truffle_balance = truffle_ledgerEntry.ccys.find(p => p.ccyTypeId == CONST.ccyType.SGD).balance;
+        console.log('truffle_balance', truffle_balance);
+        assert(truffle_balance == 10000, 'unexpected truffle balance after funding');
         
-    //     // getLedgerEntry - web3
-    //     const web3_ledgerEntry = await contract.methods.getLedgerEntry(A).call();
-    //     const web3_balance = web3_ledgerEntry.ccys.find(p => p.ccyTypeId == CONST.ccyType.SGD).balance;
-    //     console.log('web3_balance (BN)', web3_balance);
-    //     console.log('web3_balance.toString()', web3_balance.toString());
+        // getLedgerEntry - web3
+        const web3_ledgerEntry = await contract.methods.getLedgerEntry(A).call();
+        const web3_balance = web3_ledgerEntry.ccys.find(p => p.ccyTypeId == CONST.ccyType.SGD).balance;
+        console.log('web3_balance (BN)', web3_balance);
+        console.log('web3_balance.toString()', web3_balance.toString());
 
-    //     assert(web3_balance.toString() == '10000', 'unexpected web3 balance after funding');
-    // });
+        assert(web3_balance.toString() == '10000', 'unexpected web3 balance after funding');
+    });
 
-    // it("web3 - get accounts", async () => {
-    //     const web3 = new Web3('http://127.0.0.1:8545');
-    //     const accounts = await web3.eth.getAccounts();
-    //     console.dir(accounts);
-    // });
+    it("web3 - get accounts", async () => {
+        const web3 = new Web3('http://127.0.0.1:8545');
+        const accounts = await web3.eth.getAccounts();
+        console.dir(accounts);
+    });
 
     it("web3 - public accessors - should work", async () => {
         var address = stm.address;

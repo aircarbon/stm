@@ -1,5 +1,11 @@
 const st = artifacts.require('StMaster');
 const truffleAssert = require('truffle-assertions');
+
+const acmJson = require('../build/contracts/StMaster.json');
+const Web3 = require('web3');
+const abi = acmJson['abi'];
+const EthereumJsTx = require('ethereumjs-tx');
+
 const CONST = require('../const.js');
 
 contract("StMaster", accounts => {
@@ -13,9 +19,10 @@ contract("StMaster", accounts => {
             console.log(`addrNdx: ${global.TaddrNdx} - contract @ ${stm.address} (owner: ${accounts[0]})`);
     });
 
-    // it('libs - test1', async () => {
-    //     console.log('st2 addr', await stm.addr_st2.call());
-    //     console.log('call st2', await stm.call_st2.call());
+    // tmp test: for non-dev funding of erc20 accounts ()
+    // it('web3 - use web3 to fund erc20 test accounts from owner', async () => {
+    //     const data = await CONST.sendEthTestAddr(0, 1, "0.01"); // working ok
+    //     console.log('data', data);
     // });
 
     it('setup - contract owner should have default ledger entry', async () => {
