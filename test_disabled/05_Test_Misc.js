@@ -21,7 +21,7 @@ contract("StMaster", accounts => {
 
     // tmp test: for non-dev funding of erc20 accounts ()
     // it('web3 - use web3 to fund erc20 test accounts from owner', async () => {
-    //     const data = await CONST.sendEthTestAddr(0, 1, "0.01"); // working ok
+        //     const data = await CONST.web3_sendEthTestAddr(0, 1, "0.01"); // working ok
     //     console.log('data', data);
     // });
 

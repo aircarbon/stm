@@ -14,11 +14,14 @@ const Erc20Lib = artifacts.require('./Erc20Lib.sol');
 //const StLedger = artifacts.require('./StLedger.sol');
 const StMaster = artifacts.require('./StMaster.sol');
 
+const CONST = require('../const.js');
 const { db } = require('../../common/dist');
 
 module.exports = async function (deployer) {
 
     process.env.NETWORK = deployer.network; 
+    process.env.NETWORK_ID = deployer.network_id; 
+
     console.log('2_deploy_contracts: ', deployer.network);
 
     StMaster.synchronization_timeout = 42;  // seconds
@@ -56,26 +59,25 @@ module.exports = async function (deployer) {
         deployer.link(Erc20Lib, StMaster);
 
         // StMaster
-        const contractName = "SecTok_Master";
-        const contractVer = "0.7";
-        const contractUnit = "KG";
-        const contractSymbol = "CCC";
-        const contractDecimals = 4;
-        return deployer.deploy(StMaster, contractName, contractVer, contractUnit, contractSymbol, contractDecimals).then(async stm => {
-            
+        // const contractName = CONST.contractName; //"SecTok_Master";
+        // const contractVer = CONST.contractVer; //"0.7";
+        // const contractUnit = CONST.contractUnit; //"KG";
+        // const contractSymbol = CONST.contractSymbol; //"CCC";
+        // const contractDecimals = CONST.contractDecimals; //4;
+        return deployer.deploy(StMaster, CONST.contractName, CONST.contractVer, CONST.contractUnit, CONST.contractSymbol, CONST.contractDecimals).then(async stm => {
+            console.log('deplyed ok');
+
             //console.dir(stm.abi);
             //console.dir(deployer);
 
             if (!deployer.network.includes("-fork")) {
-                global.configContext = 'erc20';
-
 
                 var ip = "unknown";
                 publicIp.v4().then(p => ip = p).catch(e => { console.log("WARN: could not get IP - will write 'unknown'"); });
 
                 await db.SaveDeployment({
-                    contractName: contractName,
-                     contractVer: contractVer,
+                    contractName: CONST.contractName,
+                     contractVer: CONST.contractVer,
                        networkId: deployer.network_id,
                  deployedAddress: stm.address,
                 deployerHostName: os.hostname(),
