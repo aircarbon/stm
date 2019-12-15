@@ -29,66 +29,71 @@ contract("StMaster", accounts => {
         GRAY_2 = accounts[NDX_GRAY_2];
         
         await stm.whitelist(WHITE);
-        await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      WHITE, CONST.nullFees, [], [], { from: accounts[0] });
+
+        // mint with originator fee - should be ignored by ERC20
+        const testFee = { fee_fixed: 1, fee_percBips: 10, fee_min: 0, fee_max: 0 };
+        await stm.mintSecTokenBatch(CONST.tokenType.VCS, CONST.tonCarbon, 1, WHITE, testFee, [], [], { from: accounts[0] });
+
+        // set exchange fee VCS - should be ignored by ERC20
+        await stm.setFee_TokType(CONST.tokenType.VCS, CONST.nullAddr, testFee );
+
+        // set ledger fees VCS - should be ignored by ERC20
+        await stm.setFee_TokType(CONST.tokenType.VCS, WHITE,  testFee );
+        
+        await stm.fund(CONST.ccyType.SGD, 1, GRAY_1, { from: accounts[0] });
+        await stm.setFee_TokType(CONST.tokenType.VCS, GRAY_1, testFee );
+
+        await stm.fund(CONST.ccyType.SGD, 1, GRAY_2, { from: accounts[0] });
+        await stm.setFee_TokType(CONST.tokenType.VCS, GRAY_2, testFee );
     });
 
     //
-    // ordered tests: these need to run in this order; they assume state of previous test in the contract
+    // ordered tests: these need to run in this order; they assume contract state from previous test(s)
     //
 
     it('erc20 - should be able to send from whitelist addr to graylist addr (i.e. WITHDRAW: exchange => erc20)', async () => {
-        await ex_to_erc20();
-    }); // state: 1000 STs in GRAY_1
-    async function ex_to_erc20() {
+        await white_to_gray_1();
+    });
+    async function white_to_gray_1() {
         const data = await helper.transferLedger({ stm, accounts, 
                 ledger_A: WHITE,                               ledger_B: GRAY_1,
                    qty_A: CONST.tonCarbon,                tokenTypeId_A: CONST.tokenType.VCS,
                    qty_B: 0,                              tokenTypeId_B: 0,
             ccy_amount_A: 0,                                ccyTypeId_A: 0,
             ccy_amount_B: 0,                                ccyTypeId_B: 0,
+               applyFees: false,
         });
+
         assert(data.ledgerB_before.tokens_sumQty == 0, 'unexpected graylist ledger GRAY_1 quantity before');
         assert(data.ledgerB_after.tokens_sumQty > 0, 'unexpected graylist ledger GRAY_1 quantity after');    
     }
 
-    //
-    // (todo: get infura working)
-    //
-    
     it('erc20 - should be able to send from graylist addr to whitelist addr (i.e. DEPOSIT: erc20 => exchange)', async () => {
-        
+        await gray_1_to_white();
+    });
+    async function gray_1_to_white() {
         const fundTx = await CONST.web3_sendEthTestAddr(0, NDX_GRAY_1, "0.1"); // fund GRAY_1 for erc20 op
         const erc20Tx = await stm.transfer(WHITE, CONST.tonCarbon, { from: GRAY_1 } );
-
-        // ###: repro "excesive batches"
-        // await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      WHITE, CONST.nullFees, [], [], { from: accounts[0] });
-        // await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      WHITE, CONST.nullFees, [], [], { from: accounts[0] });
-        // await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      WHITE, CONST.nullFees, [], [], { from: accounts[0] });
-        // await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      WHITE, CONST.nullFees, [], [], { from: accounts[0] });
-        // const erc20Tx = await stm.transfer(WHITE, CONST.gtCarbon, { from: GRAY_1 } );
-
-        //console.log('erc20 => exchange tx: ', erc20Tx);
         CONST.logGas(erc20Tx, '(erc20 => exchange)');
 
         const GRAY_after = await stm.getLedgerEntry(GRAY_1);
         const WHITE_after = await stm.getLedgerEntry(WHITE);
         assert(GRAY_after.tokens_sumQty == 0, 'unexpected graylist ledger GRAY_1 quantity after');     
         assert(WHITE_after.tokens_sumQty == CONST.tonCarbon, 'unexpected whitelist ledger WHITE quantity after');     
-    }); // state: 1000 STs back to WHITE
+    }
 
     it('erc20 - should be able to send from graylist addr to graylist addr (i.e. erc20 => erc20)', async () => {
-        await ex_to_erc20(); // state: 1000 STs in GRAY_1
-        
+        await white_to_gray_1(); 
+        await gray_1_to_gray_2();
+    });
+    async function gray_1_to_gray_2() {
         const fundTx = await CONST.web3_sendEthTestAddr(0, NDX_GRAY_1, "0.01"); // fund GRAY_1 for erc20 op
         const erc20Tx = await stm.transfer(GRAY_2, CONST.tonCarbon, { from: GRAY_1 } );
-        //console.log('erc20 => erc20 tx: ', erc20Tx);
         CONST.logGas(erc20Tx, '(erc20 => erc20)');
         
         const GRAY1_after = await stm.getLedgerEntry(GRAY_1);
         const GRAY2_after = await stm.getLedgerEntry(GRAY_2);
         assert(GRAY1_after.tokens_sumQty == 0, 'unexpected graylist ledger GRAY_1 quantity after');     
         assert(GRAY2_after.tokens_sumQty == CONST.tonCarbon, 'unexpected graylist ledger GRAY_2 quantity after');     
-    });
-
-    // SHOULD NOT have any fees on erc20.transfer() - can adapt above tests to include this
+    }
 });
