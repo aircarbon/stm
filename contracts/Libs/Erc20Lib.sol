@@ -50,7 +50,8 @@ library Erc20Lib {
                 }
 
                 // transfer this type up to required amount
-                uint256 qtyTransfer = qtyType <= remainingToTransfer ? qtyType : remainingToTransfer;
+                uint256 qtyTransfer = remainingToTransfer >= qtyType ? qtyType : remainingToTransfer;
+
                 if (qtyTransfer > 0) {
                     TransferLib.TransferArgs memory a = TransferLib.TransferArgs({
                             ledger_A: msg.sender,
@@ -67,7 +68,7 @@ library Erc20Lib {
                         feeAddrOwner: owner
                     });
                     TransferLib.transferOrTrade(ledgerData, globalFees, a);
-                    remainingToTransfer -= qtyType;
+                    remainingToTransfer -= qtyTransfer;
                 }
             }
         }

@@ -12,11 +12,6 @@ library TransferLib {
     uint256 constant MAX_BATCHES_PREVIEW = 4; // for fee previews: max distinct batch IDs that can participate in one side of a trade fee preview
 
     //
-    // ERC20
-    //
-    //...?
-
-    //
     // INTERNAL
     //
     struct TransferArgs {

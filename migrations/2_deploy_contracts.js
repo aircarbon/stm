@@ -65,8 +65,6 @@ module.exports = async function (deployer) {
         // const contractSymbol = CONST.contractSymbol; //"CCC";
         // const contractDecimals = CONST.contractDecimals; //4;
         return deployer.deploy(StMaster, CONST.contractName, CONST.contractVer, CONST.contractUnit, CONST.contractSymbol, CONST.contractDecimals).then(async stm => {
-            console.log('deplyed ok');
-
             //console.dir(stm.abi);
             //console.dir(deployer);
 

@@ -52,16 +52,22 @@ contract("StMaster", accounts => {
     }
 
     //
-    // TODO: use const.web3_sendEthTestAddr() to fund erc20 addr with eth for these 2:
     // (todo: get infura working)
     //
     
-    // ## ropsten: "Error: insufficient funds for gas * price + value"
     it('erc20 - should be able to send from graylist addr to whitelist addr (i.e. DEPOSIT: erc20 => exchange)', async () => {
         
         const fundTx = await CONST.web3_sendEthTestAddr(0, NDX_GRAY_1, "0.1"); // fund GRAY_1 for erc20 op
         const erc20Tx = await stm.transfer(WHITE, CONST.tonCarbon, { from: GRAY_1 } );
-        console.log('erc20 => exchange tx: ', erc20Tx);
+
+        // ###: repro "excesive batches"
+        // await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      WHITE, CONST.nullFees, [], [], { from: accounts[0] });
+        // await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      WHITE, CONST.nullFees, [], [], { from: accounts[0] });
+        // await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      WHITE, CONST.nullFees, [], [], { from: accounts[0] });
+        // await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      WHITE, CONST.nullFees, [], [], { from: accounts[0] });
+        // const erc20Tx = await stm.transfer(WHITE, CONST.gtCarbon, { from: GRAY_1 } );
+
+        //console.log('erc20 => exchange tx: ', erc20Tx);
         CONST.logGas(erc20Tx, '(erc20 => exchange)');
 
         const GRAY_after = await stm.getLedgerEntry(GRAY_1);
@@ -70,14 +76,13 @@ contract("StMaster", accounts => {
         assert(WHITE_after.tokens_sumQty == CONST.tonCarbon, 'unexpected whitelist ledger WHITE quantity after');     
     }); // state: 1000 STs back to WHITE
 
-    // ##. ropsten: "insufficient data for uint256 type (arg="fee_tok_B", coderType="uint256", value="0x00000000")"
-    // ?? expecting "insufficient funds"
     it('erc20 - should be able to send from graylist addr to graylist addr (i.e. erc20 => erc20)', async () => {
         await ex_to_erc20(); // state: 1000 STs in GRAY_1
         
         const fundTx = await CONST.web3_sendEthTestAddr(0, NDX_GRAY_1, "0.01"); // fund GRAY_1 for erc20 op
         const erc20Tx = await stm.transfer(GRAY_2, CONST.tonCarbon, { from: GRAY_1 } );
-        console.log('erc20 => erc20 tx: ', erc20Tx);
+        //console.log('erc20 => erc20 tx: ', erc20Tx);
+        CONST.logGas(erc20Tx, '(erc20 => erc20)');
         
         const GRAY1_after = await stm.getLedgerEntry(GRAY_1);
         const GRAY2_after = await stm.getLedgerEntry(GRAY_2);

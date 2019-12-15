@@ -34,7 +34,8 @@ module.exports = {
     getAccountAndKey: async (accountNdx) => getAccountAndKey(accountNdx),
     
     web3_sendEthTestAddr: (sendFromNdx, sendToNdx, ethValue) => web3_sendEthTestAddr(sendFromNdx, sendToNdx, ethValue),
-    web3_callOwnerMethod: (methodName, methodArgs) => web3_callOwnerMethod(methodName, methodArgs),
+    web3_call: (methodName, methodArgs) => web3_call(methodName, methodArgs),
+    web3_tx: (methodName, methodArgs, fromAddr, fromPrivKey) => web3_tx(methodName, methodArgs, fromAddr, fromPrivKey),
 
     nullFees: {
         fee_fixed: 0,
@@ -131,8 +132,16 @@ async function getAccountAndKey(accountNdx) {
     return { addr, privKey: privKeyHex };
 }
 
-async function web3_callOwnerMethod(methodName, methodArgs) {
-    const { addr: ownerAddr,     privKey: ownerPrivKey } = await getAccountAndKey(0);
+async function web3_call(methodName, methodArgs) {
+    const { web3, ethereumTxChain } = getTestContextWeb3();
+    const contractDb = (await db.GetDeployment(process.env.NETWORK_ID, contractName, contractVer)).recordset[0];
+    var contract = new web3.eth.Contract(JSON.parse(contractDb.abi), contractDb.addr);
+    const callRet = await contract.methods[methodName](...methodArgs).call();
+    return callRet;
+}
+
+async function web3_tx(methodName, methodArgs, fromAddr, fromPrivKey) {
+    //const { addr: ownerAddr,     privKey: ownerPrivKey } = await getAccountAndKey(0);
     //const { addr: whiteListAddr, privKey } = await getAccountAndKey(whitelistNdx);
 
     const { web3, ethereumTxChain } = getTestContextWeb3();
@@ -140,8 +149,8 @@ async function web3_callOwnerMethod(methodName, methodArgs) {
     var contract = new web3.eth.Contract(JSON.parse(contractDb.abi), contractDb.addr);
 
     // send signed tx
-    console.log(`${methodName}(${methodArgs.join()}) [${process.env.NETWORK}): ${web3.currentProvider.host}]`);
-    const nonce = await web3.eth.getTransactionCount(ownerAddr, "pending");
+    console.log(`${methodName}(${methodArgs.join()}) [${process.env.NETWORK}: ${web3.currentProvider.host}]`);
+    const nonce = await web3.eth.getTransactionCount(fromAddr, "pending");
     var paramsData = contract.methods
         [methodName](...methodArgs)
         .encodeABI();
@@ -150,7 +159,7 @@ async function web3_callOwnerMethod(methodName, methodArgs) {
            nonce: nonce,
         gasPrice: web3.utils.toHex(web3.utils.toWei('40', 'gwei')),
         gasLimit: 500000,
-            from: ownerAddr,
+            from: fromAddr,
               to: contractDb.addr,
             data: paramsData,
            value: 0
@@ -158,24 +167,24 @@ async function web3_callOwnerMethod(methodName, methodArgs) {
         ethereumTxChain,
     );
     //console.dir(fromPrivKey);
-    tx.sign(Buffer.from(ownerPrivKey, 'hex'));
+    tx.sign(Buffer.from(fromPrivKey, 'hex'));
     const raw = '0x' + tx.serialize().toString('hex');
     const txPromise = new Promise((resolve, reject) =>  {
         var txHash;
         web3.eth.sendSignedTransaction(raw)
         .on("receipt", receipt => {
-            console.log(`==> receipt`, receipt);
+            console.log(` => receipt`, receipt);
         })
         .on("transactionHash", hash => {
             txHash = hash;
-            console.log(`==> ${txHash} ...`);
+            console.log(` => ${txHash} ...`);
         })
         .on("confirmation", confirms => {
-            console.log(`==> ${txHash} - ${confirms} confirm(s)`);
+            //console.log(` => ${txHash} - ${confirms} confirm(s)`);
             resolve(txHash);
         })
         .on("error", error => {
-            //console.log(`==> ## error`, error.message);
+            //console.log(` => ## error`, error.message);
             reject(error);
         });
     });
@@ -188,7 +197,7 @@ async function web3_sendEthTestAddr(sendFromNdx, sendToNdx, ethValue) {
 
     // send signed tx
     const { web3, ethereumTxChain } = getTestContextWeb3();
-    console.log(`web3_sendEthTestAddr: Ξ${ethValue.toFixed(8)} @ ${fromAddr} ==> ${toAddr} (${web3.currentProvider.host})`);
+    console.log(`web3_sendEthTestAddr: Ξ${ethValue.toString()} @ ${fromAddr}  => ${toAddr} (${web3.currentProvider.host})`);
     const nonce = await web3.eth.getTransactionCount(fromAddr, "pending");
     const EthereumTx = EthereumJsTx.Transaction
     var tx = new EthereumTx({
@@ -200,8 +209,6 @@ async function web3_sendEthTestAddr(sendFromNdx, sendToNdx, ethValue) {
            value: web3.utils.toHex(web3.utils.toWei(ethValue)),
         },
         ethereumTxChain,
-        //{ chain: 'ropsten', hardfork: 'petersburg' }
-        //{ chain: 'rinkeby', hardfork: 'petersburg' }
     );
     //console.dir(fromPrivKey);
     tx.sign(Buffer.from(fromPrivKey, 'hex'));
@@ -210,18 +217,18 @@ async function web3_sendEthTestAddr(sendFromNdx, sendToNdx, ethValue) {
         var txHash;
         web3.eth.sendSignedTransaction(raw)
         .on("receipt", receipt => {
-            console.log(`==> receipt`, receipt);
+            //console.log(` => receipt`, receipt);
         })
         .on("transactionHash", hash => {
             txHash = hash;
-            console.log(`==> ${txHash} ...`);
+            console.log(` => ${txHash} ...`);
         })
         .on("confirmation", confirms => {
-            console.log(`==> ${txHash} - ${confirms} confirm(s)`);
+            //console.log(` => ${txHash} - ${confirms} confirm(s)`);
             resolve(txHash);
         })
         .on("error", error => {
-            console.log(`==> ## error`, error);
+            //console.log(` => ## error`, error);
             reject(error);
         });
     });

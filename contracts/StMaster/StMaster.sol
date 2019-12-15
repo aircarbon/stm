@@ -51,7 +51,8 @@ contract StMaster is StMintable, StBurnable, CcyFundable, CcyWithdrawable, StTra
     // LAUNCH LIST
     //
     // PRI 0 ** ERC20 **
-    //   todo: main tests... 90%
+    //   ### erc20 "excessive batches" but only sending 1000 kg (one batch)... why??
+    //   TODO: (DEFINITELY!) -- test sending across >1 type... (VCS & UNFCCC)
     //   todo: scoop - ropsten deployment
     //
     // R&D -- PERF/IDEA: change internalTransfer so it can operate on *any* stTypeId...? stTypeId is only a property of batch -- any good reason to restrict it?
