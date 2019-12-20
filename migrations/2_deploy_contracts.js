@@ -9,6 +9,7 @@ const LedgerLib = artifacts.require('./LedgerLib.sol');
 const TransferLib = artifacts.require('./TransferLib.sol');
 const FeeLib = artifacts.require('./FeeLib.sol');
 const Erc20Lib = artifacts.require('./Erc20Lib.sol');
+const DataLib = artifacts.require('./DataLib.sol');
 
 //const StMintable = artifacts.require('./StMintable.sol');
 //const StLedger = artifacts.require('./StLedger.sol');
@@ -58,12 +59,9 @@ module.exports = async function (deployer) {
     return deployer.deploy(Erc20Lib).then(async feeLib => { 
         deployer.link(Erc20Lib, StMaster);
 
-        // StMaster
-        // const contractName = CONST.contractName; //"SecTok_Master";
-        // const contractVer = CONST.contractVer; //"0.7";
-        // const contractUnit = CONST.contractUnit; //"KG";
-        // const contractSymbol = CONST.contractSymbol; //"CCC";
-        // const contractDecimals = CONST.contractDecimals; //4;
+    return deployer.deploy(DataLib).then(async dataLib => { 
+        deployer.link(DataLib, StMaster);
+
         return deployer.deploy(StMaster, CONST.contractName, CONST.contractVer, CONST.contractUnit, CONST.contractSymbol, CONST.contractDecimals).then(async stm => {
             //console.dir(stm.abi);
             //console.dir(deployer);
@@ -85,6 +83,7 @@ module.exports = async function (deployer) {
             }
         }).catch(err => { console.error('failed deployment: StMaster', err); });
     
+    }).catch(err => { console.error('failed deployment: DataLib', err); });
     }).catch(err => { console.error('failed deployment: Erc20Lib', err); });
     }).catch(err => { console.error('failed deployment: FeeLib', err); });
     }).catch(err => { console.error('failed deployment: TransferLib', err); });

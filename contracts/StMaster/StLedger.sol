@@ -17,10 +17,29 @@ contract StLedger is Owned, StTypes, CcyTypes {
     //
 
     /**
-     * @dev Returns all accounts in the ledger
+     * @dev Returns all account addresses in the ledger
      */
     function getLedgerOwners() external view returns (address[] memory) {
         return ledgerData._ledgerOwners;
+    }
+
+    /**
+     * @dev Returns a single account address in the ledger
+     * DATA_DUMP: individual fetches
+     */
+    function getLedgerOwnerCount() external view returns (uint256) { return ledgerData._ledgerOwners.length; }
+
+    /**
+     * @dev Returns a single account address in the ledger
+     * DATA_DUMP: individual fetches
+     */
+    function getLedgerOwner(uint256 index) external view returns (address) { return ledgerData._ledgerOwners[index]; }
+
+    /**
+     * @dev Returns the ledger entry for a single account
+     */
+    function getLedgerEntry(address account) external view returns (StructLib.LedgerReturn memory) {
+        return LedgerLib.getLedgerEntry(ledgerData, stTypesData, ccyTypesData, account);
     }
 
     /**
@@ -38,13 +57,6 @@ contract StLedger is Owned, StTypes, CcyTypes {
         //splitFrom_id: ledgerData._sts_splitFrom_id[id],
           //splitTo_id: ledgerData._sts_splitTo_id[id]
             });
-    }
-
-    /**
-     * @dev Returns the ledger entry for a single account
-     */
-    function getLedgerEntry(address account) external view returns (StructLib.LedgerReturn memory) {
-        return LedgerLib.getLedgerEntry(ledgerData, stTypesData, ccyTypesData, account);
     }
 
     /**

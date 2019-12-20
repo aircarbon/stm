@@ -8,8 +8,6 @@ import "../Libs/StructLib.sol";
 import "../Libs/CcyLib.sol";
 
 contract CcyFundable is Owned, StLedger {
-    //event CcyFundedLedger(uint256 ccyTypeId, address ledgerOwner, int256 amount);
-
     /**
      * @dev Funds a ledger entry with a currency amount
      * @param ccyTypeId Currency type ID

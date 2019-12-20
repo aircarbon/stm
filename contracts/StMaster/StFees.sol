@@ -7,14 +7,13 @@ import "./StLedger.sol";
 import "../Libs/StructLib.sol";
 import "../Libs/FeeLib.sol";
 
+//
+// NOTE: fees are applied ON TOP OF the supplied transfer amounts to the transfer() fn.
+//       i.e. transfer amounts are not inclusive of fees, they are additional
+//
 contract StFees is Owned, StLedger {
-    // NOTE: fees are applied ON TOP OF the supplied transfer amounts to the transfer() fn.
-    //       i.e. transfer amounts are not inclusive of fees, they are additional
-
     // GLOBAL FEES
     StructLib.FeeStruct globalFees;
-
-    // TODO: drop fee_fixed completely (it's == fee_min)
 
     // fees accessor (all types)
     enum GetFeeType { CCY, TOK }

@@ -111,8 +111,10 @@ EXCHANGE_FEE: 1,
 
 function getTestContextWeb3() {
     const context = 
-              process.env.NETWORK == 'development' ? { web3: new Web3('http://127.0.0.1:8545'),    ethereumTxChain: {} }
-            : process.env.NETWORK == 'ropsten_ac' ?  { web3: new Web3('https://ac-dev0.net:9545'), ethereumTxChain: { chain: 'ropsten', hardfork: 'petersburg' } }
+              process.env.WEB3_NETWORK_ID == 888 ? { web3: new Web3('http://127.0.0.1:8545'),    ethereumTxChain: {} }
+            : process.env.WEB3_NETWORK_ID == 777 ? { web3: new Web3('http://127.0.0.1:8545'),    ethereumTxChain: {} }
+            : process.env.WEB3_NETWORK_ID == 999 ? { web3: new Web3('http://127.0.0.1:8545'),    ethereumTxChain: {} }
+            : process.env.WEB3_NETWORK_ID == 3 ?  { web3: new Web3('https://ac-dev0.net:9545'), ethereumTxChain: { chain: 'ropsten', hardfork: 'petersburg' } }
             : undefined;
     if (!context) throw('unknown process.env.NETWORK');
     return context;
@@ -134,7 +136,7 @@ async function getAccountAndKey(accountNdx) {
 
 async function web3_call(methodName, methodArgs) {
     const { web3, ethereumTxChain } = getTestContextWeb3();
-    const contractDb = (await db.GetDeployment(process.env.NETWORK_ID, contractName, contractVer)).recordset[0];
+    const contractDb = (await db.GetDeployment(process.env.WEB3_NETWORK_ID, contractName, contractVer)).recordset[0];
     var contract = new web3.eth.Contract(JSON.parse(contractDb.abi), contractDb.addr);
     const callRet = await contract.methods[methodName](...methodArgs).call();
     return callRet;
@@ -145,7 +147,7 @@ async function web3_tx(methodName, methodArgs, fromAddr, fromPrivKey) {
     //const { addr: whiteListAddr, privKey } = await getAccountAndKey(whitelistNdx);
 
     const { web3, ethereumTxChain } = getTestContextWeb3();
-    const contractDb = (await db.GetDeployment(process.env.NETWORK_ID, contractName, contractVer)).recordset[0];
+    const contractDb = (await db.GetDeployment(process.env.WEB3_NETWORK_ID, contractName, contractVer)).recordset[0];
     var contract = new web3.eth.Contract(JSON.parse(contractDb.abi), contractDb.addr);
 
     // send signed tx
@@ -184,7 +186,7 @@ async function web3_tx(methodName, methodArgs, fromAddr, fromPrivKey) {
             resolve(txHash);
         })
         .on("error", error => {
-            //console.log(` => ## error`, error.message);
+            console.log(` => ## error`, error.message);
             reject(error);
         });
     });
@@ -197,7 +199,7 @@ async function web3_sendEthTestAddr(sendFromNdx, sendToNdx, ethValue) {
 
     // send signed tx
     const { web3, ethereumTxChain } = getTestContextWeb3();
-    console.log(`web3_sendEthTestAddr: Ξ${ethValue.toString()} @ ${fromAddr}  => ${toAddr} (${web3.currentProvider.host})`);
+    //console.log(`web3_sendEthTestAddr: Ξ${ethValue.toString()} @ ${fromAddr}  => ${toAddr} (${web3.currentProvider.host})`);
     const nonce = await web3.eth.getTransactionCount(fromAddr, "pending");
     const EthereumTx = EthereumJsTx.Transaction
     var tx = new EthereumTx({
@@ -221,14 +223,14 @@ async function web3_sendEthTestAddr(sendFromNdx, sendToNdx, ethValue) {
         })
         .on("transactionHash", hash => {
             txHash = hash;
-            console.log(` => ${txHash} ...`);
+            //console.log(` => ${txHash} ...`);
         })
         .on("confirmation", confirms => {
             //console.log(` => ${txHash} - ${confirms} confirm(s)`);
             resolve(txHash);
         })
         .on("error", error => {
-            //console.log(` => ## error`, error);
+            console.log(` => ## error`, error);
             reject(error);
         });
     });

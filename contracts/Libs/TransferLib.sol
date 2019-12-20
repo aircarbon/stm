@@ -67,8 +67,6 @@ library TransferLib {
         StructLib.FeeStruct storage globalFees,
         TransferLib.TransferArgs memory a
     ) public {
-        //require(ledgerData._ledger[a.ledger_A].exists == true, "Bad ledger_A");
-        //require(ledgerData._ledger[a.ledger_B].exists == true, "Bad ledger_B");
         require(a.ledger_A != a.ledger_B, "Bad transfer");
         require(a.qty_A > 0 || a.qty_B > 0 || a.ccy_amount_A > 0 || a.ccy_amount_B > 0, "Bad null transfer");
         require(a.qty_A <= 0xffffffffffffffff, "Bad qty_A");
@@ -472,7 +470,7 @@ library TransferLib {
                 }
             }
             if (!knownBatch) {
-                require(ret.batchCount < MAX_BATCHES_PREVIEW, "Excessive batches");
+                require(ret.batchCount < MAX_BATCHES_PREVIEW, "Too many batches: try sending a smaller amount");
                 ret.batchIds[ret.batchCount] = fromBatchId;
                 ret.transferQty[ret.batchCount] = remainingToTransfer >= stQty ? stQty : remainingToTransfer;
                 ret.batchCount++;

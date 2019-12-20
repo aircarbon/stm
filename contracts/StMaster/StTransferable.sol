@@ -11,6 +11,7 @@ import "../Libs/TransferLib.sol";
 import "../Libs/Erc20Lib.sol";
 
 contract StTransferable is Owned, StLedger, StFees, StErc20 {
+    
     /**
      * @dev Transfers or trades assets between ledger accounts
      * @dev allows: one-sided transfers, transfers of same asset types, and transfers (trades) of different asset types

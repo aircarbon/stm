@@ -9,12 +9,11 @@ library StructLib {
         string  unit; // e.g. "cents", "satoshi"
         uint16  decimals;
     }
-
     struct GetCcyTypesReturn {
         Ccy[] ccyTypes;
     }
 
-    struct CcyTypesStruct {
+    struct CcyTypesStruct { // ** DATA_DUMP: OK
         mapping(uint256 => Ccy) _ccyTypes;                     // typeId (1-based) -> ccy
         uint256 _count_ccyTypes;
     }
@@ -28,13 +27,13 @@ library StructLib {
         SecTokenTypeReturn[] tokenTypes;
     }
 
-    struct StTypesStruct {
+    struct StTypesStruct { // ** DATA_DUMP: OK
         mapping(uint256 => string) _tokenTypeNames;             // typeId (1-based) -> typeName
         uint256 _count_tokenTypes;
     }
 
     // TOKEN BATCH
-    struct SecTokenBatch {
+    struct SecTokenBatch { // ** DATA_DUMP: OK
         uint64     id;                                          // global sequential id: 1-based
         uint256    mintedTimestamp;                             // minting block.timestamp
         uint256    tokenTypeId;                                 // token type of the batch
@@ -46,17 +45,6 @@ library StructLib {
         address    originator;                                  // original owner (minter) of the batch
     }
 
-    struct SecTokenReturn {
-        bool    exists;                                         // for existence check by id
-        uint256 id;                                             // global sequential id: 1-based
-        uint256 mintedQty;                                      // initial unit qty minted in the ST
-        uint256 currentQty;                                     // current (variable) unit qty in the ST (i.e. burned = currentQty - mintedQty)
-        uint64 batchId;                                         // parent batch of the ST
-        //uint256 mintedTimestamp;                              // minting block.timestamp
-        //uint256 splitFrom_id;                                 // the parent ST (if any)
-        //uint256 splitTo_id;                                   // the child ST (if any)
-    }
-
     struct Ledger {
         bool                          exists;                   // for existance check by address
         mapping(uint256 => uint256[]) tokenType_stIds;          // SecTokenTypeId -> stId[] of all owned STs
@@ -65,34 +53,46 @@ library StructLib {
         StructLib.FeeStruct           customFees;               // global fee override - per ledger entry
     }
 
-    struct LedgerReturn {
+    struct LedgerReturn {                                       // ledger return structure
         bool                   exists;
         LedgerSecTokenReturn[] tokens;                          // STs with types & sizes (in contract base unit) information - v2
         uint256                tokens_sumQty;                   // retained for caller convenience - v1
         LedgerCcyReturn[]      ccys;                            // currency balances
     }
-    struct LedgerSecTokenReturn {                               // ledger return structure
-        uint256 stId;
-        uint256 tokenTypeId;
-        string  tokenTypeName;
-        uint64  batchId;
-        uint256 currentQty;
-        //uint256 mintedTimestamp;
-        //uint256 splitFrom_id;
-        //uint256 splitTo_id;
-    }
-    struct LedgerCcyReturn {
-        uint256 ccyTypeId;
-        string  name;
-        string  unit;
-        int256  balance;
-    }
+        struct LedgerSecTokenReturn {
+            uint256 stId;
+            uint256 tokenTypeId;
+            string  tokenTypeName;
+            uint64  batchId;
+            uint256 currentQty;
+            //uint256 mintedTimestamp;
+            //uint256 splitFrom_id;
+            //uint256 splitTo_id;
+        }
+        struct LedgerCcyReturn {
+            uint256 ccyTypeId;
+            string  name;
+            string  unit;
+            int256  balance;
+        }
+
+
     // *** PACKED SECURITY TOKEN ***
     struct PackedSt {
         uint64 batchId;
         uint64 mintedQty;
         uint64 currentQty;
     }
+        struct SecTokenReturn {
+            bool    exists;                                     // for existence check by id
+            uint256 id;                                         // global sequential id: 1-based
+            uint256 mintedQty;                                  // initial unit qty minted in the ST
+            uint256 currentQty;                                 // current (variable) unit qty in the ST (i.e. burned = currentQty - mintedQty)
+            uint64 batchId;                                     // parent batch of the ST
+            //uint256 mintedTimestamp;                          // minting block.timestamp
+            //uint256 splitFrom_id;                             // the parent ST (if any)
+            //uint256 splitTo_id;                               // the child ST (if any)
+        }
     struct PackedStTotals {
         uint80 transferedQty;
         uint80 exchangeFeesPaidQty;

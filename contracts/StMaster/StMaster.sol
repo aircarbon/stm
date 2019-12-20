@@ -50,21 +50,20 @@ contract StMaster is StMintable, StBurnable, CcyFundable, CcyWithdrawable, StTra
     //
     // LAUNCH LIST
     //
-    // PRI 0 ** ERC20 **
-    //   ### erc20 "excessive batches" but only sending 1000 kg (one batch)... why??
-    //   TODO: (DEFINITELY!) -- test sending across >1 type... (VCS & UNFCCC)
-    //   todo: scoop - ropsten deployment
-    //
-    // R&D -- PERF/IDEA: change internalTransfer so it can operate on *any* stTypeId...? stTypeId is only a property of batch -- any good reason to restrict it?
-    //
-    // PRI 1 -- NEW-CONTRACT (DATA COPY) (so can defer splitting, and address anything else)
-    //   > just need to be able to read out *all* data from storage (new contract can then have writers)
-    //   > new Lib for this: DataReader -- needs to take paginated outputs
+    // TODO: DATA COPY (for contract upgrade path) w/ data hash (paginated?)
+
+    // TODO: BURN/FREEZE: need to be able to freeze/unfreeze tokens so they can't be traded...
+    // todo: (perf) change internalTransfer so it can operate on *any* stTypeId...? any good reason to restrict it?
+    // todo: increase/finalize MAX_BATCHES_PREVIEW
+    // todo: drop fee_fixed completely (it's == fee_min)
+    //   TODO: ERC20 authorize() support
     //
     // PRI 0 ** CASHFLOWS re. SD **
     //   ....?!
     //
     // TODO: Thom - get ETH re. mainnet testing
+    // TODO: cleanup (SafeMath) + audit...
+    // (todo: infura - ropsten deployment)
     //
     // ====== MAINNET ======
     //

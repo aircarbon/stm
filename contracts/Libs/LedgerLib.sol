@@ -66,7 +66,7 @@ library LedgerLib {
         }
 
         // populate balances for each currency type
-        ccys = new StructLib.LedgerCcyReturn[](ccyTypesData._count_ccyTypes + 1);
+        ccys = new StructLib.LedgerCcyReturn[](ccyTypesData._count_ccyTypes);
         for (uint256 ccyTypeId = 1; ccyTypeId <= ccyTypesData._count_ccyTypes; ccyTypeId++) {
             ccys[ccyTypeId - 1] = StructLib.LedgerCcyReturn({
                    ccyTypeId: ccyTypeId,
