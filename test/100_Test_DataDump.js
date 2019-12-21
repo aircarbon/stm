@@ -50,7 +50,7 @@ contract("StMaster", accounts => {
             const ccyType = ccyTypesData.ccyTypes[i];
             const setFee = await stm.setFee_CcyType(ccyType.id, CONST.nullAddr, { fee_fixed: i+1, fee_percBips: (i+1)*100, fee_min: (i+1), fee_max: (i+1+100) } );
             const x = await stm.getFee(CONST.getFeeType.CCY, ccyType.id, CONST.nullAddr);
-            console.log(`Exchange Fee: ccyTypeId=${ccyType.id} { x.fee_fixed=${x.fee_fixed} / x.fee_percBips=${x.fee_percBips} /  x.fee_min=${x.fee_min} / x.fee_max=${x.fee_max} }`);
+            console.log(`Exchange Fee: ccyTypeId=${ccyType.id} { x.fee_fixed=${x.fee_fixed} / x.fee_percBips=${x.fee_percBips} / x.fee_min=${x.fee_min} / x.fee_max=${x.fee_max} }`);
             curHash = await checkHashUpdate(curHash);
         }
 
@@ -59,7 +59,7 @@ contract("StMaster", accounts => {
             const tokType = stTypesData.tokenTypes[i];
             const setFee = await stm.setFee_TokType(tokType.id, CONST.nullAddr, { fee_fixed: i+1, fee_percBips: (i+1)*100, fee_min: (i+1), fee_max: (i+1+100) } );
             const x = await stm.getFee(CONST.getFeeType.TOK, tokType.id, CONST.nullAddr);
-            console.log(`Exchange Fee: tokType=${tokType.id} { x.fee_fixed=${x.fee_fixed} / x.fee_percBips=${x.fee_percBips} /  x.fee_min=${x.fee_min} / x.fee_max=${x.fee_max} }`);
+            console.log(`Exchange Fee: tokType=${tokType.id} { x.fee_fixed=${x.fee_fixed} / x.fee_percBips=${x.fee_percBips} / x.fee_min=${x.fee_min} / x.fee_max=${x.fee_max} }`);
             curHash = await checkHashUpdate(curHash);
         }
 
@@ -75,7 +75,7 @@ contract("StMaster", accounts => {
             ];
             const mintTx_B1 = await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, 1000 * (i+1), 1, M, batchFee,  metaKVPs.map(p => p.k), metaKVPs.map(p => p.v), { from: accounts[0] });
             const mintTx_B2 = await stm.mintSecTokenBatch(CONST.tokenType.VCS,    10000 * (i+1), 1, M, batchFee, metaKVPs.map(p => p.k), metaKVPs.map(p => p.v), { from: accounts[0] });
-            //console.log('getLedgerHashcode: ', await stm.getLedgerHashcode());
+            curHash = await checkHashUpdate(curHash);
         }
         const batchCount = await stm.getSecTokenBatchCount.call();
         for (let i=1 ; i <= batchCount; i++) { // read all
@@ -83,9 +83,8 @@ contract("StMaster", accounts => {
             console.log(`Batch Data: id=${i} mintedQty=${x.mintedQty} burnedQty=${x.burnedQty} metaKeys=${x.metaKeys.join()} metaValues=${x.metaValues.join()} { x.fee_fixed=${x.origTokFee.fee_fixed} / x.fee_percBips=${x.origTokFee.fee_percBips} / x.fee_min=${x.origTokFee.fee_min} / x.fee_max=${x.origTokFee.fee_max} }`);
         }
 
-        // TODO: post some trades so tokens get split and moved around, maybe erc20 send too
-
-        // TODO: hashcode for contract data...
+        // todo: post some trades so tokens get split and moved around, maybe erc20 send too
+        //...
 
         // ledger - entries
         const entryCount = await stm.getLedgerOwnerCount(); // DATA_DUMP: individual fetches
@@ -96,12 +95,18 @@ contract("StMaster", accounts => {
             for (let j=0 ; j < entryCount; j++) { // fund & set ledger ccy & tok type fees
                 const entryOwner = await stm.getLedgerOwner(j);
                 await stm.fund(ccyType.id, (j+1)*100+(i+1), entryOwner, { from: accounts[0] });
+                if (entryOwner != accounts[0])
+                    curHash = await checkHashUpdate(curHash);
 
                 const setLedgerFeeCcy = await stm.setFee_CcyType(ccyType.id, entryOwner, { fee_fixed: i+2+j+2, fee_percBips: (i+2+j+2)*100, fee_min: (i+2+j+2), fee_max: (i+2+j+2+100) } );
+                if (entryOwner != accounts[0])
+                    curHash = await checkHashUpdate(curHash);
 
                 for (let k=0 ; k < stTypesData.tokenTypes.length; k++) {
                     const tokType = stTypesData.tokenTypes[k];
-                    const setLedgerFeeTok = await stm.setFee_TokType(tokType.id, entryOwner, { fee_fixed: k+4+j+4, fee_percBips: (k+4+j+4)*100, fee_min: (k+4+j+4), fee_max: (k+4+j+4+100) } );
+                    const setLedgerFeeTok = await stm.setFee_TokType(tokType.id, entryOwner, { fee_fixed: i+k+4+j+4, fee_percBips: (i+k+4+j+4)*100, fee_min: (i+k+4+j+4), fee_max: (i+k+4+j+4+100) } );
+                    if (entryOwner != accounts[0])
+                       curHash = await checkHashUpdate(curHash);
                 }
             }
         }
@@ -121,7 +126,9 @@ contract("StMaster", accounts => {
             for (let j=0 ; j < x.tokens.length; j++) { // ledger tokens
                 const st = x.tokens[j];
                 if (!stTypeIds.includes(st.tokenTypeId)) stTypeIds.push(st.tokenTypeId);
+                //
                 // TODO: ... getSecToken (stId)
+                //...
             }
 
             for (let j=0 ; j < stTypeIds.length; j++) { // ledger tok type fee

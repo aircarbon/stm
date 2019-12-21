@@ -83,7 +83,7 @@ library LedgerLib {
                 }
             }
 
-            // hash ledger currencies & custom fee
+            // hash ledger currency balances & custom fees
             for (uint256 ccyTypeId = 1; ccyTypeId <= ccyTypesData._count_ccyTypes; ccyTypeId++) {
                 // hash currency type balance
                 ledgerHash = keccak256(abi.encodePacked(ledgerHash, entry.ccyType_balance[ccyTypeId]));
@@ -95,7 +95,7 @@ library LedgerLib {
             }
         }
 
-        // todo: integrity check - st total minted/burned implied == batch totals == global totals
+        // TODO: integrity check - st total minted/burned implied == batch totals == global totals
         //       integrity check - all st's exist exactly once on a ledger entry
 
         // hash totals
