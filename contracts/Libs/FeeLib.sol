@@ -30,8 +30,9 @@ library FeeLib {
         if (ledgerOwner != address(0x0)) {
             require(ledgerData._ledger[ledgerOwner].exists == true, "Bad ledgerOwner");
             feeStruct = ledgerData._ledger[ledgerOwner].customFees;
-            feeStruct.tokType_Set[tokenTypeId] = a.fee_fixed != 0 || a.fee_percBips != 0 || a.fee_min != 0 || a.fee_max != 0;
         }
+
+        feeStruct.tokType_Set[tokenTypeId] = a.fee_fixed != 0 || a.fee_percBips != 0 || a.fee_min != 0 || a.fee_max != 0;
 
         if (feeStruct.tok[tokenTypeId].fee_fixed != a.fee_fixed || a.fee_fixed != 0)
             emit SetFeeTokFix(tokenTypeId, ledgerOwner, a.fee_fixed);
@@ -64,8 +65,9 @@ library FeeLib {
         if (ledgerOwner != address(0x0)) {
             require(ledgerData._ledger[ledgerOwner].exists == true, "Bad ledgerOwner");
             feeStruct = ledgerData._ledger[ledgerOwner].customFees;
-            feeStruct.ccyType_Set[ccyTypeId] = a.fee_fixed != 0 || a.fee_percBips != 0 || a.fee_min != 0 || a.fee_max != 0;
         }
+
+        feeStruct.ccyType_Set[ccyTypeId] = a.fee_fixed != 0 || a.fee_percBips != 0 || a.fee_min != 0 || a.fee_max != 0;
 
         if (feeStruct.ccy[ccyTypeId].fee_fixed != a.fee_fixed || a.fee_fixed != 0)
             emit SetFeeCcyFix(ccyTypeId, ledgerOwner, a.fee_fixed);

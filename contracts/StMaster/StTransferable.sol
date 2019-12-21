@@ -9,9 +9,17 @@ import "./StErc20.sol";
 import "../Libs/StructLib.sol";
 import "../Libs/TransferLib.sol";
 import "../Libs/Erc20Lib.sol";
+import "../Libs/LedgerLib.sol";
 
 contract StTransferable is Owned, StLedger, StFees, StErc20 {
-    
+
+    /**
+     * @dev Returns a keccak256 hash of the ledger data
+     */
+    function getLedgerHashcode() external view returns (bytes32) {
+        return LedgerLib.getLedgerHashcode(ledgerData, stTypesData, ccyTypesData, erc20Data, globalFees);
+    }
+
     /**
      * @dev Transfers or trades assets between ledger accounts
      * @dev allows: one-sided transfers, transfers of same asset types, and transfers (trades) of different asset types

@@ -99,6 +99,7 @@ library StructLib {
         uint80 originatorFeesPaidQty;
     }
 
+
     struct LedgerStruct {
         // *** Batch LIST
         mapping(uint256 => SecTokenBatch) _batches;             // main batch list: all ST batches, by batch ID
