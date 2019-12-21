@@ -73,13 +73,14 @@ library LedgerLib {
                 }
 
                 // loop tokens, hash their details
-                for (uint256 stNdx = 0 ; stNdx < stIds.length ; stNdx++) {
-                    StructLib.PackedSt memory st = ledgerData._sts[stNdx];
+                for (uint256 stNdx = 0; stNdx < stIds.length; stNdx++) {
+                    StructLib.PackedSt memory st = ledgerData._sts[stIds[stNdx]];
 
                     ledgerHash = keccak256(abi.encodePacked(ledgerHash,
                         st.batchId,
                         st.mintedQty,
-                        st.currentQty));
+                        st.currentQty
+                    ));
                 }
             }
 
@@ -123,23 +124,6 @@ library LedgerLib {
         ));
     }
 
-    // returns minimal tokenID -> qty mapping, for erc20 transfer
-    // function getLedgerTokenTypeCounts(
-    //     StructLib.LedgerStruct storage ledgerData,
-    //     StructLib.StTypesStruct storage stTypesData,
-    //     uint256 tokenTypeId,
-    //     address account)
-    // public view returns (uint256 ret) {
-    //     //for (uint256 tokenTypeId = 1; tokenTypeId <= stTypesData._count_tokenTypes; tokenTypeId++) {
-    //         uint256[] memory tokenType_stIds = ledgerData._ledger[account].tokenType_stIds[tokenTypeId];
-
-    //         for (uint256 ndx = 0; ndx < tokenType_stIds.length; ndx++) {
-    //             uint256 stId = tokenType_stIds[ndx];
-    //             ret[tokenTypeId] += ledgerData._sts[stId].currentQty;
-    //         }
-    //     //}
-    // }
-
     // returns full (expensive) ledger information
     function getLedgerEntry(
         StructLib.LedgerStruct storage ledgerData,
@@ -166,18 +150,16 @@ library LedgerLib {
                 uint256 stId = tokenType_stIds[ndx];
 
                 // sum ST sizes - convenience for caller
-                tokens_sumQty += ledgerData._sts[stId].currentQty; //ledgerData._sts_currentQty[stId];
+                tokens_sumQty += ledgerData._sts[stId].currentQty;
 
                 // STs by type
                 tokens[flatSecTokenNdx] = StructLib.LedgerSecTokenReturn({
                            stId: stId,
                     tokenTypeId: tokenTypeId,
                   tokenTypeName: stTypesData._tokenTypeNames[tokenTypeId],
-                        batchId: ledgerData._sts[stId].batchId, //ledgerData._sts_batchId[stId],
-                     currentQty: ledgerData._sts[stId].currentQty //ledgerData._sts_currentQty[stId]
-              //mintedTimestamp: ledgerData._sts_mintedTimestamp[stId],
-                 //splitFrom_id: ledgerData._sts_splitFrom_id[stId],
-                   //splitTo_id: ledgerData._sts_splitTo_id[stId]
+                        batchId: ledgerData._sts[stId].batchId,
+                      mintedQty: ledgerData._sts[stId].mintedQty,
+                     currentQty: ledgerData._sts[stId].currentQty
                 });
                 flatSecTokenNdx++;
             }

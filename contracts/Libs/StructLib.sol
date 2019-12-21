@@ -64,10 +64,8 @@ library StructLib {
             uint256 tokenTypeId;
             string  tokenTypeName;
             uint64  batchId;
+            uint256 mintedQty;
             uint256 currentQty;
-            //uint256 mintedTimestamp;
-            //uint256 splitFrom_id;
-            //uint256 splitTo_id;
         }
         struct LedgerCcyReturn {
             uint256 ccyTypeId;
@@ -78,7 +76,7 @@ library StructLib {
 
 
     // *** PACKED SECURITY TOKEN ***
-    struct PackedSt {
+    struct PackedSt { // ** DATA_DUMP: OK
         uint64 batchId;
         uint64 mintedQty;
         uint64 currentQty;
@@ -89,9 +87,6 @@ library StructLib {
             uint256 mintedQty;                                  // initial unit qty minted in the ST
             uint256 currentQty;                                 // current (variable) unit qty in the ST (i.e. burned = currentQty - mintedQty)
             uint64 batchId;                                     // parent batch of the ST
-            //uint256 mintedTimestamp;                          // minting block.timestamp
-            //uint256 splitFrom_id;                             // the parent ST (if any)
-            //uint256 splitTo_id;                               // the child ST (if any)
         }
     struct PackedStTotals {
         uint80 transferedQty;
