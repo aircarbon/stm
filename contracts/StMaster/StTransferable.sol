@@ -14,7 +14,9 @@ import "../Libs/LedgerLib.sol";
 contract StTransferable is Owned, StLedger, StFees, StErc20 {
 
     /**
-     * @dev Returns a keccak256 hash of the ledger data
+     * @dev Returns a keccak256 hash of the ledger data -- to demonstrate that ledger data is unchanged across contract upgrades.
+     * (Contract owner's ledger entry and its whitelist entry are excluded from the hash calculation;
+     *    contract owner is the only value *expected* to change across contract upgrades)
      */
     function getLedgerHashcode() external view returns (bytes32) {
         return LedgerLib.getLedgerHashcode(ledgerData, stTypesData, ccyTypesData, erc20Data, globalFees);

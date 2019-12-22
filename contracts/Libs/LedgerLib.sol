@@ -5,6 +5,11 @@ import "./StructLib.sol";
 
 library LedgerLib {
 
+    struct ConsistencyCheck {
+        uint256 totalCur;
+        uint256 totalMinted;
+        uint256 totalTokensOnLedger;
+    }
     function getLedgerHashcode(
         StructLib.LedgerStruct storage ledgerData,
         StructLib.StTypesStruct storage stTypesData,
@@ -13,9 +18,9 @@ library LedgerLib {
         StructLib.FeeStruct storage globalFees
     )
     public view returns (bytes32) {
-        bytes32 ledgerHash = 0;
+        bytes32 ledgerHash;
 
-        // hash currency types & exchange fees
+        // hash currency types & exchange currency fees
         for (uint256 ccyTypeId = 1; ccyTypeId <= ccyTypesData._count_ccyTypes; ccyTypeId++) {
             StructLib.Ccy storage ccy = ccyTypesData._ccyTypes[ccyTypeId];
             ledgerHash = keccak256(abi.encodePacked(ledgerHash,
@@ -27,7 +32,7 @@ library LedgerLib {
             }
         }
 
-        // hash token types & exchange fees
+        // hash token types & exchange token fees
         for (uint256 stTypeId = 1; stTypeId <= stTypesData._count_tokenTypes; stTypeId++) {
             ledgerHash = keccak256(abi.encodePacked(ledgerHash, stTypesData._tokenTypeNames[stTypeId]));
 
@@ -37,28 +42,40 @@ library LedgerLib {
         }
 
         // hash whitelist
-        ledgerHash = keccak256(abi.encodePacked(ledgerHash, erc20Data._whitelist));
+        for (uint256 whitelistNdx = 0; whitelistNdx < erc20Data._whitelist.length; whitelistNdx++) {
+            if (erc20Data._whitelist[whitelistNdx] != msg.sender && // exclude contract owner
+                whitelistNdx > 0 // this allows tests to simulate new contact owner - whitelist entry 0 is contract owner, by convention
+            ) {
+                ledgerHash = keccak256(abi.encodePacked(ledgerHash, erc20Data._whitelist[whitelistNdx]));
+            }
+        }
 
         // hash batches
         for (uint256 batchId = 1; batchId <= ledgerData._batches_currentMax_id; batchId++) {
             StructLib.SecTokenBatch storage batch = ledgerData._batches[batchId];
 
-            ledgerHash = keccak256(abi.encodePacked(ledgerHash,
-                batch.id,
-                batch.mintedTimestamp, batch.tokenTypeId,
-                batch.mintedQty, batch.burnedQty,
-                hashStringArray(batch.metaKeys),
-                hashStringArray(batch.metaValues),
-                hashSetFeeArgs(batch.origTokFee),
-                batch.originator
-            ));
+            if (batch.originator != msg.sender) { // exclude contract owner
+                ledgerHash = keccak256(abi.encodePacked(ledgerHash,
+                    batch.id,
+                    batch.mintedTimestamp, batch.tokenTypeId,
+                    batch.mintedQty, batch.burnedQty,
+                    hashStringArray(batch.metaKeys),
+                    hashStringArray(batch.metaValues),
+                    hashSetFeeArgs(batch.origTokFee),
+                    batch.originator
+                ));
+            }
         }
 
-        // walk ledger - skip owner ledger entry [0]
-        // (we expect that address to change across contract updates)
-        for (uint256 ledgerNdx = 1; ledgerNdx < ledgerData._ledgerOwners.length; ledgerNdx++) {
-            address owner = ledgerData._ledgerOwners[ledgerNdx];
-            StructLib.Ledger storage entry = ledgerData._ledger[owner];
+        // walk ledger
+        ConsistencyCheck memory chk;
+        for (uint256 ledgerNdx = 0; ledgerNdx < ledgerData._ledgerOwners.length; ledgerNdx++) {
+            address entryOwner = ledgerData._ledgerOwners[ledgerNdx];
+            StructLib.Ledger storage entry = ledgerData._ledger[entryOwner];
+
+            // hash ledger entry owner, exclude contract owner
+            if (ledgerNdx != 0)
+                ledgerHash = keccak256(abi.encodePacked(ledgerHash, entryOwner));
 
             // hash ledger tokens & custom fee
             for (uint256 stTypeId = 1; stTypeId <= stTypesData._count_tokenTypes; stTypeId++) {
@@ -81,6 +98,11 @@ library LedgerLib {
                         st.mintedQty,
                         st.currentQty
                     ));
+
+                    // consistency check
+                    chk.totalCur += uint256(st.currentQty);
+                    chk.totalMinted += uint256(st.mintedQty);
+                    chk.totalTokensOnLedger++;
                 }
             }
 
@@ -96,13 +118,26 @@ library LedgerLib {
             }
         }
 
-        // TODO: integrity check - st total minted/burned implied == batch totals == global totals
-        //       integrity check - all st's exist exactly once on a ledger entry
+        // consistency check - global totals vs. all STs
+        require(chk.totalMinted == ledgerData._tokens_totalMintedQty, "Consistency check failed (1)");
+        require(chk.totalMinted - chk.totalCur == ledgerData._tokens_totalBurnedQty, "Consistency check failed (2)");
 
-        // hash totals
+        // consistency check - all STs exist against exactly one ledger entry
+        require(chk.totalTokensOnLedger == ledgerData._tokens_currentMax_id, "Consistency check failed (3)");
+
+        // hash totals & counters
+        ledgerHash = keccak256(abi.encodePacked(ledgerHash, ledgerData._tokens_currentMax_id));
         ledgerHash = keccak256(abi.encodePacked(ledgerHash, ledgerData._tokens_totalMintedQty));
         ledgerHash = keccak256(abi.encodePacked(ledgerHash, ledgerData._tokens_totalBurnedQty));
-        //...
+        ledgerHash = keccak256(abi.encodePacked(ledgerHash, uint256(ledgerData._tokens_total.transferedQty)));
+        ledgerHash = keccak256(abi.encodePacked(ledgerHash, uint256(ledgerData._tokens_total.exchangeFeesPaidQty)));
+        ledgerHash = keccak256(abi.encodePacked(ledgerHash, uint256(ledgerData._tokens_total.originatorFeesPaidQty)));
+        for (uint256 ccyTypeId = 1; ccyTypeId <= ccyTypesData._count_ccyTypes; ccyTypeId++) {
+            ledgerHash = keccak256(abi.encodePacked(ledgerHash, uint256(ledgerData._ccyType_totalFunded[ccyTypeId])));
+            ledgerHash = keccak256(abi.encodePacked(ledgerHash, uint256(ledgerData._ccyType_totalWithdrawn[ccyTypeId])));
+            ledgerHash = keccak256(abi.encodePacked(ledgerHash, uint256(ledgerData._ccyType_totalTransfered[ccyTypeId])));
+            ledgerHash = keccak256(abi.encodePacked(ledgerHash, uint256(ledgerData._ccyType_totalFeesPaid[ccyTypeId])));
+        }
 
         return ledgerHash;
     }

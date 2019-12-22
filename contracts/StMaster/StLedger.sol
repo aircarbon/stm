@@ -13,7 +13,7 @@ contract StLedger is Owned, StTypes, CcyTypes {
     StructLib.LedgerStruct ledgerData;
 
     //
-    // ACCESSORS -- ** PUBLIC ** LEDGER
+    // ACCESSORS -- PUBLIC LEDGER
     //
 
     /**
@@ -43,31 +43,27 @@ contract StLedger is Owned, StTypes, CcyTypes {
     }
 
     /**
-     * @dev Returns an ST by ID
+     * @dev Returns a token by ID
      */
     function getSecToken(uint256 id) external view returns (StructLib.SecTokenReturn memory) {
         return StructLib.SecTokenReturn({
-                exists: ledgerData._sts[id].batchId != 0, //ledgerData._sts_batchId[id] != 0,
+                exists: ledgerData._sts[id].batchId != 0,
                     id: id,
-             mintedQty: ledgerData._sts[id].mintedQty, //ledgerData._sts_mintedQty[id],
-            currentQty: ledgerData._sts[id].currentQty, //ledgerData._sts_currentQty[id],
-               batchId: ledgerData._sts[id].batchId //ledgerData._sts_batchId[id]
-
-     //mintedTimestamp: ledgerData._sts_mintedTimestamp[id],
-        //splitFrom_id: ledgerData._sts_splitFrom_id[id],
-          //splitTo_id: ledgerData._sts_splitTo_id[id]
-            });
+             mintedQty: ledgerData._sts[id].mintedQty,
+            currentQty: ledgerData._sts[id].currentQty,
+               batchId: ledgerData._sts[id].batchId
+        });
     }
 
     /**
-     * @dev Returns the global ST batch count
+     * @dev Returns the global token batch count
      */
     function getSecTokenBatchCount() external view returns (uint256) {
         return ledgerData._batches_currentMax_id; // 1-based
     }
 
     /**
-     * @dev Returns an ST batch by ID
+     * @dev Returns a token batch by ID
      */
     function getSecTokenBatch(uint256 batchId) external view returns (StructLib.SecTokenBatch memory) {
         require(batchId >= 1 && batchId <= ledgerData._batches_currentMax_id, "Bad batchId");

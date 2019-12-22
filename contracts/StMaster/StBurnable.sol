@@ -8,6 +8,7 @@ import "../Libs/StructLib.sol";
 import "../Libs/TokenLib.sol";
 
 contract StBurnable is Owned, StLedger {
+    
     /**
      * @dev Burns contact base token units by resizing STs, and/or removing STs from the ledger
      * @dev Removes STs (or fractions of) from the main list and from the ledger, resizing as necessary

@@ -7,10 +7,11 @@ import "./StMintable.sol";
 import "./StBurnable.sol";
 import "./StTransferable.sol";
 import "./StErc20.sol";
+import "./StDataLoadable.sol";
 
 import "../Libs/StructLib.sol"; // bytecode of libs get *removed* during linking (solc/truffle migrate)
 
-contract StMaster is StMintable, StBurnable, CcyFundable, CcyWithdrawable, StTransferable {
+contract StMaster is StMintable, StBurnable, CcyFundable, CcyWithdrawable, StTransferable, StDataLoadable {
     // contract properties
     string public name;
     string public version;
@@ -50,19 +51,32 @@ contract StMaster is StMintable, StBurnable, CcyFundable, CcyWithdrawable, StTra
     //
     // LAUNCH LIST
     //
-    // TODO: DATA COPY (for contract upgrade path) w/ data hash (paginated?)
-
-    // TODO: BURN/FREEZE: need to be able to freeze/unfreeze tokens so they can't be traded...
-    // todo: (perf) change internalTransfer so it can operate on *any* stTypeId...? any good reason to restrict it?
-    // todo: increase/finalize MAX_BATCHES_PREVIEW
-    // todo: drop fee_fixed completely (it's == fee_min)
-    //   TODO: ERC20 authorize() support
+    // ADMIN:
+    //   > fee preview on transfer
+    //   > batch fee on mint
+    //   > explorer v1
+    //   > all accounts[0] refs and privkey to move to config
+    //   > [add ccy-type, add eeu-type (can run from truffle, not needed)]
+    //
+    // PROD AWS
+    //   > me to setup, sole account
+    //   > me to deploy (how much manual?)
+    //   > me to set config
+    //
+    // SOL
+    //   > TODO: DATA_LOAD ... (for proving contract upgrade path) w/ unchanged ledger hash
+    //   > TODO: cleanup (SafeMath) + audit...
+    //
+    //   > todo: increase/finalize MAX_BATCHES_PREVIEW
+    //   > todo: drop fee_fixed completely (it's == fee_min)
+    //
+    //   > todo: change internalTransfer so it can operate on *any* stTypeId... (?) > workaround is to mint only one type (VCS/UNFCCC can still be encoded in meta)
+    //   > todo: ERC20 authorize() support (?)
     //
     // PRI 0 ** CASHFLOWS re. SD **
     //   ....?!
     //
     // TODO: Thom - get ETH re. mainnet testing
-    // TODO: cleanup (SafeMath) + audit...
     // (todo: infura - ropsten deployment)
     //
     // ====== MAINNET ======
@@ -86,9 +100,9 @@ contract StMaster is StMintable, StBurnable, CcyFundable, CcyWithdrawable, StTra
     ) StErc20(contractSymbol, contractDecimals)
     public {
         // set contract properties
-        name = contractName; //"SecTok_Master";
-        version = contractVer; //"0.7";
-        unit = contractUnit; //"KG";
+        name = contractName;
+        version = contractVer;
+        unit = contractUnit;
 
         // params - token types
         stTypesData._tokenTypeNames[1] = 'CER - UNFCCC - Certified Emission Reduction';

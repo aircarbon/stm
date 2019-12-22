@@ -102,6 +102,7 @@ library StructLib {
 
         // *** SecTokens LIST
         mapping(uint256 => PackedSt) _sts;
+        uint256 _tokens_currentMax_id;                          // 1-based - updated by Mint() and by transferSplitSecTokens()
 
         // *** LEDGER
         mapping(address => Ledger) _ledger;                     // main ledger list: all entries, by account
@@ -111,7 +112,6 @@ library StructLib {
         uint256 _tokens_totalMintedQty;                         // TODO: split by type
         uint256 _tokens_totalBurnedQty;                         // TODO: split by type
 
-        uint256 _tokens_currentMax_id;                          // 1-based - updated by Mint() and by transferSplitSecTokens()
         PackedStTotals _tokens_total;
 
         mapping(uint256 => uint256) _ccyType_totalFunded;
