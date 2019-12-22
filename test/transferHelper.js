@@ -31,7 +31,7 @@ module.exports = {
         var totalKg_tfd_before, totalKg_tfd_after;
         const totalCcy_tfd_before = [];
         const totalCcy_tfd_after = [];
-        totalKg_tfd_before = await stm.getSecToken_totalTransfered.call();
+        totalKg_tfd_before = await stm.getSecToken_totalTransferedQty.call();
         totalCcy_tfd_before[ccyTypeId_A] = await stm.getCcy_totalTransfered.call(ccyTypeId_A);
         totalCcy_tfd_before[ccyTypeId_B] = await stm.getCcy_totalTransfered.call(ccyTypeId_B);
 
@@ -163,7 +163,7 @@ module.exports = {
         //console.log('originatorFeeData', originatorFeeData);
 
         // global totals: transferred after
-        totalKg_tfd_after = await stm.getSecToken_totalTransfered.call();
+        totalKg_tfd_after = await stm.getSecToken_totalTransferedQty.call();
         totalCcy_tfd_after[ccyTypeId_A] = await stm.getCcy_totalTransfered.call(ccyTypeId_A);
         totalCcy_tfd_after[ccyTypeId_B] = await stm.getCcy_totalTransfered.call(ccyTypeId_B);
 

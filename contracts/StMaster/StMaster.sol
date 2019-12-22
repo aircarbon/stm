@@ -127,6 +127,16 @@ contract StMaster is StMintable, StBurnable, CcyFundable, CcyWithdrawable, StTra
         ledgerData._ledgerOwners.push(owner);
     }
 
+    /**
+     * @dev Immutably seals the contract. Once sealed, no further whitelist entries can be added, and no bulk data load actions can be performed.
+     */
+    function sealContract() public {
+        ledgerData._contractSealed = true;
+    }
+    function getContractSeal() external view returns (bool) {
+        return ledgerData._contractSealed;
+    }
+
     // TODO: for updateable libs - proxy dispatcher
     // https://blog.openzeppelin.com/proxy-libraries-in-solidity-79fbe4b970fd/
     // test lib...

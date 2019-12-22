@@ -60,6 +60,7 @@ library CcyLib {
         int256  amount, // signed value: ledger ccyType_balance supports (theoretical) -ve balances
         address ledgerOwner)
     public {
+        require(ledgerData._contractSealed, "Contract is not sealed");
         require(ccyTypeId >= 1 && ccyTypeId <= ccyTypesData._count_ccyTypes, "Bad ccyTypeId");
         require(amount >= 0, "Min. amount 1"); // allow funding zero (initializes empty ledger entry), disallow negative funding
 
@@ -92,6 +93,7 @@ library CcyLib {
         int256  amount, // signed value: ledger ccyType_balance supports (theoretical) -ve balances
         address ledgerOwner)
     public {
+        require(ledgerData._contractSealed, "Contract is not sealed");
         require(ccyTypeId >= 1 && ccyTypeId <= ccyTypesData._count_ccyTypes, "Bad ccyTypeId");
         require(amount > 0, "Min. amount 1"); // disallow negative withdrawing
         require(ledgerData._ledger[ledgerOwner].exists == true, "Bad ledgerOwner");

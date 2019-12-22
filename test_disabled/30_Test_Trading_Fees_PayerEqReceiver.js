@@ -12,18 +12,20 @@ contract("StMaster", accounts => {
 
     before(async () => {
         stm = await st.deployed();
-        stm.whitelist(accounts[0]);
+
+        if (!global.TaddrNdx) global.TaddrNdx = 0;
+        await stm.whitelist(accounts[0]);
+        
+        for (let i=1 ; i < 60 ; i++) { // whitelist enough accounts for the tests
+            await stm.whitelist(accounts[global.TaddrNdx + i]);
+        }
+        await stm.sealContract();
     });
 
     beforeEach(async () => {
-        if (!global.TaddrNdx) global.TaddrNdx = 0;
         global.TaddrNdx += 2;
         if (CONST.logTestAccountUsage)
-            console.log(`addrNdx: ${global.TaddrNdx} - contract @ ${stm.address} (owner: ${accounts[0]})`);
-        if (CONST.whitelistExchangeTestAcounts) {
-            await stm.whitelist(accounts[global.TaddrNdx + 0]);
-            await stm.whitelist(accounts[global.TaddrNdx + 1]);
-        }
+            console.log(`TaddrNdx: ${global.TaddrNdx} - contract @ ${stm.address} (owner: ${accounts[0]})`);
     });
 
     // STs: NO FEES IF FEE RECEIVER = FEE SENDER (contract owner or batch originator)

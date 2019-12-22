@@ -33,16 +33,10 @@ contract StErc20 is StFees, IErc20 {
 
     // WHITELIST
     function whitelist(address addr) public {
-        Erc20Lib.whitelist(erc20Data, addr);
+        Erc20Lib.whitelist(ledgerData, erc20Data, addr);
     }
     function getWhitelist() external view returns (address[] memory) {
         return erc20Data._whitelist;
-    }
-    function getWhitelistSeal() external view returns (bool) {
-        return erc20Data._whitelistClosed;
-    }
-    function sealWhitelist() public {
-        Erc20Lib.seal(erc20Data);
     }
 
     // ERC20 - CORE

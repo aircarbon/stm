@@ -1,7 +1,6 @@
 const os = require('os');
 const publicIp = require('public-ip');
 
-//const St2x = artifacts.require('./St2x.sol');
 const StructLib = artifacts.require('./StructLib.sol');
 const CcyLib = artifacts.require('./CcyLib.sol');
 const TokenLib = artifacts.require('./TokenLib.sol');
@@ -9,10 +8,8 @@ const LedgerLib = artifacts.require('./LedgerLib.sol');
 const TransferLib = artifacts.require('./TransferLib.sol');
 const FeeLib = artifacts.require('./FeeLib.sol');
 const Erc20Lib = artifacts.require('./Erc20Lib.sol');
-const DataLib = artifacts.require('./DataLib.sol');
+const LoadLib = artifacts.require('./LoadLib.sol');
 
-//const StMintable = artifacts.require('./StMintable.sol');
-//const StLedger = artifacts.require('./StLedger.sol');
 const StMaster = artifacts.require('./StMaster.sol');
 
 const CONST = require('../const.js');
@@ -26,9 +23,6 @@ module.exports = async function (deployer) {
     console.log('2_deploy_contracts: ', deployer.network);
 
     StMaster.synchronization_timeout = 42;  // seconds
-
-    //deployer.deploy(St2x).then(async st2x => {
-        //deployer.link(St2x, StMaster);
 
     deployer.deploy(StructLib).then(async ccyLib => { 
         deployer.link(StructLib, CcyLib);
@@ -59,8 +53,8 @@ module.exports = async function (deployer) {
     return deployer.deploy(Erc20Lib).then(async feeLib => { 
         deployer.link(Erc20Lib, StMaster);
 
-    return deployer.deploy(DataLib).then(async dataLib => { 
-        deployer.link(DataLib, StMaster);
+    return deployer.deploy(LoadLib).then(async loadLib => { 
+        deployer.link(LoadLib, StMaster);
 
         return deployer.deploy(StMaster, CONST.contractName, CONST.contractVer, CONST.contractUnit, CONST.contractSymbol, CONST.contractDecimals).then(async stm => {
             //console.dir(stm.abi);

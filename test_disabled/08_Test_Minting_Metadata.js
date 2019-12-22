@@ -19,8 +19,12 @@ contract("StMaster", accounts => {
         { k: 'UNFCCC_ISSUANCE_SERIAL_END',   v: 'BR-5-85448545-1-1-0-8' } // freetext
     ];
 
-    beforeEach(async () => {
+    before(async () => {
         stm = await st.deployed();
+        await stm.sealContract();
+    });
+
+    beforeEach(async () => {
         if (!global.TaddrNdx) global.TaddrNdx = 0;
         global.TaddrNdx++;
         if (CONST.logTestAccountUsage)

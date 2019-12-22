@@ -6,8 +6,12 @@ const CONST = require('../const.js');
 contract("StMaster", accounts => {
     var stm;
 
-    beforeEach(async () => {
+    before(async () => {
         stm = await st.deployed();
+        await stm.sealContract();
+    });
+
+    beforeEach(async () => {
         if (!global.TaddrNdx) global.TaddrNdx = 0;
         global.TaddrNdx++;
         if (CONST.logTestAccountUsage)

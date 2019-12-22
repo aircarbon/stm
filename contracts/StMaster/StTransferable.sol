@@ -61,7 +61,7 @@ contract StTransferable is Owned, StLedger, StFees, StErc20 {
     /**
      * @dev Returns the total global quantity of carbon transfered
      */
-    function getSecToken_totalTransfered()
+    function getSecToken_totalTransferedQty()
     external view onlyOwner() returns (uint256) {
         return ledgerData._tokens_total.transferedQty;
     }

@@ -64,6 +64,7 @@ library TokenLib {
         MintSecTokenBatchArgs memory a)
     public {
 
+        require(ledgerData._contractSealed, "Contract is not sealed");
         require(a.tokenTypeId >= 1 && a.tokenTypeId <= stTypesData._count_tokenTypes, "Bad tokenTypeId");
         //require(a.mintSecTokenCount >= 1, "Minimum one ST required");
         //require(a.mintQty % a.mintSecTokenCount == 0, "mintQty must divide evenly into mintSecTokenCount");
@@ -111,21 +112,15 @@ library TokenLib {
             uint256 newId = ledgerData._tokens_currentMax_id + 1 + uint256(ndx);
 
             // mint ST
-            //uint256 stQty = uint256(a.mintQty) / uint256(a.mintSecTokenCount);
             uint64 stQty = uint64(a.mintQty) / uint64(a.mintSecTokenCount);
-            ledgerData._sts[newId].batchId = uint64(newBatch.id); //ledgerData._sts_batchId[newId] = newBatch.id;
-            ledgerData._sts[newId].mintedQty = stQty; //ledgerData._sts_mintedQty[newId] = stQty;
-            ledgerData._sts[newId].currentQty = stQty; //ledgerData._sts_currentQty[newId] = stQty;
-            //ledgerData._sts_mintedTimestamp[newId] = block.timestamp;
+            ledgerData._sts[newId].batchId = uint64(newBatch.id);
+            ledgerData._sts[newId].mintedQty = stQty;
+            ledgerData._sts[newId].currentQty = stQty;
 
             emit MintedSecToken(newId, newBatch.id, a.tokenTypeId, a.batchOwner, stQty);
 
             // assign
             ledgerData._ledger[a.batchOwner].tokenType_stIds[a.tokenTypeId].push(newId);
-
-            // maintain fast ST ownership lookup - by keccak256(ledgerOwner||stId)
-            // not currently used (was used when burning by stId)
-            //ledgerData._ownsSecTokenId[keccak256(abi.encodePacked(a.batchOwner, newId))] = true;
         }
 
         ledgerData._tokens_currentMax_id += uint256(a.mintSecTokenCount);
@@ -139,6 +134,7 @@ library TokenLib {
         string memory metaKeyNew,
         string memory metaValueNew)
     public {
+        require(ledgerData._contractSealed, "Contract is not sealed");
         require(batchId >= 1 && batchId <= ledgerData._batches_currentMax_id, "Bad batchId");
 
         for (uint256 kvpNdx = 0; kvpNdx < ledgerData._batches[batchId].metaKeys.length; kvpNdx++) {
@@ -157,6 +153,7 @@ library TokenLib {
         uint256 batchId,
         StructLib.SetFeeArgs memory originatorFeeNew)
     public {
+        require(ledgerData._contractSealed, "Contract is not sealed");
         require(batchId >= 1 && batchId <= ledgerData._batches_currentMax_id, "Bad batchId");
         require(ledgerData._batches[batchId].origTokFee.fee_fixed >= originatorFeeNew.fee_fixed, "Bad fee args");
         require(ledgerData._batches[batchId].origTokFee.fee_percBips >= originatorFeeNew.fee_percBips, "Bad fee args");
@@ -179,6 +176,7 @@ library TokenLib {
         uint256 burnQty // accept 256 bits, so we can downcast and test if in 64-bit range
     )
     public {
+        require(ledgerData._contractSealed, "Contract is not sealed");
         require(ledgerData._ledger[ledgerOwner].exists == true, "Bad ledgerOwner");
         require(burnQty >= 0x1 && burnQty <= 0xffffffffffffffff, "Bad burnQty"); // max uint64
         require(tokenTypeId >= 1 && tokenTypeId <= stTypesData._count_tokenTypes, "Bad tokenTypeId");

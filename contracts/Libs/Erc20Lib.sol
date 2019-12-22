@@ -8,15 +8,16 @@ library Erc20Lib {
     event Transfer(address indexed from, address indexed to, uint256 value);
     event Approval(address indexed owner, address indexed spender, uint256 value);
 
-    // WHITELIST
-    function whitelist(StructLib.Erc20Struct storage erc20Data, address addr) public {
+    // WHITELIST -- todo: move seal to ledger
+    function whitelist(
+        StructLib.LedgerStruct storage ledgerData,
+        StructLib.Erc20Struct storage erc20Data,
+        address addr)
+    public {
         require(!erc20Data._whitelisted[addr], "Already whitelisted");
-        require(!erc20Data._whitelistClosed, "Whitelist sealed");
+        require(!ledgerData._contractSealed, "Contract is sealed");
         erc20Data._whitelist.push(addr);
         erc20Data._whitelisted[addr] = true;
-    }
-    function seal(StructLib.Erc20Struct storage erc20Data) public {
-        erc20Data._whitelistClosed = true;
     }
 
     // TRANSFER
@@ -36,6 +37,7 @@ library Erc20Lib {
         StructLib.FeeStruct storage globalFees, address owner, // fees: disabled for erc20 - not used
         address recipient, uint256 amount
     ) public returns (bool) {
+        require(ledgerData._contractSealed, "Contract is not sealed");
 
         uint256 remainingToTransfer = amount;
         while (remainingToTransfer > 0) {

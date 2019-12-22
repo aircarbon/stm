@@ -8,8 +8,12 @@ const CONST = require('../const.js');
 contract("StMaster", accounts => {
     var stm;
 
-    beforeEach(async () => {
+    before(async () => {
         stm = await st.deployed();
+        await stm.sealContract();
+    });
+
+    beforeEach(async () => {
         if (!global.TaddrNdx) global.TaddrNdx = 0;
         global.TaddrNdx++;
         if (CONST.logTestAccountUsage)
@@ -29,7 +33,7 @@ contract("StMaster", accounts => {
         assert(batch.origTokFee.fee_max      == origFee.fee_max,       'unexpected originator fee_min on minted batch');
     });
 
-    /*it('minting originator fee - should allow minting of collared, uncapped batch fee', async () => {
+    it('minting originator fee - should allow minting of collared, uncapped batch fee', async () => {
         const M = accounts[global.TaddrNdx];
         const origFee = { fee_fixed: 10, fee_percBips: 10, fee_min: 10, fee_max: 0 }
         await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.tonCarbon, 1, M, origFee, [], [], { from: accounts[0] });
@@ -167,5 +171,5 @@ contract("StMaster", accounts => {
             await stm.setOriginatorFeeTokenBatch(batchId, origFee,                                     { from: accounts[0] });
         } catch (ex) { assert(ex.reason == 'Bad fee args', `unexpected: ${ex.reason}`); return; }
         assert.fail('expected contract exception');        
-    });*/
+    });
 });

@@ -67,13 +67,13 @@ library LedgerLib {
             }
         }
 
-        // walk ledger
+        // walk ledger -- exclude contract owner from hashes
         ConsistencyCheck memory chk;
         for (uint256 ledgerNdx = 0; ledgerNdx < ledgerData._ledgerOwners.length; ledgerNdx++) {
             address entryOwner = ledgerData._ledgerOwners[ledgerNdx];
             StructLib.Ledger storage entry = ledgerData._ledger[entryOwner];
 
-            // hash ledger entry owner, exclude contract owner
+            // hash ledger entry owner
             if (ledgerNdx != 0)
                 ledgerHash = keccak256(abi.encodePacked(ledgerHash, entryOwner));
 
@@ -82,22 +82,21 @@ library LedgerLib {
                 uint256[] storage stIds = entry.tokenType_stIds[stTypeId];
 
                 // hash token type id list
-                ledgerHash = keccak256(abi.encodePacked(ledgerHash, stIds));
+                //if (ledgerNdx != 0)
+                    ledgerHash = keccak256(abi.encodePacked(ledgerHash, stIds));
 
                 // hash token type ledger fee
                 if (entry.customFees.tokType_Set[stTypeId]) {
-                    ledgerHash = keccak256(abi.encodePacked(ledgerHash, hashSetFeeArgs(entry.customFees.tok[stTypeId])));
+                    //if (ledgerNdx != 0)
+                        ledgerHash = keccak256(abi.encodePacked(ledgerHash, hashSetFeeArgs(entry.customFees.tok[stTypeId])));
                 }
 
                 // loop tokens, hash their details
                 for (uint256 stNdx = 0; stNdx < stIds.length; stNdx++) {
                     StructLib.PackedSt memory st = ledgerData._sts[stIds[stNdx]];
 
-                    ledgerHash = keccak256(abi.encodePacked(ledgerHash,
-                        st.batchId,
-                        st.mintedQty,
-                        st.currentQty
-                    ));
+                    //if (ledgerNdx != 0)
+                        ledgerHash = keccak256(abi.encodePacked(ledgerHash, st.batchId, st.mintedQty, st.currentQty));
 
                     // consistency check
                     chk.totalCur += uint256(st.currentQty);
@@ -109,11 +108,13 @@ library LedgerLib {
             // hash ledger currency balances & custom fees
             for (uint256 ccyTypeId = 1; ccyTypeId <= ccyTypesData._count_ccyTypes; ccyTypeId++) {
                 // hash currency type balance
-                ledgerHash = keccak256(abi.encodePacked(ledgerHash, entry.ccyType_balance[ccyTypeId]));
+                //if (ledgerNdx != 0)
+                    ledgerHash = keccak256(abi.encodePacked(ledgerHash, entry.ccyType_balance[ccyTypeId]));
 
                 // hash currency type ledger fee
                 if (entry.customFees.ccyType_Set[ccyTypeId]) {
-                    ledgerHash = keccak256(abi.encodePacked(ledgerHash, hashSetFeeArgs(entry.customFees.ccy[ccyTypeId])));
+                    //if (ledgerNdx != 0)
+                        ledgerHash = keccak256(abi.encodePacked(ledgerHash, hashSetFeeArgs(entry.customFees.ccy[ccyTypeId])));
                 }
             }
         }

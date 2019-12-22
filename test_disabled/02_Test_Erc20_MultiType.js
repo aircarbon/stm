@@ -25,6 +25,7 @@ contract("StMaster", accounts => {
         GRAY_2 = accounts[NDX_GRAY_2];
         
         await stm.whitelist(WHITE);
+        await stm.sealContract();
 
         // mint batches x 3 with originator fees - should be ignored by ERC20
         const testFee = { fee_fixed: 1, fee_percBips: 10, fee_min: 0, fee_max: 0 };

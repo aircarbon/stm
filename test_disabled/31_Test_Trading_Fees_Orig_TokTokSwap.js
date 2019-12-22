@@ -10,9 +10,17 @@ const web3 = new Web3();
 contract("StMaster", accounts => {
     var stm;
 
-    beforeEach(async () => {
+    before(async () => {
         stm = await st.deployed();
+
         if (!global.TaddrNdx) global.TaddrNdx = 0;
+        for (let i=0 ; i < 60 ; i++) { // whitelist enough accounts for the tests
+            await stm.whitelist(accounts[global.TaddrNdx + i]);
+        }
+        await stm.sealContract();
+    });
+
+    beforeEach(async () => {
         //global.TaddrNdx += 5; // tests increment this; they use varying #'s of accounts
         if (CONST.logTestAccountUsage)
             console.log(`addrNdx: ${global.TaddrNdx} - contract @ ${stm.address} (owner: ${accounts[0]})`);
@@ -23,8 +31,8 @@ contract("StMaster", accounts => {
     it('fees (orig/orig) - apply VCS token M originator fees (+ ledger fee) / UNFCCC token M originator fees (+ global fee), on a 1.5 ST trade (tok fee on A / tok fee on B)', async () => {
         const A = accounts[++global.TaddrNdx];
         const B = accounts[++global.TaddrNdx];
-        await stm.whitelist(A);
-        await stm.whitelist(B);
+        //await stm.whitelist(A);
+        //await stm.whitelist(B);
 
         const tokType_A = CONST.tokenType.VCS;
         const tokType_B = CONST.tokenType.UNFCCC;
@@ -121,7 +129,7 @@ contract("StMaster", accounts => {
         for (var i=0; i < originatorCount ; i++) {
             const M = accounts[++global.TaddrNdx]
             M_multi.push({ account: M });
-            await stm.whitelist(M);
+            //await stm.whitelist(M);
         }
         var totalTokQty = 0;
         for (var i = 0 ; i < M_multi.length ; i++) {

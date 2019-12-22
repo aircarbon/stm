@@ -17,10 +17,10 @@ contract Owned {
         require(_readOnly == false, "Read-only");
         _;
     }
-    modifier onlyWhenReadOnly() {
-        require(_readOnly == true, "Set to read-only");
-        _;
-    }
+    // modifier onlyWhenReadOnly() {
+    //     require(_readOnly == true, "Set to read-only first");
+    //     _;
+    // }
 
     /**
      * @dev Sets the contract-wide read only state

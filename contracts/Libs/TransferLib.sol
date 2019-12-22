@@ -67,6 +67,7 @@ library TransferLib {
         StructLib.FeeStruct storage globalFees,
         TransferLib.TransferArgs memory a
     ) public {
+        require(ledgerData._contractSealed, "Contract is not sealed");
         require(a.ledger_A != a.ledger_B, "Bad transfer");
         require(a.qty_A > 0 || a.qty_B > 0 || a.ccy_amount_A > 0 || a.ccy_amount_B > 0, "Bad null transfer");
         require(a.qty_A <= 0xffffffffffffffff, "Bad qty_A");

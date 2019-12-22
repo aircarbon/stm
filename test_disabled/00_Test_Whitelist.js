@@ -40,7 +40,7 @@ contract("StMaster", accounts => {
     });
 
     it('whitelist - should be able to seal the whitelist', async () => {
-        const sealTx = await stm.sealWhitelist();
+        const sealTx = await stm.sealContract();
         console.log('*** WHITELIST SEALED *** tx=', sealTx.tx);
     });
 
@@ -49,7 +49,7 @@ contract("StMaster", accounts => {
             const addr = accounts[WHITELIST_COUNT];
             await stm.whitelist(addr);
         } catch (ex) {
-            assert(ex.reason == 'Whitelist sealed', `unexpected: ${ex.reason}`);
+            assert(ex.reason == 'Contract is sealed', `unexpected: ${ex.reason}`);
             return;
         }
         assert.fail('expected contract exception');

@@ -48,7 +48,6 @@ library StructLib {
     struct Ledger {
         bool                          exists;                   // for existance check by address
         mapping(uint256 => uint256[]) tokenType_stIds;          // SecTokenTypeId -> stId[] of all owned STs
-      //mapping(uint256 => uint256)   tokenType_sumQty;         // SecTokenTypeId -> sum of token qty's across all owned STs
         mapping(uint256 => int256)    ccyType_balance;          // CcyTypeId -> balance -- SIGNED! WE MAY WANT TO SUPPORT -VE BALANCES LATER...
         StructLib.FeeStruct           customFees;               // global fee override - per ledger entry
     }
@@ -118,6 +117,8 @@ library StructLib {
         mapping(uint256 => uint256) _ccyType_totalWithdrawn;
         mapping(uint256 => uint256) _ccyType_totalTransfered;
         mapping(uint256 => uint256) _ccyType_totalFeesPaid;
+
+        bool _contractSealed;
     }
 
     // FEE STRUCTURE -- (ledger or global) fees for all ccy's and token types
@@ -136,7 +137,6 @@ library StructLib {
 
     // ERC20 TYPES
     struct Erc20Struct {
-        bool _whitelistClosed;
         address[] _whitelist;
         mapping(address => bool) _whitelisted;
     }

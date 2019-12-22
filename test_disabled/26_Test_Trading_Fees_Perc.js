@@ -7,16 +7,20 @@ const BN = require('bn.js');
 contract("StMaster", accounts => {
     var stm;
 
-    beforeEach(async () => {
+    before(async () => {
         stm = await st.deployed();
         if (!global.TaddrNdx) global.TaddrNdx = 0;
+        
+        for (let i=0 ; i < 60 ; i++) { // whitelist enough accounts for the tests
+            await stm.whitelist(accounts[global.TaddrNdx + i]);
+        }
+        await stm.sealContract();
+    });
+
+    beforeEach(async () => {
         global.TaddrNdx += 2;
         if (CONST.logTestAccountUsage)
-            console.log(`addrNdx: ${global.TaddrNdx} - contract @ ${stm.address} (owner: ${accounts[0]})`);
-        if (CONST.whitelistExchangeTestAcounts) {
-            await stm.whitelist(accounts[global.TaddrNdx + 0]);
-            await stm.whitelist(accounts[global.TaddrNdx + 1]);
-        }
+            console.log(`TaddrNdx: ${global.TaddrNdx} - contract @ ${stm.address} (owner: ${accounts[0]})`);
     });
 
     // ST FEES

@@ -7,8 +7,12 @@ contract("StMaster", accounts => {
 
     const countDefaultCcyTypes = 7;
 
-    beforeEach(async () => {
+    before(async () => {
         stm = await st.deployed();
+        await stm.sealContract();
+    });
+
+    beforeEach(async () => {
         if (!global.TaddrNdx) global.TaddrNdx = 0;
         global.TaddrNdx++;
         if (CONST.logTestAccountUsage)

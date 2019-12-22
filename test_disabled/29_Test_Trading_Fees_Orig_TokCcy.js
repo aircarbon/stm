@@ -17,19 +17,27 @@ contract("StMaster", accounts => {
     const ORIG_FEES_UNFCCC_B2 = { fee_fixed: 2, fee_percBips: 200, fee_min: 20, fee_max: 0 };
     const ORIG_FEES_UNFCCC_B3 = { fee_fixed: 3, fee_percBips: 300, fee_min: 30, fee_max: 0 };
 
-    beforeEach(async () => {
+    before(async () => {
         stm = await st.deployed();
         if (!global.TaddrNdx) global.TaddrNdx = 0;
+        
+        for (let i=0 ; i < 60 ; i++) { // whitelist enough accounts for the tests
+            await stm.whitelist(accounts[global.TaddrNdx + i]);
+        }
+        await stm.sealContract();
+    });
+
+    beforeEach(async () => {
+        global.TaddrNdx += 2;
+        if (CONST.logTestAccountUsage)
+            console.log(`TaddrNdx: ${global.TaddrNdx} - contract @ ${stm.address} (owner: ${accounts[0]})`);
+    });
+
+    beforeEach(async () => {
+        stm = await st.deployed();
         global.TaddrNdx += 5;
         if (CONST.logTestAccountUsage)
             console.log(`addrNdx: ${global.TaddrNdx} - contract @ ${stm.address} (owner: ${accounts[0]})`);
-        if (CONST.whitelistExchangeTestAcounts) {
-            await stm.whitelist(accounts[global.TaddrNdx + 0]);
-            await stm.whitelist(accounts[global.TaddrNdx + 1]);
-            await stm.whitelist(accounts[global.TaddrNdx + 2]);
-            await stm.whitelist(accounts[global.TaddrNdx + 3]);
-            await stm.whitelist(accounts[global.TaddrNdx + 4]);
-        }
     });
 
     // ST ORIGINATOR FEES - SINGLE ORIGINATOR
