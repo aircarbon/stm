@@ -19,39 +19,69 @@ library LoadLib {
 
     function createLedgerEntry(
         StructLib.LedgerStruct storage ledgerData,
-        address ledgerEntryOwner
+        address ledgerEntryOwner,
+        StructLib.LedgerCcyReturn[] memory ccys
     )
     public {
         require(!ledgerData._contractSealed, "Contract is sealed");
+
+        if (!ledgerData._ledger[ledgerEntryOwner].exists) {
+            ledgerData._ledgerOwners.push(ledgerEntryOwner);
+        }
+
         ledgerData._ledger[ledgerEntryOwner] = StructLib.Ledger({
                 exists: true,
             customFees: StructLib.FeeStruct()
         });
-        ledgerData._ledgerOwners.push(ledgerEntryOwner);
+
+        for (uint256 i = 0 ; i < ccys.length ; i++) {
+            ledgerData._ledger[ledgerEntryOwner].ccyType_balance[ccys[i].ccyTypeId] = ccys[i].balance;
+        }
     }
 
     function addSecToken(
         StructLib.LedgerStruct storage ledgerData,
         address ledgerEntryOwner,
-        uint64 batchId, uint256 stId, uint256 tokenTypeId, uint64 mintedQty, uint64 currentQty,
-        uint256 _tokens_currentMax_id, uint256 _tokens_totalMintedQty)
+        uint64 batchId, uint256 stId, uint256 tokenTypeId, uint64 mintedQty, uint64 currentQty
+    )
     public {
+        require(!ledgerData._contractSealed, "Contract is sealed");
         ledgerData._sts[stId].batchId = batchId;
         ledgerData._sts[stId].mintedQty = mintedQty;
         ledgerData._sts[stId].currentQty = currentQty;
         ledgerData._ledger[ledgerEntryOwner].tokenType_stIds[tokenTypeId].push(stId);
-        ledgerData._tokens_currentMax_id = _tokens_currentMax_id;
-        ledgerData._tokens_totalMintedQty = _tokens_totalMintedQty;
     }
 
     function setTokenTotals(
         StructLib.LedgerStruct storage ledgerData,
-        uint80 totalExchangeFeesPaidQty,
-        uint80 totalOriginatorFeesPaidQty,
-        uint80 totalTransferedQty)
+        uint80 packed_ExchangeFeesPaidQty, uint80 packed_OriginatorFeesPaidQty, uint80 packed_TransferedQty,
+        uint256 currentMax_id, uint256 totalMintedQty, uint256 totalBurnedQty
+    )
     public {
-        ledgerData._tokens_total.exchangeFeesPaidQty = totalExchangeFeesPaidQty;
-        ledgerData._tokens_total.originatorFeesPaidQty += totalOriginatorFeesPaidQty;
-        ledgerData._tokens_total.transferedQty = totalTransferedQty;
+        require(!ledgerData._contractSealed, "Contract is sealed");
+        ledgerData._tokens_total.exchangeFeesPaidQty = packed_ExchangeFeesPaidQty;
+        ledgerData._tokens_total.originatorFeesPaidQty = packed_OriginatorFeesPaidQty;
+        ledgerData._tokens_total.transferedQty = packed_TransferedQty;
+
+        ledgerData._tokens_currentMax_id = currentMax_id;
+        ledgerData._tokens_totalMintedQty = totalMintedQty;
+        ledgerData._tokens_totalBurnedQty = totalBurnedQty;
     }
+
+    function setTotalCcyFunded(
+        StructLib.LedgerStruct storage ledgerData,
+        uint256 ccyTypeId, uint256 amount)
+    public {
+        require(!ledgerData._contractSealed, "Contract is sealed");
+        ledgerData._ccyType_totalFunded[ccyTypeId] = amount;
+    }
+
+    function setTotalCcyWithdrawn(
+        StructLib.LedgerStruct storage ledgerData,
+        uint256 ccyTypeId, uint256 amount)
+    public {
+        require(!ledgerData._contractSealed, "Contract is sealed");
+        ledgerData._ccyType_totalWithdrawn[ccyTypeId] = amount;
+    }
+
 }

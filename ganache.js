@@ -9,7 +9,7 @@ const { NETWORK_ID } = process.env;
 // ropsten limit: 8m
 // mainnet limit: ~10m
 // ganache default limit: 6m
-const command = `ganache-cli --port ${PORT} --accounts ${TOTAL_ACCOUNTS} --networkId ${NETWORK_ID} --mnemonic "${MNEMONIC}" --gasLimit 7000000`;
+const command = `ganache-cli --port ${PORT} --accounts ${TOTAL_ACCOUNTS} --networkId ${NETWORK_ID} --mnemonic "${MNEMONIC}" --gasLimit 7800000`;
 
 shell.echo(`Run: ${command}`);
 

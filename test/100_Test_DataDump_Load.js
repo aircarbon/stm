@@ -24,20 +24,20 @@ contract("StMaster", accounts => {
     });
 
     it('data dump - should be able to read all contract data', async () => {
-        const ENTRY_COUNT = 2;
+        const ENTRY_COUNT = 10;
         var curHash = await stm_cur.getLedgerHashcode();
 
-        // // ccy types
-        // await stm_cur.addCcyType('TEST_CCY_TYPE', 'TEST_UNIT', 42);
-        // const ccyTypesData = await stm_cur.getCcyTypes();
-        // console.log(`Ccy Types: ${ccyTypesData.ccyTypes.map(p => p.name).join(', ')}`);
-        // curHash = await checkHashUpdate(curHash);
+        // ccy types
+        await stm_cur.addCcyType('TEST_CCY_TYPE', 'TEST_UNIT', 42);
+        const ccyTypesData = await stm_cur.getCcyTypes();
+        console.log(`Ccy Types: ${ccyTypesData.ccyTypes.map(p => p.name).join(', ')}`);
+        curHash = await checkHashUpdate(curHash);
 
-        // // token types
-        // await stm_cur.addSecTokenType('NEW_TOK_TYPE', { from: accounts[0] });
-        // const stTypesData = await stm_cur.getSecTokenTypes();
-        // console.log(`St Types: ${stTypesData.tokenTypes.map(p => p.name).join(', ')}`);
-        // curHash = await checkHashUpdate(curHash);
+        // token types
+        await stm_cur.addSecTokenType('NEW_TOK_TYPE', { from: accounts[0] });
+        const stTypesData = await stm_cur.getSecTokenTypes();
+        console.log(`St Types: ${stTypesData.tokenTypes.map(p => p.name).join(', ')}`);
+        curHash = await checkHashUpdate(curHash);
 
         // whitelist
         for (let i=0 ; i < ENTRY_COUNT + 1; i++)
@@ -47,23 +47,23 @@ contract("StMaster", accounts => {
         curHash = await checkHashUpdate(curHash);
         stm_cur.sealContract();
 
-        // // exchange fee - ccy's
-        // for (let i=0 ; i < ccyTypesData.ccyTypes.length; i++) {
-        //     const ccyType = ccyTypesData.ccyTypes[i];
-        //     const setFee = await stm_cur.setFee_CcyType(ccyType.id, CONST.nullAddr, { fee_fixed: i+1, fee_percBips: (i+1)*100, fee_min: (i+1), fee_max: (i+1+100) } );
-        //     const x = await stm_cur.getFee(CONST.getFeeType.CCY, ccyType.id, CONST.nullAddr);
-        //     console.log(`Exchange Fee: ccyTypeId=${ccyType.id} { x.fee_fixed=${x.fee_fixed} / x.fee_percBips=${x.fee_percBips} / x.fee_min=${x.fee_min} / x.fee_max=${x.fee_max} }`);
-        //     curHash = await checkHashUpdate(curHash);
-        // }
+        // exchange fee - ccy's
+        for (let i=0 ; i < ccyTypesData.ccyTypes.length; i++) {
+            const ccyType = ccyTypesData.ccyTypes[i];
+            const setFee = await stm_cur.setFee_CcyType(ccyType.id, CONST.nullAddr, { fee_fixed: i+1, fee_percBips: (i+1)*100, fee_min: (i+1), fee_max: (i+1+100) } );
+            const x = await stm_cur.getFee(CONST.getFeeType.CCY, ccyType.id, CONST.nullAddr);
+            console.log(`Exchange Fee: ccyTypeId=${ccyType.id} { x.fee_fixed=${x.fee_fixed} / x.fee_percBips=${x.fee_percBips} / x.fee_min=${x.fee_min} / x.fee_max=${x.fee_max} }`);
+            curHash = await checkHashUpdate(curHash);
+        }
 
-        // // exchange fee - tok's
-        // for (let i=0 ; i < stTypesData.tokenTypes.length; i++) {
-        //     const tokType = stTypesData.tokenTypes[i];
-        //     const setFee = await stm_cur.setFee_TokType(tokType.id, CONST.nullAddr, { fee_fixed: i+1, fee_percBips: (i+1)*100, fee_min: (i+1), fee_max: (i+1+100) } );
-        //     const x = await stm_cur.getFee(CONST.getFeeType.TOK, tokType.id, CONST.nullAddr);
-        //     console.log(`Exchange Fee: tokType=${tokType.id} { x.fee_fixed=${x.fee_fixed} / x.fee_percBips=${x.fee_percBips} / x.fee_min=${x.fee_min} / x.fee_max=${x.fee_max} }`);
-        //     curHash = await checkHashUpdate(curHash);
-        // }
+        // exchange fee - tok's
+        for (let i=0 ; i < stTypesData.tokenTypes.length; i++) {
+            const tokType = stTypesData.tokenTypes[i];
+            const setFee = await stm_cur.setFee_TokType(tokType.id, CONST.nullAddr, { fee_fixed: i+1, fee_percBips: (i+1)*100, fee_min: (i+1), fee_max: (i+1+100) } );
+            const x = await stm_cur.getFee(CONST.getFeeType.TOK, tokType.id, CONST.nullAddr);
+            console.log(`Exchange Fee: tokType=${tokType.id} { x.fee_fixed=${x.fee_fixed} / x.fee_percBips=${x.fee_percBips} / x.fee_min=${x.fee_min} / x.fee_max=${x.fee_max} }`);
+            curHash = await checkHashUpdate(curHash);
+        }
 
         // ledger - batches
         const MM = [];
@@ -112,48 +112,56 @@ contract("StMaster", accounts => {
             );
             curHash = await checkHashUpdate(curHash);
 
-            // // burn - some of batch 2 VCS
-            // const burn_tx_B2 = await stm.burnTokens(M, CONST.tokenType.VCS, 1);
-            // curHash = await checkHashUpdate(curHash);
+            // burn - some of batch 2 VCS
+            const burn_tx_B2 = await stm_cur.burnTokens(M, CONST.tokenType.VCS, 1);
+            curHash = await checkHashUpdate(curHash);
         }
-        // const batchCount = await stm.getSecTokenBatchCount.call();
-        // for (let i=1 ; i <= batchCount; i++) { // read all
-        //     const x = await stm.getSecTokenBatch(i); // --> StructLib.SecTokenBatch
-        //     console.log(`Batch Data: id=${i} mintedQty=${x.mintedQty} burnedQty=${x.burnedQty} metaKeys=${x.metaKeys.join()} metaValues=${x.metaValues.join()} { x.fee_fixed=${x.origTokFee.fee_fixed} / x.fee_percBips=${x.origTokFee.fee_percBips} / x.fee_min=${x.origTokFee.fee_min} / x.fee_max=${x.origTokFee.fee_max} }`);
-        // }
+        const batchCount = await stm_cur.getSecTokenBatchCount.call();
+        for (let i=1 ; i <= batchCount; i++) { // read all
+            const x = await stm_cur.getSecTokenBatch(i); // --> StructLib.SecTokenBatch
+            console.log(`Batch Data: id=${i} mintedQty=${x.mintedQty} burnedQty=${x.burnedQty} metaKeys=${x.metaKeys.join()} metaValues=${x.metaValues.join()} { x.fee_fixed=${x.origTokFee.fee_fixed} / x.fee_percBips=${x.origTokFee.fee_percBips} / x.fee_min=${x.origTokFee.fee_min} / x.fee_max=${x.origTokFee.fee_max} }`);
+        }
 
-        // // ledger entries: fund, set ledger fees
-        // const entryCount = await stm.getLedgerOwnerCount(); // DATA_DUMP: individual fetches
-        // const allEntries = await stm.getLedgerOwners(); // ## NON-PAGED - x-ref check
-        // assert(allEntries.length == entryCount, 'getLedgerOwnerCount / getLedgerOwners mismatch');
-        // for (let i=0 ; i < ccyTypesData.ccyTypes.length; i++) { // test ccy data 
-        //     const ccyType = ccyTypesData.ccyTypes[i];
+        // ledger entries: fund, set ledger fees
+        const entryCount = await stm_cur.getLedgerOwnerCount(); // DATA_DUMP: individual fetches
+        const allEntries = await stm_cur.getLedgerOwners(); // ## NON-PAGED - x-ref check
+        assert(allEntries.length == entryCount, 'getLedgerOwnerCount / getLedgerOwners mismatch');
+        
+        for (let j=0 ; j < entryCount; j++) { // fund, withdraw & set ledger ccy & tok type fees
+            const entryOwner = await stm_cur.getLedgerOwner(j);
             
-        //     for (let j=0 ; j < entryCount; j++) { // fund, withdraw & set ledger ccy & tok type fees
-        //         const entryOwner = await stm.getLedgerOwner(j);
-                
-        //         await stm.fund(ccyType.id, (j+1)*100+(i+1), entryOwner, { from: accounts[0] });
-        //         if (entryOwner != accounts[0])
-        //             curHash = await checkHashUpdate(curHash);
+            // for all ccy types
+            for (let i=0 ; i < ccyTypesData.ccyTypes.length; i++) { // test ccy data 
+                const ccyType = ccyTypesData.ccyTypes[i];
+            
+                // fund to ledger
+                await stm_cur.fund(ccyType.id, (j+1)*100+(i+1), entryOwner, { from: accounts[0] });
+                if (entryOwner != accounts[0])
+                    curHash = await checkHashUpdate(curHash);
 
-        //         await stm.withdraw(ccyType.id, 1, entryOwner, { from: accounts[0] });
-        //         if (entryOwner != accounts[0])
-        //             curHash = await checkHashUpdate(curHash);
+                // withdraw from ledger
+                await stm_cur.withdraw(ccyType.id, 1, entryOwner, { from: accounts[0] });
+                if (entryOwner != accounts[0])
+                    curHash = await checkHashUpdate(curHash);
 
-        //         const setLedgerFeeCcy = await stm.setFee_CcyType(ccyType.id, entryOwner, { fee_fixed: i+2+j+2, fee_percBips: (i+2+j+2)*100, fee_min: (i+2+j+2), fee_max: (i+2+j+2+100) } );
-        //         if (entryOwner != accounts[0])
-        //             curHash = await checkHashUpdate(curHash);
+                // set ledger ccy fee
+                await stm_cur.setFee_CcyType(ccyType.id, entryOwner, { fee_fixed: i+2+j+2, fee_percBips: (i+2+j+2)*100, fee_min: (i+2+j+2), fee_max: (i+2+j+2+100) } );
+                if (entryOwner != accounts[0])
+                    curHash = await checkHashUpdate(curHash);
+            }
 
-        //         for (let k=0 ; k < stTypesData.tokenTypes.length; k++) {
-        //             const tokType = stTypesData.tokenTypes[k];
-        //             const setLedgerFeeTok = await stm.setFee_TokType(tokType.id, entryOwner, { fee_fixed: i+k+4+j+4, fee_percBips: (i+k+4+j+4)*100, fee_min: (i+k+4+j+4), fee_max: (i+k+4+j+4+100) } );
-        //             if (entryOwner != accounts[0])
-        //                curHash = await checkHashUpdate(curHash);
-        //         }
-        //     }
-        // }
+            // for all token types
+            for (let k=0 ; k < stTypesData.tokenTypes.length; k++) {
+                const tokType = stTypesData.tokenTypes[k];
 
-        // // ledger entries: iterate, read all
+                // set ledger token fee
+                await stm_cur.setFee_TokType(tokType.id, entryOwner, { fee_fixed: k+4+j+4, fee_percBips: (k+4+j+4)*100, fee_min: (k+4+j+4), fee_max: (k+4+j+4+100) } );
+                if (entryOwner != accounts[0])
+                    curHash = await checkHashUpdate(curHash);
+            }
+        }
+
+        // ledger entries: iterate, read all
         // for (let i=0 ; i < entryCount; i++) {
         //     //const entry = entries[i]; // ## NON-PAGED
         //     const entryOwner = await stm.getLedgerOwner(i); // DATA_DUMP: individual fetches
@@ -186,87 +194,94 @@ contract("StMaster", accounts => {
     });
 
     it('data load - should be able to initialize a new contract with data from old', async () => {
-        // // load ccy & token types
-        // const curCcys = await stm_cur.getCcyTypes(), newCcys = await stm_new.getCcyTypes(), loadCcys = _.differenceWith(curCcys.ccyTypes, newCcys.ccyTypes, _.isEqual);
-        // _.forEach(loadCcys, async (p) => await stm_new.addCcyType(p.name, p.unit, p.decimals));
+        // load ccy & token types
+        const curCcys = await stm_cur.getCcyTypes(), newCcys = await stm_new.getCcyTypes(), loadCcys = _.differenceWith(curCcys.ccyTypes, newCcys.ccyTypes, _.isEqual);
+        _.forEach(loadCcys, async (p) => await stm_new.addCcyType(p.name, p.unit, p.decimals));
 
-        // const curToks = await stm_cur.getSecTokenTypes(), newToks = await stm_new.getSecTokenTypes(), loadToks = _.differenceWith(curToks.tokenTypes, newToks.tokenTypes, _.isEqual);
-        // _.forEach(loadToks, async (p) => await stm_new.addSecTokenType(p.name));
+        const curToks = await stm_cur.getSecTokenTypes(), newToks = await stm_new.getSecTokenTypes(), loadToks = _.differenceWith(curToks.tokenTypes, newToks.tokenTypes, _.isEqual);
+        _.forEach(loadToks, async (p) => await stm_new.addSecTokenType(p.name));
 
-        // // load whitelist
+        // load whitelist
         stm_new.whitelist(accounts[555]); // simulate a new contract owner (first whitelist entry, by convention) -- i.e. we can upgrade contract with a new privkey
         const curWL = (await stm_cur.getWhitelist()), newWL = (await stm_new.getWhitelist()), loadWL = _.differenceWith(curWL.slice(1), newWL.slice(1), _.isEqual);
         _.forEach(loadWL, async (p) => await stm_new.whitelist(p));
 
-        // // load exchange fee - ccy's
-        // _.forEach(curCcys.ccyTypes, async (p) => await stm_new.setFee_CcyType(p.id, CONST.nullAddr, (await stm_cur.getFee(CONST.getFeeType.CCY, p.id, CONST.nullAddr))));
+        // currencies - load exchange fees, set total funded & withdrawn
+        _.forEach(curCcys.ccyTypes, async (p) => { 
+            await stm_new.setFee_CcyType(p.id, CONST.nullAddr, (await stm_cur.getFee(CONST.getFeeType.CCY, p.id, CONST.nullAddr)));
+            await stm_new.setTotalCcyFunded(p.id, (await stm_cur.getTotalCcyFunded(p.id)));
+            await stm_new.setTotalCcyWithdrawn(p.id, (await stm_cur.getTotalCcyWithdrawn(p.id)));
+        });
 
-        // // load exchange fee - tok's
-        // _.forEach(curToks.tokenTypes, async (p) => await stm_new.setFee_TokType(p.id, CONST.nullAddr, (await stm_cur.getFee(CONST.getFeeType.TOK, p.id, CONST.nullAddr))));
+        // tokens - load exchange fees
+        _.forEach(curToks.tokenTypes, async (p) => { 
+            await stm_new.setFee_TokType(p.id, CONST.nullAddr, (await stm_cur.getFee(CONST.getFeeType.TOK, p.id, CONST.nullAddr)))
+        });
 
         // load batches
         const curBatchCount = await stm_cur.getSecTokenBatchCount();
         const curBatches = [];
-        for (let batchId=1; batchId <= curBatchCount; batchId++) {
-            curBatches.push(await stm_cur.getSecTokenBatch(batchId));
-        }
-        for (let p of _.chunk(curBatches, 2)) {
-            //console.log(`loading ${p.length} batches [${p.map(p2 => p2.id).join(', ')}] of ${curBatches.length}...`);
+        for (let batchId=1; batchId <= curBatchCount; batchId++) curBatches.push(await stm_cur.getSecTokenBatch(batchId));
+        for (let p of _.chunk(curBatches, 2)) { // ** tune chunk size
             await stm_new.loadSecTokenBatch(p, curBatchCount);
         }
-        //console.log('stm_new.getLedgerHashcode: ', await stm_new.getLedgerHashcode());
 
-        // create ledger entries, add tokens
+        // create ledger entries, add tokens, fees & balances
         const curEntryCount = await stm_cur.getLedgerOwnerCount();
-        const curSecTokenMintedCount = await stm_cur.getSecToken_countMinted();
-        const curSecTokenMintedQty = await stm_cur.getSecToken_totalMintedQty();
         for (let i=0 ; i < curEntryCount; i++) {
             const curEntryOwner = await stm_cur.getLedgerOwner(i);
             const curEntry = await stm_cur.getLedgerEntry(curEntryOwner);
 
-            if ((await stm_new.getLedgerEntry(curEntryOwner)).exists == false) {
-                //console.log('createLedgerEntry', curEntryOwner);
-                await stm_new.createLedgerEntry(curEntryOwner); // creates new/empty ledger entry
-            }
+            // create ledger entry, populate with currency balances
+            await stm_new.createLedgerEntry(curEntryOwner, curEntry.ccys);
 
+            // set ledger ccy fees
+            for (p of curCcys.ccyTypes) await stm_new.setFee_CcyType(p.id, curEntryOwner, (await stm_cur.getFee(CONST.getFeeType.CCY, p.id, curEntryOwner)));
+
+            // set ledger token fees
+            for (p of curToks.tokenTypes) await stm_new.setFee_TokType(p.id, curEntryOwner, (await stm_cur.getFee(CONST.getFeeType.TOK, p.id, curEntryOwner)));
+
+            // add tokens
             for (let p of curEntry.tokens) {
-                //console.log('addSecToken, id=', p.stId);
                 await stm_new.addSecToken(curEntryOwner, 
                     p.batchId,
                     p.stId,
                     p.tokenTypeId,
                     p.mintedQty,
-                    p.currentQty,
-                    curSecTokenMintedCount, curSecTokenMintedQty
+                    p.currentQty
                 );
             }
         }
-        for (let p of await stm_cur.getLedgerOwners()) {
-            const x = await stm_cur.getLedgerEntry(p);
-            console.log(`curEntry: ${p} tok.stId=[ ${x.tokens.map(p => p.stId).join(', ')} ] ccy.bal=[${x.ccys.map(p => `{ccyId=${p.ccyTypeId} bal=${p.balance}}`).join(', ')}]`);
-        }
-        console.log('---');
-        for (let p of await stm_new.getLedgerOwners()) {
-            const x = await stm_new.getLedgerEntry(p);
-            console.log(`newEntry: ${p} tok.stId=[ ${x.tokens.map(p => p.stId).join(', ')} ] ccy.bal=[${x.ccys.map(p => `{ccyId=${p.ccyTypeId} bal=${p.balance}}`).join(', ')}]`);
-        }
+        // for (let p of await stm_cur.getLedgerOwners()) {
+        //     const x = await stm_cur.getLedgerEntry(p);
+        //     console.log(`curEntry: ${p} tok.stId=[ ${x.tokens.map(p => p.stId).join(', ')} ] ccy.bal=[${x.ccys.map(p => `{ccyId=${p.ccyTypeId} bal=${p.balance}}`).join(', ')}]`);
+        // }
+        // console.log('---');
+        // for (let p of await stm_new.getLedgerOwners()) {
+        //     const x = await stm_new.getLedgerEntry(p);
+        //     console.log(`newEntry: ${p} tok.stId=[ ${x.tokens.map(p => p.stId).join(', ')} ] ccy.bal=[${x.ccys.map(p => `{ccyId=${p.ccyTypeId} bal=${p.balance}}`).join(', ')}]`);
+        // }
 
         // set token totals
         const curTotalExchangeFeesPaidQty = await stm_cur.getSecToken_totalExchangeFeesPaidQty();
         const curTotalOriginatorFeesPaidQty = await stm_cur.getSecToken_totalOriginatorFeesPaidQty();
         const curTotalTransferedQty = await stm_cur.getSecToken_totalTransferedQty();
-        await stm_new.setTokenTotals(curTotalExchangeFeesPaidQty, curTotalOriginatorFeesPaidQty, curTotalTransferedQty);
+        const curSecTokenMintedCount = await stm_cur.getSecToken_countMinted();
+        const curSecTokenBurnedQty = await stm_cur.getSecToken_totalBurnedQty();
+        const curSecTokenMintedQty = await stm_cur.getSecToken_totalMintedQty();
+        await stm_new.setTokenTotals(
+            curTotalExchangeFeesPaidQty, curTotalOriginatorFeesPaidQty, curTotalTransferedQty,
+            curSecTokenMintedCount, curSecTokenMintedQty, curSecTokenBurnedQty
+        );
 
-        console.log('stm_cur.getSecToken_totalExchangeFeesPaidQty', await stm_cur.getSecToken_totalExchangeFeesPaidQty());
-        console.log('stm_cur.getSecToken_totalOriginatorFeesPaidQty', await stm_cur.getSecToken_totalOriginatorFeesPaidQty());
-        console.log('stm_cur.getSecToken_totalTransferedQty', await stm_cur.getSecToken_totalTransferedQty());
-        console.log('---');
-        console.log('stm_new.getSecToken_totalExchangeFeesPaidQty', await stm_new.getSecToken_totalExchangeFeesPaidQty());
-        console.log('stm_new.getSecToken_totalOriginatorFeesPaidQty', await stm_new.getSecToken_totalOriginatorFeesPaidQty());
-        console.log('stm_new.getSecToken_totalTransferedQty', await stm_new.getSecToken_totalTransferedQty());
-
-        //console.log('stm_new.getLedgerHashcode: ', await stm_new.getLedgerHashcode());
+        console.log('stm_cur.getLedgerHashcode: ', await stm_cur.getLedgerHashcode());
+        console.log('stm_new.getLedgerHashcode: ', await stm_new.getLedgerHashcode());
+        
+        stm_new.sealContract();
         assert(await stm_cur.getLedgerHashcode() == await stm_new.getLedgerHashcode(), 'ledger hashcode mismatch');
+
+        // ~7.49m for 1x { 2 batches, 2 transfers }
+        // ...    for 10x { 2 batches, 2 transfers }
     });
 
     async function checkHashUpdate(curHash) {

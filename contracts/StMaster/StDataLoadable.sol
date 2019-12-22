@@ -16,27 +16,39 @@ contract StDataLoadable is Owned, StLedger, StFees, StErc20 {
         LoadLib.loadSecTokenBatch(ledgerData, batches, _batches_currentMax_id);
     }
 
-    function createLedgerEntry(address ledgerEntryOwner) public onlyOwner() {
-        LoadLib.createLedgerEntry(ledgerData, ledgerEntryOwner);
+    function createLedgerEntry(
+        address ledgerEntryOwner,
+        StructLib.LedgerCcyReturn[] memory ccys
+    ) public onlyOwner() {
+        LoadLib.createLedgerEntry(ledgerData, ledgerEntryOwner, ccys);
     }
 
-    function addSecToken(address ledgerEntryOwner,
-        uint64 batchId, uint256 stId, uint256 tokenTypeId, uint64 mintedQty, uint64 currentQty,
-        uint256 _tokens_currentMax_id, uint256 _tokens_totalMintedQty
+    function addSecToken(
+        address ledgerEntryOwner,
+        uint64 batchId, uint256 stId, uint256 tokenTypeId, uint64 mintedQty, uint64 currentQty
     ) public onlyOwner() {
         LoadLib.addSecToken(ledgerData,
-            ledgerEntryOwner, batchId, stId, tokenTypeId, mintedQty, currentQty,
-            _tokens_currentMax_id, _tokens_totalMintedQty
+            ledgerEntryOwner, batchId, stId, tokenTypeId, mintedQty, currentQty
         );
     }
 
     function setTokenTotals(
-        uint80 totalExchangeFeesPaidQty,
-        uint80 totalOriginatorFeesPaidQty,
-        uint80 totalTransferedQty)
-    public onlyOwner() {
+        uint80 packed_ExchangeFeesPaidQty, uint80 packed_OriginatorFeesPaidQty, uint80 packed_TransferedQty,
+        uint256 currentMax_id, uint256 totalMintedQty, uint256 totalBurnedQty
+    ) public onlyOwner() {
         LoadLib.setTokenTotals(ledgerData,
-            totalExchangeFeesPaidQty, totalOriginatorFeesPaidQty, totalTransferedQty
+            packed_ExchangeFeesPaidQty, packed_OriginatorFeesPaidQty, packed_TransferedQty,
+            currentMax_id, totalMintedQty, totalBurnedQty
         );
+    }
+
+    function setTotalCcyFunded(uint256 ccyTypeId, uint256 amount)
+    public onlyOwner() {
+        LoadLib.setTotalCcyFunded(ledgerData, ccyTypeId, amount);
+    }
+
+    function setTotalCcyWithdrawn(uint256 ccyTypeId, uint256 amount)
+    public onlyOwner() {
+        LoadLib.setTotalCcyWithdrawn(ledgerData, ccyTypeId, amount);
     }
 }
