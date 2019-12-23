@@ -11,22 +11,27 @@ const EthereumJsTx = require('ethereumjs-tx');
 
 const { db } = require('../common/dist');
 
-const contractName = "SecTok_Master";
-const contractVer = "0.7";
-const contractUnit = "KG";
-const contractSymbol = "CCC";
-const contractDecimals = 4;
+const contractProps = {
+    COMMODITY: {
+        contractName: "SecTok_Master",
+        contractVer: "0.8",
+        contractUnit: "KG",
+        contractSymbol: "CCC",
+        contractDecimals: 4,
+    },
+    CASHFLOW: {
+        contractName: "Cashflow_SingDax_1A",
+        contractVer: "0.8",
+        contractUnit: "Token(s)",
+        contractSymbol: "SD1A",
+        contractDecimals: 0,
+    },
+};
 
 module.exports = {
-    contractName: contractName,
-    contractVer: contractVer,
-    contractUnit: contractUnit,
-    contractSymbol: contractSymbol,
-    contractDecimals: contractDecimals,
-    
-    //logTestAccountUsage: true,
+    contractProps: contractProps,
 
-    whitelistExchangeTestAcounts: true,
+    //logTestAccountUsage: true,
 
     nullAddr: "0x0000000000000000000000000000000000000000",
 
@@ -136,7 +141,8 @@ async function getAccountAndKey(accountNdx) {
 
 async function web3_call(methodName, methodArgs) {
     const { web3, ethereumTxChain } = getTestContextWeb3();
-    const contractDb = (await db.GetDeployment(process.env.WEB3_NETWORK_ID, contractName, contractVer)).recordset[0];
+    const contractDb = (await db.GetDeployment(process.env.WEB3_NETWORK_ID, contractProps[process.env.CONTRACT_TYPE].contractName, contractProps[process.env.CONTRACT_TYPE].contractVer)).recordset[0];
+    if (!contractDb) throw(Error(`Failed to lookup contract deployment for networkId=${process.env.WEB3_NETWORK_ID}, contractName=${contractProps[process.env.CONTRACT_TYPE].contractName}, contractVer=${contractProps[process.env.CONTRACT_TYPE].contractVer}`));
     var contract = new web3.eth.Contract(JSON.parse(contractDb.abi), contractDb.addr);
     const callRet = await contract.methods[methodName](...methodArgs).call();
     return callRet;
@@ -147,7 +153,8 @@ async function web3_tx(methodName, methodArgs, fromAddr, fromPrivKey) {
     //const { addr: whiteListAddr, privKey } = await getAccountAndKey(whitelistNdx);
 
     const { web3, ethereumTxChain } = getTestContextWeb3();
-    const contractDb = (await db.GetDeployment(process.env.WEB3_NETWORK_ID, contractName, contractVer)).recordset[0];
+    const contractDb = (await db.GetDeployment(process.env.WEB3_NETWORK_ID, contractProps[process.env.CONTRACT_TYPE].contractName, contractProps[process.env.CONTRACT_TYPE].contractVer)).recordset[0];
+    if (!contractDb) throw(Error(`Failed to lookup contract deployment for networkId=${process.env.WEB3_NETWORK_ID}, contractName=${contractProps[process.env.CONTRACT_TYPE].contractName}, contractVer=${contractProps[process.env.CONTRACT_TYPE].contractVer}`));
     var contract = new web3.eth.Contract(JSON.parse(contractDb.abi), contractDb.addr);
 
     // send signed tx

@@ -1,70 +1,43 @@
-# AirCarbon - ERC20 AirCarbon ST Contract
+# SecTokMaster - Security Token Master (ERC20 [partial] Compatible Commodity or Cashflow Token)
 
 ## Setup
-
 - `npm install`
 - `npm i truffle -g`
 - `npm i ganache-cli -g`
 
 ## Run local node
+- `ganache-cli --accounts 1024 --networkId 888 --mnemonic "educate school blast ability display bleak club soon curve car oil ostrich" --gasLimit 7800000`
+ > runs with a large number of accounts (the tests require more than 10 built into `truffle develop`)
+ > runs with custom network ID 888
+ > runs with gas limit ~= reported default geth Ropsten-connected node gas limit
+ > runs with InstaMining by default
+ > OR (better, for individual dev account separation by networkId): from repo root: `yarn ganache` after change NETWORK_ID=xxx in .env files.
 
-- `ganache-cli -a 888 -i 888 -m "educate school blast ability display bleak club soon curve car oil ostrich"`
-  > runs with a large number of accounts (the tests require way more than 10 built into `truffle develop`)
-  > runs with custom network ID 888
-  > runs with InstaMining by default
-Or, better (for individual dev account separation), from repo root:
-- `yarn ganache` after change NETWORK_ID=888 or NETWORK_ID=889 on .env files.
+## Dual Mode
+Operates as a semi-fungible (multi-minting batch, multi-type) COMMODITY token, or as a fungible (single-minting batch, single-type) CASHFLOW token.
+Set environment variable to:
+ > `export CONTRACT_TYPE=COMMODITY` or
+ > `export CONTRACT_TYPE=CASHFLOW`
+Migration script will pickup this env var and deploy a test contract accordingly.
+
+## Migrate (Deploy) Contracts
+- `truffle migrate --network development --reset` (ganache-cli local node)
+- `truffle migrate --network ropsten_ac --reset` (AirCarbon's ropsten geth node)
+- `truffle migrate --network rinkeby_infura --reset` (infura rinkeby faster than infura ropsten?)
 
 ## Run Tests
-
 - `truffle compile` or (undocumented) `truffle compile --reset` if it keeps recompiling when there aren't any changes in the Solidity
 - `truffle test --network development`
 
-## Migrate (Deploy) Contracts
 
-- `truffle migrate --network development --reset` (ganache-cli local node)
-- `truffle migrate --network ropsten_ac --reset` (AirCarbon's ropsten geth node)
-- `truffle migrate --network rinkeby_infura --reset` (infura rinkeby is much faster than infura ropsten)
 
 ## Dbg - `truffle develop`
-
 - `truffle develop`
-
   > note: tests will fail with `develop`'s built-in ganache instance (not enough test accounts)\
-
 - `migrate`
 - `AcMaster.deployed().then((i) => { ac=i })`
 - `` AcMaster.MintedSecTokenBatch({}).watch((err,res) => { console.log(`MintedSecTokenBatch... id = ${res.args.id}`) }) ``
 - `ac.methods`
-- `ac.mintSecTokenBatch(0, 1, '0xc3241d546dDE0Bf0A42BE0b3fEe70Da17ad724c9')`
+- `ac.mintSecTokenBatch(1, 1000, 1, '0xc3241d546dDE0Bf0A42BE0b3fEe70Da17ad724c9', { fee_fixed: 1, fee_percBips: 10, fee_min: 0, fee_max: 0 }, [], [])`
 - `ac.getLedgerEntry('0xc3241d546dDE0Bf0A42BE0b3fEe70Da17ad724c9')`
-- `ac.getSecTokens()`
-
-## WIP - TODOs
-
-    ### contract - core fn's
-    * TODO: TEST FEES -- transfer test suite (all types inc. trade) w/ fees applied
-    *
-    * TOOD: long-running simulation test
-    *   > mints batches randomly & assigns to initial owners (eeu xfer)
-    *   > funds new accounts randomly & withdraws randomly
-    *   > trades randomly
-    * expect: split/merge to hold up, KG & ccy consistency overall to hold up, etc.
-
-    * IPFS pointers & URL pointers for batch minting
-
-    ### contract - ERC721-compat
-    * ERC721 interface/compat: https://github.com/ethereum/EIPs/blob/master/EIPS/eip-721.md
-    * ** one vST = one ("size/KG-mutable") NFT **
-    * (more like "semi-fungable token" (i.e. IFF sizes of two same-type NFT-STs are same, they are actually fungible while sizes are the same))
-
-    ### contract - security
-    * global contract-paused flag (admin)
-
-    ### ac-admin - web3/JS
-    * authentication & action-logging (implies DB)
-    * contract-action invoker (one page per action)
-    * contract event viewer (new & historic)
-    * ledger viewer/summary
-    * proto-TX-explorer
-    * API layer (separate deployment to ac-admin?)
+- `ac.getSecToken(1)`

@@ -3,7 +3,7 @@ const MNEMONIC = require('./dev_mnemonic.js').MNEMONIC;
 
 const shell = require('shelljs');
 const PORT = 8545;
-const TOTAL_ACCOUNTS = 888;
+const TOTAL_ACCOUNTS = 1024;
 const { NETWORK_ID } = process.env;
 
 // ropsten limit: 8m

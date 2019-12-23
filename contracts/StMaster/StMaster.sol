@@ -52,6 +52,8 @@ contract StMaster is StMintable, StBurnable, CcyFundable, CcyWithdrawable, StTra
     // -- J 1+3 --
     // PRI 0 ** CASHFLOWS re. SD **
     //
+    //   >>> new deployer (or flag on deployer) > to deploy "CashFlowMaster" w/ other
+    //
     //   ... issuance (first payable?) -- triggers minting to payer, routes ETH to "issuer"
     //
 

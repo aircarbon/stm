@@ -27,8 +27,8 @@ describe('Contract Web3 Interface', async () => {
 
     //
     // can run these to test web3 more quickly, e.g.
-    //      Dev: ("export NETWORK=development && mocha test_web3 --timeout 120000 --exit")
-    //  Ropsten: ("export NETWORK=ropsten_ac && mocha test_web3 --timeout 120000 --exit")
+    //         Dev: ("export WEB3_NETWORK_ID=888 && export CONTRACT_TYPE=COMMODITY && mocha test_web3 --timeout 120000 --exit")
+    //  Ropsten AC: ("export WEB3_NETWORK_ID=3 && export CONTRACT_TYPE=COMMODITY && mocha test_web3 --timeout 120000 --exit")
     //
 
     before(async () => {
@@ -52,6 +52,7 @@ describe('Contract Web3 Interface', async () => {
             if (ex.toString().includes("Already whitelisted")) console.log('(already whitelisted - nop)');
             else throw(ex);
         }
+        const sealTx = await CONST.web3_tx('sealContract', [], OWNER, OWNER_privKey);
 
         // setup - mint for A
         //for (var i=0 ; i < 10 ; i++) {

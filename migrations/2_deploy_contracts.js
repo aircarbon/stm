@@ -16,11 +16,19 @@ const CONST = require('../const.js');
 const { db } = require('../../common/dist');
 
 module.exports = async function (deployer) {
+    process.env.NETWORK = deployer.network;
+    process.env.NETWORK_ID = deployer.network_id;
 
-    process.env.NETWORK = deployer.network; 
-    process.env.NETWORK_ID = deployer.network_id; 
-
-    console.log('2_deploy_contracts: ', deployer.network);
+    console.log('== SecTokMaster == DEPLOY...');
+    console.log('\tprocess.env.CONTRACT_TYPE: ', process.env.CONTRACT_TYPE);
+    console.log('\t      process.env.NETWORK: ', process.env.NETWORK);
+    console.log('\t   process.env.NETWORK_ID: ', process.env.NETWORK_ID);
+    var type;
+    switch (process.env.CONTRACT_TYPE) {
+        case 'CASHFLOW':
+        case 'COMMODITY': type = process.env.CONTRACT_TYPE; break;
+        default: throw('Missing or unknown process.env.CONTRACT_TYPE: set to CASHFLOW or COMMODITY.');
+    }
 
     StMaster.synchronization_timeout = 42;  // seconds
 
@@ -56,18 +64,25 @@ module.exports = async function (deployer) {
     return deployer.deploy(LoadLib).then(async loadLib => { 
         deployer.link(LoadLib, StMaster);
 
-        return deployer.deploy(StMaster, CONST.contractName, CONST.contractVer, CONST.contractUnit, CONST.contractSymbol, CONST.contractDecimals).then(async stm => {
+        return deployer.deploy(StMaster, 
+            CONST.contractProps[type].contractName, 
+            CONST.contractProps[type].contractVer, 
+            CONST.contractProps[type].contractUnit, 
+            CONST.contractProps[type].contractSymbol, 
+            CONST.contractProps[type].contractDecimals
+        ).then(async stm => {
             //console.dir(stm.abi);
             //console.dir(deployer);
 
             if (!deployer.network.includes("-fork")) {
 
                 var ip = "unknown";
-                publicIp.v4().then(p => ip = p).catch(e => { console.log("WARN: could not get IP - will write 'unknown'"); });
+                publicIp.v4().then(p => ip = p).catch(e => { console.log("\tWARN: could not get IP - will write 'unknown'"); });
 
+                console.log(`>>> SAVING DEPLOYMENT: ${CONST.contractProps[type].contractName} ${CONST.contractProps[type].contractVer}`);
                 await db.SaveDeployment({
-                    contractName: CONST.contractName,
-                     contractVer: CONST.contractVer,
+                    contractName: CONST.contractProps[type].contractName,
+                     contractVer: CONST.contractProps[type].contractVer,
                        networkId: deployer.network_id,
                  deployedAddress: stm.address,
                 deployerHostName: os.hostname(),
@@ -85,5 +100,4 @@ module.exports = async function (deployer) {
     }).catch(err => { console.error('failed deployment: CcyLib', err); });
     }).catch(err => { console.error('failed deployment: LedgerLib', err); });
     }).catch(err => { console.error('failed deployment: StructLib', err); });
-
 };
