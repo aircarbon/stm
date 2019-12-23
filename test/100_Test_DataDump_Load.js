@@ -24,7 +24,7 @@ contract("StMaster", accounts => {
     });
 
     it('data dump - should be able to read all contract data', async () => {
-        const ENTRY_COUNT = 10;
+        const ENTRY_COUNT = 1;
         var curHash = await stm_cur.getLedgerHashcode();
 
         // ccy types
@@ -280,8 +280,10 @@ contract("StMaster", accounts => {
         stm_new.sealContract();
         assert(await stm_cur.getLedgerHashcode() == await stm_new.getLedgerHashcode(), 'ledger hashcode mismatch');
 
-        // ~7.49m for 1x { 2 batches, 2 transfers }
-        // ...    for 10x { 2 batches, 2 transfers }
+        // ~7.49m     for 1x { 2 batches, 2 transfers }
+        // 34,157,603 for 10x { 2 batches, 2 transfers }
+        // ~2.9m per { 2 batches, 2 trades }
+        // ~0.75m per trade/batch @ 10 gwei ~= $1.00 per trade
     });
 
     async function checkHashUpdate(curHash) {

@@ -49,7 +49,14 @@ contract StMaster is StMintable, StBurnable, CcyFundable, CcyWithdrawable, StTra
     event Approval(address indexed owner, address indexed spender, uint256 value);
 
     //
-    // LAUNCH LIST
+    // -- J 1+3 --
+    // PRI 0 ** CASHFLOWS re. SD **
+    //
+    //   ... issuance (first payable?) -- triggers minting to payer, routes ETH to "issuer"
+    //
+
+    //
+    // -- LAUNCH LIST --
     //
     // ADMIN:
     //   > fee preview on transfer
@@ -64,17 +71,15 @@ contract StMaster is StMintable, StBurnable, CcyFundable, CcyWithdrawable, StTra
     //   > me to set config
     //
     // SOL
-    //   > TODO: DATA_LOAD ... (for proving contract upgrade path) w/ unchanged ledger hash
+    //   > TODO: SCP (test w/ mocha web3) web3.eth.estimateGas() (in place of hard-coded erc20 gas limits)
+    //
     //   > TODO: cleanup (SafeMath) + audit...
     //
     //   > todo: increase/finalize MAX_BATCHES_PREVIEW
     //   > todo: drop fee_fixed completely (it's == fee_min)
     //
-    //   > todo: change internalTransfer so it can operate on *any* stTypeId... (?) > workaround is to mint only one type (VCS/UNFCCC can still be encoded in meta)
-    //   > todo: ERC20 authorize() support (?)
-    //
-    // PRI 0 ** CASHFLOWS re. SD **
-    //   ....?!
+    //   > todo: change internalTransfer so it can operate on *any* stTypeId... (???) > workaround is to mint only one type (VCS/UNFCCC can still be encoded in meta)
+    //   > todo: ERC20 authorize() support (???)
     //
     // TODO: Thom - get ETH re. mainnet testing
     // (todo: infura - ropsten deployment)
