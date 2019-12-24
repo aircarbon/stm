@@ -123,6 +123,7 @@ EXCHANGE_FEE: 1,
 };
 
 function getTestContextWeb3() {
+    //console.log('process.env.WEB3_NETWORK_ID', process.env.WEB3_NETWORK_ID);
     const context = 
               process.env.WEB3_NETWORK_ID == 888 ? { web3: new Web3('http://127.0.0.1:8545'),    ethereumTxChain: {} }
             : process.env.WEB3_NETWORK_ID == 777 ? { web3: new Web3('http://127.0.0.1:8545'),    ethereumTxChain: {} }

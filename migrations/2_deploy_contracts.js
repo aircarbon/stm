@@ -19,6 +19,7 @@ const { db } = require('../../common/dist');
 module.exports = async function (deployer) {
     process.env.NETWORK = deployer.network;
     process.env.NETWORK_ID = deployer.network_id;
+    process.env.WEB3_NETWORK_ID = deployer.network_id;
 
     console.log('== SecTokMaster == DEPLOY...');
     console.log('\tprocess.env.CONTRACT_TYPE: ', process.env.CONTRACT_TYPE);
