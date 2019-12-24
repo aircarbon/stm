@@ -145,6 +145,29 @@ library StructLib {
         mapping(address => bool) _whitelisted;
     }
 
+    // CASHFLOW STRUCTURE
+    enum CashflowType { BOND, EQUITY }
+    struct CashflowArgs { // v1: single-issuance, single-subscriber
+
+        CashflowType cashflowType;       // issuance type
+        uint256      wei_principal;      // total issuance/subsciption value
+
+        uint256      issued_Blk;         // issuance (start) block no
+        uint256      term_Blks;          // total term/tenor, in blocks - 0 for perpetual
+
+        uint256      bond_bps;           // rates: basis points per year on principal
+        uint256      bond_int_EveryBlks; // rates: interest due every n blocks
+    }
+    struct CashflowStruct {
+        CashflowArgs args;
+
+        // TODO: payment history... (& bond_int_lastPaidBlk)
+        //uint256 bond_int_payments;       // todo - { block_no, amount, }
+        //uint256 bond_int_lastPaidBlk;    // rates: last paid interest block no
+
+        // TODO: getCashflowStatus() ==> returns in default or not, based on block.number # and issuer payment history...
+    }
+
     /**
      * @dev Checks if the supplied ledger owner holds at least the specified quantity of supplied ST type
      * @param ledger Ledger owner
