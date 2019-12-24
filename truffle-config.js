@@ -62,7 +62,7 @@ module.exports = {
       // for "truffle test" -- with manually launched "ganache-cli -a 1000" (1000 test accounts)
       host: process.env.GANACHE_HOST || "127.0.0.1",
       port: 8545,
-      gas: 7000000,
+      gas: 7800000,
       network_id: "*" // 777, 888, 999
     },
 
@@ -71,7 +71,7 @@ module.exports = {
       provider: () => new HDWalletProvider(MNEMONIC, "https://ac-dev0.net:9545",
                       0, 888), // # test accounts
       network_id: "*", // 3
-      gas: 7000000, // node reported limit: 7,984,363
+      gas: 7800000, // node reported limit: 7,984,363
       gasPrice: web3.utils.toWei(gweiDeployment, "gwei"),
       networkCheckTimeout: 30000,
     },
@@ -81,7 +81,7 @@ module.exports = {
       provider: () => new HDWalletProvider(MNEMONIC, "https://ac-dev1.net:9545",
                       0, 888), // # test accounts
       network_id: "*", // 4242 ?
-      gas: 7000000,
+      gas: 7800000,
       gasPrice: web3.utils.toWei(gweiDeployment, "gwei")
     },
 
@@ -90,7 +90,7 @@ module.exports = {
       provider: () => new HDWalletProvider(MNEMONIC, "https://ropsten.infura.io/v3/93db2c7fd899496d8400e86100058297",
                       0, 888), // # test accounts
       network_id: "*", // 3 ?
-      gas: 7000000,
+      gas: 7800000,
       gasPrice: web3.utils.toWei(gweiDeployment, "gwei")
     },
 
@@ -98,7 +98,7 @@ module.exports = {
       provider: () => new HDWalletProvider(MNEMONIC, "https://rinkeby.infura.io/v3/93db2c7fd899496d8400e86100058297",
                       0, 888), // # test accounts
       network_id: "*", // 4 ?
-      gas: 7000000,
+      gas: 7800000,
       gasPrice: web3.utils.toWei(gweiDeployment, "gwei")
     }
 
@@ -142,7 +142,7 @@ module.exports = {
 
     reporterOptions: {
       currency: 'usd',
-      gasPrice: 20
+      gasPrice: 10
      //, url: 'https://ac-dev0.net:9545'
     }
   },
