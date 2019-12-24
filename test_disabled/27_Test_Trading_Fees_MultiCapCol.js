@@ -7,8 +7,9 @@ const BN = require('bn.js');
 contract("StMaster", accounts => {
     var stm;
 
-    before(async () => {
+    before(async function () {
         stm = await st.deployed();
+        if (await stm.getContractType() == CONST.contractType.CASHFLOW) this.skip();
         if (!global.TaddrNdx) global.TaddrNdx = 0;
         
         for (let i=0 ; i < 60 ; i++) { // whitelist enough accounts for the tests
@@ -24,7 +25,7 @@ contract("StMaster", accounts => {
     });
 
     // ST MULTI FEES - CAP & COLLAR
-    it('fees (multi-capcol) - apply VCS token fee 1000 BP + 5 KG fixed (cap 10 KG) on a small trade (fee on A)', async () => {
+    it(`fees (multi-capcol) - apply VCS token fee 1000 BP + 5 KG fixed (cap 10 KG) on a small trade (fee on A)`, async () => {
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.TaddrNdx + 0], CONST.nullFees, [], [], { from: accounts[0] });
         await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        accounts[global.TaddrNdx + 1],                         { from: accounts[0] });
 
@@ -61,7 +62,7 @@ contract("StMaster", accounts => {
         assert(ledgerA_VcsKgAfter == Number(ledgerA_VcsKgBefore) - Number(expectedFeeKg) - Number(transferAmountKg), 'unexpected ledger A (fee payer) VCS ST quantity after transfer');
     });
 
-    it('fees (multi-capcol) - apply VCS token fee 1000 BP + 1000 KG fixed (collar 100m tons), on a large (0.5 GT) trade (fee on B)', async () => {
+    it(`fees (multi-capcol) - apply VCS token fee 1000 BP + 1000 KG fixed (collar 100m tons), on a large (0.5 GT) trade (fee on B)`, async () => {
         await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        accounts[global.TaddrNdx + 0],                         { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.gtCarbon, 1,       accounts[global.TaddrNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
 
@@ -100,7 +101,7 @@ contract("StMaster", accounts => {
     });
 
     // CCY MULTI FEES - CAP & COLLAR
-    it('fees (multi-capcol) - apply ETH ccy fee 2500 BP + 0.01 ETH fixed (collar 0.2 ETH), on a small trade (fee on A)', async () => {
+    it(`fees (multi-capcol) - apply ETH ccy fee 2500 BP + 0.01 ETH fixed (collar 0.2 ETH), on a small trade (fee on A)`, async () => {
         await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        accounts[global.TaddrNdx + 0],                         { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.TaddrNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
 
@@ -130,7 +131,7 @@ contract("StMaster", accounts => {
         });
     });
 
-    it('fees (multi-capcol) - apply ETH ccy fee 1000 BP + 1000 ETH fixed (cap 50000 ETH), on a large (500k ETH) trade (fee on B)', async () => {
+    it(`fees (multi-capcol) - apply ETH ccy fee 1000 BP + 1000 ETH fixed (cap 50000 ETH), on a large (500k ETH) trade (fee on B)`, async () => {
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.TaddrNdx + 0], CONST.nullFees, [], [], { from: accounts[0] });
         await stm.fund(CONST.ccyType.ETH,                   CONST.millionEth_wei,    accounts[global.TaddrNdx + 1],                         { from: accounts[0] });
 
@@ -154,7 +155,7 @@ contract("StMaster", accounts => {
         });
     });
 
-    it('fees (multi-capcol) - should allow a capped transfer with otherwise insufficient carbon to cover fees (fee on A)', async () => {
+    it(`fees (multi-capcol) - should allow a capped transfer with otherwise insufficient carbon to cover fees (fee on A)`, async () => {
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.TaddrNdx + 0], CONST.nullFees, [], [], { from: accounts[0] });
         await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        accounts[global.TaddrNdx + 1],                         { from: accounts[0] });
 
@@ -176,7 +177,7 @@ contract("StMaster", accounts => {
         });
     });
 
-    it('fees (multi-capcol) - should not allow a transfer with insufficient currency to cover collared fees (fee on A)', async () => {
+    it(`fees (multi-capcol) - should not allow a transfer with insufficient currency to cover collared fees (fee on A)`, async () => {
         await stm.fund(CONST.ccyType.ETH,                   "1000",                  accounts[global.TaddrNdx + 0],                         { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.TaddrNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
 
@@ -206,7 +207,7 @@ contract("StMaster", accounts => {
         assert.fail('expected contract exception');
     });
 
-    it('fees (multi-capcol) - should not allow a transfer with insufficient carbon to cover collared fees (fee on B)', async () => {
+    it(`fees (multi-capcol) - should not allow a transfer with insufficient carbon to cover collared fees (fee on B)`, async () => {
         await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        accounts[global.TaddrNdx + 0],                         { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.TaddrNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
 

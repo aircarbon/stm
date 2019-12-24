@@ -7,19 +7,20 @@ contract("StMaster", accounts => {
 
     const countDefaultCcyTypes = 7;
 
-    before(async () => {
+    before(async function () {
         stm = await st.deployed();
+        if (await stm.getContractType() == CONST.contractType.CASHFLOW) this.skip();
         await stm.sealContract();
+        if (!global.TaddrNdx) global.TaddrNdx = 0;
     });
 
     beforeEach(async () => {
-        if (!global.TaddrNdx) global.TaddrNdx = 0;
         global.TaddrNdx++;
         if (CONST.logTestAccountUsage)
             console.log(`addrNdx: ${global.TaddrNdx} - contract @ ${stm.address} (owner: ${accounts[0]})`);
     });
 
-    it('ccy types - should have correct default (ID 1-based) values', async () => {
+    it(`ccy types - should have correct default (ID 1-based) values`, async () => {
         const types = (await stm.getCcyTypes()).ccyTypes;
         assert(types.length == countDefaultCcyTypes, 'unexpected default ccy type count');
 
@@ -32,7 +33,7 @@ contract("StMaster", accounts => {
         assert(types[1].id == 2, 'unexpected default ccy type id 2');
     });
 
-    it('ccy types - should make visible newly added currency types in the ledger', async () => {
+    it(`ccy types - should make visible newly added currency types in the ledger`, async () => {
         // add new ccy type
         const addCcyTx = await stm.addCcyType('TEST_COIN', 'TEST_UNIT', 2);
         const types = (await stm.getCcyTypes()).ccyTypes;
@@ -49,7 +50,7 @@ contract("StMaster", accounts => {
         assert(ledgerEntryAfter.ccys.some(p => p.unit == 'TEST_UNIT'), 'missing/invalid new currency unit from ledger after minting');
     });
 
-    it('ccy types - should allow funding of newly added currency types', async () => {
+    it(`ccy types - should allow funding of newly added currency types`, async () => {
         // add new ccy type
         await stm.addCcyType('TEST_COIN2', 'TEST_UNIT', 42);
         const types = (await stm.getCcyTypes()).ccyTypes;
@@ -62,7 +63,7 @@ contract("StMaster", accounts => {
         assert(ledgerEntryAfter.ccys.find(p => p.ccyTypeId == newTypeId).balance == 424242, 'unexpected ledger balance of new currency type after funding');
     });
 
-    it('ccy types - should not allow non-owner to add a currency type', async () => {
+    it(`ccy types - should not allow non-owner to add a currency type`, async () => {
         try {
             await stm.addCcyType('NEW_TYPE_ID_3', 'test_unit', 2, { from: accounts[1] });
         } catch (ex) { 
@@ -72,7 +73,7 @@ contract("StMaster", accounts => {
         assert.fail('expected contract exception');
     });
 
-    it('ccy types - should not allow adding an existing currency type name', async () => {
+    it(`ccy types - should not allow adding an existing currency type name`, async () => {
         try {
             await stm.addCcyType('ETH', 'test_unit', 2, { from: accounts[0] });
         } catch (ex) { 
@@ -82,7 +83,7 @@ contract("StMaster", accounts => {
         assert.fail('expected contract exception');
     });
 
-    it('ccy types - should not allow adding a currency type when contract is read only', async () => {
+    it(`ccy types - should not allow adding a currency type when contract is read only`, async () => {
         try {
             await stm.setReadOnly(true, { from: accounts[0] }); 
             await stm.addCcyType('NEW_TYPE_ID_4', 'test_unit', 2, { from: accounts[0] });

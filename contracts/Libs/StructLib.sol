@@ -145,6 +145,10 @@ library StructLib {
         mapping(address => bool) _whitelisted;
     }
 
+    //
+    // TODO: safeMath upgrade...
+    //
+
     // CASHFLOW STRUCTURE
     enum CashflowType { BOND, EQUITY }
     struct CashflowArgs { // v1: single-issuance, single-subscriber

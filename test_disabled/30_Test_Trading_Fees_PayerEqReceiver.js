@@ -10,8 +10,9 @@ const web3 = new Web3();
 contract("StMaster", accounts => {
     var stm;
 
-    before(async () => {
+    before(async function () {
         stm = await st.deployed();
+        if (await stm.getContractType() == CONST.contractType.CASHFLOW) this.skip();
 
         if (!global.TaddrNdx) global.TaddrNdx = 0;
         await stm.whitelist(accounts[0]);
@@ -30,7 +31,7 @@ contract("StMaster", accounts => {
 
     // STs: NO FEES IF FEE RECEIVER = FEE SENDER (contract owner or batch originator)
 
-    it('fees (fee payer=receiver) - global/ledger/originator token fees should not be applied when fee sender is fee receiver (fee on A, contract owner & batch originator)', async () => {
+    it(`fees (fee payer=receiver) - global/ledger/originator token fees should not be applied when fee sender is fee receiver (fee on A, contract owner & batch originator)`, async () => {
         const A = accounts[0]; // sender is contract owner, exchange fee receiver, and batch originator fee receiver
         const B = accounts[global.TaddrNdx + 1];
         const allFees = { fee_fixed: 0, fee_percBips: 100, fee_min: 0, fee_max: 0 };
@@ -69,7 +70,7 @@ contract("StMaster", accounts => {
         assert(Big(receiver_balAfter).eq(Big(receiver_balBefore).plus(Big(transferAmountKg))), 'unexpected receiver carbon after transfer');
     });
 
-    it('fees (fee payer=receiver) - global/ledger/originator token fees should not be applied when fee sender is fee receiver (fee on B, contract owner & batch originator)', async () => {
+    it(`fees (fee payer=receiver) - global/ledger/originator token fees should not be applied when fee sender is fee receiver (fee on B, contract owner & batch originator)`, async () => {
         const A = accounts[global.TaddrNdx + 0];
         const B = accounts[0]; // sender is contract owner, exchange fee receiver, and batch originator fee receiver
         const allFees = { fee_fixed: 0, fee_percBips: 100, fee_min: 0, fee_max: 0 };
@@ -108,7 +109,7 @@ contract("StMaster", accounts => {
         assert(Big(receiver_balAfter).eq(Big(receiver_balBefore).plus(Big(transferAmountKg))), 'unexpected receiver carbon after transfer');
     });
 
-    it('fees (fee payer=receiver) - originator token fee should not be applied (global should be) when fee sender is fee receiver (fee on A, batch originator)', async () => {
+    it(`fees (fee payer=receiver) - originator token fee should not be applied (global should be) when fee sender is fee receiver (fee on A, batch originator)`, async () => {
         const A = accounts[global.TaddrNdx + 0]; // sender is batch originator 
         const B = accounts[global.TaddrNdx + 1];
         const origFees = { fee_fixed: 0, fee_percBips: 100, fee_min: 0, fee_max: 2 };
@@ -153,7 +154,7 @@ contract("StMaster", accounts => {
         assert(Big(receiver_balAfter).eq(Big(receiver_balBefore).plus(Big(transferAmountKg))), 'unexpected receiver token balance after transfer');
     });
 
-    it('fees (fee payer=receiver) - originator token fee should not be applied (ledger should be) when fee sender is fee receiver (fee on B, batch originator)', async () => {
+    it(`fees (fee payer=receiver) - originator token fee should not be applied (ledger should be) when fee sender is fee receiver (fee on B, batch originator)`, async () => {
         const A = accounts[global.TaddrNdx + 0]; 
         const B = accounts[global.TaddrNdx + 1]; // sender is batch originator 
         const origFees = { fee_fixed: 0, fee_percBips: 100, fee_min: 0, fee_max: 2 };
@@ -200,7 +201,7 @@ contract("StMaster", accounts => {
 
     // CCY FEES: NO FEES IF FEE RECEIVER = FEE SENDER (only ever the case for contract owner)
 
-    it('fees (fee payer=receiver) - global/ledger currency fee should not be applied when fee sender is fee receiver (fee on A, contract owner)', async () => {
+    it(`fees (fee payer=receiver) - global/ledger currency fee should not be applied when fee sender is fee receiver (fee on A, contract owner)`, async () => {
         const A = accounts[0]; // sender is contract owner, exchange fee receiver
         const B = accounts[global.TaddrNdx + 1];
         const allFees = { fee_fixed: 0, fee_percBips: 100, fee_min: 0, fee_max: 0 };
@@ -239,7 +240,7 @@ contract("StMaster", accounts => {
         assert(Big(receiver_balAfter).eq(Big(receiver_balBefore).plus(Big(transferAmountEth))), 'unexpected receiver currency after transfer');
     });
 
-    it('fees (fee payer=receiver) - global/ledger currency fee should not be applied when fee sender is fee receiver (fee on B, contract owner)', async () => {
+    it(`fees (fee payer=receiver) - global/ledger currency fee should not be applied when fee sender is fee receiver (fee on B, contract owner)`, async () => {
         const A = accounts[global.TaddrNdx + 1];
         const B = accounts[0]; // sender is contract owner (exchange fee receiver)
         const allFees = { fee_fixed: 0, fee_percBips: 100, fee_min: 0, fee_max: 0 };

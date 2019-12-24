@@ -10,7 +10,7 @@ import "./StErc20.sol";
 import "./StDataLoadable.sol";
 import "./StPayable.sol";
 
-import "../Libs/StructLib.sol"; // bytecode of libs get *removed* during linking (solc/truffle migrate)
+import "../Libs/StructLib.sol";
 
 contract StMaster is StMintable, StBurnable, CcyFundable, CcyWithdrawable, StTransferable, StDataLoadable, StPayable {
 
@@ -55,9 +55,10 @@ contract StMaster is StMintable, StBurnable, CcyFundable, CcyWithdrawable, StTra
     // PRI 0 ** CASHFLOWS re. SD ** >>> MVP
     //
     //   >>> new deployer (or flag on deployer) > to deploy "CashFlowMaster" w/ other
-    //    > DONE: limit batches=1 + limit StTypes=1
+    //    > done: limit batches=1 + limit StTypes=1
     //
-    //    > limit batches=1 + limit StTypes=1
+    //    > CLEANUP: SafeMath...
+    //    > TODO: CashflowArgs in ctor(), display on web-admin
     //
     //    > SINGLE ISSUANCE / SINGLE SUBSCRIBER -- first payable received:
     //        > require 1 batch minted (sits locked with issuer to start with) - return funds otherwise

@@ -5,8 +5,9 @@ const helper = require('../test/transferHelper.js');
 contract("StMaster", accounts => {
     var stm;
 
-    before(async () => {
+    before(async function () {
         stm = await st.deployed();
+        if (await stm.getContractType() == CONST.contractType.CASHFLOW) this.skip();
         if (!global.TaddrNdx) global.TaddrNdx = 0;
         
         for (let i=0 ; i < 60 ; i++) { // whitelist enough accounts for the tests
@@ -21,7 +22,7 @@ contract("StMaster", accounts => {
             console.log(`TaddrNdx: ${global.TaddrNdx} - contract @ ${stm.address} (owner: ${accounts[0]})`);
     });
 
-    it('trading - should allow two-sided (vST <-> ccy) transfer (A <-> B) across ledger entries', async () => {
+    it(`trading - should allow two-sided (vST <-> ccy) transfer (A <-> B) across ledger entries`, async () => {
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.TaddrNdx + 0], CONST.nullFees, [], [], { from: accounts[0] });
         await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        accounts[global.TaddrNdx + 1],                         { from: accounts[0] });
         const data = await helper.transferLedger({ stm, accounts, 
@@ -37,7 +38,7 @@ contract("StMaster", accounts => {
         assert(data.ledgerB_after.tokens_sumQty > 0, 'unexpected ledger B ST quantity after');
     });
 
-    it('trading - should allow two-sided (ccy <-> vST) transfer (A <-> B) across ledger entries', async () => {
+    it(`trading - should allow two-sided (ccy <-> vST) transfer (A <-> B) across ledger entries`, async () => {
         await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        accounts[global.TaddrNdx + 0],                         { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.TaddrNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
         const data = await helper.transferLedger({ stm, accounts, 
@@ -53,7 +54,7 @@ contract("StMaster", accounts => {
         assert(data.ledgerB_after.ccys.find(p => p.ccyTypeId == CONST.ccyType.ETH).balance > 0, 'unexpected ledger B currency after');
     });
 
-    it('trading - should have reasonable gas cost for two-sided transfer', async () => {
+    it(`trading - should have reasonable gas cost for two-sided transfer`, async () => {
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.TaddrNdx + 0], CONST.nullFees, [], [], { from: accounts[0] });
         await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        accounts[global.TaddrNdx + 1],                         { from: accounts[0] });
         const data = await helper.transferLedger({ stm, accounts, 

@@ -17,8 +17,9 @@ contract("StMaster", accounts => {
     const ORIG_FEES_UNFCCC_B2 = { fee_fixed: 2, fee_percBips: 200, fee_min: 20, fee_max: 0 };
     const ORIG_FEES_UNFCCC_B3 = { fee_fixed: 3, fee_percBips: 300, fee_min: 30, fee_max: 0 };
 
-    before(async () => {
+    before(async function () {
         stm = await st.deployed();
+        if (await stm.getContractType() == CONST.contractType.CASHFLOW) this.skip();
         if (!global.TaddrNdx) global.TaddrNdx = 0;
         
         for (let i=0 ; i < 60 ; i++) { // whitelist enough accounts for the tests
@@ -42,7 +43,7 @@ contract("StMaster", accounts => {
 
     // ST ORIGINATOR FEES - SINGLE ORIGINATOR
 
-    it('fees (orig/ccy) - apply VCS token 1 originator fee (+ ledger @ x4) [/ ETH global fee], on a 1.5 ST trade (tok fee on A / ccy fee on B)', async () => {
+    it(`fees (orig/ccy) - apply VCS token 1 originator fee (+ ledger @ x4) [/ ETH global fee], on a 1.5 ST trade (tok fee on A / ccy fee on B)`, async () => {
         // SETUP - mint for M ([+0]), move all to A ([+1])
         const M = accounts[global.TaddrNdx + 0];
         const A = accounts[global.TaddrNdx + 1];
@@ -126,7 +127,7 @@ contract("StMaster", accounts => {
         assert(Big(A_balAfter).eq(Big(A_balBefore).minus(Big(data.originatorFees_tok_A)).minus(Big(data.exchangeFee_tok_A)).minus(Big(transferAmountKg))), 'unexpected fee payer token balance after transfer');
     });
 
-    it('fees (orig/ccy) - apply UNFCCC token 1 originator fees (+ global @ x8) / SGD ledger fee, on a 2.5 ST trade (tok fee on B / ccy fee on A)', async () => {
+    it(`fees (orig/ccy) - apply UNFCCC token 1 originator fees (+ global @ x8) / SGD ledger fee, on a 2.5 ST trade (tok fee on B / ccy fee on A)`, async () => {
         // SETUP - mint for M ([+0]), move all to B ([+2])
         const M = accounts[global.TaddrNdx + 0];
         const A = accounts[global.TaddrNdx + 1];
@@ -212,7 +213,7 @@ contract("StMaster", accounts => {
 
     // ST ORIGINATOR FEES - MULTIPLE ORIGINATORS
 
-    it('fees (orig/ccy) - apply VCS token multiple [3] originator fees (+ ledger @ x4), on a 3.5 ST trade (fee on A)', async () => {
+    it(`fees (orig/ccy) - apply VCS token multiple [3] originator fees (+ ledger @ x4), on a 3.5 ST trade (fee on A)`, async () => {
         // SETUP - mint for M[] ([+0], [+1], [+2]), move all to A ([+3]) 
         const M_multi = [ 
             { account: accounts[global.TaddrNdx + 0] }, 
@@ -316,7 +317,7 @@ contract("StMaster", accounts => {
         assert(Big(B_balAfter).eq(Big(B_balBefore).plus(Big(transferAmountKg))), 'unexpected receiver token balance after transfer');
     });
 
-    it('fees (orig/ccy) - apply UNFCCC token multiple [3] originator fees (+ global @ x10), on a 3.5 ST trade (fee on B)', async () => {
+    it(`fees (orig/ccy) - apply UNFCCC token multiple [3] originator fees (+ global @ x10), on a 3.5 ST trade (fee on B)`, async () => {
         // SETUP - mint for M[] ([+0], [+1], [+2]), move all to B ([+3]) 
         const M_multi = [ 
             { account: accounts[global.TaddrNdx + 0] }, 

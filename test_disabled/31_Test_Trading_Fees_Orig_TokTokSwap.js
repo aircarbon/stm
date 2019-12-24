@@ -10,8 +10,9 @@ const web3 = new Web3();
 contract("StMaster", accounts => {
     var stm;
 
-    before(async () => {
+    before(async function () {
         stm = await st.deployed();
+        if (await stm.getContractType() == CONST.contractType.CASHFLOW) this.skip();
 
         if (!global.TaddrNdx) global.TaddrNdx = 0;
         for (let i=0 ; i < 60 ; i++) { // whitelist enough accounts for the tests
@@ -28,7 +29,7 @@ contract("StMaster", accounts => {
 
     // ST ORIGINATOR FEES - MULTIPLE ORIGINATORS
 
-    it('fees (orig/orig) - apply VCS token M originator fees (+ ledger fee) / UNFCCC token M originator fees (+ global fee), on a 1.5 ST trade (tok fee on A / tok fee on B)', async () => {
+    it(`fees (orig/orig) - apply VCS token M originator fees (+ ledger fee) / UNFCCC token M originator fees (+ global fee), on a 1.5 ST trade (tok fee on A / tok fee on B)`, async () => {
         const A = accounts[++global.TaddrNdx];
         const B = accounts[++global.TaddrNdx];
         //await stm.whitelist(A);

@@ -6,8 +6,9 @@ const CONST = require('../const.js');
 contract("StMaster", accounts => {
     var stm;
 
-    before(async () => {
+    before(async function () {
         stm = await st.deployed();
+        if (await stm.getContractType() == CONST.contractType.CASHFLOW) this.skip();
         if (!global.TaddrNdx) global.TaddrNdx = 0;
         
         for (let i=0 ; i < 30 ; i++) { // whitelist enough accounts for the tests
@@ -22,7 +23,7 @@ contract("StMaster", accounts => {
             console.log(`addrNdx: ${global.TaddrNdx} - contract @ ${stm.address} (owner: ${accounts[0]})`);
     });
 
-    it('transferring - should not allow non-owner to transfer across ledger entries', async () => {
+    it(`transferring - should not allow non-owner to transfer across ledger entries`, async () => {
         try {
             await helper.transferWrapper(stm, accounts, accounts[global.TaddrNdx + 0], accounts[global.TaddrNdx + 1], 0, 0, 0, 0, 0, 0, 0, 0, false, { from: accounts[1] });
         } catch (ex) { 
@@ -32,7 +33,7 @@ contract("StMaster", accounts => {
         assert.fail('expected contract exception');
     });
 
-    it('transferring - should not allow a null transfer', async () => {
+    it(`transferring - should not allow a null transfer`, async () => {
         await stm.fund(CONST.ccyType.SGD, CONST.thousandCcy_cents,       accounts[global.TaddrNdx + 0], { from: accounts[0] });
         await stm.fund(CONST.ccyType.SGD, CONST.thousandCcy_cents,       accounts[global.TaddrNdx + 1], { from: accounts[0] });
         try {
@@ -44,7 +45,7 @@ contract("StMaster", accounts => {
         assert.fail('expected contract exception');
     });
 
-    it('transferring - should not allow transfer of invalid (2^64) quantity of token units (A)', async () => {
+    it(`transferring - should not allow transfer of invalid (2^64) quantity of token units (A)`, async () => {
         await stm.mintSecTokenBatch(CONST.tokenType.VCS, CONST.ktCarbon, 1,             accounts[global.TaddrNdx + 0], CONST.nullFees, [], [], { from: accounts[0] });
         await stm.fund(CONST.ccyType.SGD,                CONST.thousandCcy_cents,       accounts[global.TaddrNdx + 1],                         { from: accounts[0] });
         try {
@@ -67,7 +68,7 @@ contract("StMaster", accounts => {
         assert.fail('expected contract exception');
     });
 
-    it('transferring - should not allow transfer of invalid (2^64) quantity of token units (B)', async () => {
+    it(`transferring - should not allow transfer of invalid (2^64) quantity of token units (B)`, async () => {
         await stm.fund(CONST.ccyType.SGD,                CONST.thousandCcy_cents,       accounts[global.TaddrNdx + 0],                         { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.VCS, CONST.ktCarbon, 1,             accounts[global.TaddrNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
         try {
@@ -90,7 +91,7 @@ contract("StMaster", accounts => {
         assert.fail('expected contract exception');
     });
 
-    it('transferring - should not allow single-origin multiple-asset transfers (1)', async () => {
+    it(`transferring - should not allow single-origin multiple-asset transfers (1)`, async () => {
         await stm.fund(CONST.ccyType.SGD,                CONST.thousandCcy_cents,       accounts[global.TaddrNdx + 0],         { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.VCS, CONST.ktCarbon, 1,             accounts[global.TaddrNdx + 0], CONST.nullFees, [], [], { from: accounts[0] });
         await stm.fund(CONST.ccyType.SGD,                CONST.thousandCcy_cents,       accounts[global.TaddrNdx + 1],         { from: accounts[0] });
@@ -114,7 +115,7 @@ contract("StMaster", accounts => {
         assert.fail('expected contract exception');
     });
 
-    it('transferring - should not allow single-origin multiple-asset transfers (2)', async () => {
+    it(`transferring - should not allow single-origin multiple-asset transfers (2)`, async () => {
         await stm.fund(CONST.ccyType.SGD,                CONST.thousandCcy_cents,       accounts[global.TaddrNdx + 0],         { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.VCS, CONST.ktCarbon, 1,             accounts[global.TaddrNdx + 0], CONST.nullFees, [], [], { from: accounts[0] });
         await stm.fund(CONST.ccyType.SGD,                CONST.thousandCcy_cents,       accounts[global.TaddrNdx + 1],         { from: accounts[0] });
@@ -138,7 +139,7 @@ contract("StMaster", accounts => {
         assert.fail('expected contract exception');
     });
 
-    it('transferring - should not allow single-origin multiple-asset transfers (3)', async () => {
+    it(`transferring - should not allow single-origin multiple-asset transfers (3)`, async () => {
         await stm.fund(CONST.ccyType.SGD,                CONST.thousandCcy_cents,       accounts[global.TaddrNdx + 0],         { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.VCS, CONST.ktCarbon, 1,             accounts[global.TaddrNdx + 0], CONST.nullFees, [], [], { from: accounts[0] });
         await stm.fund(CONST.ccyType.SGD,                CONST.thousandCcy_cents,       accounts[global.TaddrNdx + 1],         { from: accounts[0] });
@@ -162,7 +163,7 @@ contract("StMaster", accounts => {
         assert.fail('expected contract exception');
     });
 
-    it('transferring - should not allow transfer to self', async () => {
+    it(`transferring - should not allow transfer to self`, async () => {
         await stm.fund(CONST.ccyType.SGD, CONST.thousandCcy_cents,       accounts[global.TaddrNdx + 0], { from: accounts[0] });
         await stm.fund(CONST.ccyType.SGD, CONST.thousandCcy_cents,       accounts[global.TaddrNdx + 1], { from: accounts[0] });
         try {
@@ -181,7 +182,7 @@ contract("StMaster", accounts => {
         assert.fail('expected contract exception');
     });
 
-    it('transferring - should not allow transfers when contract is read only', async () => {
+    it(`transferring - should not allow transfers when contract is read only`, async () => {
         await stm.fund(CONST.ccyType.SGD, CONST.thousandCcy_cents,       accounts[global.TaddrNdx + 0],         { from: accounts[0] });
         await stm.fund(CONST.ccyType.ETH, CONST.oneEth_wei,              accounts[global.TaddrNdx + 1],         { from: accounts[0] });
         try {
@@ -203,7 +204,7 @@ contract("StMaster", accounts => {
         assert.fail('expected contract exception');
     });
 
-    it('transferring - should not allow mismatched ccy type/amount transfers (ccy A)', async () => {
+    it(`transferring - should not allow mismatched ccy type/amount transfers (ccy A)`, async () => {
         await stm.fund(CONST.ccyType.SGD, CONST.thousandCcy_cents,       accounts[global.TaddrNdx + 0],         { from: accounts[0] });
         await stm.fund(CONST.ccyType.ETH, CONST.oneEth_wei,              accounts[global.TaddrNdx + 1],         { from: accounts[0] });
         try {
@@ -222,7 +223,7 @@ contract("StMaster", accounts => {
         assert.fail('expected contract exception');
     });
 
-    it('transferring - should not allow mismatched ccy type/amount transfers (ccy B)', async () => {
+    it(`transferring - should not allow mismatched ccy type/amount transfers (ccy B)`, async () => {
         await stm.fund(CONST.ccyType.SGD, CONST.thousandCcy_cents,       accounts[global.TaddrNdx + 0],         { from: accounts[0] });
         await stm.fund(CONST.ccyType.ETH, CONST.oneEth_wei,              accounts[global.TaddrNdx + 1],         { from: accounts[0] });
         try {
@@ -241,7 +242,7 @@ contract("StMaster", accounts => {
         assert.fail('expected contract exception');
     });
 
-    it('transferring - should not allow mismatched ccy type/amount transfers (tok A)', async () => {
+    it(`transferring - should not allow mismatched ccy type/amount transfers (tok A)`, async () => {
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.ktCarbon, 1, accounts[global.TaddrNdx + 0], CONST.nullFees, [], [], { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.ktCarbon, 1, accounts[global.TaddrNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
         try {
@@ -260,7 +261,7 @@ contract("StMaster", accounts => {
         assert.fail('expected contract exception');
     });
 
-    it('transferring - should not allow mismatched ccy type/amount transfers (tok B)', async () => {
+    it(`transferring - should not allow mismatched ccy type/amount transfers (tok B)`, async () => {
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.ktCarbon, 1, accounts[global.TaddrNdx + 0], CONST.nullFees, [], [], { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.ktCarbon, 1, accounts[global.TaddrNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
         try {
@@ -280,7 +281,7 @@ contract("StMaster", accounts => {
     });
 
     // covered by erc20 tests
-    // it('transferring - should allow a transfer to an unkown ledger entry (erc20 support) (B)', async () => {
+    // it(`transferring - should allow a transfer to an unkown ledger entry (erc20 support) (B)`, async () => {
     //     await stm.fund(CONST.ccyType.SGD, CONST.thousandCcy_cents,       accounts[global.TaddrNdx + 0], { from: accounts[0] });
     //     //try {
     //         await helper.transferWrapper(stm, accounts, accounts[global.TaddrNdx + 0], accounts[global.TaddrNdx + 1], 
@@ -297,7 +298,7 @@ contract("StMaster", accounts => {
     //     // }
     //     //assert.fail('expected contract exception');
     // });
-    // it('transferring - should allow a transfer from an unkown ledger entry (erc20 support) (A)', async () => {
+    // it(`transferring - should allow a transfer from an unkown ledger entry (erc20 support) (A)`, async () => {
     //     await stm.fund(CONST.ccyType.SGD, CONST.thousandCcy_cents,       accounts[global.TaddrNdx + 0], { from: accounts[0] });
     //     //try {
     //         await helper.transferWrapper(stm, accounts, accounts[global.TaddrNdx + 0], accounts[global.TaddrNdx + 1], 

@@ -10,8 +10,9 @@ const web3 = new Web3();
 contract("StMaster", accounts => {
     var stm;
 
-    before(async () => {
+    before(async function () {
         stm = await st.deployed();
+        if (await stm.getContractType() == CONST.contractType.CASHFLOW) this.skip();
         if (!global.TaddrNdx) global.TaddrNdx = 0;
         
         for (let i=0 ; i < 60 ; i++) { // whitelist enough accounts for the tests
@@ -28,7 +29,7 @@ contract("StMaster", accounts => {
 
     // ST MULTI FEES: LEDGER OVERRIDE
 
-    it('fees (ledger) - apply VCS token ledger override fee 1000 BP + 5 KG fixed (cap 10 KG) on a small trade (fee on A)', async () => {
+    it(`fees (ledger) - apply VCS token ledger override fee 1000 BP + 5 KG fixed (cap 10 KG) on a small trade (fee on A)`, async () => {
         const A = accounts[global.TaddrNdx + 0];
         const B = accounts[global.TaddrNdx + 1];
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      A, CONST.nullFees, [], [], { from: accounts[0] });
@@ -76,7 +77,7 @@ contract("StMaster", accounts => {
         assert(Big(A_balAfter).eq(Big(A_balBefore).minus(Big(expectedFeeKg)).minus(Big(transferAmountKg))), 'unexpected fee payer token balance after transfer');
     });
 
-    it('fees (ledger) - apply then clear VCS token ledger override fee 1000 BP + 5 KG fixed (cap 10 KG) on a small trade (fee on A)', async () => {
+    it(`fees (ledger) - apply then clear VCS token ledger override fee 1000 BP + 5 KG fixed (cap 10 KG) on a small trade (fee on A)`, async () => {
         const A = accounts[global.TaddrNdx + 0];
         const B = accounts[global.TaddrNdx + 1];
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      A, CONST.nullFees, [], [], { from: accounts[0] });
@@ -131,7 +132,7 @@ contract("StMaster", accounts => {
         assert(Big(A_balAfter).eq(Big(A_balBefore).minus(Big(expectedFeeKg)).minus(Big(transferAmountKg))), 'unexpected fee payer token balance after transfer');
     });
 
-    it('fees (ledger) - apply VCS token ledger override fee 1000 BP + 1000 KG fixed (collar 100m tons), on a large (0.5 GT) trade (fee on B)', async () => {
+    it(`fees (ledger) - apply VCS token ledger override fee 1000 BP + 1000 KG fixed (collar 100m tons), on a large (0.5 GT) trade (fee on B)`, async () => {
         const A = accounts[global.TaddrNdx + 0];
         const B = accounts[global.TaddrNdx + 1];
 
@@ -181,7 +182,7 @@ contract("StMaster", accounts => {
         assert(Big(B_balAfter).eq(Big(B_balBefore).minus(Big(expectedFeeKg)).minus(Big(transferAmountKg))), 'unexpected fee payer token balance after transfer');
     });
 
-    it('fees (ledger) - apply then clear VCS token ledger override fee 1000 BP + 1000 KG fixed (collar 100m tons), on a large (0.5 GT) trade (fee on B)', async () => {
+    it(`fees (ledger) - apply then clear VCS token ledger override fee 1000 BP + 1000 KG fixed (collar 100m tons), on a large (0.5 GT) trade (fee on B)`, async () => {
         const A = accounts[global.TaddrNdx + 0];
         const B = accounts[global.TaddrNdx + 1];
 
@@ -240,7 +241,7 @@ contract("StMaster", accounts => {
 
     // CCY MULTI FEES: LEDGER OVERRIDE
 
-    it('fees (ledger) - apply ETH ccy override fee 2500 BP + 0.01 ETH fixed (collar 0.2 ETH), on a small trade (fee on A)', async () => {
+    it(`fees (ledger) - apply ETH ccy override fee 2500 BP + 0.01 ETH fixed (collar 0.2 ETH), on a small trade (fee on A)`, async () => {
         const A = accounts[global.TaddrNdx + 0];
         const B = accounts[global.TaddrNdx + 1];
         await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        A,                         { from: accounts[0] });
@@ -288,7 +289,7 @@ contract("StMaster", accounts => {
         assert(Big(A_balAfter).eq(Big(A_balBefore).minus(Big(expectedFeeCcy)).minus(Big(transferAmountCcy))), 'unexpected fee payer currency balance after transfer');
     });
 
-    it('fees (ledger) - apply then clear ETH ccy override fee 2500 BP + 0.01 ETH fixed (collar 0.2 ETH), on a small trade (fee on A)', async () => {
+    it(`fees (ledger) - apply then clear ETH ccy override fee 2500 BP + 0.01 ETH fixed (collar 0.2 ETH), on a small trade (fee on A)`, async () => {
         const A = accounts[global.TaddrNdx + 0];
         const B = accounts[global.TaddrNdx + 1];
         await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        A,                         { from: accounts[0] });
@@ -343,7 +344,7 @@ contract("StMaster", accounts => {
         assert(Big(A_balAfter).eq(Big(A_balBefore).minus(Big(expectedFeeCcy)).minus(Big(transferAmountCcy))), 'unexpected fee payer currency balance after transfer');
     });
 
-    it('fees (ledger) - apply ETH ccy ledger override fee 1000 BP + 1000 ETH fixed (cap 50000 ETH), on a large (500k ETH) trade (fee on B)', async () => {
+    it(`fees (ledger) - apply ETH ccy ledger override fee 1000 BP + 1000 ETH fixed (cap 50000 ETH), on a large (500k ETH) trade (fee on B)`, async () => {
         const A = accounts[global.TaddrNdx + 0];
         const B = accounts[global.TaddrNdx + 1];
 
@@ -393,7 +394,7 @@ contract("StMaster", accounts => {
         assert(Big(B_balAfter).eq(Big(B_balBefore).minus(Big(expectedFeeCcy)).minus(Big(transferAmountCcy))), 'unexpected fee payer currency balance after transfer');
     });
 
-    it('fees (ledger) - apply then clear ETH ccy ledger override fee 1000 BP + 1000 ETH fixed (cap 50000 ETH), on a large (250k ETH) trade (fee on B)', async () => {
+    it(`fees (ledger) - apply then clear ETH ccy ledger override fee 1000 BP + 1000 ETH fixed (cap 50000 ETH), on a large (250k ETH) trade (fee on B)`, async () => {
         const A = accounts[global.TaddrNdx + 0];
         const B = accounts[global.TaddrNdx + 1];
 
@@ -452,7 +453,7 @@ contract("StMaster", accounts => {
 
     // CCY & ST MULTI FEES + GLOBAL FEES: LEDGER OVERRIDE
 
-    it('fees (ledger) - should allow a ledger fee-capped transfer from A with otherwise insufficient carbon to cover fees (ledger fee on A, global fee on B)', async () => {
+    it(`fees (ledger) - should allow a ledger fee-capped transfer from A with otherwise insufficient carbon to cover fees (ledger fee on A, global fee on B)`, async () => {
         const A = accounts[global.TaddrNdx + 0];
         const B = accounts[global.TaddrNdx + 1];
 
@@ -510,7 +511,7 @@ contract("StMaster", accounts => {
         assert(Big(B_balAfter).eq(Big(B_balBefore).minus(Big(expectedFeeEth)).minus(Big(transferAmountEth))), 'unexpected fee payer currency balance after transfer');
     });
 
-    it('fees (ledger) - should allow a ledger fee-capped transfer from B with otherwise insufficient ccy to cover fees (ledger fee on B, global fee on A)', async () => {
+    it(`fees (ledger) - should allow a ledger fee-capped transfer from B with otherwise insufficient ccy to cover fees (ledger fee on B, global fee on A)`, async () => {
         const A = accounts[global.TaddrNdx + 0];
         const B = accounts[global.TaddrNdx + 1];
 
@@ -568,7 +569,7 @@ contract("StMaster", accounts => {
         assert(Big(B_balAfter).eq(Big(B_balBefore).minus(Big(expectedFeeEth)).minus(Big(transferAmountEth))), 'unexpected fee payer currency balance after transfer');
     });
 
-    it('fees (ledger) - should not allow a transfer with insufficient carbon to cover collared ledger fee (fee on B)', async () => {
+    it(`fees (ledger) - should not allow a transfer with insufficient carbon to cover collared ledger fee (fee on B)`, async () => {
         const A = accounts[global.TaddrNdx + 0];
         const B = accounts[global.TaddrNdx + 1];
 
@@ -601,7 +602,7 @@ contract("StMaster", accounts => {
         assert.fail('expected contract exception');
     });
 
-    it('fees (ledger) - should not allow a transfer with insufficient carbon to cover collared ledger fee (fee on A)', async () => {
+    it(`fees (ledger) - should not allow a transfer with insufficient carbon to cover collared ledger fee (fee on A)`, async () => {
         const A = accounts[global.TaddrNdx + 0];
         const B = accounts[global.TaddrNdx + 1];
 
