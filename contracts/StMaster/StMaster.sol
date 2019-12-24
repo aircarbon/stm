@@ -8,10 +8,12 @@ import "./StBurnable.sol";
 import "./StTransferable.sol";
 import "./StErc20.sol";
 import "./StDataLoadable.sol";
+import "./StPayable.sol";
 
 import "../Libs/StructLib.sol"; // bytecode of libs get *removed* during linking (solc/truffle migrate)
 
-contract StMaster is StMintable, StBurnable, CcyFundable, CcyWithdrawable, StTransferable, StDataLoadable {
+contract StMaster is StMintable, StBurnable, CcyFundable, CcyWithdrawable, StTransferable, StDataLoadable, StPayable {
+
     // contract properties
     string public name;
     string public version;
@@ -20,42 +22,109 @@ contract StMaster is StMintable, StBurnable, CcyFundable, CcyWithdrawable, StTra
     // events -- (hack: see: https://ethereum.stackexchange.com/questions/11137/watching-events-defined-in-libraries)
     // CcyLib events
     event AddedCcyType(uint256 id, string name, string unit);
-    event CcyFundedLedger(uint256 ccyTypeId, address ledgerOwner, int256 amount);
-    event CcyWithdrewLedger(uint256 ccyTypeId, address ledgerOwner, int256 amount);
+    event CcyFundedLedger(uint256 ccyTypeId, address indexed ledgerOwner, int256 amount);
+    event CcyWithdrewLedger(uint256 ccyTypeId, address indexed ledgerOwner, int256 amount);
     // TokenLib events
     event AddedSecTokenType(uint256 id, string name);
-    event BurnedFullSecToken(uint256 stId, uint256 tokenTypeId, address ledgerOwner, uint256 burnedQty);
-    event BurnedPartialSecToken(uint256 stId, uint256 tokenTypeId, address ledgerOwner, uint256 burnedQty);
-    event MintedSecTokenBatch(uint256 batchId, uint256 tokenTypeId, address batchOwner, uint256 mintQty, uint256 mintSecTokenCount);
-    event MintedSecToken(uint256 stId, uint256 batchId, uint256 tokenTypeId, address ledgerOwner, uint256 mintedQty);
-    event AddedBatchMetadata(uint256 batchId, string key, string value);
-    event SetBatchOriginatorFee(uint256 batchId, StructLib.SetFeeArgs originatorFee);
+    event BurnedFullSecToken(uint256 indexed stId, uint256 tokenTypeId, address indexed ledgerOwner, uint256 burnedQty);
+    event BurnedPartialSecToken(uint256 indexed stId, uint256 tokenTypeId, address indexed ledgerOwner, uint256 burnedQty);
+    event MintedSecTokenBatch(uint256 indexed batchId, uint256 tokenTypeId, address indexed batchOwner, uint256 mintQty, uint256 mintSecTokenCount);
+    event MintedSecToken(uint256 indexed stId, uint256 indexed batchId, uint256 tokenTypeId, address indexed ledgerOwner, uint256 mintedQty);
+    event AddedBatchMetadata(uint256 indexed batchId, string key, string value);
+    event SetBatchOriginatorFee(uint256 indexed batchId, StructLib.SetFeeArgs originatorFee);
     // TransferLib events
     enum TransferType { User, ExchangeFee, OriginatorFee }
-    event TransferedLedgerCcy(address from, address to, uint256 ccyTypeId, uint256 amount, TransferType transferType);
-    event TransferedFullSecToken(address from, address to, uint256 stId, uint256 mergedToSecTokenId, uint256 qty, TransferType transferType);
-    event TransferedPartialSecToken(address from, address to, uint256 splitFromSecTokenId, uint256 newSecTokenId, uint256 mergedToSecTokenId, uint256 qty, TransferType transferType);
+    event TransferedLedgerCcy(address indexed from, address indexed to, uint256 ccyTypeId, uint256 amount, TransferType transferType);
+    event TransferedFullSecToken(address indexed from, address indexed to, uint256 indexed stId, uint256 mergedToSecTokenId, uint256 qty, TransferType transferType);
+    event TransferedPartialSecToken(address indexed from, address indexed to, uint256 indexed splitFromSecTokenId, uint256 newSecTokenId, uint256 mergedToSecTokenId, uint256 qty, TransferType transferType);
     // FeeLib events
-    event SetFeeTokFix(uint256 tokenTypeId, address ledgerOwner, uint256 fee_tokenQty_Fixed);
-    event SetFeeCcyFix(uint256 ccyTypeId, address ledgerOwner, uint256 fee_ccy_Fixed);
-    event SetFeeTokBps(uint256 tokenTypeId, address ledgerOwner, uint256 fee_token_PercBips);
-    event SetFeeCcyBps(uint256 ccyTypeId, address ledgerOwner, uint256 fee_ccy_PercBips);
-    event SetFeeTokMin(uint256 tokenTypeId, address ledgerOwner, uint256 fee_token_Min);
-    event SetFeeCcyMin(uint256 ccyTypeId, address ledgerOwner, uint256 fee_ccy_Min);
-    event SetFeeTokMax(uint256 tokenTypeId, address ledgerOwner, uint256 fee_token_Max);
-    event SetFeeCcyMax(uint256 ccyTypeId, address ledgerOwner, uint256 fee_ccy_Max);
+    event SetFeeTokFix(uint256 tokenTypeId, address indexed ledgerOwner, uint256 fee_tokenQty_Fixed);
+    event SetFeeCcyFix(uint256 ccyTypeId, address indexed ledgerOwner, uint256 fee_ccy_Fixed);
+    event SetFeeTokBps(uint256 tokenTypeId, address indexed ledgerOwner, uint256 fee_token_PercBips);
+    event SetFeeCcyBps(uint256 ccyTypeId, address indexed ledgerOwner, uint256 fee_ccy_PercBips);
+    event SetFeeTokMin(uint256 tokenTypeId, address indexed ledgerOwner, uint256 fee_token_Min);
+    event SetFeeCcyMin(uint256 ccyTypeId, address indexed ledgerOwner, uint256 fee_ccy_Min);
+    event SetFeeTokMax(uint256 tokenTypeId, address indexed ledgerOwner, uint256 fee_token_Max);
+    event SetFeeCcyMax(uint256 ccyTypeId, address indexed ledgerOwner, uint256 fee_ccy_Max);
     // Erc20Lib events
     event Transfer(address indexed from, address indexed to, uint256 value);
     event Approval(address indexed owner, address indexed spender, uint256 value);
 
     //
     // -- J 1+3 --
-    // PRI 0 ** CASHFLOWS re. SD **
+    // PRI 0 ** CASHFLOWS re. SD ** >>> MVP
     //
     //   >>> new deployer (or flag on deployer) > to deploy "CashFlowMaster" w/ other
+    //    > DONE: limit batches=1 + limit StTypes=1
     //
-    //   ... issuance (first payable?) -- triggers minting to payer, routes ETH to "issuer"
+    //    > limit batches=1 + limit StTypes=1
     //
+    //    > SINGLE ISSUANCE / SINGLE SUBSCRIBER -- first payable received:
+    //        > require 1 batch minted (sits locked with issuer to start with) - return funds otherwise
+    //        > issuer receives all from payable, minus fees
+    //        > payer receives all tokens from issuer
+    //
+    //          TODO: could split this up later - issued batch has total ETH amount to buy all,
+    //                and fractions thereof result in partial subscription - MULTI-SUBSCRIBER
+    //          TODO: >1 batch minting (dilutes, due to pro-rata) - MULTI-ISSUANCE
+    //
+    //    > SUBSEQUENT PAYABLE
+    //        > require: already subscribed
+    //        > require: payer is issuer
+    //        > pro-rata ledger owners
+    //
+    //    > before first payable received:
+    //        > can ONLY mint (exactly once), batch sits with issuer (locked, effectively)
+    //
+
+    function getContractType() public view returns(StructLib.ContractType) { return ledgerData.contractType; }
+
+    constructor(
+        StructLib.ContractType contractType,
+        string memory contractName,
+        string memory contractVer,
+        string memory contractUnit,
+        string memory contractSymbol,
+        uint8 contractDecimals
+    ) StErc20(contractSymbol, contractDecimals)
+    public {
+        // set common properties
+        name = contractName;
+        version = contractVer;
+        unit = contractUnit;
+
+        // contract type
+        ledgerData.contractType = contractType;
+
+        // set token & ccy types
+        if (contractType == StructLib.ContractType.COMMODITY) {
+            stTypesData._tokenTypeNames[1] = 'CER - UNFCCC - Certified Emission Reduction';
+            stTypesData._tokenTypeNames[2] = 'VCS - VERRA - Verified Carbon Standard';
+            stTypesData._count_tokenTypes = 2;
+            ccyTypesData._ccyTypes[1] = StructLib.Ccy({ id: 1, name: 'SGD', unit: 'cents',      decimals: 2 }); // gas: ~500k (!) for pre-populating these
+            ccyTypesData._ccyTypes[2] = StructLib.Ccy({ id: 2, name: 'ETH', unit: 'Wei',        decimals: 18 });
+            ccyTypesData._ccyTypes[3] = StructLib.Ccy({ id: 3, name: 'BTC', unit: 'Satoshi',    decimals: 8 });
+            ccyTypesData._ccyTypes[4] = StructLib.Ccy({ id: 4, name: 'USD', unit: 'cents',      decimals: 2 });
+            ccyTypesData._ccyTypes[5] = StructLib.Ccy({ id: 5, name: 'EUR', unit: 'euro cents', decimals: 2 });
+            ccyTypesData._ccyTypes[6] = StructLib.Ccy({ id: 6, name: 'HKD', unit: 'cents',      decimals: 2 });
+            ccyTypesData._ccyTypes[7] = StructLib.Ccy({ id: 7, name: 'GBP', unit: 'pence',      decimals: 2 });
+            ccyTypesData._count_ccyTypes = 7;
+        }
+        else if (contractType == StructLib.ContractType.CASHFLOW) {
+            stTypesData._tokenTypeNames[1] = contractName;
+            stTypesData._count_tokenTypes = 1;
+            ccyTypesData._ccyTypes[1] = StructLib.Ccy({ id: 1, name: 'ETH', unit: 'Wei',        decimals: 18 });
+            ccyTypesData._count_ccyTypes = 1;
+        }
+        else revert('Bad contract type');
+
+        // create ledger entry for contract owner - transfer fees are paid to this ledger entry
+        ledgerData._ledger[owner] = StructLib.Ledger({
+            exists: true,
+        customFees: StructLib.FeeStruct()
+        });
+        ledgerData._ledgerOwners.push(owner);
+    }
 
     //
     // -- LAUNCH LIST --
@@ -97,42 +166,6 @@ contract StMaster is StMintable, StBurnable, CcyFundable, CcyWithdrawable, StTra
     //    >> with MAX_BATCHES_PREVIEW exceeded ... change to more(bool) ... ?
     //  ** fee-preview: tests general / using it for splitting multi-batch transfers
     //
-
-    constructor(
-        string memory contractName,
-        string memory contractVer,
-        string memory contractUnit,
-        string memory contractSymbol,
-        uint8 contractDecimals
-    ) StErc20(contractSymbol, contractDecimals)
-    public {
-        // set contract properties
-        name = contractName;
-        version = contractVer;
-        unit = contractUnit;
-
-        // params - token types
-        stTypesData._tokenTypeNames[1] = 'CER - UNFCCC - Certified Emission Reduction';
-        stTypesData._tokenTypeNames[2] = 'VCS - VERRA - Verified Carbon Standard';
-        stTypesData._count_tokenTypes = 2;
-
-        // params - currency types
-        ccyTypesData._ccyTypes[1] = StructLib.Ccy({ id: 1, name: 'SGD', unit: 'cents',      decimals: 2 }); // gas: ~500k (!) for pre-populating these
-        ccyTypesData._ccyTypes[2] = StructLib.Ccy({ id: 2, name: 'ETH', unit: 'Wei',        decimals: 18 });
-        ccyTypesData._ccyTypes[3] = StructLib.Ccy({ id: 3, name: 'BTC', unit: 'Satoshi',    decimals: 8 });
-        ccyTypesData._ccyTypes[4] = StructLib.Ccy({ id: 4, name: 'USD', unit: 'cents',      decimals: 2 });
-        ccyTypesData._ccyTypes[5] = StructLib.Ccy({ id: 5, name: 'EUR', unit: 'euro cents', decimals: 2 });
-        ccyTypesData._ccyTypes[6] = StructLib.Ccy({ id: 6, name: 'HKD', unit: 'cents',      decimals: 2 });
-        ccyTypesData._ccyTypes[7] = StructLib.Ccy({ id: 7, name: 'GBP', unit: 'pence',      decimals: 2 });
-        ccyTypesData._count_ccyTypes = 7;
-
-         // create ledger entry for contract owner - transfer fees are paid to this ledger entry
-        ledgerData._ledger[owner] = StructLib.Ledger({
-            exists: true,
-        customFees: StructLib.FeeStruct()
-        });
-        ledgerData._ledgerOwners.push(owner);
-    }
 
     /**
      * @dev Immutably seals the contract. Once sealed, no further whitelist entries can be added, and no bulk data load actions can be performed.

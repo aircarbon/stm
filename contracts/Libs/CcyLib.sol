@@ -5,8 +5,8 @@ import "./StructLib.sol";
 
 library CcyLib {
     event AddedCcyType(uint256 id, string name, string unit);
-    event CcyFundedLedger(uint256 ccyTypeId, address ledgerOwner, int256 amount);
-    event CcyWithdrewLedger(uint256 ccyTypeId, address ledgerOwner, int256 amount);
+    event CcyFundedLedger(uint256 ccyTypeId, address indexed ledgerOwner, int256 amount);
+    event CcyWithdrewLedger(uint256 ccyTypeId, address indexed ledgerOwner, int256 amount);
 
     // CCY TYPES
     function addCcyType(

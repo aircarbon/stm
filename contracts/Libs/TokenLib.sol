@@ -6,18 +6,22 @@ import "./FeeLib.sol";
 
 library TokenLib {
     event AddedSecTokenType(uint256 id, string name);
-    event BurnedFullSecToken(uint256 stId, uint256 tokenTypeId, address ledgerOwner, uint256 burnedQty);
-    event BurnedPartialSecToken(uint256 stId, uint256 tokenTypeId, address ledgerOwner, uint256 burnedQty);
-    event MintedSecTokenBatch(uint256 batchId, uint256 tokenTypeId, address batchOwner, uint256 mintQty, uint256 mintSecTokenCount);
-    event MintedSecToken(uint256 stId, uint256 batchId, uint256 tokenTypeId, address ledgerOwner, uint256 mintedQty);
-    event AddedBatchMetadata(uint256 batchId, string key, string value);
-    event SetBatchOriginatorFee(uint256 batchId, StructLib.SetFeeArgs originatorFee);
+    event BurnedFullSecToken(uint256 indexed stId, uint256 tokenTypeId, address indexed ledgerOwner, uint256 burnedQty);
+    event BurnedPartialSecToken(uint256 indexed stId, uint256 tokenTypeId, address indexed ledgerOwner, uint256 burnedQty);
+    event MintedSecTokenBatch(uint256 indexed batchId, uint256 tokenTypeId, address indexed batchOwner, uint256 mintQty, uint256 mintSecTokenCount);
+    event MintedSecToken(uint256 indexed stId, uint256 indexed batchId, uint256 tokenTypeId, address indexed ledgerOwner, uint256 mintedQty);
+    event AddedBatchMetadata(uint256 indexed batchId, string key, string value);
+    event SetBatchOriginatorFee(uint256 indexed batchId, StructLib.SetFeeArgs originatorFee);
 
     // TOKEN TYPES
     function addSecTokenType(
+        StructLib.LedgerStruct storage ledgerData,
         StructLib.StTypesStruct storage stTypesData,
         string memory name)
     public {
+        if (ledgerData.contractType == StructLib.ContractType.CASHFLOW)
+            require(stTypesData._count_tokenTypes == 0, "Bad cashflow request");
+
         for (uint256 tokenTypeId = 1; tokenTypeId <= stTypesData._count_tokenTypes; tokenTypeId++) {
             require(keccak256(abi.encodePacked(stTypesData._tokenTypeNames[tokenTypeId])) != keccak256(abi.encodePacked(name)), "Duplicate name");
         }
@@ -49,10 +53,8 @@ library TokenLib {
     // MINTING
     struct MintSecTokenBatchArgs {
         uint256              tokenTypeId;
-
         uint256              mintQty; // accept 256 bits, so we can downcast and test if in 64-bit range
         int64                mintSecTokenCount;
-
         address              batchOwner;
         StructLib.SetFeeArgs origTokFee;
         string[]             metaKeys;
@@ -71,9 +73,11 @@ library TokenLib {
         require(a.mintSecTokenCount == 1, "Set mintSecTokenCount 1");
         require(a.mintQty >= 0x1 && a.mintQty <= 0xffffffffffffffff, "Bad mintQty"); // max uint64
         require(uint256(ledgerData._batches_currentMax_id) + 1 <= 0xffffffffffffffff, "Too many batches");
-
         require(a.origTokFee.fee_max >= a.origTokFee.fee_min || a.origTokFee.fee_max == 0, "Bad fee args");
         require(a.origTokFee.fee_percBips <= 10000, "Bad fee args");
+
+        if (ledgerData.contractType == StructLib.ContractType.CASHFLOW)
+            require(ledgerData._batches_currentMax_id == 0, "Bad cashflow request");
 
         // ### string[] param lengths are reported as zero!
         /*require(metaKeys.length == 0, "At least one metadata key must be provided");

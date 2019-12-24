@@ -9,6 +9,7 @@ const TransferLib = artifacts.require('./TransferLib.sol');
 const FeeLib = artifacts.require('./FeeLib.sol');
 const Erc20Lib = artifacts.require('./Erc20Lib.sol');
 const LoadLib = artifacts.require('./LoadLib.sol');
+const PayableLib = artifacts.require('./PayableLib.sol');
 
 const StMaster = artifacts.require('./StMaster.sol');
 
@@ -64,7 +65,11 @@ module.exports = async function (deployer) {
     return deployer.deploy(LoadLib).then(async loadLib => { 
         deployer.link(LoadLib, StMaster);
 
-        return deployer.deploy(StMaster, 
+    return deployer.deploy(PayableLib).then(async payableLib => { 
+        deployer.link(PayableLib, StMaster);
+        
+            return deployer.deploy(StMaster, 
+            type == "CASHFLOW" ? CONST.contractType.CASHFLOW : CONST.contractType.COMMODITY,
             CONST.contractProps[type].contractName, 
             CONST.contractProps[type].contractVer, 
             CONST.contractProps[type].contractUnit, 
@@ -92,6 +97,7 @@ module.exports = async function (deployer) {
             }
         }).catch(err => { console.error('failed deployment: StMaster', err); });
     
+    }).catch(err => { console.error('failed deployment: PayableLib', err); });
     }).catch(err => { console.error('failed deployment: DataLib', err); });
     }).catch(err => { console.error('failed deployment: Erc20Lib', err); });
     }).catch(err => { console.error('failed deployment: FeeLib', err); });

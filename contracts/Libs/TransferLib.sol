@@ -5,9 +5,9 @@ import "./StructLib.sol";
 
 library TransferLib {
     enum TransferType { User, ExchangeFee, OriginatorFee }
-    event TransferedLedgerCcy(address from, address to, uint256 ccyTypeId, uint256 amount, TransferType transferType);
-    event TransferedFullSecToken(address from, address to, uint256 stId, uint256 mergedToSecTokenId, uint256 qty, TransferType transferType);
-    event TransferedPartialSecToken(address from, address to, uint256 splitFromSecTokenId, uint256 newSecTokenId, uint256 mergedToSecTokenId, uint256 qty, TransferType transferType);
+    event TransferedLedgerCcy(address indexed from, address indexed to, uint256 ccyTypeId, uint256 amount, TransferType transferType);
+    event TransferedFullSecToken(address indexed from, address indexed to, uint256 indexed stId, uint256 mergedToSecTokenId, uint256 qty, TransferType transferType);
+    event TransferedPartialSecToken(address indexed from, address indexed to, uint256 indexed splitFromSecTokenId, uint256 newSecTokenId, uint256 mergedToSecTokenId, uint256 qty, TransferType transferType);
 
     uint256 constant MAX_BATCHES_PREVIEW = 4; // for fee previews: max distinct batch IDs that can participate in one side of a trade fee preview
 

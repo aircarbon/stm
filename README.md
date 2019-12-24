@@ -29,11 +29,12 @@ Migration script will pickup this env var and deploy a test contract accordingly
 - `truffle compile` or (undocumented) `truffle compile --reset` if it keeps recompiling when there aren't any changes in the Solidity
 - `truffle test --network development`
 
-
+## Dbg - misc
+If you see `Error: invalid reporter "eth-gas-reporter"` -- try running `npm i` in ./packages/erc20
 
 ## Dbg - `truffle develop`
 - `truffle develop`
-  > note: tests will fail with `develop`'s built-in ganache instance (not enough test accounts)\
+  > note: tests will fail with `develop`'s built-in ganache instance (not enough test accounts)
 - `migrate`
 - `AcMaster.deployed().then((i) => { ac=i })`
 - `` AcMaster.MintedSecTokenBatch({}).watch((err,res) => { console.log(`MintedSecTokenBatch... id = ${res.args.id}`) }) ``

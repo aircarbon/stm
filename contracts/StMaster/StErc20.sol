@@ -5,7 +5,6 @@ import "../Interfaces/IErc20.sol";
 
 import "./Owned.sol";
 import "./StLedger.sol";
-import "./StTypes.sol";
 import "./CcyTypes.sol";
 import "./StFees.sol";
 

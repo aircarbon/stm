@@ -23,7 +23,7 @@ const SCOOP_TESTNETS_2 = "0xe4f1925fba6cbf65c81dc8d25163c899f14cd6c1";
 const SCOOP_DOM10_1 = "0xd183d12ced4accb265b0eda55b3526c7cb102485";
 const SCOOP_DOM10_2 = "0x23fa93bcabb452a9964d5b49777f2462bb632587";
 
-describe('Contract Web3 Interface', async () => {
+describe(`Contract Web3 Interface`, async () => {
 
     //
     // can run these to test web3 more quickly, e.g.
@@ -31,7 +31,7 @@ describe('Contract Web3 Interface', async () => {
     //  Ropsten AC: ("export WEB3_NETWORK_ID=3 && export CONTRACT_TYPE=COMMODITY && mocha test_web3 --timeout 120000 --exit")
     //
 
-    before(async () => {
+    before(async function () {
         var x;
         x = await CONST.getAccountAndKey(OWNER_NDX);
         OWNER = x.addr; OWNER_privKey = x.privKey;
@@ -49,8 +49,9 @@ describe('Contract Web3 Interface', async () => {
         try {
             const whitelistTx = await CONST.web3_tx('whitelist', [ WHITE ], OWNER, OWNER_privKey);
         } catch(ex) {
-            if (ex.toString().includes("Already whitelisted")) console.log('(already whitelisted - nop)');
-            else throw(ex);
+            // swallow - ropsten doesn't include the revert msg
+            //if (ex.toString().includes("Already whitelisted")) console.log('(already whitelisted - nop)');
+            //else throw(ex);
         }
         const sealTx = await CONST.web3_tx('sealContract', [], OWNER, OWNER_privKey);
 
@@ -76,7 +77,7 @@ describe('Contract Web3 Interface', async () => {
         const fundTx = await CONST.web3_sendEthTestAddr(0, GRAY_1_NDX, "0.1");
     });
 
-    it('web3 direct - erc20 - should be able to send from graylist addr to testnets@scoop.tech (erc20 => erc20)', async () => {
+    it(`web3 direct - erc20 - should be able to send from graylist addr to testnets@scoop.tech (erc20 => erc20)`, async () => {
         // const { web3, ethereumTxChain } = CONST.getTestContextWeb3();
         // console.log('web3.currentProvider.host', web3.currentProvider.host);
 
@@ -99,7 +100,7 @@ describe('Contract Web3 Interface', async () => {
         //const erc20 = await CONST.web3_tx('transfer', [ SCOOP_TESTNETS_1, "1000" ], GRAY_1, GRAY_1_privKey);
         const erc20 = await CONST.web3_tx('transfer', [ SCOOP_DOM10_1, "1000" ], GRAY_1, GRAY_1_privKey);
         //CONST.logGas(erc20, 'erc20 1 type, 1 batch');
-        console.log('erc20', erc20);
+        //console.log('erc20', erc20);
         
         // le = await CONST.web3_call('getLedgerEntry', [ SCOOP_TESTNETS_1 ]);
         // console.log('le', le);
@@ -108,7 +109,7 @@ describe('Contract Web3 Interface', async () => {
         // });
     });
    
-    // it('web3 direct - erc20 - should be able to send from graylist addr to whitelist addr (DEPOSIT: erc20 => exchange)', async () => {
+    // it(`web3 direct - erc20 - should be able to send from graylist addr to whitelist addr (DEPOSIT: erc20 => exchange)`, async () => {
     //     // var le;
     //     // le = await CONST.web3_call('getLedgerEntry', [ GRAY_1 ]);
     //     // le.tokens.forEach(p => {

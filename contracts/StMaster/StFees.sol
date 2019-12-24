@@ -17,7 +17,7 @@ contract StFees is Owned, StLedger {
 
     // fees accessor (all types)
     enum GetFeeType { CCY, TOK }
-    
+
     /**
      * @dev Define fee structure for token type - global or per ledger entry
      * @param feeType Fee type: currency or token
