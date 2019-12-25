@@ -156,7 +156,6 @@ library StructLib {
         CashflowType cashflowType;       // issuance type
         uint256      wei_principal;      // total issuance/subsciption value
 
-        uint256      issued_Blk;         // issuance (start) block no
         uint256      term_Blks;          // total term/tenor, in blocks - 0 for perpetual
 
         uint256      bond_bps;           // rates: basis points per year on principal
@@ -164,6 +163,7 @@ library StructLib {
     }
     struct CashflowStruct {
         CashflowArgs args;
+        uint256      issued_Blk;         // issuance (start) block no
 
         // TODO: payment history... (& bond_int_lastPaidBlk)
         //uint256 bond_int_payments;       // todo - { block_no, amount, }

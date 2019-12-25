@@ -71,8 +71,9 @@ module.exports = async function (deployer) {
         
             return deployer.deploy(StMaster, 
             type == "CASHFLOW" ? CONST.contractType.CASHFLOW : CONST.contractType.COMMODITY,
-            CONST.contractProps[type].contractName, 
-            CONST.contractProps[type].contractVer, 
+            CONST.contractProps[type].cashflowArgs,
+            CONST.contractProps[type].contractName,
+            CONST.contractProps[type].contractVer,
             CONST.contractProps[type].contractUnit, 
             CONST.contractProps[type].contractSymbol, 
             CONST.contractProps[type].contractDecimals

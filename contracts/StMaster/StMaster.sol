@@ -12,7 +12,7 @@ import "./StPayable.sol";
 
 import "../Libs/StructLib.sol";
 
-contract StMaster is StMintable, StBurnable, CcyFundable, CcyWithdrawable, StTransferable, StDataLoadable, StPayable {
+contract StMaster is StMintable, StBurnable, CcyFundable, CcyWithdrawable, StTransferable, StDataLoadable {
 
     // contract properties
     string public name;
@@ -81,6 +81,7 @@ contract StMaster is StMintable, StBurnable, CcyFundable, CcyWithdrawable, StTra
 
     constructor(
         StructLib.ContractType contractType,
+        StructLib.CashflowArgs memory cashflowArgs,
         string memory contractName,
         string memory contractVer,
         string memory contractUnit,
@@ -95,6 +96,7 @@ contract StMaster is StMintable, StBurnable, CcyFundable, CcyWithdrawable, StTra
 
         // contract type
         ledgerData.contractType = contractType;
+        cashflowData.args = cashflowArgs;
 
         // set token & ccy types
         if (contractType == StructLib.ContractType.COMMODITY) {

@@ -15,10 +15,21 @@ library LedgerLib {
         StructLib.StTypesStruct storage stTypesData,
         StructLib.CcyTypesStruct storage ccyTypesData,
         StructLib.Erc20Struct storage erc20Data,
+        StructLib.CashflowStruct storage cashflowData,
         StructLib.FeeStruct storage globalFees
     )
     public view returns (bytes32) {
         bytes32 ledgerHash;
+
+        // hash cashflow data
+        ledgerHash = keccak256(abi.encodePacked(ledgerHash,
+            cashflowData.args.cashflowType,
+            cashflowData.args.wei_principal,
+            cashflowData.args.term_Blks,
+            cashflowData.args.bond_bps,
+            cashflowData.args.bond_int_EveryBlks,
+            cashflowData.issued_Blk
+        ));
 
         // hash currency types & exchange currency fees
         for (uint256 ccyTypeId = 1; ccyTypeId <= ccyTypesData._count_ccyTypes; ccyTypeId++) {

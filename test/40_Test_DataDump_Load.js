@@ -8,12 +8,13 @@ contract("StMaster", accounts => {
 
     before(async function () {  
         stm_cur = await st.deployed();
-        if (await stm_cur.getContractType() == CONST.contractType.CASHFLOW) this.skip();
+        //if (await stm_cur.getContractType() == CONST.contractType.CASHFLOW) this.skip();
         console.log(`stm_cur: @${stm_cur.address} ledgerHash=${await stm_cur.getLedgerHashcode()} / ${await stm_cur.name()} ${await stm_cur.version()}`);
 
         stm_new = await st.new(
             await stm_cur.getContractType(),
-            `${await stm_cur.name()}_UPGRADED`,
+            (await stm_cur.getCashflowData()).args,
+            `${await stm_cur.name()}`, //_UPGRADED`,
             `${await stm_cur.version()}_B`,
             await stm_cur.unit(),
             await stm_cur.symbol(),
@@ -42,10 +43,12 @@ contract("StMaster", accounts => {
         curHash = await checkHashUpdate(curHash);
 
         // token types
-        await stm_cur.addSecTokenType('NEW_TOK_TYPE', { from: accounts[0] });
         const stTypesData = await stm_cur.getSecTokenTypes();
-        console.log(`St Types: ${stTypesData.tokenTypes.map(p => p.name).join(', ')}`);
-        curHash = await checkHashUpdate(curHash);
+        if (await stm_cur.getContractType() == CONST.contractType.COMMODITY) {
+            await stm_cur.addSecTokenType('NEW_TOK_TYPE', { from: accounts[0] });
+            console.log(`St Types: ${stTypesData.tokenTypes.map(p => p.name).join(', ')}`);
+            curHash = await checkHashUpdate(curHash);
+        }
 
         // whitelist
         for (let i=0 ; i < ENTRY_COUNT + 1; i++)
@@ -89,8 +92,10 @@ contract("StMaster", accounts => {
             console.log('minting for account... ', M);
             const mintTx_B1 = await stm_cur.mintSecTokenBatch(CONST.tokenType.UNFCCC, 1000 * (i+1), 1, M, batchFee,  metaKVPs.map(p => p.k), metaKVPs.map(p => p.v), { from: accounts[0] });
             curHash = await checkHashUpdate(curHash);
-            const mintTx_B2 = await stm_cur.mintSecTokenBatch(CONST.tokenType.VCS,    10000 * (i+1), 1, M, batchFee, metaKVPs.map(p => p.k), metaKVPs.map(p => p.v), { from: accounts[0] });
-            curHash = await checkHashUpdate(curHash);
+            if (await stm_cur.getContractType() == CONST.contractType.COMMODITY) {
+                const mintTx_B2 = await stm_cur.mintSecTokenBatch(CONST.tokenType.VCS,    10000 * (i+1), 1, M, batchFee, metaKVPs.map(p => p.k), metaKVPs.map(p => p.v), { from: accounts[0] });
+                curHash = await checkHashUpdate(curHash);
+            }
 
             // transfer to owner - batch 1 UNFCCC, no fees
             const send_tx_B1 = await stm_cur.transferOrTrade({ 
@@ -107,21 +112,23 @@ contract("StMaster", accounts => {
             curHash = await checkHashUpdate(curHash);
 
             // transfer to owner - batch 2 VCS, with fees
-            const send_tx_B2 = await stm_cur.transferOrTrade({ 
-                        ledger_A: M,                            ledger_B: accounts[0], 
-                           qty_A: 100,                     tokenTypeId_A: CONST.tokenType.VCS, 
-                           qty_B: 0,                       tokenTypeId_B: 0, 
-                    ccy_amount_A: 0,                         ccyTypeId_A: 0, 
-                    ccy_amount_B: 0,                         ccyTypeId_B: 0, 
-                       applyFees: true,
-                    feeAddrOwner: CONST.nullAddr,
-                },
-                { from: accounts[0] }
-            );
-            curHash = await checkHashUpdate(curHash);
+            if (await stm_cur.getContractType() == CONST.contractType.COMMODITY) {
+                    const send_tx_B2 = await stm_cur.transferOrTrade({ 
+                            ledger_A: M,                            ledger_B: accounts[0], 
+                            qty_A: 100,                     tokenTypeId_A: CONST.tokenType.VCS, 
+                            qty_B: 0,                       tokenTypeId_B: 0, 
+                        ccy_amount_A: 0,                         ccyTypeId_A: 0, 
+                        ccy_amount_B: 0,                         ccyTypeId_B: 0, 
+                        applyFees: true,
+                        feeAddrOwner: CONST.nullAddr,
+                    },
+                    { from: accounts[0] }
+                );
+                curHash = await checkHashUpdate(curHash);
+            }
 
-            // burn - some of batch 2 VCS
-            const burn_tx_B2 = await stm_cur.burnTokens(M, CONST.tokenType.VCS, 1);
+            // burn - some of batch 1 VCS
+            const burn_tx_B1 = await stm_cur.burnTokens(M, CONST.tokenType.UNFCCC, 1);
             curHash = await checkHashUpdate(curHash);
         }
         const batchCount = await stm_cur.getSecTokenBatchCount.call();
