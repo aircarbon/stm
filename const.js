@@ -11,6 +11,24 @@ const EthereumJsTx = require('ethereumjs-tx');
 
 const { db } = require('../common/dist');
 
+// misc
+const GWEI_GAS_BID = '10';
+
+// CFD helpers
+const nullCashflowArgs = { cashflowType: 0, wei_principal: 0, term_Blks: 0, bond_bps: 0, bond_int_EveryBlks: 0 };
+const cashflowType = Object.freeze({ 
+    BOND: 0,
+    EQUITY: 1,
+});
+const blocksFromSecs = (secs) => Math.ceil(secs / 15); // 15 secs per block avg assumed
+const blocksFromMins = (mins) => Math.ceil(blocksFromSecs(mins * 60));
+const blocksFromHours = (hours) => Math.ceil(blocksFromMins(hours * 60));
+const blocksFromDays = (days) => Math.ceil(blocksFromHours(days * 24));
+const blocksFromMonths = (months) => Math.ceil(blocksFromDays(months * 30.42));
+
+//
+// MAIN: deployer definitions -- ontract ctor() params
+//
 const contractVer = "0.9";
 const contractProps = {
     COMMODITY: {
@@ -19,6 +37,7 @@ const contractProps = {
         contractUnit: "KG",
         contractSymbol: "CCC",
         contractDecimals: 4,
+        cashflowArgs: nullCashflowArgs,
     },
     CASHFLOW: {
         contractVer: contractVer,
@@ -26,10 +45,15 @@ const contractProps = {
         contractUnit: "Token(s)",
         contractSymbol: "SD1A",
         contractDecimals: 0,
+        cashflowArgs: {
+              cashflowType: cashflowType.BOND,
+             wei_principal: web3.utils.toWei("100", "ether"),
+                 term_Blks: blocksFromDays(1),
+                  bond_bps: 1000, // 10%
+        bond_int_EveryBlks: blocksFromHours(1)
+        }
     },
 };
-
-const GWEI_GAS_BID = '10';
 
 module.exports = {
     contractProps: contractProps,
@@ -56,6 +80,8 @@ module.exports = {
         COMMODITY: 0,
         CASHFLOW: 1,
     }),
+
+    cashflowType: cashflowType,
 
     getFeeType: Object.freeze({
         CCY: 0,
@@ -125,10 +151,18 @@ EXCHANGE_FEE: 1,
 function getTestContextWeb3() {
     //console.log('process.env.WEB3_NETWORK_ID', process.env.WEB3_NETWORK_ID);
     const context = 
+              // DM
               process.env.WEB3_NETWORK_ID == 888 ? { web3: new Web3('http://127.0.0.1:8545'),    ethereumTxChain: {} }
-            : process.env.WEB3_NETWORK_ID == 777 ? { web3: new Web3('http://127.0.0.1:8545'),    ethereumTxChain: {} }
-            : process.env.WEB3_NETWORK_ID == 999 ? { web3: new Web3('http://127.0.0.1:8545'),    ethereumTxChain: {} }
-            : process.env.WEB3_NETWORK_ID == 3 ?  { web3: new Web3('https://ac-dev0.net:9545'), ethereumTxChain: { chain: 'ropsten', hardfork: 'petersburg' } }
+
+              // Vince
+            : process.env.WEB3_NETWORK_ID == 890 ? { web3: new Web3('http://127.0.0.1:8545'),    ethereumTxChain: {} }
+
+              // Dung
+            : process.env.WEB3_NETWORK_ID == 889 ? { web3: new Web3('http://127.0.0.1:8545'),    ethereumTxChain: {} }
+
+              // Ropsten
+            : process.env.WEB3_NETWORK_ID == 3 ?  { web3: new Web3('https://ac-dev0.net:9545'),  ethereumTxChain: { chain: 'ropsten', hardfork: 'petersburg' } }
+
             : undefined;
     if (!context) throw('unknown process.env.NETWORK');
     return context;

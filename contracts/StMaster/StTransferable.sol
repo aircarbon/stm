@@ -5,13 +5,14 @@ import "./Owned.sol";
 import "./StLedger.sol";
 import "./StFees.sol";
 import "./StErc20.sol";
+import "./StPayable.sol";
 
 import "../Libs/StructLib.sol";
 import "../Libs/TransferLib.sol";
 import "../Libs/Erc20Lib.sol";
 import "../Libs/LedgerLib.sol";
 
-contract StTransferable is Owned, StLedger, StFees, StErc20 {
+contract StTransferable is Owned, StLedger, StFees, StErc20, StPayable {
 
     /**
      * @dev Returns a keccak256 hash of the ledger data -- to demonstrate that ledger data is unchanged across contract upgrades.
@@ -19,7 +20,7 @@ contract StTransferable is Owned, StLedger, StFees, StErc20 {
      *    contract owner is the only value *expected* to change across contract upgrades)
      */
     function getLedgerHashcode() external view returns (bytes32) {
-        return LedgerLib.getLedgerHashcode(ledgerData, stTypesData, ccyTypesData, erc20Data, globalFees);
+        return LedgerLib.getLedgerHashcode(ledgerData, stTypesData, ccyTypesData, erc20Data, cashflowData, globalFees);
     }
 
     /**

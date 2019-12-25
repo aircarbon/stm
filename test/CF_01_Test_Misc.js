@@ -29,6 +29,11 @@ contract("StMaster", accounts => {
         assert((await stm.getCcyTypes()).ccyTypes.length == 1);
     });
 
+    it(`setup - be able to read cashflow data`, async () => {
+        const cashflowData = await stm.getCashflowData();
+        assert(cashflowData.args.wei_principal > 0);
+    });
+
     it(`setup - should not be able add token types`, async () => {
         try {
             await stm.addSecTokenType('NEW_TYPE_NAME');
