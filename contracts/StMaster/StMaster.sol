@@ -57,7 +57,6 @@ contract StMaster is StMintable, StBurnable, CcyFundable, CcyWithdrawable, StTra
     //   >>> new deployer (or flag on deployer) > to deploy "CashFlowMaster" w/ other
     //    > done: limit batches=1 + limit StTypes=1
     //
-    //    > CLEANUP: SafeMath...
     //    > TODO: CashflowArgs in ctor(), display on web-admin
     //
     //    > SINGLE ISSUANCE / SINGLE SUBSCRIBER -- first payable received:
@@ -155,6 +154,7 @@ contract StMaster is StMintable, StBurnable, CcyFundable, CcyWithdrawable, StTra
     //
     // TODO: Thom - get ETH re. mainnet testing
     // (todo: infura - ropsten deployment)
+    //    > CLEANUP: SafeMath...
     //
     // ====== MAINNET ======
     //
