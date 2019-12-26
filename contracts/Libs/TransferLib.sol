@@ -68,7 +68,7 @@ library TransferLib {
         TransferLib.TransferArgs memory a
     ) public {
         require(ledgerData._contractSealed, "Contract is not sealed");
-        require(a.ledger_A != a.ledger_B, "Bad transfer");
+        //require(a.ledger_A != a.ledger_B, "Bad transfer"); // erc20 compat: allow send-to-self -- todo: could NOP below when ledger_A == a.ledger_B
         require(a.qty_A > 0 || a.qty_B > 0 || a.ccy_amount_A > 0 || a.ccy_amount_B > 0, "Bad null transfer");
         require(a.qty_A <= 0xffffffffffffffff, "Bad qty_A");
         require(a.qty_B <= 0xffffffffffffffff, "Bad qty_B");
