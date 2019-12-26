@@ -12,7 +12,8 @@ const EthereumJsTx = require('ethereumjs-tx');
 const { db } = require('../common/dist');
 
 // misc
-const GWEI_GAS_BID = '10';
+const WEB3_GWEI_GAS_BID = '10';
+const WEB3_GAS_LIMIT = 5000000;
 
 // CFD helpers
 const nullCashflowArgs = { cashflowType: 0, wei_principal: 0, term_Blks: 0, bond_bps: 0, bond_int_EveryBlks: 0 };
@@ -36,7 +37,7 @@ const contractProps = {
         contractName: "AirCarbon_CORSIA", //"SecTok_Master",
         contractUnit: "KG",
         contractSymbol: "CCC",
-        contractDecimals: 4,
+        contractDecimals: 0,
         cashflowArgs: nullCashflowArgs,
     },
     CASHFLOW: {
@@ -206,8 +207,8 @@ async function web3_tx(methodName, methodArgs, fromAddr, fromPrivKey) {
         .encodeABI();
     const txData = {
         nonce: nonce,
-     gasPrice: web3.utils.toHex(web3.utils.toWei(GWEI_GAS_BID, 'gwei')),
-     gasLimit: 500000,
+     gasPrice: web3.utils.toHex(web3.utils.toWei(WEB3_GWEI_GAS_BID, 'gwei')),
+     gasLimit: WEB3_GAS_LIMIT,
          from: fromAddr,
            to: contractDb.addr,
          data: paramsData,
@@ -257,8 +258,8 @@ async function web3_sendEthTestAddr(sendFromNdx, sendToNdx, ethValue) {
     const EthereumTx = EthereumJsTx.Transaction
     var tx = new EthereumTx({
            nonce: nonce,
-        gasPrice: web3.utils.toHex(web3.utils.toWei(GWEI_GAS_BID, 'gwei')),
-        gasLimit: 500000,
+        gasPrice: web3.utils.toHex(web3.utils.toWei(WEB3_GWEI_GAS_BID, 'gwei')),
+        gasLimit: WEB3_GAS_LIMIT,
               to: toAddr,
             from: fromAddr,
            value: web3.utils.toHex(web3.utils.toWei(ethValue)),

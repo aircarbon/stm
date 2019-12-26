@@ -51,15 +51,30 @@ contract StMaster is StMintable, StBurnable, CcyFundable, CcyWithdrawable, StTra
     event Approval(address indexed owner, address indexed spender, uint256 value);
 
     //
+    // #### scp -- Uncaught (in promise) Error: Node error: {"code":-32000,"message":"gas required exceeds allowance (5000000) or always failing transaction"}
+    //   (only form testnets --- could be nonce is wrong?)
+    //      NEED TO SUPPORT SEND-TO-SELF ...
+    //
+    // #### scp -- slow load; correlates with ALL ERC20 ASSETS populating -- looks like all ETH TX's -- into the cache?!!?!
+    //  >> receiving tx's for testnets sent from d+10, and not sent to testnets ...
+    //  >> STALE SOCKET? hard repro 
+    //  >> could put some guard in process path if addr is invalid?
+    //
+    // # scp -- tx CCC: 0x1d1f7b566d2a1bce0b0be65e71a9906023b49b77b7e70d4807e8c27fa0119173 -- being hit TWICE in load... WHY?
+    //     >> only on full load with no cache?
+    //
+    // >>> scp -- test send erc20 commodity multi-type from wallet...
+    //
     // -- J 1+3 --
     // PRI 0 ** CASHFLOWS re. SD ** >>> MVP
     //
     //   >>> new deployer (or flag on deployer) > to deploy "CashFlowMaster" w/ other
     //    > done: limit batches=1 + limit StTypes=1
-    //
-    //    > TODO: CashflowArgs in ctor(), display on web-admin
+    //    > done: CashflowArgs in ctor(), display on web-admin
     //
     //    > SINGLE ISSUANCE / SINGLE SUBSCRIBER -- first payable received:
+    //        > TODO: manual minting: switch IPFS default fields...
+    //
     //        > require 1 batch minted (sits locked with issuer to start with) - return funds otherwise
     //        > issuer receives all from payable, minus fees
     //        > payer receives all tokens from issuer
@@ -144,8 +159,6 @@ contract StMaster is StMintable, StBurnable, CcyFundable, CcyWithdrawable, StTra
     //   > me to set config
     //
     // SOL
-    //   > TODO: SCP (test w/ mocha web3) web3.eth.estimateGas() (in place of hard-coded erc20 gas limits)
-    //
     //   > TODO: cleanup (SafeMath) + audit...
     //
     //   > todo: increase/finalize MAX_BATCHES_PREVIEW
