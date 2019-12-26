@@ -95,7 +95,7 @@ contract("StMaster", accounts => {
     }
 
     it(`erc20 - should be able to send 1 type / 1 batch from graylist addr to graylist addr (erc20 => other erc20)`, async () => {
-        await white_to_gray_1(); 
+        //await white_to_gray_1(); 
         await gray_1_to_gray_2();
     });
     async function gray_1_to_gray_2() {
