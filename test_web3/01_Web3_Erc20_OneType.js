@@ -97,11 +97,8 @@ describe(`Contract Web3 Interface`, async () => {
         // le = await CONST.web3_call('getLedgerEntry', [ SCOOP_TESTNETS_1 ]);
         // console.log('le', le);
 
-        // send to self: testing / WIP ...
-        const erc20 = await CONST.web3_tx('transfer', [ GRAY_1, "1000" ], GRAY_1, GRAY_1_privKey);
-
-        //const erc20 = await CONST.web3_tx('transfer', [ SCOOP_TESTNETS_1, "1000" ], GRAY_1, GRAY_1_privKey);
-        //const erc20 = await CONST.web3_tx('transfer', [ SCOOP_DOM10_1, "1000" ], GRAY_1, GRAY_1_privKey);
+        await CONST.web3_tx('transfer', [ SCOOP_TESTNETS_1, "50000" ], GRAY_1, GRAY_1_privKey);
+        await CONST.web3_tx('transfer', [ SCOOP_DOM10_1,    "50000" ], GRAY_1, GRAY_1_privKey);
 
         //CONST.logGas(erc20, 'erc20 1 type, 1 batch');
         //console.log('erc20', erc20);

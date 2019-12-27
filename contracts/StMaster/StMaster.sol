@@ -60,10 +60,8 @@ contract StMaster is StMintable, StBurnable, CcyFundable, CcyWithdrawable, StTra
     //  >> STALE SOCKET? hard repro 
     //  >> could put some guard in process path if addr is invalid?
     //
-    // # scp -- tx CCC: 0x1d1f7b566d2a1bce0b0be65e71a9906023b49b77b7e70d4807e8c27fa0119173 -- being hit TWICE in load... WHY?
-    //     >> only on full load with no cache?
-    //
     // >>> scp -- test send erc20 commodity multi-type from wallet...
+    //
     //
     // -- J 1+3 --
     // PRI 0 ** CASHFLOWS re. SD ** >>> MVP
@@ -159,6 +157,7 @@ contract StMaster is StMintable, StBurnable, CcyFundable, CcyWithdrawable, StTra
     //   > me to set config
     //
     // SOL
+    //   > TODO: bunch libs to reduce # of deployments needed
     //   > TODO: cleanup (SafeMath) + audit...
     //
     //   > todo: increase/finalize MAX_BATCHES_PREVIEW
