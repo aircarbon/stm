@@ -81,14 +81,27 @@ contract("StMaster", accounts => {
         assert(WHITE_after.tokens_sumQty == CONST.tonCarbon, 'unexpected whitelist ledger WHITE quantity after');     
     }
 
-    it(`erc20 - should be able to send 1 type / 1 batch from graylist addr to graylist addr (erc20 => erc20)`, async () => {
+    it(`erc20 - should be able to send 1 type / 1 batch from graylist addr to self (erc20 => same erc20)`, async () => {
         await white_to_gray_1(); 
+        await gray_1_to_gray_1();
+    });
+    async function gray_1_to_gray_1() {
+        const fundTx = await CONST.web3_sendEthTestAddr(0, NDX_GRAY_1, "0.01"); // fund GRAY_1 for erc20 op
+        const erc20Tx = await stm.transfer(GRAY_1, CONST.tonCarbon, { from: GRAY_1 } );
+        CONST.logGas(erc20Tx, '(erc20 => same erc20)');
+        
+        const GRAY1_after = await stm.getLedgerEntry(GRAY_1);
+        assert(GRAY1_after.tokens_sumQty == CONST.tonCarbon, 'unexpected graylist ledger GRAY_1 quantity after');     
+    }
+
+    it(`erc20 - should be able to send 1 type / 1 batch from graylist addr to graylist addr (erc20 => other erc20)`, async () => {
+        //await white_to_gray_1(); 
         await gray_1_to_gray_2();
     });
     async function gray_1_to_gray_2() {
         const fundTx = await CONST.web3_sendEthTestAddr(0, NDX_GRAY_1, "0.01"); // fund GRAY_1 for erc20 op
         const erc20Tx = await stm.transfer(GRAY_2, CONST.tonCarbon, { from: GRAY_1 } );
-        CONST.logGas(erc20Tx, '(erc20 => erc20)');
+        CONST.logGas(erc20Tx, '(erc20 => other erc20)');
         
         const GRAY1_after = await stm.getLedgerEntry(GRAY_1);
         const GRAY2_after = await stm.getLedgerEntry(GRAY_2);

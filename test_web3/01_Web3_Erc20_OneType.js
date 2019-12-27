@@ -77,7 +77,7 @@ describe(`Contract Web3 Interface`, async () => {
         const fundTx = await CONST.web3_sendEthTestAddr(0, GRAY_1_NDX, "0.1");
     });
 
-    it(`web3 direct - erc20 - should be able to send from graylist addr to testnets@scoop.tech (erc20 => erc20)`, async () => {
+    it(`web3 direct - erc20 - should be able to send single token type from graylist addr to external wallet (erc20 => erc20)`, async () => {
         // const { web3, ethereumTxChain } = CONST.getTestContextWeb3();
         // console.log('web3.currentProvider.host', web3.currentProvider.host);
 
@@ -97,8 +97,9 @@ describe(`Contract Web3 Interface`, async () => {
         // le = await CONST.web3_call('getLedgerEntry', [ SCOOP_TESTNETS_1 ]);
         // console.log('le', le);
 
-        //const erc20 = await CONST.web3_tx('transfer', [ SCOOP_TESTNETS_1, "1000" ], GRAY_1, GRAY_1_privKey);
-        const erc20 = await CONST.web3_tx('transfer', [ SCOOP_DOM10_1, "1000" ], GRAY_1, GRAY_1_privKey);
+        await CONST.web3_tx('transfer', [ SCOOP_TESTNETS_1, "50000" ], GRAY_1, GRAY_1_privKey);
+        await CONST.web3_tx('transfer', [ SCOOP_DOM10_1,    "50000" ], GRAY_1, GRAY_1_privKey);
+
         //CONST.logGas(erc20, 'erc20 1 type, 1 batch');
         //console.log('erc20', erc20);
         
