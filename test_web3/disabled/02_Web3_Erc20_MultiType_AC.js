@@ -20,8 +20,8 @@ var GRAY_2, GRAY_2_privKey;
 const SCOOP_TESTNETS_1 = "0x8443b1edf203f96d1a5ec98301cfebc4d3cf2b20";
 const SCOOP_TESTNETS_2 = "0xe4f1925fba6cbf65c81dc8d25163c899f14cd6c1";
 
-const SCOOP_DOM10_1 = "0xd183d12ced4accb265b0eda55b3526c7cb102485";
-const SCOOP_DOM10_2 = "0x23fa93bcabb452a9964d5b49777f2462bb632587";
+const AIRCARBON_DOM10_1 = "0x3bf2a66c7057bc3737b5e6a7c0bc39b41437ffb8";
+const AIRCARBON_DOM10_2 = "0x3b9a2f8c123efbd9919e0903c994efae15cf78ef";
 
 describe(`Contract Web3 Interface`, async () => {
 
@@ -57,7 +57,10 @@ describe(`Contract Web3 Interface`, async () => {
             //if (ex.toString().includes("Already whitelisted")) console.log('(already whitelisted - nop)');
             //else throw(ex);
         }
-        const sealTx = await CONST.web3_tx('sealContract', [], OWNER, OWNER_privKey);
+        const sealedStatus = await CONST.web3_call('getContractSeal', []);
+        if (!sealedStatus) {
+            const sealTx = await CONST.web3_tx('sealContract', [], OWNER, OWNER_privKey);
+        }
 
         // setup - mint for A
         //for (var i=0 ; i < 10 ; i++) {
@@ -93,11 +96,12 @@ describe(`Contract Web3 Interface`, async () => {
         //}
 
         // setup - fund GRAY_1 eth
-        const fundTx = await CONST.web3_sendEthTestAddr(0, GRAY_1_NDX, "0.1");
+        const fundTx = await CONST.web3_sendEthTestAddr(0, GRAY_1, "0.05");
     });
 
     it(`web3 direct - erc20 - should be able to send multiple token types from graylist addr to external wallet (erc20 => erc20)`, async () => {
-        const erc20 = await CONST.web3_tx('transfer', [ SCOOP_DOM10_1, "200000" ], GRAY_1, GRAY_1_privKey);
+        await CONST.web3_tx('transfer', [ AIRCARBON_DOM10_1, "200000" ], GRAY_1, GRAY_1_privKey);
+        await CONST.web3_sendEthTestAddr(0, AIRCARBON_DOM10_1, "0.05");
     });
 });
 

@@ -85,7 +85,7 @@ contract("StMaster", accounts => {
         await gray_1_to_white();
     });
     async function gray_1_to_white() {
-        const fundTx = await CONST.web3_sendEthTestAddr(0, NDX_GRAY_1, "0.1"); // fund GRAY_1 for erc20 op
+        const fundTx = await CONST.web3_sendEthTestAddr(0, GRAY_1, "0.1"); // fund GRAY_1 for erc20 op
         const erc20Tx = await stm.transfer(WHITE, 6000, { from: GRAY_1 } );
         CONST.logGas(erc20Tx, '(erc20 => exchange)');
 
@@ -100,7 +100,7 @@ contract("StMaster", accounts => {
         await gray_1_to_gray_2();
     });
     async function gray_1_to_gray_2() {
-        const fundTx = await CONST.web3_sendEthTestAddr(0, NDX_GRAY_1, "0.01"); // fund GRAY_1 for erc20 op
+        const fundTx = await CONST.web3_sendEthTestAddr(0, GRAY_1, "0.01"); // fund GRAY_1 for erc20 op
         const erc20Tx = await stm.transfer(GRAY_2, 6000, { from: GRAY_1 } );
         CONST.logGas(erc20Tx, '(erc20 => erc20)');
         
