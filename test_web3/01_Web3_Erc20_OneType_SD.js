@@ -20,15 +20,15 @@ var GRAY_2, GRAY_2_privKey;
 const SCOOP_TESTNETS_1 = "0x8443b1edf203f96d1a5ec98301cfebc4d3cf2b20";
 const SCOOP_TESTNETS_2 = "0xe4f1925fba6cbf65c81dc8d25163c899f14cd6c1";
 
-const SCOOP_DOM10_1 = "0xd183d12ced4accb265b0eda55b3526c7cb102485";
-const SCOOP_DOM10_2 = "0x23fa93bcabb452a9964d5b49777f2462bb632587";
+const SINGDAX_DOM10_1 = "0xb67762628da0fbeb4793bd54a9e09d1dfd4cb08d";
+const SINGDAX_DOM10_2 = "0xa822b9557bc78d44bd89e22c4e59521e0bc2506f";
 
 describe(`Contract Web3 Interface`, async () => {
 
     //
     // can run these to test web3 more quickly, e.g.
-    //         Dev: ("export WEB3_NETWORK_ID=888 && export CONTRACT_TYPE=COMMODITY && mocha test_web3 --timeout 120000 --exit")
-    //  Ropsten AC: ("export WEB3_NETWORK_ID=3 && export CONTRACT_TYPE=COMMODITY && mocha test_web3 --timeout 120000 --exit")
+    //         Dev: ("export WEB3_NETWORK_ID=888 && export CONTRACT_TYPE=COMMODITY && mocha test_web3 --timeout 9120000 --exit")
+    //  Ropsten AC: ("export WEB3_NETWORK_ID=3 && export CONTRACT_TYPE=COMMODITY && mocha test_web3 --timeout 9120000 --exit")
     //
 
     before(async function () {
@@ -53,61 +53,58 @@ describe(`Contract Web3 Interface`, async () => {
             //if (ex.toString().includes("Already whitelisted")) console.log('(already whitelisted - nop)');
             //else throw(ex);
         }
-        const sealTx = await CONST.web3_tx('sealContract', [], OWNER, OWNER_privKey);
+        const sealedStatus = await CONST.web3_call('getContractSeal', []);
+        if (!sealedStatus) {
+            const sealTx = await CONST.web3_tx('sealContract', [], OWNER, OWNER_privKey);
+        }
 
-        // setup - mint for A
-        //for (var i=0 ; i < 10 ; i++) {
+        // setup - mint for A -- CASHFLOW v1: only one minting (single issuance)
+        try {
             const mintTx = await CONST.web3_tx('mintSecTokenBatch', [
-                CONST.tokenType.VCS,    100000, 1,      WHITE, CONST.nullFees, [], [],
+                1,    100000, 1,      WHITE, CONST.nullFees, [], [],
             ], OWNER, OWNER_privKey);
 
-            // setup - transferOrTrade A -> GRAY_1
+            // transferOrTrade A -> GRAY_1
             const transferTradeTx = await CONST.web3_tx('transferOrTrade', [ {
                     ledger_A: WHITE,                               ledger_B: GRAY_1,
-                       qty_A: 100000,                         tokenTypeId_A: CONST.tokenType.VCS,
+                       qty_A: 100000,                         tokenTypeId_A: 1,
                        qty_B: 0,                              tokenTypeId_B: 0,
                 ccy_amount_A: 0,                                ccyTypeId_A: 0,
                 ccy_amount_B: 0,                                ccyTypeId_B: 0,
                    applyFees: false,
                 feeAddrOwner: CONST.nullAddr
             }], OWNER, OWNER_privKey);
-        //}
+        } catch(ex) {}
 
         // setup - fund GRAY_1 eth
-        const fundTx = await CONST.web3_sendEthTestAddr(0, GRAY_1_NDX, "0.1");
+        //const fundTx = await CONST.web3_sendEthTestAddr(0, GRAY_1, "0.1");
     });
 
     it(`web3 direct - erc20 - should be able to send single token type from graylist addr to external wallet (erc20 => erc20)`, async () => {
-        // const { web3, ethereumTxChain } = CONST.getTestContextWeb3();
-        // console.log('web3.currentProvider.host', web3.currentProvider.host);
+        //await CONST.web3_tx('transfer', [ SCOOP_TESTNETS_1, "1" ], GRAY_1, GRAY_1_privKey);
 
-        // console.log('process.env.NETWORK', process.env.NETWORK);
-        // console.log('process.env.WEB3_NETWORK_ID', process.env.WEB3_NETWORK_ID);
-        // const contractDb = (await db.GetDeployment(process.env.WEB3_NETWORK_ID, CONST.contractName, CONST.contractVer)).recordset[0];
-        // console.log('contractDb.addr', contractDb.addr);
+        await CONST.web3_tx('transfer', [ SINGDAX_DOM10_1,  "1" ], GRAY_1, GRAY_1_privKey, false);
+        await CONST.web3_sendEthTestAddr(0, SINGDAX_DOM10_1, "0.01");
 
-        // var contract = new web3.eth.Contract(JSON.parse(contractDb.abi), contractDb.addr);
-        // const name = await contract.methods.name.call();
-        // console.log('name', name);
+        await CONST.web3_tx('transfer', [ SINGDAX_DOM10_1,  "2" ], GRAY_1, GRAY_1_privKey, false);
+        await CONST.web3_sendEthTestAddr(0, SINGDAX_DOM10_1, "0.02");
 
-        //const name = await CONST.web3_call('name', []);
-        //console.log('name: ', name);
+        await CONST.web3_tx('transfer', [ SINGDAX_DOM10_1,  "3" ], GRAY_1, GRAY_1_privKey, false);
+        await CONST.web3_sendEthTestAddr(0, SINGDAX_DOM10_1, "0.03");
 
-        // var le;
-        // le = await CONST.web3_call('getLedgerEntry', [ SCOOP_TESTNETS_1 ]);
-        // console.log('le', le);
-
-        await CONST.web3_tx('transfer', [ SCOOP_TESTNETS_1, "50000" ], GRAY_1, GRAY_1_privKey);
-        await CONST.web3_tx('transfer', [ SCOOP_DOM10_1,    "50000" ], GRAY_1, GRAY_1_privKey);
-
-        //CONST.logGas(erc20, 'erc20 1 type, 1 batch');
-        //console.log('erc20', erc20);
+        await CONST.web3_tx('transfer', [ SINGDAX_DOM10_1,  "4" ], GRAY_1, GRAY_1_privKey, false);
+        await CONST.web3_sendEthTestAddr(0, SINGDAX_DOM10_1, "0.04");
         
-        // le = await CONST.web3_call('getLedgerEntry', [ SCOOP_TESTNETS_1 ]);
-        // console.log('le', le);
-        // le.tokens.forEach(p => {
-        //     console.log(`stId: ${p.stId} batchId: ${p.batchId} currentQty: ${p.currentQty.toString()}`);
-        // });
+        await CONST.web3_tx('transfer', [ SINGDAX_DOM10_1,  "5" ], GRAY_1, GRAY_1_privKey, false);
+        await CONST.web3_sendEthTestAddr(0, SINGDAX_DOM10_1, "0.05");
+
+        //await CONST.web3_tx('transfer', [ SINGDAX_DOM10_1,  "1" ], GRAY_1, GRAY_1_privKey);
+        //await CONST.web3_sendEthTestAddr(0, SINGDAX_DOM10_1, "0.05");
+        
+        //await CONST.web3_tx('transfer', [ SINGDAX_DOM10_2,  "1" ], GRAY_1, GRAY_1_privKey);
+        //await CONST.web3_sendEthTestAddr(0, SINGDAX_DOM10_2, "0.05");
+
+        //await CONST.web3_tx('transfer', [ SINGDAX_DOM10_2,  "1" ], GRAY_1, GRAY_1_privKey);
     });
    
     // it(`web3 direct - erc20 - should be able to send from graylist addr to whitelist addr (DEPOSIT: erc20 => exchange)`, async () => {
