@@ -15,8 +15,8 @@ describe(`Contract Web3 Interface`, async () => {
 
     //
     // can run these to test web3 more quickly, e.g.
-    //         Dev: ("export WEB3_NETWORK_ID=888 && export CONTRACT_TYPE=COMMODITY && mocha test_web3 --timeout 9120000 --exit")
-    //  Ropsten AC: ("export WEB3_NETWORK_ID=3 && export CONTRACT_TYPE=COMMODITY && mocha test_web3 --timeout 9120000 --exit")
+    //         Dev: ("export WEB3_NETWORK_ID=888 && export CONTRACT_TYPE=CASHFLOW && mocha test_web3 --timeout 9120000 --exit")
+    //  Ropsten AC: ("export WEB3_NETWORK_ID=3 && export CONTRACT_TYPE=CASHFLOW && mocha test_web3 --timeout 9120000 --exit")
     //
 
     it(`web3 direct - cashflow - seal`, async () => {
