@@ -4,13 +4,13 @@ const { Core, Ledger } = require("../core/dist");
 const { db } = require("../common/dist");
 
 const NETWORK_ID = Number(process.env.NETWORK_ID || 888);
-const ADDRESS = String(
-  process.env.ACCOUNT_ADDRESS || "0xf57B0adC78461888BF32d5FB92784CF3FC8f9956"
-);
+const ADDRESS = process.env.ACCOUNT_ADDRESS;
 const CONTRACT_NAME = process.env.CONTRACT_NAME || "AirCarbon_CORSIA";
 const CONTRACT_VERSION = process.env.CONTRACT_VERSION || "0.91";
 
 (async function() {
+  if (!ADDRESS) throw new Error("Missing ACCOUNT_ADDRESS on your ENV");
+
   const record = await db.GetDeployment(
     NETWORK_ID,
     CONTRACT_NAME,
