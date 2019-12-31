@@ -51,17 +51,6 @@ contract StMaster is StMintable, StBurnable, CcyFundable, CcyWithdrawable, StTra
     event Approval(address indexed owner, address indexed spender, uint256 value);
 
     //
-    // #### scp -- Uncaught (in promise) Error: Node error: {"code":-32000,"message":"gas required exceeds allowance (5000000) or always failing transaction"}
-    //   (only form testnets --- could be nonce is wrong?)
-    //      NEED TO SUPPORT SEND-TO-SELF ...
-    //
-    // #### scp -- slow load; correlates with ALL ERC20 ASSETS populating -- looks like all ETH TX's -- into the cache?!!?!
-    //  >> receiving tx's for testnets sent from d+10, and not sent to testnets ...
-    //  >> STALE SOCKET? hard repro 
-    //  >> could put some guard in process path if addr is invalid?
-    //
-    // >>> scp -- test send erc20 commodity multi-type from wallet...
-    //
     //
     // -- J 1+3 --
     // PRI 0 ** CASHFLOWS re. SD ** >>> MVP
