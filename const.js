@@ -150,7 +150,6 @@ EXCHANGE_FEE: 1,
 };
 
 function getTestContextWeb3() {
-    //console.log('process.env.WEB3_NETWORK_ID', process.env.WEB3_NETWORK_ID);
     const context = 
               // DM
               process.env.WEB3_NETWORK_ID == 888 ? { web3: new Web3('http://127.0.0.1:8545'),    ethereumTxChain: {} }
@@ -165,7 +164,7 @@ function getTestContextWeb3() {
             : process.env.WEB3_NETWORK_ID == 3 ?  { web3: new Web3('https://ac-dev0.net:9545'),  ethereumTxChain: { chain: 'ropsten', hardfork: 'petersburg' } }
 
             : undefined;
-    if (!context) throw('unknown process.env.NETWORK');
+    if (!context) throw('WEB3_NETWORK_ID is not set!');
     return context;
 }
 
