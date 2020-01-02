@@ -51,27 +51,13 @@ contract StMaster is StMintable, StBurnable, CcyFundable, CcyWithdrawable, StTra
     event Approval(address indexed owner, address indexed spender, uint256 value);
 
     //
-    // #### scp -- Uncaught (in promise) Error: Node error: {"code":-32000,"message":"gas required exceeds allowance (5000000) or always failing transaction"}
-    //   (only form testnets --- could be nonce is wrong?)
-    //      NEED TO SUPPORT SEND-TO-SELF ...
-    //
-    // #### scp -- slow load; correlates with ALL ERC20 ASSETS populating -- looks like all ETH TX's -- into the cache?!!?!
-    //  >> receiving tx's for testnets sent from d+10, and not sent to testnets ...
-    //  >> STALE SOCKET? hard repro 
-    //  >> could put some guard in process path if addr is invalid?
-    //
-    // >>> scp -- test send erc20 commodity multi-type from wallet...
-    //
+    // SCP todo: use decimals fields for erc20 (send/exchange text fields, or at least round to .decimals before passing to API)
     //
     // -- J 1+3 --
     // PRI 0 ** CASHFLOWS re. SD ** >>> MVP
     //
-    //   >>> new deployer (or flag on deployer) > to deploy "CashFlowMaster" w/ other
-    //    > done: limit batches=1 + limit StTypes=1
-    //    > done: CashflowArgs in ctor(), display on web-admin
-    //
     //    > SINGLE ISSUANCE / SINGLE SUBSCRIBER -- first payable received:
-    //        > TODO: manual minting: switch IPFS default fields...
+    //        > TODO: manual minting: switch IPFS default fields (todo: remove IPFS_ hard-coding in .tsx)
     //
     //        > require 1 batch minted (sits locked with issuer to start with) - return funds otherwise
     //        > issuer receives all from payable, minus fees

@@ -1,21 +1,28 @@
 require("dotenv").config();
 
-const acmJSON = require("./build/contracts/StMaster.json");
 const { Core, Ledger } = require("../core/dist");
+const { db } = require("../common/dist");
 
 const NETWORK_ID = Number(process.env.NETWORK_ID || 888);
-const ADDRESS = String(
-  process.env.ROOT_ACCOUNT || "0xf57B0adC78461888BF32d5FB92784CF3FC8f9956"
-);
-
-const core = new Core(NETWORK_ID);
-const ledger = new Ledger(core.web3, {
-  address: ADDRESS,
-  abi: acmJSON.abi,
-  rootAccount: Core.rootAccount
-});
+const CONTRACT_NAME = process.env.CONTRACT_NAME || "AirCarbon_CORSIA";
+const CONTRACT_VERSION = process.env.CONTRACT_VERSION || "0.91";
 
 (async function() {
+  const record = await db.GetDeployment(
+    NETWORK_ID,
+    CONTRACT_NAME,
+    CONTRACT_VERSION
+  );
+  const { recordset } = record;
+  const [contract] = recordset || [];
+  const abi = JSON.parse(contract.abi);
+  const address = contract.addr;
+  const core = new Core(NETWORK_ID);
+  const ledger = new Ledger(core.web3, {
+    abi,
+    address,
+    rootAccount: Core.rootAccount
+  });
   const accounts = await core.accounts;
   const LIMIT = 10;
   let counter = 0;
@@ -27,10 +34,11 @@ const ledger = new Ledger(core.web3, {
       console.warn("something went wrong", { error });
     }
     counter += 1;
-    if (counter > LIMIT) break;
+    if (counter > LIMIT) {
+      console.warn("seal contract");
+      await ledger.sealContract();
+      break;
+    }
   }
-
-  console.warn("seal contract");
-  await ledger.sealContract();
   process.exit();
 })();
