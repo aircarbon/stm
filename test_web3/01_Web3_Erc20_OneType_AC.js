@@ -21,9 +21,6 @@ const SCOOP_TESTNETS_1 = "0x8443b1edf203f96d1a5ec98301cfebc4d3cf2b20";
 const SCOOP_TESTNETS_2 = "0xe4f1925fba6cbf65c81dc8d25163c899f14cd6c1";
 
 <<<<<<< HEAD:packages/erc20/test_web3/disabled/01_Web3_Erc20_OneType_SD.js
-=======
-<<<<<<< HEAD:packages/erc20/test_web3/disabled/01_Web3_Erc20_OneType_SD.js
->>>>>>> aircarbon-master:packages/erc20/test_web3/disabled/01_Web3_Erc20_OneType_SD.js
 <<<<<<< HEAD:packages/erc20/test_web3/disabled/01_Web3_Erc20_OneType_SD.js
 const SINGDAX_DOM10_1 = "0xb67762628da0fbeb4793bd54a9e09d1dfd4cb08d";
 const SINGDAX_DOM10_2 = "0xa822b9557bc78d44bd89e22c4e59521e0bc2506f";
@@ -31,13 +28,10 @@ const SINGDAX_DOM10_2 = "0xa822b9557bc78d44bd89e22c4e59521e0bc2506f";
 const AIRCARBON_DOM10_1 = "0x3bf2a66c7057bc3737b5e6a7c0bc39b41437ffb8";
 const AIRCARBON_DOM10_2 = "0x3b9a2f8c123efbd9919e0903c994efae15cf78ef";
 >>>>>>> 56dfe7587b4b74f17cb5bc8714a8fb9911760224:packages/erc20/test_web3/01_Web3_Erc20_OneType_AC.js
-<<<<<<< HEAD:packages/erc20/test_web3/disabled/01_Web3_Erc20_OneType_SD.js
-=======
 =======
 const AIRCARBON_DOM10_1 = "0x3bf2a66c7057bc3737b5e6a7c0bc39b41437ffb8";
 const AIRCARBON_DOM10_2 = "0x3b9a2f8c123efbd9919e0903c994efae15cf78ef";
 >>>>>>> 56dfe7587b4b74f17cb5bc8714a8fb9911760224:packages/erc20/test_web3/01_Web3_Erc20_OneType_AC.js
->>>>>>> aircarbon-master:packages/erc20/test_web3/disabled/01_Web3_Erc20_OneType_SD.js
 
 describe(`Contract Web3 Interface`, async () => {
 
@@ -94,20 +88,14 @@ describe(`Contract Web3 Interface`, async () => {
 
         // setup - fund GRAY_1 eth
 <<<<<<< HEAD:packages/erc20/test_web3/disabled/01_Web3_Erc20_OneType_SD.js
-=======
-<<<<<<< HEAD:packages/erc20/test_web3/disabled/01_Web3_Erc20_OneType_SD.js
->>>>>>> aircarbon-master:packages/erc20/test_web3/disabled/01_Web3_Erc20_OneType_SD.js
 <<<<<<< HEAD:packages/erc20/test_web3/disabled/01_Web3_Erc20_OneType_SD.js
         //const fundTx = await CONST.web3_sendEthTestAddr(0, GRAY_1, "0.1");
 =======
         const fundTx = await CONST.web3_sendEthTestAddr(0, GRAY_1, "0.05");
 >>>>>>> 56dfe7587b4b74f17cb5bc8714a8fb9911760224:packages/erc20/test_web3/01_Web3_Erc20_OneType_AC.js
-<<<<<<< HEAD:packages/erc20/test_web3/disabled/01_Web3_Erc20_OneType_SD.js
-=======
 =======
         const fundTx = await CONST.web3_sendEthTestAddr(0, GRAY_1, "0.05");
 >>>>>>> 56dfe7587b4b74f17cb5bc8714a8fb9911760224:packages/erc20/test_web3/01_Web3_Erc20_OneType_AC.js
->>>>>>> aircarbon-master:packages/erc20/test_web3/disabled/01_Web3_Erc20_OneType_SD.js
     });
 
     it(`web3 direct - erc20 - should be able to send single token type from graylist addr to external wallet (erc20 => erc20)`, async () => {
@@ -122,13 +110,31 @@ describe(`Contract Web3 Interface`, async () => {
         await CONST.web3_tx('transfer', [ SINGDAX_DOM10_1,  "3" ], GRAY_1, GRAY_1_privKey, false);
         await CONST.web3_sendEthTestAddr(0, SINGDAX_DOM10_1, "0.03");
 
+<<<<<<< HEAD:packages/erc20/test_web3/disabled/01_Web3_Erc20_OneType_SD.js
+<<<<<<< HEAD:packages/erc20/test_web3/disabled/01_Web3_Erc20_OneType_SD.js
         await CONST.web3_tx('transfer', [ SINGDAX_DOM10_1,  "4" ], GRAY_1, GRAY_1_privKey, false);
         await CONST.web3_sendEthTestAddr(0, SINGDAX_DOM10_1, "0.04");
         
         await CONST.web3_tx('transfer', [ SINGDAX_DOM10_1,  "5" ], GRAY_1, GRAY_1_privKey, false);
         await CONST.web3_sendEthTestAddr(0, SINGDAX_DOM10_1, "0.05");
+=======
+=======
+>>>>>>> 56dfe7587b4b74f17cb5bc8714a8fb9911760224:packages/erc20/test_web3/01_Web3_Erc20_OneType_AC.js
+        //await CONST.web3_tx('transfer', [ SCOOP_TESTNETS_1,  "50000" ], GRAY_1, GRAY_1_privKey);
+        await CONST.web3_tx('transfer', [ AIRCARBON_DOM10_1, "25000" ], GRAY_1, GRAY_1_privKey);
+        await CONST.web3_tx('transfer', [ AIRCARBON_DOM10_2, "25000" ], GRAY_1, GRAY_1_privKey);
+        await CONST.web3_sendEthTestAddr(0, AIRCARBON_DOM10_1, "0.05");
+        await CONST.web3_sendEthTestAddr(0, AIRCARBON_DOM10_2, "0.05");
+<<<<<<< HEAD:packages/erc20/test_web3/disabled/01_Web3_Erc20_OneType_SD.js
+>>>>>>> 56dfe7587b4b74f17cb5bc8714a8fb9911760224:packages/erc20/test_web3/01_Web3_Erc20_OneType_AC.js
+
         //await CONST.web3_tx('transfer', [ SINGDAX_DOM10_1,  "1" ], GRAY_1, GRAY_1_privKey);
         //await CONST.web3_sendEthTestAddr(0, SINGDAX_DOM10_1, "0.05");
+=======
+
+        //CONST.logGas(erc20, 'erc20 1 type, 1 batch');
+        //console.log('erc20', erc20);
+>>>>>>> 56dfe7587b4b74f17cb5bc8714a8fb9911760224:packages/erc20/test_web3/01_Web3_Erc20_OneType_AC.js
         
         //await CONST.web3_tx('transfer', [ SINGDAX_DOM10_2,  "1" ], GRAY_1, GRAY_1_privKey);
         //await CONST.web3_sendEthTestAddr(0, SINGDAX_DOM10_2, "0.05");
