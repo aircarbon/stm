@@ -1,12 +1,13 @@
 require("dotenv").config();
 const CONST = require('./const.js');
 
-const { Core, Ledger } = require("../core/dist");
-const { db } = require("../common/dist");
+//const { Core, Ledger } = require("../core/dist");
+//const { db } = require("../common/dist");
 
-const NETWORK_ID = Number(process.env.NETWORK_ID || 888);
-const CONTRACT_NAME = process.env.CONTRACT_NAME || CONST.contractProps.CASHFLOW.contractName;
-const CONTRACT_VERSION = process.env.CONTRACT_VERSION || CONST.contractProps.CASHFLOW.contractVer;
+//const NETWORK_ID = Number(process.env.NETWORK_ID || 888);
+//const CONTRACT_NAME = process.env.CONTRACT_NAME || CONST.contractProps.CASHFLOW.contractName;
+//const CONTRACT_VERSION = process.env.CONTRACT_VERSION || CONST.contractProps.CASHFLOW.contractVer;
+process.env.WEB3_NETWORK_ID = Number(process.env.NETWORK_ID || 888);
 
 (async function() {
   var x;
