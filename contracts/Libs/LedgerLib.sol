@@ -29,7 +29,9 @@ library LedgerLib {
             cashflowData.args.term_Blks,
             cashflowData.args.bond_bps,
             cashflowData.args.bond_int_EveryBlks,
-            cashflowData.issued_Blk
+            //cashflowData.issued_Blk
+            cashflowData.qty_issuanceMax,
+            cashflowData.qty_issuanceRemaining
         ));
 
         // hash currency types & exchange currency fees

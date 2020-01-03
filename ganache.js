@@ -15,7 +15,7 @@ const command =
 --networkId ${NETWORK_ID} \
 --mnemonic "${MNEMONIC}" \
 --gasLimit 7800000 \
---defaultBalanceEther 10000`;
+--defaultBalanceEther 1000000000`;
 
 shell.echo(`Run: ${command}`);
 

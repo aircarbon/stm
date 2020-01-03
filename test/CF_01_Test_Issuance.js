@@ -16,6 +16,15 @@ contract("StMaster", accounts => {
     var OWNER, OWNER_privKey;
     var ISSUER;
 
+    const ISSUANCE_QTY = 1000000;
+    var cashflowData;
+
+    // TODO: ### no payments unless sealed!!
+
+    // TODO: display/info -- (on cashflowdata struct): calc issuanceRemaining
+    // TODO: test scp subscriber -- send eth_test to contract, receive tokens...
+    // TOOD: scp - show totalSupply() for erc20's
+
     before(async function () {
         stm = await st.deployed();
         if (await stm.getContractType() != CONST.contractType.CASHFLOW) this.skip();
@@ -26,7 +35,9 @@ contract("StMaster", accounts => {
         OWNER = x.addr; OWNER_privKey = x.privKey;
 
         ISSUER = accounts[++global.TaddrNdx];
-        await stm.mintSecTokenBatch(1, 10000000, 1, ISSUER, CONST.nullFees, [], [], { from: OWNER });
+        await stm.mintSecTokenBatch(1, ISSUANCE_QTY, 1, ISSUER, CONST.nullFees, [], [], { from: OWNER });
+
+        cashflowData = await stm.getCashflowData();
     });
 
     beforeEach(async () => {
@@ -37,15 +48,23 @@ contract("StMaster", accounts => {
 
     it(`cashflow - issuance - should not be able to subscribe more than the issuance size`, async () => {
         try {
-            await subscribe(ISSUER, accounts[++global.TaddrNdx], "1001");
+            const wei_maxSubscriptionValue = 
+                Big(cashflowData.args.wei_issuancePrice).times(Big(ISSUANCE_QTY))
+
+            await subscribe(
+                ISSUER,
+                accounts[++global.TaddrNdx], 
+                web3.utils.fromWei(
+                    wei_maxSubscriptionValue
+                    .plus(Big(cashflowData.args.wei_issuancePrice)) // round up one token qty
+                .toFixed(), 'ether'));
+
         } catch (ex) {  
             assert(ex.reason == 'Insufficient remaining issuance', `unexpected: ${ex.reason}`);
             return;
         }
         assert.fail('expected contract exception');
     });
-
-    // TODO: display/info -- (on cashflowdata struct): calc issuanceRemaining
 
     it(`cashflow - issuance - can multi-subscribe up to max issuance`, async () => {
         const SUB_1 = ++global.TaddrNdx;
@@ -65,8 +84,6 @@ contract("StMaster", accounts => {
         
         //const SUB_4 = ++global.TaddrNdx;
         //await subscribe(ISSUER, accounts[SUB_4], "500.0");
-
-        // TODO: test scp subscriber -- send eth_test to contract, receive tokens...
 
         // TODO: test issuer payments... 
         //       if we *include* the unissued tokens (sitting with issuer), in issuer payments
@@ -102,7 +119,6 @@ contract("StMaster", accounts => {
         //truffleAssert.prettyPrintEmittedEvents(subscriptionTx);
 
         // expect subscriber gets change
-        const cashflowData = await stm.getCashflowData();
         const wei_expectedChange = Big(wei_subAmountSent).mod(Big(cashflowData.args.wei_issuancePrice));
         const count_expectedTokens = Big(wei_subAmountSent).minus(wei_expectedChange).div(Big(cashflowData.args.wei_issuancePrice));
         const { weiCost: wei_Cost } = 

@@ -20,6 +20,6 @@ contract StPayable is StFees {
      * @dev Returns cashflow data
      */
     function getCashflowData() public view returns(StructLib.CashflowStruct memory) {
-        return cashflowData;
+        return PayableLib.getCashflowData(ledgerData, cashflowData);
     }
 }

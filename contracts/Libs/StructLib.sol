@@ -166,7 +166,9 @@ library StructLib {
     struct CashflowStruct {
         CashflowArgs args;
 
-        uint256      issued_Blk;         // issuance (start) block no
+        uint256      qty_issuanceMax;
+        uint256      qty_issuanceRemaining;
+        //uint256      issued_Blk;         // issuance (start) block no
         // --> wei_totIssued
         // --> mapping(address ==> )
 

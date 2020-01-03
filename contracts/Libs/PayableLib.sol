@@ -46,6 +46,7 @@ library PayableLib {
         }
 
         // room to subscribe in the issuance batch?
+        // todo: multi-issuance: todo - walk all STs...
         uint256[] storage issuer_stIds = ledgerData._ledger[issueBatch.originator].tokenType_stIds[1]; // single sec-type, ID 1
         require(issuer_stIds.length == 1, "Unexpected cashflow batch originator token count");
         StructLib.PackedSt storage issuerSt = ledgerData._sts[issuer_stIds[0]];
@@ -86,4 +87,20 @@ library PayableLib {
     private {
 
     }
-} 
+
+    function getCashflowData(
+        StructLib.LedgerStruct storage ledgerData,
+        StructLib.CashflowStruct storage cashflowData
+    )
+    public view returns(StructLib.CashflowStruct memory) {
+        StructLib.CashflowStruct memory ret = cashflowData;
+        if (ledgerData._batches_currentMax_id == 1) { // todo: multi-issuance: todo - walk all STs...
+            StructLib.SecTokenBatch storage issueBatch = ledgerData._batches[1];
+            uint256[] storage issuer_stIds = ledgerData._ledger[issueBatch.originator].tokenType_stIds[1];
+            StructLib.PackedSt storage issuerSt = ledgerData._sts[issuer_stIds[0]];
+            ret.qty_issuanceMax = issuerSt.mintedQty;
+            ret.qty_issuanceRemaining = issuerSt.currentQty;
+        }
+        return ret;
+    }
+}
