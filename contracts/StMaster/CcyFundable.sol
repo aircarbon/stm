@@ -8,6 +8,25 @@ import "../Libs/StructLib.sol";
 import "../Libs/CcyLib.sol";
 
 contract CcyFundable is Owned, StLedger {
+
+    /**
+     * @dev Adds a new currency type
+     * @param name New currency type name
+     * @param unit Base unit of the new currency type
+     * @param decimals Number of decimal places in smallest unit
+     */
+    function addCcyType(string memory name, string memory unit, uint16 decimals)
+    public onlyOwner() onlyWhenReadWrite() {
+        CcyLib.addCcyType(ledgerData, ccyTypesData, name, unit, decimals);
+    }
+
+    /**
+     * @dev Returns current currency types
+     */
+    function getCcyTypes() external view returns (StructLib.GetCcyTypesReturn memory) {
+        return CcyLib.getCcyTypes(ccyTypesData);
+    }
+
     /**
      * @dev Funds a ledger entry with a currency amount
      * @param ccyTypeId Currency type ID
@@ -18,29 +37,7 @@ contract CcyFundable is Owned, StLedger {
                   int256  amount, // signed value: ledger ccyType_balance supports (theoretical) -ve balances
                   address ledgerOwner)
     public onlyOwner() onlyWhenReadWrite() {
-
         CcyLib.fund(ledgerData, ccyTypesData, ccyTypeId, amount, ledgerOwner);
-        // require(ccyTypeId >= 1 && ccyTypeId <= ccyTypesData._count_ccyTypes, "Bad ccyTypeId");
-        // require(amount >= 0, "Invalid amount"); // allow funding zero (initializes empty ledger entry), disallow negative funding
-
-        // // we keep amount as signed value - ledger allows -ve balances (currently unused capability)
-        // //uint256 fundAmount = uint256(amount);
-
-        // // create ledger entry as required
-        // if (ledgerData._ledger[ledgerOwner].exists == false) {
-        //     ledgerData._ledger[ledgerOwner] = StructLib.Ledger({
-        //           exists: true
-        //     });
-        //     ledgerData._ledgerOwners.push(ledgerOwner);
-        // }
-
-        // // update ledger balance
-        // ledgerData._ledger[ledgerOwner].ccyType_balance[ccyTypeId] += amount;
-
-        // // update global total funded
-        // ledgerData._ccyType_totalFunded[ccyTypeId] += uint256(amount);
-
-        // emit CcyFundedLedger(ccyTypeId, ledgerOwner, amount);
     }
 
     /**

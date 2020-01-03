@@ -45,7 +45,7 @@ library StructLib {
         string[]   metaKeys;                                    // metadata keys
         string[]   metaValues;                                  // metadata values
         SetFeeArgs origTokFee;                                  // batch originator fees on all transfers of tokens from this batch
-        address    originator;                                  // original owner (minter) of the batch
+        address payable originator;                             // original owner (minter) of the batch
     }
 
     struct Ledger {
@@ -154,7 +154,9 @@ library StructLib {
     struct CashflowArgs { // v1: single-issuance, single-subscriber
 
         CashflowType cashflowType;       // issuance type
-        uint256      wei_principal;      // total issuance/subsciption value
+
+        uint256      wei_maxIssuance;    // total issuance/subsciption value
+        uint256      wei_issuancePrice;  // subsciption price in wei per token
 
         uint256      term_Blks;          // total term/tenor, in blocks - 0 for perpetual
 
@@ -163,7 +165,10 @@ library StructLib {
     }
     struct CashflowStruct {
         CashflowArgs args;
+
         uint256      issued_Blk;         // issuance (start) block no
+        // --> wei_totIssued
+        // --> mapping(address ==> )
 
         // TODO: payment history... (& bond_int_lastPaidBlk)
         //uint256 bond_int_payments;       // todo - { block_no, amount, }

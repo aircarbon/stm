@@ -2,11 +2,11 @@ pragma solidity 0.5.13;
 
 contract Owned {
     address payable owner;
-    bool _readOnly;
+    bool public readOnly;
 
     constructor() public {
         owner = msg.sender;
-        _readOnly = false;
+        readOnly = false;
     }
 
     modifier onlyOwner() {
@@ -14,20 +14,20 @@ contract Owned {
         _; // required magic
     }
     modifier onlyWhenReadWrite() {
-        require(_readOnly == false, "Read-only");
+        require(readOnly == false, "Read-only");
         _;
     }
     // modifier onlyWhenReadOnly() {
-    //     require(_readOnly == true, "Set to read-only first");
+    //     require(readOnly == true, "Set to read-only first");
     //     _;
     // }
 
     /**
      * @dev Sets the contract-wide read only state
-     * @param readOnly State to set
+     * @param _readOnly State to set
      */
-    function setReadOnly(bool readOnly)
+    function setReadOnly(bool _readOnly)
     public onlyOwner() {
-        _readOnly = readOnly;
+        readOnly = _readOnly;
     }
 }

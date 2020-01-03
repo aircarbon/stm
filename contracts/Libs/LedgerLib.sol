@@ -24,7 +24,8 @@ library LedgerLib {
         // hash cashflow data
         ledgerHash = keccak256(abi.encodePacked(ledgerHash,
             cashflowData.args.cashflowType,
-            cashflowData.args.wei_principal,
+            cashflowData.args.wei_maxIssuance,
+            cashflowData.args.wei_issuancePrice,
             cashflowData.args.term_Blks,
             cashflowData.args.bond_bps,
             cashflowData.args.bond_int_EveryBlks,

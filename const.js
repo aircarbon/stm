@@ -16,7 +16,7 @@ const WEB3_GWEI_GAS_BID = '10';
 const WEB3_GAS_LIMIT = 5000000;
 
 // CFD helpers
-const nullCashflowArgs = { cashflowType: 0, wei_principal: 0, term_Blks: 0, bond_bps: 0, bond_int_EveryBlks: 0 };
+const nullCashflowArgs = { cashflowType: 0, wei_maxIssuance: 0, wei_issuancePrice: 0, term_Blks: 0, bond_bps: 0, bond_int_EveryBlks: 0 };
 const cashflowType = Object.freeze({ 
     BOND: 0,
     EQUITY: 1,
@@ -30,7 +30,7 @@ const blocksFromMonths = (months) => Math.ceil(blocksFromDays(months * 30.42));
 //
 // MAIN: deployer definitions -- ontract ctor() params
 //
-const contractVer = "0.91";
+const contractVer = "0.92.2";
 const contractProps = {
     COMMODITY: {
         contractVer: contractVer,
@@ -48,7 +48,8 @@ const contractProps = {
         contractDecimals: 0,
         cashflowArgs: {
               cashflowType: cashflowType.BOND,
-             wei_principal: web3.utils.toWei("100", "ether"),
+           wei_maxIssuance: web3.utils.toWei("1000", "ether"),
+         wei_issuancePrice: web3.utils.toWei("1", "ether"),
                  term_Blks: blocksFromDays(1),
                   bond_bps: 1000, // 10%
         bond_int_EveryBlks: blocksFromHours(1)
@@ -239,7 +240,7 @@ async function web3_tx(methodName, methodArgs, fromAddr, fromPrivKey) {
             resolve(txHash);
         })
         .once("error", error => {
-            console.log(`   => ## error`, error.message);
+            console.log(`   => ## error`, error);
             reject(error);
         });
     });
@@ -284,7 +285,7 @@ async function web3_sendEthTestAddr(sendFromNdx, sendToAddr, ethValue) {
             resolve(txHash);
         })
         .once("error", error => {
-            console.log(`   => ## error`, error.message);
+            console.log(`   => ## error`, error);
             reject(error);
         });
     });

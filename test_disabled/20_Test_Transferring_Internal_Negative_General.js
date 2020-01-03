@@ -163,24 +163,25 @@ contract("StMaster", accounts => {
         assert.fail('expected contract exception');
     });
 
-    it(`transferring - should not allow transfer to self`, async () => {
-        await stm.fund(CONST.ccyType.SGD, CONST.thousandCcy_cents,       accounts[global.TaddrNdx + 0], { from: accounts[0] });
-        await stm.fund(CONST.ccyType.SGD, CONST.thousandCcy_cents,       accounts[global.TaddrNdx + 1], { from: accounts[0] });
-        try {
-            await helper.transferWrapper(stm, accounts, accounts[global.TaddrNdx + 0], accounts[global.TaddrNdx + 0], 
-                0, 0, 0, 0, 
-                CONST.thousandCcy_cents,     // ccy_amount_A
-                CONST.ccyType.SGD,           // ccyTypeId_A
-                0,                           // ccy_amount_B
-                0,                           // ccyTypeId_B
-                false,                       // applyFees
-                { from: accounts[0] });
-        } catch (ex) { 
-            assert(ex.reason == 'Bad transfer', `unexpected: ${ex.reason}`);
-            return; 
-        }
-        assert.fail('expected contract exception');
-    });
+    // DEPRECATED: allowing this, for support of ERC20 semantics (+ scp wallet uses send-to-self for estimateGas)
+    // it(`transferring - should not allow transfer to self`, async () => {
+    //     await stm.fund(CONST.ccyType.SGD, CONST.thousandCcy_cents,       accounts[global.TaddrNdx + 0], { from: accounts[0] });
+    //     await stm.fund(CONST.ccyType.SGD, CONST.thousandCcy_cents,       accounts[global.TaddrNdx + 1], { from: accounts[0] });
+    //     try {
+    //         await helper.transferWrapper(stm, accounts, accounts[global.TaddrNdx + 0], accounts[global.TaddrNdx + 0], 
+    //             0, 0, 0, 0, 
+    //             CONST.thousandCcy_cents,     // ccy_amount_A
+    //             CONST.ccyType.SGD,           // ccyTypeId_A
+    //             0,                           // ccy_amount_B
+    //             0,                           // ccyTypeId_B
+    //             false,                       // applyFees
+    //             { from: accounts[0] });
+    //     } catch (ex) { 
+    //         assert(ex.reason == 'Bad transfer', `unexpected: ${ex.reason}`);
+    //         return; 
+    //     }
+    //     assert.fail('expected contract exception');
+    // });
 
     it(`transferring - should not allow transfers when contract is read only`, async () => {
         await stm.fund(CONST.ccyType.SGD, CONST.thousandCcy_cents,       accounts[global.TaddrNdx + 0],         { from: accounts[0] });
