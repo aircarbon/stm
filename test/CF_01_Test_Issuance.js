@@ -26,7 +26,7 @@ contract("StMaster", accounts => {
         OWNER = x.addr; OWNER_privKey = x.privKey;
 
         ISSUER = accounts[++global.TaddrNdx];
-        await stm.mintSecTokenBatch(1, 1000, 1, ISSUER, CONST.nullFees, [], [], { from: OWNER });
+        await stm.mintSecTokenBatch(1, 10000000, 1, ISSUER, CONST.nullFees, [], [], { from: OWNER });
     });
 
     beforeEach(async () => {
@@ -45,10 +45,38 @@ contract("StMaster", accounts => {
         assert.fail('expected contract exception');
     });
 
+    // TODO: display/info -- (on cashflowdata struct): calc issuanceRemaining
+
     it(`cashflow - issuance - can multi-subscribe up to max issuance`, async () => {
-        // TODO: multi-loop, expect last fill fails (subscription full)
-        // TODO: display/info -- (on cashflowdata struct): calc issuanceRemaining
-        await subscribe(ISSUER, accounts[++global.TaddrNdx], "2.5");
+        const SUB_1 = ++global.TaddrNdx;
+        await subscribe(ISSUER, accounts[SUB_1], "2.5");
+        await subscribe(ISSUER, accounts[SUB_1], "2.0");
+        await subscribe(ISSUER, accounts[SUB_1], "1.9");
+
+        const SUB_2 = ++global.TaddrNdx;
+        await subscribe(ISSUER, accounts[SUB_2], "20.5");
+        await subscribe(ISSUER, accounts[SUB_2], "20.0");
+        await subscribe(ISSUER, accounts[SUB_2], "10.9");
+
+        const SUB_3 = ++global.TaddrNdx;
+        await subscribe(ISSUER, accounts[SUB_3], "200.5");
+        await subscribe(ISSUER, accounts[SUB_3], "200.0");
+        await subscribe(ISSUER, accounts[SUB_3], "100.9");
+        
+        //const SUB_4 = ++global.TaddrNdx;
+        //await subscribe(ISSUER, accounts[SUB_4], "500.0");
+
+        // TODO: test scp subscriber -- send eth_test to contract, receive tokens...
+
+        // TODO: test issuer payments... 
+        //       if we *include* the unissued tokens (sitting with issuer), in issuer payments
+        //       then there is no dilution when late subscribers come in -- that makes sense
+
+        //       only thing that would dilute would be subsequent (multi) *issuance* -- 
+        //       means >1 batch for CFT (but still all against same issuer)
+        //       only change neeed woudl be for payable to look at ALL BATCHES for available tokens, not just 1 monobatch
+
+        // TODO: then test more subscribers
     });
 
     async function subscribe(issuer, subscriber, amount) {
@@ -77,7 +105,11 @@ contract("StMaster", accounts => {
         const cashflowData = await stm.getCashflowData();
         const wei_expectedChange = Big(wei_subAmountSent).mod(Big(cashflowData.args.wei_issuancePrice));
         const count_expectedTokens = Big(wei_subAmountSent).minus(wei_expectedChange).div(Big(cashflowData.args.wei_issuancePrice));
-        const { weiCost: wei_Cost } = await CONST.logGas(web3, subscriptionTx, 'Subscribe to issuance');
+        const { weiCost: wei_Cost } = 
+            await CONST.logGas(web3, subscriptionTx,
+`Subscribe Ξ${web3.utils.fromWei(wei_subAmountSent, 'ether').toString().padStart(5)} => \
+#${count_expectedTokens} token(s)`);
+
         // console.log('    sub_balBefore', sub_balBefore.toString());
         // console.log(' wei_subAmountSent', wei_subAmountSent);
         // console.log('          wei_Cost', wei_Cost);
@@ -119,6 +151,8 @@ contract("StMaster", accounts => {
         assert(Big(sub_ledgerBefore.tokens_sumQty).plus(issuer_ledgerBefore.tokens_sumQty).eq(
             Big(sub_ledgerAfter.tokens_sumQty).plus(Big(issuer_ledgerAfter.tokens_sumQty))
         ), 'unexpected total sum tokens after');
+
+        return count_expectedTokens.toString();
     }
 
 });

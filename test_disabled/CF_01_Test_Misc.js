@@ -33,8 +33,7 @@ contract("StMaster", accounts => {
 
     it(`cashflow - misc - be able to read cashflow data`, async () => {
         const cashflowData = await stm.getCashflowData();
-        //console.log('cashflowData', cashflowData);
-        assert(cashflowData.args.wei_maxIssuance > 0);
+        assert(cashflowData.args.wei_issuancePrice > 0);
     });
 
     it(`cashflow - misc - should not be able add token types`, async () => {

@@ -155,7 +155,7 @@ library StructLib {
 
         CashflowType cashflowType;       // issuance type
 
-        uint256      wei_maxIssuance;    // total issuance/subsciption value
+      //uint256      wei_maxIssuance;    // total issuance/subsciption value
         uint256      wei_issuancePrice;  // subsciption price in wei per token
 
         uint256      term_Blks;          // total term/tenor, in blocks - 0 for perpetual
