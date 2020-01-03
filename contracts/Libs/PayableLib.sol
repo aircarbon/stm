@@ -5,6 +5,7 @@ import "./StructLib.sol";
 import "./TransferLib.sol";
 
 library PayableLib {
+    event IssuanceSubscribed(address indexed subscriber, address indexed issuer, uint256 weiSent, uint256 weiChange, uint256 tokensSubscribed);
 
     // v1: multi-sub (+multi-issue...?)
     function pay(
@@ -33,10 +34,7 @@ library PayableLib {
         StructLib.FeeStruct storage globalFees, address owner
     )
     private {
-        // https://medium.com/daox/three-methods-to-transfer-funds-in-ethereum-by-means-of-solidity-5719944ed6e9
-
         // TODO: restrict msg.value upper bound so no overflow?
-        // TODO: events...
 
         // calculate subscription size
         uint256 qtyTokens = msg.value / cashflowData.args.wei_issuancePrice;
@@ -44,12 +42,14 @@ library PayableLib {
         // send back the difference (modulo) to payer
         uint256 weiChange = msg.value % cashflowData.args.wei_issuancePrice;
         if (weiChange > 0) {
-            msg.sender.transfer(weiChange); // ... ### failing revert??
+            msg.sender.transfer(weiChange);
         }
 
         // room to subscribe in the issuance batch?
         uint256[] storage issuer_stIds = ledgerData._ledger[issueBatch.originator].tokenType_stIds[1]; // single sec-type, ID 1
         require(issuer_stIds.length == 1, "Unexpected cashflow batch originator token count");
+        StructLib.PackedSt storage issuerSt = ledgerData._sts[issuer_stIds[0]];
+        require(issuerSt.currentQty >= qtyTokens, "Insufficient remaining issuance");
 
         // fwd payment to issuer
         issueBatch.originator.transfer(msg.value - weiChange);
@@ -66,10 +66,15 @@ library PayableLib {
              ccyTypeId_A: 0,
             ccy_amount_B: 0,
              ccyTypeId_B: 0,
-               applyFees: false, // TODO: issuance fees (set then clear ledgerFee?)
+               applyFees: false,
             feeAddrOwner: owner
         });
         TransferLib.transferOrTrade(ledgerData, globalFees, a);
+
+        // todo: issuance fees (set then clear ledgerFee?)
+        // todo: record subscribers? or no need - only care about holders? (ledgers != issuer)
+
+        emit IssuanceSubscribed(msg.sender, issueBatch.originator, msg.value, weiChange, qtyTokens);
     }
 
     function processIssuerPayment(

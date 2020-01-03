@@ -61,7 +61,7 @@ contract("StMaster", accounts => {
 
     it(`funding - should have reasonable gas cost for funding`, async () => {
         const fundTx = await stm.fund(CONST.ccyType.SGD, CONST.thousandCcy_cents, accounts[global.TaddrNdx], { from: accounts[0] });
-        CONST.logGas(fundTx, `Funding`);
+        await CONST.logGas(web3, fundTx, `Funding`);
     });
 
     it(`funding - should allow minting and funding on same ledger entry`, async () => {

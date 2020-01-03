@@ -304,7 +304,7 @@ contract("StMaster", accounts => {
         const contractOwnerCarbonKgAfter  =  data.owner_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.UNFCCC).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
         assert(contractOwnerCarbonKgAfter == Number(contractOwnerCarbonKgBefore) + Number(expectedFeeCarbon), 'unexpected contract owner (fee receiver) UNFCCC ST quantity after transfer');
 
-        CONST.logGas(data.transferTx, `0.5 vST trade eeu/ccy (A <-> B) w/ fees on both`);
+        await CONST.logGas(web3, data.transferTx, `0.5 vST trade eeu/ccy (A <-> B) w/ fees on both`);
     });
 
     it(`fees (percentage) - should have reasonable gas cost for two-sided transfer (eeu/ccy) (fee on ccy)`, async () => {
@@ -349,7 +349,7 @@ contract("StMaster", accounts => {
         const contractOwnerCarbonKgAfter  =  data.owner_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.UNFCCC).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
         assert(contractOwnerCarbonKgAfter == Number(contractOwnerCarbonKgBefore) + Number(expectedFeeCarbon), 'unexpected contract owner (fee receiver) UNFCCC ST quantity after transfer');
 
-        CONST.logGas(data.transferTx, `0.5 vST trade eeu/ccy (A <-> B) w/ fees on ccy`);
+        await CONST.logGas(web3, data.transferTx, `0.5 vST trade eeu/ccy (A <-> B) w/ fees on ccy`);
     });
 
     it(`fees (percentage) - should have reasonable gas cost for two-sided transfer (eeu/ccy) (fee on eeu)`, async () => {
@@ -394,7 +394,7 @@ contract("StMaster", accounts => {
         const contractOwnerCarbonKgAfter  =  data.owner_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.UNFCCC).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
         assert(contractOwnerCarbonKgAfter == Number(contractOwnerCarbonKgBefore) + Number(expectedFeeCarbon), 'unexpected contract owner (fee receiver) UNFCCC ST quantity after transfer');
 
-        CONST.logGas(data.transferTx, `0.5 vST trade eeu/ccy (A <-> B) w/ fees on eeu`);
+        await CONST.logGas(web3, data.transferTx, `0.5 vST trade eeu/ccy (A <-> B) w/ fees on eeu`);
     });
 
     it(`fees (percentage) - should round fees to zero for minimal transfers (ccy & carbon)`, async () => {

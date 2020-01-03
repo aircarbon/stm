@@ -49,6 +49,8 @@ contract StMaster is StMintable, StBurnable, CcyFundable, CcyWithdrawable, StTra
     // Erc20Lib events
     event Transfer(address indexed from, address indexed to, uint256 value);
     event Approval(address indexed owner, address indexed spender, uint256 value);
+    // PayableLib events
+    event IssuanceSubscribed(address indexed subscriber, address indexed issuer, uint256 weiSent, uint256 weiChange, uint256 tokensSubscribed);
 
     //
     // SCP todo: use decimals fields for erc20 (send/exchange text fields, or at least round to .decimals before passing to API)

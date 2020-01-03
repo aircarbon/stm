@@ -103,7 +103,7 @@ contract("StMaster", accounts => {
             ccy_amount_B: CONST.tenthEth_wei,               ccyTypeId_B: CONST.ccyType.ETH,
                applyFees: true,
         });
-        CONST.logGas(data.transferTx, `Single Orig Fees ${1}`);
+        await CONST.logGas(web3, data.transferTx, `Single Orig Fees ${1}`);
         const M_ledgerAfter = await stm.getLedgerEntry(M);
 
         // TEST - contract owner has received exchange fees (tokens + currency)
@@ -187,7 +187,7 @@ contract("StMaster", accounts => {
             ccy_amount_B: 0,                                ccyTypeId_B: 0,
                applyFees: true,
         });
-        CONST.logGas(data.transferTx, `Single Orig Fees ${1}`);
+        await CONST.logGas(web3, data.transferTx, `Single Orig Fees ${1}`);
         const M_ledgerAfter = await stm.getLedgerEntry(M);
 
         // TEST - contract owner has received expected token exchange fees
@@ -289,7 +289,7 @@ contract("StMaster", accounts => {
         for (var i = 0 ; i < M_multi.length ; i++) {
             M_multi[i].ledgerAfter = await stm.getLedgerEntry(M_multi[i].account);
         }
-        CONST.logGas(data.transferTx, `Multi Orig Fees ${M_multi.length}`);
+        await CONST.logGas(web3, data.transferTx, `Multi Orig Fees ${M_multi.length}`);
         //console.log('feesPreview', data.feesPreview);
 
         // TEST - contract owner has received exchange fee
@@ -394,7 +394,7 @@ contract("StMaster", accounts => {
         for (var i = 0 ; i < M_multi.length ; i++) {
             M_multi[i].ledgerAfter = await stm.getLedgerEntry(M_multi[i].account);
         }
-        CONST.logGas(data.transferTx, `Multi Orig Fees ${M_multi.length}`);
+        await CONST.logGas(web3, data.transferTx, `Multi Orig Fees ${M_multi.length}`);
         //console.log('feesPreview', data.feesPreview);
 
         // TEST - contract owner has received exchange fee

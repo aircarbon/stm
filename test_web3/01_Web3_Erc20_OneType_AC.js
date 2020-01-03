@@ -106,7 +106,7 @@ describe(`Contract Web3 Interface`, async () => {
         await CONST.web3_sendEthTestAddr(0, AIRCARBON_DOM10_1, "0.05");
         await CONST.web3_sendEthTestAddr(0, AIRCARBON_DOM10_2, "0.05");
 
-        //CONST.logGas(erc20, 'erc20 1 type, 1 batch');
+        //await CONST.logGas(web3, erc20, 'erc20 1 type, 1 batch');
         //console.log('erc20', erc20);
         
         // le = await CONST.web3_call('getLedgerEntry', [ SCOOP_TESTNETS_1 ]);
@@ -136,7 +136,7 @@ describe(`Contract Web3 Interface`, async () => {
     //     // console.log('trade', trade);
 
     //     const erc20 = await CONST.web3_tx('transfer', [ WHITE, "1000" ], GRAY_1, GRAY_1_privKey);
-    //     CONST.logGas(erc20, 'erc20 1 type, 1 batch');
+    //     await CONST.logGas(web3, erc20, 'erc20 1 type, 1 batch');
     // });
 });
 

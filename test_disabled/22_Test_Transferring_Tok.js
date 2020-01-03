@@ -33,7 +33,7 @@ contract("StMaster", accounts => {
             ccy_amount_A: 0,                                  ccyTypeId_A: 0,
             ccy_amount_B: 0,                                  ccyTypeId_B: 0,
         });
-        CONST.logGas(data.transferTx, `0.5 vST one-way (A -> B)`);
+        await CONST.logGas(web3, data.transferTx, `0.5 vST one-way (A -> B)`);
     });
 
     // one-sided kg transfer, no consideration, 1 full ST

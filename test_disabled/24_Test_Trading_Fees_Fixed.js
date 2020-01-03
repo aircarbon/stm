@@ -368,7 +368,7 @@ contract("StMaster", accounts => {
                applyFees: true,
         });
 
-        CONST.logGas(data.transferTx, `1.0 vST trade eeu/ccy (A <-> B) w/ fees on both`);
+        await CONST.logGas(web3, data.transferTx, `1.0 vST trade eeu/ccy (A <-> B) w/ fees on both`);
     });
 
     it(`fees (fixed) - should have reasonable gas cost for two-sided transfer (eeu/ccy) (fee on ccy)`, async () => {
@@ -397,7 +397,7 @@ contract("StMaster", accounts => {
                applyFees: true,
         });
         //truffleAssert.prettyPrintEmittedEvents(tradeTx.transferTx);
-        CONST.logGas(data.transferTx, `1.0 vST trade eeu/ccy (A <-> B) w/ fees on ccy`);
+        await CONST.logGas(web3, data.transferTx, `1.0 vST trade eeu/ccy (A <-> B) w/ fees on ccy`);
     });
 
     it(`fees (fixed) - should have reasonable gas cost for two-sided transfer (eeu/ccy) (fee on eeu)`, async () => {
@@ -428,7 +428,7 @@ contract("StMaster", accounts => {
                applyFees: true,
         });
 
-        CONST.logGas(data.transferTx, `1.0 vST trade eeu/ccy (A <-> B) w/ fees on tok`);
+        await CONST.logGas(web3, data.transferTx, `1.0 vST trade eeu/ccy (A <-> B) w/ fees on tok`);
     });
 
     it(`fees (fixed) - should have reasonable gas cost for two-sided transfer (eeu/ccy) (base gas cost: no fees)`, async () => {
@@ -459,7 +459,7 @@ contract("StMaster", accounts => {
                applyFees: true,
         });
 
-        CONST.logGas(data.transferTx, `1.0 vST trade eeu/ccy (A <-> B) w/ no fees`);
+        await CONST.logGas(web3, data.transferTx, `1.0 vST trade eeu/ccy (A <-> B) w/ no fees`);
     });
 
     it(`fees (fixed) - should not allow non-owner to set global fee structure (ccy)`, async () => {
