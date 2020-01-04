@@ -11,11 +11,12 @@ contract("StMaster", accounts => {
         //if (await stm_cur.getContractType() == CONST.contractType.CASHFLOW) this.skip();
         console.log(`stm_cur: @${stm_cur.address} ledgerHash=${await stm_cur.getLedgerHashcode()} / ${await stm_cur.name()} ${await stm_cur.version()}`);
 
+        // explorers need unique contract names?!
         stm_new = await st.new(
             await stm_cur.getContractType(),
             (await stm_cur.getCashflowData()).args,
-            `${await stm_cur.name()}`, //_UPGRADED`,
-            `${await stm_cur.version()}_B`,
+            `${await stm_cur.name()}_V++`,
+            `${await stm_cur.version()}_V++`,
             await stm_cur.unit(),
             await stm_cur.symbol(),
             await stm_cur.decimals(),
