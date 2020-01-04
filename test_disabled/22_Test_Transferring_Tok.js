@@ -33,7 +33,7 @@ contract("StMaster", accounts => {
             ccy_amount_A: 0,                                  ccyTypeId_A: 0,
             ccy_amount_B: 0,                                  ccyTypeId_B: 0,
         });
-        CONST.logGas(data.transferTx, `0.5 vST one-way (A -> B)`);
+        await CONST.logGas(web3, data.transferTx, `0.5 vST one-way (A -> B)`);
     });
 
     // one-sided kg transfer, no consideration, 1 full ST
@@ -218,7 +218,7 @@ contract("StMaster", accounts => {
     });
 
     // two-sided kg transfer / kg consideration, 1 full + 1 partial ST (split), receiver owns and sends same type
-    it(`transferring tok - should allow two-sided transfer (A <-> B) 1.5 vSTs (VCS) across ledger entries, receiver owns same type`, async () => {
+    it(`transferring tok - should allow two-sided transfer (A <-> B) ~0.5 vSTs (VCS) across ledger entries, receiver owns same type`, async () => {
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.TaddrNdx + 0], CONST.nullFees, [], [], { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.TaddrNdx + 0], CONST.nullFees, [], [], { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.TaddrNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
@@ -232,7 +232,7 @@ contract("StMaster", accounts => {
     });
 
     // two-sided kg transfer / kg consideration, 1 full + 1 partial ST (split), receiver owns and sends different type
-    it(`transferring tok - should allow two-sided transfer (A <-> B) 1.5 vSTs of different ST types across ledger entries`, async () => {
+    it(`transferring tok - should allow two-sided transfer (A <-> B) ~0.5 vSTs (swap ST types) across ledger entries`, async () => {
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.TaddrNdx + 0], CONST.nullFees, [], [], { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.TaddrNdx + 0], CONST.nullFees, [], [], { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.tonCarbon, 1,      accounts[global.TaddrNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });

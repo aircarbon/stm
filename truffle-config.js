@@ -62,8 +62,9 @@ module.exports = {
       // for "truffle test" -- with manually launched "ganache-cli -a 1000" (1000 test accounts)
       host: process.env.GANACHE_HOST || "127.0.0.1",
       port: 8545,
+      network_id: "*", // 777, 888, 999
       gas: 7800000,
-      network_id: "*" // 777, 888, 999
+      gasPrice: web3.utils.toWei(gweiDeployment, "gwei")
     },
 
     // aircarbon ropsten geth node -- a bit faster than infura, but representative of mainnet

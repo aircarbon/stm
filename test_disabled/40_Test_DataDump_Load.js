@@ -30,9 +30,12 @@ contract("StMaster", accounts => {
         const whitelist = await stm_cur.getWhitelist();
         const allLedgerOwners = await stm_cur.getLedgerOwners();
         const ledgerEntry = await stm_cur.getLedgerEntry(accounts[0]);
+        const cashflowData = await stm_cur.getCashflowData();
     });
 
-    it(`data dump - should be able to read all contract data`, async () => {
+    it(`data dump - should be able to read all contract data`, async function () {
+        if (await stm_cur.getContractType() == CONST.contractType.CASHFLOW) this.skip();
+
         const ENTRY_COUNT = 1;
         var curHash = await stm_cur.getLedgerHashcode();
 
@@ -209,6 +212,12 @@ contract("StMaster", accounts => {
     });
 
     it(`data load - should be able to initialize a new contract with data from old`, async () => {
+
+        //
+        // cashflow data: args are set in new contract ctor()
+        // TODO: remaining cashflow data (need StDataLoadable support...)
+        //...
+
         // load ccy & token types
         const curCcys = await stm_cur.getCcyTypes(), newCcys = await stm_new.getCcyTypes(), loadCcys = _.differenceWith(curCcys.ccyTypes, newCcys.ccyTypes, _.isEqual);
         _.forEach(loadCcys, async (p) => await stm_new.addCcyType(p.name, p.unit, p.decimals));

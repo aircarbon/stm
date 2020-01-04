@@ -23,7 +23,7 @@ contract StMintable is Owned, StLedger {
         uint256                     tokenTypeId,
         uint256                     mintQty,
         int64                       mintSecTokenCount,
-        address                     batchOwner,
+        address payable             batchOwner,
         StructLib.SetFeeArgs memory originatorFee,
         string[] memory             metaKeys,
         string[] memory             metaValues)

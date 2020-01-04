@@ -2,7 +2,7 @@ const Big = require('big.js');
 
 const Web3 = require('web3');
 const web3 = new Web3();
-const _gasPriceEth = web3.utils.fromWei(web3.utils.toWei("20", "gwei"), 'ether');
+//const _gasPriceEth = web3.utils.fromWei(web3.utils.toWei("20", "gwei"), 'ether');
 const _ethUsd = 150;
 
 const bip39 = require('bip39');
@@ -16,7 +16,9 @@ const WEB3_GWEI_GAS_BID = '10';
 const WEB3_GAS_LIMIT = 5000000;
 
 // CFD helpers
-const nullCashflowArgs = { cashflowType: 0, wei_principal: 0, term_Blks: 0, bond_bps: 0, bond_int_EveryBlks: 0 };
+const nullCashflowArgs = { cashflowType: 0, 
+    //wei_maxIssuance: 0, 
+    wei_issuancePrice: 0, term_Blks: 0, bond_bps: 0, bond_int_EveryBlks: 0 };
 const cashflowType = Object.freeze({ 
     BOND: 0,
     EQUITY: 1,
@@ -28,9 +30,9 @@ const blocksFromDays = (days) => Math.ceil(blocksFromHours(days * 24));
 const blocksFromMonths = (months) => Math.ceil(blocksFromDays(months * 30.42));
 
 //
-// MAIN: deployer definitions -- ontract ctor() params
+// MAIN: deployer definitions -- contract ctor() params
 //
-const contractVer = "0.91";
+const contractVer = "0.94";
 const contractProps = {
     COMMODITY: {
         contractVer: contractVer,
@@ -48,7 +50,8 @@ const contractProps = {
         contractDecimals: 0,
         cashflowArgs: {
               cashflowType: cashflowType.BOND,
-             wei_principal: web3.utils.toWei("100", "ether"),
+         //wei_maxIssuance: web3.utils.toWei("1000000", "ether"),
+         wei_issuancePrice: web3.utils.toWei("0.01", "ether"),
                  term_Blks: blocksFromDays(1),
                   bond_bps: 1000, // 10%
         bond_int_EveryBlks: blocksFromHours(1)
@@ -139,13 +142,23 @@ EXCHANGE_FEE: 1,
 
 
     // gas approx values - for cost estimations
-    gasPriceEth: _gasPriceEth,
-         ethUsd: _ethUsd,
+    //gasPriceEth: _gasPriceEth,
+    //     ethUsd: _ethUsd,
 
-    logGas: (tx, desc) => {
-        var usdCost = _gasPriceEth * tx.receipt.gasUsed * _ethUsd;
-        console.log(`>>> gasUsed - ${desc}: ${tx.receipt.gasUsed} @${_gasPriceEth} ETH/gas = Ξ${(_gasPriceEth * tx.receipt.gasUsed).toFixed(4)} ~= $${(usdCost).toFixed(4)}`);
-        return usdCost;
+    logGas: async (truffleWeb3, truffleTx, desc) => { // actual gas price, not estimated
+        //console.log('truffleTx', truffleTx);
+
+        const web3Tx = await truffleWeb3.eth.getTransaction(truffleTx.receipt.transactionHash);
+        //console.log('web3Tx', web3Tx);
+
+        const actualGasPriceEth = web3.utils.fromWei(web3Tx.gasPrice);
+        //console.log('actualGasPriceEth', actualGasPriceEth);
+
+        const weiCost = web3Tx.gasPrice * truffleTx.receipt.gasUsed;
+        const usdCost = actualGasPriceEth * truffleTx.receipt.gasUsed * _ethUsd;
+
+        console.log(`>>> gasUsed - ${desc}: ${truffleTx.receipt.gasUsed} @${actualGasPriceEth} ETH/gas = Ξ${(actualGasPriceEth * truffleTx.receipt.gasUsed).toFixed(4)} ~= $${(usdCost).toFixed(4)}`);
+        return { usdCost, weiCost };
     }
 };
 
@@ -242,7 +255,7 @@ async function web3_tx(methodName, methodArgs, fromAddr, fromPrivKey, returnBefo
             }
         })
         .once("error", error => {
-            console.log(`   => ## error`, error.message);
+            console.log(`   => ## error`, error);
             reject(error);
         });
     });
@@ -287,7 +300,7 @@ async function web3_sendEthTestAddr(sendFromNdx, sendToAddr, ethValue) {
             resolve(txHash);
         })
         .once("error", error => {
-            console.log(`   => ## error`, error.message);
+            console.log(`   => ## error`, error);
             reject(error);
         });
     });

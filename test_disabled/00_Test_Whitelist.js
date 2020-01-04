@@ -22,7 +22,7 @@ const CONST = require('../const.js');
         for (var i=0 ; i < WHITELIST_COUNT ; i++) { // note - we include account[0] owner account in the whitelist
             const addr = accounts[i];
             const whitelistTx = await stm.whitelist(addr);
-            //totalCostUsd += CONST.logGas(whitelistTx, `whitelist account ndx #${i} ${addr}`);
+            //totalCostUsd += (await CONST.logGas(web3, whitelistTx, `whitelist account ndx #${i} ${addr}`)).usdCost;
         }
         global.TaddrNdx += WHITELIST_COUNT;
 
