@@ -19,11 +19,12 @@ describe(`Contract Web3 Interface`, async () => {
     //  Ropsten AC: ("export WEB3_NETWORK_ID=3 && export CONTRACT_TYPE=CASHFLOW && mocha test_web3 --timeout 9120000 --exit")
     //
 
-    it(`web3 direct - cashflow - seal`, async () => {
+    it(`web3 direct - cashflow - balanceOf`, async () => {
         var x;
         x = await CONST.getAccountAndKey(OWNER_NDX);
         OWNER = x.addr; OWNER_privKey = x.privKey;
-        const sealTx = await CONST.web3_tx('sealContract', [], OWNER, OWNER_privKey);
+        const data = await CONST.web3_call('balanceOf', [ '0xb67762628da0fbeb4793bd54a9e09d1dfd4cb08d' ], OWNER, OWNER_privKey);
+        console.log('data', data);
     });
 });
 
