@@ -244,7 +244,6 @@ async function web3_tx(methodName, methodArgs, fromAddr, fromPrivKey, returnBefo
         })
         .once("transactionHash", hash => {
             txHash = hash;
-            if (returnBeforeConfirmed) resolve(txHash);
             console.log(`   => ${txHash} ...`);
         })
         .once("confirmation", async (confirms) => {

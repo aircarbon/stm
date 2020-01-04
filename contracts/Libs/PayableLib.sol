@@ -98,7 +98,7 @@ library PayableLib {
             StructLib.SecTokenBatch storage issueBatch = ledgerData._batches[1];
             uint256[] storage issuer_stIds = ledgerData._ledger[issueBatch.originator].tokenType_stIds[1];
             StructLib.PackedSt storage issuerSt = ledgerData._sts[issuer_stIds[0]];
-            ret.qty_issuanceMax = issuerSt.mintedQty;
+            ret.qty_issuanceMax = issueBatch.mintedQty; //issuerSt.mintedQty; // ### gets dec'd when split by design
             ret.qty_issuanceRemaining = issuerSt.currentQty;
         }
         return ret;

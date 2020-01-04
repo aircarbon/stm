@@ -21,6 +21,9 @@ contract("StMaster", accounts => {
 
     // TODO: ### no payments unless sealed!!
 
+    // TODO: update solc (max v == 0.6.1 ?)
+    // TODO: etherscan -> verify contract (without code bodies?)
+
     // TODO: display/info -- (on cashflowdata struct): calc issuanceRemaining
     // TODO: test scp subscriber -- send eth_test to contract, receive tokens...
     // TOOD: scp - show totalSupply() for erc20's
