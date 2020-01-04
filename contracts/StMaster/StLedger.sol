@@ -2,17 +2,17 @@ pragma solidity 0.5.13;
 pragma experimental ABIEncoderV2;
 
 import "./Owned.sol";
-import "./CcyTypes.sol";
 
 import "../Libs/LedgerLib.sol";
 import "../Libs/StructLib.sol";
 import "../Libs/TokenLib.sol";
 
-contract StLedger is Owned, CcyTypes {
+contract StLedger is Owned {
 
     StructLib.LedgerStruct ledgerData;
 
     StructLib.StTypesStruct stTypesData;
+    StructLib.CcyTypesStruct ccyTypesData;
 
     /**
      * @dev Adds a new ST type

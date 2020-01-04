@@ -20,7 +20,7 @@ library TokenLib {
         string memory name)
     public {
         if (ledgerData.contractType == StructLib.ContractType.CASHFLOW)
-            require(stTypesData._count_tokenTypes == 0, "Bad cashflow request");
+            revert("Bad cashflow request");
 
         for (uint256 tokenTypeId = 1; tokenTypeId <= stTypesData._count_tokenTypes; tokenTypeId++) {
             require(keccak256(abi.encodePacked(stTypesData._tokenTypeNames[tokenTypeId])) != keccak256(abi.encodePacked(name)), "Duplicate name");
@@ -55,7 +55,7 @@ library TokenLib {
         uint256              tokenTypeId;
         uint256              mintQty; // accept 256 bits, so we can downcast and test if in 64-bit range
         int64                mintSecTokenCount;
-        address              batchOwner;
+        address payable      batchOwner;
         StructLib.SetFeeArgs origTokFee;
         string[]             metaKeys;
         string[]             metaValues;

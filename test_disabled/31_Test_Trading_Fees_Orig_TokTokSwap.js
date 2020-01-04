@@ -70,8 +70,8 @@ contract("StMaster", accounts => {
         });
         for (var i = 0 ; i < M_multi_A.length ; i++) M_multi_A[i].ledgerAfter = await stm.getLedgerEntry(M_multi_A[i].account);
         for (var i = 0 ; i < M_multi_B.length ; i++) M_multi_B[i].ledgerAfter = await stm.getLedgerEntry(M_multi_B[i].account);
-        CONST.logGas(data.transferTx, `Multi Orig Fees`);
-        console.log('feesPreview', data.feesPreview);
+        await CONST.logGas(web3, data.transferTx, `Multi Orig Fees`);
+        //console.log('feesPreview', data.feesPreview);
 
         console.log('qty_A', qty_A.toString());
         console.log('qty_B', qty_B.toString());

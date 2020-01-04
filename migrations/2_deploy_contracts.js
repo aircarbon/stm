@@ -54,7 +54,8 @@ module.exports = async function (deployer) {
 
     return deployer.deploy(TransferLib).then(async transferLib => { 
         deployer.link(TransferLib, Erc20Lib);
-        
+        deployer.link(TransferLib, PayableLib);
+
         deployer.link(TransferLib, StMaster);
     
     return deployer.deploy(FeeLib).then(async feeLib => { 
@@ -69,7 +70,9 @@ module.exports = async function (deployer) {
     return deployer.deploy(PayableLib).then(async payableLib => { 
         deployer.link(PayableLib, StMaster);
         
-            return deployer.deploy(StMaster, 
+        //console.log('cashflowArgs', CONST.contractProps[type].cashflowArgs);
+        
+        return deployer.deploy(StMaster, 
             type == "CASHFLOW" ? CONST.contractType.CASHFLOW : CONST.contractType.COMMODITY,
             CONST.contractProps[type].cashflowArgs,
             CONST.contractProps[type].contractName,

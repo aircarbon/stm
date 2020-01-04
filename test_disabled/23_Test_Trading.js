@@ -64,6 +64,6 @@ contract("StMaster", accounts => {
              ccy_amount_A: 0,                                  ccyTypeId_A: 0,
              ccy_amount_B: CONST.oneEth_wei,                   ccyTypeId_B: CONST.ccyType.ETH,
         });
-        CONST.logGas(data.transferTx, `0.5 vST trade eeu/ccy (A <-> B)`);
+        await CONST.logGas(web3, data.transferTx, `0.5 vST trade eeu/ccy (A <-> B)`);
     });
 });

@@ -80,7 +80,7 @@ contract("StMaster", accounts => {
             ccy_amount_A: CONST.oneEth_wei,                  ccyTypeId_A: CONST.ccyType.ETH,
             ccy_amount_B: 0,                                 ccyTypeId_B: 0,
         });
-        CONST.logGas(data.transferTx, `ccy one-way (A -> B)`);
+        await CONST.logGas(web3, data.transferTx, `ccy one-way (A -> B)`);
     });
 
     it(`transferring ccy - should have reasonable gas cost for two-sided currency transfer (A <-> B)`, async () => {
@@ -93,7 +93,7 @@ contract("StMaster", accounts => {
             ccy_amount_A: 10000000,                           ccyTypeId_A: CONST.ccyType.ETH,
             ccy_amount_B: 50000000,                           ccyTypeId_B: CONST.ccyType.ETH,
         });
-        CONST.logGas(data.transferTx, `ccy two-way (A <-> B)`);
+        await CONST.logGas(web3, data.transferTx, `ccy two-way (A <-> B)`);
     });
 
     it(`transferring ccy - should not allow one-sided transfer (A -> B) of an invalid currency value`, async () => {

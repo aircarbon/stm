@@ -132,7 +132,7 @@ describe(`Contract Web3 Interface`, async () => {
         //await CONST.web3_sendEthTestAddr(0, SINGDAX_DOM10_1, "0.05");
 =======
 
-        //CONST.logGas(erc20, 'erc20 1 type, 1 batch');
+        //await CONST.logGas(web3, erc20, 'erc20 1 type, 1 batch');
         //console.log('erc20', erc20);
 >>>>>>> 56dfe7587b4b74f17cb5bc8714a8fb9911760224:packages/erc20/test_web3/01_Web3_Erc20_OneType_AC.js
         
@@ -162,7 +162,7 @@ describe(`Contract Web3 Interface`, async () => {
     //     // console.log('trade', trade);
 
     //     const erc20 = await CONST.web3_tx('transfer', [ WHITE, "1000" ], GRAY_1, GRAY_1_privKey);
-    //     CONST.logGas(erc20, 'erc20 1 type, 1 batch');
+    //     await CONST.logGas(web3, erc20, 'erc20 1 type, 1 batch');
     // });
 });
 

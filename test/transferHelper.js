@@ -152,7 +152,7 @@ module.exports = {
                    applyFees
         }, { from: accounts[0] }
         );
-        //CONST.logGas(transferTx, `TransferHelper`);
+        //await CONST.logGas(web3, transferTx, `TransferHelper`);
 
         // ledger entries after
         ledgerA_after = await stm.getLedgerEntry(ledger_A);

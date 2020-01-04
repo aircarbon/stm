@@ -11,6 +11,8 @@ const CONST = require('../const.js');
 contract("StMaster", accounts => {
     var stm;
 
+    // ** ORDERED! **
+
     before(async function () {
         stm = await st.deployed();
         if (await stm.getContractType() != CONST.contractType.CASHFLOW) this.skip();
@@ -24,17 +26,17 @@ contract("StMaster", accounts => {
             console.log(`addrNdx: ${global.TaddrNdx} - contract @ ${stm.address} (owner: ${accounts[0]})`);
     });
 
-    it(`setup - have correct initial state`, async () => {
+    it(`cashflow - misc - have correct initial state`, async () => {
         assert((await stm.getSecTokenTypes()).tokenTypes.length == 1);
         assert((await stm.getCcyTypes()).ccyTypes.length == 1);
     });
 
-    it(`setup - be able to read cashflow data`, async () => {
+    it(`cashflow - misc - be able to read cashflow data`, async () => {
         const cashflowData = await stm.getCashflowData();
-        assert(cashflowData.args.wei_principal > 0);
+        assert(cashflowData.args.wei_issuancePrice > 0);
     });
 
-    it(`setup - should not be able add token types`, async () => {
+    it(`cashflow - misc - should not be able add token types`, async () => {
         try {
             await stm.addSecTokenType('NEW_TYPE_NAME');
         } catch (ex) {
@@ -44,7 +46,30 @@ contract("StMaster", accounts => {
         assert.fail('expected contract exception');
     });
 
-    it(`setup - should not be able to mint more than one batch`, async () => {
+    it(`cashflow - misc - should not be able add currency types`, async () => {
+        try {
+            await stm.addCcyType('TEST_COIN', 'TEST_UNIT', 2);
+        } catch (ex) {
+            assert(ex.reason == 'Bad cashflow request', `unexpected: ${ex.reason}`);
+            return;
+        }
+        assert.fail('expected contract exception');
+    });
+
+    it(`cashflow - misc - should not allow any payments unless mono-batch has been minted to issuer`, async () => {
+        try {
+            await stm.send(web3.utils.toWei("0.00001", "ether"), { from: accounts[0] });
+        } catch (ex) {
+            assert(ex.reason == 'Bad cashflow request: no minted batch', `unexpected: ${ex.reason}`);
+            return;
+        }
+        assert.fail('expected contract exception');
+        // console.log('sendTx', sendTx);
+        // let contractBalance = await web3.eth.getBalance(stm.address);
+        // console.log('contractBalance', contractBalance);
+    });
+
+    it(`cashflow - misc - should not be able to mint more than one batch`, async () => {
         await stm.mintSecTokenBatch(1, 1000, 1, accounts[1], CONST.nullFees, [], [], { from: accounts[0] });
         try {
             await stm.mintSecTokenBatch(1, 1000, 1, accounts[1], CONST.nullFees, [], [], { from: accounts[0] });
@@ -52,6 +77,19 @@ contract("StMaster", accounts => {
             assert(ex.reason == 'Bad cashflow request', `unexpected: ${ex.reason}`);
             return;
         }
+        assert.fail('expected contract exception');
+    });
+
+    it(`cashflow - misc - should not allow any payments when contract is read only`, async () => {
+        try {
+            await stm.setReadOnly(true, { from: accounts[0] });
+            await stm.send(web3.utils.toWei("0.00001", "ether"), { from: accounts[0] });
+        } catch (ex) {
+            await stm.setReadOnly(false, { from: accounts[0] });
+            assert(ex.reason == 'Read-only', `unexpected: ${ex.reason}`);
+            return;
+        }
+        await stm.setReadOnly(false, { from: accounts[0] });
         assert.fail('expected contract exception');
     });
 });
