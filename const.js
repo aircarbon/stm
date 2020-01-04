@@ -242,9 +242,9 @@ async function web3_tx(methodName, methodArgs, fromAddr, fromPrivKey) {
         .on("receipt", receipt => {
             //console.log(`   => receipt`, receipt);
         })
-        .on("transactionHash", hash => {
+        .once("transactionHash", hash => {
             txHash = hash;
-            //console.log(`   => ${txHash} ...`);
+            console.log(`   => ${txHash} ...`);
         })
         .once("confirmation", async (confirms) => {
             const receipt = await web3.eth.getTransactionReceipt(txHash);
