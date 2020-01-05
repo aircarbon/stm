@@ -56,21 +56,23 @@ library PayableLib {
         issueBatch.originator.transfer(msg.value - weiChange);
 
         // transfer tokens to payer
-        TransferLib.TransferArgs memory a = TransferLib.TransferArgs({
-                ledger_A: issueBatch.originator,
-                ledger_B: msg.sender,
-                   qty_A: qtyTokens,
-           tokenTypeId_A: 1,
-                   qty_B: 0,
-           tokenTypeId_B: 0,
-            ccy_amount_A: 0,
-             ccyTypeId_A: 0,
-            ccy_amount_B: 0,
-             ccyTypeId_B: 0,
-               applyFees: false,
-            feeAddrOwner: owner
-        });
-        TransferLib.transferOrTrade(ledgerData, globalFees, a);
+        if (qtyTokens > 0) {
+            TransferLib.TransferArgs memory a = TransferLib.TransferArgs({
+                    ledger_A: issueBatch.originator,
+                    ledger_B: msg.sender,
+                       qty_A: qtyTokens,
+               tokenTypeId_A: 1,
+                       qty_B: 0,
+               tokenTypeId_B: 0,
+                ccy_amount_A: 0,
+                 ccyTypeId_A: 0,
+                ccy_amount_B: 0,
+                 ccyTypeId_B: 0,
+                   applyFees: false,
+                feeAddrOwner: owner
+            });
+            TransferLib.transferOrTrade(ledgerData, globalFees, a);
+        }
 
         // todo: issuance fees (set then clear ledgerFee?)
         // todo: record subscribers? or no need - only care about holders? (ledgers != issuer)

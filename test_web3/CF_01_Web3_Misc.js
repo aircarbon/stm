@@ -23,7 +23,15 @@ describe(`Contract Web3 Interface`, async () => {
         var x;
         x = await CONST.getAccountAndKey(OWNER_NDX);
         OWNER = x.addr; OWNER_privKey = x.privKey;
-        const data = await CONST.web3_call('balanceOf', [ '0xb67762628da0fbeb4793bd54a9e09d1dfd4cb08d' ], OWNER, OWNER_privKey);
+        const data = await CONST.web3_call('balanceOf', [ '0xda482E8AFbDE4eE45197A1402a0E1Fd1DD175710' ], OWNER, OWNER_privKey);
+        console.log('data', data);
+    });
+
+    it(`web3 direct - cashflow - totalSupply`, async () => {
+        var x;
+        x = await CONST.getAccountAndKey(OWNER_NDX);
+        OWNER = x.addr; OWNER_privKey = x.privKey;
+        const data = await CONST.web3_call('totalSupply', [], OWNER, OWNER_privKey);
         console.log('data', data);
     });
 });
