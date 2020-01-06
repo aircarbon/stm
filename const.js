@@ -32,11 +32,11 @@ const blocksFromMonths = (months) => Math.ceil(blocksFromDays(months * 30.42));
 //
 // MAIN: deployer definitions -- contract ctor() params
 //
-const contractVer = "0.94";
+const contractVer = "0.95b";
 const contractProps = {
     COMMODITY: {
         contractVer: contractVer,
-        contractName: "AirCarbon_CORSIA", //"SecTok_Master",
+        contractName: `AirCarbon_CORSIA_v${contractVer}`, //"SecTok_Master",
         contractUnit: "KG",
         contractSymbol: "CCC",
         contractDecimals: 0,
@@ -44,14 +44,13 @@ const contractProps = {
     },
     CASHFLOW: {
         contractVer: contractVer,
-        contractName: "SingDax_CFT_1A",
+        contractName: `SingDax_CFT_v${contractVer}_1A`,
         contractUnit: "Token(s)",
         contractSymbol: "SD1A",
         contractDecimals: 0,
         cashflowArgs: {
               cashflowType: cashflowType.BOND,
-         //wei_maxIssuance: web3.utils.toWei("1000000", "ether"),
-         wei_issuancePrice: web3.utils.toWei("0.01", "ether"),
+         wei_issuancePrice: web3.utils.toWei("0.02", "ether"),
                  term_Blks: blocksFromDays(1),
                   bond_bps: 1000, // 10%
         bond_int_EveryBlks: blocksFromHours(1)

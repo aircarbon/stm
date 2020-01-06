@@ -19,26 +19,22 @@ contract("StMaster", accounts => {
     const ISSUANCE_QTY = 1000000;
     var cashflowData;
 
-    // TODO: ### no payments unless sealed!!
+    // CFT CORE -- aim for *no whitelisting*, i.e. all external control ERC20 accounts...
 
+        // TODO: edit issuancePrice... + (new) quantityForSale...
+
+    // others...
     // TODO: update solc (max v == 0.6.1 ?)
     // TODO: etherscan -> verify contract (without code bodies?)
-
-    // TODO: display/info -- (on cashflowdata struct): calc issuanceRemaining
-    // TODO: test scp subscriber -- send eth_test to contract, receive tokens...
-    // TOOD: scp - show totalSupply() for erc20's
+    // TOOD: SCP - show totalSupply() for erc20's
 
     before(async function () {
         stm = await st.deployed();
         if (await stm.getContractType() != CONST.contractType.CASHFLOW) this.skip();
-        await stm.sealContract();
         if (!global.TaddrNdx) global.TaddrNdx = 0;
 
         const x = await CONST.getAccountAndKey(0);
         OWNER = x.addr; OWNER_privKey = x.privKey;
-
-        ISSUER = accounts[++global.TaddrNdx];
-        await stm.mintSecTokenBatch(1, ISSUANCE_QTY, 1, ISSUER, CONST.nullFees, [], [], { from: OWNER });
 
         cashflowData = await stm.getCashflowData();
     });
@@ -47,6 +43,56 @@ contract("StMaster", accounts => {
         global.TaddrNdx++;
         if (CONST.logTestAccountUsage)
             console.log(`addrNdx: ${global.TaddrNdx} - contract @ ${stm.address} (owner: ${OWNER})`);
+    });
+
+    it(`cashflow - issuance - should not be able to subscribe when contract is not sealed`, async () => {
+        try {
+            await stm.send(cashflowData.args.wei_issuancePrice, { from: accounts[++global.TaddrNdx] });
+        } catch (ex) {  
+            assert(ex.reason == 'Contract is not sealed', `unexpected: ${ex.reason}`);
+            return;
+        }
+        assert.fail('expected contract exception');
+    });
+
+    it(`cashflow - issuance - should be able to seal contract`, async () => {
+        await stm.sealContract();
+    });
+
+    it(`cashflow - issuance - should not handle payable tx when no issuance batch is minted`, async () => {
+        try {
+            await stm.send(cashflowData.args.wei_issuancePrice, { from: accounts[++global.TaddrNdx] });
+        } catch (ex) {  
+            assert(ex.reason == 'Bad cashflow request: no minted batch', `unexpected: ${ex.reason}`);
+            return;
+        }
+        assert.fail('expected contract exception');
+    });
+
+    it(`cashflow - issuance - should be able to mint issuance batch`, async () => {
+        ISSUER = accounts[++global.TaddrNdx];
+        await stm.mintSecTokenBatch(1, ISSUANCE_QTY, 1, ISSUER, CONST.nullFees, [], [], { from: OWNER });
+    });
+
+    it(`cashflow - issuance - should be able to handle zero-value payable tx`, async () => {
+        const SUB_1 = ++global.TaddrNdx;
+        await subscribe(ISSUER, accounts[SUB_1], "0.0");
+    });
+
+    it(`cashflow - issuance - should not handle payable tx when contract is read only`, async () => {
+        try {
+            await stm.setReadOnly(true, { from: accounts[0] });
+            await subscribe(
+                ISSUER,
+                accounts[++global.TaddrNdx], 
+                web3.utils.fromWei(cashflowData.args.wei_issuancePrice.toString(), 'ether'));
+            await stm.setReadOnly(false, { from: accounts[0] });
+        } catch (ex) {  
+            await stm.setReadOnly(false, { from: accounts[0] });
+            assert(ex.reason == 'Read-only', `unexpected: ${ex.reason}`);
+            return;
+        }
+        assert.fail('expected contract exception');
     });
 
     it(`cashflow - issuance - should not be able to subscribe more than the issuance size`, async () => {
@@ -87,16 +133,6 @@ contract("StMaster", accounts => {
         
         //const SUB_4 = ++global.TaddrNdx;
         //await subscribe(ISSUER, accounts[SUB_4], "500.0");
-
-        // TODO: test issuer payments... 
-        //       if we *include* the unissued tokens (sitting with issuer), in issuer payments
-        //       then there is no dilution when late subscribers come in -- that makes sense
-
-        //       only thing that would dilute would be subsequent (multi) *issuance* -- 
-        //       means >1 batch for CFT (but still all against same issuer)
-        //       only change neeed woudl be for payable to look at ALL BATCHES for available tokens, not just 1 monobatch
-
-        // TODO: then test more subscribers
     });
 
     async function subscribe(issuer, subscriber, amount) {
@@ -165,12 +201,13 @@ contract("StMaster", accounts => {
         // console.log('   sub_ledgerAfter.tokens_sumQty', sub_ledgerAfter.tokens_sumQty);
         // console.log('issuer_ledgerBefore.tokens_sumQty', issuer_ledgerBefore.tokens_sumQty);
         // console.log(' issuer_ledgerAfter.tokens_sumQty', issuer_ledgerAfter.tokens_sumQty);
-        assert(Big(issuer_ledgerAfter.tokens_sumQty).lt(Big(issuer_ledgerBefore.tokens_sumQty)), 'unexpected issuer token balance after');
-        assert(Big(sub_ledgerAfter.tokens_sumQty).gt(Big(sub_ledgerBefore.tokens_sumQty)), 'unexpected subscriber token balance after');
-        assert(Big(sub_ledgerBefore.tokens_sumQty).plus(issuer_ledgerBefore.tokens_sumQty).eq(
-            Big(sub_ledgerAfter.tokens_sumQty).plus(Big(issuer_ledgerAfter.tokens_sumQty))
-        ), 'unexpected total sum tokens after');
-
+        if (wei_subAmountSent > 0) {
+            assert(Big(issuer_ledgerAfter.tokens_sumQty).lt(Big(issuer_ledgerBefore.tokens_sumQty)), 'unexpected issuer token balance after');
+            assert(Big(sub_ledgerAfter.tokens_sumQty).gt(Big(sub_ledgerBefore.tokens_sumQty)), 'unexpected subscriber token balance after');
+            assert(Big(sub_ledgerBefore.tokens_sumQty).plus(issuer_ledgerBefore.tokens_sumQty).eq(
+                Big(sub_ledgerAfter.tokens_sumQty).plus(Big(issuer_ledgerAfter.tokens_sumQty))
+            ), 'unexpected total sum tokens after');
+        }
         return count_expectedTokens.toString();
     }
 
