@@ -25,13 +25,14 @@ library LedgerLib {
         ledgerHash = keccak256(abi.encodePacked(ledgerHash,
             cashflowData.args.cashflowType,
             //cashflowData.args.wei_maxIssuance,
-            cashflowData.args.wei_issuancePrice,
+            //cashflowData.args.wei_currentPrice,
             cashflowData.args.term_Blks,
             cashflowData.args.bond_bps,
             cashflowData.args.bond_int_EveryBlks,
             //cashflowData.issued_Blk
             cashflowData.qty_issuanceMax,
-            cashflowData.qty_issuanceRemaining
+            cashflowData.qty_issuanceRemaining,
+            cashflowData.wei_currentPrice
         ));
 
         // hash currency types & exchange currency fees
