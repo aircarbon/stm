@@ -50,7 +50,7 @@ const contractProps = {
         contractDecimals: 0,
         cashflowArgs: {
               cashflowType: cashflowType.BOND,
-         wei_issuancePrice: web3.utils.toWei("0.01", "ether"),
+         wei_issuancePrice: web3.utils.toWei("0.02", "ether"),
                  term_Blks: blocksFromDays(1),
                   bond_bps: 1000, // 10%
         bond_int_EveryBlks: blocksFromHours(1)
