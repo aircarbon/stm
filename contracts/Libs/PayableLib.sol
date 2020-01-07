@@ -3,6 +3,7 @@ pragma experimental ABIEncoderV2;
 
 import "./StructLib.sol";
 import "./TransferLib.sol";
+//import "./TokenLib.sol";
 
 library PayableLib {
     event IssuanceSubscribed(address indexed subscriber, address indexed issuer, uint256 weiSent, uint256 weiChange, uint256 tokensSubscribed);
@@ -12,7 +13,39 @@ library PayableLib {
     //  https://diligence.consensys.net/blog/2019/09/stop-using-soliditys-transfer-now/
     //
 
-    // v1: multi-sub (+multi-issue...?)
+    function setIssuerValues(
+        StructLib.LedgerStruct storage ledgerData,
+        StructLib.CashflowStruct storage cashflowData,
+        uint256 wei_currentPrice,
+        uint256 qty_saleAllocation
+    ) public {
+        require(ledgerData._contractSealed, "Contract is not sealed");
+
+        require(ledgerData._batches_currentMax_id == 1,
+            "Bad cashflow request: no minted batch");
+        StructLib.SecTokenBatch storage issueBatch = ledgerData._batches[1];
+
+        require(msg.sender == issueBatch.originator,
+            "Bad cashflow request: access denied");
+
+        // qty_saleAllocation is the *cummulative* amount allowable for sale;
+        // i.e. it can't be set < the currently sold amount, and it can't be set > the total issuance monobatch size
+        StructLib.CashflowStruct memory current = getCashflowData(ledgerData, cashflowData);
+        require(qty_saleAllocation <= current.qty_issuanceMax, "Bad cashflow request: qty_saleAllocation too large");
+        require(qty_saleAllocation >= current.qty_issuanceSold, "Bad cashflow request: qty_saleAllocation too small");
+
+        // we require a fixed price for bonds, because price paid is used to determine the interest due;
+        // (we could have variable pricing, but only at the cost of copying the price paid into the token structure)
+        if (cashflowData.args.cashflowType == StructLib.CashflowType.BOND) {
+            require(cashflowData.wei_currentPrice == 0 || wei_currentPrice == cashflowData.wei_currentPrice,
+                "Bad cashflow request: cannot change price for bond once set");
+        }
+
+        cashflowData.qty_saleAllocation = qty_saleAllocation;
+        cashflowData.wei_currentPrice = wei_currentPrice;
+    }
+
+    // v1: multi-sub
     function pay(
         StructLib.LedgerStruct storage ledgerData,
         StructLib.CashflowStruct storage cashflowData,
@@ -20,14 +53,15 @@ library PayableLib {
     )
     public {
         require(ledgerData._contractSealed, "Contract is not sealed");
+        require(ledgerData._batches_currentMax_id == 1, "Bad cashflow request: no minted batch");
+        require(cashflowData.wei_currentPrice > 0, "Bad cashflow request: no price set");
 
         // get issuer
-        require(ledgerData._batches_currentMax_id == 1, "Bad cashflow request: no minted batch");
         StructLib.SecTokenBatch storage issueBatch = ledgerData._batches[1];
 
         // process payment
         if (msg.sender == issueBatch.originator) {
-            processIssuerPayment(ledgerData, cashflowData, issueBatch, globalFees, owner); // sender is issuer
+            //processIssuerPayment(ledgerData, cashflowData, issueBatch, globalFees, owner); // sender is issuer
         }
         else {
             processSubscriberPayment(ledgerData, cashflowData, issueBatch, globalFees, owner); // all other senders
@@ -41,22 +75,19 @@ library PayableLib {
         StructLib.FeeStruct storage globalFees, address owner
     )
     private {
+        require(cashflowData.qty_saleAllocation > 0, "Bad cashflow request: nothing for sale");
+
         // TODO: restrict msg.value upper bound so no overflow
 
         // calculate subscription size
-        uint256 qtyTokens = msg.value / cashflowData.args.wei_issuancePrice;
+        uint256 qtyTokens = msg.value / cashflowData.wei_currentPrice;
+        require(cashflowData.qty_saleAllocation >= qtyTokens, "Bad cashflow request: insufficient quantity for sale");
 
-        // send back the difference (modulo) to payer
-        uint256 weiChange = msg.value % cashflowData.args.wei_issuancePrice;
+        // send back the difference to payer
+        uint256 weiChange = msg.value % cashflowData.wei_currentPrice;
         if (weiChange > 0) {
             msg.sender.transfer(weiChange);
         }
-
-        // room to subscribe in the issuance batch?
-        uint256[] storage issuer_stIds = ledgerData._ledger[issueBatch.originator].tokenType_stIds[1]; // single sec-type, ID 1
-        require(issuer_stIds.length == 1, "Unexpected cashflow batch originator token count");
-        StructLib.PackedSt storage issuerSt = ledgerData._sts[issuer_stIds[0]];
-        require(issuerSt.currentQty >= qtyTokens, "Insufficient remaining issuance");
 
         // fwd payment to issuer
         issueBatch.originator.transfer(msg.value - weiChange);
@@ -133,13 +164,15 @@ library PayableLib {
         uint256 I = issuerSt.currentQty;
         uint256 S = B - I;
         //uint256 r = cashflowData.args.bond_bps;
-        //uint256 p = cashflowData.args.wei_issuancePrice;
+        //uint256 p = cashflowData.wei_currentPrice;
 
         // TODO: fees
         // uint256 fee = ...
         // owner.transfer(msg.fee);
         // uint256 msgValueExFees = msg.value - fee
         //...
+
+        // TODO: events...
 
         if (cashflowData.args.cashflowType == StructLib.CashflowType.BOND) {
             // TODO: calc/switch interest vs. principal repayment...?
@@ -186,6 +219,7 @@ library PayableLib {
             StructLib.PackedSt storage issuerSt = ledgerData._sts[issuer_stIds[0]];
             ret.qty_issuanceMax = issueBatch.mintedQty;
             ret.qty_issuanceRemaining = issuerSt.currentQty;
+            ret.qty_issuanceSold = issueBatch.mintedQty - issuerSt.currentQty;
         }
         return ret;
     }

@@ -18,7 +18,8 @@ const WEB3_GAS_LIMIT = 5000000;
 // CFD helpers
 const nullCashflowArgs = { cashflowType: 0, 
     //wei_maxIssuance: 0, 
-    wei_issuancePrice: 0, term_Blks: 0, bond_bps: 0, bond_int_EveryBlks: 0 };
+    //wei_currentPrice: 0,
+    term_Blks: 0, bond_bps: 0, bond_int_EveryBlks: 0 };
 const cashflowType = Object.freeze({ 
     BOND: 0,
     EQUITY: 1,
@@ -32,7 +33,7 @@ const blocksFromMonths = (months) => Math.ceil(blocksFromDays(months * 30.42));
 //
 // MAIN: deployer definitions -- contract ctor() params
 //
-const contractVer = "0.95b";
+const contractVer = "0.95c";
 const contractProps = {
     COMMODITY: {
         contractVer: contractVer,
@@ -50,7 +51,7 @@ const contractProps = {
         contractDecimals: 0,
         cashflowArgs: {
               cashflowType: cashflowType.BOND,
-         wei_issuancePrice: web3.utils.toWei("0.02", "ether"),
+        //wei_currentPrice: web3.utils.toWei("0.02", "ether"),
                  term_Blks: blocksFromDays(1),
                   bond_bps: 1000, // 10%
         bond_int_EveryBlks: blocksFromHours(1)

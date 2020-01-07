@@ -51,6 +51,7 @@ module.exports = async function (deployer) {
 
     return deployer.deploy(TokenLib).then(async tokenLib => { 
         deployer.link(TokenLib, StMaster);
+        //deployer.link(TokenLib, PayableLib);
 
     return deployer.deploy(TransferLib).then(async transferLib => { 
         deployer.link(TransferLib, Erc20Lib);
