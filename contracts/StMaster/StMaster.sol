@@ -53,29 +53,19 @@ contract StMaster is StMintable, StBurnable, CcyFundable, CcyWithdrawable, StTra
     event IssuanceSubscribed(address indexed subscriber, address indexed issuer, uint256 weiSent, uint256 weiChange, uint256 tokensSubscribed);
 
     //
-    // SCP todo: use decimals fields for erc20 (send/exchange text fields, or at least round to .decimals before passing to API)
-    //
     // -- J 1+3 --
     // PRI 0 ** CASHFLOWS re. SD ** >>> MVP
+    //      CFT CORE -- aim for *no whitelisting*, i.e. all external control ERC20 accounts...
     //
-    //    > SINGLE ISSUANCE / SINGLE SUBSCRIBER -- first payable received:
-    //        > TODO: manual minting: switch IPFS default fields (todo: remove IPFS_ hard-coding in .tsx)
+    //      TODO: test issuerPayments...
     //
-    //        > require 1 batch minted (sits locked with issuer to start with) - return funds otherwise
-    //        > issuer receives all from payable, minus fees
-    //        > payer receives all tokens from issuer
+    //      TODO: edit issuancePrice... + (new) quantityForSale...
     //
-    //          TODO: could split this up later - issued batch has total ETH amount to buy all,
-    //                and fractions thereof result in partial subscription - MULTI-SUBSCRIBER
-    //          TODO: >1 batch minting (dilutes, due to pro-rata) - MULTI-ISSUANCE
-    //
-    //    > SUBSEQUENT PAYABLE
-    //        > require: already subscribed
-    //        > require: payer is issuer
-    //        > pro-rata ledger owners
-    //
-    //    > before first payable received:
-    //        > can ONLY mint (exactly once), batch sits with issuer (locked, effectively)
+    // others...
+    // TODO: update solc (max v == 0.6.1 ?)
+    // TODO: etherscan -> verify contract (without code bodies?)
+    // TOOD: SCP - show totalSupply() for erc20's
+    // TODO: SCP - use decimals fields for erc20 (send/exchange text fields, or at least round to .decimals before passing to API)
     //
 
     function getContractType() public view returns(StructLib.ContractType) { return ledgerData.contractType; }

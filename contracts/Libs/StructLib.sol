@@ -153,21 +153,19 @@ library StructLib {
     enum CashflowType { BOND, EQUITY }
     struct CashflowArgs { // v1: single-issuance, single-subscriber
 
-        CashflowType cashflowType;       // issuance type
-
-      //uint256      wei_maxIssuance;    // total issuance/subsciption value
-        uint256      wei_issuancePrice;  // subsciption price in wei per token
-
-        uint256      term_Blks;          // total term/tenor, in blocks - 0 for perpetual
-
-        uint256      bond_bps;           // rates: basis points per year on principal
-        uint256      bond_int_EveryBlks; // rates: interest due every n blocks
+        CashflowType cashflowType;          // issuance type
+        uint256      term_Blks;             // total term/tenor, in blocks - (todo: 0 for perpetual?)
+        uint256      bond_bps;              // rates: basis points per year on principal
+        uint256      bond_int_EveryBlks;    // rates: interest due every n blocks
     }
     struct CashflowStruct {
         CashflowArgs args;
+        uint256      wei_currentPrice;      // current subscription price, in wei per token
+        uint256      qty_issuanceMax;       // the amount minted in the issuance monobatch
+        uint256      qty_issuanceRemaining; // the amount remaining unsold of the issuance monobatch
+        uint256      qty_issuanceSold;      // the amount sold of the issuance monobatch
+        uint256      qty_saleAllocation;           // the amount of the issuance monobatch that is available for sale
 
-        uint256      qty_issuanceMax;
-        uint256      qty_issuanceRemaining;
         //uint256      issued_Blk;         // issuance (start) block no
         // --> wei_totIssued
         // --> mapping(address ==> )
