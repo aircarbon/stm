@@ -1,47 +1,13 @@
-/*const Big = require('big.js');
-
 const st = artifacts.require('StMaster');
 const truffleAssert = require('truffle-assertions');
-
-const acmJson = require('../build/contracts/StMaster.json');
-const Web3 = require('web3');
-const abi = acmJson['abi'];
-const EthereumJsTx = require('ethereumjs-tx');
-
+const BN = require('bn.js');
+const Big = require('big.js');
 const CONST = require('../const.js');
-const helper = require('../test/transferHelper.js');
 
-contract("StMaster", accounts => {
-    var stm;
-    var OWNER, OWNER_privKey;
-    var ISSUER;
+module.exports = {
 
-    const ISSUANCE_QTY = 1000000;
-    var cashflowData;
+    subscribe: async (stm, issuer, subscriber, amount) => {
 
-    before(async function () {
-        stm = await st.deployed();
-        if (await stm.getContractType() != CONST.contractType.CASHFLOW) this.skip();
-        if (!global.TaddrNdx) global.TaddrNdx = 0;
-
-        const x = await CONST.getAccountAndKey(0);
-        OWNER = x.addr; OWNER_privKey = x.privKey;
-
-        cashflowData = await stm.getCashflowData();
-        
-        await stm.sealContract();
-
-        ISSUER = accounts[++global.TaddrNdx];
-        await stm.mintSecTokenBatch(1, ISSUANCE_QTY, 1, ISSUER, CONST.nullFees, [], [], { from: OWNER });
-    });
-
-    beforeEach(async () => {
-        global.TaddrNdx++;
-        if (CONST.logTestAccountUsage)
-            console.log(`addrNdx: ${global.TaddrNdx} - contract @ ${stm.address} (owner: ${OWNER})`);
-    });
-
-    async function subscribe(issuer, subscriber, amount) {
         const issuer_balBefore = await web3.eth.getBalance(issuer);
         const issuer_ledgerBefore = await stm.getLedgerEntry(issuer);
 
@@ -64,8 +30,9 @@ contract("StMaster", accounts => {
         //truffleAssert.prettyPrintEmittedEvents(subscriptionTx);
 
         // expect subscriber gets change
-        const wei_expectedChange = Big(wei_subAmountSent).mod(Big(cashflowData.args.wei_currentPrice));
-        const count_expectedTokens = Big(wei_subAmountSent).minus(wei_expectedChange).div(Big(cashflowData.args.wei_currentPrice));
+        const cashflowData = await stm.getCashflowData();
+        const wei_expectedChange = Big(wei_subAmountSent).mod(Big(cashflowData.wei_currentPrice));
+        const count_expectedTokens = Big(wei_subAmountSent).minus(wei_expectedChange).div(Big(cashflowData.wei_currentPrice));
         const { weiCost: wei_Cost } = 
             await CONST.logGas(web3, subscriptionTx,
 `Subscribe Ξ${web3.utils.fromWei(wei_subAmountSent, 'ether').toString().padStart(5)} => \
@@ -76,7 +43,7 @@ contract("StMaster", accounts => {
         // console.log('          wei_Cost', wei_Cost);
         // console.log('     sub_balAfter', sub_balAfter.toString());
         assert(Big(sub_balAfter.toString()).eq(
-            Big(sub_balBefore.toString())
+             Big(sub_balBefore.toString())
             .minus(Big(wei_subAmountSent.toString()))
             .minus(Big(wei_Cost.toString()))
             .plus(Big(wei_expectedChange.toString()))
@@ -117,5 +84,4 @@ contract("StMaster", accounts => {
         return count_expectedTokens.toString();
     }
 
-});
-*/
+};

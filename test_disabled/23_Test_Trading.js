@@ -1,6 +1,6 @@
 const st = artifacts.require('StMaster');
 const CONST = require('../const.js');
-const helper = require('../test/transferHelper.js');
+const transferHelper = require('../test/transferHelper.js');
 
 contract("StMaster", accounts => {
     var stm;
@@ -25,7 +25,7 @@ contract("StMaster", accounts => {
     it(`trading - should allow two-sided (vST <-> ccy) transfer (A <-> B) across ledger entries`, async () => {
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.TaddrNdx + 0], CONST.nullFees, [], [], { from: accounts[0] });
         await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        accounts[global.TaddrNdx + 1],                         { from: accounts[0] });
-        const data = await helper.transferLedger({ stm, accounts, 
+        const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: accounts[global.TaddrNdx + 0],       ledger_B: accounts[global.TaddrNdx + 1],
                    qty_A: 750,                            tokenTypeId_A: CONST.tokenType.VCS,
                    qty_B: 0,                              tokenTypeId_B: 0,
@@ -41,7 +41,7 @@ contract("StMaster", accounts => {
     it(`trading - should allow two-sided (ccy <-> vST) transfer (A <-> B) across ledger entries`, async () => {
         await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        accounts[global.TaddrNdx + 0],                         { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.TaddrNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
-        const data = await helper.transferLedger({ stm, accounts, 
+        const data = await transferHelper.transferLedger({ stm, accounts, 
                  ledger_A: accounts[global.TaddrNdx + 0],         ledger_B: accounts[global.TaddrNdx + 1],
                     qty_A: 0,                                tokenTypeId_A: 0,
                     qty_B: 750,                              tokenTypeId_B: CONST.tokenType.VCS,
@@ -57,7 +57,7 @@ contract("StMaster", accounts => {
     it(`trading - should have reasonable gas cost for two-sided transfer`, async () => {
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.TaddrNdx + 0], CONST.nullFees, [], [], { from: accounts[0] });
         await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        accounts[global.TaddrNdx + 1],                         { from: accounts[0] });
-        const data = await helper.transferLedger({ stm, accounts, 
+        const data = await transferHelper.transferLedger({ stm, accounts, 
                  ledger_A: accounts[global.TaddrNdx + 0],       ledger_B: accounts[global.TaddrNdx + 1],
                     qty_A: 500,                              tokenTypeId_A: CONST.tokenType.VCS,
                     qty_B: 0,                                tokenTypeId_B: 0,

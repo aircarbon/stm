@@ -1,7 +1,7 @@
 const st = artifacts.require('StMaster');
 const truffleAssert = require('truffle-assertions');
 const CONST = require('../const.js');
-const helper = require('../test/transferHelper.js');
+const transferHelper = require('../test/transferHelper.js');
 const BN = require('bn.js');
 
 contract("StMaster", accounts => {
@@ -42,7 +42,7 @@ contract("StMaster", accounts => {
         // transfer, with fee structure applied
         const transferAmountKg = new BN(100); // 100 kg
         const expectedFeeKg = Math.min(Math.floor(Number(transferAmountKg.toString()) * (feeBps/10000)) + feeFix, feeCap);
-        const data = await helper.transferLedger({ stm, accounts, 
+        const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: accounts[global.TaddrNdx + 0],     ledger_B: accounts[global.TaddrNdx + 1],
                    qty_A: transferAmountKg,               tokenTypeId_A: CONST.tokenType.VCS,
                    qty_B: 0,                              tokenTypeId_B: 0,
@@ -80,7 +80,7 @@ contract("StMaster", accounts => {
         const transferAmountKg = new BN(CONST.gtCarbon / 2); // 0.5 giga ton
         const expectedFeeKg = Math.max(Math.floor(Number(transferAmountKg.toString()) * (feeBps/10000)) + feeFix, feeMin);
         //console.log('expectedFeeKg', expectedFeeKg.toFixed());
-        const data = await helper.transferLedger({ stm, accounts, 
+        const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: accounts[global.TaddrNdx + 0],     ledger_B: accounts[global.TaddrNdx + 1],
                    qty_A: 0,                              tokenTypeId_A: 0,
                    qty_B: transferAmountKg,               tokenTypeId_B: CONST.tokenType.VCS,
@@ -121,7 +121,7 @@ contract("StMaster", accounts => {
         // transfer, with fee structure applied
         const transferAmountCcy = new BN(CONST.tenthEth_wei);
         const expectedFeeCcy = Math.max(Math.floor(Number(transferAmountCcy.toString()) * (ethFeeBps/10000)) + Number(ethFeeFix), ethFeeMin);
-        const data = await helper.transferLedger({ stm, accounts, 
+        const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: accounts[global.TaddrNdx + 0],                          ledger_B: accounts[global.TaddrNdx + 1],
                    qty_A: 0,                                                   tokenTypeId_A: 0,
                    qty_B: 750,                                                 tokenTypeId_B: CONST.tokenType.VCS,
@@ -145,7 +145,7 @@ contract("StMaster", accounts => {
         // transfer, with fee structure applied
         const transferAmountCcy = new BN(CONST.millionEth_wei).div(new BN(2)); // 500k
         const expectedFeeCcy = Math.min(Math.floor(Number(transferAmountCcy.toString()) * (ethFeeBps/10000)) + Number(ethFeeFix), ethFeeMax);
-        const data = await helper.transferLedger({ stm, accounts, 
+        const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: accounts[global.TaddrNdx + 0],                          ledger_B: accounts[global.TaddrNdx + 1],
                    qty_A: 750,                                                 tokenTypeId_A: CONST.tokenType.VCS,
                    qty_B: 0,                                                   tokenTypeId_B: 0,
@@ -167,7 +167,7 @@ contract("StMaster", accounts => {
         await stm.setFee_CcyType(CONST.ccyType.ETH, CONST.nullAddr,   CONST.nullFees);
 
         const transferAmountKg = new BN(950); // not enough carbon for this trade, without the fee cap
-        const data = await helper.transferLedger({ stm, accounts, 
+        const data = await transferHelper.transferLedger({ stm, accounts, 
             ledger_A: accounts[global.TaddrNdx + 0],     ledger_B: accounts[global.TaddrNdx + 1],
                qty_A: transferAmountKg,               tokenTypeId_A: CONST.tokenType.VCS,
                qty_B: 0,                              tokenTypeId_B: 0,
@@ -191,7 +191,7 @@ contract("StMaster", accounts => {
         // transfer, with fee structure applied
         try {
             const transferAmountCcy = new BN(900);
-            const data = await helper.transferLedger({ stm, accounts,
+            const data = await transferHelper.transferLedger({ stm, accounts,
                     ledger_A: accounts[global.TaddrNdx + 0],                          ledger_B: accounts[global.TaddrNdx + 1],
                        qty_A: 0,                                                   tokenTypeId_A: 0,
                        qty_B: 750,                                                 tokenTypeId_B: CONST.tokenType.VCS,
@@ -220,7 +220,7 @@ contract("StMaster", accounts => {
 
         try {
             const transferAmountKg = new BN(900);
-            const data = await helper.transferLedger({ stm, accounts, 
+            const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: accounts[global.TaddrNdx + 0],     ledger_B: accounts[global.TaddrNdx + 1],
                    qty_A: 0,                              tokenTypeId_A: 0,
                    qty_B: transferAmountKg,               tokenTypeId_B: CONST.tokenType.VCS,

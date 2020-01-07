@@ -1,11 +1,9 @@
 const st = artifacts.require('StMaster');
 const truffleAssert = require('truffle-assertions');
 const CONST = require('../const.js');
-const helper = require('../test/transferHelper.js');
+const transferHelper = require('../test/transferHelper.js');
 const BN = require('bn.js');
 const Big = require('big.js');
-const Web3 = require('web3');
-const web3 = new Web3();
 
 contract("StMaster", accounts => {
     var stm;
@@ -57,7 +55,7 @@ contract("StMaster", accounts => {
         await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        A,                    { from: accounts[0] });
         await stm.setFee_TokType(CONST.tokenType.VCS,       CONST.nullAddr,          CONST.nullFees);
         await stm.setFee_CcyType(CONST.ccyType.ETH,         CONST.nullAddr,          CONST.nullFees);
-        const data_MA = await helper.transferLedger({ stm, accounts, 
+        const data_MA = await transferHelper.transferLedger({ stm, accounts, 
             ledger_A: M,                                   ledger_B: A,
                qty_A: new BN(MA_qty),                 tokenTypeId_A: CONST.tokenType.VCS,
                qty_B: 0,                              tokenTypeId_B: 0,
@@ -95,7 +93,7 @@ contract("StMaster", accounts => {
         // TEST - transfer
         const transferAmountKg = new BN(1500);
         const M_ledgerBefore = await stm.getLedgerEntry(M);
-        const data = await helper.transferLedger({ stm, accounts, 
+        const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: A,                                   ledger_B: B,
                    qty_A: transferAmountKg,               tokenTypeId_A: CONST.tokenType.VCS,
                    qty_B: 0,                              tokenTypeId_B: 0,
@@ -142,7 +140,7 @@ contract("StMaster", accounts => {
         await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        B,                    { from: accounts[0] });
         await stm.setFee_TokType(CONST.tokenType.UNFCCC,    CONST.nullAddr,          CONST.nullFees);
         await stm.setFee_CcyType(CONST.ccyType.ETH,         CONST.nullAddr,          CONST.nullFees);
-        const data_MA = await helper.transferLedger({ stm, accounts, 
+        const data_MA = await transferHelper.transferLedger({ stm, accounts, 
             ledger_A: M,                                   ledger_B: B,
                qty_A: new BN(MA_qty),                 tokenTypeId_A: CONST.tokenType.UNFCCC,
                qty_B: 0,                              tokenTypeId_B: 0,
@@ -179,7 +177,7 @@ contract("StMaster", accounts => {
         // TEST - transfer
         const transferAmountKg = new BN(1500);
         const M_ledgerBefore = await stm.getLedgerEntry(M);
-        const data = await helper.transferLedger({ stm, accounts, 
+        const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: A,                                   ledger_B: B,
                    qty_A: 0,                              tokenTypeId_A: 0,
                    qty_B: transferAmountKg,               tokenTypeId_B: CONST.tokenType.UNFCCC,
@@ -244,7 +242,7 @@ contract("StMaster", accounts => {
             await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        A,                    { from: accounts[0] });
             await stm.setFee_TokType(CONST.tokenType.VCS,       CONST.nullAddr,          CONST.nullFees);
             await stm.setFee_CcyType(CONST.ccyType.ETH,         CONST.nullAddr,          CONST.nullFees);
-            const data_MA = await helper.transferLedger({ stm, accounts, 
+            const data_MA = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: M,                                   ledger_B: A,
                    qty_A: new BN(MA_qty),                 tokenTypeId_A: CONST.tokenType.VCS,
                    qty_B: 0,                              tokenTypeId_B: 0,
@@ -278,7 +276,7 @@ contract("StMaster", accounts => {
         for (var i = 0 ; i < M_multi.length ; i++) {
             M_multi[i].ledgerBefore = await stm.getLedgerEntry(M_multi[i].account);
         }
-        const data = await helper.transferLedger({ stm, accounts, 
+        const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: A,                                   ledger_B: B,
                    qty_A: transferAmountKg,               tokenTypeId_A: CONST.tokenType.VCS,
                    qty_B: 0,                              tokenTypeId_B: 0,
@@ -348,7 +346,7 @@ contract("StMaster", accounts => {
             await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        B,                    { from: accounts[0] });
             await stm.setFee_TokType(CONST.tokenType.UNFCCC,    CONST.nullAddr,          CONST.nullFees);
             await stm.setFee_CcyType(CONST.ccyType.ETH,         CONST.nullAddr,          CONST.nullFees);
-            const data_MA = await helper.transferLedger({ stm, accounts, 
+            const data_MA = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: M,                                   ledger_B: B,
                    qty_A: new BN(MA_qty),                 tokenTypeId_A: CONST.tokenType.UNFCCC,
                    qty_B: 0,                              tokenTypeId_B: 0,
@@ -383,7 +381,7 @@ contract("StMaster", accounts => {
         for (var i = 0 ; i < M_multi.length ; i++) {
             M_multi[i].ledgerBefore = await stm.getLedgerEntry(M_multi[i].account);
         }
-        const data = await helper.transferLedger({ stm, accounts, 
+        const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: A,                                   ledger_B: B,
                    qty_A: 0,                              tokenTypeId_A: 0,
                    qty_B: transferAmountKg,               tokenTypeId_B: CONST.tokenType.UNFCCC,

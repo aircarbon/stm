@@ -1,6 +1,6 @@
 const st = artifacts.require('StMaster');
 const Big = require('big.js');
-const helper = require('./transferHelper.js');
+const transferHelper = require('./transferHelper.js');
 const CONST = require('../const.js');
 
 contract("StMaster", accounts => {
@@ -25,7 +25,7 @@ contract("StMaster", accounts => {
 
     it(`transferring - should not allow non-owner to transfer across ledger entries`, async () => {
         try {
-            await helper.transferWrapper(stm, accounts, accounts[global.TaddrNdx + 0], accounts[global.TaddrNdx + 1], 0, 0, 0, 0, 0, 0, 0, 0, false, { from: accounts[1] });
+            await transferHelper.transferWrapper(stm, accounts, accounts[global.TaddrNdx + 0], accounts[global.TaddrNdx + 1], 0, 0, 0, 0, 0, 0, 0, 0, false, { from: accounts[1] });
         } catch (ex) { 
             assert(ex.reason == 'Restricted', `unexpected: ${ex.reason}`);
             return;
@@ -37,7 +37,7 @@ contract("StMaster", accounts => {
         await stm.fund(CONST.ccyType.SGD, CONST.thousandCcy_cents,       accounts[global.TaddrNdx + 0], { from: accounts[0] });
         await stm.fund(CONST.ccyType.SGD, CONST.thousandCcy_cents,       accounts[global.TaddrNdx + 1], { from: accounts[0] });
         try {
-            await helper.transferWrapper(stm, accounts, accounts[global.TaddrNdx + 0], accounts[global.TaddrNdx + 1], 0, 0, 0, 0, 0, 0, 0, 0, false, { from: accounts[0] });
+            await transferHelper.transferWrapper(stm, accounts, accounts[global.TaddrNdx + 0], accounts[global.TaddrNdx + 1], 0, 0, 0, 0, 0, 0, 0, 0, false, { from: accounts[0] });
         } catch (ex) {
             assert(ex.reason == 'Bad null transfer', `unexpected: ${ex.reason}`);
             return;
@@ -50,7 +50,7 @@ contract("StMaster", accounts => {
         await stm.fund(CONST.ccyType.SGD,                CONST.thousandCcy_cents,       accounts[global.TaddrNdx + 1],                         { from: accounts[0] });
         try {
             const qty_A = Big(2).pow(64);//.minus(1);
-            await helper.transferWrapper(stm, accounts, accounts[global.TaddrNdx + 0], accounts[global.TaddrNdx + 1], 
+            await transferHelper.transferWrapper(stm, accounts, accounts[global.TaddrNdx + 0], accounts[global.TaddrNdx + 1], 
                 qty_A.toString(),            // qty_A
                 CONST.tokenType.VCS,         // tokenTypeId_A
                 0,                           // qty_B
@@ -73,7 +73,7 @@ contract("StMaster", accounts => {
         await stm.mintSecTokenBatch(CONST.tokenType.VCS, CONST.ktCarbon, 1,             accounts[global.TaddrNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
         try {
             const qty_A = Big(2).pow(64);//.minus(1);
-            await helper.transferWrapper(stm, accounts, accounts[global.TaddrNdx + 0], accounts[global.TaddrNdx + 1], 
+            await transferHelper.transferWrapper(stm, accounts, accounts[global.TaddrNdx + 0], accounts[global.TaddrNdx + 1], 
                 0,                           // qty_A
                 0,                           // tokenTypeId_A
                 qty_A.toString(),            // qty_B
@@ -97,7 +97,7 @@ contract("StMaster", accounts => {
         await stm.fund(CONST.ccyType.SGD,                CONST.thousandCcy_cents,       accounts[global.TaddrNdx + 1],         { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.VCS, CONST.ktCarbon, 1,             accounts[global.TaddrNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
         try {
-            await helper.transferWrapper(stm, accounts, accounts[global.TaddrNdx + 0], accounts[global.TaddrNdx + 1], 
+            await transferHelper.transferWrapper(stm, accounts, accounts[global.TaddrNdx + 0], accounts[global.TaddrNdx + 1], 
                 CONST.ktCarbon,              // qty_A
                 CONST.tokenType.VCS,         // tokenTypeId_A
                 0,                           // qty_B
@@ -121,7 +121,7 @@ contract("StMaster", accounts => {
         await stm.fund(CONST.ccyType.SGD,                CONST.thousandCcy_cents,       accounts[global.TaddrNdx + 1],         { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.VCS, CONST.ktCarbon, 1,             accounts[global.TaddrNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
         try {
-            await helper.transferWrapper(stm, accounts, accounts[global.TaddrNdx + 0], accounts[global.TaddrNdx + 1], 
+            await transferHelper.transferWrapper(stm, accounts, accounts[global.TaddrNdx + 0], accounts[global.TaddrNdx + 1], 
                 0,                           // qty_A
                 0,                           // tokenTypeId_A
                 CONST.ktCarbon,              // qty_B
@@ -145,7 +145,7 @@ contract("StMaster", accounts => {
         await stm.fund(CONST.ccyType.SGD,                CONST.thousandCcy_cents,       accounts[global.TaddrNdx + 1],         { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.VCS, CONST.ktCarbon, 1,             accounts[global.TaddrNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
         try {
-            await helper.transferWrapper(stm, accounts, accounts[global.TaddrNdx + 0], accounts[global.TaddrNdx + 1], 
+            await transferHelper.transferWrapper(stm, accounts, accounts[global.TaddrNdx + 0], accounts[global.TaddrNdx + 1], 
                 CONST.ktCarbon,              // qty_A
                 CONST.tokenType.VCS,         // tokenTypeId_A
                 CONST.ktCarbon,              // qty_B
@@ -168,7 +168,7 @@ contract("StMaster", accounts => {
     //     await stm.fund(CONST.ccyType.SGD, CONST.thousandCcy_cents,       accounts[global.TaddrNdx + 0], { from: accounts[0] });
     //     await stm.fund(CONST.ccyType.SGD, CONST.thousandCcy_cents,       accounts[global.TaddrNdx + 1], { from: accounts[0] });
     //     try {
-    //         await helper.transferWrapper(stm, accounts, accounts[global.TaddrNdx + 0], accounts[global.TaddrNdx + 0], 
+    //         await transferHelper.transferWrapper(stm, accounts, accounts[global.TaddrNdx + 0], accounts[global.TaddrNdx + 0], 
     //             0, 0, 0, 0, 
     //             CONST.thousandCcy_cents,     // ccy_amount_A
     //             CONST.ccyType.SGD,           // ccyTypeId_A
@@ -188,7 +188,7 @@ contract("StMaster", accounts => {
         await stm.fund(CONST.ccyType.ETH, CONST.oneEth_wei,              accounts[global.TaddrNdx + 1],         { from: accounts[0] });
         try {
             await stm.setReadOnly(true, { from: accounts[0] });
-            await helper.transferWrapper(stm, accounts, accounts[global.TaddrNdx + 0], accounts[global.TaddrNdx + 1], 
+            await transferHelper.transferWrapper(stm, accounts, accounts[global.TaddrNdx + 0], accounts[global.TaddrNdx + 1], 
                 0, 0, 0, 0, 
                 CONST.thousandCcy_cents,     // ccy_amount_A
                 CONST.ccyType.SGD,           // ccyTypeId_A
@@ -209,7 +209,7 @@ contract("StMaster", accounts => {
         await stm.fund(CONST.ccyType.SGD, CONST.thousandCcy_cents,       accounts[global.TaddrNdx + 0],         { from: accounts[0] });
         await stm.fund(CONST.ccyType.ETH, CONST.oneEth_wei,              accounts[global.TaddrNdx + 1],         { from: accounts[0] });
         try {
-            await helper.transferWrapper(stm, accounts, accounts[global.TaddrNdx + 0], accounts[global.TaddrNdx + 1], 
+            await transferHelper.transferWrapper(stm, accounts, accounts[global.TaddrNdx + 0], accounts[global.TaddrNdx + 1], 
                 0, 0, 0, 0, 
                 CONST.thousandCcy_cents,     // ccy_amount_A
                 0,                           // ccyTypeId_A --> ###
@@ -228,7 +228,7 @@ contract("StMaster", accounts => {
         await stm.fund(CONST.ccyType.SGD, CONST.thousandCcy_cents,       accounts[global.TaddrNdx + 0],         { from: accounts[0] });
         await stm.fund(CONST.ccyType.ETH, CONST.oneEth_wei,              accounts[global.TaddrNdx + 1],         { from: accounts[0] });
         try {
-            await helper.transferWrapper(stm, accounts, accounts[global.TaddrNdx + 0], accounts[global.TaddrNdx + 1], 
+            await transferHelper.transferWrapper(stm, accounts, accounts[global.TaddrNdx + 0], accounts[global.TaddrNdx + 1], 
                 0, 0, 0, 0, 
                 CONST.thousandCcy_cents,     // ccy_amount_A
                 CONST.ccyType.SGD,           // ccyTypeId_A
@@ -247,7 +247,7 @@ contract("StMaster", accounts => {
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.ktCarbon, 1, accounts[global.TaddrNdx + 0], CONST.nullFees, [], [], { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.ktCarbon, 1, accounts[global.TaddrNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
         try {
-            await helper.transferWrapper(stm, accounts, accounts[global.TaddrNdx + 0], accounts[global.TaddrNdx + 1], 
+            await transferHelper.transferWrapper(stm, accounts, accounts[global.TaddrNdx + 0], accounts[global.TaddrNdx + 1], 
                 CONST.ktCarbon,              // qty_A
                 0,                           // tokenTypeId_A --> ###
                 CONST.ktCarbon,              // qty_B
@@ -266,7 +266,7 @@ contract("StMaster", accounts => {
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.ktCarbon, 1, accounts[global.TaddrNdx + 0], CONST.nullFees, [], [], { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.ktCarbon, 1, accounts[global.TaddrNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
         try {
-            await helper.transferWrapper(stm, accounts, accounts[global.TaddrNdx + 0], accounts[global.TaddrNdx + 1], 
+            await transferHelper.transferWrapper(stm, accounts, accounts[global.TaddrNdx + 0], accounts[global.TaddrNdx + 1], 
                 CONST.ktCarbon,              // qty_A
                 CONST.tokenType.VCS,         // tokenTypeId_A 
                 CONST.ktCarbon,              // qty_B
@@ -285,7 +285,7 @@ contract("StMaster", accounts => {
     // it(`transferring - should allow a transfer to an unkown ledger entry (erc20 support) (B)`, async () => {
     //     await stm.fund(CONST.ccyType.SGD, CONST.thousandCcy_cents,       accounts[global.TaddrNdx + 0], { from: accounts[0] });
     //     //try {
-    //         await helper.transferWrapper(stm, accounts, accounts[global.TaddrNdx + 0], accounts[global.TaddrNdx + 1], 
+    //         await transferHelper.transferWrapper(stm, accounts, accounts[global.TaddrNdx + 0], accounts[global.TaddrNdx + 1], 
     //             0, 0, 0, 0, 
     //             CONST.thousandCcy_cents,     // ccy_amount_A
     //             CONST.ccyType.SGD,           // ccyTypeId_A
@@ -302,7 +302,7 @@ contract("StMaster", accounts => {
     // it(`transferring - should allow a transfer from an unkown ledger entry (erc20 support) (A)`, async () => {
     //     await stm.fund(CONST.ccyType.SGD, CONST.thousandCcy_cents,       accounts[global.TaddrNdx + 0], { from: accounts[0] });
     //     //try {
-    //         await helper.transferWrapper(stm, accounts, accounts[global.TaddrNdx + 0], accounts[global.TaddrNdx + 1], 
+    //         await transferHelper.transferWrapper(stm, accounts, accounts[global.TaddrNdx + 0], accounts[global.TaddrNdx + 1], 
     //             0, 0, 0, 0, 
     //             CONST.thousandCcy_cents,     // ccy_amount_A
     //             CONST.ccyType.SGD,           // ccyTypeId_A

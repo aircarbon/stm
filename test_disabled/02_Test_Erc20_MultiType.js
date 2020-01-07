@@ -4,7 +4,7 @@ const bip39 = require('bip39');
 const hdkey = require('ethereumjs-wallet/hdkey');
 const wallet = require('ethereumjs-wallet');
 const CONST = require('../const.js');
-const helper = require('../test/transferHelper.js');
+const transferHelper = require('../test/transferHelper.js');
 
 contract("StMaster", accounts => {
     var stm;
@@ -63,7 +63,7 @@ contract("StMaster", accounts => {
         await white_to_gray_1();
     });
     async function white_to_gray_1() {
-        await helper.transferLedger({ stm, accounts, 
+        await transferHelper.transferLedger({ stm, accounts, 
             ledger_A: WHITE,                               ledger_B: GRAY_1,
                qty_A: 3000,                           tokenTypeId_A: CONST.tokenType.VCS,
                qty_B: 0,                              tokenTypeId_B: 0,
@@ -71,7 +71,7 @@ contract("StMaster", accounts => {
         ccy_amount_B: 0,                                ccyTypeId_B: 0,
            applyFees: false,
         });
-        await helper.transferLedger({ stm, accounts, 
+        await transferHelper.transferLedger({ stm, accounts, 
             ledger_A: WHITE,                               ledger_B: GRAY_1,
                qty_A: 3000,                           tokenTypeId_A: CONST.tokenType.UNFCCC,
                qty_B: 0,                              tokenTypeId_B: 0,

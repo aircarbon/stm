@@ -1,7 +1,7 @@
 const st = artifacts.require('StMaster');
 const truffleAssert = require('truffle-assertions');
 const CONST = require('../const.js');
-const helper = require('../test/transferHelper.js');
+const transferHelper = require('../test/transferHelper.js');
 const BN = require('bn.js');
 const Big = require('big.js');
 const Web3 = require('web3');
@@ -50,7 +50,7 @@ contract("StMaster", accounts => {
         // transfer
         const transferAmountKg = new BN(1500);
         const expectedFeeKg = 0; // no fees expected: fee-sender == fee-receiver
-        const data = await helper.transferLedger({ stm, accounts, 
+        const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: A,                                   ledger_B: B,
                    qty_A: transferAmountKg,               tokenTypeId_A: CONST.tokenType.VCS,
                    qty_B: 0,                              tokenTypeId_B: 0,
@@ -89,7 +89,7 @@ contract("StMaster", accounts => {
         // transfer
         const transferAmountKg = new BN(1500);
         const expectedFeeKg = 0; // no fees expected: fee-sender == fee-receiver
-        const data = await helper.transferLedger({ stm, accounts, 
+        const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: A,                                   ledger_B: B,
                    qty_A: 0,                              tokenTypeId_A: 0,
                    qty_B: transferAmountKg,               tokenTypeId_B: CONST.tokenType.VCS,
@@ -134,7 +134,7 @@ contract("StMaster", accounts => {
         const expectedFeeKg = // fees expected: exchange global fee only
             Math.min(Math.floor(Number(transferAmountKg.toString()) * (globalFee.fee_percBips/10000)) + globalFee.fee_fixed, globalFee.fee_max);
 
-        const data = await helper.transferLedger({ stm, accounts, 
+        const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: A,                                   ledger_B: B,
                    qty_A: transferAmountKg,               tokenTypeId_A: CONST.tokenType.VCS,
                    qty_B: 0,                              tokenTypeId_B: 0,
@@ -179,7 +179,7 @@ contract("StMaster", accounts => {
         const expectedFeeKg = // fees expected: exchange ledger fee only
             Math.min(Math.floor(Number(transferAmountKg.toString()) * (ledgerFee.fee_percBips/10000)) + ledgerFee.fee_fixed, ledgerFee.fee_max);
 
-        const data = await helper.transferLedger({ stm, accounts, 
+        const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: A,                                   ledger_B: B,
                    qty_A: 0,                              tokenTypeId_A: 0,
                    qty_B: transferAmountKg,               tokenTypeId_B: CONST.tokenType.VCS,
@@ -220,7 +220,7 @@ contract("StMaster", accounts => {
         // transfer
         const transferAmountEth = CONST.tenthEth_wei;
         const expectedFeeEth = 0; // no fees expected: fee-sender == fee-receiver
-        const data = await helper.transferLedger({ stm, accounts, 
+        const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: A,                                   ledger_B: B,
                    qty_A: 0,                              tokenTypeId_A: 0,
                    qty_B: new BN(1500),                   tokenTypeId_B: CONST.tokenType.VCS,
@@ -259,7 +259,7 @@ contract("StMaster", accounts => {
         // transfer
         const transferAmountEth = CONST.tenthEth_wei;
         const expectedFeeEth = 0; // no fees expected: fee-sender == fee-receiver
-        const data = await helper.transferLedger({ stm, accounts, 
+        const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: A,                                   ledger_B: B,
                    qty_A: new BN(1500),                   tokenTypeId_A: CONST.tokenType.VCS,
                    qty_B: 0,                              tokenTypeId_B: 0,

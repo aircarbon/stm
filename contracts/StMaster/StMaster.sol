@@ -104,7 +104,7 @@ contract StMaster is StMintable, StBurnable, CcyFundable, CcyWithdrawable, StTra
             ccyTypesData._count_ccyTypes = 7;
         }
         else if (contractType == StructLib.ContractType.CASHFLOW) {
-            stTypesData._tokenTypeNames[1] = contractName;
+            stTypesData._tokenTypeNames[1] = 'UNI_TOKEN'; //contractName;
             stTypesData._count_tokenTypes = 1;
             ccyTypesData._ccyTypes[1] = StructLib.Ccy({ id: 1, name: 'ETH', unit: 'Wei',        decimals: 18 });
             ccyTypesData._count_ccyTypes = 1;

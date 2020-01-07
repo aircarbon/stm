@@ -1,7 +1,7 @@
 const truffleAssert = require('truffle-assertions');
 const st = artifacts.require('StMaster');
 const CONST = require('../const.js');
-const helper = require('./transferHelper.js');
+const transferHelper = require('./transferHelper.js');
 
 contract("StMaster", accounts => {
     var stm;
@@ -26,7 +26,7 @@ contract("StMaster", accounts => {
     it(`transferring tok - should have reasonable gas cost for one-sided 0.5 vST transfer (A -> B), aka. carbon movement`, async () => {
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.TaddrNdx + 0], CONST.nullFees, [], [], { from: accounts[0] });
         await stm.fund(CONST.ccyType.ETH,                   0,                                  accounts[global.TaddrNdx + 1],         { from: accounts[0] });
-        const data = await helper.transferLedger({ stm, accounts, 
+        const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: accounts[global.TaddrNdx + 0],         ledger_B: accounts[global.TaddrNdx + 1],
                    qty_A: 750,                              tokenTypeId_A: CONST.tokenType.VCS,
                    qty_B: 0,                                tokenTypeId_B: 0,
@@ -41,7 +41,7 @@ contract("StMaster", accounts => {
         await stm.mintSecTokenBatch(CONST.tokenType.VCS, CONST.ktCarbon, 1,       accounts[global.TaddrNdx + 0], CONST.nullFees, [], [], { from: accounts[0] });
         await stm.fund(CONST.ccyType.SGD,                CONST.thousandCcy_cents, accounts[global.TaddrNdx + 1],         { from: accounts[0] });
         
-        const data = await helper.transferLedger({ stm, accounts, 
+        const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: accounts[global.TaddrNdx + 0],         ledger_B: accounts[global.TaddrNdx + 1],
                     qty_A: CONST.ktCarbon,                  tokenTypeId_A: CONST.tokenType.VCS,
                     qty_B: 0,                               tokenTypeId_B: 0,
@@ -59,7 +59,7 @@ contract("StMaster", accounts => {
         await stm.fund(CONST.ccyType.SGD,                   CONST.thousandCcy_cents, accounts[global.TaddrNdx + 0],         { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.ktCarbon, 1,       accounts[global.TaddrNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
         
-        const data = await helper.transferLedger({ stm, accounts, 
+        const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: accounts[global.TaddrNdx + 0],         ledger_B: accounts[global.TaddrNdx + 1],
                    qty_A: 0,                                tokenTypeId_A: 0,
                    qty_B: CONST.ktCarbon,                   tokenTypeId_B: CONST.tokenType.UNFCCC,
@@ -78,7 +78,7 @@ contract("StMaster", accounts => {
         await stm.mintSecTokenBatch(CONST.tokenType.VCS, CONST.ktCarbon, 1,       accounts[global.TaddrNdx + 0], CONST.nullFees, [], [], { from: accounts[0] });
         await stm.fund(CONST.ccyType.SGD,                CONST.thousandCcy_cents, accounts[global.TaddrNdx + 1],         { from: accounts[0] });
         
-        const data = await helper.transferLedger({ stm, accounts, 
+        const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: accounts[global.TaddrNdx + 0],         ledger_B: accounts[global.TaddrNdx + 1],
                    qty_A: CONST.ktCarbon / 2,               tokenTypeId_A: CONST.tokenType.VCS,
                    qty_B: 0,                                tokenTypeId_B: 0,
@@ -97,7 +97,7 @@ contract("StMaster", accounts => {
         await stm.fund(CONST.ccyType.SGD,                CONST.thousandCcy_cents, accounts[global.TaddrNdx + 0],         { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.VCS, CONST.ktCarbon, 1,       accounts[global.TaddrNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
         
-        const data = await helper.transferLedger({ stm, accounts, 
+        const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: accounts[global.TaddrNdx + 0],         ledger_B: accounts[global.TaddrNdx + 1],
                    qty_A: 0,                                tokenTypeId_A: 0,
                    qty_B: CONST.ktCarbon / 2,               tokenTypeId_B: CONST.tokenType.VCS,
@@ -117,14 +117,14 @@ contract("StMaster", accounts => {
     // it(`transferring tok - should allow one-sided transfer (A -> B) of 1.5 vSTs (VCS) across ledger entries`, async () => {
     //     await stm.mintSecTokenBatch(CONST.tokenType.VCS, CONST.tonCarbon, 2,      accounts[global.TaddrNdx + 0], CONST.nullFees, [], [], { from: accounts[0] });
     //     await stm.fund        (CONST.ccyType.USD, CONST.thousandCcy_cents, accounts[global.TaddrNdx + 1],         { from: accounts[0] });
-    //     const data = await helper.transferLedger({ stm, accounts, 
+    //     const data = await transferHelper.transferLedger({ stm, accounts, 
     //             ledger_A: accounts[global.TaddrNdx + 0],     ledger_B: accounts[global.TaddrNdx + 1],
     //                 qty_A: 750,                              tokenTypeId_A: CONST.tokenType.VCS,
     //                 qty_B: 0,                                tokenTypeId_B: 0,
     //         ccy_amount_A: 0,                                ccyTypeId_A: 0,
     //         ccy_amount_B: 0,                                ccyTypeId_B: 0,
     //     });
-    //     helper.assert_nFull_1Partial({
+    //     transferHelper.assert_nFull_1Partial({
     //                    fullEvents: data.eeuFullEvents,
     //                 partialEvents: data.eeuPartialEvents,
     //   expectFullTransfer_eeuCount: 1,
@@ -135,14 +135,14 @@ contract("StMaster", accounts => {
     // it(`transferring tok - should allow one-sided transfer (B -> A) of 1.5 vSTs (UNFCCC) across ledger entries`, async () => {
     //     await stm.fund        (CONST.ccyType.USD,    CONST.thousandCcy_cents, accounts[global.TaddrNdx + 0],         { from: accounts[0] });
     //     await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.tonCarbon, 2,      accounts[global.TaddrNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
-    //     const data = await helper.transferLedger({ stm, accounts, 
+    //     const data = await transferHelper.transferLedger({ stm, accounts, 
     //             ledger_A: accounts[global.TaddrNdx + 0],     ledger_B: accounts[global.TaddrNdx + 1],
     //                 qty_A: 0,                                tokenTypeId_A: 0,
     //                 qty_B: 750,                              tokenTypeId_B: CONST.tokenType.UNFCCC,
     //         ccy_amount_A: 0,                                ccyTypeId_A: 0,
     //         ccy_amount_B: 0,                                ccyTypeId_B: 0,
     //     });
-    //     helper.assert_nFull_1Partial({
+    //     transferHelper.assert_nFull_1Partial({
     //                    fullEvents: data.eeuFullEvents,
     //                 partialEvents: data.eeuPartialEvents,
     //   expectFullTransfer_eeuCount: 1,
@@ -156,14 +156,14 @@ contract("StMaster", accounts => {
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.TaddrNdx + 0], CONST.nullFees, [], [], { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.tonCarbon, 1,      accounts[global.TaddrNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
         
-        const data = await helper.transferLedger({ stm, accounts, 
+        const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: accounts[global.TaddrNdx + 0],         ledger_B: accounts[global.TaddrNdx + 1],
                    qty_A: 500,                              tokenTypeId_A: CONST.tokenType.VCS,
                    qty_B: 0,                                tokenTypeId_B: 0,
             ccy_amount_A: 0,                                  ccyTypeId_A: 0,
             ccy_amount_B: 0,                                  ccyTypeId_B: 0,
         });
-        helper.assert_nFull_1Partial({
+        transferHelper.assert_nFull_1Partial({
                        fullEvents: data.eeuFullEvents,
                     partialEvents: data.eeuPartialEvents,
       expectFullTransfer_eeuCount: 0,
@@ -178,14 +178,14 @@ contract("StMaster", accounts => {
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.TaddrNdx + 0], CONST.nullFees, [], [], { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.tonCarbon, 1,      accounts[global.TaddrNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
         
-        const data = await helper.transferLedger({ stm, accounts, 
+        const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: accounts[global.TaddrNdx + 0],         ledger_B: accounts[global.TaddrNdx + 1],
                    qty_A: 1500,                             tokenTypeId_A: CONST.tokenType.VCS,
                    qty_B: 0,                                tokenTypeId_B: 0,
             ccy_amount_A: 0,                                  ccyTypeId_A: 0,
             ccy_amount_B: 0,                                  ccyTypeId_B: 0,
         });
-        helper.assert_nFull_1Partial({
+        transferHelper.assert_nFull_1Partial({
                        fullEvents: data.eeuFullEvents,
                     partialEvents: data.eeuPartialEvents,
       expectFullTransfer_eeuCount: 1,
@@ -199,7 +199,7 @@ contract("StMaster", accounts => {
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.TaddrNdx + 0], CONST.nullFees, [], [], { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.TaddrNdx + 0], CONST.nullFees, [], [], { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.TaddrNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
-        const data = await helper.transferLedger({ stm, accounts, 
+        const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: accounts[global.TaddrNdx + 0],         ledger_B: accounts[global.TaddrNdx + 1],
                    qty_A: 1500,                             tokenTypeId_A: CONST.tokenType.VCS,
                    qty_B: 0,                                tokenTypeId_B: 0,
@@ -208,7 +208,7 @@ contract("StMaster", accounts => {
         });
         //console.log('data.eeuFullEvents', data.eeuFullEvents);
         //console.log('data.eeuPartialEvents', data.eeuPartialEvents);
-        helper.assert_nFull_1Partial({
+        transferHelper.assert_nFull_1Partial({
                        fullEvents: data.eeuFullEvents,
                     partialEvents: data.eeuPartialEvents,
       expectFullTransfer_eeuCount: 1,
@@ -222,7 +222,7 @@ contract("StMaster", accounts => {
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.TaddrNdx + 0], CONST.nullFees, [], [], { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.TaddrNdx + 0], CONST.nullFees, [], [], { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.TaddrNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
-        const data = await helper.transferLedger({ stm, accounts, 
+        const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: accounts[global.TaddrNdx + 0],         ledger_B: accounts[global.TaddrNdx + 1],
                    qty_A: 750,                              tokenTypeId_A: CONST.tokenType.VCS,
                    qty_B: 250,                              tokenTypeId_B: CONST.tokenType.VCS,
@@ -237,7 +237,7 @@ contract("StMaster", accounts => {
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.TaddrNdx + 0], CONST.nullFees, [], [], { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.tonCarbon, 1,      accounts[global.TaddrNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.tonCarbon, 1,      accounts[global.TaddrNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
-        const data = await helper.transferLedger({ stm, accounts, 
+        const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: accounts[global.TaddrNdx + 0],         ledger_B: accounts[global.TaddrNdx + 1],
                    qty_A: 750,                              tokenTypeId_A: CONST.tokenType.VCS,
                    qty_B: 250,                              tokenTypeId_B: CONST.tokenType.UNFCCC,
@@ -253,7 +253,7 @@ contract("StMaster", accounts => {
         await stm.fund(CONST.ccyType.SGD,                   0,                       accounts[global.TaddrNdx + 1],         { from: accounts[0] });
         
         // setup: transfer 0.5, from batch 1 
-        await helper.transferLedger({ stm, accounts, 
+        await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: accounts[global.TaddrNdx + 0],         ledger_B: accounts[global.TaddrNdx + 1],
                    qty_A: 500,                              tokenTypeId_A: CONST.tokenType.VCS,
                    qty_B: 0,                                tokenTypeId_B: 0,
@@ -262,7 +262,7 @@ contract("StMaster", accounts => {
         });
 
         // transfer 0.25, also from batch 1 -- expect merge on existing destination eeu of same batch
-        const data = await helper.transferLedger({ stm, accounts, 
+        const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: accounts[global.TaddrNdx + 0],         ledger_B: accounts[global.TaddrNdx + 1],
                    qty_A: 250,                              tokenTypeId_A: CONST.tokenType.VCS,
                    qty_B: 0,                                tokenTypeId_B: 0,
@@ -280,7 +280,7 @@ contract("StMaster", accounts => {
         await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC,    CONST.tonCarbon, 1,   accounts[global.TaddrNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
         
         // setup: transfer 0.1, split batch 1 to receiver
-        await helper.transferLedger({ stm, accounts, 
+        await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: accounts[global.TaddrNdx + 0],         ledger_B: accounts[global.TaddrNdx + 1],
                    qty_A: 100,                              tokenTypeId_A: CONST.tokenType.UNFCCC,
                    qty_B: 0,                                tokenTypeId_B: 0,
@@ -290,7 +290,7 @@ contract("StMaster", accounts => {
 
         // repeated transfers -- expect consistent merge of existing destination eeu of the same batch
         for (var i = 0; i < 3 ; i++) {
-            const data = await helper.transferLedger({ stm, accounts, 
+            const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: accounts[global.TaddrNdx + 0],    ledger_B: accounts[global.TaddrNdx + 1],
                    qty_A: 1,                           tokenTypeId_A: CONST.tokenType.UNFCCC,
                    qty_B: 0,                           tokenTypeId_B: 0,
@@ -310,7 +310,7 @@ contract("StMaster", accounts => {
         
         // setup A: transfer 0.1 from B, split batch 2 to A
         // setup B: transfer 0.1 from A, split batch 1 to B
-        await helper.transferLedger({ stm, accounts, 
+        await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: accounts[global.TaddrNdx + 0],         ledger_B: accounts[global.TaddrNdx + 1],
                    qty_A: 100,                              tokenTypeId_A: CONST.tokenType.UNFCCC,
                    qty_B: 100,                              tokenTypeId_B: CONST.tokenType.VCS,
@@ -320,7 +320,7 @@ contract("StMaster", accounts => {
 
         // repeated transfers -- expect consistent merge of existing destination eeu of the same batch
         for (var i = 0; i < 3 ; i++) {
-            const data = await helper.transferLedger({ stm, accounts, 
+            const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: accounts[global.TaddrNdx + 0],         ledger_B: accounts[global.TaddrNdx + 1],
                    qty_A: 1,                                tokenTypeId_A: CONST.tokenType.UNFCCC,
                    qty_B: 1,                                tokenTypeId_B: CONST.tokenType.VCS,
@@ -339,7 +339,7 @@ contract("StMaster", accounts => {
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.TaddrNdx + 0], CONST.nullFees, [], [], { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.tonCarbon, 1,      accounts[global.TaddrNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
         try {
-            await helper.transferWrapper(stm, accounts,
+            await transferHelper.transferWrapper(stm, accounts,
                 accounts[global.TaddrNdx + 0], accounts[global.TaddrNdx + 1],
                 -1,                          // qty_A
                 CONST.tokenType.VCS,         // tokenTypeId_A
@@ -359,7 +359,7 @@ contract("StMaster", accounts => {
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.TaddrNdx + 0], CONST.nullFees, [], [], { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.tonCarbon, 1,      accounts[global.TaddrNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
         try {
-            await helper.transferWrapper(stm, accounts,
+            await transferHelper.transferWrapper(stm, accounts,
                 accounts[global.TaddrNdx + 0], accounts[global.TaddrNdx + 1],
                 0,                           // qty_A
                 0,                           // tokenTypeId_A
@@ -379,7 +379,7 @@ contract("StMaster", accounts => {
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.TaddrNdx + 0], CONST.nullFees, [], [], { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.mtCarbon,  1,      accounts[global.TaddrNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
         try {
-            await helper.transferWrapper(stm, accounts,
+            await transferHelper.transferWrapper(stm, accounts,
                 accounts[global.TaddrNdx + 0], accounts[global.TaddrNdx + 1],
                 CONST.tonCarbon + 1,         // qty_A
                 CONST.tokenType.VCS,         // tokenTypeId_A
@@ -399,7 +399,7 @@ contract("StMaster", accounts => {
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.TaddrNdx + 0], CONST.nullFees, [], [], { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.mtCarbon,  1,      accounts[global.TaddrNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
         try {
-            await helper.transferWrapper(stm, accounts,
+            await transferHelper.transferWrapper(stm, accounts,
                 accounts[global.TaddrNdx + 0], accounts[global.TaddrNdx + 1],
                 CONST.tonCarbon,             // qty_A
                 CONST.tokenType.UNFCCC,      // tokenTypeId_A
@@ -419,7 +419,7 @@ contract("StMaster", accounts => {
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.TaddrNdx + 0], CONST.nullFees, [], [], { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.TaddrNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
         try {
-            await helper.transferWrapper(stm, accounts,
+            await transferHelper.transferWrapper(stm, accounts,
                 accounts[global.TaddrNdx + 0], accounts[global.TaddrNdx + 1],
                 0,                           // qty_A
                 0,                           // tokenTypeId_A
@@ -439,7 +439,7 @@ contract("StMaster", accounts => {
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.TaddrNdx + 0], CONST.nullFees, [], [], { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.TaddrNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
         try {
-            await helper.transferWrapper(stm, accounts,
+            await transferHelper.transferWrapper(stm, accounts,
                 accounts[global.TaddrNdx + 0], accounts[global.TaddrNdx + 1],
                 0,                           // qty_A
                 0,                           // tokenTypeId_A

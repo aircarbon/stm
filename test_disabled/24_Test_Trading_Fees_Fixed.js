@@ -1,7 +1,7 @@
 const st = artifacts.require('StMaster');
 const truffleAssert = require('truffle-assertions');
 const CONST = require('../const.js');
-const helper = require('../test/transferHelper.js');
+const transferHelper = require('../test/transferHelper.js');
 const BN = require('bn.js');
 
 contract("StMaster", accounts => {
@@ -39,7 +39,7 @@ contract("StMaster", accounts => {
 
         // transfer, with fee structure applied
         const carbonKgTransferAmount = 750;
-        const data = await helper.transferLedger({ stm, accounts, 
+        const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: accounts[global.TaddrNdx + 0],     ledger_B: accounts[global.TaddrNdx + 1],
                    qty_A: carbonKgTransferAmount,         tokenTypeId_A: CONST.tokenType.VCS,
                    qty_B: 0,                              tokenTypeId_B: 0,
@@ -74,7 +74,7 @@ contract("StMaster", accounts => {
         assert((await stm.getFee(CONST.getFeeType.TOK, CONST.tokenType.VCS, CONST.nullAddr)).fee_fixed == 0, 'unexpected VCS fixed KG fee after setting UNFCCC fee structure');
 
         // transfer, with fee structure applied
-        const data = await helper.transferLedger({ stm, accounts, 
+        const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: accounts[global.TaddrNdx + 0],     ledger_B: accounts[global.TaddrNdx + 1],
                    qty_A: 0,                              tokenTypeId_A: 0,
                    qty_B: 750,                            tokenTypeId_B: CONST.tokenType.UNFCCC,
@@ -111,7 +111,7 @@ contract("StMaster", accounts => {
         assert((await stm.getFee(CONST.getFeeType.TOK, newSecTokenTypeId, CONST.nullAddr)).fee_fixed == newSecTokenTypeFixedFee, 'unexpected new ST type fixed KG fee after setting fee structure');
 
         // transfer, with fee structure applied
-        const data = await helper.transferLedger({ stm, accounts, 
+        const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: accounts[global.TaddrNdx + 0],     ledger_B: accounts[global.TaddrNdx + 1],
                    qty_A: 1,                              tokenTypeId_A: newSecTokenTypeId,
                    qty_B: 0,                              tokenTypeId_B: 0,
@@ -141,7 +141,7 @@ contract("StMaster", accounts => {
         assert((await stm.getFee(CONST.getFeeType.CCY, CONST.ccyType.SGD, CONST.nullAddr)).fee_fixed == 0, 'unexpected USD fixed cents fee after setting ETH fee structure');
 
         // transfer, with fee structure applied
-        const data = await helper.transferLedger({ stm, accounts, 
+        const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: accounts[global.TaddrNdx + 0],                          ledger_B: accounts[global.TaddrNdx + 1],
                    qty_A: 0,                                                   tokenTypeId_A: 0,
                    qty_B: 750,                                                 tokenTypeId_B: CONST.tokenType.VCS,
@@ -168,7 +168,7 @@ contract("StMaster", accounts => {
         assert((await stm.getFee(CONST.getFeeType.CCY, CONST.ccyType.SGD, CONST.nullAddr)).fee_fixed == usdFeeFixed_cents, 'unexpected USD fixed cents fee after setting USD fee structure');
 
         // transfer, with fee structure applied
-        const data = await helper.transferLedger({ stm, accounts, 
+        const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: accounts[global.TaddrNdx + 0],                                    ledger_B: accounts[global.TaddrNdx + 1],
                    qty_A: 750,                                                           tokenTypeId_A: CONST.tokenType.VCS,
                    qty_B: 0,                                                             tokenTypeId_B: 0,
@@ -198,7 +198,7 @@ contract("StMaster", accounts => {
         assert((await stm.getFee(CONST.getFeeType.CCY, newCcyTypeId, CONST.nullAddr)).fee_fixed == newCcyFeeFixed_units, 'unexpected new currency fixed fee after setting fee structure');
 
         // transfer, with fee structure applied
-        const data = await helper.transferLedger({ stm, accounts, 
+        const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: accounts[global.TaddrNdx + 0],                     ledger_B: accounts[global.TaddrNdx + 1],
                    qty_A: 750,                                            tokenTypeId_A: CONST.tokenType.VCS,
                    qty_B: 0,                                              tokenTypeId_B: 0,
@@ -234,7 +234,7 @@ contract("StMaster", accounts => {
         assert((await stm.getFee(CONST.getFeeType.TOK, CONST.tokenType.VCS, CONST.nullAddr)).fee_fixed == vcsKgFeeFixed, 'unexpected VCS fixed KG fee after setting VCS fee structure');
 
         // transfer, with fee structure applied
-        const data = await helper.transferLedger({ stm, accounts, 
+        const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: accounts[global.TaddrNdx + 0],                            ledger_B: accounts[global.TaddrNdx + 1],
                    qty_A: 0,                                                     tokenTypeId_A: 0,
                    qty_B: new BN(CONST.tonCarbon).sub(new BN(vcsKgFeeFixed)),    tokenTypeId_B: CONST.tokenType.VCS,
@@ -273,7 +273,7 @@ contract("StMaster", accounts => {
         assert((await stm.getFee(CONST.getFeeType.TOK, CONST.tokenType.UNFCCC, CONST.nullAddr)).fee_fixed == unfcccKgFeeFixed, 'unexpected UNFCCC fixed KG fee after setting UNFCCC fee structure');
 
         // transfer, with fee structure applied
-        const data = await helper.transferLedger({ stm, accounts, 
+        const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: accounts[global.TaddrNdx + 0],                                    ledger_B: accounts[global.TaddrNdx + 1],
                    qty_A: 0,                                                             tokenTypeId_A: 0,
                    qty_B: new BN(CONST.tonCarbon).sub(new BN(unfcccKgFeeFixed)),         tokenTypeId_B: CONST.tokenType.UNFCCC,
@@ -319,7 +319,7 @@ contract("StMaster", accounts => {
         assert((await stm.getFee(CONST.getFeeType.TOK, newSecTokenTypeId, CONST.nullAddr)).fee_fixed == newSecTokenTypeKgFeeFixed, 'unexpected new eeu type fixed KG fee after setting eeu fee structure');
 
         // transfer, with fee structure applied
-        const data = await helper.transferLedger({ stm, accounts, 
+        const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: accounts[global.TaddrNdx + 0],                                         ledger_B: accounts[global.TaddrNdx + 1],
                    qty_A: 0,                                                                  tokenTypeId_A: 0,
                    qty_B: new BN(CONST.tonCarbon).sub(new BN(newSecTokenTypeKgFeeFixed)),     tokenTypeId_B: newSecTokenTypeId,
@@ -359,7 +359,7 @@ contract("StMaster", accounts => {
         assert((await stm.getFee(CONST.getFeeType.TOK, CONST.tokenType.UNFCCC, CONST.nullAddr)).fee_fixed == unfcccKgFeeFixed, 'unexpected UNFCCC fixed KG fee after setting UNFCCC fee structure');
 
         // transfer, with fee structure applied
-        const data = await helper.transferLedger({ stm, accounts, 
+        const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: accounts[global.TaddrNdx + 0],                                    ledger_B: accounts[global.TaddrNdx + 1],
                    qty_A: 0,                                                             tokenTypeId_A: 0,
                    qty_B: new BN(CONST.tonCarbon).sub(new BN(unfcccKgFeeFixed)),         tokenTypeId_B: CONST.tokenType.UNFCCC,
@@ -388,7 +388,7 @@ contract("StMaster", accounts => {
         assert((await stm.getFee(CONST.getFeeType.TOK, CONST.tokenType.UNFCCC, CONST.nullAddr)).fee_fixed == unfcccKgFeeFixed, 'unexpected UNFCCC fixed KG fee after setting UNFCCC fee structure');
 
         // transfer, with fee structure applied
-        const data = await helper.transferLedger({ stm, accounts, 
+        const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: accounts[global.TaddrNdx + 0],                                    ledger_B: accounts[global.TaddrNdx + 1],
                    qty_A: 0,                                                             tokenTypeId_A: 0,
                    qty_B: new BN(CONST.tonCarbon).sub(new BN(unfcccKgFeeFixed)),         tokenTypeId_B: CONST.tokenType.UNFCCC,
@@ -419,7 +419,7 @@ contract("StMaster", accounts => {
         assert((await stm.getFee(CONST.getFeeType.TOK, CONST.tokenType.UNFCCC, CONST.nullAddr)).fee_fixed == unfcccKgFeeFixed, 'unexpected UNFCCC fixed KG fee after setting UNFCCC fee structure');
 
         // transfer, with fee structure applied
-        const data = await helper.transferLedger({ stm, accounts, 
+        const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: accounts[global.TaddrNdx + 0],                                    ledger_B: accounts[global.TaddrNdx + 1],
                    qty_A: 0,                                                             tokenTypeId_A: 0,
                    qty_B: new BN(CONST.tonCarbon).sub(new BN(unfcccKgFeeFixed)),         tokenTypeId_B: CONST.tokenType.UNFCCC,
@@ -450,7 +450,7 @@ contract("StMaster", accounts => {
         assert((await stm.getFee(CONST.getFeeType.TOK, CONST.tokenType.UNFCCC, CONST.nullAddr)).fee_fixed == unfcccKgFeeFixed, 'unexpected UNFCCC fixed KG fee after setting UNFCCC fee structure');
 
         // transfer, with fee structure applied
-        const data = await helper.transferLedger({ stm, accounts, 
+        const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: accounts[global.TaddrNdx + 0],                                    ledger_B: accounts[global.TaddrNdx + 1],
                    qty_A: 0,                                                             tokenTypeId_A: 0,
                    qty_B: new BN(CONST.tonCarbon).sub(new BN(unfcccKgFeeFixed)),         tokenTypeId_B: CONST.tokenType.UNFCCC,
@@ -490,7 +490,7 @@ contract("StMaster", accounts => {
         await stm.setFee_TokType(CONST.tokenType.UNFCCC, CONST.nullAddr, CONST.nullFees );
 
         try {
-            await helper.transferLedger({ stm, accounts, 
+            await transferHelper.transferLedger({ stm, accounts, 
                     ledger_A: accounts[global.TaddrNdx + 0],                                    ledger_B: accounts[global.TaddrNdx + 1],
                        qty_A: 0,                                                             tokenTypeId_A: 0,
                        qty_B: new BN(CONST.tonCarbon),                                       tokenTypeId_B: CONST.tokenType.UNFCCC,
@@ -514,7 +514,7 @@ contract("StMaster", accounts => {
         await stm.setFee_TokType(CONST.tokenType.UNFCCC, CONST.nullAddr, { fee_fixed: 1, fee_percBips: 0, fee_min: 0, fee_max: 0 } );
 
         try {
-            await helper.transferLedger({ stm, accounts, 
+            await transferHelper.transferLedger({ stm, accounts, 
                     ledger_A: accounts[global.TaddrNdx + 0],                                    ledger_B: accounts[global.TaddrNdx + 1],
                        qty_A: 0,                                                             tokenTypeId_A: 0,
                        qty_B: new BN(CONST.tonCarbon),                                       tokenTypeId_B: CONST.tokenType.UNFCCC,

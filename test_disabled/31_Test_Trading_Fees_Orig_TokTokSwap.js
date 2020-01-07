@@ -1,7 +1,7 @@
 const st = artifacts.require('StMaster');
 const truffleAssert = require('truffle-assertions');
 const CONST = require('../const.js');
-const helper = require('../test/transferHelper.js');
+const transferHelper = require('../test/transferHelper.js');
 const BN = require('bn.js');
 const Big = require('big.js');
 const Web3 = require('web3');
@@ -60,7 +60,7 @@ contract("StMaster", accounts => {
 
         for (var i = 0 ; i < M_multi_A.length ; i++) M_multi_A[i].ledgerBefore = await stm.getLedgerEntry(M_multi_A[i].account);
         for (var i = 0 ; i < M_multi_B.length ; i++) M_multi_B[i].ledgerBefore = await stm.getLedgerEntry(M_multi_B[i].account);
-        const data = await helper.transferLedger({ stm, accounts, 
+        const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: A,                                   ledger_B: B,
                    qty_A: qty_A,                          tokenTypeId_A: tokType_A,
                    qty_B: qty_B,                          tokenTypeId_B: tokType_B,
@@ -152,7 +152,7 @@ contract("StMaster", accounts => {
             await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        transferTo,    { from: accounts[0] });
             await stm.setFee_TokType(tokenType,                 CONST.nullAddr,          CONST.nullFees); // no exchange fees
             await stm.setFee_CcyType(CONST.ccyType.ETH,         CONST.nullAddr,          CONST.nullFees);
-            const data_MA = await helper.transferLedger({ stm, accounts, 
+            const data_MA = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: M,                                   ledger_B: transferTo,
                    qty_A: new BN(M_qty.toString()),       tokenTypeId_A: tokenType,
                    qty_B: 0,                              tokenTypeId_B: 0,
