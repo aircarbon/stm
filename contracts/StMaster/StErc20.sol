@@ -1,4 +1,4 @@
-pragma solidity 0.5.13;
+pragma solidity ^0.5.13;
 pragma experimental ABIEncoderV2;
 
 import "../Interfaces/IErc20.sol";

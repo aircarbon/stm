@@ -20,6 +20,8 @@ contract("StMaster", accounts => {
             await stm_cur.unit(),
             await stm_cur.symbol(),
             await stm_cur.decimals(),
+            await stm_cur.chainlinkAggregator_btcUsd(),
+            await stm_cur.chainlinkAggregator_ethUsd()
         );
         console.log(`stm_new: @${stm_new.address} ledgerHash=${await stm_new.getLedgerHashcode()} / ${await stm_new.name()} ${await stm_new.version()}`);
     });

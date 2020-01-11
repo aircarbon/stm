@@ -1,4 +1,4 @@
-pragma solidity 0.5.13;
+pragma solidity ^0.5.13;
 pragma experimental ABIEncoderV2;
 
 import "./CcyFundable.sol";
@@ -11,6 +11,8 @@ import "./StDataLoadable.sol";
 import "./StPayable.sol";
 
 import "../Libs/StructLib.sol";
+
+import "../Interfaces/IAggregatorInterface.sol";
 
 contract StMaster is StMintable, StBurnable, CcyFundable, CcyWithdrawable, StTransferable, StDataLoadable {
 
@@ -70,27 +72,40 @@ contract StMaster is StMintable, StBurnable, CcyFundable, CcyWithdrawable, StTra
 
     function getContractType() public view returns(StructLib.ContractType) { return ledgerData.contractType; }
 
+    address public chainlinkAggregator_btcUsd;
+    address public chainlinkAggregator_ethUsd;
+    function get_btcUsd() public view returns(int256) {
+        if (chainlinkAggregator_btcUsd == address(0x0)) return 42;
+        AggregatorInterface ref = AggregatorInterface(chainlinkAggregator_btcUsd);
+        return ref.latestAnswer();
+    }
+
     constructor(
-        StructLib.ContractType contractType,
-        StructLib.CashflowArgs memory cashflowArgs,
-        string memory contractName,
-        string memory contractVer,
-        string memory contractUnit,
-        string memory contractSymbol,
-        uint8 contractDecimals
-    ) StErc20(contractSymbol, contractDecimals)
+        StructLib.ContractType _contractType,
+        StructLib.CashflowArgs memory _cashflowArgs,
+        string memory _contractName,
+        string memory _contractVer,
+        string memory _contractUnit,
+        string memory _contractSymbol,
+        uint8 _contractDecimals,
+        address _chainlinkAggregator_btcUsd,
+        address _chainlinkAggregator_ethUsd
+    ) StErc20(_contractSymbol, _contractDecimals)
     public {
+        chainlinkAggregator_btcUsd = _chainlinkAggregator_btcUsd;
+        chainlinkAggregator_ethUsd = _chainlinkAggregator_ethUsd;
+
         // set common properties
-        name = contractName;
-        version = contractVer;
-        unit = contractUnit;
+        name = _contractName;
+        version = _contractVer;
+        unit = _contractUnit;
 
         // contract type
-        ledgerData.contractType = contractType;
-        cashflowData.args = cashflowArgs;
+        ledgerData.contractType = _contractType;
+        cashflowData.args = _cashflowArgs;
 
         // set token & ccy types
-        if (contractType == StructLib.ContractType.COMMODITY) {
+        if (_contractType == StructLib.ContractType.COMMODITY) {
             stTypesData._tokenTypeNames[1] = 'CER - UNFCCC - Certified Emission Reduction';
             stTypesData._tokenTypeNames[2] = 'VCS - VERRA - Verified Carbon Standard';
             stTypesData._count_tokenTypes = 2;
@@ -103,7 +118,7 @@ contract StMaster is StMintable, StBurnable, CcyFundable, CcyWithdrawable, StTra
             ccyTypesData._ccyTypes[7] = StructLib.Ccy({ id: 7, name: 'GBP', unit: 'pence',      decimals: 2 });
             ccyTypesData._count_ccyTypes = 7;
         }
-        else if (contractType == StructLib.ContractType.CASHFLOW) {
+        else if (_contractType == StructLib.ContractType.CASHFLOW) {
             stTypesData._tokenTypeNames[1] = 'UNI_TOKEN'; //contractName;
             stTypesData._count_tokenTypes = 1;
             ccyTypesData._ccyTypes[1] = StructLib.Ccy({ id: 1, name: 'ETH', unit: 'Wei',        decimals: 18 });

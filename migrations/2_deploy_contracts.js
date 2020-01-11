@@ -73,6 +73,13 @@ module.exports = async function (deployer) {
         
         //console.log('cashflowArgs', CONST.contractProps[type].cashflowArgs);
         
+        // mainnet
+        //const chainlinkAggregator_btcUsd = '0xF5fff180082d6017036B771bA883025c654BC935';
+        //const chainlinkAggregator_ethUsd = '0x79fEbF6B9F76853EDBcBc913e6aAE8232cFB9De9';
+        // ropsten
+        //const chainlinkAggregator_btcUsd = '0x882906a758207FeA9F21e0bb7d2f24E561bd0981';
+        //const chainlinkAggregator_ethUsd = '0x8468b2bDCE073A157E560AA4D9CcF6dB1DB98507';
+
         return deployer.deploy(StMaster, 
             type == "CASHFLOW" ? CONST.contractType.CASHFLOW : CONST.contractType.COMMODITY,
             CONST.contractProps[type].cashflowArgs,
@@ -80,7 +87,9 @@ module.exports = async function (deployer) {
             CONST.contractProps[type].contractVer,
             CONST.contractProps[type].contractUnit, 
             CONST.contractProps[type].contractSymbol, 
-            CONST.contractProps[type].contractDecimals
+            CONST.contractProps[type].contractDecimals,
+            CONST.chainlinkAggregators[process.env.NETWORK_ID].btcUsd, //chainlinkAggregator_btcUsd,
+            CONST.chainlinkAggregators[process.env.NETWORK_ID].ethUsd //chainlinkAggregator_ethUsd
         ).then(async stm => {
             //console.dir(stm.abi);
             //console.dir(deployer);

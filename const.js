@@ -59,12 +59,33 @@ const contractProps = {
     },
 };
 
+
 module.exports = {
     contractProps: contractProps,
 
     //logTestAccountUsage: true,
 
     nullAddr: "0x0000000000000000000000000000000000000000",
+
+    // https://docs.chain.link/docs/using-chainlink-reference-contracts
+    chainlinkAggregators: {
+        "3": { // ropsten
+            btcUsd: '0x882906a758207FeA9F21e0bb7d2f24E561bd0981',
+            ethUsd: '0x8468b2bDCE073A157E560AA4D9CcF6dB1DB98507'
+        },
+        "888": { // dev
+            btcUsd: '0x0000000000000000000000000000000000000000',
+            ethUsd: '0x0000000000000000000000000000000000000000'
+        },
+        "889": { // dev
+            btcUsd: '0x0000000000000000000000000000000000000000',
+            ethUsd: '0x0000000000000000000000000000000000000000'
+        },
+        "890": { // dev
+            btcUsd: '0x0000000000000000000000000000000000000000',
+            ethUsd: '0x0000000000000000000000000000000000000000'
+        },
+    },
 
     getTestContextWeb3: () => getTestContextWeb3(),
     getAccountAndKey: async (accountNdx) => getAccountAndKey(accountNdx),
