@@ -1,8 +1,5 @@
 const st = artifacts.require('StMaster');
 const truffleAssert = require('truffle-assertions');
-const bip39 = require('bip39');
-const hdkey = require('ethereumjs-wallet/hdkey');
-const wallet = require('ethereumjs-wallet');
 const CONST = require('../const.js');
 const transferHelper = require('../test/transferHelper.js');
 

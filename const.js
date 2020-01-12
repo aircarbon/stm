@@ -88,7 +88,7 @@ module.exports = {
     },
 
     getTestContextWeb3: () => getTestContextWeb3(),
-    getAccountAndKey: async (accountNdx) => getAccountAndKey(accountNdx),
+    getAccountAndKey: async (accountNdx, mnemonic) => getAccountAndKey(accountNdx, mnemonic),
     
     web3_sendEthTestAddr: (sendFromNdx, sendToAddr, ethValue) => web3_sendEthTestAddr(sendFromNdx, sendToAddr, ethValue),
     web3_call: (methodName, methodArgs) => web3_call(methodName, methodArgs),
@@ -202,8 +202,8 @@ function getTestContextWeb3() {
     return context;
 }
 
-async function getAccountAndKey(accountNdx) {
-    const MNEMONIC = require('./dev_mnemonic.js').MNEMONIC;
+async function getAccountAndKey(accountNdx, mnemonic) {
+    const MNEMONIC = mnemonic || require('./dev_mnemonic.js').MNEMONIC;
     //console.log('MNEMONIC: ', MNEMONIC);
     const seed = await bip39.mnemonicToSeed(MNEMONIC);
     const hdk = hdkey.fromMasterSeed(seed);

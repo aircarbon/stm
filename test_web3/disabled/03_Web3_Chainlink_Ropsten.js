@@ -19,7 +19,14 @@ describe(`Contract Web3 Interface`, async () => {
     before(async function () {
     });
 
-    it(`web3 direct - chainlink -  should be able to get refernce data contract values`, async () => {
+    //
+    // TODO: change issuance to price in fiat, and use ref data eth/fiat values
+    //        (issuance tests then change, finish issuance tests for eq-type [basic] re. updating price mid issuance)
+    //
+    // TODO: WalletDetailSend in SCP re. SCP upgrades for auto-convert on receipt (esp. server mode)
+    //
+
+    it(`web3 direct - chainlink - should be able to get reference data contract values`, async () => {
         console.log('addr_btcUsd', await CONST.web3_call('chainlinkAggregator_btcUsd', []));
         console.log('get_btcUsd', await CONST.web3_call('get_btcUsd', []));
     });

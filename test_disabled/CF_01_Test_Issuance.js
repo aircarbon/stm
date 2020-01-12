@@ -21,8 +21,6 @@ contract("StMaster", accounts => {
     const ISSUANCE_QTY = 1000000;
     var cashflowData;
 
-    // sol: wrap mint + setArgs new qtyForSale (issue())
-
     before(async function () {
         stm = await st.deployed();
         if (await stm.getContractType() != CONST.contractType.CASHFLOW) this.skip();
