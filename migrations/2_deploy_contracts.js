@@ -16,15 +16,19 @@ const StMaster = artifacts.require('./StMaster.sol');
 const CONST = require('../const.js');
 const { db } = require('../../common/dist');
 
+function logEnv() {
+    console.log('\tprocess.env.CONTRACT_TYPE: ', process.env.CONTRACT_TYPE);
+    console.log('\t      process.env.NETWORK: ', process.env.NETWORK);
+    console.log('\t   process.env.NETWORK_ID: ', process.env.NETWORK_ID);
+}
+
 module.exports = async function (deployer) {
     process.env.NETWORK = deployer.network;
     process.env.NETWORK_ID = deployer.network_id;
     process.env.WEB3_NETWORK_ID = deployer.network_id;
 
     console.log('== SecTokMaster == DEPLOY...');
-    console.log('\tprocess.env.CONTRACT_TYPE: ', process.env.CONTRACT_TYPE);
-    console.log('\t      process.env.NETWORK: ', process.env.NETWORK);
-    console.log('\t   process.env.NETWORK_ID: ', process.env.NETWORK_ID);
+    logEnv();
     var type;
     switch (process.env.CONTRACT_TYPE) {
         case 'CASHFLOW':

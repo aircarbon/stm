@@ -183,21 +183,21 @@ EXCHANGE_FEE: 1,
     }
 };
 
-function getTestContextWeb3() {
+function getTestContextWeb3() { 
     const context = 
-              // DM
-              process.env.WEB3_NETWORK_ID == 888 ? { web3: new Web3('http://127.0.0.1:8545'),    ethereumTxChain: {} }
+            // DM
+            process.env.WEB3_NETWORK_ID == 888 ? { web3: new Web3('http://127.0.0.1:8545'),  ethereumTxChain: {} }
 
-              // Vince
-            : process.env.WEB3_NETWORK_ID == 890 ? { web3: new Web3('http://127.0.0.1:8545'),    ethereumTxChain: {} }
+            // Vince
+        : process.env.WEB3_NETWORK_ID == 890 ? { web3: new Web3('http://127.0.0.1:8545'),    ethereumTxChain: {} }
 
-              // Dung
-            : process.env.WEB3_NETWORK_ID == 889 ? { web3: new Web3('http://127.0.0.1:8545'),    ethereumTxChain: {} }
+            // Dung
+        : process.env.WEB3_NETWORK_ID == 889 ? { web3: new Web3('http://127.0.0.1:8545'),    ethereumTxChain: {} }
 
-              // Ropsten
-            : process.env.WEB3_NETWORK_ID == 3 ?  { web3: new Web3('https://ac-dev0.net:9545'),  ethereumTxChain: { chain: 'ropsten', hardfork: 'petersburg' } }
+            // Ropsten
+        : process.env.WEB3_NETWORK_ID == 3 ?   { web3: new Web3('https://ac-dev0.net:9545'), ethereumTxChain: { chain: 'ropsten', hardfork: 'petersburg' } }
 
-            : undefined;
+        : undefined;
     if (!context) throw('WEB3_NETWORK_ID is not set!');
     return context;
 }

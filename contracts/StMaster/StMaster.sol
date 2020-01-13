@@ -54,14 +54,16 @@ contract StMaster is StMintable, StBurnable, CcyFundable, CcyWithdrawable, StTra
     // PayableLib events
     event IssuanceSubscribed(address indexed subscriber, address indexed issuer, uint256 weiSent, uint256 weiChange, uint256 tokensSubscribed);
 
+    
+    // CLEANUP: reduce # of libs for less deployment pain
+    // TEST: web3 tests for bulk/test data (explorer)
+
     //
     // -- J 1+3 --
-    // PRI 0 ** CASHFLOWS re. SD ** >>> MVP
-    //      CFT CORE -- aim for *no whitelisting*, i.e. all external control ERC20 accounts...
+    // PRI 0 ** CASHFLOWS ==>>> MVP -- CFT CORE (aiming for *no whitelisting*, i.e. all external control ERC20 accounts)
     //
-    //      TODO: test issuerPayments...
-    //
-    //      TODO: edit issuancePrice... + (new) quantityForSale...
+    //      TODO: FIAT issuancePrice... + (eq-type) changing issuancePrice mid-issuance
+    //      TODO: issuerPayments v0 basic (no validations, i.e. eq-path only?)
     //
     // others...
     // TODO: update solc (max v == 0.6.1 ?)
