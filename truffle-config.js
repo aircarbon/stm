@@ -26,7 +26,7 @@ const HDWalletProvider = require("@truffle/hdwallet-provider");
 // wallet seed (only needed for public testnets: ropsten & rinkeby - manage wallet with MetaMask)
 const MNEMONIC = 'educate school blast ability display bleak club soon curve car oil ostrich';
 
-const gweiDeployment = "25";
+const gweiDeployment = "10";
 
 module.exports = {
   /**

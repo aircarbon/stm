@@ -31,8 +31,8 @@ describe(`Contract Web3 Interface`, async () => {
 
     //
     // can run these to test web3 more quickly, e.g.
-    //         Dev: ("export WEB3_NETWORK_ID=888 && export CONTRACT_TYPE=COMMODITY && mocha test_web3 --timeout 120000 --exit")
-    //  Ropsten AC: ("export WEB3_NETWORK_ID=3 && export CONTRACT_TYPE=COMMODITY && mocha test_web3 --timeout 120000 --exit")
+    //         Dev: ("export WEB3_NETWORK_ID=888 && export CONTRACT_TYPE=COMMODITY && mocha test_web3 --timeout 10000000 --exit")
+    //  Ropsten AC: ("export WEB3_NETWORK_ID=3 && export CONTRACT_TYPE=COMMODITY && mocha test_web3 --timeout 10000000 --exit")
     //
 
     before(async function () {
@@ -68,7 +68,7 @@ describe(`Contract Web3 Interface`, async () => {
                 CONST.tokenType.VCS,    100000, 1,      WHITE, CONST.nullFees, [], [],
             ], OWNER, OWNER_privKey);
 
-            // setup - transferOrTrade A -> GRAY_1
+            // setup - transferOrTrade A -> GRAY_1 (withdraw)
             const transferTradeTx = await CONST.web3_tx('transferOrTrade', [ {
                     ledger_A: WHITE,                               ledger_B: GRAY_1,
                        qty_A: 100000,                         tokenTypeId_A: CONST.tokenType.VCS,

@@ -6,11 +6,12 @@ const BN = require('bn.js');
 const { db } = require('../../common/dist');
 require('dotenv').config();
 const _ = require('lodash');
+const chalk = require('chalk');
 
 const CONST = require('../const.js');
 
-var OWNER, OWNER_privKey;
 const OWNER_NDX = 0;
+var OWNER, OWNER_privKey;
 
 // whitelisted minters
 const WHITE_MINTER_START_NDX = 1;
@@ -21,21 +22,11 @@ const WHITE_MINTERS = [];
 // whitelisted buyers
 const WHITE_BUYER_START_NDX = WHITE_MINTER_START_NDX + WHITE_MINTER_COUNT;
 const WHITE_BUYER_COUNT = 2;
-const BUYS_PER_WHITE_BUYER = 1;
+const BUYS_PER_WHITE_BUYER = 3;
 const WHITE_BUYERS = [];
 
-// const GRAY_1_NDX = 800;
-// const GRAY_2_NDX = 801;
-
-// var WHITE, WHITE_privKey;
-// var GRAY_1, GRAY_1_privKey;
-// var GRAY_2, GRAY_2_privKey;
-
-const SCOOP_TESTNETS_1 = "0x8443b1edf203f96d1a5ec98301cfebc4d3cf2b20";
-const SCOOP_TESTNETS_2 = "0xe4f1925fba6cbf65c81dc8d25163c899f14cd6c1";
-
-const AIRCARBON_DOM10_1 = "0x3bf2a66c7057bc3737b5e6a7c0bc39b41437ffb8";
-const AIRCARBON_DOM10_2 = "0x3b9a2f8c123efbd9919e0903c994efae15cf78ef";
+const GRAY_NDX = 800;
+var GRAY, GRAY_privKey;
 
 //
 // populates larger volumes of random/representative test data
@@ -45,8 +36,8 @@ describe(`Contract Web3 Interface`, async () => {
 
     //
     // can run these to test web3 more quickly, e.g.
-    //         Dev: ("export WEB3_NETWORK_ID=888 && export CONTRACT_TYPE=COMMODITY && mocha test_web3 --timeout 120000 --exit")
-    //  Ropsten AC: ("export WEB3_NETWORK_ID=3 && export CONTRACT_TYPE=COMMODITY && mocha test_web3 --timeout 120000 --exit")
+    //         Dev: ("export WEB3_NETWORK_ID=888 && export CONTRACT_TYPE=COMMODITY && mocha test_web3 --timeout 10000000 --exit")
+    //  Ropsten AC: ("export WEB3_NETWORK_ID=3 && export CONTRACT_TYPE=COMMODITY && mocha test_web3 --timeout 10000000 --exit")
     //
 
     before(async function () {
@@ -54,26 +45,34 @@ describe(`Contract Web3 Interface`, async () => {
         x = await CONST.getAccountAndKey(OWNER_NDX);
         OWNER = x.addr; OWNER_privKey = x.privKey;
 
+        x = await CONST.getAccountAndKey(GRAY_NDX);
+        GRAY = x.addr; GRAY_privKey = x.privKey;
+        const sendEthTx = await CONST.web3_sendEthTestAddr(0, GRAY, "0.01"); // setup - fund GRAY eth
+
+        const sealedStatus = await CONST.web3_call('getContractSeal', []);
+        //assert(sealedStatus == false, 'contract is already sealed');
+
         // setup whitelist: minters
         for (var whiteNdx = WHITE_MINTER_START_NDX; whiteNdx < WHITE_MINTER_START_NDX + WHITE_MINTER_COUNT; whiteNdx++) {
             x = await CONST.getAccountAndKey(whiteNdx);
+            //console.log(chalk.inverse(`SETUP MINTER: ${x.addr}`));
             WHITE_MINTERS.push({ndx: whiteNdx, addr: x.addr, privKey: x.privKey});
             try {
                 const whitelistTx = await CONST.web3_tx('whitelist', [ x.addr ], OWNER, OWNER_privKey);
-            } catch(ex) {} // swallow - ropsten doesn't include the revert msg
+            } catch(ex) { console.warn(ex); } // swallow - ropsten doesn't include the revert msg
         }
 
         // setup whitelist: buyers
         for (var whiteNdx = WHITE_BUYER_START_NDX; whiteNdx < WHITE_BUYER_START_NDX + WHITE_BUYER_COUNT; whiteNdx++) {
             x = await CONST.getAccountAndKey(whiteNdx);
+            //console.log(chalk.inverse(`SETUP BUYER: ${x.addr}`));
             WHITE_BUYERS.push({ndx: whiteNdx, addr: x.addr, privKey: x.privKey});
             try {
                 const whitelistTx = await CONST.web3_tx('whitelist', [ x.addr ], OWNER, OWNER_privKey);
-            } catch(ex) {}
+            } catch(ex) { console.warn(ex); }
         }
         
         // seal
-        const sealedStatus = await CONST.web3_call('getContractSeal', []);
         if (!sealedStatus) {
             const sealTx = await CONST.web3_tx('sealContract', [], OWNER, OWNER_privKey);
         }
@@ -87,18 +86,15 @@ describe(`Contract Web3 Interface`, async () => {
         if (!(await CONST.web3_call('getCcyTypes',[])).ccyTypes.some(p => p.name == 'NEW_CCY_TYPE_A')) {
             await CONST.web3_tx('addCcyType', [ 'NEW_CCY_TYPE_A', 'cents', 2 ], OWNER, OWNER_privKey);
         }
-
-        // setup - fund GRAY_1 eth
-        //const fundTx = await CONST.web3_sendEthTestAddr(0, GRAY_1, "0.05");
     });
 
     it(`web3 direct - multi - should be able to mint multiple batches for all whitelist minters`, async () => {
         const curTokTypes = (await CONST.web3_call('getSecTokenTypes', [])).tokenTypes;
 
         for (var whiteNdx = 0; whiteNdx < WHITE_MINTERS.length ; whiteNdx++) {
-            const W = WHITE_MINTERS[whiteNdx];
-
-            console.group(`MINTING FOR WHITELIST LEDGER ${W.addr}...`);
+            const WM = WHITE_MINTERS[whiteNdx];
+            
+            console.group(chalk.inverse(`MINTING FOR ${WM.addr}...`));
             for (var batchNdx = 0; batchNdx < BATCHES_PER_WHITE_MINTER ; batchNdx++) {
                 const batchFees = {
                     fee_fixed: batchNdx * 10,
@@ -107,7 +103,7 @@ describe(`Contract Web3 Interface`, async () => {
                     fee_max: batchNdx * 50,
                 };
                 const mintTx = await CONST.web3_tx('mintSecTokenBatch', [
-                    (batchNdx % curTokTypes.length) + 1, ((batchNdx+1) * 100000), 1, W.addr, batchFees, [], [],
+                    (batchNdx % curTokTypes.length) + 1, ((batchNdx+1) * 1000000), 1, WM.addr, batchFees, [], [],
                 ], OWNER, OWNER_privKey);
             }
             console.groupEnd();
@@ -116,13 +112,75 @@ describe(`Contract Web3 Interface`, async () => {
 
     it(`web3 direct - multi - should be able to fund (tokens & ccy), trade & withdraw (tokens & ccy) for all whitelist buyers`, async () => {
         const curTokTypes = (await CONST.web3_call('getSecTokenTypes', [])).tokenTypes;
-        // todo: fund white buyer (deposit ccy)
-        //       trade different ccy's white minters
-        //       withdraw some ccy
-        //       withdraw some tokens to erc20
-        //       deposit tokens back erc20
-        //
-        //...
+        const ccyTypes = (await CONST.web3_call('getCcyTypes', [])).ccyTypes;
+
+        for (var whiteNdx = WHITE_BUYER_START_NDX; whiteNdx < WHITE_BUYER_START_NDX + WHITE_BUYER_COUNT; whiteNdx++) {
+            const BUYER = WHITE_BUYERS[whiteNdx - WHITE_BUYER_START_NDX];
+
+            // fund white buyer (deposit ccy)
+            const ccyTypeIdFunded = (whiteNdx % ccyTypes.length) + 1;
+            const fundTx = await CONST.web3_tx('fund', [ccyTypeIdFunded, 1000000 * (whiteNdx+1), BUYER.addr], OWNER, OWNER_privKey);
+
+            // trade with minters
+            console.group(chalk.inverse(`BUYING FOR ${BUYER.addr}...`));
+            for (var buyNdx = 0; buyNdx < BUYS_PER_WHITE_BUYER; buyNdx++) {
+                const SELLER = WHITE_MINTERS[(whiteNdx+buyNdx) % WHITE_MINTERS.length];
+                const minterLedger = (await CONST.web3_call('getLedgerEntry', [SELLER.addr]));
+                const minterTokTypeId = minterLedger.tokens[0].tokenTypeId.toString();
+                //console.log(`WM ${WM.addr}:`);
+                //console.dir(minter.tokens_sumQty.toString());
+                //console.dir(minter.tokens.length);
+                //console.dir(minter.tokens[0].tokenTypeId.toString());
+                //console.dir(minter.tokens[0].currentQty.toString());
+
+                const exchangeCcyFee = { fee_fixed: buyNdx * 11, fee_percBips: buyNdx * 6, fee_min: buyNdx * 11, fee_max: buyNdx * 51, };
+                const ledgerCcyFee =   { fee_fixed: buyNdx * 12, fee_percBips: buyNdx * 7, fee_min: buyNdx * 12, fee_max: buyNdx * 52, };
+                const setExchangeCcyFeeTx = await CONST.web3_tx('setFee_CcyType', [ ccyTypeIdFunded, CONST.nullAddr, exchangeCcyFee ], OWNER, OWNER_privKey);
+                const setLedgerCcyFeeTx   = await CONST.web3_tx('setFee_CcyType', [ ccyTypeIdFunded, BUYER.addr,        ledgerCcyFee   ], OWNER, OWNER_privKey);
+
+                const exchangeTokFee = { fee_fixed: buyNdx * 11, fee_percBips: buyNdx * 6, fee_min: buyNdx * 11, fee_max: buyNdx * 51, };
+                const ledgerTokFee =   { fee_fixed: buyNdx * 12, fee_percBips: buyNdx * 7, fee_min: buyNdx * 12, fee_max: buyNdx * 52, };
+                const setExchangeTokFeeTx = await CONST.web3_tx('setFee_TokType', [ minterTokTypeId, CONST.nullAddr, exchangeTokFee ], OWNER, OWNER_privKey);
+                const setLedgerTokFeeTx   = await CONST.web3_tx('setFee_TokType', [ minterTokTypeId, SELLER.addr,        ledgerTokFee   ], OWNER, OWNER_privKey);
+
+                const tradeTx = await CONST.web3_tx('transferOrTrade', [ {
+                    ledger_A: SELLER.addr,                                  ledger_B: BUYER.addr,
+                       qty_A: minterLedger.tokens[0].currentQty.div(2),  tokenTypeId_A: minterTokTypeId,
+                       qty_B: 0,                                   tokenTypeId_B: 0,
+                ccy_amount_A: 0,                                     ccyTypeId_A: 0,
+                ccy_amount_B: 5000,                                  ccyTypeId_B: ccyTypeIdFunded,
+                   applyFees: true,
+                feeAddrOwner: CONST.nullAddr
+            }], OWNER, OWNER_privKey);
+            }
+            console.groupEnd();
+
+            // withdraw some ccy
+            const withdrawTx = await CONST.web3_tx('withdraw', [ccyTypeIdFunded, 100 * (whiteNdx+1), BUYER.addr], OWNER, OWNER_privKey);
+
+            // withdraw all tokens to graylist addr
+            const buyerLedger = (await CONST.web3_call('getLedgerEntry', [BUYER.addr]));
+            console.group(chalk.inverse(`WITHDRAWING (SELF-CUSTODY) ALL FOR ${BUYER.addr}...`));
+            for (var x = 0; x < buyerLedger.tokens.length ; x++) {
+                const withdrawTokensTx = await CONST.web3_tx('transferOrTrade', [ {
+                    ledger_A: BUYER.addr,                            ledger_B: GRAY,
+                       qty_A: buyerLedger.tokens[x].currentQty, tokenTypeId_A: buyerLedger.tokens[x].tokenTypeId.toString(),
+                       qty_B: 0,                                tokenTypeId_B: 0,
+                ccy_amount_A: 0,                                  ccyTypeId_A: 0,
+                ccy_amount_B: 0,                                  ccyTypeId_B: 0,
+                   applyFees: false,
+                feeAddrOwner: CONST.nullAddr
+            }], OWNER, OWNER_privKey);
+            }
+            console.groupEnd();
+            
+            // deposit tokens back (erc20 in)
+            console.group(chalk.inverse(`DEPOSITING ALL FOR ${BUYER.addr}...`));
+            const grayLedger = (await CONST.web3_call('getLedgerEntry', [GRAY]));
+            await CONST.web3_tx('transfer', [ BUYER.addr, buyerLedger.tokens_sumQty.toString() ], GRAY, GRAY_privKey);
+            console.groupEnd();
+        }
+       
     });
    
 });

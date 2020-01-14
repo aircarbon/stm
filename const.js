@@ -34,7 +34,7 @@ const blocksFromMonths = (months) => Math.ceil(blocksFromDays(months * 30.42));
 //
 // MAIN: deployer definitions -- contract ctor() params
 //
-const contractVer = "0.95c";
+const contractVer = "0.96a";
 const contractProps = {
     COMMODITY: {
         contractVer: contractVer,
@@ -251,7 +251,7 @@ async function web3_tx(methodName, methodArgs, fromAddr, fromPrivKey) {
 
     // estimate gas
     const gasEstimate = await web3.eth.estimateGas(txData);
-    console.log(chalk.gray.dim('   -> gasEstimate=', gasEstimate));
+    console.log(chalk.yellow('   -> gasEstimate=', gasEstimate));
 
     // send signed tx
     const EthereumTx = EthereumJsTx.Transaction
@@ -266,15 +266,15 @@ async function web3_tx(methodName, methodArgs, fromAddr, fromPrivKey) {
         })
         .once("transactionHash", hash => {
             txHash = hash;
-            console.log(chalk.gray.dim(`   => ${txHash} ...`));
+            console.log(chalk.yellow(`   => ${txHash} ...`));
         })
         .once("confirmation", async (confirms) => {
             const receipt = await web3.eth.getTransactionReceipt(txHash);
-            console.log(chalk.gray.dim(`   => ${txHash} - ${confirms} confirm(s), receipt.gasUsed=`, receipt.gasUsed));
+            console.log(chalk.yellow(`   => ${txHash} - ${confirms} confirm(s), receipt.gasUsed=`, receipt.gasUsed));
             resolve(txHash);
         })
         .once("error", error => {
-            console.log(chalk.gray.dim(`   => ## error`, error));
+            console.log(chalk.yellow(`   => ## error`, error));
             reject(error);
         });
     });
