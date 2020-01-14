@@ -54,8 +54,18 @@ contract StMaster is StMintable, StBurnable, CcyFundable, CcyWithdrawable, StTra
     // PayableLib events
     event IssuanceSubscribed(address indexed subscriber, address indexed issuer, uint256 weiSent, uint256 weiChange, uint256 tokensSubscribed);
 
-    
-    // CLEANUP: reduce # of libs for less deployment pain
+    // CLEANUP: reduce # of libs for less deployment pain?
+    // StMaster     6142526
+    // TransferLib  2300475
+    // TokenLib     1876567
+    // LedgerLib    1709851
+    // CcyLib       948476
+    // PayableLib   895495
+    // LoadLib      878583
+    // Erc20Lib     504580
+    // FeeLib       577162
+    // StructLib    170684
+
     // TEST: web3 tests for bulk/test data (explorer)
 
     //
@@ -79,6 +89,11 @@ contract StMaster is StMintable, StBurnable, CcyFundable, CcyWithdrawable, StTra
     function get_btcUsd() public view returns(int256) {
         if (chainlinkAggregator_btcUsd == address(0x0)) return 42;
         AggregatorInterface ref = AggregatorInterface(chainlinkAggregator_btcUsd);
+        return ref.latestAnswer();
+    }
+    function get_ethUsd() public view returns(int256) {
+        if (chainlinkAggregator_ethUsd == address(0x0)) return 42;
+        AggregatorInterface ref = AggregatorInterface(chainlinkAggregator_ethUsd);
         return ref.latestAnswer();
     }
 

@@ -23,6 +23,10 @@ const SCOOP_TESTNETS_2 = "0xe4f1925fba6cbf65c81dc8d25163c899f14cd6c1";
 const AIRCARBON_DOM10_1 = "0x3bf2a66c7057bc3737b5e6a7c0bc39b41437ffb8";
 const AIRCARBON_DOM10_2 = "0x3b9a2f8c123efbd9919e0903c994efae15cf78ef";
 
+//
+// single ST-type ERC20 transfer
+//
+
 describe(`Contract Web3 Interface`, async () => {
 
     //
