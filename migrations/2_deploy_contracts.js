@@ -15,12 +15,7 @@ const StMaster = artifacts.require('./StMaster.sol');
 
 const CONST = require('../const.js');
 const { db } = require('../../common/dist');
-
-function logEnv() {
-    console.log('\tprocess.env.CONTRACT_TYPE: ', process.env.CONTRACT_TYPE);
-    console.log('\t      process.env.NETWORK: ', process.env.NETWORK);
-    console.log('\t   process.env.NETWORK_ID: ', process.env.NETWORK_ID);
-}
+const chalk = require('chalk');
 
 module.exports = async function (deployer) {
     process.env.NETWORK = deployer.network;
@@ -28,7 +23,7 @@ module.exports = async function (deployer) {
     process.env.WEB3_NETWORK_ID = deployer.network_id;
 
     console.log('== SecTokMaster == DEPLOY...');
-    logEnv();
+
     var type;
     switch (process.env.CONTRACT_TYPE) {
         case 'CASHFLOW':
@@ -55,7 +50,6 @@ module.exports = async function (deployer) {
 
     return deployer.deploy(TokenLib).then(async tokenLib => { 
         deployer.link(TokenLib, StMaster);
-        //deployer.link(TokenLib, PayableLib);
 
     return deployer.deploy(TransferLib).then(async transferLib => { 
         deployer.link(TransferLib, Erc20Lib);
@@ -77,20 +71,13 @@ module.exports = async function (deployer) {
         
         //console.log('cashflowArgs', CONST.contractProps[type].cashflowArgs);
         
-        // mainnet
-        //const chainlinkAggregator_btcUsd = '0xF5fff180082d6017036B771bA883025c654BC935';
-        //const chainlinkAggregator_ethUsd = '0x79fEbF6B9F76853EDBcBc913e6aAE8232cFB9De9';
-        // ropsten
-        //const chainlinkAggregator_btcUsd = '0x882906a758207FeA9F21e0bb7d2f24E561bd0981';
-        //const chainlinkAggregator_ethUsd = '0x8468b2bDCE073A157E560AA4D9CcF6dB1DB98507';
-
         return deployer.deploy(StMaster, 
             type == "CASHFLOW" ? CONST.contractType.CASHFLOW : CONST.contractType.COMMODITY,
             CONST.contractProps[type].cashflowArgs,
             CONST.contractProps[type].contractName,
             CONST.contractProps[type].contractVer,
-            CONST.contractProps[type].contractUnit, 
-            CONST.contractProps[type].contractSymbol, 
+            CONST.contractProps[type].contractUnit,
+            CONST.contractProps[type].contractSymbol,
             CONST.contractProps[type].contractDecimals,
             CONST.chainlinkAggregators[process.env.NETWORK_ID].btcUsd, //chainlinkAggregator_btcUsd,
             CONST.chainlinkAggregators[process.env.NETWORK_ID].ethUsd //chainlinkAggregator_ethUsd
@@ -98,8 +85,17 @@ module.exports = async function (deployer) {
             //console.dir(stm.abi);
             //console.dir(deployer);
 
-            if (!deployer.network.includes("-fork")) {
+            // **PROD TODO (L2 obfuscation)
+            const MNEMONIC = require('../dev_mnemonic.js').MNEMONIC; // **PROD TODO
+            const accountAndKey = await CONST.getAccountAndKey(0, MNEMONIC);
+            const OWNER = accountAndKey.addr;
+            const OWNER_privKey = accountAndKey.privKey;
+            // TODO: derive - an encryption key & salt [from contract name?] -> derivation code should be in a private repo (AWS lambda?)
+            // TODO: encrypt - privKey & display encrypted [for manual population of AWS secret, L1]
+            logEnv("DEPLOYMENT COMPLETE", OWNER, OWNER_privKey);
 
+            // save to DB
+            if (!deployer.network.includes("-fork")) {
                 var ip = "unknown";
                 publicIp.v4().then(p => ip = p).catch(e => { console.log("\tWARN: could not get IP - will write 'unknown'"); });
 
@@ -126,3 +122,12 @@ module.exports = async function (deployer) {
     }).catch(err => { console.error('failed deployment: LedgerLib', err); });
     }).catch(err => { console.error('failed deployment: StructLib', err); });
 };
+
+function logEnv(phase, owner, ownerPrivKey) {
+    console.log(chalk.black.bgWhite(phase));
+    console.log(chalk.red('\tprocess.env.CONTRACT_TYPE: '), process.env.CONTRACT_TYPE);
+    console.log(chalk.red('\t      process.env.NETWORK: '), process.env.NETWORK);
+    console.log(chalk.red('\t   process.env.NETWORK_ID: '), process.env.NETWORK_ID);
+    console.log(chalk.red('\t                    owner: '), owner);
+    console.log(chalk.red('\t             ownerPrivKey: '), ownerPrivKey);
+}

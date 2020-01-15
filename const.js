@@ -70,6 +70,10 @@ module.exports = {
 
     // https://docs.chain.link/docs/using-chainlink-reference-contracts
     chainlinkAggregators: {
+        "1": { // mainnet
+            btcUsd: '0xF5fff180082d6017036B771bA883025c654BC935',
+            ethUsd: '0x79fEbF6B9F76853EDBcBc913e6aAE8232cFB9De9'
+        },
         "3": { // ropsten
             btcUsd: '0x882906a758207FeA9F21e0bb7d2f24E561bd0981',
             ethUsd: '0x8468b2bDCE073A157E560AA4D9CcF6dB1DB98507'

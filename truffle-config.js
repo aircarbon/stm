@@ -20,11 +20,10 @@
 require('dotenv').config();
 const Web3 = require("web3");
 const web3 = new Web3();
-
 const HDWalletProvider = require("@truffle/hdwallet-provider");
 
-// wallet seed (only needed for public testnets: ropsten & rinkeby - manage wallet with MetaMask)
-const MNEMONIC = 'educate school blast ability display bleak club soon curve car oil ostrich';
+const DEV_MNEMONIC = require('./dev_mnemonic.js').MNEMONIC;
+const PROD_MNEMONIC = '...'; // **PROD TODO
 
 const gweiDeployment = "10";
 
@@ -75,7 +74,7 @@ module.exports = {
 
     // aircarbon ropsten geth node -- a bit faster than infura, representative of mainnet
     ropsten_ac: {
-      provider: () => new HDWalletProvider(MNEMONIC, "https://ac-dev0.net:9545",
+      provider: () => new HDWalletProvider(DEV_MNEMONIC, "https://ac-dev0.net:9545",
                       0, 1000), // # test accounts
       network_id: "*", // 3
       gas: 7800000, // node reported limit: 7,984,363
@@ -88,7 +87,7 @@ module.exports = {
 
     // aircarbon private testnet geth node
     testnet_ace: {
-      provider: () => new HDWalletProvider(MNEMONIC, "https://ac-dev1.net:9545",
+      provider: () => new HDWalletProvider(DEV_MNEMONIC, "https://ac-dev1.net:9545",
                       0, 1000), // # test accounts
       network_id: "*", // 4242 ?
       gas: 7800000,
@@ -97,7 +96,7 @@ module.exports = {
 
     // ropsten infura -- much slower than rinkeby infura
     ropsten_infura: {
-      provider: () => new HDWalletProvider(MNEMONIC, "https://ropsten.infura.io/v3/93db2c7fd899496d8400e86100058297",
+      provider: () => new HDWalletProvider(DEV_MNEMONIC, "https://ropsten.infura.io/v3/93db2c7fd899496d8400e86100058297",
                       0, 1000), // # test accounts
       network_id: "*", // 3 ?
       gas: 7800000,
@@ -105,7 +104,7 @@ module.exports = {
     },
 
     rinkeby_infura: {
-      provider: () => new HDWalletProvider(MNEMONIC, "https://rinkeby.infura.io/v3/93db2c7fd899496d8400e86100058297",
+      provider: () => new HDWalletProvider(DEV_MNEMONIC, "https://rinkeby.infura.io/v3/93db2c7fd899496d8400e86100058297",
                       0, 1000), // # test accounts
       network_id: "*", // 4 ?
       gas: 7800000,
