@@ -12,8 +12,6 @@ import "./StPayable.sol";
 
 import "../Libs/StructLib.sol";
 
-import "../Interfaces/IAggregatorInterface.sol";
-
 contract StMaster is StMintable, StBurnable, CcyFundable, CcyWithdrawable, StTransferable, StDataLoadable {
 
     // contract properties
@@ -52,7 +50,7 @@ contract StMaster is StMintable, StBurnable, CcyFundable, CcyWithdrawable, StTra
     event Transfer(address indexed from, address indexed to, uint256 value);
     event Approval(address indexed owner, address indexed spender, uint256 value);
     // PayableLib events
-    event IssuanceSubscribed(address indexed subscriber, address indexed issuer, uint256 weiSent, uint256 weiChange, uint256 tokensSubscribed);
+    event IssuanceSubscribed(address indexed subscriber, address indexed issuer, uint256 weiSent, uint256 weiChange, uint256 tokensSubscribed, uint256 weiPrice);
 
     // CLEANUP: reduce # of libs for less deployment pain?
     // StMaster     6142526
@@ -83,19 +81,6 @@ contract StMaster is StMintable, StBurnable, CcyFundable, CcyWithdrawable, StTra
     //
 
     function getContractType() public view returns(StructLib.ContractType) { return ledgerData.contractType; }
-
-    address public chainlinkAggregator_btcUsd;
-    address public chainlinkAggregator_ethUsd;
-    function get_btcUsd() public view returns(int256) {
-        if (chainlinkAggregator_btcUsd == address(0x0)) return 42;
-        AggregatorInterface ref = AggregatorInterface(chainlinkAggregator_btcUsd);
-        return ref.latestAnswer();
-    }
-    function get_ethUsd() public view returns(int256) {
-        if (chainlinkAggregator_ethUsd == address(0x0)) return 42;
-        AggregatorInterface ref = AggregatorInterface(chainlinkAggregator_ethUsd);
-        return ref.latestAnswer();
-    }
 
     constructor(
         StructLib.ContractType _contractType,

@@ -160,7 +160,8 @@ library StructLib {
     }
     struct CashflowStruct {
         CashflowArgs args;
-        uint256      wei_currentPrice;      // current subscription price, in wei per token
+        uint256      wei_currentPrice;      // current subscription price, in wei per token; or
+        uint256      cents_currentPrice;    // current subscription price, in USD cents per token
         uint256      qty_issuanceMax;       // the amount minted in the issuance monobatch
         uint256      qty_issuanceRemaining; // the amount remaining unsold of the issuance monobatch
         uint256      qty_issuanceSold;      // the amount sold of the issuance monobatch
