@@ -12,8 +12,6 @@ import "./StPayable.sol";
 
 import "../Libs/StructLib.sol";
 
-import "../Interfaces/IAggregatorInterface.sol";
-
 contract StMaster is StMintable, StBurnable, CcyFundable, CcyWithdrawable, StTransferable, StDataLoadable {
 
     // contract properties
@@ -52,16 +50,28 @@ contract StMaster is StMintable, StBurnable, CcyFundable, CcyWithdrawable, StTra
     event Transfer(address indexed from, address indexed to, uint256 value);
     event Approval(address indexed owner, address indexed spender, uint256 value);
     // PayableLib events
-    event IssuanceSubscribed(address indexed subscriber, address indexed issuer, uint256 weiSent, uint256 weiChange, uint256 tokensSubscribed);
+    event IssuanceSubscribed(address indexed subscriber, address indexed issuer, uint256 weiSent, uint256 weiChange, uint256 tokensSubscribed, uint256 weiPrice);
+
+    // CLEANUP: reduce # of libs for less deployment pain?
+    // StMaster     6142526
+    // TransferLib  2300475
+    // TokenLib     1876567
+    // LedgerLib    1709851
+    // CcyLib       948476
+    // PayableLib   895495
+    // LoadLib      878583
+    // Erc20Lib     504580
+    // FeeLib       577162
+    // StructLib    170684
+
+    // TEST: web3 tests for bulk/test data (explorer)
 
     //
     // -- J 1+3 --
-    // PRI 0 ** CASHFLOWS re. SD ** >>> MVP
-    //      CFT CORE -- aim for *no whitelisting*, i.e. all external control ERC20 accounts...
+    // PRI 0 ** CASHFLOWS ==>>> MVP -- CFT CORE (aiming for *no whitelisting*, i.e. all external control ERC20 accounts)
     //
-    //      TODO: test issuerPayments...
-    //
-    //      TODO: edit issuancePrice... + (new) quantityForSale...
+    //      TODO: FIAT issuancePrice... + (eq-type) changing issuancePrice mid-issuance
+    //      TODO: issuerPayments v0 basic (no validations, i.e. eq-path only?)
     //
     // others...
     // TODO: update solc (max v == 0.6.1 ?)
@@ -71,14 +81,6 @@ contract StMaster is StMintable, StBurnable, CcyFundable, CcyWithdrawable, StTra
     //
 
     function getContractType() public view returns(StructLib.ContractType) { return ledgerData.contractType; }
-
-    address public chainlinkAggregator_btcUsd;
-    address public chainlinkAggregator_ethUsd;
-    function get_btcUsd() public view returns(int256) {
-        if (chainlinkAggregator_btcUsd == address(0x0)) return 42;
-        AggregatorInterface ref = AggregatorInterface(chainlinkAggregator_btcUsd);
-        return ref.latestAnswer();
-    }
 
     constructor(
         StructLib.ContractType _contractType,

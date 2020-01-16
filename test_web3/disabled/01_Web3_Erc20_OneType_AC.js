@@ -23,12 +23,16 @@ const SCOOP_TESTNETS_2 = "0xe4f1925fba6cbf65c81dc8d25163c899f14cd6c1";
 const AIRCARBON_DOM10_1 = "0x3bf2a66c7057bc3737b5e6a7c0bc39b41437ffb8";
 const AIRCARBON_DOM10_2 = "0x3b9a2f8c123efbd9919e0903c994efae15cf78ef";
 
+//
+// single ST-type ERC20 transfer
+//
+
 describe(`Contract Web3 Interface`, async () => {
 
     //
     // can run these to test web3 more quickly, e.g.
-    //         Dev: ("export WEB3_NETWORK_ID=888 && export CONTRACT_TYPE=COMMODITY && mocha test_web3 --timeout 120000 --exit")
-    //  Ropsten AC: ("export WEB3_NETWORK_ID=3 && export CONTRACT_TYPE=COMMODITY && mocha test_web3 --timeout 120000 --exit")
+    //         Dev: ("export WEB3_NETWORK_ID=888 && export CONTRACT_TYPE=COMMODITY && mocha test_web3 --timeout 10000000 --exit")
+    //  Ropsten AC: ("export WEB3_NETWORK_ID=3 && export CONTRACT_TYPE=COMMODITY && mocha test_web3 --timeout 10000000 --exit")
     //
 
     before(async function () {
@@ -64,8 +68,8 @@ describe(`Contract Web3 Interface`, async () => {
                 CONST.tokenType.VCS,    100000, 1,      WHITE, CONST.nullFees, [], [],
             ], OWNER, OWNER_privKey);
 
-            // setup - transferOrTrade A -> GRAY_1
-            const transferTradeTx = await CONST.web3_tx('transferOrTrade', [ {
+            // setup - transferOrTrade A -> GRAY_1 (withdraw)
+            const withdrawTx = await CONST.web3_tx('transferOrTrade', [ {
                     ledger_A: WHITE,                               ledger_B: GRAY_1,
                        qty_A: 100000,                         tokenTypeId_A: CONST.tokenType.VCS,
                        qty_B: 0,                              tokenTypeId_B: 0,
@@ -74,6 +78,7 @@ describe(`Contract Web3 Interface`, async () => {
                    applyFees: false,
                 feeAddrOwner: CONST.nullAddr
             }], OWNER, OWNER_privKey);
+            //await CONST.logGas(CONST.getTestContextWeb3().web3, { receipt: withdrawTx }, 'exchange => erc20 (withdraw): 1 type, 1 batch');
         //}
 
         // setup - fund GRAY_1 eth
@@ -81,63 +86,19 @@ describe(`Contract Web3 Interface`, async () => {
     });
 
     it(`web3 direct - erc20 - should be able to send single token type from graylist addr to external wallet (erc20 => erc20)`, async () => {
-        // const { web3, ethereumTxChain } = CONST.getTestContextWeb3();
-        // console.log('web3.currentProvider.host', web3.currentProvider.host);
+        const erc20_1 = await CONST.web3_tx('transfer', [ AIRCARBON_DOM10_1, "25000" ], GRAY_1, GRAY_1_privKey);
+        const erc20_2 = await CONST.web3_tx('transfer', [ AIRCARBON_DOM10_2, "25000" ], GRAY_1, GRAY_1_privKey);
+        //await CONST.logGas(CONST.getTestContextWeb3().web3, { receipt: erc20_1 }, 'erc20 => erc20 (transfer 1): 1 type, 1 batch');
+        //await CONST.logGas(CONST.getTestContextWeb3().web3, { receipt: erc20_2 }, 'erc20 => erc20 (transfer 2): 1 type, 1 batch');
 
-        // console.log('process.env.NETWORK', process.env.NETWORK);
-        // console.log('process.env.WEB3_NETWORK_ID', process.env.WEB3_NETWORK_ID);
-        // const contractDb = (await db.GetDeployment(process.env.WEB3_NETWORK_ID, CONST.contractName, CONST.contractVer)).recordset[0];
-        // console.log('contractDb.addr', contractDb.addr);
-
-        // var contract = new web3.eth.Contract(JSON.parse(contractDb.abi), contractDb.addr);
-        // const name = await contract.methods.name.call();
-        // console.log('name', name);
-
-        //const name = await CONST.web3_call('name', []);
-        //console.log('name: ', name);
-
-        // var le;
-        // le = await CONST.web3_call('getLedgerEntry', [ SCOOP_TESTNETS_1 ]);
-        // console.log('le', le);
-
-        //await CONST.web3_tx('transfer', [ SCOOP_TESTNETS_1,  "50000" ], GRAY_1, GRAY_1_privKey);
-        await CONST.web3_tx('transfer', [ AIRCARBON_DOM10_1, "25000" ], GRAY_1, GRAY_1_privKey);
-        await CONST.web3_tx('transfer', [ AIRCARBON_DOM10_2, "25000" ], GRAY_1, GRAY_1_privKey);
-        await CONST.web3_sendEthTestAddr(0, AIRCARBON_DOM10_1, "0.05");
-        await CONST.web3_sendEthTestAddr(0, AIRCARBON_DOM10_2, "0.05");
-
-        //await CONST.logGas(web3, erc20, 'erc20 1 type, 1 batch');
-        //console.log('erc20', erc20);
-        
-        // le = await CONST.web3_call('getLedgerEntry', [ SCOOP_TESTNETS_1 ]);
-        // console.log('le', le);
-        // le.tokens.forEach(p => {
-        //     console.log(`stId: ${p.stId} batchId: ${p.batchId} currentQty: ${p.currentQty.toString()}`);
-        // });
+        await CONST.web3_sendEthTestAddr(0, AIRCARBON_DOM10_1, "0.01");
+        await CONST.web3_sendEthTestAddr(0, AIRCARBON_DOM10_2, "0.01");
     });
    
-    // it(`web3 direct - erc20 - should be able to send from graylist addr to whitelist addr (DEPOSIT: erc20 => exchange)`, async () => {
-    //     // var le;
-    //     // le = await CONST.web3_call('getLedgerEntry', [ GRAY_1 ]);
-    //     // le.tokens.forEach(p => {
-    //     //     console.log(`stId: ${p.stId} batchId: ${p.batchId} currentQty: ${p.currentQty.toString()}`);
-    //     // });
-
-    //     // const whitelistTx = await CONST.web3_tx('whitelist', [ GRAY_1 ], OWNER, OWNER_privKey);
-    //     // const trade = await CONST.web3_tx('transferOrTrade', [ { 
-    //     //             ledger_A: GRAY_1,                              ledger_B: WHITE,
-    //     //                qty_A: 0001,                           tokenTypeId_A: CONST.tokenType.VCS,
-    //     //                qty_B: 0,                              tokenTypeId_B: 0,
-    //     //         ccy_amount_A: 0,                                ccyTypeId_A: 0,
-    //     //         ccy_amount_B: 0,                                ccyTypeId_B: 0,
-    //     //            applyFees: false,
-    //     //         feeAddrOwner: CONST.nullAddr
-    //     // }], OWNER, OWNER_privKey);
-    //     // console.log('trade', trade);
-
-    //     const erc20 = await CONST.web3_tx('transfer', [ WHITE, "1000" ], GRAY_1, GRAY_1_privKey);
-    //     await CONST.logGas(web3, erc20, 'erc20 1 type, 1 batch');
-    // });
+    it(`web3 direct - erc20 - should be able to send from graylist addr to whitelist addr (DEPOSIT: erc20 => exchange)`, async () => {
+        const erc20_deposit = await CONST.web3_tx('transfer', [ WHITE, "50000" ], GRAY_1, GRAY_1_privKey);
+        //await CONST.logGas(CONST.getTestContextWeb3().web3, { receipt: erc20_deposit }, 'erc20 => exchange (deposit): 1 type, 1 batch');
+    });
 });
 
   

@@ -6,7 +6,7 @@ const CONST = require('../const.js');
 
 module.exports = {
 
-    subscribe: async (stm, issuer, subscriber, amount) => {
+    subscribe: async (stm, wei_priceForOne, issuer, subscriber, amount) => {
 
         const issuer_balBefore = await web3.eth.getBalance(issuer);
         const issuer_ledgerBefore = await stm.getLedgerEntry(issuer);
@@ -31,8 +31,8 @@ module.exports = {
 
         // expect subscriber gets change
         const cashflowData = await stm.getCashflowData();
-        const wei_expectedChange = Big(wei_subAmountSent).mod(Big(cashflowData.wei_currentPrice));
-        const count_expectedTokens = Big(wei_subAmountSent).minus(wei_expectedChange).div(Big(cashflowData.wei_currentPrice));
+        const wei_expectedChange = Big(wei_subAmountSent).mod(Big(wei_priceForOne)); //cashflowData.wei_currentPrice));
+        const count_expectedTokens = Big(wei_subAmountSent).minus(wei_expectedChange).div(Big(wei_priceForOne)); //cashflowData.wei_currentPrice));
         const { weiCost: wei_Cost } = 
             await CONST.logGas(web3, subscriptionTx,
 `Subscribe Ξ${web3.utils.fromWei(wei_subAmountSent, 'ether').toString().padStart(5)} => \

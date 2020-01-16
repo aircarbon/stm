@@ -22,13 +22,14 @@
         "bip39": "^3.0.2",
         "bn.js": "^5.0.0",
         "chainlink": "^0.7.10",
+        "chalk": "^3.0.0",
         "dotenv": "^8.1.0",
         "lodash": "^4.17.15"
     },
     "devDependencies": {
         "@truffle/hdwallet-provider": "1.0.18",
         "big-number": "2.0.0",
-        "eth-gas-reporter": "^0.2.12",
+        "eth-gas-reporter": "0.2.14",
         "ethereumjs-tx": "^2.1.1",
         "ethereumjs-wallet": "^0.6.3",
         "mocha": "^5.1.1",

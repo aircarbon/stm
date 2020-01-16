@@ -20,11 +20,10 @@
 require('dotenv').config();
 const Web3 = require("web3");
 const web3 = new Web3();
-
 const HDWalletProvider = require("@truffle/hdwallet-provider");
 
-// wallet seed (only needed for public testnets: ropsten & rinkeby - manage wallet with MetaMask)
-const MNEMONIC = 'educate school blast ability display bleak club soon curve car oil ostrich';
+const DEV_MNEMONIC = require('./dev_mnemonic.js').MNEMONIC;
+const PROD_MNEMONIC = '...'; // **PROD TODO
 
 const gweiDeployment = "10";
 
@@ -47,6 +46,12 @@ module.exports = {
       }
     },
 
+    //
+    // DEPLOYMENT TIMEOUTS/LIMITS
+    // web3 waits a maximum of 50 blocks for TX receipt (https://github.com/trufflesuite/truffle/issues/594)
+    // gweiDeployment MUST BE HIGH ENOUGH TO RELIABLY CONFIRM WITHIN 50 BLOCKS, otherwise deployments will fail
+    //
+
     // Useful for testing. The `development` name is special - truffle uses it by default
     // if it's defined here and no other network is specified at the command line.
     // You should run a client (like ganache-cli, geth or parity) in a separate terminal
@@ -59,28 +64,31 @@ module.exports = {
     //     network_id: "*",
     // },
     development: {
-      // for "truffle test" -- with manually launched "ganache-cli -a 1000" (1000 test accounts)
+      // for "truffle test" -- use with "ganache-cli -a 1000" (1000 test accounts)
       host: process.env.GANACHE_HOST || "127.0.0.1",
       port: 8545,
-      network_id: "*", // 777, 888, 999
+      network_id: "*", // see: getTestContextWeb3() for dev network_id convention
       gas: 7800000,
       gasPrice: web3.utils.toWei(gweiDeployment, "gwei")
     },
 
-    // aircarbon ropsten geth node -- a bit faster than infura, but representative of mainnet
+    // aircarbon ropsten geth node -- a bit faster than infura, representative of mainnet
     ropsten_ac: {
-      provider: () => new HDWalletProvider(MNEMONIC, "https://ac-dev0.net:9545",
-                      0, 888), // # test accounts
+      provider: () => new HDWalletProvider(DEV_MNEMONIC, "https://ac-dev0.net:9545",
+                      0, 1000), // # test accounts
       network_id: "*", // 3
       gas: 7800000, // node reported limit: 7,984,363
       gasPrice: web3.utils.toWei(gweiDeployment, "gwei"),
       networkCheckTimeout: 30000,
+
+      skipDryRun: true,
+      timeoutBlocks: 200, // but web3 always times out at 50 blocks?!
     },
 
     // aircarbon private testnet geth node
     testnet_ace: {
-      provider: () => new HDWalletProvider(MNEMONIC, "https://ac-dev1.net:9545",
-                      0, 888), // # test accounts
+      provider: () => new HDWalletProvider(DEV_MNEMONIC, "https://ac-dev1.net:9545",
+                      0, 1000), // # test accounts
       network_id: "*", // 4242 ?
       gas: 7800000,
       gasPrice: web3.utils.toWei(gweiDeployment, "gwei")
@@ -88,16 +96,16 @@ module.exports = {
 
     // ropsten infura -- much slower than rinkeby infura
     ropsten_infura: {
-      provider: () => new HDWalletProvider(MNEMONIC, "https://ropsten.infura.io/v3/93db2c7fd899496d8400e86100058297",
-                      0, 888), // # test accounts
+      provider: () => new HDWalletProvider(DEV_MNEMONIC, "https://ropsten.infura.io/v3/93db2c7fd899496d8400e86100058297",
+                      0, 1000), // # test accounts
       network_id: "*", // 3 ?
       gas: 7800000,
-      gasPrice: web3.utils.toWei(gweiDeployment, "gwei")
+      gasPrice: web3.utils.toWei(gweiDeployment, "gwei"),
     },
 
     rinkeby_infura: {
-      provider: () => new HDWalletProvider(MNEMONIC, "https://rinkeby.infura.io/v3/93db2c7fd899496d8400e86100058297",
-                      0, 888), // # test accounts
+      provider: () => new HDWalletProvider(DEV_MNEMONIC, "https://rinkeby.infura.io/v3/93db2c7fd899496d8400e86100058297",
+                      0, 1000), // # test accounts
       network_id: "*", // 4 ?
       gas: 7800000,
       gasPrice: web3.utils.toWei(gweiDeployment, "gwei")

@@ -8,6 +8,7 @@ const _ethUsd = 150;
 const bip39 = require('bip39');
 const hdkey = require('ethereumjs-wallet/hdkey');
 const EthereumJsTx = require('ethereumjs-tx');
+const chalk = require('chalk');
 
 const { db } = require('../common/dist');
 
@@ -33,7 +34,7 @@ const blocksFromMonths = (months) => Math.ceil(blocksFromDays(months * 30.42));
 //
 // MAIN: deployer definitions -- contract ctor() params
 //
-const contractVer = "0.95c";
+const contractVer = "0.96a";
 const contractProps = {
     COMMODITY: {
         contractVer: contractVer,
@@ -51,7 +52,6 @@ const contractProps = {
         contractDecimals: 0,
         cashflowArgs: {
               cashflowType: cashflowType.BOND,
-        //wei_currentPrice: web3.utils.toWei("0.02", "ether"),
                  term_Blks: blocksFromDays(1),
                   bond_bps: 1000, // 10%
         bond_int_EveryBlks: blocksFromHours(1)
@@ -69,6 +69,10 @@ module.exports = {
 
     // https://docs.chain.link/docs/using-chainlink-reference-contracts
     chainlinkAggregators: {
+        "1": { // mainnet
+            btcUsd: '0xF5fff180082d6017036B771bA883025c654BC935',
+            ethUsd: '0x79fEbF6B9F76853EDBcBc913e6aAE8232cFB9De9'
+        },
         "3": { // ropsten
             btcUsd: '0x882906a758207FeA9F21e0bb7d2f24E561bd0981',
             ethUsd: '0x8468b2bDCE073A157E560AA4D9CcF6dB1DB98507'
@@ -183,21 +187,21 @@ EXCHANGE_FEE: 1,
     }
 };
 
-function getTestContextWeb3() {
+function getTestContextWeb3() { 
     const context = 
-              // DM
-              process.env.WEB3_NETWORK_ID == 888 ? { web3: new Web3('http://127.0.0.1:8545'),    ethereumTxChain: {} }
+            // DM
+            process.env.WEB3_NETWORK_ID == 888 ? { web3: new Web3('http://127.0.0.1:8545'),  ethereumTxChain: {} }
 
-              // Vince
-            : process.env.WEB3_NETWORK_ID == 890 ? { web3: new Web3('http://127.0.0.1:8545'),    ethereumTxChain: {} }
+            // Vince
+        : process.env.WEB3_NETWORK_ID == 890 ? { web3: new Web3('http://127.0.0.1:8545'),    ethereumTxChain: {} }
 
-              // Dung
-            : process.env.WEB3_NETWORK_ID == 889 ? { web3: new Web3('http://127.0.0.1:8545'),    ethereumTxChain: {} }
+            // Dung
+        : process.env.WEB3_NETWORK_ID == 889 ? { web3: new Web3('http://127.0.0.1:8545'),    ethereumTxChain: {} }
 
-              // Ropsten
-            : process.env.WEB3_NETWORK_ID == 3 ?  { web3: new Web3('https://ac-dev0.net:9545'),  ethereumTxChain: { chain: 'ropsten', hardfork: 'petersburg' } }
+            // Ropsten
+        : process.env.WEB3_NETWORK_ID == 3 ?   { web3: new Web3('https://ac-dev0.net:9545'), ethereumTxChain: { chain: 'ropsten', hardfork: 'petersburg' } }
 
-            : undefined;
+        : undefined;
     if (!context) throw('WEB3_NETWORK_ID is not set!');
     return context;
 }
@@ -220,7 +224,7 @@ async function web3_call(methodName, methodArgs) {
     const { web3, ethereumTxChain } = getTestContextWeb3();
     const contractDb = (await db.GetDeployment(process.env.WEB3_NETWORK_ID, contractProps[process.env.CONTRACT_TYPE].contractName, contractProps[process.env.CONTRACT_TYPE].contractVer)).recordset[0];
     if (!contractDb) throw(Error(`Failed to lookup contract deployment for networkId=${process.env.WEB3_NETWORK_ID}, contractName=${contractProps[process.env.CONTRACT_TYPE].contractName}, contractVer=${contractProps[process.env.CONTRACT_TYPE].contractVer}`));
-    console.log(` > CALL: [${contractDb.contract_enum} ${contractDb.contract_ver} @${contractDb.addr}] ${methodName}(${methodArgs.join()}) [networkId: ${process.env.WEB3_NETWORK_ID} - ${web3.currentProvider.host}]`);
+    console.log(` > CALL: [${contractDb.contract_enum} ${contractDb.contract_ver} @${contractDb.addr}] ${chalk.blue.bgWhite(methodName)}(${methodArgs.join()}) [networkId: ${process.env.WEB3_NETWORK_ID} - ${web3.currentProvider.host}]`);
     var contract = new web3.eth.Contract(JSON.parse(contractDb.abi), contractDb.addr);
     const callRet = await contract.methods[methodName](...methodArgs).call();
     return callRet;
@@ -233,7 +237,7 @@ async function web3_tx(methodName, methodArgs, fromAddr, fromPrivKey) {
     var contract = new web3.eth.Contract(JSON.parse(contractDb.abi), contractDb.addr);
 
     // tx data
-    console.log(` > TX: [${contractDb.contract_enum} ${contractDb.contract_ver} @${contractDb.addr}] ${methodName}(${methodArgs.join()}) [networkId: ${process.env.WEB3_NETWORK_ID} - ${web3.currentProvider.host}]`);
+    console.log(` >   TX: [${contractDb.contract_enum} ${contractDb.contract_ver} @${contractDb.addr}] ${chalk.red.bgWhite(methodName)}(${methodArgs.join()}) [networkId: ${process.env.WEB3_NETWORK_ID} - ${web3.currentProvider.host}]`);
     const nonce = await web3.eth.getTransactionCount(fromAddr, "pending");
     var paramsData = contract.methods
         [methodName](...methodArgs)
@@ -250,7 +254,7 @@ async function web3_tx(methodName, methodArgs, fromAddr, fromPrivKey) {
 
     // estimate gas
     const gasEstimate = await web3.eth.estimateGas(txData);
-    console.log('   -> gasEstimate=', gasEstimate);
+    console.log(chalk.yellow('   -> gasEstimate=', gasEstimate));
 
     // send signed tx
     const EthereumTx = EthereumJsTx.Transaction
@@ -265,15 +269,15 @@ async function web3_tx(methodName, methodArgs, fromAddr, fromPrivKey) {
         })
         .once("transactionHash", hash => {
             txHash = hash;
-            console.log(`   => ${txHash} ...`);
+            console.log(chalk.yellow(`   => ${txHash} ...`));
         })
         .once("confirmation", async (confirms) => {
             const receipt = await web3.eth.getTransactionReceipt(txHash);
-            console.log(`   => ${txHash} - ${confirms} confirm(s), receipt.gasUsed=`, receipt.gasUsed);
+            console.log(chalk.yellow(`   => ${txHash} - ${confirms} confirm(s), receipt.gasUsed=`, receipt.gasUsed));
             resolve(txHash);
         })
         .once("error", error => {
-            console.log(`   => ## error`, error);
+            console.log(chalk.yellow(`   => ## error`, error));
             reject(error);
         });
     });

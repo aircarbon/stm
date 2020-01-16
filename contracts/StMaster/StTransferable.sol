@@ -45,7 +45,7 @@ contract StTransferable is Owned, StLedger, StFees, StErc20, StPayable {
      * @param a TransferLib.TransferArgs arguments
      * @return Exchange fees at index 0, batch originator fees at subsequent indexes
      */
-    uint256 constant MAX_BATCHES_PREVIEW = 4; // library constants not accessible in contract; must duplicate TransferLib value
+    uint256 constant MAX_BATCHES_PREVIEW = 128; // library constants not accessible in contract; must duplicate TransferLib value
     function transfer_feePreview(TransferLib.TransferArgs calldata a)
     external view onlyOwner() returns (TransferLib.FeesCalc[1 + MAX_BATCHES_PREVIEW * 2] memory feesAll) {
         return TransferLib.transfer_feePreview(ledgerData, globalFees, owner, a);
