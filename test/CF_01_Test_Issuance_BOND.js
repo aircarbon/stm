@@ -11,10 +11,7 @@ const BN = require('bn.js');
 
 const CONST = require('../const.js');
 const transferHelper = require('../test/transferHelper.js');
-
 const issuanceHelper = require('../test/issuanceHelper.js');
-
-// TODO: (separate test file) equity -- TEST CAN CHANGE ISSUANCE PRICE (up/down rounds)
 
 contract("StMaster", accounts => {
     var stm;
@@ -24,7 +21,7 @@ contract("StMaster", accounts => {
     const ISSUANCE_QTY = 1000000;
     var cashflowData;
 
-    const bondPricing = "USD"; // TODO: switch all logic below based on this...
+    const bondPricing = "ETH"; // TODO: switch all logic below based on this...
     var cents_currentPrice;
     var wei_currentPrice;
 

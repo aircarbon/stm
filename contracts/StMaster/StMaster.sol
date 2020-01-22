@@ -52,6 +52,21 @@ contract StMaster is StMintable, StBurnable, CcyFundable, CcyWithdrawable, StTra
     // PayableLib events
     event IssuanceSubscribed(address indexed subscriber, address indexed issuer, uint256 weiSent, uint256 weiChange, uint256 tokensSubscribed, uint256 weiPrice);
 
+    //
+    // PRI 0 ** CASHFLOWS (J 1+3) ==>>> MVP -- CFT CORE (aiming for *no whitelisting*, i.e. all external control ERC20 accounts)
+    //
+    //      TODO: pri1 - test - exchange fees on subscriptions
+    //      TODO: pri1 - new  - eth fees on subscriptions (new fee-type)
+    //      TODO: pri2 - issuerPayments (BOND) v0 basic (no validations, i.e. eq-path only?)
+    //      TODO: pri3 - wallet auto-converts
+    //      TODO: pri4 - (eq-type) changing issuancePrice mid-issuance
+    //
+    // others...
+    // TODO: update solc (max v == 0.6.1 ?)
+    // TODO: etherscan -> verify contract (without code bodies?)
+    // TOOD: SCP - show totalSupply() for erc20's
+    // TODO: SCP - use decimals fields for erc20 (send/exchange text fields, or at least round to .decimals before passing to API)
+    //
     // CLEANUP: reduce # of libs for less deployment pain?
     // StMaster     6142526
     // TransferLib  2300475
@@ -63,22 +78,6 @@ contract StMaster is StMintable, StBurnable, CcyFundable, CcyWithdrawable, StTra
     // Erc20Lib     504580
     // FeeLib       577162
     // StructLib    170684
-
-    // TEST: web3 tests for bulk/test data (explorer)
-
-    //
-    // -- J 1+3 --
-    // PRI 0 ** CASHFLOWS ==>>> MVP -- CFT CORE (aiming for *no whitelisting*, i.e. all external control ERC20 accounts)
-    //
-    //      TODO: FIAT issuancePrice... + (eq-type) changing issuancePrice mid-issuance
-    //      TODO: issuerPayments v0 basic (no validations, i.e. eq-path only?)
-    //
-    // others...
-    // TODO: update solc (max v == 0.6.1 ?)
-    // TODO: etherscan -> verify contract (without code bodies?)
-    // TOOD: SCP - show totalSupply() for erc20's
-    // TODO: SCP - use decimals fields for erc20 (send/exchange text fields, or at least round to .decimals before passing to API)
-    //
 
     function getContractType() public view returns(StructLib.ContractType) { return ledgerData.contractType; }
 
