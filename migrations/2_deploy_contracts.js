@@ -24,10 +24,10 @@ module.exports = async function (deployer) {
 
     console.log('== SecTokMaster == DEPLOY...');
 
-    var type;
+    var contractType;
     switch (process.env.CONTRACT_TYPE) {
         case 'CASHFLOW':
-        case 'COMMODITY': type = process.env.CONTRACT_TYPE; break;
+        case 'COMMODITY': contractType = process.env.CONTRACT_TYPE; break;
         default: throw('Missing or unknown process.env.CONTRACT_TYPE: set to CASHFLOW or COMMODITY.');
     }
 
@@ -72,13 +72,13 @@ module.exports = async function (deployer) {
         //console.log('cashflowArgs', CONST.contractProps[type].cashflowArgs);
         
         return deployer.deploy(StMaster, 
-            type == "CASHFLOW" ? CONST.contractType.CASHFLOW : CONST.contractType.COMMODITY,
-            CONST.contractProps[type].cashflowArgs,
-            CONST.contractProps[type].contractName,
-            CONST.contractProps[type].contractVer,
-            CONST.contractProps[type].contractUnit,
-            CONST.contractProps[type].contractSymbol,
-            CONST.contractProps[type].contractDecimals,
+            contractType == "CASHFLOW" ? CONST.contractType.CASHFLOW : CONST.contractType.COMMODITY,
+            CONST.contractProps[contractType].cashflowArgs,
+            CONST.contractProps[contractType].contractName,
+            CONST.contractProps[contractType].contractVer,
+            CONST.contractProps[contractType].contractUnit,
+            CONST.contractProps[contractType].contractSymbol,
+            CONST.contractProps[contractType].contractDecimals,
             CONST.chainlinkAggregators[process.env.NETWORK_ID].btcUsd, //chainlinkAggregator_btcUsd,
             CONST.chainlinkAggregators[process.env.NETWORK_ID].ethUsd //chainlinkAggregator_ethUsd
         ).then(async stm => {
@@ -99,15 +99,16 @@ module.exports = async function (deployer) {
                 var ip = "unknown";
                 publicIp.v4().then(p => ip = p).catch(e => { console.log("\tWARN: could not get IP - will write 'unknown'"); });
 
-                console.log(`>>> SAVING DEPLOYMENT: ${CONST.contractProps[type].contractName} ${CONST.contractProps[type].contractVer}`);
+                console.log(`>>> SAVING DEPLOYMENT: ${CONST.contractProps[contractType].contractName} ${CONST.contractProps[contractType].contractVer}`);
                 await db.SaveDeployment({
-                    contractName: CONST.contractProps[type].contractName,
-                     contractVer: CONST.contractProps[type].contractVer,
+                    contractName: CONST.contractProps[contractType].contractName,
+                     contractVer: CONST.contractProps[contractType].contractVer,
                        networkId: deployer.network_id,
                  deployedAddress: stm.address,
                 deployerHostName: os.hostname(),
                     deployerIpv4: ip,
-                     deployedAbi: JSON.stringify(stm.abi)
+                     deployedAbi: JSON.stringify(stm.abi),
+                    contractType,
                 });
             }
         }).catch(err => { console.error('failed deployment: StMaster', err); });
