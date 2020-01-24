@@ -106,7 +106,7 @@ contract("StMaster", accounts => {
             // transfer to owner - batch 1 UNFCCC, no fees
             const send_tx_B1 = await stm_cur.transferOrTrade({ 
                         ledger_A: M,                            ledger_B: accounts[0], 
-                           qty_A: 1,                       tokenTypeId_A: CONST.tokenType.UNFCCC, 
+                           qty_A: 200,                     tokenTypeId_A: CONST.tokenType.UNFCCC, 
                            qty_B: 0,                       tokenTypeId_B: 0, 
                     ccy_amount_A: 0,                         ccyTypeId_A: 0, 
                     ccy_amount_B: 0,                         ccyTypeId_B: 0, 
@@ -120,11 +120,11 @@ contract("StMaster", accounts => {
             // transfer to owner - batch 2 VCS, with fees
             if (await stm_cur.getContractType() == CONST.contractType.COMMODITY) {
                     const send_tx_B2 = await stm_cur.transferOrTrade({ 
-                            ledger_A: M,                            ledger_B: accounts[0], 
+                         ledger_A: M,                            ledger_B: accounts[0], 
                             qty_A: 100,                     tokenTypeId_A: CONST.tokenType.VCS, 
                             qty_B: 0,                       tokenTypeId_B: 0, 
-                        ccy_amount_A: 0,                         ccyTypeId_A: 0, 
-                        ccy_amount_B: 0,                         ccyTypeId_B: 0, 
+                     ccy_amount_A: 0,                         ccyTypeId_A: 0, 
+                     ccy_amount_B: 0,                         ccyTypeId_B: 0, 
                         applyFees: true,
                         feeAddrOwner: CONST.nullAddr,
                     },
@@ -133,8 +133,12 @@ contract("StMaster", accounts => {
                 curHash = await checkHashUpdate(curHash);
             }
 
-            // burn - some of batch 1 VCS
+            // burn - parital, UNFCCC
             const burn_tx_B1 = await stm_cur.burnTokens(M, CONST.tokenType.UNFCCC, 1);
+            curHash = await checkHashUpdate(curHash);
+
+            // burn - full, batch 2 VCS
+            const burn_tx_B2 = await stm_cur.burnTokens(M, CONST.tokenType.VCS, 100);
             curHash = await checkHashUpdate(curHash);
         }
         const batchCount = await stm_cur.getSecTokenBatchCount.call();

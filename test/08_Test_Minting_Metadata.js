@@ -46,12 +46,9 @@ contract("StMaster", accounts => {
 
         const burnTx = await stm.burnTokens(M, CONST.tokenType.UNFCCC, 1000);
         console.log('hash2', await stm.getLedgerHashcode())
-
-        // TODO: data load test - mint + burn full
-
     });
 
-    /*it(`minting metadata - should allow metadata no KVP minting`, async () => {
+    it(`minting metadata - should allow metadata no KVP minting`, async () => {
         const batchId = await mintBatchWithMetadata( 
             { tokenType: CONST.tokenType.UNFCCC, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.TaddrNdx],
              metaKeys: [],
@@ -131,7 +128,7 @@ contract("StMaster", accounts => {
              metaKeys: unfccc_ExampleKvps.map(p => p.k),
            metaValues: unfccc_ExampleKvps.map(p => p.v),
         }, { from: accounts[0] } );
-    });*/
+    });
 
     // ###
     // issues doing validation in the contact: string[] dynamic (ABIEncoderV2) string [] params' .length property returns 0 (?!)
@@ -180,7 +177,7 @@ contract("StMaster", accounts => {
     //     assert.fail('expected contract exception');
     // });
 
-    /*it(`post-minting metadata - should allow adding of a new KVP after minting`, async () => {
+    it(`post-minting metadata - should allow adding of a new KVP after minting`, async () => {
         const batchId = await mintBatchWithMetadata( 
             { tokenType: CONST.tokenType.UNFCCC, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.TaddrNdx],
              metaKeys: unfccc_ExampleKvps.map(p => p.k),
@@ -236,7 +233,7 @@ contract("StMaster", accounts => {
             return;
         }
         assert.fail('expected contract exception');
-    });*/
+    });
 
     async function mintBatchWithMetadata({ tokenType, qtyUnit, qtySecTokens, receiver, metaKeys, metaValues }) {
         const mintTx = await stm.mintSecTokenBatch(tokenType, qtyUnit, qtySecTokens, receiver, CONST.nullFees, metaKeys, metaValues, { from: accounts[0] });
