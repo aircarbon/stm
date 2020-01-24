@@ -92,7 +92,7 @@ library LedgerLib {
             if (ledgerNdx != 0)
                 ledgerHash = keccak256(abi.encodePacked(ledgerHash, entryOwner));
 
-            // hash ledger tokens & custom fee
+            // hash ledger tokens & custom fee, by token types
             for (uint256 stTypeId = 1; stTypeId <= stTypesData._count_tokenTypes; stTypeId++) {
                 uint256[] storage stIds = entry.tokenType_stIds[stTypeId];
 
@@ -102,18 +102,6 @@ library LedgerLib {
                 // hash token type ledger fee
                 if (entry.customFees.tokType_Set[stTypeId]) {
                     ledgerHash = keccak256(abi.encodePacked(ledgerHash, hashSetFeeArgs(entry.customFees.tok[stTypeId])));
-                }
-
-                // loop tokens, hash their details
-                for (uint256 stNdx = 0; stNdx < stIds.length; stNdx++) {
-                    StructLib.PackedSt memory st = ledgerData._sts[stIds[stNdx]];
-
-                    ledgerHash = keccak256(abi.encodePacked(ledgerHash, st.batchId, st.mintedQty, st.currentQty));
-
-                    // consistency check
-                    chk.totalCur += uint256(st.currentQty);
-                    chk.totalMinted += uint256(st.mintedQty);
-                    chk.totalTokensOnLedger++;
                 }
             }
 
@@ -129,12 +117,20 @@ library LedgerLib {
             }
         }
 
+        // walk all tokens (including those fully deleted from the ledger by burn()), hash
+        for (uint256 stId = 1; stId <= ledgerData._tokens_currentMax_id; stId++) {
+            StructLib.PackedSt memory st = ledgerData._sts[stId];
+
+            ledgerHash = keccak256(abi.encodePacked(ledgerHash, st.batchId, st.mintedQty, st.currentQty));
+
+            // consistency check
+            chk.totalCur += uint256(st.currentQty);
+            chk.totalMinted += uint256(st.mintedQty);
+        }
+
         // consistency check - global totals vs. all STs
         require(chk.totalMinted == ledgerData._tokens_totalMintedQty, "Consistency check failed (1)");
         require(chk.totalMinted - chk.totalCur == ledgerData._tokens_totalBurnedQty, "Consistency check failed (2)");
-
-        // consistency check - all STs exist against exactly one ledger entry
-        require(chk.totalTokensOnLedger == ledgerData._tokens_currentMax_id, "Consistency check failed (3)");
 
         // hash totals & counters
         ledgerHash = keccak256(abi.encodePacked(ledgerHash, ledgerData._tokens_currentMax_id));
