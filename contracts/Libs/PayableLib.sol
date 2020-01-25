@@ -238,13 +238,16 @@ library PayableLib {
     )
     public view returns(StructLib.CashflowStruct memory) {
         StructLib.CashflowStruct memory ret = cashflowData;
-        if (ledgerData._batches_currentMax_id == 1) {
-            StructLib.SecTokenBatch storage issueBatch = ledgerData._batches[1];
-            uint256[] storage issuer_stIds = ledgerData._ledger[issueBatch.originator].tokenType_stIds[1];
-            StructLib.PackedSt storage issuerSt = ledgerData._sts[issuer_stIds[0]];
-            ret.qty_issuanceMax = issueBatch.mintedQty;
-            ret.qty_issuanceRemaining = issuerSt.currentQty;
-            ret.qty_issuanceSold = issueBatch.mintedQty - issuerSt.currentQty;
+
+        if (ledgerData.contractType == StructLib.ContractType.CASHFLOW) {
+            if (ledgerData._batches_currentMax_id == 1) {
+                StructLib.SecTokenBatch storage issueBatch = ledgerData._batches[1]; // CFT: uni-batch
+                uint256[] storage issuer_stIds = ledgerData._ledger[issueBatch.originator].tokenType_stIds[1]; // CFT: uni-type
+                StructLib.PackedSt storage issuerSt = ledgerData._sts[issuer_stIds[0]];
+                ret.qty_issuanceMax = issueBatch.mintedQty;
+                ret.qty_issuanceRemaining = issuerSt.currentQty;
+                ret.qty_issuanceSold = issueBatch.mintedQty - issuerSt.currentQty;
+            }
         }
         return ret;
     }
