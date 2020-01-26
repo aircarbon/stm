@@ -1,0 +1,47 @@
+pragma solidity ^0.5.13;
+pragma experimental ABIEncoderV2;
+
+import "./IStMaster.sol";
+
+import "./ICcyCollateralizable.sol";
+import "./IStMintable.sol";
+import "./IStBurnable.sol";
+import "./IStTransferable.sol";
+import "./IErc20.sol";
+import "./IStPayable.sol";
+import "./IDataLoadable.sol";
+
+import "../Libs/StructLib.sol";
+
+//
+// *MOCK* public ctor interface; for etherscan contract verification of ./interfaces/*
+//
+// (.MOCK because we don't want it included in the deployment compile)
+//
+// getting: "Error! Invalid constructor arguments provided. Please verify that they are in ABI-encoded format"
+// due to ABIEncoderV2 on ctor() args?
+//
+contract StMasterMock is IStMaster,
+    IStMintable, IStBurnable, ICcyCollateralizable, IStTransferable, IDataLoadable {
+
+    string public name;
+    string public version;
+    string public unit;
+
+    function getContractType() public view returns(StructLib.ContractType) { revert("Not implemented"); }
+
+    constructor(
+        StructLib.ContractType _contractType,
+        StructLib.CashflowArgs memory _cashflowArgs,
+        string memory _contractName,
+        string memory _contractVer,
+        string memory _contractUnit,
+        string memory _contractSymbol,
+        uint8 _contractDecimals,
+        address _chainlinkAggregator_btcUsd,
+        address _chainlinkAggregator_ethUsd
+    ) public { revert("Not implemented"); }
+
+    function sealContract() external { revert("Not implemented"); }
+    function getContractSeal() external view returns (bool) { revert("Not implemented"); }
+}

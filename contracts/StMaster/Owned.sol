@@ -5,11 +5,13 @@ import "../Interfaces/IOwned.sol";
 contract Owned is IOwned
 {
     address payable owner;
-    bool public readOnly;
+
+    bool readOnlyState;
+    function readOnly() external view returns (bool) { return readOnlyState; }
 
     constructor() public {
         owner = msg.sender;
-        readOnly = false;
+        readOnlyState = false;
     }
 
     modifier onlyOwner() {
@@ -17,7 +19,7 @@ contract Owned is IOwned
         _; // required magic
     }
     modifier onlyWhenReadWrite() {
-        require(readOnly == false, "Read-only");
+        require(readOnlyState == false, "Read-only");
         _;
     }
     // modifier onlyWhenReadOnly() {
@@ -25,8 +27,8 @@ contract Owned is IOwned
     //     _;
     // }
 
-    function setReadOnly(bool _readOnly)
+    function setReadOnly(bool readOnlyNewState)
     external onlyOwner() {
-        readOnly = _readOnly;
+        readOnlyState = readOnlyNewState;
     }
 }

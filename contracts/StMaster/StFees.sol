@@ -20,7 +20,7 @@ contract StFees is IStFees,
     StructLib.FeeStruct globalFees;
 
     function getFee(GetFeeType feeType, uint256 typeId, address ledgerOwner)
-    public view returns(StructLib.SetFeeArgs memory) {
+    external view onlyOwner() returns(StructLib.SetFeeArgs memory) {
         StructLib.FeeStruct storage fs = ledgerOwner == address(0x0) ? globalFees : ledgerData._ledger[ledgerOwner].customFees;
         mapping(uint256 => StructLib.SetFeeArgs) storage fa = feeType == GetFeeType.CCY ? fs.ccy : fs.tok;
         return StructLib.SetFeeArgs( {
@@ -29,16 +29,6 @@ contract StFees is IStFees,
                  fee_min: fa[typeId].fee_min,
                  fee_max: fa[typeId].fee_max
         });
-    }
-
-    function setFee_TokType(uint256 tokenTypeId, address ledgerOwner, StructLib.SetFeeArgs memory feeArgs)
-    public onlyOwner() onlyWhenReadWrite() {
-        FeeLib.setFee_TokType(ledgerData, stTypesData, globalFees, tokenTypeId, ledgerOwner, feeArgs);
-    }
-
-    function setFee_CcyType(uint256 ccyTypeId, address ledgerOwner, StructLib.SetFeeArgs memory feeArgs)
-    public onlyOwner() onlyWhenReadWrite() {
-        FeeLib.setFee_CcyType(ledgerData, ccyTypesData, globalFees, ccyTypeId, ledgerOwner, feeArgs);
     }
 
     function getSecToken_totalExchangeFeesPaidQty()
@@ -54,5 +44,15 @@ contract StFees is IStFees,
     function getCcy_totalExchangeFeesPaid(uint256 ccyTypeId)
     external view onlyOwner() returns (uint256) {
         return ledgerData._ccyType_totalFeesPaid[ccyTypeId];
+    }
+
+    function setFee_TokType(uint256 tokenTypeId, address ledgerOwner, StructLib.SetFeeArgs memory feeArgs)
+    public onlyOwner() onlyWhenReadWrite() {
+        FeeLib.setFee_TokType(ledgerData, stTypesData, globalFees, tokenTypeId, ledgerOwner, feeArgs);
+    }
+
+    function setFee_CcyType(uint256 ccyTypeId, address ledgerOwner, StructLib.SetFeeArgs memory feeArgs)
+    public onlyOwner() onlyWhenReadWrite() {
+        FeeLib.setFee_CcyType(ledgerData, ccyTypesData, globalFees, ccyTypeId, ledgerOwner, feeArgs);
     }
 }

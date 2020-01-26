@@ -4,10 +4,10 @@ pragma solidity ^0.5.13;
  * @notice Method modifiers & read-only state
  */
  contract IOwned {
-    /**
-     * @notice Returns the current read-only contract state
-     */
-    function readOnly() external returns (bool);
+    // /**
+    //  * @notice Returns the current read-only contract state
+    //  */
+    // function readOnly() public returns (bool);
 
     /**
      * @notice Modifier for methods only available to the contract owner

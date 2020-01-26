@@ -13,11 +13,11 @@ import "../Libs/LedgerLib.sol";
  */
  contract IStTransferable is IOwned {
 
-    /**
-     * @notice Returns a keccak256 hash of all contract data
-     * @dev Contract owner's ledger entry and its whitelist entry are excluded from the hash calculation; they are expected to change across contract upgrades
-     */
-    function getLedgerHashcode() external view returns (bytes32) { revert("Not implemented"); }
+    // /**
+    //  * @notice Returns a keccak256 hash of all contract data
+    //  * @dev Contract owner's ledger entry and its whitelist entry are excluded from the hash calculation; they are expected to change across contract upgrades
+    //  */
+    // function getLedgerHashcode() external view returns (bytes32) { revert("Not implemented"); }
 
     /**
      * @notice Transfers or trades assets between ledger accounts

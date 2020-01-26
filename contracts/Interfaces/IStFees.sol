@@ -23,7 +23,25 @@ contract IStFees is IOwned {
      * @param ledgerOwner If > 0x0, returns the ledger (override) fee in effect for the address, else returns the global fee
      */
     function getFee(GetFeeType feeType, uint256 typeId, address ledgerOwner)
-    public view returns(StructLib.SetFeeArgs memory) { revert("Not implemented"); }
+    external view onlyOwner() returns(StructLib.SetFeeArgs memory) { revert("Not implemented"); }
+
+    /**
+     * @notice Returns the total quantity of token exchange fees paid, in the contract base unit
+     */
+    function getSecToken_totalExchangeFeesPaidQty()
+    external view onlyOwner() returns (uint256) { revert("Not implemented"); }
+
+    /**
+     * @notice Returns the total quantity of token originator fees paid, in the contract base unit
+     */
+    function getSecToken_totalOriginatorFeesPaidQty()
+    external view onlyOwner() returns (uint256) { revert("Not implemented"); }
+
+    /**
+     * @notice Returns the total amount of currency exchange fees paid, for the supplied currency
+     */
+    function getCcy_totalExchangeFeesPaid(uint256 ccyTypeId)
+    external view onlyOwner() returns (uint256) { revert("Not implemented"); }
 
     /**
      * @notice Sets the current fee structure (global or ledger fee) for the supplied token type
@@ -43,21 +61,4 @@ contract IStFees is IOwned {
     function setFee_CcyType(uint256 ccyTypeId, address ledgerOwner, StructLib.SetFeeArgs memory feeArgs)
     public onlyOwner() onlyWhenReadWrite() { revert("Not implemented"); }
 
-    /**
-     * @notice Returns the total quantity of token exchange fees paid, in the contract base unit
-     */
-    function getSecToken_totalExchangeFeesPaidQty()
-    external view onlyOwner() returns (uint256) { revert("Not implemented"); }
-
-    /**
-     * @notice Returns the total quantity of token originator fees paid, in the contract base unit
-     */
-    function getSecToken_totalOriginatorFeesPaidQty()
-    external view onlyOwner() returns (uint256) { revert("Not implemented"); }
-
-    /**
-     * @notice Returns the total amount of currency exchange fees paid, for the supplied currency
-     */
-    function getCcy_totalExchangeFeesPaid(uint256 ccyTypeId)
-    external view onlyOwner() returns (uint256) { revert("Not implemented"); }
 }

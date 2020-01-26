@@ -11,6 +11,24 @@ import "../Libs/TokenLib.sol";
  */
  contract ICcyCollateralizable is IOwned {
 
+    // /**
+    //  * @notice Returns the current currency types
+    //  */
+    // function getCcyTypes()
+    // external view returns (StructLib.GetCcyTypesReturn memory) { revert("Not implemented"); }
+
+    /**
+     * @notice Returns the total amount of funded collateralized currency for the supplied currency type
+     */
+    function getTotalCcyFunded(uint256 ccyTypeId)
+    external view onlyOwner() returns (uint256) { revert("Not implemented"); }
+
+    /**
+     * @dev Returns the total global amount withdrawn for the supplied currency
+     */
+    function getTotalCcyWithdrawn(uint256 ccyTypeId)
+    external view onlyOwner() returns (uint256) { revert("Not implemented"); }
+
     /**
      * @notice Adds a new currency type
      * @param name New currency type name
@@ -19,11 +37,6 @@ import "../Libs/TokenLib.sol";
      */
     function addCcyType(string memory name, string memory unit, uint16 decimals)
     public onlyOwner() onlyWhenReadWrite() { revert("Not implemented"); }
-
-    /**
-     * @notice Returns the current currency types
-     */
-    function getCcyTypes() external view returns (StructLib.GetCcyTypesReturn memory) { revert("Not implemented"); }
 
     /**
      * @notice Funds a ledger entry with the specified amount and type of collateralized currency
@@ -36,11 +49,6 @@ import "../Libs/TokenLib.sol";
                   address ledgerOwner)
     public onlyOwner() onlyWhenReadWrite() { revert("Not implemented"); }
 
-    /**
-     * @notice Returns the total amount of funded collateralized currency for the supplied currency type
-     */
-    function getTotalCcyFunded(uint256 ccyTypeId)
-    external view onlyOwner() returns (uint256) { revert("Not implemented"); }
 
     /**
      * @notice Withdraws the specified amount and type of collateralized currency from the specified ledger entry
@@ -53,9 +61,4 @@ import "../Libs/TokenLib.sol";
                       address ledgerOwner)
     public onlyOwner() onlyWhenReadWrite() { revert("Not implemented"); }
 
-    /**
-     * @dev Returns the total global amount withdrawn for the supplied currency
-     */
-    function getTotalCcyWithdrawn(uint256 ccyTypeId)
-    external view onlyOwner() returns (uint256) { revert("Not implemented"); }
 }

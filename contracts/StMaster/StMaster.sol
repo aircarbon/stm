@@ -2,6 +2,7 @@ pragma solidity ^0.5.13;
 pragma experimental ABIEncoderV2;
 
 import "../Interfaces/IStMaster.sol";
+import "../Interfaces/IPublicViews.sol";
 
 import "./CcyCollateralizable.sol";
 import "./StMintable.sol";
@@ -13,13 +14,21 @@ import "./DataLoadable.sol";
 
 import "../Libs/StructLib.sol";
 
-contract StMaster is IStMaster, 
+contract StMaster is IStMaster, IPublicViews,
     StMintable, StBurnable, Collateralizable, StTransferable, DataLoadable {
 
     // contract properties
     string public name;
-    string public version;
-    string public unit; // the smallest (integer, non-divisible) security token unit, e.g. "KG"
+
+    function getContractType() external view returns(StructLib.ContractType) { return ledgerData.contractType; }
+
+    function getContractSeal() external view returns (bool) { return ledgerData._contractSealed; }
+    function sealContract() external { ledgerData._contractSealed = true; }
+
+    string contractVersion;
+    string contractUnit; // the smallest (integer, non-divisible) security token unit, e.g. "KG"
+    function version() external view returns (string memory) { return contractVersion; }
+    function unit() external view returns (string memory) { return contractUnit; }
 
     // events -- (hack: see: https://ethereum.stackexchange.com/questions/11137/watching-events-defined-in-libraries)
     // CcyLib events
@@ -81,8 +90,6 @@ contract StMaster is IStMaster,
     // FeeLib       577162
     // StructLib    170684
 
-    function getContractType() public view returns(StructLib.ContractType) { return ledgerData.contractType; }
-
     constructor(
         StructLib.ContractType _contractType,
         StructLib.CashflowArgs memory _cashflowArgs,
@@ -100,8 +107,8 @@ contract StMaster is IStMaster,
 
         // set common properties
         name = _contractName;
-        version = _contractVer;
-        unit = _contractUnit;
+        contractVersion = _contractVer;
+        contractUnit = _contractUnit;
 
         // contract type
         ledgerData.contractType = _contractType;
@@ -177,16 +184,6 @@ contract StMaster is IStMaster,
     //    >> with MAX_BATCHES_PREVIEW exceeded ... change to more(bool) ... ?
     //  ** fee-preview: tests general / using it for splitting multi-batch transfers
     //
-
-    /**
-     * @dev Immutably seals the contract. Once sealed, no further whitelist entries can be added, and no bulk data load actions can be performed.
-     */
-    function sealContract() external {
-        ledgerData._contractSealed = true;
-    }
-    function getContractSeal() external view returns (bool) {
-        return ledgerData._contractSealed;
-    }
 
     // TODO: for updateable libs - proxy dispatcher
     // https://blog.openzeppelin.com/proxy-libraries-in-solidity-79fbe4b970fd/

@@ -4,6 +4,32 @@ pragma solidity ^0.5.13;
  * @notice Partial ERC20
  */
 interface IErc20 {
+
+    // /**
+    //  * @notice Returns the token's name
+    //  */
+    // function name() external view returns (string memory);
+
+    // /**
+    //  * @notice Returns the token's symbol
+    //  */
+    //  function symbol() external view returns (string memory);
+
+    // /**
+    //  * @notice Returns the number of decimals to divide by when displaying the token's balance
+    //  */
+    //  function decimals() external view returns (uint8);
+
+    // /**
+    //  * @notice Returns the total minted supply of the token
+    //  */
+    // function totalSupply() external view returns (uint256);
+
+    // /**
+    //  * @notice Returns the token balance for the supplied address
+    //  */
+    // function balanceOf(address account) external view returns (uint256);
+
     /**
      * @notice Emitted when `value` tokens are moved from one account (`from`) to another (`to`)
      */
@@ -13,31 +39,6 @@ interface IErc20 {
      * @dev Emitted when the allowance of a `spender` for an `owner` is set by a call to {approve}. `value` is the new allowance
      */
     event Approval(address indexed owner, address indexed spender, uint256 value);
-
-    /**
-     * @notice Returns the token's name
-     */
-    function name() external view returns (string memory);
-
-    /**
-     * @notice Returns the token's symbol
-     */
-     function symbol() external view returns (string memory);
-
-    /**
-     * @notice Returns the number of decimals to divide by when displaying the token's balance
-     */
-     function decimals() external view returns (uint8);
-
-    /**
-     * @notice Returns the total minted supply of the token
-     */
-    function totalSupply() external view returns (uint256);
-
-    /**
-     * @notice Returns the token balance for the supplied address
-     */
-    function balanceOf(address account) external view returns (uint256);
 
     /**
      * @notice Transfers the supplied number of tokens from the caller to the supplied `recipient`

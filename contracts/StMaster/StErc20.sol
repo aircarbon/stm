@@ -24,7 +24,7 @@ contract StErc20 is StFees, IErc20 {
     string public symbol;
     uint8 public decimals;
 
-    constructor(string memory _symbol, uint8 _decimals) public {
+    constructor(string memory _symbol, uint8 _decimals) internal {
         symbol = _symbol;
         decimals = _decimals;
     }

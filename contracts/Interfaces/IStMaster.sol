@@ -43,28 +43,28 @@ import "../Libs/StructLib.sol";
     // PayableLib events
     event IssuanceSubscribed(address indexed subscriber, address indexed issuer, uint256 weiSent, uint256 weiChange, uint256 tokensSubscribed, uint256 weiPrice);
 
-    /**
-     * @notice Contract version
-     */
-    function version() external view returns (string memory);
+    // /**
+    //  * @notice Contract version
+    //  */
+    // function version() external view returns (string memory);
 
-    /**
-     * @notice The security token unit name, e.g. "KG" or carbon, "Token" for generic CFT tokens
-     */
-    function unit() external view returns (string memory);
+    // /**
+    //  * @notice The security token unit name, e.g. "KG" or carbon, "Token" for generic CFT tokens
+    //  */
+    // function unit() external view returns (string memory);
 
-    /**
-     * @notice Returns the contract type: COMMODITY (0) or CASHFLOW (1)
-     */
-    function getContractType() external view returns(StructLib.ContractType);
+    // /**
+    //  * @notice Returns the contract type: COMMODITY (0) or CASHFLOW (1)
+    //  */
+    // function getContractType() external view returns(StructLib.ContractType);
+
+    // /**
+    //  * @notice Returns whether or not the contract is sealed
+    //  */
+    // function getContractSeal() external view returns (bool);
 
     /**
      * @notice Seals the contract
      */
     function sealContract() external;
-
-    /**
-     * @notice Returns whether or not the contract is sealed
-     */
-    function getContractSeal() external view returns (bool);
 }

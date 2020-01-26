@@ -79,14 +79,22 @@ module.exports = async function (deployer) {
             CONST.contractProps[contractType].contractUnit,
             CONST.contractProps[contractType].contractSymbol,
             CONST.contractProps[contractType].contractDecimals,
-            CONST.chainlinkAggregators[process.env.NETWORK_ID].btcUsd, //chainlinkAggregator_btcUsd,
-            CONST.chainlinkAggregators[process.env.NETWORK_ID].ethUsd //chainlinkAggregator_ethUsd
+            CONST.chainlinkAggregators[process.env.NETWORK_ID].btcUsd,
+            CONST.chainlinkAggregators[process.env.NETWORK_ID].ethUsd
         ).then(async stm => {
+            //console.dir(stm);
             //console.dir(stm.abi);
             //console.dir(deployer);
 
-            // **PROD TODO (L2 obfuscation)
-            const MNEMONIC = require('../dev_mnemonic.js').MNEMONIC; // **PROD TODO
+            // get ABI-encoded ctor params (for etherscan contract verification)
+                // ## https://github.com/ethereumjs/ethereumjs-abi/issues/69
+                //const ejs_abi = require('ethereumjs-abi');
+                //var encodedArgs = ejs_abi.encode(stm.abi, "balanceOf(uint256 address)", [ "0x0000000000000000000000000000000000000000" ])
+                //console.log('encodedArgs', encodedArgs.toString('hex'));
+            // TODO: try https://github.com/Zoltu/ethereum-abi-encoder ...
+
+            // 
+            const MNEMONIC = require('../dev_mnemonic.js').MNEMONIC;
             const accountAndKey = await CONST.getAccountAndKey(0, MNEMONIC);
             const OWNER = accountAndKey.addr;
             const OWNER_privKey = accountAndKey.privKey;

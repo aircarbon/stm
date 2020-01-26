@@ -19,44 +19,43 @@ contract IStLedger is IOwned {
     function addSecTokenType(string memory name)
     public onlyOwner() onlyWhenReadWrite() { revert("Not implemented"); }
 
-    /**
-     * @notice Returns current ST types
-     */
-    function getSecTokenTypes()
-    external view returns (StructLib.GetSecTokenTypesReturn memory) { revert("Not implemented"); }
+    // /**
+    //  * @notice Returns current token types
+    //  */
+    // function getSecTokenTypes() external view returns (StructLib.GetSecTokenTypesReturn memory) { revert("Not implemented"); }
 
-    /**
-     * @notice Returns all account addresses in the ledger
-     */
-    function getLedgerOwners() external view returns (address[] memory) { revert("Not implemented"); }
+    // /**
+    //  * @notice Returns all account addresses in the ledger
+    //  */
+    // function getLedgerOwners() external view returns (address[] memory) { revert("Not implemented"); }
 
-    /**
-     * @notice Returns a single account address in the ledger
-     */
-    function getLedgerOwnerCount() external view returns (uint256) { revert("Not implemented"); }
+    // /**
+    //  * @notice Returns a single account address in the ledger
+    //  */
+    // function getLedgerOwnerCount() external view returns (uint256) { revert("Not implemented"); }
 
-    /**
-     * @notice Returns a single account address in the ledger
-     */
-    function getLedgerOwner(uint256 index) external view returns (address) { revert("Not implemented"); }
+    // /**
+    //  * @notice Returns a single account address in the ledger
+    //  */
+    // function getLedgerOwner(uint256 index) external view returns (address) { revert("Not implemented"); }
 
-    /**
-     * @notice Returns the ledger entry for a single account
-     */
-    function getLedgerEntry(address account) external view returns (StructLib.LedgerReturn memory) { revert("Not implemented"); }
+    // /**
+    //  * @notice Returns the ledger entry for a single account
+    //  */
+    // function getLedgerEntry(address account) external view returns (StructLib.LedgerReturn memory) { revert("Not implemented"); }
 
-    /**
-     * @notice Returns a token by ID
-     */
-    function getSecToken(uint256 id) external view returns (StructLib.SecTokenReturn memory) { revert("Not implemented"); }
+    // /**
+    //  * @notice Returns a token by ID
+    //  */
+    // function getSecToken(uint256 id) external view returns (StructLib.SecTokenReturn memory) { revert("Not implemented"); }
 
-    /**
-     * @notice Returns the global token batch count
-     */
-    function getSecTokenBatchCount() external view returns (uint256) { revert("Not implemented"); }
+    // /**
+    //  * @notice Returns the global token batch count
+    //  */
+    // function getSecTokenBatchCount() external view returns (uint256) { revert("Not implemented"); }
 
-    /**
-     * @notice Returns a token batch by ID
-     */
-    function getSecTokenBatch(uint256 batchId) external view returns (StructLib.SecTokenBatch memory) { revert("Not implemented"); }
+    // /**
+    //  * @notice Returns a token batch by ID
+    //  */
+    // function getSecTokenBatch(uint256 batchId) external view returns (StructLib.SecTokenBatch memory) { revert("Not implemented"); }
 }

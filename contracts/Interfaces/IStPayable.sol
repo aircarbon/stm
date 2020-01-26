@@ -14,15 +14,20 @@ import "../Libs/PayableLib.sol";
  */
  contract IStPayable is IOwned {
 
-    /**
-     * @notice Returns current BTC/USD rate according to Chainlink reference data contract
-     */
-    function get_btcUsd() public view returns(int256) { revert("Not implemented"); }
+    // /**
+    //  * @notice Returns current BTC/USD rate according to Chainlink reference data contract
+    //  */
+    // function get_btcUsd() public view returns(int256) { revert("Not implemented"); }
 
-    /**
-     * @notice Returns current ETH/USD rate according to Chainlink reference data contract
-     */
-    function get_ethUsd() public view returns(int256) { revert("Not implemented"); }
+    // /**
+    //  * @notice Returns current ETH/USD rate according to Chainlink reference data contract
+    //  */
+    // function get_ethUsd() public view returns(int256) { revert("Not implemented"); }
+
+    // /**
+    //  * @notice Returns cashflow data
+    //  */
+    // function getCashflowData() public view returns(StructLib.CashflowStruct memory) { revert("Not implemented"); }
 
     /**
      * @notice Handles (1) subscriber payments and (2) issuer payments (bond interest payments & principal repayments, and equity dividend payments)
@@ -42,8 +47,4 @@ import "../Libs/PayableLib.sol";
         uint256 qty_saleAllocation
     ) external onlyWhenReadWrite() { revert("Not implemented"); }
 
-    /**
-     * @notice Returns cashflow data
-     */
-    function getCashflowData() public view returns(StructLib.CashflowStruct memory) { revert("Not implemented"); }
 }
