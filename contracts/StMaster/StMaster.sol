@@ -1,18 +1,20 @@
 pragma solidity ^0.5.13;
 pragma experimental ABIEncoderV2;
 
-import "./CcyFundable.sol";
-import "./CcyWithdrawable.sol";
+import "../Interfaces/IStMaster.sol";
+
+import "./CcyCollateralizable.sol";
 import "./StMintable.sol";
 import "./StBurnable.sol";
 import "./StTransferable.sol";
 import "./StErc20.sol";
-import "./StDataLoadable.sol";
 import "./StPayable.sol";
+import "./DataLoadable.sol";
 
 import "../Libs/StructLib.sol";
 
-contract StMaster is StMintable, StBurnable, CcyFundable, CcyWithdrawable, StTransferable, StDataLoadable {
+contract StMaster is IStMaster, 
+    StMintable, StBurnable, Collateralizable, StTransferable, DataLoadable {
 
     // contract properties
     string public name;
@@ -33,7 +35,7 @@ contract StMaster is StMintable, StBurnable, CcyFundable, CcyWithdrawable, StTra
     event AddedBatchMetadata(uint256 indexed batchId, string key, string value);
     event SetBatchOriginatorFee(uint256 indexed batchId, StructLib.SetFeeArgs originatorFee);
     // TransferLib events
-    enum TransferType { User, ExchangeFee, OriginatorFee }
+    //enum TransferType { User, ExchangeFee, OriginatorFee }
     event TransferedLedgerCcy(address indexed from, address indexed to, uint256 ccyTypeId, uint256 amount, TransferType transferType);
     event TransferedFullSecToken(address indexed from, address indexed to, uint256 indexed stId, uint256 mergedToSecTokenId, uint256 qty, TransferType transferType);
     event TransferedPartialSecToken(address indexed from, address indexed to, uint256 indexed splitFromSecTokenId, uint256 newSecTokenId, uint256 mergedToSecTokenId, uint256 qty, TransferType transferType);
@@ -179,7 +181,7 @@ contract StMaster is StMintable, StBurnable, CcyFundable, CcyWithdrawable, StTra
     /**
      * @dev Immutably seals the contract. Once sealed, no further whitelist entries can be added, and no bulk data load actions can be performed.
      */
-    function sealContract() public {
+    function sealContract() external {
         ledgerData._contractSealed = true;
     }
     function getContractSeal() external view returns (bool) {

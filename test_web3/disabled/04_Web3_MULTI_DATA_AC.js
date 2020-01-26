@@ -1,6 +1,4 @@
 const assert = require('assert');
-//const acmJson = require('../build/contracts/StMaster.json');
-//const abi = acmJson['abi'];
 const EthereumJsTx = require('ethereumjs-tx');
 const BN = require('bn.js');
 const { db } = require('../../common/dist');

@@ -1,6 +1,8 @@
 pragma solidity ^0.5.13;
 pragma experimental ABIEncoderV2;
 
+import "../Interfaces/IDataLoadable.sol";
+
 import "./Owned.sol";
 import "./StLedger.sol";
 import "./StFees.sol";
@@ -10,7 +12,8 @@ import "../Libs/StructLib.sol";
 import "../Libs/TokenLib.sol";
 import "../Libs/LoadLib.sol";
 
-contract StDataLoadable is Owned, StLedger, StFees, StErc20 {
+contract DataLoadable is IDataLoadable,
+    Owned, StLedger, StFees, StErc20 {
 
     function loadSecTokenBatch(StructLib.SecTokenBatch[] memory batches, uint64 _batches_currentMax_id) public onlyOwner() {
         LoadLib.loadSecTokenBatch(ledgerData, batches, _batches_currentMax_id);

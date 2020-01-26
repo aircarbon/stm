@@ -59,7 +59,7 @@ contract StErc20 is StFees, IErc20 {
 
     // ERC20 - APPROVALS: NOP for now
     // would be needed for bonding curve implementation?
-    function allowance(address owner, address spender) public view returns (uint256) { return 0; }
-    function approve(address spender, uint256 amount) public returns (bool) { return false; }
-    function transferFrom(address sender, address recipient, uint256 amount) public returns (bool) { return false; }
+    // function allowance(address owner, address spender) public view returns (uint256) { return 0; }
+    // function approve(address spender, uint256 amount) public returns (bool) { return false; }
+    // function transferFrom(address sender, address recipient, uint256 amount) public returns (bool) { return false; }
 }

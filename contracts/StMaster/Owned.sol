@@ -1,6 +1,9 @@
 pragma solidity ^0.5.13;
 
-contract Owned {
+import "../Interfaces/IOwned.sol";
+
+contract Owned is IOwned
+{
     address payable owner;
     bool public readOnly;
 
@@ -22,12 +25,8 @@ contract Owned {
     //     _;
     // }
 
-    /**
-     * @dev Sets the contract-wide read only state
-     * @param _readOnly State to set
-     */
     function setReadOnly(bool _readOnly)
-    public onlyOwner() {
+    external onlyOwner() {
         readOnly = _readOnly;
     }
 }

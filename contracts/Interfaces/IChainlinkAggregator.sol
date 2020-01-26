@@ -1,6 +1,10 @@
 pragma solidity ^0.5.13;
 
-interface AggregatorInterface {
+/**
+ * @notice Chainlink Reference Data Contract
+ * @dev https://docs.chain.link/docs/using-chainlink-reference-contracts
+ */
+ interface IChainlinkAggregator {
   function latestAnswer() external view returns (int256);
   function latestTimestamp() external view returns (uint256);
   function latestRound() external view returns (uint256);

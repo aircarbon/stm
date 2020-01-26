@@ -47,7 +47,7 @@ contract("StMaster", accounts => {
     // ordered tests: these need to run in this order; they assume contract state from previous test(s)
     //
 
-    it(`erc20 - should be able to send 1 type / 1 batch from whitelist addr to graylist addr (WITHDRAW: exchange => erc20)`, async () => {
+    it(`erc20 single-type - should be able to send 1 type / 1 batch from whitelist addr to graylist addr (WITHDRAW: exchange => erc20)`, async () => {
         await white_to_gray_1();
     });
     async function white_to_gray_1() {
@@ -64,7 +64,7 @@ contract("StMaster", accounts => {
         assert(data.ledgerB_after.tokens_sumQty > 0, 'unexpected graylist ledger GRAY_1 quantity after');    
     }
 
-    it(`erc20 - should be able to send 1 type / 1 batch from graylist addr to whitelist addr (DEPOSIT: erc20 => exchange)`, async () => {
+    it(`erc20 single-type - should be able to send 1 type / 1 batch from graylist addr to whitelist addr (DEPOSIT: erc20 => exchange)`, async () => {
         await gray_1_to_white();
     });
     async function gray_1_to_white() {
@@ -78,7 +78,7 @@ contract("StMaster", accounts => {
         assert(WHITE_after.tokens_sumQty == CONST.tonCarbon, 'unexpected whitelist ledger WHITE quantity after');     
     }
 
-    it(`erc20 - should be able to send 1 type / 1 batch from graylist addr to self (erc20 => same erc20)`, async () => {
+    it(`erc20 single-type - should be able to send 1 type / 1 batch from graylist addr to self (erc20 => same erc20)`, async () => {
         await white_to_gray_1(); 
         await gray_1_to_gray_1();
     });
@@ -91,7 +91,7 @@ contract("StMaster", accounts => {
         assert(GRAY1_after.tokens_sumQty == CONST.tonCarbon, 'unexpected graylist ledger GRAY_1 quantity after');     
     }
 
-    it(`erc20 - should be able to send 1 type / 1 batch from graylist addr to graylist addr (erc20 => other erc20)`, async () => {
+    it(`erc20 single-type - should be able to send 1 type / 1 batch from graylist addr to graylist addr (erc20 => other erc20)`, async () => {
         //await white_to_gray_1(); 
         await gray_1_to_gray_2();
     });

@@ -4,8 +4,6 @@ const CONST = require('../const.js');
 const transferHelper = require('../test/transferHelper.js');
 const BN = require('bn.js');
 const Big = require('big.js');
-const Web3 = require('web3');
-const web3 = new Web3();
 
 contract("StMaster", accounts => {
     var stm;
@@ -38,7 +36,7 @@ contract("StMaster", accounts => {
         const tokType_A = CONST.tokenType.VCS;
         const tokType_B = CONST.tokenType.UNFCCC;
         var { qty: qty_A, M_multi: M_multi_A } = await MintAndTransfer({ tokenType: tokType_A, originatorCount: 2, batchesPerOriginator: 1, transferTo: A });
-        var { qty: qty_B, M_multi: M_multi_B } = await MintAndTransfer({ tokenType: tokType_B, originatorCount: 1, batchesPerOriginator: 4, transferTo: B });
+        var { qty: qty_B, M_multi: M_multi_B } = await MintAndTransfer({ tokenType: tokType_B, originatorCount: 1, batchesPerOriginator: 2, transferTo: B });
         console.log('qty_A', qty_A.toString());
         console.log('qty_B', qty_B.toString());
         console.log('M_multi_A', M_multi_A);

@@ -29,6 +29,10 @@ Migration script will pickup this env var and deploy a test contract accordingly
 - `truffle compile` or (undocumented) `truffle compile --reset` if it keeps recompiling when there aren't any changes in the Solidity
 - `truffle test --network development`
 
+## Docs
+- `npx soldoc --output html ./doc ./contracts/Interfaces`
+- solidity-docgen: pending -- https://github.com/OpenZeppelin/solidity-docgen/issues/132
+
 ## Dbg - misc
 If you see `Error: invalid reporter "eth-gas-reporter"` -- try running `npm i` in ./packages/erc20
 

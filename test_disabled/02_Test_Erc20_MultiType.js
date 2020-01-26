@@ -56,7 +56,7 @@ contract("StMaster", accounts => {
     // ordered tests: these need to run in this order; they assume contract state from previous test(s)
     //
 
-    it(`erc20 - should be able to send 2 types / 3 batches from whitelist addr to graylist addr (WITHDRAW: exchange => erc20)`, async () => {
+    it(`erc20 multi-type - should be able to send 2 types / 3 batches from whitelist addr to graylist addr (WITHDRAW: exchange => erc20)`, async () => {
         await white_to_gray_1();
     });
     async function white_to_gray_1() {
@@ -78,7 +78,7 @@ contract("StMaster", accounts => {
         });
     }
 
-    it(`erc20 - should be able to send 2 types / 3 batches from graylist addr to whitelist addr (DEPOSIT: erc20 => exchange)`, async () => {
+    it(`erc20 multi-type - should be able to send 2 types / 3 batches from graylist addr to whitelist addr (DEPOSIT: erc20 => exchange)`, async () => {
         await gray_1_to_white();
     });
     async function gray_1_to_white() {
@@ -92,7 +92,7 @@ contract("StMaster", accounts => {
         assert(WHITE_after.tokens_sumQty == 6000, 'unexpected whitelist ledger WHITE quantity after');     
     }
 
-    it(`erc20 - should be able to send 2 types / 3 batches from graylist addr to graylist addr (erc20 => erc20)`, async () => {
+    it(`erc20 multi-type - should be able to send 2 types / 3 batches from graylist addr to graylist addr (erc20 => erc20)`, async () => {
         await white_to_gray_1(); 
         await gray_1_to_gray_2();
     });
