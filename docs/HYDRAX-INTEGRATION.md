@@ -1,5 +1,7 @@
 # Exchange Integration Spec - draft v0.1
-HydraX (HX) <-> AirCarbon [SekTokMaster (STM) v0.96]
+HydraX (HX) <-> AirCarbon [SekTokMaster (STM)]
+
+STM v0.96d - Ropsten: 0x6Fd1ddb673283137EF02A29e92Bc3ca32cc107B7
 
 ## New Account Opening
 The most important (phase 1) aspect is to link a HX account ID with an STM account ID (in ETH account format).
