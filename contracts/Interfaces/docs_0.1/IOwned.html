@@ -206,11 +206,11 @@
 
         <div class="container">
             <div class="notification">
-                <h1 class="title is-1" id="contractName">IErc20</h1>
-                contracts&#x2F;Interfaces&#x2F;IErc20.sol
-                <p>Partial ERC20</p>
+                <h1 class="title is-1" id="contractName">IOwned</h1>
+                contracts&#x2F;Interfaces&#x2F;IOwned.sol
+                <p>Method modifiers &amp; read-only state</p>
                 <br />
-                <small class="generated">Generated in Sun Jan 26 2020 21:08:20 GMT+0000 (Greenwich Mean Time)</small>
+                <small class="generated">Generated in Mon Jan 27 2020 21:07:25 GMT+0000 (Greenwich Mean Time)</small>
             </div>
 
             <div class="soldoc-box">
@@ -236,96 +236,14 @@
                 </p>
             </div>
 
-            <div class="soldoc-box">
-                <p>
-                    <a name="Transfer">
-                        <strong class="method">Transfer</strong>
-                    </a>
-                    <div class="box-info">
-                        <br />
-                        <p>Emitted when &#x60;value&#x60; tokens are moved from one account (&#x60;from&#x60;) to another (&#x60;to&#x60;)</p>
-                    </div>
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th></th>
-                                <th>Type</th>
-                                <th>Name</th>
-                                <th>Natspec</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>input</td>
-                                <td>address</td>
-                                <td>from</td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td>input</td>
-                                <td>address</td>
-                                <td>to</td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td>input</td>
-                                <td>uint256</td>
-                                <td>value</td>
-                                <td></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </p>
-            </div>
-            <div class="soldoc-box">
-                <p>
-                    <a name="Approval">
-                        <strong class="method">Approval</strong>
-                    </a>
-                    <div class="box-info">
-                        <br />
-                        <p><i>Emitted when the allowance of a &#x60;spender&#x60; for an &#x60;owner&#x60; is set by a call to {approve}. &#x60;value&#x60; is the new allowance</i></p>
-                    </div>
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th></th>
-                                <th>Type</th>
-                                <th>Name</th>
-                                <th>Natspec</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>input</td>
-                                <td>address</td>
-                                <td>owner</td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td>input</td>
-                                <td>address</td>
-                                <td>spender</td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td>input</td>
-                                <td>uint256</td>
-                                <td>value</td>
-                                <td></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </p>
-            </div>
 
             <div class="soldoc-box">
                 <p>
-                    <a name="transfer">
+                    <a name="setReadOnly">
                         <div class="method-name-title">
                             <div class="d-flex bd-highlight">
                                 <div class="p-2 flex-grow-1 bd-highlight">
-                                    <h2 style="float: left;">transfer</h2>
+                                    <h2 style="float: left;">setReadOnly</h2>
                                 </div>
                                 <div class="p-2 bd-highlight">
                                     <span class="badge badge-danger">external</span>
@@ -335,8 +253,7 @@
                     </a>
                     <div class="box-info">
                         <br />
-                        <p><i style="white-space: pre;">&#x60;value&#x60; may be zero</i></p>
-                        <p>Transfers the supplied number of tokens from the caller to the supplied &#x60;recipient&#x60;</p>
+                        <p>Sets the contract current read-only state</p>
                     </div>
                     <table class="table">
                         <thead class="thead-light">
@@ -350,20 +267,8 @@
                         <tbody>
                             <tr>
                                 <td>input</td>
-                                <td>address</td>
-                                <td>recipient</td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td>input</td>
-                                <td>uint256</td>
-                                <td>amount</td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td>output</td>
                                 <td>bool</td>
-                                <td></td>
+                                <td>_readOnly</td>
                                 <td></td>
                             </tr>
                         </tbody>
@@ -379,14 +284,12 @@
             <br />
             <span style="color: #777777;">EVENTS</span>
             <ul id="events" style="padding-left: 25px;" class="list-group side-list">
-                <li class="list-group-item"><a href="IErc20.html#Transfer">Transfer</a></li>
-                <li class="list-group-item"><a href="IErc20.html#Approval">Approval</a></li>
             </ul>
             <br />
             <br />
             <span style="color: #777777;">FUNCTIONS</span>
             <ul id="functions" style="padding-left: 25px;" class="list-group side-list">
-                <li class="list-group-item"><a href="IErc20.html#transfer">transfer</a></li>
+                <li class="list-group-item"><a href="IOwned.html#setReadOnly">setReadOnly</a></li>
             </ul>
         </aside>
     </div>
@@ -397,7 +300,7 @@
             return inputContent.map((content) => content.type === 'directory' ? cDirectory(content) : cFile(content)).join('');
         }
         function loadDirectoryTreeView() {
-            var paths = [{"path":"./contracts/Interfaces","name":"Interfaces","children":[{"path":"contracts/Interfaces/ICcyCollateralizable.sol","name":"ICcyCollateralizable.sol","size":2562,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IChainlinkAggregator.sol","name":"IChainlinkAggregator.sol","size":672,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IDataLoadable.sol","name":"IDataLoadable.sol","size":1419,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IErc20.sol","name":"IErc20.sol","size":1885,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IOwned.sol","name":"IOwned.sol","size":739,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IPublicViews.sol","name":"IPublicViews.sol","size":3935,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IStBurnable.sol","name":"IStBurnable.sol","size":972,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IStFees.sol","name":"IStFees.sol","size":3007,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IStLedger.sol","name":"IStLedger.sol","size":2058,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IStMaster.sol","name":"IStMaster.sol","size":3913,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IStMintable.sol","name":"IStMintable.sol","size":2622,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IStPayable.sol","name":"IStPayable.sol","size":1812,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IStTransferable.sol","name":"IStTransferable.sol","size":2293,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/StMasterMock.sol.MOCK","name":"StMasterMock.sol.MOCK","size":1544,"extension":".mock","type":"file"}],"size":29433,"type":"directory"}];
+            var paths = [{"path":"./contracts/Interfaces","name":"Interfaces","children":[{"path":"contracts/Interfaces/ICcyCollateralizable.sol","name":"ICcyCollateralizable.sol","size":2562,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IChainlinkAggregator.sol","name":"IChainlinkAggregator.sol","size":672,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IDataLoadable.sol","name":"IDataLoadable.sol","size":1419,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IErc20.sol","name":"IErc20.sol","size":1885,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IOwned.sol","name":"IOwned.sol","size":739,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IPublicViews.sol","name":"IPublicViews.sol","size":4439,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IStBurnable.sol","name":"IStBurnable.sol","size":972,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IStFees.sol","name":"IStFees.sol","size":3007,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IStLedger.sol","name":"IStLedger.sol","size":2058,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IStMaster.sol","name":"IStMaster.sol","size":3913,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IStMintable.sol","name":"IStMintable.sol","size":2622,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IStPayable.sol","name":"IStPayable.sol","size":1812,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IStTransferable.sol","name":"IStTransferable.sol","size":2307,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/StMasterMock.sol.MOCK","name":"StMasterMock.sol.MOCK","size":1544,"extension":".mock","type":"file"},{"path":"contracts/Interfaces/docs","name":"docs","children":[{"path":"contracts/Interfaces/docs/.DS_Store","name":".DS_Store","size":8196,"extension":"","type":"file"},{"path":"contracts/Interfaces/docs/HYDRAX-INTEGRATION.md","name":"HYDRAX-INTEGRATION.md","size":6614,"extension":".md","type":"file"},{"path":"contracts/Interfaces/docs/OVERVIEW.md","name":"OVERVIEW.md","size":2994,"extension":".md","type":"file"}],"size":17804,"type":"directory"}],"size":47755,"type":"directory"}];
         document.getElementById("contracts-treeview").innerHTML = renderTreeView(paths);
         }
         loadDirectoryTreeView();

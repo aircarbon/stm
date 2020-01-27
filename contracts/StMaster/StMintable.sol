@@ -7,7 +7,7 @@ import "./Owned.sol";
 import "./StLedger.sol";
 
 import "../Libs/LedgerLib.sol";
-import "../Libs/StructLib.sol";
+import "../Interfaces/StructLib.sol";
 import "../Libs/FeeLib.sol";
 
 contract StMintable is IStMintable,

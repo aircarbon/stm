@@ -206,11 +206,12 @@
 
         <div class="container">
             <div class="notification">
-                <h1 class="title is-1" id="contractName">ICcyCollateralizable</h1>
-                contracts&#x2F;Interfaces&#x2F;ICcyCollateralizable.sol
-                <p>Controls collateralized currency: funding, withdrawing and adding of collateral currency types</p>
+                <h1 class="title is-1" id="contractName">IStFees</h1>
+                contracts&#x2F;Interfaces&#x2F;IStFees.sol
+                <p>Fees in addition to the amounts supplied to transferOrTrade() (i.e. transfer amounts are not inclusive of fees, they are additional)</p>
+                <p>Controls fees by currency and token type</p>
                 <br />
-                <small class="generated">Generated in Sun Jan 26 2020 21:08:20 GMT+0000 (Greenwich Mean Time)</small>
+                <small class="generated">Generated in Mon Jan 27 2020 21:07:25 GMT+0000 (Greenwich Mean Time)</small>
             </div>
 
             <div class="soldoc-box">
@@ -239,11 +240,11 @@
 
             <div class="soldoc-box">
                 <p>
-                    <a name="getTotalCcyFunded">
+                    <a name="getFee">
                         <div class="method-name-title">
                             <div class="d-flex bd-highlight">
                                 <div class="p-2 flex-grow-1 bd-highlight">
-                                    <h2 style="float: left;">getTotalCcyFunded</h2>
+                                    <h2 style="float: left;">getFee</h2>
                                 </div>
                                 <div class="p-2 bd-highlight">
                                     <span class="badge badge-danger">external</span>
@@ -254,7 +255,142 @@
                     </a>
                     <div class="box-info">
                         <br />
-                        <p>Returns the total amount of funded collateralized currency for the supplied currency type</p>
+                        <p>Returns the current fee structure (global or ledger fee) for the supplied token or currency type</p>
+                    </div>
+                    <table class="table">
+                        <thead class="thead-light">
+                            <tr>
+                                <th scope="col"></th>
+                                <th scope="col">Type</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Natspec</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>input</td>
+                                <td></td>
+                                <td>feeType</td>
+                                <td>Fee type: currency (0) or token (1)</td>
+                            </tr>
+                            <tr>
+                                <td>input</td>
+                                <td>uint256</td>
+                                <td>typeId</td>
+                                <td>The currencyTypeId or tokenTypeId for which to return fees</td>
+                            </tr>
+                            <tr>
+                                <td>input</td>
+                                <td>address</td>
+                                <td>ledgerOwner</td>
+                                <td>If &gt; 0x0, returns the ledger (override) fee in effect for the address, else returns the global fee</td>
+                            </tr>
+                            <tr>
+                                <td>output</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </p>
+            </div>
+            <div class="soldoc-box">
+                <p>
+                    <a name="getSecToken_totalExchangeFeesPaidQty">
+                        <div class="method-name-title">
+                            <div class="d-flex bd-highlight">
+                                <div class="p-2 flex-grow-1 bd-highlight">
+                                    <h2 style="float: left;">getSecToken_totalExchangeFeesPaidQty</h2>
+                                </div>
+                                <div class="p-2 bd-highlight">
+                                    <span class="badge badge-danger">external</span>
+                                    <span class="badge badge-info">view</span>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                    <div class="box-info">
+                        <br />
+                        <p>Returns the total quantity of token exchange fees paid, in the contract base unit</p>
+                    </div>
+                    <table class="table">
+                        <thead class="thead-light">
+                            <tr>
+                                <th scope="col"></th>
+                                <th scope="col">Type</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Natspec</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>output</td>
+                                <td>uint256</td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </p>
+            </div>
+            <div class="soldoc-box">
+                <p>
+                    <a name="getSecToken_totalOriginatorFeesPaidQty">
+                        <div class="method-name-title">
+                            <div class="d-flex bd-highlight">
+                                <div class="p-2 flex-grow-1 bd-highlight">
+                                    <h2 style="float: left;">getSecToken_totalOriginatorFeesPaidQty</h2>
+                                </div>
+                                <div class="p-2 bd-highlight">
+                                    <span class="badge badge-danger">external</span>
+                                    <span class="badge badge-info">view</span>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                    <div class="box-info">
+                        <br />
+                        <p>Returns the total quantity of token originator fees paid, in the contract base unit</p>
+                    </div>
+                    <table class="table">
+                        <thead class="thead-light">
+                            <tr>
+                                <th scope="col"></th>
+                                <th scope="col">Type</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Natspec</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>output</td>
+                                <td>uint256</td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </p>
+            </div>
+            <div class="soldoc-box">
+                <p>
+                    <a name="getCcy_totalExchangeFeesPaid">
+                        <div class="method-name-title">
+                            <div class="d-flex bd-highlight">
+                                <div class="p-2 flex-grow-1 bd-highlight">
+                                    <h2 style="float: left;">getCcy_totalExchangeFeesPaid</h2>
+                                </div>
+                                <div class="p-2 bd-highlight">
+                                    <span class="badge badge-danger">external</span>
+                                    <span class="badge badge-info">view</span>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                    <div class="box-info">
+                        <br />
+                        <p>Returns the total amount of currency exchange fees paid, for the supplied currency</p>
                     </div>
                     <table class="table">
                         <thead class="thead-light">
@@ -284,56 +420,11 @@
             </div>
             <div class="soldoc-box">
                 <p>
-                    <a name="getTotalCcyWithdrawn">
+                    <a name="setFee_TokType">
                         <div class="method-name-title">
                             <div class="d-flex bd-highlight">
                                 <div class="p-2 flex-grow-1 bd-highlight">
-                                    <h2 style="float: left;">getTotalCcyWithdrawn</h2>
-                                </div>
-                                <div class="p-2 bd-highlight">
-                                    <span class="badge badge-danger">external</span>
-                                    <span class="badge badge-info">view</span>
-                                </div>
-                            </div>
-                        </div>
-                    </a>
-                    <div class="box-info">
-                        <br />
-                        <p><i style="white-space: pre;">Returns the total global amount withdrawn for the supplied currency</i></p>
-                    </div>
-                    <table class="table">
-                        <thead class="thead-light">
-                            <tr>
-                                <th scope="col"></th>
-                                <th scope="col">Type</th>
-                                <th scope="col">Name</th>
-                                <th scope="col">Natspec</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>input</td>
-                                <td>uint256</td>
-                                <td>ccyTypeId</td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td>output</td>
-                                <td>uint256</td>
-                                <td></td>
-                                <td></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </p>
-            </div>
-            <div class="soldoc-box">
-                <p>
-                    <a name="addCcyType">
-                        <div class="method-name-title">
-                            <div class="d-flex bd-highlight">
-                                <div class="p-2 flex-grow-1 bd-highlight">
-                                    <h2 style="float: left;">addCcyType</h2>
+                                    <h2 style="float: left;">setFee_TokType</h2>
                                 </div>
                                 <div class="p-2 bd-highlight">
                                     <span class="badge badge-primary">public</span>
@@ -343,57 +434,7 @@
                     </a>
                     <div class="box-info">
                         <br />
-                        <p>Adds a new currency type</p>
-                    </div>
-                    <table class="table">
-                        <thead class="thead-light">
-                            <tr>
-                                <th scope="col"></th>
-                                <th scope="col">Type</th>
-                                <th scope="col">Name</th>
-                                <th scope="col">Natspec</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>input</td>
-                                <td>string</td>
-                                <td>name</td>
-                                <td>New currency type name</td>
-                            </tr>
-                            <tr>
-                                <td>input</td>
-                                <td>string</td>
-                                <td>unit</td>
-                                <td>Base unit of the new currency type, e.g. &quot;cents&quot; for USD, &quot;Wei&quot; for ETH</td>
-                            </tr>
-                            <tr>
-                                <td>input</td>
-                                <td>uint16</td>
-                                <td>decimals</td>
-                                <td>Number of decimal places in the smallest currency unit, e.g. 2 for USD, 18 for ETH</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </p>
-            </div>
-            <div class="soldoc-box">
-                <p>
-                    <a name="fund">
-                        <div class="method-name-title">
-                            <div class="d-flex bd-highlight">
-                                <div class="p-2 flex-grow-1 bd-highlight">
-                                    <h2 style="float: left;">fund</h2>
-                                </div>
-                                <div class="p-2 bd-highlight">
-                                    <span class="badge badge-primary">public</span>
-                                </div>
-                            </div>
-                        </div>
-                    </a>
-                    <div class="box-info">
-                        <br />
-                        <p>Funds a ledger entry with the specified amount and type of collateralized currency</p>
+                        <p>Sets the current fee structure (global or ledger fee) for the supplied token type</p>
                     </div>
                     <table class="table">
                         <thead class="thead-light">
@@ -408,20 +449,20 @@
                             <tr>
                                 <td>input</td>
                                 <td>uint256</td>
-                                <td>ccyTypeId</td>
-                                <td>Currency type ID</td>
-                            </tr>
-                            <tr>
-                                <td>input</td>
-                                <td>int256</td>
-                                <td>amount</td>
-                                <td>Amount of the currency to fund, in currency base units</td>
+                                <td>tokenTypeId</td>
+                                <td>Token type</td>
                             </tr>
                             <tr>
                                 <td>input</td>
                                 <td>address</td>
                                 <td>ledgerOwner</td>
-                                <td>Ledger owner to fund</td>
+                                <td>The ledger address for which to set fee structure, or 0x0 to set global fee structure</td>
+                            </tr>
+                            <tr>
+                                <td>input</td>
+                                <td></td>
+                                <td>feeArgs</td>
+                                <td>The fee structure to assign to the supplied leder entry address, or to set as the global fee structure</td>
                             </tr>
                         </tbody>
                     </table>
@@ -429,11 +470,11 @@
             </div>
             <div class="soldoc-box">
                 <p>
-                    <a name="withdraw">
+                    <a name="setFee_CcyType">
                         <div class="method-name-title">
                             <div class="d-flex bd-highlight">
                                 <div class="p-2 flex-grow-1 bd-highlight">
-                                    <h2 style="float: left;">withdraw</h2>
+                                    <h2 style="float: left;">setFee_CcyType</h2>
                                 </div>
                                 <div class="p-2 bd-highlight">
                                     <span class="badge badge-primary">public</span>
@@ -443,7 +484,7 @@
                     </a>
                     <div class="box-info">
                         <br />
-                        <p>Withdraws the specified amount and type of collateralized currency from the specified ledger entry</p>
+                        <p>Sets the current fee structure (global or ledger fee) for the supplied currency type</p>
                     </div>
                     <table class="table">
                         <thead class="thead-light">
@@ -459,19 +500,19 @@
                                 <td>input</td>
                                 <td>uint256</td>
                                 <td>ccyTypeId</td>
-                                <td>Currency type ID</td>
-                            </tr>
-                            <tr>
-                                <td>input</td>
-                                <td>int256</td>
-                                <td>amount</td>
-                                <td>Amount of the currency to withdraw, in currency base units</td>
+                                <td>Currency type</td>
                             </tr>
                             <tr>
                                 <td>input</td>
                                 <td>address</td>
                                 <td>ledgerOwner</td>
-                                <td>ledger owner to withdraw from</td>
+                                <td>The ledger address for which to set fee structure, or 0x0 to set global fee structure</td>
+                            </tr>
+                            <tr>
+                                <td>input</td>
+                                <td></td>
+                                <td>feeArgs</td>
+                                <td>The fee structure to assign to the supplied leder entry address, or to set as the global fee structure</td>
                             </tr>
                         </tbody>
                     </table>
@@ -492,11 +533,12 @@
             <br />
             <span style="color: #777777;">FUNCTIONS</span>
             <ul id="functions" style="padding-left: 25px;" class="list-group side-list">
-                <li class="list-group-item"><a href="ICcyCollateralizable.html#getTotalCcyFunded">getTotalCcyFunded</a></li>
-                <li class="list-group-item"><a href="ICcyCollateralizable.html#getTotalCcyWithdrawn">getTotalCcyWithdrawn</a></li>
-                <li class="list-group-item"><a href="ICcyCollateralizable.html#addCcyType">addCcyType</a></li>
-                <li class="list-group-item"><a href="ICcyCollateralizable.html#fund">fund</a></li>
-                <li class="list-group-item"><a href="ICcyCollateralizable.html#withdraw">withdraw</a></li>
+                <li class="list-group-item"><a href="IStFees.html#getFee">getFee</a></li>
+                <li class="list-group-item"><a href="IStFees.html#getSecToken_totalExchangeFeesPaidQty">getSecToken_totalExchangeFeesPaidQty</a></li>
+                <li class="list-group-item"><a href="IStFees.html#getSecToken_totalOriginatorFeesPaidQty">getSecToken_totalOriginatorFeesPaidQty</a></li>
+                <li class="list-group-item"><a href="IStFees.html#getCcy_totalExchangeFeesPaid">getCcy_totalExchangeFeesPaid</a></li>
+                <li class="list-group-item"><a href="IStFees.html#setFee_TokType">setFee_TokType</a></li>
+                <li class="list-group-item"><a href="IStFees.html#setFee_CcyType">setFee_CcyType</a></li>
             </ul>
         </aside>
     </div>
@@ -507,7 +549,7 @@
             return inputContent.map((content) => content.type === 'directory' ? cDirectory(content) : cFile(content)).join('');
         }
         function loadDirectoryTreeView() {
-            var paths = [{"path":"./contracts/Interfaces","name":"Interfaces","children":[{"path":"contracts/Interfaces/ICcyCollateralizable.sol","name":"ICcyCollateralizable.sol","size":2562,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IChainlinkAggregator.sol","name":"IChainlinkAggregator.sol","size":672,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IDataLoadable.sol","name":"IDataLoadable.sol","size":1419,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IErc20.sol","name":"IErc20.sol","size":1885,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IOwned.sol","name":"IOwned.sol","size":739,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IPublicViews.sol","name":"IPublicViews.sol","size":3935,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IStBurnable.sol","name":"IStBurnable.sol","size":972,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IStFees.sol","name":"IStFees.sol","size":3007,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IStLedger.sol","name":"IStLedger.sol","size":2058,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IStMaster.sol","name":"IStMaster.sol","size":3913,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IStMintable.sol","name":"IStMintable.sol","size":2622,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IStPayable.sol","name":"IStPayable.sol","size":1812,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IStTransferable.sol","name":"IStTransferable.sol","size":2293,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/StMasterMock.sol.MOCK","name":"StMasterMock.sol.MOCK","size":1544,"extension":".mock","type":"file"}],"size":29433,"type":"directory"}];
+            var paths = [{"path":"./contracts/Interfaces","name":"Interfaces","children":[{"path":"contracts/Interfaces/ICcyCollateralizable.sol","name":"ICcyCollateralizable.sol","size":2562,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IChainlinkAggregator.sol","name":"IChainlinkAggregator.sol","size":672,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IDataLoadable.sol","name":"IDataLoadable.sol","size":1419,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IErc20.sol","name":"IErc20.sol","size":1885,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IOwned.sol","name":"IOwned.sol","size":739,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IPublicViews.sol","name":"IPublicViews.sol","size":4439,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IStBurnable.sol","name":"IStBurnable.sol","size":972,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IStFees.sol","name":"IStFees.sol","size":3007,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IStLedger.sol","name":"IStLedger.sol","size":2058,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IStMaster.sol","name":"IStMaster.sol","size":3913,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IStMintable.sol","name":"IStMintable.sol","size":2622,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IStPayable.sol","name":"IStPayable.sol","size":1812,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IStTransferable.sol","name":"IStTransferable.sol","size":2307,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/StMasterMock.sol.MOCK","name":"StMasterMock.sol.MOCK","size":1544,"extension":".mock","type":"file"},{"path":"contracts/Interfaces/docs","name":"docs","children":[{"path":"contracts/Interfaces/docs/.DS_Store","name":".DS_Store","size":8196,"extension":"","type":"file"},{"path":"contracts/Interfaces/docs/HYDRAX-INTEGRATION.md","name":"HYDRAX-INTEGRATION.md","size":6614,"extension":".md","type":"file"},{"path":"contracts/Interfaces/docs/OVERVIEW.md","name":"OVERVIEW.md","size":2994,"extension":".md","type":"file"}],"size":17804,"type":"directory"}],"size":47755,"type":"directory"}];
         document.getElementById("contracts-treeview").innerHTML = renderTreeView(paths);
         }
         loadDirectoryTreeView();

@@ -4,7 +4,7 @@ pragma experimental ABIEncoderV2;
 import "./IOwned.sol";
 
 import "../Libs/LedgerLib.sol";
-import "../Libs/StructLib.sol";
+import "../Interfaces/StructLib.sol";
 import "../Libs/TokenLib.sol";
 
 /**

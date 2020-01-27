@@ -5,7 +5,7 @@ HydraX (HX) <-> AirCarbon [SekTokMaster (STM)]
 STM v0.96d - Ropsten: 0x6Fd1ddb673283137EF02A29e92Bc3ca32cc107B7
 
 ## General - Public Web3 Views
-See ./interfaces/IPublicViews.sol
+See ../IPublicViews.sol
 
 ## General -- Dev Private Permissioned API
 ```ac-ex-api``` *TBD*

@@ -1,7 +1,7 @@
 const os = require('os');
 const publicIp = require('public-ip');
 
-const StructLib = artifacts.require('./StructLib.sol');
+const StructLib = artifacts.require('../Interfaces/StructLib.sol');
 const CcyLib = artifacts.require('./CcyLib.sol');
 const TokenLib = artifacts.require('./TokenLib.sol');
 const LedgerLib = artifacts.require('./LedgerLib.sol');

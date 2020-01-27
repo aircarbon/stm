@@ -7,7 +7,7 @@ import "../Interfaces/IStPayable.sol";
 import "./StFees.sol";
 
 import "../Libs/LedgerLib.sol";
-import "../Libs/StructLib.sol";
+import "../Interfaces/StructLib.sol";
 import "../Libs/PayableLib.sol";
 
 import "../Interfaces/IChainlinkAggregator.sol";

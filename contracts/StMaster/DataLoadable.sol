@@ -8,7 +8,7 @@ import "./StLedger.sol";
 import "./StFees.sol";
 import "./StErc20.sol";
 
-import "../Libs/StructLib.sol";
+import "../Interfaces/StructLib.sol";
 import "../Libs/TokenLib.sol";
 import "../Libs/LoadLib.sol";
 

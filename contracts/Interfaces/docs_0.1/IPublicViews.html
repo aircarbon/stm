@@ -210,7 +210,7 @@
                 contracts&#x2F;Interfaces&#x2F;IPublicViews.sol
                 <p>Public views</p>
                 <br />
-                <small class="generated">Generated in Sun Jan 26 2020 21:08:20 GMT+0000 (Greenwich Mean Time)</small>
+                <small class="generated">Generated in Mon Jan 27 2020 21:07:25 GMT+0000 (Greenwich Mean Time)</small>
             </div>
 
             <div class="soldoc-box">
@@ -271,6 +271,50 @@
                                 <td>output</td>
                                 <td>bytes32</td>
                                 <td></td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </p>
+            </div>
+            <div class="soldoc-box">
+                <p>
+                    <a name="transfer_feePreview">
+                        <div class="method-name-title">
+                            <div class="d-flex bd-highlight">
+                                <div class="p-2 flex-grow-1 bd-highlight">
+                                    <h2 style="float: left;">transfer_feePreview</h2>
+                                </div>
+                                <div class="p-2 bd-highlight">
+                                    <span class="badge badge-danger">external</span>
+                                    <span class="badge badge-info">view</span>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                    <div class="box-info">
+                        <br />
+                    </div>
+                    <table class="table">
+                        <thead class="thead-light">
+                            <tr>
+                                <th scope="col"></th>
+                                <th scope="col">Type</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Natspec</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>input</td>
+                                <td></td>
+                                <td>a</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>output</td>
+                                <td></td>
+                                <td>feesAll</td>
                                 <td></td>
                             </tr>
                         </tbody>
@@ -1180,6 +1224,7 @@
             <span style="color: #777777;">FUNCTIONS</span>
             <ul id="functions" style="padding-left: 25px;" class="list-group side-list">
                 <li class="list-group-item"><a href="IPublicViews.html#getLedgerHashcode">getLedgerHashcode</a></li>
+                <li class="list-group-item"><a href="IPublicViews.html#transfer_feePreview">transfer_feePreview</a></li>
                 <li class="list-group-item"><a href="IPublicViews.html#get_btcUsd">get_btcUsd</a></li>
                 <li class="list-group-item"><a href="IPublicViews.html#get_ethUsd">get_ethUsd</a></li>
                 <li class="list-group-item"><a href="IPublicViews.html#getCashflowData">getCashflowData</a></li>
@@ -1212,7 +1257,7 @@
             return inputContent.map((content) => content.type === 'directory' ? cDirectory(content) : cFile(content)).join('');
         }
         function loadDirectoryTreeView() {
-            var paths = [{"path":"./contracts/Interfaces","name":"Interfaces","children":[{"path":"contracts/Interfaces/ICcyCollateralizable.sol","name":"ICcyCollateralizable.sol","size":2562,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IChainlinkAggregator.sol","name":"IChainlinkAggregator.sol","size":672,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IDataLoadable.sol","name":"IDataLoadable.sol","size":1419,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IErc20.sol","name":"IErc20.sol","size":1885,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IOwned.sol","name":"IOwned.sol","size":739,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IPublicViews.sol","name":"IPublicViews.sol","size":3935,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IStBurnable.sol","name":"IStBurnable.sol","size":972,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IStFees.sol","name":"IStFees.sol","size":3007,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IStLedger.sol","name":"IStLedger.sol","size":2058,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IStMaster.sol","name":"IStMaster.sol","size":3913,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IStMintable.sol","name":"IStMintable.sol","size":2622,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IStPayable.sol","name":"IStPayable.sol","size":1812,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IStTransferable.sol","name":"IStTransferable.sol","size":2293,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/StMasterMock.sol.MOCK","name":"StMasterMock.sol.MOCK","size":1544,"extension":".mock","type":"file"}],"size":29433,"type":"directory"}];
+            var paths = [{"path":"./contracts/Interfaces","name":"Interfaces","children":[{"path":"contracts/Interfaces/ICcyCollateralizable.sol","name":"ICcyCollateralizable.sol","size":2562,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IChainlinkAggregator.sol","name":"IChainlinkAggregator.sol","size":672,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IDataLoadable.sol","name":"IDataLoadable.sol","size":1419,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IErc20.sol","name":"IErc20.sol","size":1885,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IOwned.sol","name":"IOwned.sol","size":739,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IPublicViews.sol","name":"IPublicViews.sol","size":4439,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IStBurnable.sol","name":"IStBurnable.sol","size":972,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IStFees.sol","name":"IStFees.sol","size":3007,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IStLedger.sol","name":"IStLedger.sol","size":2058,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IStMaster.sol","name":"IStMaster.sol","size":3913,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IStMintable.sol","name":"IStMintable.sol","size":2622,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IStPayable.sol","name":"IStPayable.sol","size":1812,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IStTransferable.sol","name":"IStTransferable.sol","size":2307,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/StMasterMock.sol.MOCK","name":"StMasterMock.sol.MOCK","size":1544,"extension":".mock","type":"file"},{"path":"contracts/Interfaces/docs","name":"docs","children":[{"path":"contracts/Interfaces/docs/.DS_Store","name":".DS_Store","size":8196,"extension":"","type":"file"},{"path":"contracts/Interfaces/docs/HYDRAX-INTEGRATION.md","name":"HYDRAX-INTEGRATION.md","size":6614,"extension":".md","type":"file"},{"path":"contracts/Interfaces/docs/OVERVIEW.md","name":"OVERVIEW.md","size":2994,"extension":".md","type":"file"}],"size":17804,"type":"directory"}],"size":47755,"type":"directory"}];
         document.getElementById("contracts-treeview").innerHTML = renderTreeView(paths);
         }
         loadDirectoryTreeView();

@@ -6,7 +6,7 @@ import "../Interfaces/IStFees.sol";
 import "./Owned.sol";
 import "./StLedger.sol";
 
-import "../Libs/StructLib.sol";
+import "../Interfaces/StructLib.sol";
 import "../Libs/FeeLib.sol";
 
 //

@@ -1,7 +1,7 @@
 pragma solidity ^0.5.13;
 pragma experimental ABIEncoderV2;
 
-import "./StructLib.sol";
+import "../Interfaces/StructLib.sol";
 
 library FeeLib {
     event SetFeeTokFix(uint256 tokenTypeId, address indexed ledgerOwner, uint256 fee_tokenQty_Fixed);

@@ -11,7 +11,7 @@ import "./IErc20.sol";
 import "./IStPayable.sol";
 import "./IDataLoadable.sol";
 
-import "../Libs/StructLib.sol";
+import "../Interfaces/StructLib.sol";
 
 //
 // *MOCK* public ctor interface; for etherscan contract verification of ./interfaces/*

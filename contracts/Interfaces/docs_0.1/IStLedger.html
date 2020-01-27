@@ -206,11 +206,11 @@
 
         <div class="container">
             <div class="notification">
-                <h1 class="title is-1" id="contractName">IStTransferable</h1>
-                contracts&#x2F;Interfaces&#x2F;IStTransferable.sol
-                <p>Controls internal exchange (whitelisted) transfers &amp; trades</p>
+                <h1 class="title is-1" id="contractName">IStLedger</h1>
+                contracts&#x2F;Interfaces&#x2F;IStLedger.sol
+                <p>Ledger accessors, and adding of token types</p>
                 <br />
-                <small class="generated">Generated in Sun Jan 26 2020 21:08:20 GMT+0000 (Greenwich Mean Time)</small>
+                <small class="generated">Generated in Mon Jan 27 2020 21:07:25 GMT+0000 (Greenwich Mean Time)</small>
             </div>
 
             <div class="soldoc-box">
@@ -239,11 +239,11 @@
 
             <div class="soldoc-box">
                 <p>
-                    <a name="transferOrTrade">
+                    <a name="addSecTokenType">
                         <div class="method-name-title">
                             <div class="d-flex bd-highlight">
                                 <div class="p-2 flex-grow-1 bd-highlight">
-                                    <h2 style="float: left;">transferOrTrade</h2>
+                                    <h2 style="float: left;">addSecTokenType</h2>
                                 </div>
                                 <div class="p-2 bd-highlight">
                                     <span class="badge badge-primary">public</span>
@@ -253,8 +253,7 @@
                     </a>
                     <div class="box-info">
                         <br />
-                        <p><i style="white-space: pre;">Optionally applies: fees per the current fee structure, and paying them to contract owner&#39;s ledger entry</i></p>
-                        <p>Transfers or trades assets between ledger accounts</p>
+                        <p>Adds a new ST type</p>
                     </div>
                     <table class="table">
                         <thead class="thead-light">
@@ -268,137 +267,9 @@
                         <tbody>
                             <tr>
                                 <td>input</td>
-                                <td></td>
-                                <td>a</td>
-                                <td>StructLib.TransferArgs arguments</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </p>
-            </div>
-            <div class="soldoc-box">
-                <p>
-                    <a name="transfer_feePreview">
-                        <div class="method-name-title">
-                            <div class="d-flex bd-highlight">
-                                <div class="p-2 flex-grow-1 bd-highlight">
-                                    <h2 style="float: left;">transfer_feePreview</h2>
-                                </div>
-                                <div class="p-2 bd-highlight">
-                                    <span class="badge badge-danger">external</span>
-                                    <span class="badge badge-info">view</span>
-                                </div>
-                            </div>
-                        </div>
-                    </a>
-                    <div class="box-info">
-                        <br />
-                    </div>
-                    <table class="table">
-                        <thead class="thead-light">
-                            <tr>
-                                <th scope="col"></th>
-                                <th scope="col">Type</th>
-                                <th scope="col">Name</th>
-                                <th scope="col">Natspec</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>input</td>
-                                <td></td>
-                                <td>a</td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td>output</td>
-                                <td></td>
-                                <td>feesAll</td>
-                                <td></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </p>
-            </div>
-            <div class="soldoc-box">
-                <p>
-                    <a name="getCcy_totalTransfered">
-                        <div class="method-name-title">
-                            <div class="d-flex bd-highlight">
-                                <div class="p-2 flex-grow-1 bd-highlight">
-                                    <h2 style="float: left;">getCcy_totalTransfered</h2>
-                                </div>
-                                <div class="p-2 bd-highlight">
-                                    <span class="badge badge-danger">external</span>
-                                    <span class="badge badge-info">view</span>
-                                </div>
-                            </div>
-                        </div>
-                    </a>
-                    <div class="box-info">
-                        <br />
-                        <p>Returns the total currency amount transfered, for the supplied currency type</p>
-                    </div>
-                    <table class="table">
-                        <thead class="thead-light">
-                            <tr>
-                                <th scope="col"></th>
-                                <th scope="col">Type</th>
-                                <th scope="col">Name</th>
-                                <th scope="col">Natspec</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>input</td>
-                                <td>uint256</td>
-                                <td>ccyTypeId</td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td>output</td>
-                                <td>uint256</td>
-                                <td></td>
-                                <td></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </p>
-            </div>
-            <div class="soldoc-box">
-                <p>
-                    <a name="getSecToken_totalTransferedQty">
-                        <div class="method-name-title">
-                            <div class="d-flex bd-highlight">
-                                <div class="p-2 flex-grow-1 bd-highlight">
-                                    <h2 style="float: left;">getSecToken_totalTransferedQty</h2>
-                                </div>
-                                <div class="p-2 bd-highlight">
-                                    <span class="badge badge-danger">external</span>
-                                    <span class="badge badge-info">view</span>
-                                </div>
-                            </div>
-                        </div>
-                    </a>
-                    <div class="box-info">
-                        <br />
-                        <p><i style="white-space: pre;">Returns the global quantity of tokens transfered, across all token types</i></p>
-                    </div>
-                    <table class="table">
-                        <thead class="thead-light">
-                            <tr>
-                                <th scope="col"></th>
-                                <th scope="col">Type</th>
-                                <th scope="col">Name</th>
-                                <th scope="col">Natspec</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>output</td>
-                                <td>uint256</td>
-                                <td></td>
-                                <td></td>
+                                <td>string</td>
+                                <td>name</td>
+                                <td>New ST type name</td>
                             </tr>
                         </tbody>
                     </table>
@@ -419,10 +290,7 @@
             <br />
             <span style="color: #777777;">FUNCTIONS</span>
             <ul id="functions" style="padding-left: 25px;" class="list-group side-list">
-                <li class="list-group-item"><a href="IStTransferable.html#transferOrTrade">transferOrTrade</a></li>
-                <li class="list-group-item"><a href="IStTransferable.html#transfer_feePreview">transfer_feePreview</a></li>
-                <li class="list-group-item"><a href="IStTransferable.html#getCcy_totalTransfered">getCcy_totalTransfered</a></li>
-                <li class="list-group-item"><a href="IStTransferable.html#getSecToken_totalTransferedQty">getSecToken_totalTransferedQty</a></li>
+                <li class="list-group-item"><a href="IStLedger.html#addSecTokenType">addSecTokenType</a></li>
             </ul>
         </aside>
     </div>
@@ -433,7 +301,7 @@
             return inputContent.map((content) => content.type === 'directory' ? cDirectory(content) : cFile(content)).join('');
         }
         function loadDirectoryTreeView() {
-            var paths = [{"path":"./contracts/Interfaces","name":"Interfaces","children":[{"path":"contracts/Interfaces/ICcyCollateralizable.sol","name":"ICcyCollateralizable.sol","size":2562,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IChainlinkAggregator.sol","name":"IChainlinkAggregator.sol","size":672,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IDataLoadable.sol","name":"IDataLoadable.sol","size":1419,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IErc20.sol","name":"IErc20.sol","size":1885,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IOwned.sol","name":"IOwned.sol","size":739,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IPublicViews.sol","name":"IPublicViews.sol","size":3935,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IStBurnable.sol","name":"IStBurnable.sol","size":972,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IStFees.sol","name":"IStFees.sol","size":3007,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IStLedger.sol","name":"IStLedger.sol","size":2058,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IStMaster.sol","name":"IStMaster.sol","size":3913,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IStMintable.sol","name":"IStMintable.sol","size":2622,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IStPayable.sol","name":"IStPayable.sol","size":1812,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IStTransferable.sol","name":"IStTransferable.sol","size":2293,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/StMasterMock.sol.MOCK","name":"StMasterMock.sol.MOCK","size":1544,"extension":".mock","type":"file"}],"size":29433,"type":"directory"}];
+            var paths = [{"path":"./contracts/Interfaces","name":"Interfaces","children":[{"path":"contracts/Interfaces/ICcyCollateralizable.sol","name":"ICcyCollateralizable.sol","size":2562,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IChainlinkAggregator.sol","name":"IChainlinkAggregator.sol","size":672,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IDataLoadable.sol","name":"IDataLoadable.sol","size":1419,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IErc20.sol","name":"IErc20.sol","size":1885,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IOwned.sol","name":"IOwned.sol","size":739,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IPublicViews.sol","name":"IPublicViews.sol","size":4439,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IStBurnable.sol","name":"IStBurnable.sol","size":972,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IStFees.sol","name":"IStFees.sol","size":3007,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IStLedger.sol","name":"IStLedger.sol","size":2058,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IStMaster.sol","name":"IStMaster.sol","size":3913,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IStMintable.sol","name":"IStMintable.sol","size":2622,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IStPayable.sol","name":"IStPayable.sol","size":1812,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IStTransferable.sol","name":"IStTransferable.sol","size":2307,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/StMasterMock.sol.MOCK","name":"StMasterMock.sol.MOCK","size":1544,"extension":".mock","type":"file"},{"path":"contracts/Interfaces/docs","name":"docs","children":[{"path":"contracts/Interfaces/docs/.DS_Store","name":".DS_Store","size":8196,"extension":"","type":"file"},{"path":"contracts/Interfaces/docs/HYDRAX-INTEGRATION.md","name":"HYDRAX-INTEGRATION.md","size":6614,"extension":".md","type":"file"},{"path":"contracts/Interfaces/docs/OVERVIEW.md","name":"OVERVIEW.md","size":2994,"extension":".md","type":"file"}],"size":17804,"type":"directory"}],"size":47755,"type":"directory"}];
         document.getElementById("contracts-treeview").innerHTML = renderTreeView(paths);
         }
         loadDirectoryTreeView();

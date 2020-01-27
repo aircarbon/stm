@@ -34,9 +34,9 @@ Core features of STM include:
 * Ledger entries consist of a mapping of token types to token IDs, and a mapping of currency types to currency (collateral) balances.
 
 ## Web3 Public Interface
-TODO: see: ./interfaces/IPublicViews.html ...
+see: ./IPublicViews.html ...
 
 ## Exchange Private Interface
-TODO: document exchange interface & flow ...
+TODO
 
 

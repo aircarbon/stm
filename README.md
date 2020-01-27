@@ -30,7 +30,7 @@ Migration script will pickup this env var and deploy a test contract accordingly
 - `truffle test --network development`
 
 ## Docs
-- `npx soldoc --output html ./docs/interfaces ./contracts/Interfaces`
+- `npx soldoc --output html ./contracts/interfaces/docs_0.1 ./contracts/Interfaces`
 - solidity-docgen: pending -- https://github.com/OpenZeppelin/solidity-docgen/issues/132
 
 ## Dbg - misc

@@ -6,7 +6,7 @@ import "../Interfaces/IStBurnable.sol";
 import "./Owned.sol";
 import "./StLedger.sol";
 
-import "../Libs/StructLib.sol";
+import "../Interfaces/StructLib.sol";
 import "../Libs/TokenLib.sol";
 
 contract StBurnable is Owned, StLedger {

@@ -3,7 +3,7 @@ pragma experimental ABIEncoderV2;
 
 import "./IOwned.sol";
 
-import "../Libs/StructLib.sol";
+import "../Interfaces/StructLib.sol";
 import "../Libs/TransferLib.sol";
 import "../Libs/Erc20Lib.sol";
 import "../Libs/LedgerLib.sol";

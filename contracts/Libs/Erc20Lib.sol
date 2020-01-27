@@ -1,7 +1,7 @@
 pragma solidity ^0.5.13;
 pragma experimental ABIEncoderV2;
 
-import "./StructLib.sol";
+import "../Interfaces/StructLib.sol";
 import "./TransferLib.sol";
 
 library Erc20Lib {

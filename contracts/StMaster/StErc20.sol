@@ -7,7 +7,7 @@ import "./Owned.sol";
 import "./StLedger.sol";
 import "./StFees.sol";
 
-import "../Libs/StructLib.sol";
+import "../Interfaces/StructLib.sol";
 import "../Libs/TransferLib.sol";
 import "../Libs/LedgerLib.sol";
 import "../Libs/Erc20Lib.sol";

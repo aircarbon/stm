@@ -205,7 +205,7 @@ library StructLib {
     }
 
     /**
-     * @dev Checks if the supplied ledger owner holds at least the specified quantity of supplied ST type
+     * @notice Checks if the supplied ledger owner holds at least the specified quantity of supplied ST type
      * @param ledger Ledger owner
      * @param tokenTypeId ST type
      * @param qty Validation quantity in contract base unit
@@ -223,7 +223,7 @@ library StructLib {
     }
 
     /**
-     * @dev Checks if the supplied ledger owner holds at least the specified amount of supplied currency type
+     * @notice Checks if the supplied ledger owner holds at least the specified amount of supplied currency type
      * @param ledger Ledger owner
      * @param ccyTypeId currency type
      * @param amount Validation amount

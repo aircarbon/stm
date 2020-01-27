@@ -6,7 +6,7 @@ import "../Interfaces/IStLedger.sol";
 import "./Owned.sol";
 
 import "../Libs/LedgerLib.sol";
-import "../Libs/StructLib.sol";
+import "../Interfaces/StructLib.sol";
 import "../Libs/TokenLib.sol";
 
 contract StLedger is IStLedger,
