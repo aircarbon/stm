@@ -55,7 +55,7 @@ library Erc20Lib {
                 uint256 qtyTransfer = remainingToTransfer >= qtyType ? qtyType : remainingToTransfer;
 
                 if (qtyTransfer > 0) {
-                    TransferLib.TransferArgs memory a = TransferLib.TransferArgs({
+                    StructLib.TransferArgs memory a = StructLib.TransferArgs({
                             ledger_A: msg.sender,
                             ledger_B: recipient,
                                qty_A: qtyTransfer,

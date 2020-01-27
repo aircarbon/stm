@@ -24,19 +24,19 @@ import "../Libs/LedgerLib.sol";
      * @dev Allows: one-sided transfers, transfers of same asset types, and transfers (trades) of different asset types
      * @dev Disallows: movement from a single origin of more than one asset-type
      * @dev Optionally applies: fees per the current fee structure, and paying them to contract owner's ledger entry
-     * @param a TransferLib.TransferArgs arguments
+     * @param a StructLib.TransferArgs arguments
      */
-    function transferOrTrade(TransferLib.TransferArgs memory a)
+    function transferOrTrade(StructLib.TransferArgs memory a)
     public onlyOwner() onlyWhenReadWrite() { revert("Not implemented"); }
 
-    /**
-     * @notice Returns a fee preview for the supplied transfer
-     * @param a TransferLib.TransferArgs arguments
-     * @return Exchange fees at index 0, batch originator fees at subsequent indexes
-     */
-    uint256 constant MAX_BATCHES_PREVIEW = 128; // library constants not accessible in contract; must duplicate TransferLib value
-    function transfer_feePreview(TransferLib.TransferArgs calldata a)
-    external view onlyOwner() returns (TransferLib.FeesCalc[1 + MAX_BATCHES_PREVIEW * 2] memory feesAll) { revert("Not implemented"); }
+    // /**
+    //  * @notice Returns a fee preview for the supplied transfer
+    //  * @param a StructLib.TransferArgs arguments
+    //  * @return Exchange fees at index 0, batch originator fees at subsequent indexes
+    //  */
+    // uint256 constant MAX_BATCHES_PREVIEW = 128; // library constants not accessible in contract; must duplicate TransferLib value
+    // function transfer_feePreview(StructLib.TransferArgs calldata a)
+    // external view onlyOwner() returns (StructLib.FeesCalc[1 + MAX_BATCHES_PREVIEW * 2] memory feesAll) { revert("Not implemented"); }
 
     /**
      * @notice Returns the total currency amount transfered, for the supplied currency type

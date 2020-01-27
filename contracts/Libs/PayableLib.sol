@@ -119,7 +119,7 @@ library PayableLib {
 
         // transfer tokens to payer
         if (qtyTokens > 0) {
-            TransferLib.TransferArgs memory a = TransferLib.TransferArgs({
+            StructLib.TransferArgs memory a = StructLib.TransferArgs({
                     ledger_A: issueBatch.originator,
                     ledger_B: msg.sender,
                        qty_A: qtyTokens,

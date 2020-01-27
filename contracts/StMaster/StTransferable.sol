@@ -22,7 +22,7 @@ contract StTransferable is Owned,
         return LedgerLib.getLedgerHashcode(ledgerData, stTypesData, ccyTypesData, erc20Data, cashflowData, globalFees);
     }
 
-    function transferOrTrade(TransferLib.TransferArgs memory a)
+    function transferOrTrade(StructLib.TransferArgs memory a)
     public onlyOwner() onlyWhenReadWrite() {
         // abort if sending tokens from a non-whitelist account
         require(!(a.qty_A > 0 && !erc20Data._whitelisted[a.ledger_A]), "Not whitelisted (A)");
@@ -33,8 +33,8 @@ contract StTransferable is Owned,
     }
 
     uint256 constant MAX_BATCHES_PREVIEW = 128; // library constants not accessible in contract; must duplicate TransferLib value
-    function transfer_feePreview(TransferLib.TransferArgs calldata a)
-    external view onlyOwner() returns (TransferLib.FeesCalc[1 + MAX_BATCHES_PREVIEW * 2] memory feesAll) {
+    function transfer_feePreview(StructLib.TransferArgs calldata a)
+    external view onlyOwner() returns (StructLib.FeesCalc[1 + MAX_BATCHES_PREVIEW * 2] memory feesAll) {
         return TransferLib.transfer_feePreview(ledgerData, globalFees, owner, a);
     }
 

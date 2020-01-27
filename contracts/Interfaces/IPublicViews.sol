@@ -17,6 +17,15 @@ contract IPublicViews {
      */
     function getLedgerHashcode() external view returns (bytes32);
 
+    /**
+     * @notice Returns a fee preview for the supplied transfer
+     * @param a StructLib.TransferArgs arguments
+     * @return Exchange fees at index 0, batch originator fees at subsequent indexes
+     */
+    uint256 constant MAX_BATCHES_PREVIEW = 128; // library constants not accessible in contract; must duplicate TransferLib value
+    function transfer_feePreview(StructLib.TransferArgs calldata a)
+    external view returns (StructLib.FeesCalc[1 + MAX_BATCHES_PREVIEW * 2] memory feesAll);
+
 //
 // IStPayable
 //

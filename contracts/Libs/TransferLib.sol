@@ -14,28 +14,6 @@ library TransferLib {
     //
     // INTERNAL
     //
-    struct TransferArgs {
-        address ledger_A;
-        address ledger_B;
-
-        uint256 qty_A;           // ST quantity moving from A (excluding fees, if any)
-        uint256 tokenTypeId_A;   // ST type moving from A
-
-        uint256 qty_B;           // ST quantity moving from B (excluding fees, if any)
-        uint256 tokenTypeId_B;   // ST type moving from B
-
-        int256  ccy_amount_A;    // currency amount moving from A (excluding fees, if any)
-                                 // (signed value: ledger ccyType_balance supports (theoretical) -ve balances)
-        uint256 ccyTypeId_A;     // currency type moving from A
-
-        int256  ccy_amount_B;    // currency amount moving from B (excluding fees, if any)
-                                 // (signed value: ledger ccyType_balance supports (theoretical) -ve balances)
-        uint256 ccyTypeId_B;     // currency type moving from B
-
-        bool    applyFees;       // apply global fee structure to the transfer (both legs)
-        address feeAddrOwner;    // exchange fees: receive address
-    }
-
     function initLedgerIfNew (
         StructLib.LedgerStruct storage ledgerData,
         address addr
@@ -47,13 +25,6 @@ library TransferLib {
         }
     }
 
-    struct FeesCalc {
-        uint256 fee_ccy_A;
-        uint256 fee_ccy_B;
-        uint256 fee_tok_A;
-        uint256 fee_tok_B;
-        address fee_to;
-    }
     struct TransferVars { // misc. working vars for transfer() fn - struct packed to preserve stack slots
         TransferSplitPreviewReturn[2] ts_previews; // [0] = A->B, [1] = B->A
         TransferSplitArgs[2] ts_args;
@@ -65,7 +36,7 @@ library TransferLib {
     function transferOrTrade(
         StructLib.LedgerStruct storage ledgerData,
         StructLib.FeeStruct storage globalFees,
-        TransferLib.TransferArgs memory a
+        StructLib.TransferArgs memory a
     ) public {
         require(ledgerData._contractSealed, "Contract is not sealed");
         //require(a.ledger_A != a.ledger_B, "Bad transfer"); // erc20 compat: allow send-to-self -- todo: could NOP below when ledger_A == a.ledger_B
@@ -89,7 +60,7 @@ library TransferLib {
         StructLib.FeeStruct storage exFeeStruct_ccy_B = ledgerData._ledger[a.ledger_B].customFees.ccyType_Set[a.ccyTypeId_B]   ? ledgerData._ledger[a.ledger_B].customFees : globalFees;
         StructLib.FeeStruct storage exFeeStruct_tok_B = ledgerData._ledger[a.ledger_B].customFees.tokType_Set[a.tokenTypeId_B] ? ledgerData._ledger[a.ledger_B].customFees : globalFees;
 
-        FeesCalc memory exFees = FeesCalc({ // exchange fees (disabled if fee-reciever == fee-payer)
+        StructLib.FeesCalc memory exFees = StructLib.FeesCalc({ // exchange fees (disabled if fee-reciever == fee-payer)
             fee_ccy_A: a.ledger_A != a.feeAddrOwner ? applyCapCollar(exFeeStruct_ccy_A.ccy, a.ccyTypeId_A, uint256(a.ccy_amount_A), calcFee(exFeeStruct_ccy_A.ccy, a.ccyTypeId_A, uint256(a.ccy_amount_A))) : 0,
             fee_ccy_B: a.ledger_B != a.feeAddrOwner ? applyCapCollar(exFeeStruct_ccy_B.ccy, a.ccyTypeId_B, uint256(a.ccy_amount_B), calcFee(exFeeStruct_ccy_B.ccy, a.ccyTypeId_B, uint256(a.ccy_amount_B))) : 0,
             fee_tok_A: a.ledger_A != a.feeAddrOwner ? applyCapCollar(exFeeStruct_tok_A.tok, a.tokenTypeId_A, a.qty_A,               calcFee(exFeeStruct_tok_A.tok, a.tokenTypeId_A, a.qty_A)) : 0,
@@ -357,12 +328,12 @@ library TransferLib {
         StructLib.LedgerStruct storage ledgerData,
         StructLib.FeeStruct storage globalFees,
         address feeAddrOwner,
-        TransferLib.TransferArgs memory a
+        StructLib.TransferArgs memory a
     )
     internal view
     // 1 exchange fee (single destination) + maximum of MAX_BATCHES_PREVIEW of originator fees on each side (x2) of the transfer
     returns (
-        TransferLib.FeesCalc[1 + MAX_BATCHES_PREVIEW * 2] memory feesAll
+        StructLib.FeesCalc[1 + MAX_BATCHES_PREVIEW * 2] memory feesAll
         //
         // SPLITTING
         // want to *also* return the # of full & partial ST transfers, involved in *ALL* the transfer actions (not just fees)
@@ -383,7 +354,7 @@ library TransferLib {
         StructLib.FeeStruct storage exFeeStruct_ccy_B = ledgerData._ledger[a.ledger_B].customFees.ccyType_Set[a.ccyTypeId_B]   ? ledgerData._ledger[a.ledger_B].customFees : globalFees;
         StructLib.FeeStruct storage exFeeStruct_tok_B = ledgerData._ledger[a.ledger_B].customFees.tokType_Set[a.tokenTypeId_B] ? ledgerData._ledger[a.ledger_B].customFees : globalFees;
 
-        feesAll[ndx++] = TransferLib.FeesCalc({
+        feesAll[ndx++] = StructLib.FeesCalc({
             fee_ccy_A: a.ledger_A != a.feeAddrOwner && a.ccy_amount_A > 0 ? applyCapCollar(exFeeStruct_ccy_A.ccy, a.ccyTypeId_A, uint256(a.ccy_amount_A), calcFee(exFeeStruct_ccy_A.ccy, a.ccyTypeId_A, uint256(a.ccy_amount_A))) : 0,
             fee_ccy_B: a.ledger_B != a.feeAddrOwner && a.ccy_amount_B > 0 ? applyCapCollar(exFeeStruct_ccy_B.ccy, a.ccyTypeId_B, uint256(a.ccy_amount_B), calcFee(exFeeStruct_ccy_B.ccy, a.ccyTypeId_B, uint256(a.ccy_amount_B))) : 0,
             fee_tok_A: a.ledger_A != a.feeAddrOwner && a.qty_A > 0        ? applyCapCollar(exFeeStruct_tok_A.tok, a.tokenTypeId_A, a.qty_A,               calcFee(exFeeStruct_tok_A.tok, a.tokenTypeId_A, a.qty_A)) : 0,
@@ -398,7 +369,7 @@ library TransferLib {
             for (uint i = 0; i < preview.batchCount ; i++) {
                 StructLib.SecTokenBatch storage batch = ledgerData._batches[preview.batchIds[i]];
                 if (a.ledger_A != batch.originator) {
-                    feesAll[ndx++] = TransferLib.FeesCalc({
+                    feesAll[ndx++] = StructLib.FeesCalc({
                         fee_ccy_A: 0,
                         fee_ccy_B: 0,
                         fee_tok_A: applyCapCollar(batch.origTokFee, preview.transferQty[i], calcFee(batch.origTokFee, preview.transferQty[i])),
@@ -413,7 +384,7 @@ library TransferLib {
             for (uint i = 0; i < preview.batchCount ; i++) {
                 StructLib.SecTokenBatch storage batch = ledgerData._batches[preview.batchIds[i]];
                 if (a.ledger_B != batch.originator) {
-                    feesAll[ndx++] = TransferLib.FeesCalc({
+                    feesAll[ndx++] = StructLib.FeesCalc({
                         fee_ccy_A: 0,
                         fee_ccy_B: 0,
                         fee_tok_A: 0,

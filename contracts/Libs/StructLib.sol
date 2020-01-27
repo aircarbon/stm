@@ -145,10 +145,6 @@ library StructLib {
         mapping(address => bool) _whitelisted;
     }
 
-    //
-    // TODO: safeMath upgrade...
-    //
-
     // CASHFLOW STRUCTURE
     enum CashflowType { BOND, EQUITY }
     struct CashflowArgs { // v1: single-issuance, single-subscriber
@@ -165,7 +161,7 @@ library StructLib {
         uint256      qty_issuanceMax;       // the amount minted in the issuance monobatch
         uint256      qty_issuanceRemaining; // the amount remaining unsold of the issuance monobatch
         uint256      qty_issuanceSold;      // the amount sold of the issuance monobatch
-        uint256      qty_saleAllocation;           // the amount of the issuance monobatch that is available for sale
+        uint256      qty_saleAllocation;    // the amount of the issuance monobatch that is available for sale
 
         //uint256      issued_Blk;         // issuance (start) block no
         // --> wei_totIssued
@@ -176,6 +172,36 @@ library StructLib {
         //uint256 bond_int_lastPaidBlk;    // rates: last paid interest block no
 
         // TODO: getCashflowStatus() ==> returns in default or not, based on block.number # and issuer payment history...
+    }
+
+    // TRANSFERS
+    struct TransferArgs {
+        address ledger_A;
+        address ledger_B;
+
+        uint256 qty_A;           // ST quantity moving from A (excluding fees, if any)
+        uint256 tokenTypeId_A;   // ST type moving from A
+
+        uint256 qty_B;           // ST quantity moving from B (excluding fees, if any)
+        uint256 tokenTypeId_B;   // ST type moving from B
+
+        int256  ccy_amount_A;    // currency amount moving from A (excluding fees, if any)
+                                 // (signed value: ledger ccyType_balance supports (theoretical) -ve balances)
+        uint256 ccyTypeId_A;     // currency type moving from A
+
+        int256  ccy_amount_B;    // currency amount moving from B (excluding fees, if any)
+                                 // (signed value: ledger ccyType_balance supports (theoretical) -ve balances)
+        uint256 ccyTypeId_B;     // currency type moving from B
+
+        bool    applyFees;       // apply global fee structure to the transfer (both legs)
+        address feeAddrOwner;    // exchange fees: receive address
+    }
+    struct FeesCalc {
+        uint256 fee_ccy_A;       // currency fee paid by A
+        uint256 fee_ccy_B;       // currency fee paid by B
+        uint256 fee_tok_A;       // token fee paid by A
+        uint256 fee_tok_B;       // token fee paid by B
+        address fee_to;          // fees paid to
     }
 
     /**
