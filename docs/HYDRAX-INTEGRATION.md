@@ -1,7 +1,14 @@
 # Exchange Integration Spec - draft v0.1
 HydraX (HX) <-> AirCarbon [SekTokMaster (STM)]
 
+## General - Testnet Contract
 STM v0.96d - Ropsten: 0x6Fd1ddb673283137EF02A29e92Bc3ca32cc107B7
+
+## General - Public Web3 Views
+See ./interfaces/IPublicViews.sol
+
+## General -- Dev Private Permissioned API
+```ac-ex-api``` *TBD*
 
 ## New Account Opening
 The most important (phase 1) aspect is to link a HX account ID with an STM account ID (in ETH account format).
@@ -49,9 +56,17 @@ Therefore, the order entry UX needs to query the STM contract to preview the fee
 
 * > ```function transfer_feePreview(StructLib.TransferArgs calldata a) external view returns (StructLib.FeesCalc[1 + MAX_BATCHES_PREVIEW * 2] memory feesAll)```
 
-## Exchange: Trade Execution & Settlement
+## Exchange: Trade Fills & Settlement
 
-* > Phase 1 - *TBD* trade execution will be through a private permissioned API, but passing ```StructLib.TransferArgs```, i.e. identical in format to ```transfer_feePreview```
+* > Phase 1 - *TBD* trade execution will be through a private permissioned API (```ac-ex-api```), but passing ```StructLib.TransferArgs```, i.e. identical in format to ```transfer_feePreview```
+
+### Phase 1 - trade fill pending state
+HX should show the ETH TX on the UI, and should show status "pending" until confirmed at least once by the network. While pending, the UI should optimistically amend the buyer and seller available balance, i.e. decrease and increase token and currency balances for buyer and seller. Upon confirmation it should requery STM via ```getLedgerEntry()``` to update the confirmed ledger balances. HX should detect the case of TXs being reverted by the network for any reason, and should unwind the optimistic updates, again by requerying STM via ```getLedgerEntry()```.
+
+TX IDs (confired or reverted) should be persisted in the HX trade table for historicaldisplay in the users' pending & completed trade views.
+
+### Phase 2 - confirmed (settled) trade fill events
+HX should show associated event data for trade fills; these include events that relate to (token and currency) fees paid by buyer and seller on each fill.
 
 ## Exchange: Withdraw & Deposit (Tokens)
 

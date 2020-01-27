@@ -142,11 +142,11 @@ describe(`Contract Web3 Interface`, async () => {
                 const setLedgerTokFeeTx   = await CONST.web3_tx('setFee_TokType', [ minterTokTypeId, SELLER.addr,        ledgerTokFee   ], OWNER, OWNER_privKey);
 
                 const tradeTx = await CONST.web3_tx('transferOrTrade', [ {
-                    ledger_A: SELLER.addr,                                  ledger_B: BUYER.addr,
+                    ledger_A: SELLER.addr,                                    ledger_B: BUYER.addr,
                        qty_A: minterLedger.tokens[0].currentQty.div(2),  tokenTypeId_A: minterTokTypeId,
-                       qty_B: 0,                                   tokenTypeId_B: 0,
-                ccy_amount_A: 0,                                     ccyTypeId_A: 0,
-                ccy_amount_B: 5000,                                  ccyTypeId_B: ccyTypeIdFunded,
+                       qty_B: 0,                                         tokenTypeId_B: 0,
+                ccy_amount_A: 0,                                           ccyTypeId_A: 0,
+                ccy_amount_B: 5000,                                        ccyTypeId_B: ccyTypeIdFunded,
                    applyFees: true,
                 feeAddrOwner: CONST.nullAddr
             }], OWNER, OWNER_privKey);
