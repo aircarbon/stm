@@ -34,19 +34,19 @@ const blocksFromMonths = (months) => Math.ceil(blocksFromDays(months * 30.42));
 //
 // MAIN: deployer definitions -- contract ctor() params
 //
-const contractVer = "0.96d";
+const contractVer = "0.96e";
 const contractProps = {
     COMMODITY: {
         contractVer: contractVer,
-        contractName: `AirCarbon_CORSIA_v${contractVer}`, //"SecTok_Master",
+        contractName: `AirCarbon__v${contractVer}`, //"SecTok_Master",
         contractUnit: "KG",
-        contractSymbol: "CCC",
+        contractSymbol: "ACC",
         contractDecimals: 0,
         cashflowArgs: nullCashflowArgs,
     },
     CASHFLOW: {
         contractVer: contractVer,
-        contractName: `SingDax_CFT_v${contractVer}_1A`,
+        contractName: `SingDax_CFT__v${contractVer}_1A`,
         contractUnit: "Token(s)",
         contractSymbol: "SD1A",
         contractDecimals: 0,
@@ -126,8 +126,9 @@ EXCHANGE_FEE: 1,
 
     // token types (contract data)
     tokenType: Object.freeze({
-        UNFCCC: 1,
-           VCS: 2,
+          CORSIA: 1,
+          NATURE: 2,
+         PREMIUM: 3,
     }),
 
     // ccy types (contract data)
@@ -278,6 +279,7 @@ async function web3_tx(methodName, methodArgs, fromAddr, fromPrivKey) {
         })
         .once("error", error => {
             console.log(chalk.yellow(`   => ## error`, error));
+            console.dir(error);
             reject(error);
         });
     });
@@ -290,7 +292,7 @@ async function web3_sendEthTestAddr(sendFromNdx, sendToAddr, ethValue) {
 
     // send signed tx
     const { web3, ethereumTxChain } = getTestContextWeb3();
-    console.log(` > TX web3_sendEthTestAddr: Ξ${ethValue.toString()} @ ${fromAddr} => ${sendToAddr} [networkId: ${process.env.WEB3_NETWORK_ID} - ${web3.currentProvider.host}]`);
+    console.log(` > TX web3_sendEthTestAddr: Ξ${chalk.red.bgWhite(ethValue.toString())} @ ${chalk.red.bgWhite(fromAddr)} => ${chalk.red.bgWhite(sendToAddr)} [networkId: ${process.env.WEB3_NETWORK_ID} - ${web3.currentProvider.host}]`);
     const nonce = await web3.eth.getTransactionCount(fromAddr, "pending");
     const EthereumTx = EthereumJsTx.Transaction
     var tx = new EthereumTx({
@@ -318,11 +320,12 @@ async function web3_sendEthTestAddr(sendFromNdx, sendToAddr, ethValue) {
         })
         .once("confirmation", async confirms => {
             const receipt = await web3.eth.getTransactionReceipt(txHash);
-            console.log(`   => ${txHash} - ${confirms} confirm(s), receipt.gasUsed=`, receipt.gasUsed);
+            console.log(chalk.yellow(`   => ${txHash} - ${confirms} confirm(s), receipt.gasUsed=`, receipt.gasUsed));
             resolve(txHash);
         })
         .once("error", error => {
-            console.log(`   => ## error`, error);
+            console.log(chalk.yellow(`   => ## error`, error));
+            console.dir(error);
             reject(error);
         });
     });

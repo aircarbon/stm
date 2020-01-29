@@ -21,25 +21,25 @@ contract("StMaster", accounts => {
     });
 
     it(`minting - should allow owner to mint a single-vST batch`, async () => {
-        await mintBatch({ tokenType: CONST.tokenType.UNFCCC, qtyUnit: CONST.ktCarbon * 100, qtySecTokens: 1, receiver: accounts[global.TaddrNdx], }, { from: accounts[0] });
+        await mintBatch({ tokenType: CONST.tokenType.CORSIA, qtyUnit: CONST.ktCarbon * 100, qtySecTokens: 1, receiver: accounts[global.TaddrNdx], }, { from: accounts[0] });
     });
 
     // DEPRECATD: no multi ST batch minting
     //it(`minting - should allow owner to mint a multi-vST (2) batch`, async () => {
-    //    await mintBatch({ tokenType: CONST.tokenType.UNFCCC, qtyUnit: CONST.ktCarbon * 100, qtySecTokens: 2, receiver: accounts[global.TaddrNdx], },{ from: accounts[0] });
+    //    await mintBatch({ tokenType: CONST.tokenType.CORSIA, qtyUnit: CONST.ktCarbon * 100, qtySecTokens: 2, receiver: accounts[global.TaddrNdx], },{ from: accounts[0] });
     //});
 
     it(`minting - should allow owner to mint a minimum-sized token (one ton)`, async () => {
-        await mintBatch({ tokenType: CONST.tokenType.UNFCCC, qtyUnit: CONST.tonCarbon * 1, qtySecTokens: 1, receiver: accounts[global.TaddrNdx], }, { from: accounts[0] });
+        await mintBatch({ tokenType: CONST.tokenType.CORSIA, qtyUnit: CONST.tonCarbon * 1, qtySecTokens: 1, receiver: accounts[global.TaddrNdx], }, { from: accounts[0] });
     });
 
     it(`minting - should allow owner to mint a megatoken (10 gigatons)`, async () => {
-        await mintBatch({ tokenType: CONST.tokenType.UNFCCC, qtyUnit: CONST.gtCarbon * 10, qtySecTokens: 1, receiver: accounts[global.TaddrNdx], }, { from: accounts[0] });
+        await mintBatch({ tokenType: CONST.tokenType.CORSIA, qtyUnit: CONST.gtCarbon * 10, qtySecTokens: 1, receiver: accounts[global.TaddrNdx], }, { from: accounts[0] });
     });
 
     it(`minting - should allow owner to mint different vST-types`, async () => {
-        await mintBatch({ tokenType: CONST.tokenType.UNFCCC, qtyUnit: CONST.ktCarbon * 100, qtySecTokens: 1, receiver: accounts[global.TaddrNdx], }, { from: accounts[0] });
-        await mintBatch({ tokenType: CONST.tokenType.VCS, qtyUnit: CONST.ktCarbon * 100, qtySecTokens: 1, receiver: accounts[global.TaddrNdx], }, { from: accounts[0] });
+        await mintBatch({ tokenType: CONST.tokenType.CORSIA, qtyUnit: CONST.ktCarbon * 100, qtySecTokens: 1, receiver: accounts[global.TaddrNdx], }, { from: accounts[0] });
+        await mintBatch({ tokenType: CONST.tokenType.NATURE, qtyUnit: CONST.ktCarbon * 100, qtySecTokens: 1, receiver: accounts[global.TaddrNdx], }, { from: accounts[0] });
     });
 
     it(`minting - should allow minting of multiple batches to the same receiver`, async () => {
@@ -49,7 +49,7 @@ contract("StMaster", accounts => {
         for (var i = 0; i < 3; i++) {
             const qtyUnit = (i + 1) * 2 * CONST.tonCarbon;
             const qtySecTokens = 1;
-            const batchId = await mintBatch({ tokenType: CONST.tokenType.UNFCCC, qtyUnit, qtySecTokens, receiver: accounts[global.TaddrNdx] }, { from: accounts[0] });
+            const batchId = await mintBatch({ tokenType: CONST.tokenType.CORSIA, qtyUnit, qtySecTokens, receiver: accounts[global.TaddrNdx] }, { from: accounts[0] });
             totalMintedQty += qtyUnit;
             totalMintedSecTokens += qtySecTokens;
             batchIds.push(batchId);
@@ -68,19 +68,19 @@ contract("StMaster", accounts => {
     });
 
     it(`minting - should have reasonable gas cost for minting of multi-vST batches`, async () => {
-        mintTx = await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.ktCarbon, 1, accounts[global.TaddrNdx], CONST.nullFees, [], [], { from: accounts[0], });
+        mintTx = await stm.mintSecTokenBatch(CONST.tokenType.CORSIA, CONST.ktCarbon, 1, accounts[global.TaddrNdx], CONST.nullFees, [], [], { from: accounts[0], });
         await CONST.logGas(web3, mintTx, `Mint  1 vST`);
 
-        // mintTx = await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.ktCarbon, 5, accounts[global.TaddrNdx], { from: accounts[0], });
+        // mintTx = await stm.mintSecTokenBatch(CONST.tokenType.CORSIA, CONST.ktCarbon, 5, accounts[global.TaddrNdx], { from: accounts[0], });
         //await CONST.logGas(web3, mintTx, `Mint  5 vST`);
 
-        // var mintTx = await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.ktCarbon, 10, accounts[global.TaddrNdx], { from: accounts[0] });
+        // var mintTx = await stm.mintSecTokenBatch(CONST.tokenType.CORSIA, CONST.ktCarbon, 10, accounts[global.TaddrNdx], { from: accounts[0] });
         //await CONST.logGas(web3, mintTx, `Mint 10 vST`);
     });
 
     it(`minting - should not allow non-owner to mint vST batches`, async () => {
         try {
-            await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.tonCarbon, 1, accounts[global.TaddrNdx], CONST.nullFees, [], [], { from: accounts[1], });
+            await stm.mintSecTokenBatch(CONST.tokenType.CORSIA, CONST.tonCarbon, 1, accounts[global.TaddrNdx], CONST.nullFees, [], [], { from: accounts[1], });
         } catch (ex) { 
             assert(ex.reason == 'Restricted', `unexpected: ${ex.reason}`);
             return;
@@ -100,7 +100,7 @@ contract("StMaster", accounts => {
 
     it(`minting - should not allow multi-vST minting`, async () => {
         try {
-            await mintBatch({ tokenType: CONST.tokenType.UNFCCC, qtyUnit: CONST.tonCarbon, qtySecTokens: 2, receiver: accounts[global.TaddrNdx], }, { from: accounts[0] } );
+            await mintBatch({ tokenType: CONST.tokenType.CORSIA, qtyUnit: CONST.tonCarbon, qtySecTokens: 2, receiver: accounts[global.TaddrNdx], }, { from: accounts[0] } );
         } catch (ex) { 
             assert(ex.reason == 'Set mintSecTokenCount 1', `unexpected: ${ex.reason}`);
             return;
@@ -110,14 +110,14 @@ contract("StMaster", accounts => {
 
     // it(`minting - should not allow non-integer KG carbon in an vST`, async () => {
     //     try {
-    //         await mintBatch({ tokenType: CONST.tokenType.UNFCCC, qtyUnit: CONST.tonCarbon, qtySecTokens: 3, receiver: accounts[global.TaddrNdx], }, { from: accounts[0] } );
+    //         await mintBatch({ tokenType: CONST.tokenType.CORSIA, qtyUnit: CONST.tonCarbon, qtySecTokens: 3, receiver: accounts[global.TaddrNdx], }, { from: accounts[0] } );
     //     } catch (ex) { return; }
     //     assert.fail('expected contract exception');
     // });
 
     it(`minting - should not allow minting invalid (0) token units (1)`, async () => {
         try {
-            await mintBatch( { tokenType: CONST.tokenType.UNFCCC, qtyUnit: 0, qtySecTokens: 1, receiver: accounts[global.TaddrNdx] }, { from: accounts[0] } );
+            await mintBatch( { tokenType: CONST.tokenType.CORSIA, qtyUnit: 0, qtySecTokens: 1, receiver: accounts[global.TaddrNdx] }, { from: accounts[0] } );
         } catch (ex) { 
             assert(ex.reason == 'Bad mintQty', `unexpected: ${ex.reason}`);
             return;
@@ -127,7 +127,7 @@ contract("StMaster", accounts => {
 
     it(`minting - should not allow minting invalid (-1) token units (2)`, async () => {
         try {
-            await mintBatch( { tokenType: CONST.tokenType.UNFCCC, qtyUnit: -1, qtySecTokens: 1, receiver: accounts[global.TaddrNdx] }, { from: accounts[0] } );
+            await mintBatch( { tokenType: CONST.tokenType.CORSIA, qtyUnit: -1, qtySecTokens: 1, receiver: accounts[global.TaddrNdx] }, { from: accounts[0] } );
         } catch (ex) { 
             assert(ex.reason == 'Bad mintQty', `unexpected: ${ex.reason}`);
             return;
@@ -139,7 +139,7 @@ contract("StMaster", accounts => {
         try {
             const qty = Big(2).pow(64);//.minus(1);
             const M = accounts[global.TaddrNdx];
-            await mintBatch({ tokenType: CONST.tokenType.UNFCCC, qtyUnit: qty.toString(), qtySecTokens: 1, receiver: accounts[global.TaddrNdx] }, { from: accounts[0] });
+            await mintBatch({ tokenType: CONST.tokenType.CORSIA, qtyUnit: qty.toString(), qtySecTokens: 1, receiver: accounts[global.TaddrNdx] }, { from: accounts[0] });
         } catch (ex) {
             assert(ex.reason == 'Bad mintQty', `unexpected: ${ex.reason}`);
             return;
@@ -149,7 +149,7 @@ contract("StMaster", accounts => {
 
     it(`minting - should not allow minting invalid vST quantities (1)`, async () => {
         try {
-            await mintBatch({ tokenType: CONST.tokenType.UNFCCC, qtyUnit: CONST.tonCarbon, qtySecTokens: 0, receiver: accounts[global.TaddrNdx], }, { from: accounts[0] });
+            await mintBatch({ tokenType: CONST.tokenType.CORSIA, qtyUnit: CONST.tonCarbon, qtySecTokens: 0, receiver: accounts[global.TaddrNdx], }, { from: accounts[0] });
         } catch (ex) { 
             assert(ex.reason == 'Set mintSecTokenCount 1', `unexpected: ${ex.reason}`);
             return;
@@ -159,7 +159,7 @@ contract("StMaster", accounts => {
 
     it(`minting - should not allow invalid minting vST quantities (2)`, async () => {
         try {
-            await mintBatch({ tokenType: CONST.tokenType.UNFCCC, qtyUnit: CONST.tonCarbon, qtySecTokens: -1, receiver: accounts[global.TaddrNdx], }, { from: accounts[0] });
+            await mintBatch({ tokenType: CONST.tokenType.CORSIA, qtyUnit: CONST.tonCarbon, qtySecTokens: -1, receiver: accounts[global.TaddrNdx], }, { from: accounts[0] });
         } catch (ex) {
             assert(ex.reason == 'Set mintSecTokenCount 1', `unexpected: ${ex.reason}`);
             return;
@@ -170,7 +170,7 @@ contract("StMaster", accounts => {
     it(`minting - should not allow minting when contract is read only`, async () => {
         try {
             await stm.setReadOnly(true, { from: accounts[0] });
-            await mintBatch({ tokenType: CONST.tokenType.UNFCCC, qtyUnit: CONST.tonCarbon, qtySecTokens: 1, receiver: accounts[global.TaddrNdx], }, { from: accounts[0] });
+            await mintBatch({ tokenType: CONST.tokenType.CORSIA, qtyUnit: CONST.tonCarbon, qtySecTokens: 1, receiver: accounts[global.TaddrNdx], }, { from: accounts[0] });
         } catch (ex) {
             assert(ex.reason == 'Read-only', `unexpected: ${ex.reason}`);
             await stm.setReadOnly(false, { from: accounts[0] });

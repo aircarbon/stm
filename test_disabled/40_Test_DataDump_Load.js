@@ -96,17 +96,17 @@ contract("StMaster", accounts => {
             
             // mint
             console.log('minting for account... ', M);
-            const mintTx_B1 = await stm_cur.mintSecTokenBatch(CONST.tokenType.UNFCCC, 1000 * (i+1), 1, M, batchFee,  metaKVPs.map(p => p.k), metaKVPs.map(p => p.v), { from: accounts[0] });
+            const mintTx_B1 = await stm_cur.mintSecTokenBatch(CONST.tokenType.CORSIA, 1000 * (i+1), 1, M, batchFee,  metaKVPs.map(p => p.k), metaKVPs.map(p => p.v), { from: accounts[0] });
             curHash = await checkHashUpdate(curHash);
             if (await stm_cur.getContractType() == CONST.contractType.COMMODITY) {
-                const mintTx_B2 = await stm_cur.mintSecTokenBatch(CONST.tokenType.VCS,    10000 * (i+1), 1, M, batchFee, metaKVPs.map(p => p.k), metaKVPs.map(p => p.v), { from: accounts[0] });
+                const mintTx_B2 = await stm_cur.mintSecTokenBatch(CONST.tokenType.NATURE,    10000 * (i+1), 1, M, batchFee, metaKVPs.map(p => p.k), metaKVPs.map(p => p.v), { from: accounts[0] });
                 curHash = await checkHashUpdate(curHash);
             }
 
-            // transfer to owner - batch 1 UNFCCC, no fees
+            // transfer to owner - batch 1 CORSIA, no fees
             const send_tx_B1 = await stm_cur.transferOrTrade({ 
                         ledger_A: M,                            ledger_B: accounts[0], 
-                           qty_A: 200,                     tokenTypeId_A: CONST.tokenType.UNFCCC, 
+                           qty_A: 200,                     tokenTypeId_A: CONST.tokenType.CORSIA, 
                            qty_B: 0,                       tokenTypeId_B: 0, 
                     ccy_amount_A: 0,                         ccyTypeId_A: 0, 
                     ccy_amount_B: 0,                         ccyTypeId_B: 0, 
@@ -117,11 +117,11 @@ contract("StMaster", accounts => {
             );
             curHash = await checkHashUpdate(curHash);
 
-            // transfer to owner - batch 2 VCS, with fees
+            // transfer to owner - batch 2 NATURE, with fees
             if (await stm_cur.getContractType() == CONST.contractType.COMMODITY) {
                     const send_tx_B2 = await stm_cur.transferOrTrade({ 
                          ledger_A: M,                            ledger_B: accounts[0], 
-                            qty_A: 100,                     tokenTypeId_A: CONST.tokenType.VCS, 
+                            qty_A: 100,                     tokenTypeId_A: CONST.tokenType.NATURE, 
                             qty_B: 0,                       tokenTypeId_B: 0, 
                      ccy_amount_A: 0,                         ccyTypeId_A: 0, 
                      ccy_amount_B: 0,                         ccyTypeId_B: 0, 
@@ -133,12 +133,12 @@ contract("StMaster", accounts => {
                 curHash = await checkHashUpdate(curHash);
             }
 
-            // burn - parital, UNFCCC
-            const burn_tx_B1 = await stm_cur.burnTokens(M, CONST.tokenType.UNFCCC, 1);
+            // burn - parital, CORSIA
+            const burn_tx_B1 = await stm_cur.burnTokens(M, CONST.tokenType.CORSIA, 1);
             curHash = await checkHashUpdate(curHash);
 
-            // burn - full, batch 2 VCS
-            const burn_tx_B2 = await stm_cur.burnTokens(M, CONST.tokenType.VCS, 100);
+            // burn - full, batch 2 NATURE
+            const burn_tx_B2 = await stm_cur.burnTokens(M, CONST.tokenType.NATURE, 100);
             curHash = await checkHashUpdate(curHash);
         }
         const batchCount = await stm_cur.getSecTokenBatchCount.call();

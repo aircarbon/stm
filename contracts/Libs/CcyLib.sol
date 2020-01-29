@@ -16,8 +16,7 @@ library CcyLib {
         string memory unit,
         uint16 decimals)
     public {
-        if (ledgerData.contractType == StructLib.ContractType.CASHFLOW)
-            revert("Bad cashflow request");
+        require(ledgerData.contractType == StructLib.ContractType.COMMODITY, "Bad cashflow request");
 
         for (uint256 ccyTypeId = 1; ccyTypeId <= ccyTypesData._count_ccyTypes; ccyTypeId++) {
             require(keccak256(abi.encodePacked(ccyTypesData._ccyTypes[ccyTypeId].name)) != keccak256(abi.encodePacked(name)),

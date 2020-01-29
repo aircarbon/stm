@@ -5,7 +5,7 @@ const CONST = require('../const.js');
 contract("StMaster", accounts => {
     var stm;
 
-    const countDefaultSecSecTokenTypes = 2;
+    const countDefaultSecSecTokenTypes = 3;
 
     before(async function () {
         stm = await st.deployed();
@@ -24,11 +24,14 @@ contract("StMaster", accounts => {
         const types = (await stm.getSecTokenTypes()).tokenTypes;
         assert(types.length == countDefaultSecSecTokenTypes, 'unexpected default eeu type count');
 
-        assert(types[0].name.includes('UNFCCC'), `unexpected default eeu type name 1`);
+        assert(types[0].name == 'AirCarbon CORSIA Token', `unexpected default eeu type name 1`);
         assert(types[0].id == 1, 'unexpected default eeu type id 1');
 
-        assert(types[1].name.includes('VERRA'), `unexpected default eeu type name 2`);
+        assert(types[1].name== 'AirCarbon Nature Token', `unexpected default eeu type name 2`);
         assert(types[1].id == 2, 'unexpected default eeu type id 2');
+
+        assert(types[2].name== 'AirCarbon Premium Token', `unexpected default eeu type name 3`);
+        assert(types[2].id == 3, 'unexpected default eeu type id 3');
     });
 
     it(`token types - should be able to use newly added ST types`, async () => {
@@ -54,7 +57,7 @@ contract("StMaster", accounts => {
 
         // mint default ST type: 4 batches 
         for (var i=0 ; i < 4 ; i++) {
-            await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.ktCarbon * 100, 1, accounts[global.TaddrNdx], CONST.nullFees, [], [], { from: accounts[0] });
+            await stm.mintSecTokenBatch(CONST.tokenType.CORSIA, CONST.ktCarbon * 100, 1, accounts[global.TaddrNdx], CONST.nullFees, [], [], { from: accounts[0] });
         }
         const batchCountAfter_Mint2 = (await stm.getSecTokenBatchCount.call()).toNumber();
         assert(batchCountAfter_Mint2 == batchCountBefore + 6, `unexpected max batch id ${batchCountAfter_Mint2} after minting (2)`);

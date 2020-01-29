@@ -28,28 +28,28 @@ contract("StMaster", accounts => {
 
         // mint batches x 3 with originator fees - should be ignored by ERC20
         const testFee = { fee_fixed: 1, fee_percBips: 10, fee_min: 0, fee_max: 0 };
-        await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1, WHITE, testFee, [], [], { from: accounts[0] });
-        await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1, WHITE, testFee, [], [], { from: accounts[0] });
-        await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1, WHITE, testFee, [], [], { from: accounts[0] });
-        await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.tonCarbon, 1, WHITE, testFee, [], [], { from: accounts[0] });
-        await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.tonCarbon, 1, WHITE, testFee, [], [], { from: accounts[0] });
-        await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.tonCarbon, 1, WHITE, testFee, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.NATURE, CONST.tonCarbon, 1, WHITE, testFee, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.NATURE, CONST.tonCarbon, 1, WHITE, testFee, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.NATURE, CONST.tonCarbon, 1, WHITE, testFee, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.CORSIA, CONST.tonCarbon, 1, WHITE, testFee, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.CORSIA, CONST.tonCarbon, 1, WHITE, testFee, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.CORSIA, CONST.tonCarbon, 1, WHITE, testFee, [], [], { from: accounts[0] });
 
         // set exchange fees - should be ignored by ERC20
-        await stm.setFee_TokType(CONST.tokenType.VCS,    CONST.nullAddr, testFee );
-        await stm.setFee_TokType(CONST.tokenType.UNFCCC, CONST.nullAddr, testFee );
+        await stm.setFee_TokType(CONST.tokenType.NATURE, CONST.nullAddr, testFee );
+        await stm.setFee_TokType(CONST.tokenType.CORSIA, CONST.nullAddr, testFee );
 
         // set ledger feess - should be ignored by ERC20
-        await stm.setFee_TokType(CONST.tokenType.VCS,    WHITE,  testFee );
-        await stm.setFee_TokType(CONST.tokenType.UNFCCC, WHITE,  testFee );
+        await stm.setFee_TokType(CONST.tokenType.NATURE, WHITE,  testFee );
+        await stm.setFee_TokType(CONST.tokenType.CORSIA, WHITE,  testFee );
         
         await stm.fund(CONST.ccyType.SGD, 1, GRAY_1, { from: accounts[0] });
-        await stm.setFee_TokType(CONST.tokenType.VCS,    GRAY_1, testFee );
-        await stm.setFee_TokType(CONST.tokenType.UNFCCC, GRAY_1, testFee );
+        await stm.setFee_TokType(CONST.tokenType.NATURE, GRAY_1, testFee );
+        await stm.setFee_TokType(CONST.tokenType.CORSIA, GRAY_1, testFee );
 
         await stm.fund(CONST.ccyType.SGD, 1, GRAY_2, { from: accounts[0] });
-        await stm.setFee_TokType(CONST.tokenType.VCS,    GRAY_2, testFee );
-        await stm.setFee_TokType(CONST.tokenType.UNFCCC, GRAY_2, testFee );
+        await stm.setFee_TokType(CONST.tokenType.NATURE, GRAY_2, testFee );
+        await stm.setFee_TokType(CONST.tokenType.CORSIA, GRAY_2, testFee );
     });
 
     //
@@ -62,7 +62,7 @@ contract("StMaster", accounts => {
     async function white_to_gray_1() {
         await transferHelper.transferLedger({ stm, accounts, 
             ledger_A: WHITE,                               ledger_B: GRAY_1,
-               qty_A: 3000,                           tokenTypeId_A: CONST.tokenType.VCS,
+               qty_A: 3000,                           tokenTypeId_A: CONST.tokenType.NATURE,
                qty_B: 0,                              tokenTypeId_B: 0,
         ccy_amount_A: 0,                                ccyTypeId_A: 0,
         ccy_amount_B: 0,                                ccyTypeId_B: 0,
@@ -70,7 +70,7 @@ contract("StMaster", accounts => {
         });
         await transferHelper.transferLedger({ stm, accounts, 
             ledger_A: WHITE,                               ledger_B: GRAY_1,
-               qty_A: 3000,                           tokenTypeId_A: CONST.tokenType.UNFCCC,
+               qty_A: 3000,                           tokenTypeId_A: CONST.tokenType.CORSIA,
                qty_B: 0,                              tokenTypeId_B: 0,
         ccy_amount_A: 0,                                ccyTypeId_A: 0,
         ccy_amount_B: 0,                                ccyTypeId_B: 0,

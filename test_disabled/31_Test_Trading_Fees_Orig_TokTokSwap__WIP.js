@@ -27,14 +27,14 @@ contract("StMaster", accounts => {
 
     // ST ORIGINATOR FEES - MULTIPLE ORIGINATORS
 
-    it(`fees (orig/orig) - apply VCS token M originator fees (+ ledger fee) / UNFCCC token M originator fees (+ global fee), on a 1.5 ST trade (tok fee on A / tok fee on B)`, async () => {
+    it(`fees (orig/orig) - apply NATURE token M originator fees (+ ledger fee) / CORSIA token M originator fees (+ global fee), on a 1.5 ST trade (tok fee on A / tok fee on B)`, async () => {
         const A = accounts[++global.TaddrNdx];
         const B = accounts[++global.TaddrNdx];
         //await stm.whitelist(A);
         //await stm.whitelist(B);
 
-        const tokType_A = CONST.tokenType.VCS;
-        const tokType_B = CONST.tokenType.UNFCCC;
+        const tokType_A = CONST.tokenType.NATURE;
+        const tokType_B = CONST.tokenType.CORSIA;
         var { qty: qty_A, M_multi: M_multi_A } = await MintAndTransfer({ tokenType: tokType_A, originatorCount: 2, batchesPerOriginator: 1, transferTo: A });
         var { qty: qty_B, M_multi: M_multi_B } = await MintAndTransfer({ tokenType: tokType_B, originatorCount: 1, batchesPerOriginator: 2, transferTo: B });
         console.log('qty_A', qty_A.toString());

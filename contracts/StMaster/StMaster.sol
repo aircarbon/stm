@@ -63,8 +63,12 @@ contract StMaster is IStMaster, IPublicViews,
     // PayableLib events
     event IssuanceSubscribed(address indexed subscriber, address indexed issuer, uint256 weiSent, uint256 weiChange, uint256 tokensSubscribed, uint256 weiPrice);
 
+    // PRI 0 ** COMMODITY ==>>> 
+    //   (a) 3x token-types [Corsia, Premium, Nature] --> consolidated KVP format for Corsia
+
+
     //
-    // PRI 0 ** CASHFLOWS (J 1+3) ==>>> MVP -- CFT CORE (aiming for *no whitelisting*, i.e. all external control ERC20 accounts)
+    // PRI 1 ** CASHFLOWS (J 1+3) ==>>> MVP -- CFT CORE (aiming for *no whitelisting*, i.e. all external control ERC20 accounts)
     //
     //      TODO: pri1 - test - exchange fees on subscriptions
     //      TODO: pri1 - new  - eth fees on subscriptions (new fee-type)
@@ -91,15 +95,15 @@ contract StMaster is IStMaster, IPublicViews,
     // StructLib    170684
 
     constructor(
-        StructLib.ContractType _contractType,
+        StructLib.ContractType        _contractType,
         StructLib.CashflowArgs memory _cashflowArgs,
-        string memory _contractName,
-        string memory _contractVer,
-        string memory _contractUnit,
-        string memory _contractSymbol,
-        uint8 _contractDecimals,
-        address _chainlinkAggregator_btcUsd,
-        address _chainlinkAggregator_ethUsd
+        string memory                 _contractName,
+        string memory                 _contractVer,
+        string memory                 _contractUnit,
+        string memory                 _contractSymbol,
+        uint8                         _contractDecimals,
+        address                       _chainlinkAggregator_btcUsd,
+        address                       _chainlinkAggregator_ethUsd
     ) StErc20(_contractSymbol, _contractDecimals)
     public {
         chainlinkAggregator_btcUsd = _chainlinkAggregator_btcUsd;
@@ -116,9 +120,10 @@ contract StMaster is IStMaster, IPublicViews,
 
         // set token & ccy types
         if (_contractType == StructLib.ContractType.COMMODITY) {
-            stTypesData._tokenTypeNames[1] = 'CER - UNFCCC - Certified Emission Reduction';
-            stTypesData._tokenTypeNames[2] = 'VCS - VERRA - Verified Carbon Standard';
-            stTypesData._count_tokenTypes = 2;
+            stTypesData._tokenTypeNames[1] = 'AirCarbon CORSIA Token';
+            stTypesData._tokenTypeNames[2] = 'AirCarbon Nature Token';
+            stTypesData._tokenTypeNames[3] = 'AirCarbon Premium Token';
+            stTypesData._count_tokenTypes = 3;
             ccyTypesData._ccyTypes[1] = StructLib.Ccy({ id: 1, name: 'SGD', unit: 'cents',      decimals: 2 }); // gas: ~500k (!) for pre-populating these
             ccyTypesData._ccyTypes[2] = StructLib.Ccy({ id: 2, name: 'ETH', unit: 'Wei',        decimals: 18 });
             ccyTypesData._ccyTypes[3] = StructLib.Ccy({ id: 3, name: 'BTC', unit: 'Satoshi',    decimals: 8 });
@@ -166,7 +171,7 @@ contract StMaster is IStMaster, IPublicViews,
     //   > todo: increase/finalize MAX_BATCHES_PREVIEW
     //   > todo: drop fee_fixed completely (it's == fee_min)
     //
-    //   > todo: change internalTransfer so it can operate on *any* stTypeId... (???) > workaround is to mint only one type (VCS/UNFCCC can still be encoded in meta)
+    //   > todo: change internalTransfer so it can operate on *any* stTypeId... (???) > still needed now that nature != premium != corsia?
     //   > todo: ERC20 authorize() support (???)
     //
     // TODO: Thom - get ETH re. mainnet testing

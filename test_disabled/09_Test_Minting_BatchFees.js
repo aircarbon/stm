@@ -24,7 +24,7 @@ contract("StMaster", accounts => {
     it(`minting originator fee - should allow minting of originator fee on a batch`, async () => {
         const M = accounts[global.TaddrNdx];
         const origFee = { fee_fixed: 1, fee_percBips: 10, fee_min: 1, fee_max: 10 }
-        await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.tonCarbon, 1, M, origFee, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.CORSIA, CONST.tonCarbon, 1, M, origFee, [], [], { from: accounts[0] });
         const batchId = await stm.getSecTokenBatchCount.call();
         const batch = await stm.getSecTokenBatch(batchId);
         assert(batch.originator == M, 'unexpected originator on minted batch');
@@ -37,18 +37,18 @@ contract("StMaster", accounts => {
     it(`minting originator fee - should allow minting of collared, uncapped batch fee`, async () => {
         const M = accounts[global.TaddrNdx];
         const origFee = { fee_fixed: 10, fee_percBips: 10, fee_min: 10, fee_max: 0 }
-        await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.tonCarbon, 1, M, origFee, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.CORSIA, CONST.tonCarbon, 1, M, origFee, [], [], { from: accounts[0] });
     });
     it(`minting originator fee - should allow minting of uncollared, capped batch fee`, async () => {
         const M = accounts[global.TaddrNdx];
         const origFee = { fee_fixed: 10, fee_percBips: 10, fee_min: 0, fee_max: 10 }
-        await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.tonCarbon, 1, M, origFee, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.CORSIA, CONST.tonCarbon, 1, M, origFee, [], [], { from: accounts[0] });
     });
 
     it(`minting originator fee - should allow decreasing of collared, uncapped batch fee`, async () => {
         const M = accounts[global.TaddrNdx];
         const origFee1 = { fee_fixed: 100, fee_percBips: 10, fee_min: 10, fee_max: 0 }
-        await stm.mintSecTokenBatch(CONST.tokenType.VCS, CONST.tonCarbon, 1, M, origFee1, [], [],   { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.NATURE, CONST.tonCarbon, 1, M, origFee1, [], [],   { from: accounts[0] });
         const batchId = await stm.getSecTokenBatchCount.call();
 
         var origFee2 = { fee_fixed: 100, fee_percBips: 10, fee_min: 9, fee_max: 0 }
@@ -58,7 +58,7 @@ contract("StMaster", accounts => {
     it(`minting originator fee - should allow decreasing of batch fee after minting`, async () => {
         const M = accounts[global.TaddrNdx];
         const origFee1 = { fee_fixed: 10, fee_percBips: 10, fee_min: 10, fee_max: 10 }
-        await stm.mintSecTokenBatch(CONST.tokenType.VCS, CONST.tonCarbon, 1, M, origFee1, [], [],   { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.NATURE, CONST.tonCarbon, 1, M, origFee1, [], [],   { from: accounts[0] });
         const batchId = await stm.getSecTokenBatchCount.call();
         var origFee2;
 
@@ -90,7 +90,7 @@ contract("StMaster", accounts => {
     it(`minting originator fee - should not allow increasing of batch fees after minting (fee_fixed)`, async () => {
         const M = accounts[global.TaddrNdx];
         const origFee1 = { fee_fixed: 1, fee_percBips: 10, fee_min: 1, fee_max: 10 }
-        await stm.mintSecTokenBatch(CONST.tokenType.VCS, CONST.tonCarbon, 1, M, origFee1, [], [],   { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.NATURE, CONST.tonCarbon, 1, M, origFee1, [], [],   { from: accounts[0] });
         const batchId = await stm.getSecTokenBatchCount.call();
         var origFee2;
 
@@ -114,7 +114,7 @@ contract("StMaster", accounts => {
     it(`minting originator fee - should not allow non-owner to edit batch fee after minting`, async () => {
         const M = accounts[global.TaddrNdx];
         const origFee1 = { fee_fixed: 1, fee_percBips: 10, fee_min: 1, fee_max: 10 };
-        await stm.mintSecTokenBatch(CONST.tokenType.VCS, CONST.tonCarbon, 1, M, origFee1, [], [],   { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.NATURE, CONST.tonCarbon, 1, M, origFee1, [], [],   { from: accounts[0] });
         const batchId = await stm.getSecTokenBatchCount.call();
         
         const origFee2 = { fee_fixed: 0, fee_percBips: 10, fee_min: 1, fee_max: 10 };
@@ -128,10 +128,10 @@ contract("StMaster", accounts => {
         const M = accounts[global.TaddrNdx];
         var origFee;
         origFee = { fee_fixed: 1, fee_percBips: 10, fee_min: 10, fee_max: 0 }; // no cap
-        await stm.mintSecTokenBatch(CONST.tokenType.VCS, CONST.tonCarbon, 1, M, origFee, [], [],       { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.NATURE, CONST.tonCarbon, 1, M, origFee, [], [],       { from: accounts[0] });
         try {
             origFee = { fee_fixed: 1, fee_percBips: 10, fee_min: 10, fee_max: 5 }; // bad cap < collar
-            await stm.mintSecTokenBatch(CONST.tokenType.VCS, CONST.tonCarbon, 1, M, origFee, [], [],   { from: accounts[0] });
+            await stm.mintSecTokenBatch(CONST.tokenType.NATURE, CONST.tonCarbon, 1, M, origFee, [], [],   { from: accounts[0] });
         } catch (ex) { assert(ex.reason == 'Bad fee args', `unexpected: ${ex.reason}`); return; }
         assert.fail('expected contract exception');
     });
@@ -140,7 +140,7 @@ contract("StMaster", accounts => {
         var origFee;
 
         origFee = { fee_fixed: 1, fee_percBips: 10, fee_min: 10, fee_max: 0 }; // no cap
-        await stm.mintSecTokenBatch(CONST.tokenType.VCS, CONST.tonCarbon, 1, M, origFee, [], [],       { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.NATURE, CONST.tonCarbon, 1, M, origFee, [], [],       { from: accounts[0] });
         const batchId = await stm.getSecTokenBatchCount.call();
         origFee = { fee_fixed: 1, fee_percBips: 10, fee_min: 9, fee_max: 0 }; // edit down - no cap
         await stm.setOriginatorFeeTokenBatch(batchId, origFee,                                         { from: accounts[0] });
@@ -156,7 +156,7 @@ contract("StMaster", accounts => {
         const M = accounts[global.TaddrNdx];
         try {
             const origFee = { fee_fixed: 1, fee_percBips: 10001, fee_min: 10, fee_max: 0 }; // bad basis points
-            await stm.mintSecTokenBatch(CONST.tokenType.VCS, CONST.tonCarbon, 1, M, origFee, [], [],   { from: accounts[0] });
+            await stm.mintSecTokenBatch(CONST.tokenType.NATURE, CONST.tonCarbon, 1, M, origFee, [], [],   { from: accounts[0] });
         } catch (ex) { assert(ex.reason == 'Bad fee args', `unexpected: ${ex.reason}`); return; }
         assert.fail('expected contract exception');        
     });
@@ -164,7 +164,7 @@ contract("StMaster", accounts => {
         const M = accounts[global.TaddrNdx];
         var origFee;
         origFee = { fee_fixed: 1, fee_percBips: 10, fee_min: 10, fee_max: 0 };
-        await stm.mintSecTokenBatch(CONST.tokenType.VCS, CONST.tonCarbon, 1, M, origFee, [], [],       { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.NATURE, CONST.tonCarbon, 1, M, origFee, [], [],       { from: accounts[0] });
         const batchId = await stm.getSecTokenBatchCount.call();
         
         try {

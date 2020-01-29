@@ -65,6 +65,7 @@ library PayableLib {
         int256 ethSat_UsdCents
     )
     public {
+        require(ledgerData.contractType == StructLib.ContractType.CASHFLOW, "Bad commodity request");
         require(ledgerData._contractSealed, "Contract is not sealed");
         require(ledgerData._batches_currentMax_id == 1, "Bad cashflow request: no minted batch");
         require(cashflowData.wei_currentPrice > 0 || cashflowData.cents_currentPrice > 0, "Bad cashflow request: no price set");

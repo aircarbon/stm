@@ -19,8 +19,7 @@ library TokenLib {
         StructLib.StTypesStruct storage stTypesData,
         string memory name)
     public {
-        if (ledgerData.contractType == StructLib.ContractType.CASHFLOW)
-            revert("Bad cashflow request");
+        require(ledgerData.contractType == StructLib.ContractType.COMMODITY, "Bad cashflow request");
 
         for (uint256 tokenTypeId = 1; tokenTypeId <= stTypesData._count_tokenTypes; tokenTypeId++) {
             require(keccak256(abi.encodePacked(stTypesData._tokenTypeNames[tokenTypeId])) != keccak256(abi.encodePacked(name)), "Duplicate name");
@@ -75,9 +74,7 @@ library TokenLib {
         require(uint256(ledgerData._batches_currentMax_id) + 1 <= 0xffffffffffffffff, "Too many batches");
         require(a.origTokFee.fee_max >= a.origTokFee.fee_min || a.origTokFee.fee_max == 0, "Bad fee args");
         require(a.origTokFee.fee_percBips <= 10000, "Bad fee args");
-
-        if (ledgerData.contractType == StructLib.ContractType.CASHFLOW)
-            require(ledgerData._batches_currentMax_id == 0, "Bad cashflow request");
+        require(ledgerData.contractType == StructLib.ContractType.COMMODITY, "Bad cashflow request");
 
         // ### string[] param lengths are reported as zero!
         /*require(metaKeys.length == 0, "At least one metadata key must be provided");
@@ -220,7 +217,8 @@ library TokenLib {
 
                 remainingToBurn -= stQty;
                 emit BurnedFullSecToken(stId, tokenTypeId, ledgerOwner, stQty);
-            } else {
+            }
+            else {
                 // resize the ST (partial burn)
                 //ledgerData._sts_currentQty[stId] -= remainingToBurn;
                 ledgerData._sts[stId].currentQty -= remainingToBurn;

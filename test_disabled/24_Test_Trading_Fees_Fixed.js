@@ -25,73 +25,73 @@ contract("StMaster", accounts => {
     });
 
     // ST FEES
-    it(`fees (fixed) - apply VCS token fee on a trade (fee on A)`, async () => {
-        await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.TaddrNdx + 0], CONST.nullFees, [], [], { from: accounts[0] });
-        await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        accounts[global.TaddrNdx + 1],                         { from: accounts[0] });
+    it(`fees (fixed) - apply NATURE token fee on a trade (fee on A)`, async () => {
+        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.tonCarbon, 1,      accounts[global.TaddrNdx + 0], CONST.nullFees, [], [], { from: accounts[0] });
+        await stm.fund(CONST.ccyType.ETH,                      CONST.oneEth_wei,        accounts[global.TaddrNdx + 1],                         { from: accounts[0] });
 
-        // set fee structure VCS: 2 KG carbon fixed
+        // set fee structure NATURE: 2 KG carbon fixed
         const carbonKgFixedFee = 2;
-        assert((await stm.getFee(CONST.getFeeType.TOK, CONST.tokenType.VCS, CONST.nullAddr)).fee_fixed == 0, 'unexpected VCS fixed KG fee before setting VCS fee structure');
-        const setFeeTx = await stm.setFee_TokType(CONST.tokenType.VCS, CONST.nullAddr, { fee_fixed: carbonKgFixedFee, fee_percBips: 0, fee_min: 0, fee_max: 0 } );
-        truffleAssert.eventEmitted(setFeeTx, 'SetFeeTokFix', ev => ev.tokenTypeId == CONST.tokenType.VCS && ev.fee_tokenQty_Fixed == carbonKgFixedFee && ev.ledgerOwner == CONST.nullAddr);
-        assert((await stm.getFee(CONST.getFeeType.TOK, CONST.tokenType.VCS, CONST.nullAddr)).fee_fixed == carbonKgFixedFee, 'unexpected VCS fixed KG fee after setting VCS fee structure');
-        assert((await stm.getFee(CONST.getFeeType.TOK, CONST.tokenType.UNFCCC, CONST.nullAddr)).fee_fixed == 0, 'unexpected UNFCCC fixed KG fee after setting VCS fee structure');
+        assert((await stm.getFee(CONST.getFeeType.TOK, CONST.tokenType.NATURE, CONST.nullAddr)).fee_fixed == 0, 'unexpected NATURE fixed KG fee before setting NATURE fee structure');
+        const setFeeTx = await stm.setFee_TokType(CONST.tokenType.NATURE, CONST.nullAddr, { fee_fixed: carbonKgFixedFee, fee_percBips: 0, fee_min: 0, fee_max: 0 } );
+        truffleAssert.eventEmitted(setFeeTx, 'SetFeeTokFix', ev => ev.tokenTypeId == CONST.tokenType.NATURE && ev.fee_tokenQty_Fixed == carbonKgFixedFee && ev.ledgerOwner == CONST.nullAddr);
+        assert((await stm.getFee(CONST.getFeeType.TOK, CONST.tokenType.NATURE, CONST.nullAddr)).fee_fixed == carbonKgFixedFee, 'unexpected NATURE fixed KG fee after setting NATURE fee structure');
+        assert((await stm.getFee(CONST.getFeeType.TOK, CONST.tokenType.CORSIA, CONST.nullAddr)).fee_fixed == 0, 'unexpected CORSIA fixed KG fee after setting NATURE fee structure');
 
         // transfer, with fee structure applied
         const carbonKgTransferAmount = 750;
         const data = await transferHelper.transferLedger({ stm, accounts, 
-                ledger_A: accounts[global.TaddrNdx + 0],     ledger_B: accounts[global.TaddrNdx + 1],
-                   qty_A: carbonKgTransferAmount,         tokenTypeId_A: CONST.tokenType.VCS,
+                ledger_A: accounts[global.TaddrNdx + 0],       ledger_B: accounts[global.TaddrNdx + 1],
+                   qty_A: carbonKgTransferAmount,         tokenTypeId_A: CONST.tokenType.NATURE,
                    qty_B: 0,                              tokenTypeId_B: 0,
             ccy_amount_A: 0,                                ccyTypeId_A: 0,
             ccy_amount_B: CONST.oneEth_wei,                 ccyTypeId_B: CONST.ccyType.ETH,
                applyFees: true,
         });
 
-        // test contract owner has received expected carbon VCS fee
-        const contractOwner_VcsKgBefore = data.owner_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
-        const contractOwner_VcsKgAfter  =  data.owner_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
-        assert(contractOwner_VcsKgAfter == Number(contractOwner_VcsKgBefore) + Number(carbonKgFixedFee), 'unexpected contract owner (fee receiver) VCS ST quantity after transfer');
+        // test contract owner has received expected carbon NATURE fee
+        const contractOwner_VcsKgBefore = data.owner_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.NATURE).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
+        const contractOwner_VcsKgAfter  =  data.owner_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.NATURE).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
+        assert(contractOwner_VcsKgAfter == Number(contractOwner_VcsKgBefore) + Number(carbonKgFixedFee), 'unexpected contract owner (fee receiver) NATURE ST quantity after transfer');
         
         // fees are *additional* to the supplied transfer KGs...
-        const ledgerA_VcsKgBefore = data.ledgerA_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
-        const ledgerA_VcsKgAfter  =  data.ledgerA_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
-        assert(ledgerA_VcsKgAfter == Number(ledgerA_VcsKgBefore) - Number(carbonKgFixedFee) - Number(carbonKgTransferAmount), 'unexpected ledger A (fee payer) VCS ST quantity after transfer');
+        const ledgerA_VcsKgBefore = data.ledgerA_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.NATURE).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
+        const ledgerA_VcsKgAfter  =  data.ledgerA_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.NATURE).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
+        assert(ledgerA_VcsKgAfter == Number(ledgerA_VcsKgBefore) - Number(carbonKgFixedFee) - Number(carbonKgTransferAmount), 'unexpected ledger A (fee payer) NATURE ST quantity after transfer');
     });
 
-    it(`fees (fixed) - apply UNFCCC token fee on a trade (fee on B)`, async () => {
+    it(`fees (fixed) - apply CORSIA token fee on a trade (fee on B)`, async () => {
         await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        accounts[global.TaddrNdx + 0],                         { from: accounts[0] });
-        await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.tonCarbon, 1,      accounts[global.TaddrNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.CORSIA, CONST.tonCarbon, 1,      accounts[global.TaddrNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
 
-        // set fee structure UNFCCC: 1 KG carbon fixed, VCS: no fee
+        // set fee structure CORSIA: 1 KG carbon fixed, NATURE: no fee
         const unfccFixedFee = 2;
-        //const setUnfccFeeTx = await stm.setFee_SecTokenType_Fixed(CONST.tokenType.UNFCCC, unfccFixedFee);
-        //const setVcsFeeTx = await stm.setFee_SecTokenType_Fixed(CONST.tokenType.VCS, 0);
-        const setUnfccFeeTx = await stm.setFee_TokType(CONST.tokenType.UNFCCC, CONST.nullAddr, { fee_fixed: unfccFixedFee, fee_percBips: 0, fee_min: 0, fee_max: 0 } );
-        const setVcsFeeTx = await stm.setFee_TokType(CONST.tokenType.VCS, CONST.nullAddr,      { fee_fixed: 0,             fee_percBips: 0, fee_min: 0, fee_max: 0 } );
-        truffleAssert.eventEmitted(setUnfccFeeTx, 'SetFeeTokFix', ev => ev.tokenTypeId == CONST.tokenType.UNFCCC && ev.fee_tokenQty_Fixed == unfccFixedFee && ev.ledgerOwner == CONST.nullAddr);
-        assert((await stm.getFee(CONST.getFeeType.TOK, CONST.tokenType.UNFCCC, CONST.nullAddr)).fee_fixed == unfccFixedFee, 'unexpected UNFCCC fixed KG fee after setting UNFCCC fee structure');
-        assert((await stm.getFee(CONST.getFeeType.TOK, CONST.tokenType.VCS, CONST.nullAddr)).fee_fixed == 0, 'unexpected VCS fixed KG fee after setting UNFCCC fee structure');
+        //const setUnfccFeeTx = await stm.setFee_SecTokenType_Fixed(CONST.tokenType.CORSIA, unfccFixedFee);
+        //const setVcsFeeTx = await stm.setFee_SecTokenType_Fixed(CONST.tokenType.NATURE, 0);
+        const setUnfccFeeTx = await stm.setFee_TokType(CONST.tokenType.CORSIA, CONST.nullAddr, { fee_fixed: unfccFixedFee, fee_percBips: 0, fee_min: 0, fee_max: 0 } );
+        const setVcsFeeTx = await stm.setFee_TokType(CONST.tokenType.NATURE, CONST.nullAddr,   { fee_fixed: 0,             fee_percBips: 0, fee_min: 0, fee_max: 0 } );
+        truffleAssert.eventEmitted(setUnfccFeeTx, 'SetFeeTokFix', ev => ev.tokenTypeId == CONST.tokenType.CORSIA && ev.fee_tokenQty_Fixed == unfccFixedFee && ev.ledgerOwner == CONST.nullAddr);
+        assert((await stm.getFee(CONST.getFeeType.TOK, CONST.tokenType.CORSIA, CONST.nullAddr)).fee_fixed == unfccFixedFee, 'unexpected CORSIA fixed KG fee after setting CORSIA fee structure');
+        assert((await stm.getFee(CONST.getFeeType.TOK, CONST.tokenType.NATURE, CONST.nullAddr)).fee_fixed == 0, 'unexpected NATURE fixed KG fee after setting CORSIA fee structure');
 
         // transfer, with fee structure applied
         const data = await transferHelper.transferLedger({ stm, accounts, 
-                ledger_A: accounts[global.TaddrNdx + 0],     ledger_B: accounts[global.TaddrNdx + 1],
+                ledger_A: accounts[global.TaddrNdx + 0],       ledger_B: accounts[global.TaddrNdx + 1],
                    qty_A: 0,                              tokenTypeId_A: 0,
-                   qty_B: 750,                            tokenTypeId_B: CONST.tokenType.UNFCCC,
+                   qty_B: 750,                            tokenTypeId_B: CONST.tokenType.CORSIA,
             ccy_amount_A: CONST.oneEth_wei,                 ccyTypeId_A: CONST.ccyType.ETH,
             ccy_amount_B: 0,                                ccyTypeId_B: 0,
                applyFees: true,
         });
 
-        // test contract owner has received expected carbon UNFCCC fee
-        const contractOwnerUnfcccKgBefore = data.owner_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.UNFCCC).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
-        const contractOwnerUnfcccKgAfter  =  data.owner_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.UNFCCC).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
-        assert(contractOwnerUnfcccKgAfter == Number(contractOwnerUnfcccKgBefore) + Number(unfccFixedFee), 'unexpected contract owner (fee receiver) UNFCCC ST quantity after transfer');
+        // test contract owner has received expected carbon CORSIA fee
+        const contractOwnercorsiaKgBefore = data.owner_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.CORSIA).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
+        const contractOwnercorsiaKgAfter  =  data.owner_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.CORSIA).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
+        assert(contractOwnercorsiaKgAfter == Number(contractOwnercorsiaKgBefore) + Number(unfccFixedFee), 'unexpected contract owner (fee receiver) CORSIA ST quantity after transfer');
 
-        // test contract owner has unchanged VCS balance (i.e. no VCS fees received)
-        const contractOwnerVcsKgBefore = data.owner_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
-        const contractOwnerVcsKgAfter  =  data.owner_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
-        assert(contractOwnerVcsKgAfter == Number(contractOwnerVcsKgBefore), 'unexpected contract owner (fee receiver) VCS ST quantity after transfer');
+        // test contract owner has unchanged NATURE balance (i.e. no NATURE fees received)
+        const contractOwnerVcsKgBefore = data.owner_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.NATURE).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
+        const contractOwnerVcsKgAfter  =  data.owner_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.NATURE).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
+        assert(contractOwnerVcsKgAfter == Number(contractOwnerVcsKgBefore), 'unexpected contract owner (fee receiver) NATURE ST quantity after transfer');
     });
 
     it(`fees (fixed) - apply large (>1 batch ST size) token fee on a trade on a newly added ST type`, async () => {
@@ -112,7 +112,7 @@ contract("StMaster", accounts => {
 
         // transfer, with fee structure applied
         const data = await transferHelper.transferLedger({ stm, accounts, 
-                ledger_A: accounts[global.TaddrNdx + 0],     ledger_B: accounts[global.TaddrNdx + 1],
+                ledger_A: accounts[global.TaddrNdx + 0],        ledger_B: accounts[global.TaddrNdx + 1],
                    qty_A: 1,                              tokenTypeId_A: newSecTokenTypeId,
                    qty_B: 0,                              tokenTypeId_B: 0,
             ccy_amount_A: 0,                                ccyTypeId_A: 0,
@@ -128,8 +128,8 @@ contract("StMaster", accounts => {
 
     // CCY FEES
     it(`fees (fixed) - apply ETH ccy fee on a max. trade (fee on A)`, async () => {
-        await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        accounts[global.TaddrNdx + 0],                         { from: accounts[0] });
-        await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.TaddrNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
+        await stm.fund(CONST.ccyType.ETH,                      CONST.oneEth_wei,        accounts[global.TaddrNdx + 0],                         { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.tonCarbon, 1,      accounts[global.TaddrNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
 
         // set fee structure ETH: 1000 Wei fixed
         const ethFeeFixed_Wei = 1000;
@@ -142,9 +142,9 @@ contract("StMaster", accounts => {
 
         // transfer, with fee structure applied
         const data = await transferHelper.transferLedger({ stm, accounts, 
-                ledger_A: accounts[global.TaddrNdx + 0],                          ledger_B: accounts[global.TaddrNdx + 1],
+                ledger_A: accounts[global.TaddrNdx + 0],                            ledger_B: accounts[global.TaddrNdx + 1],
                    qty_A: 0,                                                   tokenTypeId_A: 0,
-                   qty_B: 750,                                                 tokenTypeId_B: CONST.tokenType.VCS,
+                   qty_B: 750,                                                 tokenTypeId_B: CONST.tokenType.NATURE,
             ccy_amount_A: new BN(CONST.oneEth_wei).sub(new BN(ethFeeFixed_Wei)), ccyTypeId_A: CONST.ccyType.ETH,
             ccy_amount_B: 0,                                                     ccyTypeId_B: 0,
                applyFees: true,
@@ -157,8 +157,8 @@ contract("StMaster", accounts => {
     });
 
     it(`fees (fixed) - apply USD ccy fee on a max. trade (fee on B)`, async () => {
-        await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.TaddrNdx + 0], CONST.nullFees, [], [], { from: accounts[0] });
-        await stm.fund(CONST.ccyType.SGD,                   CONST.millionCcy_cents,  accounts[global.TaddrNdx + 1],                         { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.tonCarbon, 1,      accounts[global.TaddrNdx + 0], CONST.nullFees, [], [], { from: accounts[0] });
+        await stm.fund(CONST.ccyType.SGD,                      CONST.millionCcy_cents,  accounts[global.TaddrNdx + 1],                         { from: accounts[0] });
 
         // set fee structure USD: 1000 $ in cents
         const usdFeeFixed_cents = CONST.thousandCcy_cents;
@@ -169,8 +169,8 @@ contract("StMaster", accounts => {
 
         // transfer, with fee structure applied
         const data = await transferHelper.transferLedger({ stm, accounts, 
-                ledger_A: accounts[global.TaddrNdx + 0],                                    ledger_B: accounts[global.TaddrNdx + 1],
-                   qty_A: 750,                                                           tokenTypeId_A: CONST.tokenType.VCS,
+                ledger_A: accounts[global.TaddrNdx + 0],                                      ledger_B: accounts[global.TaddrNdx + 1],
+                   qty_A: 750,                                                           tokenTypeId_A: CONST.tokenType.NATURE,
                    qty_B: 0,                                                             tokenTypeId_B: 0,
             ccy_amount_A: 0,                                                               ccyTypeId_A: 0,
             ccy_amount_B: new BN(CONST.millionCcy_cents).sub(new BN(usdFeeFixed_cents)),   ccyTypeId_B: CONST.ccyType.SGD,
@@ -188,8 +188,8 @@ contract("StMaster", accounts => {
         const types = (await stm.getCcyTypes()).ccyTypes;
         const newCcyTypeId = types.filter(p => p.name == 'TEST_CCY_TYPE')[0].id;
 
-        await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.TaddrNdx + 0], CONST.nullFees, [], [], { from: accounts[0] });
-        await stm.fund(newCcyTypeId,                        1000,                    accounts[global.TaddrNdx + 1],                         { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.tonCarbon, 1,      accounts[global.TaddrNdx + 0], CONST.nullFees, [], [], { from: accounts[0] });
+        await stm.fund(newCcyTypeId,                           1000,                    accounts[global.TaddrNdx + 1],                         { from: accounts[0] });
 
         // set fee structure new ccy: 100 units
         const newCcyFeeFixed_units = 100;
@@ -199,8 +199,8 @@ contract("StMaster", accounts => {
 
         // transfer, with fee structure applied
         const data = await transferHelper.transferLedger({ stm, accounts, 
-                ledger_A: accounts[global.TaddrNdx + 0],                     ledger_B: accounts[global.TaddrNdx + 1],
-                   qty_A: 750,                                            tokenTypeId_A: CONST.tokenType.VCS,
+                ledger_A: accounts[global.TaddrNdx + 0],                       ledger_B: accounts[global.TaddrNdx + 1],
+                   qty_A: 750,                                            tokenTypeId_A: CONST.tokenType.NATURE,
                    qty_B: 0,                                              tokenTypeId_B: 0,
             ccy_amount_A: 0,                                                ccyTypeId_A: 0,
             ccy_amount_B: new BN(1000).sub(new BN(newCcyFeeFixed_units)),   ccyTypeId_B: newCcyTypeId,
@@ -214,9 +214,9 @@ contract("StMaster", accounts => {
     });
 
     // ST + CCY FEES
-    it(`fees (fixed) - apply ETH ccy & VCS ST fee on a max. trade (fees on both sides)`, async () => {
-        await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        accounts[global.TaddrNdx + 0],                         { from: accounts[0] });
-        await stm.mintSecTokenBatch(CONST.tokenType.VCS,    CONST.tonCarbon, 1,      accounts[global.TaddrNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
+    it(`fees (fixed) - apply ETH ccy & NATURE ST fee on a max. trade (fees on both sides)`, async () => {
+        await stm.fund(CONST.ccyType.ETH,                      CONST.oneEth_wei,        accounts[global.TaddrNdx + 0],                         { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.tonCarbon, 1,      accounts[global.TaddrNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
 
         // set fee structure ETH: 1000 Wei fixed
         const ethFeeFixed_Wei = 1000;
@@ -225,19 +225,19 @@ contract("StMaster", accounts => {
         truffleAssert.eventEmitted(setEthFeeTx, 'SetFeeCcyFix', ev => ev.ccyTypeId == CONST.ccyType.ETH && ev.fee_ccy_Fixed == ethFeeFixed_Wei && ev.ledgerOwner == CONST.nullAddr);
         assert((await stm.getFee(CONST.getFeeType.CCY, CONST.ccyType.ETH, CONST.nullAddr)).fee_fixed == ethFeeFixed_Wei, 'unexpected ETH fixed Wei fee after setting ETH fee structure');
 
-        // set fee structure VCS: 10 KG fixed
+        // set fee structure NATURE: 10 KG fixed
         const vcsKgFeeFixed = 10;
-        assert((await stm.getFee(CONST.getFeeType.TOK, CONST.tokenType.VCS, CONST.nullAddr)).fee_fixed == 0, 'unexpected VCS fixed KG fee before setting VCS fee structure');
-        //const setCarbonFeeTx = await stm.setFee_SecTokenType_Fixed(CONST.tokenType.VCS, vcsKgFeeFixed);
-        const setCarbonFeeTx = await stm.setFee_TokType(CONST.tokenType.VCS, CONST.nullAddr, { fee_fixed: vcsKgFeeFixed, fee_percBips: 0, fee_min: 0, fee_max: 0 } );
-        truffleAssert.eventEmitted(setCarbonFeeTx, 'SetFeeTokFix', ev => ev.tokenTypeId == CONST.tokenType.VCS && ev.fee_tokenQty_Fixed == vcsKgFeeFixed && ev.ledgerOwner == CONST.nullAddr);
-        assert((await stm.getFee(CONST.getFeeType.TOK, CONST.tokenType.VCS, CONST.nullAddr)).fee_fixed == vcsKgFeeFixed, 'unexpected VCS fixed KG fee after setting VCS fee structure');
+        assert((await stm.getFee(CONST.getFeeType.TOK, CONST.tokenType.NATURE, CONST.nullAddr)).fee_fixed == 0, 'unexpected NATURE fixed KG fee before setting NATURE fee structure');
+        //const setCarbonFeeTx = await stm.setFee_SecTokenType_Fixed(CONST.tokenType.NATURE, vcsKgFeeFixed);
+        const setCarbonFeeTx = await stm.setFee_TokType(CONST.tokenType.NATURE, CONST.nullAddr, { fee_fixed: vcsKgFeeFixed, fee_percBips: 0, fee_min: 0, fee_max: 0 } );
+        truffleAssert.eventEmitted(setCarbonFeeTx, 'SetFeeTokFix', ev => ev.tokenTypeId == CONST.tokenType.NATURE && ev.fee_tokenQty_Fixed == vcsKgFeeFixed && ev.ledgerOwner == CONST.nullAddr);
+        assert((await stm.getFee(CONST.getFeeType.TOK, CONST.tokenType.NATURE, CONST.nullAddr)).fee_fixed == vcsKgFeeFixed, 'unexpected NATURE fixed KG fee after setting NATURE fee structure');
 
         // transfer, with fee structure applied
         const data = await transferHelper.transferLedger({ stm, accounts, 
-                ledger_A: accounts[global.TaddrNdx + 0],                            ledger_B: accounts[global.TaddrNdx + 1],
+                ledger_A: accounts[global.TaddrNdx + 0],                              ledger_B: accounts[global.TaddrNdx + 1],
                    qty_A: 0,                                                     tokenTypeId_A: 0,
-                   qty_B: new BN(CONST.tonCarbon).sub(new BN(vcsKgFeeFixed)),    tokenTypeId_B: CONST.tokenType.VCS,
+                   qty_B: new BN(CONST.tonCarbon).sub(new BN(vcsKgFeeFixed)),    tokenTypeId_B: CONST.tokenType.NATURE,
             ccy_amount_A: new BN(CONST.oneEth_wei).sub(new BN(ethFeeFixed_Wei)),   ccyTypeId_A: CONST.ccyType.ETH,
             ccy_amount_B: 0,                                                       ccyTypeId_B: 0,
                applyFees: true,
@@ -248,15 +248,15 @@ contract("StMaster", accounts => {
         const owner_balAfter  =  data.owner_after.ccys.filter(p => p.ccyTypeId == CONST.ccyType.ETH).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
         assert(owner_balAfter == Number(owner_balBefore) + Number(ethFeeFixed_Wei), 'unexpected contract owner (fee receiver) ETH balance after transfer');
         
-        // test contract owner has received expected carbon VCS fee
-        const contractOwnerVcsKgBefore = data.owner_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
-        const contractOwnerVcsKgAfter  =  data.owner_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.VCS).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
-        assert(contractOwnerVcsKgAfter == Number(contractOwnerVcsKgBefore) + Number(vcsKgFeeFixed), 'unexpected contract owner (fee receiver) VCS ST quantity after transfer');
+        // test contract owner has received expected carbon NATURE fee
+        const contractOwnerVcsKgBefore = data.owner_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.NATURE).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
+        const contractOwnerVcsKgAfter  =  data.owner_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.NATURE).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
+        assert(contractOwnerVcsKgAfter == Number(contractOwnerVcsKgBefore) + Number(vcsKgFeeFixed), 'unexpected contract owner (fee receiver) NATURE ST quantity after transfer');
     });
 
-    it(`fees (fixed) - apply USD ccy & UNFCCC ST fee on a max. trade (fees on both sides)`, async () => {
+    it(`fees (fixed) - apply USD ccy & CORSIA ST fee on a max. trade (fees on both sides)`, async () => {
         await stm.fund(CONST.ccyType.SGD,                   CONST.millionCcy_cents,  accounts[global.TaddrNdx + 0],                         { from: accounts[0] });
-        await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.tonCarbon, 1,      accounts[global.TaddrNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.CORSIA, CONST.tonCarbon, 1,      accounts[global.TaddrNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
 
         // set fee structure USD: 100 cents
         const usdFeeFixed_cents = CONST.oneCcy_cents;
@@ -265,18 +265,18 @@ contract("StMaster", accounts => {
         truffleAssert.eventEmitted(setUsdFeeTx, 'SetFeeCcyFix', ev => ev.ccyTypeId == CONST.ccyType.SGD && ev.fee_ccy_Fixed == usdFeeFixed_cents && ev.ledgerOwner == CONST.nullAddr);
         assert((await stm.getFee(CONST.getFeeType.CCY, CONST.ccyType.SGD, CONST.nullAddr)).fee_fixed == usdFeeFixed_cents, 'unexpected USD fixed cents fee after setting USD fee structure');
 
-        // set fee structure UNFCCC: 42 KG fixed
-        const unfcccKgFeeFixed = 42;
-        //const setCarbonFeeTx = await stm.setFee_SecTokenType_Fixed(CONST.tokenType.UNFCCC, unfcccKgFeeFixed);
-        const setCarbonFeeTx = await stm.setFee_TokType(CONST.tokenType.UNFCCC, CONST.nullAddr, { fee_fixed: unfcccKgFeeFixed, fee_percBips: 0, fee_min: 0, fee_max: 0 } );
-        truffleAssert.eventEmitted(setCarbonFeeTx, 'SetFeeTokFix', ev => ev.tokenTypeId == CONST.tokenType.UNFCCC && ev.fee_tokenQty_Fixed == unfcccKgFeeFixed && ev.ledgerOwner == CONST.nullAddr);
-        assert((await stm.getFee(CONST.getFeeType.TOK, CONST.tokenType.UNFCCC, CONST.nullAddr)).fee_fixed == unfcccKgFeeFixed, 'unexpected UNFCCC fixed KG fee after setting UNFCCC fee structure');
+        // set fee structure CORSIA: 42 KG fixed
+        const corsiaKgFeeFixed = 42;
+        //const setCarbonFeeTx = await stm.setFee_SecTokenType_Fixed(CONST.tokenType.CORSIA, corsiaKgFeeFixed);
+        const setCarbonFeeTx = await stm.setFee_TokType(CONST.tokenType.CORSIA, CONST.nullAddr, { fee_fixed: corsiaKgFeeFixed, fee_percBips: 0, fee_min: 0, fee_max: 0 } );
+        truffleAssert.eventEmitted(setCarbonFeeTx, 'SetFeeTokFix', ev => ev.tokenTypeId == CONST.tokenType.CORSIA && ev.fee_tokenQty_Fixed == corsiaKgFeeFixed && ev.ledgerOwner == CONST.nullAddr);
+        assert((await stm.getFee(CONST.getFeeType.TOK, CONST.tokenType.CORSIA, CONST.nullAddr)).fee_fixed == corsiaKgFeeFixed, 'unexpected CORSIA fixed KG fee after setting CORSIA fee structure');
 
         // transfer, with fee structure applied
         const data = await transferHelper.transferLedger({ stm, accounts, 
-                ledger_A: accounts[global.TaddrNdx + 0],                                    ledger_B: accounts[global.TaddrNdx + 1],
+                ledger_A: accounts[global.TaddrNdx + 0],                                      ledger_B: accounts[global.TaddrNdx + 1],
                    qty_A: 0,                                                             tokenTypeId_A: 0,
-                   qty_B: new BN(CONST.tonCarbon).sub(new BN(unfcccKgFeeFixed)),         tokenTypeId_B: CONST.tokenType.UNFCCC,
+                   qty_B: new BN(CONST.tonCarbon).sub(new BN(corsiaKgFeeFixed)),         tokenTypeId_B: CONST.tokenType.CORSIA,
             ccy_amount_A: new BN(CONST.millionCcy_cents).sub(new BN(usdFeeFixed_cents)),   ccyTypeId_A: CONST.ccyType.SGD,
             ccy_amount_B: 0,                                                               ccyTypeId_B: 0,
                applyFees: true,
@@ -287,10 +287,10 @@ contract("StMaster", accounts => {
         const owner_balAfter  =  data.owner_after.ccys.filter(p => p.ccyTypeId == CONST.ccyType.SGD).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
         assert(owner_balAfter == Number(owner_balBefore) + Number(usdFeeFixed_cents), 'unexpected contract owner (fee receiver) USD balance after transfer');
         
-        // test contract owner has received expected carbon UNFCCC fee
-        const contractOwnerVcsKgBefore = data.owner_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.UNFCCC).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
-        const contractOwnerVcsKgAfter  =  data.owner_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.UNFCCC).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
-        assert(contractOwnerVcsKgAfter == Number(contractOwnerVcsKgBefore) + Number(unfcccKgFeeFixed), 'unexpected contract owner (fee receiver) UNFCCC ST quantity after transfer');    
+        // test contract owner has received expected carbon CORSIA fee
+        const contractOwnerVcsKgBefore = data.owner_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.CORSIA).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
+        const contractOwnerVcsKgAfter  =  data.owner_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.CORSIA).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
+        assert(contractOwnerVcsKgAfter == Number(contractOwnerVcsKgBefore) + Number(corsiaKgFeeFixed), 'unexpected contract owner (fee receiver) CORSIA ST quantity after transfer');    
     });
 
     it(`fees (fixed) - apply newly added ccy & newly added ST type fee on a max. trade (fees on both sides)`, async () => {
@@ -320,7 +320,7 @@ contract("StMaster", accounts => {
 
         // transfer, with fee structure applied
         const data = await transferHelper.transferLedger({ stm, accounts, 
-                ledger_A: accounts[global.TaddrNdx + 0],                                         ledger_B: accounts[global.TaddrNdx + 1],
+                ledger_A: accounts[global.TaddrNdx + 0],                                           ledger_B: accounts[global.TaddrNdx + 1],
                    qty_A: 0,                                                                  tokenTypeId_A: 0,
                    qty_B: new BN(CONST.tonCarbon).sub(new BN(newSecTokenTypeKgFeeFixed)),     tokenTypeId_B: newSecTokenTypeId,
             ccy_amount_A: new BN(1000).sub(new BN(ccyFeeFixed_units)),                          ccyTypeId_A: newCcyTypeId,
@@ -341,7 +341,7 @@ contract("StMaster", accounts => {
 
     it(`fees (fixed) - should have reasonable gas cost for two-sided transfer (eeu/ccy) (fees on both sides)`, async () => {
         await stm.fund(CONST.ccyType.SGD,                   CONST.millionCcy_cents,  accounts[global.TaddrNdx + 0],                         { from: accounts[0] });
-        await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.tonCarbon, 1,      accounts[global.TaddrNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.CORSIA, CONST.tonCarbon, 1,      accounts[global.TaddrNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
 
         // set fee structure USD: 100 cents
         const usdFeeFixed_cents = CONST.oneCcy_cents;
@@ -350,19 +350,19 @@ contract("StMaster", accounts => {
         truffleAssert.eventEmitted(setUsdFeeTx, 'SetFeeCcyFix', ev => ev.ccyTypeId == CONST.ccyType.SGD && ev.fee_ccy_Fixed == usdFeeFixed_cents && ev.ledgerOwner == CONST.nullAddr);
         assert((await stm.getFee(CONST.getFeeType.CCY, CONST.ccyType.SGD, CONST.nullAddr)).fee_fixed == usdFeeFixed_cents, 'unexpected USD fixed cents fee after setting USD fee structure');
 
-        // set fee structure UNFCCC: 10 KG fixed
-        const unfcccKgFeeFixed = 10;
-        //const setCarbonFeeTx = await stm.setFee_SecTokenType_Fixed(CONST.tokenType.UNFCCC, unfcccKgFeeFixed);
-        const setCarbonFeeTx = await stm.setFee_TokType(CONST.tokenType.UNFCCC, CONST.nullAddr, { fee_fixed: unfcccKgFeeFixed, fee_percBips: 0, fee_min: 0, fee_max: 0 } );
+        // set fee structure CORSIA: 10 KG fixed
+        const corsiaKgFeeFixed = 10;
+        //const setCarbonFeeTx = await stm.setFee_SecTokenType_Fixed(CONST.tokenType.CORSIA, corsiaKgFeeFixed);
+        const setCarbonFeeTx = await stm.setFee_TokType(CONST.tokenType.CORSIA, CONST.nullAddr, { fee_fixed: corsiaKgFeeFixed, fee_percBips: 0, fee_min: 0, fee_max: 0 } );
 
-        truffleAssert.eventEmitted(setCarbonFeeTx, 'SetFeeTokFix', ev => ev.tokenTypeId == CONST.tokenType.UNFCCC && ev.fee_tokenQty_Fixed == unfcccKgFeeFixed) && ev.ledgerOwner == CONST.nullAddr;
-        assert((await stm.getFee(CONST.getFeeType.TOK, CONST.tokenType.UNFCCC, CONST.nullAddr)).fee_fixed == unfcccKgFeeFixed, 'unexpected UNFCCC fixed KG fee after setting UNFCCC fee structure');
+        truffleAssert.eventEmitted(setCarbonFeeTx, 'SetFeeTokFix', ev => ev.tokenTypeId == CONST.tokenType.CORSIA && ev.fee_tokenQty_Fixed == corsiaKgFeeFixed) && ev.ledgerOwner == CONST.nullAddr;
+        assert((await stm.getFee(CONST.getFeeType.TOK, CONST.tokenType.CORSIA, CONST.nullAddr)).fee_fixed == corsiaKgFeeFixed, 'unexpected CORSIA fixed KG fee after setting CORSIA fee structure');
 
         // transfer, with fee structure applied
         const data = await transferHelper.transferLedger({ stm, accounts, 
-                ledger_A: accounts[global.TaddrNdx + 0],                                    ledger_B: accounts[global.TaddrNdx + 1],
+                ledger_A: accounts[global.TaddrNdx + 0],                                      ledger_B: accounts[global.TaddrNdx + 1],
                    qty_A: 0,                                                             tokenTypeId_A: 0,
-                   qty_B: new BN(CONST.tonCarbon).sub(new BN(unfcccKgFeeFixed)),         tokenTypeId_B: CONST.tokenType.UNFCCC,
+                   qty_B: new BN(CONST.tonCarbon).sub(new BN(corsiaKgFeeFixed)),         tokenTypeId_B: CONST.tokenType.CORSIA,
             ccy_amount_A: new BN(CONST.millionCcy_cents).sub(new BN(usdFeeFixed_cents)),   ccyTypeId_A: CONST.ccyType.SGD,
             ccy_amount_B: 0,                                                               ccyTypeId_B: 0,
                applyFees: true,
@@ -373,7 +373,7 @@ contract("StMaster", accounts => {
 
     it(`fees (fixed) - should have reasonable gas cost for two-sided transfer (eeu/ccy) (fee on ccy)`, async () => {
         await stm.fund(CONST.ccyType.SGD,                   CONST.millionCcy_cents,  accounts[global.TaddrNdx + 0],                         { from: accounts[0] });
-        await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.tonCarbon, 1,      accounts[global.TaddrNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.CORSIA, CONST.tonCarbon, 1,      accounts[global.TaddrNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
 
         // set fee structure USD: 100 cents
         const usdFeeFixed_cents = CONST.oneCcy_cents;
@@ -381,17 +381,17 @@ contract("StMaster", accounts => {
         truffleAssert.eventEmitted(setUsdFeeTx, 'SetFeeCcyFix', ev => ev.ccyTypeId == CONST.ccyType.SGD && ev.fee_ccy_Fixed == usdFeeFixed_cents && ev.ledgerOwner == CONST.nullAddr);
         assert((await stm.getFee(CONST.getFeeType.CCY, CONST.ccyType.SGD, CONST.nullAddr)).fee_fixed == usdFeeFixed_cents, 'unexpected USD fixed cents fee after setting USD fee structure');
 
-        // set fee structure UNFCCC: 0 KG fixed
-        const unfcccKgFeeFixed = 0;
-        const setCarbonFeeTx = await stm.setFee_TokType(CONST.tokenType.UNFCCC, CONST.nullAddr, { fee_fixed: unfcccKgFeeFixed, fee_percBips: 0, fee_min: 0, fee_max: 0 } );
-        //truffleAssert.eventEmitted(setCarbonFeeTx, 'SetFeeTokFix', ev => ev.tokenTypeId == CONST.tokenType.UNFCCC && ev.fee_tokenQty_Fixed == unfcccKgFeeFixed);
-        assert((await stm.getFee(CONST.getFeeType.TOK, CONST.tokenType.UNFCCC, CONST.nullAddr)).fee_fixed == unfcccKgFeeFixed, 'unexpected UNFCCC fixed KG fee after setting UNFCCC fee structure');
+        // set fee structure CORSIA: 0 KG fixed
+        const corsiaKgFeeFixed = 0;
+        const setCarbonFeeTx = await stm.setFee_TokType(CONST.tokenType.CORSIA, CONST.nullAddr, { fee_fixed: corsiaKgFeeFixed, fee_percBips: 0, fee_min: 0, fee_max: 0 } );
+        //truffleAssert.eventEmitted(setCarbonFeeTx, 'SetFeeTokFix', ev => ev.tokenTypeId == CONST.tokenType.CORSIA && ev.fee_tokenQty_Fixed == corsiaKgFeeFixed);
+        assert((await stm.getFee(CONST.getFeeType.TOK, CONST.tokenType.CORSIA, CONST.nullAddr)).fee_fixed == corsiaKgFeeFixed, 'unexpected CORSIA fixed KG fee after setting CORSIA fee structure');
 
         // transfer, with fee structure applied
         const data = await transferHelper.transferLedger({ stm, accounts, 
-                ledger_A: accounts[global.TaddrNdx + 0],                                    ledger_B: accounts[global.TaddrNdx + 1],
+                ledger_A: accounts[global.TaddrNdx + 0],                                      ledger_B: accounts[global.TaddrNdx + 1],
                    qty_A: 0,                                                             tokenTypeId_A: 0,
-                   qty_B: new BN(CONST.tonCarbon).sub(new BN(unfcccKgFeeFixed)),         tokenTypeId_B: CONST.tokenType.UNFCCC,
+                   qty_B: new BN(CONST.tonCarbon).sub(new BN(corsiaKgFeeFixed)),         tokenTypeId_B: CONST.tokenType.CORSIA,
             ccy_amount_A: new BN(CONST.millionCcy_cents).sub(new BN(usdFeeFixed_cents)),   ccyTypeId_A: CONST.ccyType.SGD,
             ccy_amount_B: 0,                                                               ccyTypeId_B: 0,
                applyFees: true,
@@ -402,7 +402,7 @@ contract("StMaster", accounts => {
 
     it(`fees (fixed) - should have reasonable gas cost for two-sided transfer (eeu/ccy) (fee on eeu)`, async () => {
         await stm.fund(CONST.ccyType.SGD,                   CONST.millionCcy_cents,  accounts[global.TaddrNdx + 0],                         { from: accounts[0] });
-        await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.tonCarbon, 1,      accounts[global.TaddrNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.CORSIA, CONST.tonCarbon, 1,      accounts[global.TaddrNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
 
         // set fee structure USD: 0 cents
         const usdFeeFixed_cents = CONST.oneCcy_cents;
@@ -411,18 +411,18 @@ contract("StMaster", accounts => {
         truffleAssert.eventEmitted(setUsdFeeTx, 'SetFeeCcyFix', ev => ev.ccyTypeId == CONST.ccyType.SGD && ev.fee_ccy_Fixed == usdFeeFixed_cents) && ev.ledgerOwner == CONST.nullAddr;
         assert((await stm.getFee(CONST.getFeeType.CCY, CONST.ccyType.SGD, CONST.nullAddr)).fee_fixed == usdFeeFixed_cents, 'unexpected USD fixed cents fee after setting USD fee structure');
 
-        // set fee structure UNFCCC: 10 KG fixed
-        const unfcccKgFeeFixed = 10;
-        //const setCarbonFeeTx = await stm.setFee_SecTokenType_Fixed(CONST.tokenType.UNFCCC, unfcccKgFeeFixed);
-        const setCarbonFeeTx = await stm.setFee_TokType(CONST.tokenType.UNFCCC, CONST.nullAddr, { fee_fixed: unfcccKgFeeFixed, fee_percBips: 0, fee_min: 0, fee_max: 0 } );
-        truffleAssert.eventEmitted(setCarbonFeeTx, 'SetFeeTokFix', ev => ev.tokenTypeId == CONST.tokenType.UNFCCC && ev.fee_tokenQty_Fixed == unfcccKgFeeFixed && ev.ledgerOwner == CONST.nullAddr);
-        assert((await stm.getFee(CONST.getFeeType.TOK, CONST.tokenType.UNFCCC, CONST.nullAddr)).fee_fixed == unfcccKgFeeFixed, 'unexpected UNFCCC fixed KG fee after setting UNFCCC fee structure');
+        // set fee structure CORSIA: 10 KG fixed
+        const corsiaKgFeeFixed = 10;
+        //const setCarbonFeeTx = await stm.setFee_SecTokenType_Fixed(CONST.tokenType.CORSIA, corsiaKgFeeFixed);
+        const setCarbonFeeTx = await stm.setFee_TokType(CONST.tokenType.CORSIA, CONST.nullAddr, { fee_fixed: corsiaKgFeeFixed, fee_percBips: 0, fee_min: 0, fee_max: 0 } );
+        truffleAssert.eventEmitted(setCarbonFeeTx, 'SetFeeTokFix', ev => ev.tokenTypeId == CONST.tokenType.CORSIA && ev.fee_tokenQty_Fixed == corsiaKgFeeFixed && ev.ledgerOwner == CONST.nullAddr);
+        assert((await stm.getFee(CONST.getFeeType.TOK, CONST.tokenType.CORSIA, CONST.nullAddr)).fee_fixed == corsiaKgFeeFixed, 'unexpected CORSIA fixed KG fee after setting CORSIA fee structure');
 
         // transfer, with fee structure applied
         const data = await transferHelper.transferLedger({ stm, accounts, 
-                ledger_A: accounts[global.TaddrNdx + 0],                                    ledger_B: accounts[global.TaddrNdx + 1],
+                ledger_A: accounts[global.TaddrNdx + 0],                                      ledger_B: accounts[global.TaddrNdx + 1],
                    qty_A: 0,                                                             tokenTypeId_A: 0,
-                   qty_B: new BN(CONST.tonCarbon).sub(new BN(unfcccKgFeeFixed)),         tokenTypeId_B: CONST.tokenType.UNFCCC,
+                   qty_B: new BN(CONST.tonCarbon).sub(new BN(corsiaKgFeeFixed)),         tokenTypeId_B: CONST.tokenType.CORSIA,
             ccy_amount_A: new BN(CONST.millionCcy_cents).sub(new BN(usdFeeFixed_cents)),   ccyTypeId_A: CONST.ccyType.SGD,
             ccy_amount_B: 0,                                                               ccyTypeId_B: 0,
                applyFees: true,
@@ -433,7 +433,7 @@ contract("StMaster", accounts => {
 
     it(`fees (fixed) - should have reasonable gas cost for two-sided transfer (eeu/ccy) (base gas cost: no fees)`, async () => {
         await stm.fund(CONST.ccyType.SGD,                   CONST.millionCcy_cents,  accounts[global.TaddrNdx + 0],                         { from: accounts[0] });
-        await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.tonCarbon, 1,      accounts[global.TaddrNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.CORSIA, CONST.tonCarbon, 1,      accounts[global.TaddrNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
 
         // set fee structure USD: 0 cents
         const usdFeeFixed_cents = CONST.oneCcy_cents;
@@ -442,18 +442,18 @@ contract("StMaster", accounts => {
         truffleAssert.eventEmitted(setUsdFeeTx, 'SetFeeCcyFix', ev => ev.ccyTypeId == CONST.ccyType.SGD && ev.fee_ccy_Fixed == usdFeeFixed_cents && ev.ledgerOwner == CONST.nullAddr);
         assert((await stm.getFee(CONST.getFeeType.CCY, CONST.ccyType.SGD, CONST.nullAddr)).fee_fixed == usdFeeFixed_cents, 'unexpected USD fixed cents fee after setting USD fee structure');
 
-        // set fee structure UNFCCC: 0 KG fixed
-        const unfcccKgFeeFixed = 0;
-        //const setCarbonFeeTx = await stm.setFee_SecTokenType_Fixed(CONST.tokenType.UNFCCC, unfcccKgFeeFixed);
-        const setCarbonFeeTx = await stm.setFee_TokType(CONST.tokenType.UNFCCC, CONST.nullAddr, { fee_fixed: unfcccKgFeeFixed, fee_percBips: 0, fee_min: 0, fee_max: 0 } );
-        truffleAssert.eventEmitted(setCarbonFeeTx, 'SetFeeTokFix', ev => ev.tokenTypeId == CONST.tokenType.UNFCCC && ev.fee_tokenQty_Fixed == unfcccKgFeeFixed && ev.ledgerOwner == CONST.nullAddr);
-        assert((await stm.getFee(CONST.getFeeType.TOK, CONST.tokenType.UNFCCC, CONST.nullAddr)).fee_fixed == unfcccKgFeeFixed, 'unexpected UNFCCC fixed KG fee after setting UNFCCC fee structure');
+        // set fee structure CORSIA: 0 KG fixed
+        const corsiaKgFeeFixed = 0;
+        //const setCarbonFeeTx = await stm.setFee_SecTokenType_Fixed(CONST.tokenType.CORSIA, corsiaKgFeeFixed);
+        const setCarbonFeeTx = await stm.setFee_TokType(CONST.tokenType.CORSIA, CONST.nullAddr, { fee_fixed: corsiaKgFeeFixed, fee_percBips: 0, fee_min: 0, fee_max: 0 } );
+        truffleAssert.eventEmitted(setCarbonFeeTx, 'SetFeeTokFix', ev => ev.tokenTypeId == CONST.tokenType.CORSIA && ev.fee_tokenQty_Fixed == corsiaKgFeeFixed && ev.ledgerOwner == CONST.nullAddr);
+        assert((await stm.getFee(CONST.getFeeType.TOK, CONST.tokenType.CORSIA, CONST.nullAddr)).fee_fixed == corsiaKgFeeFixed, 'unexpected CORSIA fixed KG fee after setting CORSIA fee structure');
 
         // transfer, with fee structure applied
         const data = await transferHelper.transferLedger({ stm, accounts, 
-                ledger_A: accounts[global.TaddrNdx + 0],                                    ledger_B: accounts[global.TaddrNdx + 1],
+                ledger_A: accounts[global.TaddrNdx + 0],                                      ledger_B: accounts[global.TaddrNdx + 1],
                    qty_A: 0,                                                             tokenTypeId_A: 0,
-                   qty_B: new BN(CONST.tonCarbon).sub(new BN(unfcccKgFeeFixed)),         tokenTypeId_B: CONST.tokenType.UNFCCC,
+                   qty_B: new BN(CONST.tonCarbon).sub(new BN(corsiaKgFeeFixed)),         tokenTypeId_B: CONST.tokenType.CORSIA,
             ccy_amount_A: new BN(CONST.millionCcy_cents).sub(new BN(usdFeeFixed_cents)),   ccyTypeId_A: CONST.ccyType.SGD,
             ccy_amount_B: 0,                                                               ccyTypeId_B: 0,
                applyFees: true,
@@ -474,7 +474,7 @@ contract("StMaster", accounts => {
 
     it(`fees (fixed) - should not allow non-owner to set global fee structure (tokens)`, async () => {
         try {
-            const tx1 = await stm.setFee_TokType(CONST.tokenType.UNFCCC, CONST.nullAddr, { fee_fixed: 10, fee_percBips: 0, fee_min: 0, fee_max: 0 }, { from: accounts[1] });
+            const tx1 = await stm.setFee_TokType(CONST.tokenType.CORSIA, CONST.nullAddr, { fee_fixed: 10, fee_percBips: 0, fee_min: 0, fee_max: 0 }, { from: accounts[1] });
         } catch (ex) { 
             assert(ex.reason == 'Restricted', `unexpected: ${ex.reason}`);
             return; 
@@ -484,16 +484,16 @@ contract("StMaster", accounts => {
 
     it(`fees (fixed) - should not allow a transfer with insufficient ccy to cover fees (A)`, async () => {
         await stm.fund(CONST.ccyType.SGD,                   CONST.millionCcy_cents,  accounts[global.TaddrNdx + 0],                         { from: accounts[0] });
-        await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.tonCarbon, 1,      accounts[global.TaddrNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.CORSIA, CONST.tonCarbon, 1,      accounts[global.TaddrNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
 
         await stm.setFee_CcyType(CONST.ccyType.SGD, CONST.nullAddr,      { fee_fixed: 1, fee_percBips: 0, fee_min: 0, fee_max: 0 } );
-        await stm.setFee_TokType(CONST.tokenType.UNFCCC, CONST.nullAddr, CONST.nullFees );
+        await stm.setFee_TokType(CONST.tokenType.CORSIA, CONST.nullAddr, CONST.nullFees );
 
         try {
             await transferHelper.transferLedger({ stm, accounts, 
-                    ledger_A: accounts[global.TaddrNdx + 0],                                    ledger_B: accounts[global.TaddrNdx + 1],
+                    ledger_A: accounts[global.TaddrNdx + 0],                                      ledger_B: accounts[global.TaddrNdx + 1],
                        qty_A: 0,                                                             tokenTypeId_A: 0,
-                       qty_B: new BN(CONST.tonCarbon),                                       tokenTypeId_B: CONST.tokenType.UNFCCC,
+                       qty_B: new BN(CONST.tonCarbon),                                       tokenTypeId_B: CONST.tokenType.CORSIA,
                 ccy_amount_A: new BN(CONST.millionCcy_cents),                                  ccyTypeId_A: CONST.ccyType.SGD,
                 ccy_amount_B: 0,                                                               ccyTypeId_B: 0,
                    applyFees: true,
@@ -508,16 +508,16 @@ contract("StMaster", accounts => {
 
     it(`fees (fixed) - should not allow a transfer with insufficient tokens to cover fees (B)`, async () => {
         await stm.fund(CONST.ccyType.SGD,                   CONST.millionCcy_cents,  accounts[global.TaddrNdx + 0],                         { from: accounts[0] });
-        await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.tonCarbon, 1,      accounts[global.TaddrNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.CORSIA, CONST.tonCarbon, 1,      accounts[global.TaddrNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
 
         await stm.setFee_CcyType(CONST.ccyType.SGD, CONST.nullAddr,      CONST.nullFees );
-        await stm.setFee_TokType(CONST.tokenType.UNFCCC, CONST.nullAddr, { fee_fixed: 1, fee_percBips: 0, fee_min: 0, fee_max: 0 } );
+        await stm.setFee_TokType(CONST.tokenType.CORSIA, CONST.nullAddr, { fee_fixed: 1, fee_percBips: 0, fee_min: 0, fee_max: 0 } );
 
         try {
             await transferHelper.transferLedger({ stm, accounts, 
-                    ledger_A: accounts[global.TaddrNdx + 0],                                    ledger_B: accounts[global.TaddrNdx + 1],
+                    ledger_A: accounts[global.TaddrNdx + 0],                                      ledger_B: accounts[global.TaddrNdx + 1],
                        qty_A: 0,                                                             tokenTypeId_A: 0,
-                       qty_B: new BN(CONST.tonCarbon),                                       tokenTypeId_B: CONST.tokenType.UNFCCC,
+                       qty_B: new BN(CONST.tonCarbon),                                       tokenTypeId_B: CONST.tokenType.CORSIA,
                 ccy_amount_A: new BN(CONST.millionCcy_cents),                                  ccyTypeId_A: CONST.ccyType.SGD,
                 ccy_amount_B: 0,                                                               ccyTypeId_B: 0,
                    applyFees: true,
