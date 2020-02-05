@@ -133,10 +133,12 @@ library StructLib {
         mapping(uint256 => SetFeeArgs) ccy;      // fee structure by currency type
     }
     struct SetFeeArgs { // fee for a specific ccy or token type
-        uint256 fee_fixed;      // apply fixed a, if any
-        uint256 fee_percBips;   // add a basis points a, if any - in basis points, i.e. minimum % = 1bp = 1/100 of 1% = 0.0001x
-        uint256 fee_min;        // collar for a (if >0)
-        uint256 fee_max;        // and cap for a (if >0)
+        uint256 fee_fixed;       // ccy & tok: transfer/trade - apply fixed a, if any
+        uint256 fee_percBips;    // ccy & tok: transfer/trade - add a basis points a, if any - in basis points, i.e. minimum % = 1bp = 1/100 of 1% = 0.0001x
+        uint256 fee_min;         // ccy & tok: transfer/trade - collar for a (if >0)
+        uint256 fee_max;         // ccy & tok: transfer/trade - and cap for a (if >0)
+        uint256 ccy_perThousand; // ccy only: trade - fixed ccy fee per 1000 of trade counterparty's consideration token qty
+        bool    ccy_mirrorFee;   // ccy only: trade - apply this ccy fee structure to counterparty's ccy balance, post trade
     }
 
     // ERC20 TYPES
@@ -226,13 +228,15 @@ library StructLib {
      * @notice Checks if the supplied ledger owner holds at least the specified amount of supplied currency type
      * @param ledger Ledger owner
      * @param ccyTypeId currency type
-     * @param amount Validation amount
+     * @param sending Amount to be sent
+     * @param receiving Amount to be received
+     * @param fee Fee to be paid
      */
     function sufficientCcy(
         StructLib.LedgerStruct storage ledgerData,
-        address ledger, uint256 ccyTypeId, int256 amount, int256 fee
+        address ledger, uint256 ccyTypeId, int256 sending, int256 receiving, int256 fee
     ) public view returns (bool) {
-        return ledgerData._ledger[ledger].ccyType_balance[ccyTypeId] >= amount + fee;
+        return ledgerData._ledger[ledger].ccyType_balance[ccyTypeId] + receiving >= sending + fee;
     }
 
 }

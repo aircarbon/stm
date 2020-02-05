@@ -34,12 +34,12 @@ const blocksFromMonths = (months) => Math.ceil(blocksFromDays(months * 30.42));
 //
 // MAIN: deployer definitions -- contract ctor() params
 //
-const contractVer = "0.96e";
+const contractVer = "0.96f";
 const contractProps = {
     COMMODITY: {
         contractVer: contractVer,
         contractName: `AirCarbon__v${contractVer}`, //"SecTok_Master",
-        contractUnit: "KG",
+        contractUnit: "Ton(s)",
         contractSymbol: "ACC",
         contractDecimals: 0,
         cashflowArgs: nullCashflowArgs,
@@ -99,6 +99,8 @@ module.exports = {
     web3_tx: (methodName, methodArgs, fromAddr, fromPrivKey) => web3_tx(methodName, methodArgs, fromAddr, fromPrivKey),
 
     nullFees: {
+        ccy_mirrorFee: false,
+        ccy_perThousand: 0,
         fee_fixed: 0,
         fee_percBips: 0,
         fee_min: 0,
@@ -142,11 +144,10 @@ EXCHANGE_FEE: 1,
         GBP: 7
     }), 
 
-    // eeu kg constants
-    tonCarbon: 1000,                      // one ton carbon in kg
-     ktCarbon: 1000 * 1000,               // kiloton carbon in kg
-     mtCarbon: 1000 * 1000 * 1000,        // megaton carbon in kg
-     gtCarbon: 1000 * 1000 * 1000 * 1000, // gigaton carbon in kg
+    // eeu qty constants
+    kt1Carbon: 1000,                      // 1000 qty (tons) = 1 kiloton
+     mtCarbon: 1000 * 1000,               // 1^6 qty (tons) = 1 megaton
+     gtCarbon: 1000 * 1000 * 1000,        // 1^9 qty (tons) = 1 gigaton
 
     // ccy constants
          oneCcy_cents: Big(1 * 100).toFixed(),

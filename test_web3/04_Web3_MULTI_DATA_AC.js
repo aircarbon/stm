@@ -131,13 +131,13 @@ describe(`Contract Web3 Interface`, async () => {
                 //console.dir(minter.tokens[0].tokenTypeId.toString());
                 //console.dir(minter.tokens[0].currentQty.toString());
 
-                const exchangeCcyFee = { fee_fixed: buyNdx * 11, fee_percBips: buyNdx * 6, fee_min: buyNdx * 11, fee_max: buyNdx * 51, };
-                const ledgerCcyFee =   { fee_fixed: buyNdx * 12, fee_percBips: buyNdx * 7, fee_min: buyNdx * 12, fee_max: buyNdx * 52, };
+                const exchangeCcyFee = { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: buyNdx * 11, fee_percBips: buyNdx * 6, fee_min: buyNdx * 11, fee_max: buyNdx * 51, };
+                const ledgerCcyFee =   { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: buyNdx * 12, fee_percBips: buyNdx * 7, fee_min: buyNdx * 12, fee_max: buyNdx * 52, };
                 const setExchangeCcyFeeTx = await CONST.web3_tx('setFee_CcyType', [ ccyTypeIdFunded, CONST.nullAddr, exchangeCcyFee ], OWNER, OWNER_privKey);
                 const setLedgerCcyFeeTx   = await CONST.web3_tx('setFee_CcyType', [ ccyTypeIdFunded, BUYER.addr,        ledgerCcyFee   ], OWNER, OWNER_privKey);
 
-                const exchangeTokFee = { fee_fixed: buyNdx * 11, fee_percBips: buyNdx * 6, fee_min: buyNdx * 11, fee_max: buyNdx * 51, };
-                const ledgerTokFee =   { fee_fixed: buyNdx * 12, fee_percBips: buyNdx * 7, fee_min: buyNdx * 12, fee_max: buyNdx * 52, };
+                const exchangeTokFee = { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: buyNdx * 11, fee_percBips: buyNdx * 6, fee_min: buyNdx * 11, fee_max: buyNdx * 51, };
+                const ledgerTokFee =   { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: buyNdx * 12, fee_percBips: buyNdx * 7, fee_min: buyNdx * 12, fee_max: buyNdx * 52, };
                 const setExchangeTokFeeTx = await CONST.web3_tx('setFee_TokType', [ minterTokTypeId, CONST.nullAddr, exchangeTokFee ], OWNER, OWNER_privKey);
                 const setLedgerTokFeeTx   = await CONST.web3_tx('setFee_TokType', [ minterTokTypeId, SELLER.addr,        ledgerTokFee   ], OWNER, OWNER_privKey);
 

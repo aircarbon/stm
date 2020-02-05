@@ -16,6 +16,10 @@ import "../Libs/FeeLib.sol";
 contract StFees is IStFees,
     Owned, StLedger {
 
+    // TODO: (1) get one-sided working for new (ccy-only!) type: "fixedPerThousand" (i.e. in respect of the other side, # tokens)
+    //        > new event: SetFeeCcyPerThousand
+    //        > applying ccy_perThousand...
+
     // GLOBAL FEES
     StructLib.FeeStruct globalFees;
 
@@ -27,8 +31,20 @@ contract StFees is IStFees,
                fee_fixed: fa[typeId].fee_fixed,
             fee_percBips: fa[typeId].fee_percBips,
                  fee_min: fa[typeId].fee_min,
-                 fee_max: fa[typeId].fee_max
+                 fee_max: fa[typeId].fee_max,
+         ccy_perThousand: fa[typeId].ccy_perThousand,
+           ccy_mirrorFee: fa[typeId].ccy_mirrorFee
         });
+    }
+
+    function setFee_TokType(uint256 tokenTypeId, address ledgerOwner, StructLib.SetFeeArgs memory feeArgs)
+    public onlyOwner() onlyWhenReadWrite() {
+        FeeLib.setFee_TokType(ledgerData, stTypesData, globalFees, tokenTypeId, ledgerOwner, feeArgs);
+    }
+
+    function setFee_CcyType(uint256 ccyTypeId, address ledgerOwner, StructLib.SetFeeArgs memory feeArgs)
+    public onlyOwner() onlyWhenReadWrite() {
+        FeeLib.setFee_CcyType(ledgerData, ccyTypesData, globalFees, ccyTypeId, ledgerOwner, feeArgs);
     }
 
     function getSecToken_totalExchangeFeesPaidQty()
@@ -46,13 +62,4 @@ contract StFees is IStFees,
         return ledgerData._ccyType_totalFeesPaid[ccyTypeId];
     }
 
-    function setFee_TokType(uint256 tokenTypeId, address ledgerOwner, StructLib.SetFeeArgs memory feeArgs)
-    public onlyOwner() onlyWhenReadWrite() {
-        FeeLib.setFee_TokType(ledgerData, stTypesData, globalFees, tokenTypeId, ledgerOwner, feeArgs);
-    }
-
-    function setFee_CcyType(uint256 ccyTypeId, address ledgerOwner, StructLib.SetFeeArgs memory feeArgs)
-    public onlyOwner() onlyWhenReadWrite() {
-        FeeLib.setFee_CcyType(ledgerData, ccyTypesData, globalFees, ccyTypeId, ledgerOwner, feeArgs);
-    }
 }

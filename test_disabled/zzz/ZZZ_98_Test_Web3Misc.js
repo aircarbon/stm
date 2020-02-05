@@ -137,7 +137,7 @@ contract("StMaster", accounts => {
     //         var contract = new infura_web3.eth.Contract(abi, address);
 
     //         var data = contract.methods
-    //             .mintSecTokenBatch(CONST.tokenType.CORSIA, CONST.ktCarbon, 1, '0xf57B0adC78461888BF32d5FB92784CF3FC8f9956')
+    //             .mintSecTokenBatch(CONST.tokenType.CORSIA, CONST.gtCarbon, 1, '0xf57B0adC78461888BF32d5FB92784CF3FC8f9956')
     //             .encodeABI(); // replaces getData()
 
     //         const ejs = require('ethereumjs-tx');
@@ -179,7 +179,7 @@ contract("StMaster", accounts => {
     //     // console.dir(acmWeb3.methods.mintSecTokenBatch);
 
     //     // const tx = await acmWeb3.methods
-    //     //     .mintSecTokenBatch(CONST.tokenType.CORSIA, CONST.ktCarbon, 1, '0xf57B0adC78461888BF32d5FB92784CF3FC8f9956')
+    //     //     .mintSecTokenBatch(CONST.tokenType.CORSIA, CONST.gtCarbon, 1, '0xf57B0adC78461888BF32d5FB92784CF3FC8f9956')
     //     //     .send({ from: '0xf57B0adC78461888BF32d5FB92784CF3FC8f9956' }, function (err, tx) {
     //     //         console.log('callback: tx=', tx);
     //     //         console.log('callback: err=', err);
@@ -192,7 +192,7 @@ contract("StMaster", accounts => {
     //     // console.time('send mintTx');
     //     // const tx = await stm.mintSecTokenBatch // not a web3 contract instance, but a TruffleContract instance
     //     //     //.sendTransaction
-    //     //     (CONST.tokenType.CORSIA, CONST.ktCarbon, 1, accounts[0], { from: accounts[0] }
+    //     //     (CONST.tokenType.CORSIA, CONST.gtCarbon, 1, accounts[0], { from: accounts[0] }
     //     //         // TruffleContact has no callback
     //     //         // , function (err, txHash) {
     //     //         //     console.log(txHash);

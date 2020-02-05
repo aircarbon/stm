@@ -48,6 +48,7 @@
         "puppeteer": "^2.0.0",
         "rimraf": "^3.0.0",
         "soldoc": "^0.1.2-beta.6",
+        "solidity-docgen": "^0.3.14",
         "truffle": "5.1.9",
         "truffle-assertions": "^0.9.1",
         "web3": "^2.0.0-alpha"

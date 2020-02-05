@@ -58,52 +58,36 @@ module.exports = {
         if (ccy_amount_A > 0 && applyFees && ledger_A != accounts[0]) { // fees not applied by contract if fee-sender == fee-receiver
             const gf = await stm.getFee(CONST.getFeeType.CCY, ccyTypeId_A, CONST.nullAddr);
             const lf = await stm.getFee(CONST.getFeeType.CCY, ccyTypeId_A, ledger_A);
-            // const globalFee_Fix = Big(await stm.globalFee_ccyType_Fix(ccyTypeId_A));
-            // const ledgerFee_Fix = Big(await stm.ledgerFee_ccyType_Fix(ccyTypeId_A, ledger_A));
-            // const globalFee_Bps = Big(await stm.globalFee_ccyType_Bps(ccyTypeId_A));
-            // const ledgerFee_Bps = Big(await stm.ledgerFee_ccyType_Bps(ccyTypeId_A, ledger_A));
-            // const globalFee_Min = Big(await stm.globalFee_ccyType_Min(ccyTypeId_A));
-            // const ledgerFee_Min = Big(await stm.ledgerFee_ccyType_Min(ccyTypeId_A, ledger_A));
-            // const globalFee_Max = Big(await stm.globalFee_ccyType_Max(ccyTypeId_A));
-            // const ledgerFee_Max = Big(await stm.ledgerFee_ccyType_Max(ccyTypeId_A, ledger_A));
-            const fix = lf.fee_fixed > 0 ? Big(lf.fee_fixed) : Big(gf.fee_fixed); //ledgerFee_Fix.gt(0) ? ledgerFee_Fix : globalFee_Fix;
-            const bps = lf.fee_percBips > 0 ? Big(lf.fee_percBips) : Big(gf.fee_percBips); //ledgerFee_Bps.gt(0) ? ledgerFee_Bps : globalFee_Bps;
-            const min = lf.fee_min > 0 ? Big(lf.fee_min) : Big(gf.fee_min); //ledgerFee_Min.gt(0) ? ledgerFee_Min : globalFee_Min;
-            const max = lf.fee_max > 0 ? Big(lf.fee_max) : Big(gf.fee_max); //ledgerFee_Max.gt(0) ? ledgerFee_Max : globalFee_Max;
-            fee_ccy_A = Big(Math.floor(fix.plus(((Big(ccy_amount_A).div(10000)).times(bps)))));
-            
-            //const max = Big(await stm.globalFee_ccyType_Max(ccyTypeId_A));
-            //const min = Big(await stm.globalFee_ccyType_Min(ccyTypeId_A));
+            const fix = lf.fee_fixed > 0 ? Big(lf.fee_fixed) : Big(gf.fee_fixed);
+            const bps = lf.fee_percBips > 0 ? Big(lf.fee_percBips) : Big(gf.fee_percBips); 
+            const min = lf.fee_min > 0 ? Big(lf.fee_min) : Big(gf.fee_min);
+            const max = lf.fee_max > 0 ? Big(lf.fee_max) : Big(gf.fee_max);
+            const perThousand = lf.ccy_perThousand > 0 ? Big(lf.ccy_perThousand) : Big(gf.ccy_perThousand);
+            fee_ccy_A = Big(Math.floor(fix
+                .plus((Big(ccy_amount_A).div(10000)).times(bps))
+                .plus(Big(Math.floor((Big(qty_B).div(1000)))).times(perThousand))
+            ));
             if (fee_ccy_A.gt(max) && max.gt(0)) fee_ccy_A = max;
             if (fee_ccy_A.lt(min) && min.gt(0)) fee_ccy_A = min;
-
-            //console.log('fee_ccy_A', fee_ccy_A.toFixed());
+            console.log('fee_ccy_A', fee_ccy_A.toFixed());
         }
+        
         var fee_ccy_B = 0;
         if (ccy_amount_B > 0 && applyFees && ledger_B != accounts[0]) { // fees not applied by contract if fee-sender == fee-receiver
-
             const gf = await stm.getFee(CONST.getFeeType.CCY, ccyTypeId_B, CONST.nullAddr);
             const lf = await stm.getFee(CONST.getFeeType.CCY, ccyTypeId_B, ledger_B);
-            // const globalFee_Fix = Big(await stm.globalFee_ccyType_Fix(ccyTypeId_B));
-            // const ledgerFee_Fix = Big(await stm.ledgerFee_ccyType_Fix(ccyTypeId_B, ledger_B));
-            // const globalFee_Bps = Big(await stm.globalFee_ccyType_Bps(ccyTypeId_B));
-            // const ledgerFee_Bps = Big(await stm.ledgerFee_ccyType_Bps(ccyTypeId_B, ledger_B));
-            // const globalFee_Min = Big(await stm.globalFee_ccyType_Min(ccyTypeId_B));
-            // const ledgerFee_Min = Big(await stm.ledgerFee_ccyType_Min(ccyTypeId_B, ledger_B));
-            // const globalFee_Max = Big(await stm.globalFee_ccyType_Max(ccyTypeId_B));
-            // const ledgerFee_Max = Big(await stm.ledgerFee_ccyType_Max(ccyTypeId_B, ledger_B));
-            const fix = lf.fee_fixed > 0 ? Big(lf.fee_fixed) : Big(gf.fee_fixed); //ledgerFee_Fix.gt(0) ? ledgerFee_Fix : globalFee_Fix;
-            const bps = lf.fee_percBips > 0 ? Big(lf.fee_percBips) : Big(gf.fee_percBips); //ledgerFee_Bps.gt(0) ? ledgerFee_Bps : globalFee_Bps;
-            const min = lf.fee_min > 0 ? Big(lf.fee_min) : Big(gf.fee_min); //ledgerFee_Min.gt(0) ? ledgerFee_Min : globalFee_Min;
-            const max = lf.fee_max > 0 ? Big(lf.fee_max) : Big(gf.fee_max); //ledgerFee_Max.gt(0) ? ledgerFee_Max : globalFee_Max;
-            fee_ccy_B = Big(Math.floor(fix.plus(((Big(ccy_amount_B).div(10000)).times(bps)))));
-            
-            //const max = Big(await stm.globalFee_ccyType_Max(ccyTypeId_B));
-            //const min = Big(await stm.globalFee_ccyType_Min(ccyTypeId_B));
+            const fix = lf.fee_fixed > 0 ? Big(lf.fee_fixed) : Big(gf.fee_fixed);
+            const bps = lf.fee_percBips > 0 ? Big(lf.fee_percBips) : Big(gf.fee_percBips);
+            const min = lf.fee_min > 0 ? Big(lf.fee_min) : Big(gf.fee_min);
+            const max = lf.fee_max > 0 ? Big(lf.fee_max) : Big(gf.fee_max);
+            const perThousand = lf.ccy_perThousand > 0 ? Big(lf.ccy_perThousand) : Big(gf.ccy_perThousand);
+            fee_ccy_B = Big(Math.floor(fix
+                .plus((Big(ccy_amount_B).div(10000)).times(bps))
+                .plus(Big(Math.floor((Big(qty_A).div(1000)))).times(perThousand))
+            ));
             if (fee_ccy_B.gt(max) && max.gt(0)) fee_ccy_B = max;
             if (fee_ccy_B.lt(min) && min.gt(0)) fee_ccy_B = min;
-              
-            //console.log('fee_ccy_B', fee_ccy_B.toFixed());
+            console.log('fee_ccy_B', fee_ccy_B.toFixed());
         }
 
         // fee preview
