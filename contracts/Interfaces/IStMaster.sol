@@ -50,7 +50,7 @@ import "../Interfaces/StructLib.sol";
     // function version() external view returns (string memory);
 
     // /**
-    //  * @notice The security token unit name, e.g. "KG" or carbon, "Token" for generic CFT tokens
+    //  * @notice The security token unit name, e.g. "TONS" or carbon, "Token" for generic CFT tokens
     //  */
     // function unit() external view returns (string memory);
 

@@ -111,7 +111,7 @@ contract("StMaster", accounts => {
         console.log('decimals', decimals);
         assert(name == 'SecTok_Master', 'fail: name');
         assert(version == '0.7', 'fail: version');
-        assert(unit == 'KG', 'fail: version');
+        assert(unit == 'TONS', 'fail: version');
         assert(symbol == 'CCC', 'fail: symbol');
         assert(decimals == 4, 'fail: decimals');
     });

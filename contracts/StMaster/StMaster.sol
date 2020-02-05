@@ -26,7 +26,7 @@ contract StMaster is IStMaster, IPublicViews,
     function sealContract() external { ledgerData._contractSealed = true; }
 
     string contractVersion;
-    string contractUnit; // the smallest (integer, non-divisible) security token unit, e.g. "KG"
+    string contractUnit; // the smallest (integer, non-divisible) security token unit, e.g. "TONS"
     function version() external view returns (string memory) { return contractVersion; }
     function unit() external view returns (string memory) { return contractUnit; }
 

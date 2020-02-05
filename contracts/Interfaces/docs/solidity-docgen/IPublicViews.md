@@ -177,7 +177,7 @@ Contract version
 
 ### <span id="IPublicViews-unit--"></span> `unit() → string` (external)
 
-The security token unit name, e.g. "KG" or carbon, "Token" for generic CFT tokens
+The security token unit name, e.g. "TONS" or carbon, "Token" for generic CFT tokens
 
 
 

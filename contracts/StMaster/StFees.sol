@@ -16,9 +16,8 @@ import "../Libs/FeeLib.sol";
 contract StFees is IStFees,
     Owned, StLedger {
 
-    // TODO: (1) get one-sided working for new (ccy-only!) type: "fixedPerThousand" (i.e. in respect of the other side, # tokens)
-    //        > new event: SetFeeCcyPerThousand
-    //        > applying ccy_perThousand...
+    // TODO: (*) ccy-fee mirror - tests
+    //       (*) orig-ccy fee - as % of exchange fee - [keep orig-tok fee?] -- disallow ccy-mirroring on originator fee set
 
     // GLOBAL FEES
     StructLib.FeeStruct globalFees;

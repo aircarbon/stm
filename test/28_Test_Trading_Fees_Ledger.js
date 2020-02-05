@@ -29,17 +29,17 @@ contract("StMaster", accounts => {
 
     // ST MULTI FEES: LEDGER OVERRIDE
 
-    it(`fees (ledger) - apply NATURE token ledger override fee 1000 BP + 5 KG fixed (cap 10 KG) on a small trade (fee on A)`, async () => {
+    it(`fees (ledger) - apply NATURE token ledger override fee 1000 BP + 5 TONS fixed (cap 10 TONS) on a small trade (fee on A)`, async () => {
         const A = accounts[global.TaddrNdx + 0];
         const B = accounts[global.TaddrNdx + 1];
         await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.kt1Carbon, 1,      A, CONST.nullFees, [], [], { from: accounts[0] });
-        await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        B,                         { from: accounts[0] });
+        await stm.fund(CONST.ccyType.ETH,                      CONST.oneEth_wei,        B,                         { from: accounts[0] });
 
         // set global fee structure (zero)
         await stm.setFee_TokType(CONST.tokenType.NATURE, CONST.nullAddr, { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: 0, fee_percBips: 0, fee_min: 0, fee_max: 0 } );
-        await stm.setFee_CcyType(CONST.ccyType.ETH, CONST.nullAddr,   { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: 0, fee_percBips: 0, fee_min: 0, fee_max: 0 } );
+        await stm.setFee_CcyType(CONST.ccyType.ETH, CONST.nullAddr,      { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: 0, fee_percBips: 0, fee_min: 0, fee_max: 0 } );
 
-        // set ledger fee structure NATURE for A: 10% + 5 KG, CAP 10 KG
+        // set ledger fee structure NATURE for A: 10% + 5 TONS, CAP 10 TONS
         const feeBps = 1000; 
         const feeFix = 5;
         const feeCap = 10;
@@ -55,11 +55,11 @@ contract("StMaster", accounts => {
         await stm.setFee_TokType(CONST.tokenType.CORSIA, A, { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: feeFix+1, fee_percBips: feeBps+1, fee_min: 0, fee_max: feeCap+1 } );
 
         // transfer, with fee structure applied
-        const transferAmountKg = new BN(100); // 100 kg
-        const expectedFeeKg = Math.min(Math.floor(Number(transferAmountKg.toString()) * (feeBps/10000)) + feeFix, feeCap);
+        const transferAmountTokQty = new BN(100); // 100 kg
+        const expectedFeeTokQty = Math.min(Math.floor(Number(transferAmountTokQty.toString()) * (feeBps/10000)) + feeFix, feeCap);
         const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: A,                                   ledger_B: B,
-                   qty_A: transferAmountKg,               tokenTypeId_A: CONST.tokenType.NATURE,
+                   qty_A: transferAmountTokQty,           tokenTypeId_A: CONST.tokenType.NATURE,
                    qty_B: 0,                              tokenTypeId_B: 0,
             ccy_amount_A: 0,                                ccyTypeId_A: 0,
             ccy_amount_B: CONST.oneEth_wei,                 ccyTypeId_B: CONST.ccyType.ETH,
@@ -69,26 +69,26 @@ contract("StMaster", accounts => {
         // contract owner has received expected token fees
         const owner_balBefore = data.owner_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.NATURE).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
         const owner_balAfter  =  data.owner_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.NATURE).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
-        assert(Big(owner_balAfter).eq(Big(owner_balBefore).plus(Big(expectedFeeKg))), 'unexpected fee receiver token balance after transfer');
+        assert(Big(owner_balAfter).eq(Big(owner_balBefore).plus(Big(expectedFeeTokQty))), 'unexpected fee receiver token balance after transfer');
         
         // sender has sent expected quantity and fees
         const A_balBefore = data.ledgerA_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.NATURE).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
         const A_balAfter  =  data.ledgerA_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.NATURE).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
-        assert(Big(A_balAfter).eq(Big(A_balBefore).minus(Big(expectedFeeKg)).minus(Big(transferAmountKg))), 'unexpected fee payer token balance after transfer');
+        assert(Big(A_balAfter).eq(Big(A_balBefore).minus(Big(expectedFeeTokQty)).minus(Big(transferAmountTokQty))), 'unexpected fee payer token balance after transfer');
     });
 
-    it(`fees (ledger) - apply then clear NATURE token ledger override fee 1000 BP + 5 KG fixed (cap 10 KG) on a small trade (fee on A)`, async () => {
+    it(`fees (ledger) - apply then clear NATURE token ledger override fee 1000 BP + 5 TONS fixed (cap 10 TONS) on a small trade (fee on A)`, async () => {
         const A = accounts[global.TaddrNdx + 0];
         const B = accounts[global.TaddrNdx + 1];
         await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.kt1Carbon, 1,      A, CONST.nullFees, [], [], { from: accounts[0] });
-        await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        B,                         { from: accounts[0] });
+        await stm.fund(CONST.ccyType.ETH,                      CONST.oneEth_wei,        B,                         { from: accounts[0] });
 
         // set global fee structure (non-zero)
         const globalFeeBps = 100, globalFeeFix = 1, globalFeeCap = 5;
         await stm.setFee_TokType(CONST.tokenType.NATURE, CONST.nullAddr, { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: globalFeeFix, fee_percBips: globalFeeBps, fee_min: 0, fee_max: globalFeeCap } );
-        await stm.setFee_CcyType(CONST.ccyType.ETH, CONST.nullAddr,   { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: 0,            fee_percBips: 0,            fee_min: 0, fee_max: 0 } );
+        await stm.setFee_CcyType(CONST.ccyType.ETH, CONST.nullAddr,      { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: 0,             fee_percBips: 0,            fee_min: 0, fee_max: 0 } );
 
-        // set ledger fee structure NATURE for A: 10% + 5 KG, CAP 10 KG
+        // set ledger fee structure NATURE for A: 10% + 5 TONS, CAP 10 TONS
         var feeBps = 1000; 
         var feeFix = 5;
         var feeCap = 10;
@@ -110,11 +110,11 @@ contract("StMaster", accounts => {
         await stm.setFee_TokType(CONST.tokenType.CORSIA, A, { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: feeFix+1, fee_percBips: feeBps+1, fee_min: 0, fee_max: feeCap+1 } );
 
         // transfer, with fee structure applied - expect global fee structure
-        const transferAmountKg = new BN(100); // 100 kg
-        const expectedFeeKg = Math.min(Math.floor(Number(transferAmountKg.toString()) * (globalFeeBps/10000)) + globalFeeFix, globalFeeCap);
+        const transferAmountTokQty = new BN(100); // 100 kg
+        const expectedFeeTokQty = Math.min(Math.floor(Number(transferAmountTokQty.toString()) * (globalFeeBps/10000)) + globalFeeFix, globalFeeCap);
         const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: A,                                   ledger_B: B,
-                   qty_A: transferAmountKg,               tokenTypeId_A: CONST.tokenType.NATURE,
+                   qty_A: transferAmountTokQty,           tokenTypeId_A: CONST.tokenType.NATURE,
                    qty_B: 0,                              tokenTypeId_B: 0,
             ccy_amount_A: 0,                                ccyTypeId_A: 0,
             ccy_amount_B: CONST.oneEth_wei,                 ccyTypeId_B: CONST.ccyType.ETH,
@@ -124,31 +124,31 @@ contract("StMaster", accounts => {
         // contract owner has received expected token fees
         const owner_balBefore = data.owner_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.NATURE).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
         const owner_balAfter  =  data.owner_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.NATURE).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
-        assert(Big(owner_balAfter).eq(Big(owner_balBefore).plus(Big(expectedFeeKg))), 'unexpected fee receiver token balance after transfer');
+        assert(Big(owner_balAfter).eq(Big(owner_balBefore).plus(Big(expectedFeeTokQty))), 'unexpected fee receiver token balance after transfer');
         
         // sender has sent expected quantity and fees
         const A_balBefore = data.ledgerA_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.NATURE).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
         const A_balAfter  =  data.ledgerA_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.NATURE).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
-        assert(Big(A_balAfter).eq(Big(A_balBefore).minus(Big(expectedFeeKg)).minus(Big(transferAmountKg))), 'unexpected fee payer token balance after transfer');
+        assert(Big(A_balAfter).eq(Big(A_balBefore).minus(Big(expectedFeeTokQty)).minus(Big(transferAmountTokQty))), 'unexpected fee payer token balance after transfer');
     });
 
-    it(`fees (ledger) - apply NATURE token ledger override fee 1000 BP + 1000 KG fixed (collar 100m tons), on a large (0.5 GT) trade (fee on B)`, async () => {
+    it(`fees (ledger) - apply NATURE token ledger override fee 1000 BP + 1000 tons fixed (collar 100m tons), on a large (0.5 GT) trade (fee on B)`, async () => {
         const A = accounts[global.TaddrNdx + 0];
         const B = accounts[global.TaddrNdx + 1];
 
-        await stm.fund(CONST.ccyType.ETH,                      CONST.oneEth_wei,        A,         { from: accounts[0] });
+        await stm.fund(CONST.ccyType.ETH,                      CONST.oneEth_wei,        A,                         { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.gtCarbon, 1,       B, CONST.nullFees, [], [], { from: accounts[0] });
 
         // set global fee structure (zero)
         await stm.setFee_TokType(CONST.tokenType.NATURE, CONST.nullAddr, { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: 0, fee_percBips: 0, fee_min: 0, fee_max: 0 } );
-        await stm.setFee_CcyType(CONST.ccyType.ETH, CONST.nullAddr,   { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: 0, fee_percBips: 0, fee_min: 0, fee_max: 0 } );
+        await stm.setFee_CcyType(CONST.ccyType.ETH, CONST.nullAddr,      { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: 0, fee_percBips: 0, fee_min: 0, fee_max: 0 } );
 
-        // set ledger fee structure NATURE on B: 10% + 1000 KG
+        // set ledger fee structure NATURE on B: 10% + 1000 TONS
         const feeBps = 1000; // 1000 bp
-        const feeFix = 1000; // 1000 kg
-        const feeMin = 100000000000; // 100m tons
+        const feeFix = 1000; // 1000 tons fixed
+        const feeMin = 100000000; // 100m tons min
         const setEeuFeeTx = await stm.setFee_TokType(CONST.tokenType.NATURE, B, { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: feeFix, fee_percBips: feeBps, fee_min: feeMin, fee_max: 0 } );
-        const setCcyFeeTx = await stm.setFee_CcyType(CONST.ccyType.ETH, B,   { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: 0,      fee_percBips: 0,      fee_min: 0,      fee_max: 0 } );
+        const setCcyFeeTx = await stm.setFee_CcyType(CONST.ccyType.ETH, B,      { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: 0,      fee_percBips: 0,      fee_min: 0,      fee_max: 0 } );
         truffleAssert.eventEmitted(setEeuFeeTx, 'SetFeeTokBps', ev => ev.tokenTypeId == CONST.tokenType.NATURE && ev.fee_token_PercBips == feeBps && ev.ledgerOwner == B);
         truffleAssert.eventEmitted(setEeuFeeTx, 'SetFeeTokFix', ev => ev.tokenTypeId == CONST.tokenType.NATURE && ev.fee_tokenQty_Fixed == feeFix && ev.ledgerOwner == B);
         truffleAssert.eventEmitted(setEeuFeeTx, 'SetFeeTokMin', ev => ev.tokenTypeId == CONST.tokenType.NATURE && ev.fee_token_Min == feeMin && ev.ledgerOwner == B);
@@ -160,12 +160,12 @@ contract("StMaster", accounts => {
         await stm.setFee_TokType(CONST.tokenType.CORSIA, B, { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: feeFix+1, fee_percBips: feeBps+1, fee_min: feeMin+1, fee_max: 0 } );
 
         // transfer, with fee structure applied
-        const transferAmountKg = new BN(CONST.gtCarbon / 2); // 0.5 giga ton
-        const expectedFeeKg = Math.max(Math.floor(Number(transferAmountKg.toString()) * (feeBps/10000)) + feeFix, feeMin);
+        const transferAmountTokQty = new BN(CONST.gtCarbon / 2); // 0.5 giga ton
+        const expectedFeeTokQty = Math.max(Math.floor(Number(transferAmountTokQty.toString()) * (feeBps/10000)) + feeFix, feeMin);
         const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: A,                                   ledger_B: B,
                    qty_A: 0,                              tokenTypeId_A: 0,
-                   qty_B: transferAmountKg,               tokenTypeId_B: CONST.tokenType.NATURE,
+                   qty_B: transferAmountTokQty,           tokenTypeId_B: CONST.tokenType.NATURE,
             ccy_amount_A: CONST.oneEth_wei,                 ccyTypeId_A: CONST.ccyType.ETH,
             ccy_amount_B: 0,                                ccyTypeId_B: 0,
                applyFees: true,
@@ -174,15 +174,15 @@ contract("StMaster", accounts => {
         // contract owner has received expected token fees
         const owner_balBefore = data.owner_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.NATURE).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
         const owner_balAfter  =  data.owner_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.NATURE).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
-        assert(Big(owner_balAfter).eq(Big(owner_balBefore).plus(Big(expectedFeeKg))), 'unexpected fee receiver token balance after transfer');
+        assert(Big(owner_balAfter).eq(Big(owner_balBefore).plus(Big(expectedFeeTokQty))), 'unexpected fee receiver token balance after transfer');
         
         // sender has sent expected quantity and fees
         const B_balBefore = data.ledgerB_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.NATURE).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
         const B_balAfter  =  data.ledgerB_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.NATURE).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
-        assert(Big(B_balAfter).eq(Big(B_balBefore).minus(Big(expectedFeeKg)).minus(Big(transferAmountKg))), 'unexpected fee payer token balance after transfer');
+        assert(Big(B_balAfter).eq(Big(B_balBefore).minus(Big(expectedFeeTokQty)).minus(Big(transferAmountTokQty))), 'unexpected fee payer token balance after transfer');
     });
 
-    it(`fees (ledger) - apply then clear NATURE token ledger override fee 1000 BP + 1000 KG fixed (collar 100m tons), on a large (0.5 GT) trade (fee on B)`, async () => {
+    it(`fees (ledger) - apply then clear NATURE token ledger override fee 1000 BP + 1000 tons fixed (collar 100m tons), on a large (0.5 GT) trade (fee on B)`, async () => {
         const A = accounts[global.TaddrNdx + 0];
         const B = accounts[global.TaddrNdx + 1];
 
@@ -190,18 +190,18 @@ contract("StMaster", accounts => {
         await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.gtCarbon, 1,       B, CONST.nullFees, [], [], { from: accounts[0] });
 
         // set global fee structure (non-zero)
-        const globalFeeBps = 100, globalFeeFix = 100, globalFeeMin = 1000000000;
+        const globalFeeBps = 100, globalFeeFix = 100, globalFeeMin = 1000000;
         await stm.setFee_TokType(CONST.tokenType.NATURE, CONST.nullAddr, { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: globalFeeFix, fee_percBips: globalFeeBps, fee_min: globalFeeMin, fee_max: 0 } );
-        await stm.setFee_CcyType(CONST.ccyType.ETH, CONST.nullAddr,   { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: 0,            fee_percBips: 0,            fee_min: 0,            fee_max: 0 } );
+        await stm.setFee_CcyType(CONST.ccyType.ETH, CONST.nullAddr,      { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: 0,            fee_percBips: 0,            fee_min: 0,            fee_max: 0 } );
 
-        // set ledger fee structure NATURE on B: 10% + 1000 KG
+        // set ledger fee structure NATURE on B: 10% + 1000 TONS
         var feeBps = 1000; // 1000 bp
-        var feeFix = 1000; // 1000 kg
-        var feeMin = 100000000000; // 100m tons
+        var feeFix = 1000; // 1000 tons
+        var feeMin = 100000000; // 100m tons min
         await stm.setFee_TokType(CONST.tokenType.NATURE, B, { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: feeFix, fee_percBips: feeBps, fee_min: feeMin, fee_max: 0 } );
-        await stm.setFee_CcyType(CONST.ccyType.ETH, B,   { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: 0,      fee_percBips: 0,      fee_min: 0,      fee_max: 0 } );
+        await stm.setFee_CcyType(CONST.ccyType.ETH, B,      { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: 0,      fee_percBips: 0,      fee_min: 0,      fee_max: 0 } );
 
-        // clear ledger fee structure (zero) on B
+        // clear ledger fee structure on B
         feeBps = 0;
         feeFix = 0;
         feeMin = 0;
@@ -217,12 +217,12 @@ contract("StMaster", accounts => {
         await stm.setFee_TokType(CONST.tokenType.CORSIA, B, { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: feeFix+1, fee_percBips: feeBps+1, fee_min: feeMin+1, fee_max: 0 } );
 
         // transfer, with fee structure applied - expect global fee structure
-        const transferAmountKg = new BN(CONST.gtCarbon / 2); // 0.5 giga ton
-        const expectedFeeKg = Math.max(Math.floor(Number(transferAmountKg.toString()) * (globalFeeBps/10000)) + globalFeeFix, globalFeeMin);
+        const transferAmountTokQty = new BN(CONST.gtCarbon / 2); // 0.5 giga ton
+        const expectedFeeTokQty = Math.max(Math.floor(Number(transferAmountTokQty.toString()) * (globalFeeBps/10000)) + globalFeeFix, globalFeeMin);
         const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: A,                                   ledger_B: B,
                    qty_A: 0,                              tokenTypeId_A: 0,
-                   qty_B: transferAmountKg,               tokenTypeId_B: CONST.tokenType.NATURE,
+                   qty_B: transferAmountTokQty,           tokenTypeId_B: CONST.tokenType.NATURE,
             ccy_amount_A: CONST.oneEth_wei,                 ccyTypeId_A: CONST.ccyType.ETH,
             ccy_amount_B: 0,                                ccyTypeId_B: 0,
                applyFees: true,
@@ -231,12 +231,12 @@ contract("StMaster", accounts => {
         // contract owner has received expected token fees
         const owner_balBefore = data.owner_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.NATURE).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
         const owner_balAfter  =  data.owner_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.NATURE).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
-        assert(Big(owner_balAfter).eq(Big(owner_balBefore).plus(Big(expectedFeeKg))), 'unexpected fee receiver token balance after transfer');
+        assert(Big(owner_balAfter).eq(Big(owner_balBefore).plus(Big(expectedFeeTokQty))), 'unexpected fee receiver token balance after transfer');
         
         // sender has sent expected quantity and fees
         const B_balBefore = data.ledgerB_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.NATURE).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
         const B_balAfter  =  data.ledgerB_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.NATURE).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
-        assert(Big(B_balAfter).eq(Big(B_balBefore).minus(Big(expectedFeeKg)).minus(Big(transferAmountKg))), 'unexpected fee payer token balance after transfer');
+        assert(Big(B_balAfter).eq(Big(B_balBefore).minus(Big(expectedFeeTokQty)).minus(Big(transferAmountTokQty))), 'unexpected fee payer token balance after transfer');
     });
 
     // CCY MULTI FEES: LEDGER OVERRIDE
@@ -244,12 +244,12 @@ contract("StMaster", accounts => {
     it(`fees (ledger) - apply ETH ccy override fee 2500 BP + 0.01 ETH fixed (collar 0.2 ETH), on a small trade (fee on A)`, async () => {
         const A = accounts[global.TaddrNdx + 0];
         const B = accounts[global.TaddrNdx + 1];
-        await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        A,                         { from: accounts[0] });
+        await stm.fund(CONST.ccyType.ETH,                      CONST.oneEth_wei,        A,                         { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.kt1Carbon, 1,      B, CONST.nullFees, [], [], { from: accounts[0] });
 
         // set global fee structure (zero)
         await stm.setFee_TokType(CONST.tokenType.NATURE, CONST.nullAddr, { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: 0, fee_percBips: 0, fee_min: 0, fee_max: 0 } );
-        await stm.setFee_CcyType(CONST.ccyType.ETH, CONST.nullAddr,   { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: 0, fee_percBips: 0, fee_min: 0, fee_max: 0 } );
+        await stm.setFee_CcyType(CONST.ccyType.ETH, CONST.nullAddr,      { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: 0, fee_percBips: 0, fee_min: 0, fee_max: 0 } );
 
         // set ledger fee structure ETH for A: 25% + 0.01 ETH, cap 0.02 ETH
         const ethFeeBps = 2500;
@@ -292,12 +292,12 @@ contract("StMaster", accounts => {
     it(`fees (ledger) - apply then clear ETH ccy override fee 2500 BP + 0.01 ETH fixed (collar 0.2 ETH), on a small trade (fee on A)`, async () => {
         const A = accounts[global.TaddrNdx + 0];
         const B = accounts[global.TaddrNdx + 1];
-        await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        A,                         { from: accounts[0] });
+        await stm.fund(CONST.ccyType.ETH,                      CONST.oneEth_wei,        A,                         { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.kt1Carbon, 1,      B, CONST.nullFees, [], [], { from: accounts[0] });
 
         // set global fee structure (non-zero)
         const globalFeeBps = 2500, globalFeeFix = CONST.thousandthEth_wei, globalFeeMin = (CONST.hundredthEth_wei * 10).toFixed();
-        await stm.setFee_CcyType(CONST.ccyType.ETH, CONST.nullAddr,   { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: globalFeeFix, fee_percBips: globalFeeBps, fee_min: globalFeeMin, fee_max: 0 } );
+        await stm.setFee_CcyType(CONST.ccyType.ETH, CONST.nullAddr,      { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: globalFeeFix, fee_percBips: globalFeeBps, fee_min: globalFeeMin, fee_max: 0 } );
         await stm.setFee_TokType(CONST.tokenType.NATURE, CONST.nullAddr, { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: 0,            fee_percBips: 0,            fee_min: 0,            fee_max: 0 } );
 
         // set ledger fee structure ETH for A: 25% + 0.01 ETH, cap 0.02 ETH
@@ -349,10 +349,10 @@ contract("StMaster", accounts => {
         const B = accounts[global.TaddrNdx + 1];
 
         await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.kt1Carbon, 1,      A, CONST.nullFees, [], [], { from: accounts[0] });
-        await stm.fund(CONST.ccyType.ETH,                   CONST.millionEth_wei,    B,                         { from: accounts[0] });
+        await stm.fund(CONST.ccyType.ETH,                      CONST.millionEth_wei,    B,                         { from: accounts[0] });
 
         // set global fee structure (zero)
-        await stm.setFee_CcyType(CONST.ccyType.ETH, CONST.nullAddr,   { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: 0, fee_percBips: 0, fee_min: 0, fee_max: 0 } );
+        await stm.setFee_CcyType(CONST.ccyType.ETH, CONST.nullAddr,      { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: 0, fee_percBips: 0, fee_min: 0, fee_max: 0 } );
         await stm.setFee_TokType(CONST.tokenType.NATURE, CONST.nullAddr, { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: 0, fee_percBips: 0, fee_min: 0, fee_max: 0 } );
 
         // set fee structure ETH on B: 10% + 1000 ETH fixed, cap 50000 ETH
@@ -399,18 +399,18 @@ contract("StMaster", accounts => {
         const B = accounts[global.TaddrNdx + 1];
 
         await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.kt1Carbon, 1,      A, CONST.nullFees, [], [], { from: accounts[0] });
-        await stm.fund(CONST.ccyType.ETH,                   CONST.millionEth_wei,    B,                         { from: accounts[0] });
+        await stm.fund(CONST.ccyType.ETH,                      CONST.millionEth_wei,    B,                         { from: accounts[0] });
 
         // set global fee structure (non-zero)
         const globalFeeBps = 100, globalFeeFix = 100, globalFeeMax = 100;
-        await stm.setFee_CcyType(CONST.ccyType.ETH, CONST.nullAddr,   { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: globalFeeFix, fee_percBips: globalFeeBps, fee_min: 0, fee_max: globalFeeMax } );
+        await stm.setFee_CcyType(CONST.ccyType.ETH, CONST.nullAddr,      { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: globalFeeFix, fee_percBips: globalFeeBps, fee_min: 0, fee_max: globalFeeMax } );
         await stm.setFee_TokType(CONST.tokenType.NATURE, CONST.nullAddr, { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: 0,            fee_percBips: 0,            fee_min: 0, fee_max: 0 } );
 
         // set fee structure ETH on B: 10% + 1000 ETH fixed, cap 50000 ETH
         var ethFeeBps = 1000; // 1000 bp
         var ethFeeFix = CONST.thousandEth_wei; 
         var ethFeeMax = "50000000000000000000000"; // 50k eth
-        await stm.setFee_CcyType(CONST.ccyType.ETH, B,   { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: ethFeeFix, fee_percBips: ethFeeBps, fee_min: 0, fee_max: ethFeeMax } );
+        await stm.setFee_CcyType(CONST.ccyType.ETH, B,      { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: ethFeeFix, fee_percBips: ethFeeBps, fee_min: 0, fee_max: ethFeeMax } );
         await stm.setFee_TokType(CONST.tokenType.NATURE, B, { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: 0,         fee_percBips: 0,         fee_min: 0, fee_max: 0 } );
 
         // clear ledger fee structure (zero) on B
@@ -459,7 +459,7 @@ contract("StMaster", accounts => {
 
         // 102,999,999 tons
         await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.kt1Carbon, 1,      A, CONST.nullFees, [], [], { from: accounts[0] });
-        await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        B,                         { from: accounts[0] });
+        await stm.fund(CONST.ccyType.ETH,                      CONST.oneEth_wei,        B,                         { from: accounts[0] });
 
         // set ledger fee structure NATURE (A): 10% + 50kg, max 50kg
         const ledgerFeeBps = 1000;
@@ -474,8 +474,8 @@ contract("StMaster", accounts => {
         await stm.setFee_CcyType(CONST.ccyType.ETH, CONST.nullAddr, { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: globalFeeFix, fee_percBips: globalFeeBps, fee_min: 0, fee_max: globalFeeMax } );
 
         // A - carbon transfer amount & exepcted ledger fee
-        const transferAmountKg = new BN(950); // not enough carbon for this trade, without the fee cap
-        const expectedFeeKg = Math.min(Math.floor(Number(transferAmountKg.toString()) * (ledgerFeeBps/10000)) + Number(ledgerFeeFix), ledgerFeeMax);
+        const transferAmountTokQty = new BN(950); // not enough carbon for this trade, without the fee cap
+        const expectedFeeTokQty = Math.min(Math.floor(Number(transferAmountTokQty.toString()) * (ledgerFeeBps/10000)) + Number(ledgerFeeFix), ledgerFeeMax);
 
         // B - ccy transfer amount & expected global fee
         const transferAmountEth = new BN(CONST.tenthEth_wei);
@@ -483,7 +483,7 @@ contract("StMaster", accounts => {
 
         const data = await transferHelper.transferLedger({ stm, accounts, 
             ledger_A: A,                                   ledger_B: B,
-               qty_A: transferAmountKg,               tokenTypeId_A: CONST.tokenType.NATURE,
+               qty_A: transferAmountTokQty,           tokenTypeId_A: CONST.tokenType.NATURE,
                qty_B: 0,                              tokenTypeId_B: 0,
         ccy_amount_A: 0,                                ccyTypeId_A: 0,
         ccy_amount_B: transferAmountEth,                ccyTypeId_B: CONST.ccyType.ETH,
@@ -491,14 +491,14 @@ contract("StMaster", accounts => {
         });
 
         // contract owner has received expected token fee
-        const owner_balBeforeKg = data.owner_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.NATURE).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
-        const owner_balAfterKg  =  data.owner_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.NATURE).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
-        assert(Big(owner_balAfterKg).eq(Big(owner_balBeforeKg).plus(Big(expectedFeeKg))), 'unexpected fee receiver token balance after transfer');
+        const owner_balBeforeTokQty = data.owner_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.NATURE).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
+        const owner_balAfterTokQty  =  data.owner_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.NATURE).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
+        assert(Big(owner_balAfterTokQty).eq(Big(owner_balBeforeTokQty).plus(Big(expectedFeeTokQty))), 'unexpected fee receiver token balance after transfer');
         
         // carbon sender has sent expected carbon quantity and paid exepcted token fee
         const A_balBefore = data.ledgerA_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.NATURE).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
         const A_balAfter  =  data.ledgerA_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.NATURE).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
-        assert(Big(A_balAfter).eq(Big(A_balBefore).minus(Big(expectedFeeKg)).minus(Big(transferAmountKg))), 'unexpected fee payer token balance after transfer');
+        assert(Big(A_balAfter).eq(Big(A_balBefore).minus(Big(expectedFeeTokQty)).minus(Big(transferAmountTokQty))), 'unexpected fee payer token balance after transfer');
 
         // contract owner has received expected ccy fee
         const owner_balBeforeCcy = data.owner_before.ccys.filter(p => p.ccyTypeId == CONST.ccyType.ETH).map(p => p.balance).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
@@ -517,7 +517,7 @@ contract("StMaster", accounts => {
 
         // 102,999,999 tons
         await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.kt1Carbon, 1,      A, CONST.nullFees, [], [], { from: accounts[0] });
-        await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        B,                         { from: accounts[0] });
+        await stm.fund(CONST.ccyType.ETH,                      CONST.oneEth_wei,        B,                         { from: accounts[0] });
 
         // set global fee structure NATURE (A)
         const globalFeeFix = 0;
@@ -532,8 +532,8 @@ contract("StMaster", accounts => {
         await stm.setFee_CcyType(CONST.ccyType.ETH, B, { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: ledgerFeeFix, fee_percBips: ledgerFeeBps, fee_min: 0, fee_max: ledgerFeeMax } );
 
         // A - carbon transfer amount & expected global fee
-        const transferAmountKg = new BN(950);
-        const expectedFeeKg = Math.min(Math.floor(Number(transferAmountKg.toString()) * (globalFeeBps/10000)) + Number(globalFeeFix), globalFeeMax);
+        const transferAmountTokQty = new BN(950);
+        const expectedFeeTokQty = Math.min(Math.floor(Number(transferAmountTokQty.toString()) * (globalFeeBps/10000)) + Number(globalFeeFix), globalFeeMax);
 
         // B - ccy transfer amount & exepcted ledger fee
         const transferAmountEth = web3.utils.toWei("0.9", "ether"); // not enough ETH for this trade, without the fee cap
@@ -541,7 +541,7 @@ contract("StMaster", accounts => {
 
         const data = await transferHelper.transferLedger({ stm, accounts, 
             ledger_A: A,                                   ledger_B: B,
-               qty_A: transferAmountKg,               tokenTypeId_A: CONST.tokenType.NATURE,
+               qty_A: transferAmountTokQty,           tokenTypeId_A: CONST.tokenType.NATURE,
                qty_B: 0,                              tokenTypeId_B: 0,
         ccy_amount_A: 0,                                ccyTypeId_A: 0,
         ccy_amount_B: transferAmountEth,                ccyTypeId_B: CONST.ccyType.ETH,
@@ -549,14 +549,14 @@ contract("StMaster", accounts => {
         });
 
         // contract owner has received expected token fee
-        const owner_balBeforeKg = data.owner_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.NATURE).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
-        const owner_balAfterKg  =  data.owner_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.NATURE).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
-        assert(Big(owner_balAfterKg).eq(Big(owner_balBeforeKg).plus(Big(expectedFeeKg))), 'unexpected fee receiver token balance after transfer');
+        const owner_balBeforeTokQty = data.owner_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.NATURE).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
+        const owner_balAfterTokQty  =  data.owner_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.NATURE).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
+        assert(Big(owner_balAfterTokQty).eq(Big(owner_balBeforeTokQty).plus(Big(expectedFeeTokQty))), 'unexpected fee receiver token balance after transfer');
         
         // carbon sender has sent expected carbon quantity and paid exepcted token fee
         const A_balBefore = data.ledgerA_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.NATURE).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
         const A_balAfter  =  data.ledgerA_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.NATURE).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
-        assert(Big(A_balAfter).eq(Big(A_balBefore).minus(Big(expectedFeeKg)).minus(Big(transferAmountKg))), 'unexpected fee payer token balance after transfer');
+        assert(Big(A_balAfter).eq(Big(A_balBefore).minus(Big(expectedFeeTokQty)).minus(Big(transferAmountTokQty))), 'unexpected fee payer token balance after transfer');
 
         // contract owner has received expected ccy fee
         const owner_balBeforeCcy = data.owner_before.ccys.filter(p => p.ccyTypeId == CONST.ccyType.ETH).map(p => p.balance).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
@@ -573,7 +573,7 @@ contract("StMaster", accounts => {
         const A = accounts[global.TaddrNdx + 0];
         const B = accounts[global.TaddrNdx + 1];
 
-        await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        A,                         { from: accounts[0] });
+        await stm.fund(CONST.ccyType.ETH,                      CONST.oneEth_wei,        A,                         { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.kt1Carbon, 1,      B, CONST.nullFees, [], [], { from: accounts[0] });
 
         // set fee structure NATURE (B): 1% + 1kg, min 101kg
@@ -581,15 +581,15 @@ contract("StMaster", accounts => {
         const feeFix = 1;
         const feeMin = 101;
         await stm.setFee_TokType(CONST.tokenType.NATURE, B, { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: feeFix, fee_percBips: feeBps, fee_min: feeMin, fee_max: 0 } );
-        await stm.setFee_CcyType(CONST.ccyType.ETH,   A,              CONST.nullFees);
-        await stm.setFee_CcyType(CONST.ccyType.ETH,   CONST.nullAddr, CONST.nullFees);
+        await stm.setFee_CcyType(CONST.ccyType.ETH,      A,              CONST.nullFees);
+        await stm.setFee_CcyType(CONST.ccyType.ETH,      CONST.nullAddr, CONST.nullFees);
 
         try {
-            const transferAmountKg = new BN(900);
+            const transferAmountTokQty = new BN(900);
             const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: A,                                   ledger_B: B,
                    qty_A: 0,                              tokenTypeId_A: 0,
-                   qty_B: transferAmountKg,               tokenTypeId_B: CONST.tokenType.NATURE,
+                   qty_B: transferAmountTokQty,           tokenTypeId_B: CONST.tokenType.NATURE,
             ccy_amount_A: CONST.oneEth_wei,                 ccyTypeId_A: CONST.ccyType.ETH,
             ccy_amount_B: 0,                                ccyTypeId_B: 0,
                applyFees: true,
@@ -607,21 +607,21 @@ contract("StMaster", accounts => {
         const B = accounts[global.TaddrNdx + 1];
 
         await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.kt1Carbon, 1,      A, CONST.nullFees, [], [], { from: accounts[0] });
-        await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        B,                         { from: accounts[0] });
+        await stm.fund(CONST.ccyType.ETH,                      CONST.oneEth_wei,        B,                         { from: accounts[0] });
 
         // set fee structure NATURE (A): 1% + 1kg, min 101kg
         const feeBps = 100; 
         const feeFix = 1;
         const feeMin = 101;
         await stm.setFee_TokType(CONST.tokenType.NATURE, A, { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: feeFix, fee_percBips: feeBps, fee_min: feeMin, fee_max: 0 } );
-        await stm.setFee_CcyType(CONST.ccyType.ETH,   B,              CONST.nullFees);
-        await stm.setFee_CcyType(CONST.ccyType.ETH,   CONST.nullAddr, CONST.nullFees);
+        await stm.setFee_CcyType(CONST.ccyType.ETH,      B,              CONST.nullFees);
+        await stm.setFee_CcyType(CONST.ccyType.ETH,      CONST.nullAddr, CONST.nullFees);
 
         try {
-            const transferAmountKg = new BN(900);
+            const transferAmountTokQty = new BN(900);
             const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: A,                                   ledger_B: B,
-                   qty_A: transferAmountKg,               tokenTypeId_A: CONST.tokenType.NATURE,
+                   qty_A: transferAmountTokQty,           tokenTypeId_A: CONST.tokenType.NATURE,
                    qty_B: 0,                              tokenTypeId_B: 0,
             ccy_amount_A: 0,                                ccyTypeId_A: 0,
             ccy_amount_B: CONST.oneEth_wei,                 ccyTypeId_B: CONST.ccyType.ETH,

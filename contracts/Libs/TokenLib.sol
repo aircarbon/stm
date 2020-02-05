@@ -74,6 +74,7 @@ library TokenLib {
         require(uint256(ledgerData._batches_currentMax_id) + 1 <= 0xffffffffffffffff, "Too many batches");
         require(a.origTokFee.fee_max >= a.origTokFee.fee_min || a.origTokFee.fee_max == 0, "Bad fee args");
         require(a.origTokFee.fee_percBips <= 10000, "Bad fee args");
+        require(a.origTokFee.ccy_mirrorFee == false, "ccy_mirrorFee unsupported for token-type fee");
         require(ledgerData.contractType == StructLib.ContractType.COMMODITY, "Bad cashflow request");
 
         // ### string[] param lengths are reported as zero!
@@ -163,6 +164,7 @@ library TokenLib {
 
         require(originatorFeeNew.fee_max >= originatorFeeNew.fee_min || originatorFeeNew.fee_max == 0, "Bad fee args");
         require(originatorFeeNew.fee_percBips <= 10000, "Bad fee args");
+        require(originatorFeeNew.ccy_mirrorFee == false, "ccy_mirrorFee unsupported for token-type fee");
 
         ledgerData._batches[batchId].origTokFee = originatorFeeNew;
         emit SetBatchOriginatorFee(batchId, originatorFeeNew);

@@ -65,29 +65,37 @@ library TransferLib {
 
         // TODO: tests for mirroring... then originator ccy fee as % of exchange fee
 
-        // apply ccy fee mirroring - only ever from one side to the other
-        // if (exFees.fee_ccy_A > 0 && exFees.fee_ccy_B == 0) {
-        //     if (exFeeStruct_ccy_A.ccy[a.ccyTypeId_A].ccy_mirrorFee == true) {
-        //         exFees.fee_ccy_B = exFees.fee_ccy_A;
-        //         a.ccyTypeId_B = a.ccyTypeId_A; // !
-        //     }
-        // }
-        // else if (exFees.fee_ccy_B > 0 && exFees.fee_ccy_A == 0) {
-        //     if (exFeeStruct_ccy_B.ccy[a.ccyTypeId_B].ccy_mirrorFee == true) {
-        //         exFees.fee_ccy_A = exFees.fee_ccy_B;
-        //         a.ccyTypeId_A = a.ccyTypeId_B; // !
-        //     }
-        // }
+        // apply exchange ccy fee mirroring - only ever from one side to the other
+        if (exFees.fee_ccy_A > 0 && exFees.fee_ccy_B == 0) {
+            if (exFeeStruct_ccy_A.ccy[a.ccyTypeId_A].ccy_mirrorFee == true) {
+                a.ccyTypeId_B = a.ccyTypeId_A;
+                //exFees.fee_ccy_B = exFees.fee_ccy_A; // symmetrical mirror
+
+                // asymmetrical mirror
+                exFeeStruct_ccy_B = ledgerData._ledger[a.ledger_B].customFees.ccyType_Set[a.ccyTypeId_B]   ? ledgerData._ledger[a.ledger_B].customFees : globalFees;
+                exFees.fee_ccy_B = a.ledger_B != a.feeAddrOwner ? calcFeeWithCapCollar(exFeeStruct_ccy_B.ccy[a.ccyTypeId_B], uint256(a.ccy_amount_A), a.qty_B) : 0; // ??!
+            }
+        }
+        else if (exFees.fee_ccy_B > 0 && exFees.fee_ccy_A == 0) {
+            if (exFeeStruct_ccy_B.ccy[a.ccyTypeId_B].ccy_mirrorFee == true) {
+                a.ccyTypeId_A = a.ccyTypeId_B;
+                //exFees.fee_ccy_A = exFees.fee_ccy_B; // symmetrical mirror
+
+                // asymmetrical mirror
+                exFeeStruct_ccy_A = ledgerData._ledger[a.ledger_A].customFees.ccyType_Set[a.ccyTypeId_A] ? ledgerData._ledger[a.ledger_A].customFees : globalFees;
+                exFees.fee_ccy_A = a.ledger_A != a.feeAddrOwner ? calcFeeWithCapCollar(exFeeStruct_ccy_A.ccy[a.ccyTypeId_A], uint256(a.ccy_amount_B), a.qty_A) : 0; // ??!
+            }
+        }
 
         // validate currency balances - transfer amount & exchange fee
         require(StructLib.sufficientCcy(ledgerData, a.ledger_A, a.ccyTypeId_A,
                     a.ccy_amount_A, // amount sending
-                    a.ccy_amount_B, // amount receiving (!?)
+                    a.ccy_amount_B, // amount receiving
                     int256(exFees.fee_ccy_A) * (a.applyFees /*&& a.ccy_amount_A > 0 */? 1 : 0)), "Insufficient currency A");
 
         require(StructLib.sufficientCcy(ledgerData, a.ledger_B, a.ccyTypeId_B,
                     a.ccy_amount_B, // amount sending
-                    a.ccy_amount_A, // amount receiving (!?)
+                    a.ccy_amount_A, // amount receiving
                     int256(exFees.fee_ccy_B) * (a.applyFees /*&& a.ccy_amount_B > 0 */? 1 : 0)), "Insufficient currency B");
 
         TransferVars memory v;
@@ -230,7 +238,6 @@ library TransferLib {
         StructLib.FeeStruct storage exFeeStruct_tok_A = ledgerData._ledger[a.ledger_A].customFees.tokType_Set[a.tokenTypeId_A] ? ledgerData._ledger[a.ledger_A].customFees : globalFees;
         StructLib.FeeStruct storage exFeeStruct_ccy_B = ledgerData._ledger[a.ledger_B].customFees.ccyType_Set[a.ccyTypeId_B]   ? ledgerData._ledger[a.ledger_B].customFees : globalFees;
         StructLib.FeeStruct storage exFeeStruct_tok_B = ledgerData._ledger[a.ledger_B].customFees.tokType_Set[a.tokenTypeId_B] ? ledgerData._ledger[a.ledger_B].customFees : globalFees;
-
         feesAll[ndx++] = StructLib.FeesCalc({
             fee_ccy_A: a.ledger_A != a.feeAddrOwner && a.ccy_amount_A > 0 ? calcFeeWithCapCollar(exFeeStruct_ccy_A.ccy[a.ccyTypeId_A], uint256(a.ccy_amount_A), a.qty_B) : 0,
             fee_ccy_B: a.ledger_B != a.feeAddrOwner && a.ccy_amount_B > 0 ? calcFeeWithCapCollar(exFeeStruct_ccy_B.ccy[a.ccyTypeId_B], uint256(a.ccy_amount_B), a.qty_A) : 0,
@@ -239,7 +246,29 @@ library TransferLib {
                fee_to: feeAddrOwner
         });
 
-        // originator token fee(s)
+        // apply exchange ccy fee mirroring - only ever from one side to the other
+        if (feesAll[0].fee_ccy_A > 0 && feesAll[0].fee_ccy_B == 0) {
+            if (exFeeStruct_ccy_A.ccy[a.ccyTypeId_A].ccy_mirrorFee == true) {
+                a.ccyTypeId_B = a.ccyTypeId_A;
+                //feesAll[0].fee_ccy_B = feesAll[0].fee_ccy_A; // symmetrical mirror
+
+                // asymmetrical mirror
+                exFeeStruct_ccy_B = ledgerData._ledger[a.ledger_B].customFees.ccyType_Set[a.ccyTypeId_B] ? ledgerData._ledger[a.ledger_B].customFees : globalFees;
+                feesAll[0].fee_ccy_B = a.ledger_B != a.feeAddrOwner ? calcFeeWithCapCollar(exFeeStruct_ccy_B.ccy[a.ccyTypeId_B], uint256(a.ccy_amount_A), a.qty_B) : 0; // ??!
+            }
+        }
+        else if (feesAll[0].fee_ccy_B > 0 && feesAll[0].fee_ccy_A == 0) {
+            if (exFeeStruct_ccy_B.ccy[a.ccyTypeId_B].ccy_mirrorFee == true) {
+                a.ccyTypeId_A = a.ccyTypeId_B;
+                //feesAll[0].fee_ccy_A = feesAll[0].fee_ccy_B; // symmetrical mirror
+
+                // asymmetrical mirror
+                exFeeStruct_ccy_A = ledgerData._ledger[a.ledger_A].customFees.ccyType_Set[a.ccyTypeId_A] ? ledgerData._ledger[a.ledger_A].customFees : globalFees;
+                feesAll[0].fee_ccy_A = a.ledger_A != a.feeAddrOwner ? calcFeeWithCapCollar(exFeeStruct_ccy_A.ccy[a.ccyTypeId_A], uint256(a.ccy_amount_B), a.qty_A) : 0; // ??!
+            }
+        }
+
+        // originator token fee(s) - per batch
         uint256 maxStId = ledgerData._tokens_currentMax_id;
         if (a.qty_A > 0) {
             TransferSplitPreviewReturn memory preview = transferSplitSecTokens_Preview(ledgerData, TransferSplitArgs({ from: a.ledger_A, to: a.ledger_B, tokenTypeId: a.tokenTypeId_A, qtyUnit: a.qty_A, transferType: TransferType.User, maxStId: maxStId }));

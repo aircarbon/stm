@@ -28,12 +28,12 @@ contract("StMaster", accounts => {
         const stId = ledgerBefore.tokens[0].stId;
         const eeuBefore = await stm.getSecToken(stId);
         const batch0_before = await stm.getSecTokenBatch(eeuBefore.batchId);
-        assert(Number(batch0_before.burnedQty) == 0, 'unexpected burn KG value on batch before burn');
+        assert(Number(batch0_before.burnedQty) == 0, 'unexpected burn TONS value on batch before burn');
 
         // burn half an ST
-        const burnedKgBefore = await stm.getSecToken_totalBurnedQty.call();
-        const burnKg = CONST.gtCarbon / 2;
-        const a0_burnTx1 = await stm.burnTokens(accounts[global.TaddrNdx], CONST.tokenType.CORSIA, burnKg);
+        const burnedTokQtyBefore = await stm.getSecToken_totalBurnedQty.call();
+        const burnTokQty = CONST.gtCarbon / 2;
+        const a0_burnTx1 = await stm.burnTokens(accounts[global.TaddrNdx], CONST.tokenType.CORSIA, burnTokQty);
         await CONST.logGas(web3, a0_burnTx1, `Burn 0.5 vST`);
 
         // validate burn partial ST event
@@ -42,25 +42,25 @@ contract("StMaster", accounts => {
             return ev.stId == stId
                 && ev.tokenTypeId == CONST.tokenType.CORSIA
                 && ev.ledgerOwner == accounts[global.TaddrNdx]
-                && ev.burnedQty == burnKg
+                && ev.burnedQty == burnTokQty
                 ;
         });
 
         // check global total
-        const burnedKgAfter = await stm.getSecToken_totalBurnedQty.call();
-        assert(burnedKgAfter.toNumber() == burnedKgBefore.toNumber() + burnKg,'unexpected total burned KG');
+        const burnedTokQtyAfter = await stm.getSecToken_totalBurnedQty.call();
+        assert(burnedTokQtyAfter.toNumber() == burnedTokQtyBefore.toNumber() + burnTokQty,'unexpected total burned TONS');
 
         // check ST
         const eeuAfter = await stm.getSecToken(stId);
-        assert(Number(eeuAfter.currentQty) == Number(eeuAfter.mintedQty) / 2, 'unexpected remaining KG in ST after burn');
+        assert(Number(eeuAfter.currentQty) == Number(eeuAfter.mintedQty) / 2, 'unexpected remaining TONS in ST after burn');
 
         // check ledger
         const ledgerAfter = await stm.getLedgerEntry(accounts[global.TaddrNdx]);
-        assert(ledgerAfter.tokens_sumQty == ledgerBefore.tokens_sumQty / 2, 'unexpected ledger KG after burn');
+        assert(ledgerAfter.tokens_sumQty == ledgerBefore.tokens_sumQty / 2, 'unexpected ledger TONS after burn');
 
         // check batch
         const batchAfter = await stm.getSecTokenBatch(eeuAfter.batchId);
-        assert(batchAfter.burnedQty == burnKg, 'unexpected batch burned KG value on batch after burn');
+        assert(batchAfter.burnedQty == burnTokQty, 'unexpected batch burned TONS value on batch after burn');
     });
 
     it(`burning - should allow owner to burn a single full vST`, async () => {
@@ -70,12 +70,12 @@ contract("StMaster", accounts => {
         const stId = ledgerBefore.tokens[0].stId;
         const eeuBefore = await stm.getSecToken(stId);
         const batch0_before = await stm.getSecTokenBatch(eeuBefore.batchId);
-        assert(Number(batch0_before.burnedQty) == 0, 'unexpected burn KG value on batch before burn');
+        assert(Number(batch0_before.burnedQty) == 0, 'unexpected burn TONS value on batch before burn');
 
         // burn a full (single) ST
-        const burnedKgBefore = await stm.getSecToken_totalBurnedQty.call();
-        const burnKg = CONST.gtCarbon;
-        const a0_burnTx1 = await stm.burnTokens(accounts[global.TaddrNdx], CONST.tokenType.CORSIA, burnKg);
+        const burnedTokQtyBefore = await stm.getSecToken_totalBurnedQty.call();
+        const burnTokQty = CONST.gtCarbon;
+        const a0_burnTx1 = await stm.burnTokens(accounts[global.TaddrNdx], CONST.tokenType.CORSIA, burnTokQty);
         await CONST.logGas(web3, a0_burnTx1, `Burn 1.0 vST`);
 
         // validate burn full ST event
@@ -84,26 +84,26 @@ contract("StMaster", accounts => {
             return ev.stId == stId
                 && ev.tokenTypeId == CONST.tokenType.CORSIA
                 && ev.ledgerOwner == accounts[global.TaddrNdx]
-                && ev.burnedQty == burnKg
+                && ev.burnedQty == burnTokQty
                 ;
         });
 
         // check global total
-        const burnedKgAfter = await stm.getSecToken_totalBurnedQty.call();
-        assert(burnedKgAfter.toNumber() == burnedKgBefore.toNumber() + burnKg, 'unexpected total burned KG');
+        const burnedTokQtyAfter = await stm.getSecToken_totalBurnedQty.call();
+        assert(burnedTokQtyAfter.toNumber() == burnedTokQtyBefore.toNumber() + burnTokQty, 'unexpected total burned TONS');
 
         // check ST
         const eeuAfter = await stm.getSecToken(stId);
-        assert(eeuAfter.currentQty == 0, 'unexpected remaining KG in ST after burn');
+        assert(eeuAfter.currentQty == 0, 'unexpected remaining TONS in ST after burn');
 
         // check ledger
         const ledgerAfter = await stm.getLedgerEntry(accounts[global.TaddrNdx]);
-        assert(ledgerAfter.tokens_sumQty == 0, 'unexpected ledger KG after burn');
+        assert(ledgerAfter.tokens_sumQty == 0, 'unexpected ledger TONS after burn');
         assert(ledgerAfter.tokens.length == 0, 'unexpected ledger ST entry after burn');
 
         // check batch
         const batchAfter = await stm.getSecTokenBatch(eeuAfter.batchId);
-        assert(batchAfter.burnedQty == burnKg, 'unexpected batch burned KG value on batch after burn');
+        assert(batchAfter.burnedQty == burnTokQty, 'unexpected batch burned TONS value on batch after burn');
     });
 
     it(`burning - should allow owner to burn 1.5 vSTs`, async () => {
@@ -116,14 +116,14 @@ contract("StMaster", accounts => {
         const eeu1_before = await stm.getSecToken(ledgerBefore.tokens[1].stId);
         const batch0_before = await stm.getSecTokenBatch(eeu0_before.batchId);
         const batch1_before = await stm.getSecTokenBatch(eeu1_before.batchId);
-        assert(Number(batch0_before.burnedQty) == 0, 'unexpected burn KG value on batch 0 before burn');
-        assert(Number(batch1_before.burnedQty) == 0, 'unexpected burn KG value on batch 1 before burn');
+        assert(Number(batch0_before.burnedQty) == 0, 'unexpected burn TONS value on batch 0 before burn');
+        assert(Number(batch1_before.burnedQty) == 0, 'unexpected burn TONS value on batch 1 before burn');
 
         // burn 1.5 eeus
-        const burnedKgBefore = await stm.getSecToken_totalBurnedQty.call();
-        const burnKg = (CONST.gtCarbon / 4) * 3;
-        const expectRemainKg = CONST.gtCarbon - burnKg;
-        const a0_burnTx1 = await stm.burnTokens(accounts[global.TaddrNdx], CONST.tokenType.CORSIA, burnKg);
+        const burnedTokQtyBefore = await stm.getSecToken_totalBurnedQty.call();
+        const burnTokQty = (CONST.gtCarbon / 4) * 3;
+        const expectRemainTokQty = CONST.gtCarbon - burnTokQty;
+        const a0_burnTx1 = await stm.burnTokens(accounts[global.TaddrNdx], CONST.tokenType.CORSIA, burnTokQty);
         await CONST.logGas(web3, a0_burnTx1, `Burn 1.5 vST`);
 
         // validate burn full ST event
@@ -139,32 +139,32 @@ contract("StMaster", accounts => {
             return ev.stId == ledgerBefore.tokens[1].stId
                    && ev.tokenTypeId == CONST.tokenType.CORSIA
                    && ev.ledgerOwner == accounts[global.TaddrNdx]
-                   && ev.burnedQty == CONST.gtCarbon - expectRemainKg - CONST.gtCarbon / 2
+                   && ev.burnedQty == CONST.gtCarbon - expectRemainTokQty - CONST.gtCarbon / 2
                    ;
         });
 
         // check global total
-        const burnedKgAfter = await stm.getSecToken_totalBurnedQty.call();
-        assert(burnedKgAfter.toNumber() == burnedKgBefore.toNumber() + burnKg, 'unexpected total burned KG');
+        const burnedTokQtyAfter = await stm.getSecToken_totalBurnedQty.call();
+        assert(burnedTokQtyAfter.toNumber() == burnedTokQtyBefore.toNumber() + burnTokQty, 'unexpected total burned TONS');
 
         // check STs
         const eeu0_After = await stm.getSecToken(ledgerBefore.tokens[0].stId);
         const eeu1_After = await stm.getSecToken(ledgerBefore.tokens[1].stId);
-        assert(eeu0_After.currentQty == 0, 'unexpected remaining KG in ST 0 after burn');
-        assert(eeu1_After.currentQty == expectRemainKg, 'unexpected remaining KG in ST 1 after burn');
+        assert(eeu0_After.currentQty == 0, 'unexpected remaining TONS in ST 0 after burn');
+        assert(eeu1_After.currentQty == expectRemainTokQty, 'unexpected remaining TONS in ST 1 after burn');
 
         // check ledger
         const ledgerAfter = await stm.getLedgerEntry(accounts[global.TaddrNdx]);
         //console.dir(ledgerAfter);
-        assert(ledgerAfter.tokens_sumQty == expectRemainKg, 'unexpected ledger KG after burn');
+        assert(ledgerAfter.tokens_sumQty == expectRemainTokQty, 'unexpected ledger TONS after burn');
         assert(ledgerAfter.tokens.length == 1, 'unexpected ledger ST entry after burn');
 
         // check batches
         const batch0_after = await stm.getSecTokenBatch(eeu0_before.batchId);
-        assert(batch0_after.burnedQty == CONST.gtCarbon / 2, 'unexpected batch burned KG value on batch 0 after burn');
+        assert(batch0_after.burnedQty == CONST.gtCarbon / 2, 'unexpected batch burned TONS value on batch 0 after burn');
         
         const batch1_after = await stm.getSecTokenBatch(eeu1_before.batchId);
-        assert(batch1_after.burnedQty == CONST.gtCarbon / 2 - expectRemainKg, 'unexpected batch burned KG value on batch 0 after burn');
+        assert(batch1_after.burnedQty == CONST.gtCarbon / 2 - expectRemainTokQty, 'unexpected batch burned TONS value on batch 0 after burn');
     });
 
     it(`burning - should allow owner to burn multiple vSTs of the correct type`, async () => {
@@ -184,22 +184,22 @@ contract("StMaster", accounts => {
         const corsia_batch1 = await stm.getSecTokenBatch(unfcc_eeus[0].batchId);
         const corsia_batch2 = await stm.getSecTokenBatch(unfcc_eeus[1].batchId);
         const corsia_batch3 = await stm.getSecTokenBatch(unfcc_eeus[2].batchId);
-        assert(corsia_batch1.burnedQty == 0, 'unexpected burn KG value on corsia_batch1 before burn');
-        assert(corsia_batch2.burnedQty == 0, 'unexpected burn KG value on corsia_batch2 before burn');
-        assert(corsia_batch3.burnedQty == 0, 'unexpected burn KG value on corsia_batch3 before burn');
+        assert(corsia_batch1.burnedQty == 0, 'unexpected burn TONS value on corsia_batch1 before burn');
+        assert(corsia_batch2.burnedQty == 0, 'unexpected burn TONS value on corsia_batch2 before burn');
+        assert(corsia_batch3.burnedQty == 0, 'unexpected burn TONS value on corsia_batch3 before burn');
 
         const nature_batch4_before = await stm.getSecTokenBatch(nature_eeus[0].batchId);
         const nature_batch5_before = await stm.getSecTokenBatch(nature_eeus[1].batchId);
         const nature_batch6_before = await stm.getSecTokenBatch(nature_eeus[2].batchId);
-        assert(nature_batch4_before.burnedQty == 0, 'unexpected burn KG value on nature_batch4 before burn');
-        assert(nature_batch5_before.burnedQty == 0, 'unexpected burn KG value on nature_batch5 before burn');
-        assert(nature_batch6_before.burnedQty == 0, 'unexpected burn KG value on nature_batch6 before burn');
+        assert(nature_batch4_before.burnedQty == 0, 'unexpected burn TONS value on nature_batch4 before burn');
+        assert(nature_batch5_before.burnedQty == 0, 'unexpected burn TONS value on nature_batch5 before burn');
+        assert(nature_batch6_before.burnedQty == 0, 'unexpected burn TONS value on nature_batch6 before burn');
 
         // burn all NATURE STs
-        const burnedKgBefore = await stm.getSecToken_totalBurnedQty.call();
-        const burnKg = CONST.gtCarbon * 3;
-        const expectRemainKg = CONST.gtCarbon * 6 - burnKg;
-        const burnTx = await stm.burnTokens(accounts[global.TaddrNdx], CONST.tokenType.NATURE, burnKg);
+        const burnedTokQtyBefore = await stm.getSecToken_totalBurnedQty.call();
+        const burnTokQty = CONST.gtCarbon * 3;
+        const expectRemainTokQty = CONST.gtCarbon * 6 - burnTokQty;
+        const burnTx = await stm.burnTokens(accounts[global.TaddrNdx], CONST.tokenType.NATURE, burnTokQty);
         await CONST.logGas(web3, burnTx, `Burn 5.0 vST`);
 
         // validate burn full ST event
@@ -211,18 +211,18 @@ contract("StMaster", accounts => {
         assert(burnedFullSecTokenEvents.length == 3, 'unexpected full ST burn event count');
 
         // check global total
-        const burnedKgAfter = await stm.getSecToken_totalBurnedQty.call();
-        assert(burnedKgAfter.toNumber() == burnedKgBefore.toNumber() + burnKg, 'unexpected total burned KG');
+        const burnedTokQtyAfter = await stm.getSecToken_totalBurnedQty.call();
+        assert(burnedTokQtyAfter.toNumber() == burnedTokQtyBefore.toNumber() + burnTokQty, 'unexpected total burned TONS');
 
         // check STs
         for (var i = 0; i < nature_eeus.length; i++) {
             const vcsSecTokenAfter = await stm.getSecToken(nature_eeus[i].stId);
-            assert(vcsSecTokenAfter.currentQty == 0, 'unexpected remaining KG in NATURE ST after burn');
+            assert(vcsSecTokenAfter.currentQty == 0, 'unexpected remaining TONS in NATURE ST after burn');
         }
 
         // check ledger
         const ledgerAfter = await stm.getLedgerEntry(accounts[global.TaddrNdx]);
-        assert(ledgerAfter.tokens_sumQty == expectRemainKg, 'unexpected ledger KG after burn');
+        assert(ledgerAfter.tokens_sumQty == expectRemainTokQty, 'unexpected ledger TONS after burn');
         assert(ledgerAfter.tokens.length == 3, 'unexpected ledger ST entry after burn');
         assert(ledgerAfter.tokens.every(p => p.tokenTypeId == CONST.tokenType.CORSIA), 'unexpected eeu composition on ledger after burn');
 
@@ -230,9 +230,9 @@ contract("StMaster", accounts => {
         const nature_batch4_after = await stm.getSecTokenBatch(nature_batch4_before.id);
         const nature_batch5_after = await stm.getSecTokenBatch(nature_batch5_before.id);
         const nature_batch6_after = await stm.getSecTokenBatch(nature_batch6_before.id);
-        assert(nature_batch4_after.burnedQty == burnKg / 3, 'unexpected batch burned KG value on nature_batch4_after');
-        assert(nature_batch5_after.burnedQty == burnKg / 3, 'unexpected batch burned KG value on nature_batch5_after');
-        assert(nature_batch6_after.burnedQty == burnKg / 3, 'unexpected batch burned KG value on nature_batch6_after');
+        assert(nature_batch4_after.burnedQty == burnTokQty / 3, 'unexpected batch burned TONS value on nature_batch4_after');
+        assert(nature_batch5_after.burnedQty == burnTokQty / 3, 'unexpected batch burned TONS value on nature_batch5_after');
+        assert(nature_batch6_after.burnedQty == burnTokQty / 3, 'unexpected batch burned TONS value on nature_batch6_after');
     });
 
     it(`burning - should not allow non-owner to burn STs`, async () => {

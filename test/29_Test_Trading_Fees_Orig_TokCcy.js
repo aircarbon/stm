@@ -52,9 +52,9 @@ contract("StMaster", accounts => {
 
         // SETUP - M -> A: no fees
         const MA_qty = 2000;
-        await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        A,                    { from: accounts[0] });
+        await stm.fund(CONST.ccyType.ETH,                      CONST.oneEth_wei,        A,                    { from: accounts[0] });
         await stm.setFee_TokType(CONST.tokenType.NATURE,       CONST.nullAddr,          CONST.nullFees);
-        await stm.setFee_CcyType(CONST.ccyType.ETH,         CONST.nullAddr,          CONST.nullFees);
+        await stm.setFee_CcyType(CONST.ccyType.ETH,            CONST.nullAddr,          CONST.nullFees);
         const data_MA = await transferHelper.transferLedger({ stm, accounts, 
             ledger_A: M,                                   ledger_B: A,
                qty_A: new BN(MA_qty),                 tokenTypeId_A: CONST.tokenType.NATURE,
@@ -71,6 +71,7 @@ contract("StMaster", accounts => {
 
         // TEST - set ledger fee NATURE for A
         const ledgerFeeTok = {
+         ccy_perThousand: 0,
                fee_fixed: ORIG_FEES_VCS_B1.fee_fixed * 4,
             fee_percBips: 0,
                  fee_min: 0,
@@ -91,11 +92,11 @@ contract("StMaster", accounts => {
         // await stm.setFee_CcyType(CONST.ccyType.ETH, CONST.nullAddr,   globalFeeCcy);
 
         // TEST - transfer
-        const transferAmountKg = new BN(1500);
+        const transferAmountTokQty = new BN(1500);
         const M_ledgerBefore = await stm.getLedgerEntry(M);
         const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: A,                                   ledger_B: B,
-                   qty_A: transferAmountKg,               tokenTypeId_A: CONST.tokenType.NATURE,
+                   qty_A: transferAmountTokQty,           tokenTypeId_A: CONST.tokenType.NATURE,
                    qty_B: 0,                              tokenTypeId_B: 0,
             ccy_amount_A: 0,                                ccyTypeId_A: 0,
             ccy_amount_B: CONST.tenthEth_wei,               ccyTypeId_B: CONST.ccyType.ETH,
@@ -122,7 +123,7 @@ contract("StMaster", accounts => {
         // TEST - token sender (A) has paid originator + exchange fees
         const A_balBefore = data.ledgerA_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.NATURE).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
         const A_balAfter  =  data.ledgerA_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.NATURE).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
-        assert(Big(A_balAfter).eq(Big(A_balBefore).minus(Big(data.originatorFees_tok_A)).minus(Big(data.exchangeFee_tok_A)).minus(Big(transferAmountKg))), 'unexpected fee payer token balance after transfer');
+        assert(Big(A_balAfter).eq(Big(A_balBefore).minus(Big(data.originatorFees_tok_A)).minus(Big(data.exchangeFee_tok_A)).minus(Big(transferAmountTokQty))), 'unexpected fee payer token balance after transfer');
     });
 
     it(`fees (orig/ccy) - apply CORSIA token 1 originator fees (+ global @ x8) / SGD ledger fee, on a 2.5 ST trade (tok fee on B / ccy fee on A)`, async () => {
@@ -156,6 +157,7 @@ contract("StMaster", accounts => {
 
         // TEST - set global fee structure CORSIA: 8x originator fee
         var globalFeeTok = {
+         ccy_perThousand: 0,
                fee_fixed: ORIG_FEES_corsia_B1.fee_fixed    * 4,
             fee_percBips: ORIG_FEES_corsia_B1.fee_percBips * 4,
                  fee_min: ORIG_FEES_corsia_B1.fee_min      * 4,
@@ -175,12 +177,12 @@ contract("StMaster", accounts => {
         await stm.setFee_CcyType(CONST.ccyType.SGD, CONST.nullAddr,   { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: 200, fee_percBips: 0, fee_min: 0, fee_max: 0 } ); // to test ledger override
 
         // TEST - transfer
-        const transferAmountKg = new BN(1500);
+        const transferAmountTokQty = new BN(1500);
         const M_ledgerBefore = await stm.getLedgerEntry(M);
         const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: A,                                   ledger_B: B,
                    qty_A: 0,                              tokenTypeId_A: 0,
-                   qty_B: transferAmountKg,               tokenTypeId_B: CONST.tokenType.CORSIA,
+                   qty_B: transferAmountTokQty,           tokenTypeId_B: CONST.tokenType.CORSIA,
             ccy_amount_A: CONST.hundredCcy_cents,           ccyTypeId_A: CONST.ccyType.SGD,
             ccy_amount_B: 0,                                ccyTypeId_B: 0,
                applyFees: true,
@@ -206,7 +208,7 @@ contract("StMaster", accounts => {
         // TEST - sender (B) has sent expected quantity and all fees, inc. originator token fee(s)
         const sender_balBefore = data.ledgerB_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.CORSIA).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
         const sender_balAfter  =  data.ledgerB_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.CORSIA).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
-        assert(Big(sender_balAfter).eq(Big(sender_balBefore).minus(Big(data.originatorFees_tok_B)).minus(Big(data.exchangeFee_tok_B)).minus(Big(transferAmountKg))), 'unexpected fee payer token balance after transfer');
+        assert(Big(sender_balAfter).eq(Big(sender_balBefore).minus(Big(data.originatorFees_tok_B)).minus(Big(data.exchangeFee_tok_B)).minus(Big(transferAmountTokQty))), 'unexpected fee payer token balance after transfer');
     });
 
     // ST ORIGINATOR FEES - MULTIPLE ORIGINATORS
@@ -270,15 +272,15 @@ contract("StMaster", accounts => {
         await stm.setFee_TokType(CONST.tokenType.NATURE, A, ledgerFees);
 
         // TEST - transfer
-        const transferAmountKg = new BN(CONST.kt1Carbon);
-        transferAmountKg.imul(new BN(M_multi.length)); 
-        transferAmountKg.isub(new BN(500)); // take off some for fees
+        const transferAmountTokQty = new BN(CONST.kt1Carbon);
+        transferAmountTokQty.imul(new BN(M_multi.length)); 
+        transferAmountTokQty.isub(new BN(500)); // take off some for fees
         for (var i = 0 ; i < M_multi.length ; i++) {
             M_multi[i].ledgerBefore = await stm.getLedgerEntry(M_multi[i].account);
         }
         const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: A,                                   ledger_B: B,
-                   qty_A: transferAmountKg,               tokenTypeId_A: CONST.tokenType.NATURE,
+                   qty_A: transferAmountTokQty,           tokenTypeId_A: CONST.tokenType.NATURE,
                    qty_B: 0,                              tokenTypeId_B: 0,
             ccy_amount_A: 0,                                ccyTypeId_A: 0,
             ccy_amount_B: CONST.oneEth_wei,                 ccyTypeId_B: CONST.ccyType.ETH,
@@ -307,12 +309,12 @@ contract("StMaster", accounts => {
         // TEST - sender (A) has paid originator + exchange fees
         const A_balBefore = data.ledgerA_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.NATURE).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
         const A_balAfter  =  data.ledgerA_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.NATURE).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
-        assert(Big(A_balAfter).eq(Big(A_balBefore).minus(Big(data.originatorFees_tok_A)).minus(Big(data.exchangeFee_tok_A)).minus(Big(transferAmountKg))), 'unexpected fee payer token balance after transfer');
+        assert(Big(A_balAfter).eq(Big(A_balBefore).minus(Big(data.originatorFees_tok_A)).minus(Big(data.exchangeFee_tok_A)).minus(Big(transferAmountTokQty))), 'unexpected fee payer token balance after transfer');
         
         // TEST - receiver (B) has received transfer amount
         const B_balBefore = data.ledgerB_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.NATURE).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
         const B_balAfter  =  data.ledgerB_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.NATURE).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
-        assert(Big(B_balAfter).eq(Big(B_balBefore).plus(Big(transferAmountKg))), 'unexpected receiver token balance after transfer');
+        assert(Big(B_balAfter).eq(Big(B_balBefore).plus(Big(transferAmountTokQty))), 'unexpected receiver token balance after transfer');
     });
 
     it(`fees (orig/ccy) - apply CORSIA token multiple [3] originator fees (+ global @ x10), on a 3.5 ST trade (fee on B)`, async () => {
@@ -375,16 +377,16 @@ contract("StMaster", accounts => {
         await stm.setFee_TokType(CONST.tokenType.CORSIA, CONST.nullAddr, globalFee);
 
         // TEST - transfer
-        const transferAmountKg = new BN(CONST.kt1Carbon);
-        transferAmountKg.imul(new BN(M_multi.length)); 
-        transferAmountKg.isub(new BN(500)); // take off some for fees
+        const transferAmountTokQty = new BN(CONST.kt1Carbon);
+        transferAmountTokQty.imul(new BN(M_multi.length)); 
+        transferAmountTokQty.isub(new BN(500)); // take off some for fees
         for (var i = 0 ; i < M_multi.length ; i++) {
             M_multi[i].ledgerBefore = await stm.getLedgerEntry(M_multi[i].account);
         }
         const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: A,                                   ledger_B: B,
                    qty_A: 0,                              tokenTypeId_A: 0,
-                   qty_B: transferAmountKg,               tokenTypeId_B: CONST.tokenType.CORSIA,
+                   qty_B: transferAmountTokQty,           tokenTypeId_B: CONST.tokenType.CORSIA,
             ccy_amount_A: CONST.oneEth_wei,                 ccyTypeId_A: CONST.ccyType.ETH,
             ccy_amount_B: 0,                                ccyTypeId_B: 0,
                applyFees: true,
@@ -412,11 +414,11 @@ contract("StMaster", accounts => {
         // TEST - sender (B) has paid originator + exchange fees
         const S_balBefore = data.ledgerB_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.CORSIA).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
         const S_balAfter  =  data.ledgerB_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.CORSIA).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
-        assert(Big(S_balAfter).eq(Big(S_balBefore).minus(Big(data.originatorFees_tok_B)).minus(Big(data.exchangeFee_tok_B)).minus(Big(transferAmountKg))), 'unexpected fee payer token balance after transfer');
+        assert(Big(S_balAfter).eq(Big(S_balBefore).minus(Big(data.originatorFees_tok_B)).minus(Big(data.exchangeFee_tok_B)).minus(Big(transferAmountTokQty))), 'unexpected fee payer token balance after transfer');
         
         // TEST - receiver (A) has received transfer amount
         const R_balBefore = data.ledgerA_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.CORSIA).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
         const R_balAfter  =  data.ledgerA_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.CORSIA).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
-        assert(Big(R_balAfter).eq(Big(R_balBefore).plus(Big(transferAmountKg))), 'unexpected receiver token balance after transfer');
+        assert(Big(R_balAfter).eq(Big(R_balBefore).plus(Big(transferAmountTokQty))), 'unexpected receiver token balance after transfer');
     });
 });

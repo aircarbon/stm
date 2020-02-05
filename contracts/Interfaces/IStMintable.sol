@@ -13,7 +13,7 @@ import "../Interfaces/StructLib.sol";
     /**
      * @notice Mints and assigns ownership of a new token batch
      * @param tokenTypeId ST-type for the batch
-     * @param mintQty quantity in contact base unit (e.g. KG) to mint across the supplied no. of STs
+     * @param mintQty quantity in contact base unit (e.g. TONS) to mint across the supplied no. of STs
      * @param mintSecTokenCount Number of STs to mint - enforced: due to memory & gas cost, always set to 1
      * @param batchOwner Ledger owner to assign the minted ST(s) to
      * @param originatorFee Originator (batch ledger owner) token fee structure to apply on all token transfers from this batch

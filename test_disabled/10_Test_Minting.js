@@ -55,13 +55,13 @@ contract("StMaster", accounts => {
             batchIds.push(batchId);
         }
 
-        var totalBatchQtyKG = 0;
+        var totalBatchQtyTok = 0;
         for (i = 0; i < batchIds.length; i++) {
             const batchId = batchIds[i];
             const batch = await stm.getSecTokenBatch(batchId);
-            totalBatchQtyKG += Number(batch.mintedQty);
+            totalBatchQtyTok += Number(batch.mintedQty);
         }
-        assert(totalBatchQtyKG == totalMintedQty, 'invalid total kg in minted batches');
+        assert(totalBatchQtyTok == totalMintedQty, 'invalid total kg in minted batches');
 
         const ledgerEntryAfter = await stm.getLedgerEntry(accounts[global.TaddrNdx]);
         assert(ledgerEntryAfter.tokens.length == totalMintedSecTokens, 'invalid eeu qty in ledger entry');
@@ -108,7 +108,7 @@ contract("StMaster", accounts => {
         assert.fail('expected contract exception');
     });    
 
-    // it(`minting - should not allow non-integer KG carbon in an vST`, async () => {
+    // it(`minting - should not allow non-integer TONS carbon in an vST`, async () => {
     //     try {
     //         await mintBatch({ tokenType: CONST.tokenType.CORSIA, qtyUnit: CONST.kt1Carbon, qtySecTokens: 3, receiver: accounts[global.TaddrNdx], }, { from: accounts[0] } );
     //     } catch (ex) { return; }
@@ -248,8 +248,8 @@ contract("StMaster", accounts => {
             assert(eeu.exists == true, 'missing vST after minting');
             assert(eeu.batchId == batchId, 'unexpected vST batch after minting');
             assert(eeu.mintedTimestamp != 0, 'missing mint timestamp on vST after minting');
-            assert(eeu.mintedQty == qtyUnit / qtySecTokens, 'unexpected vST minted KG value after minting');
-            assert(eeu.currentQty == qtyUnit / qtySecTokens, 'unexpected vST remaining (unburned) KG value after minting');
+            assert(eeu.mintedQty == qtyUnit / qtySecTokens, 'unexpected vST minted TONS value after minting');
+            assert(eeu.currentQty == qtyUnit / qtySecTokens, 'unexpected vST remaining (unburned) TONS value after minting');
         }
 
         return batchId;
