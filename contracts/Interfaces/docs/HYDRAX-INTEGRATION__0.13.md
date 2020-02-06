@@ -8,7 +8,7 @@ HydraX (HX) <-> AirCarbon [SekTokMaster (STM)]
 > admin view: additional field for this [HX]
 
 ## General - Testnet Contract
-STM v0.96e - Ropsten: 0xf9d2EdfcC1dA69830682b4BD0FD7B7f1F409597b
+STM v0.96f - Ropsten: 0x3c2BECBfd7e8efeD686887D2fFEbBEBaD1448CA1
 
 ## General - Contract Explorer
 https://dev-explorer.aircarbon.co
