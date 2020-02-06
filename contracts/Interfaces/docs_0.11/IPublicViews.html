@@ -1,0 +1,1267 @@
+<html>
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+    <!-- highlight.js -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.8/styles/github.min.css" rel="stylesheet">
+
+    <!-- twemoji-awesome -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/twemoji-awesome-clone@1.0.0/twemoji-awesome.css">
+    <link
+        href="data:image/x-icon;base64,AAABAAEAEBAQAAEABAAoAQAAFgAAACgAAAAQAAAAIAAAAAEABAAAAAAAgAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAJ6TrAFy+8QCC0vgA7+/vAC6n7ACE0/gAS2RuAKbU5QDAwMAAv+3+ACek6gApoeYAAAAAAAAAAAAAAAAARERERERERABEREREREREAEREREREREQAREREeIRERABJmZSohUREAERERKolVEQAREREozUVRABJmZRDNlFUAEREREQzZRUAREREREM2W1BJmZmZRDNlxUREREREQzZVREREREREMzVJmZmZmURDM0REREREREQzRERERERERAMAAwAAAAMAAAADAAAAAwAAAAMAAAADAAAAAwAAAAMAAAADAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAA"
+        rel="icon" type="image/x-icon" />
+    <style>
+        aside {
+            width: 200px;
+            float: left;
+        }
+
+        aside#methods {
+            float: right;
+        }
+
+        .content table td {
+            border: 0px;
+        }
+
+        tr {
+            line-height: 3em;
+        }
+
+        nav.navbar {
+            height: 80px;
+            padding: 0px 35px;
+        }
+
+        div.container {
+            float: left;
+            width: 60%;
+        }
+
+        strong.method {
+            font-size: 2em;
+            padding-right: 10px;
+        }
+
+        a strong {
+            color: black;
+        }
+
+        small.generated {
+            font-size: .65em;
+            font-style: italic;
+        }
+
+        .page-content {
+            max-width: 1300px;
+            margin: auto;
+            padding: 0px 4%;
+        }
+
+        .soldoc-box {
+            margin-bottom: 50px;
+        }
+
+        .box-info {
+            color: #858585;
+        }
+
+        .method-name-title {
+            padding: .75rem 1.25rem;
+            margin-bottom: 0;
+            border-bottom: 1px solid rgba(0, 0, 0, .125);
+        }
+
+        /*readme*/
+        .README li {
+            padding: 5px 40px;
+        }
+
+        .README h1,
+        .README h2,
+        .README h3,
+        .README h4 {
+            margin-block-start: 0.83em;
+            margin-block-end: 0.83em;
+            margin-inline-start: 0px;
+            margin-inline-end: 0px;
+        }
+
+        .box {
+            border-radius: 2px;
+        }
+
+        /* A huge thanks to Alex Raven by A Directory Tree List Style in https://codepen.io/asraven/pen/qbrQMX*/
+
+        .directory-list {
+            margin-block-start: 0px;
+            margin-inline-start: 0px;
+            padding-inline-start: 0px;
+        }
+
+        .directory-list ul {
+            border-left: 1px dashed #ddd;
+            padding-inline-start: 10px;
+        }
+
+        .directory-list li {
+            list-style: none;
+            color: #888;
+            font-size: 17px;
+            font-style: italic;
+            font-weight: normal;
+        }
+
+        .directory-list a {
+            border-bottom: 1px solid transparent;
+            color: #888;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .directory-list a:hover {
+            border-color: #eee;
+            color: #000;
+        }
+
+        .directory-list .folder,
+        .directory-list .folder>a {
+            color: #777;
+            font-weight: bold;
+        }
+
+        .side-list li {
+            padding: 6px 0px;
+            border: 0px;
+        }
+
+        .side-list a {
+            color: #777777;
+        }
+
+        .side-list a:hover {
+            text-decoration: none;
+        }
+
+        /* The icons */
+
+        .directory-list li:before {
+            margin-right: 10px;
+            content: "";
+            height: 20px;
+            vertical-align: middle;
+            width: 20px;
+            background-repeat: no-repeat;
+            display: inline-block;
+            /* file icon by default */
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path fill='lightgrey' d='M85.714,42.857V87.5c0,1.487-0.521,2.752-1.562,3.794c-1.042,1.041-2.308,1.562-3.795,1.562H19.643 c-1.488,0-2.753-0.521-3.794-1.562c-1.042-1.042-1.562-2.307-1.562-3.794v-75c0-1.487,0.521-2.752,1.562-3.794 c1.041-1.041,2.306-1.562,3.794-1.562H50V37.5c0,1.488,0.521,2.753,1.562,3.795s2.307,1.562,3.795,1.562H85.714z M85.546,35.714 H57.143V7.311c3.05,0.558,5.505,1.767,7.366,3.627l17.41,17.411C83.78,30.209,84.989,32.665,85.546,35.714z' /></svg>");
+            background-position: center 2px;
+            background-size: 60% auto;
+        }
+
+        .directory-list li.folder:before {
+            /* folder icon if folder class is specified */
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path fill='lightblue' d='M96.429,37.5v39.286c0,3.423-1.228,6.361-3.684,8.817c-2.455,2.455-5.395,3.683-8.816,3.683H16.071 c-3.423,0-6.362-1.228-8.817-3.683c-2.456-2.456-3.683-5.395-3.683-8.817V23.214c0-3.422,1.228-6.362,3.683-8.817 c2.455-2.456,5.394-3.683,8.817-3.683h17.857c3.422,0,6.362,1.228,8.817,3.683c2.455,2.455,3.683,5.395,3.683,8.817V25h37.5 c3.422,0,6.361,1.228,8.816,3.683C95.201,31.138,96.429,34.078,96.429,37.5z' /></svg>");
+            background-position: center top;
+            background-size: 75% auto;
+        }
+    </style>
+    <title>soldoc</title>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div style="width: 90%; max-width: 1300px; margin: auto;">
+            <a class="navbar-brand" href="#">Navbar</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div style="float: right;" class="collapse navbar-collapse" id="navbarSupportedContent">
+                <form class="form-inline my-2 my-lg-0">
+                    <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+                    <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+                </form>
+            </div>
+        </div>
+    </nav>
+    <br /><br /><br />
+    <div class="page-content">
+        <aside id="contracts">
+            <ul class="list-group side-list">
+                <li class="list-group-item"><a href="index.html">HOME</a></li>
+            </ul>
+            <div class="box">
+                <ul id="contracts-treeview" class="directory-list"></ul>
+            </div>
+        </aside>
+
+        <div class="container">
+            <div class="notification">
+                <h1 class="title is-1" id="contractName">IPublicViews</h1>
+                contracts&#x2F;Interfaces&#x2F;IPublicViews.sol
+                <p>Public views</p>
+                <br />
+                <small class="generated">Generated in Mon Jan 27 2020 21:07:25 GMT+0000 (Greenwich Mean Time)</small>
+            </div>
+
+            <div class="soldoc-box">
+                <p>
+                    <a name="constructor">
+                        <strong class="method">constructor</strong>
+                    </a>
+                    <div class="box-info">
+                        <br />
+                    </div>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>Type</th>
+                                <th>Name</th>
+                                <th>Natspec</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </p>
+            </div>
+
+
+            <div class="soldoc-box">
+                <p>
+                    <a name="getLedgerHashcode">
+                        <div class="method-name-title">
+                            <div class="d-flex bd-highlight">
+                                <div class="p-2 flex-grow-1 bd-highlight">
+                                    <h2 style="float: left;">getLedgerHashcode</h2>
+                                </div>
+                                <div class="p-2 bd-highlight">
+                                    <span class="badge badge-danger">external</span>
+                                    <span class="badge badge-info">view</span>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                    <div class="box-info">
+                        <br />
+                        <p><i style="white-space: pre;">Contract owner&#39;s ledger entry and its whitelist entry are excluded from the hash calculation; they are expected to change across contract upgrades</i></p>
+                        <p>Returns a keccak256 hash of all contract data</p>
+                    </div>
+                    <table class="table">
+                        <thead class="thead-light">
+                            <tr>
+                                <th scope="col"></th>
+                                <th scope="col">Type</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Natspec</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>output</td>
+                                <td>bytes32</td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </p>
+            </div>
+            <div class="soldoc-box">
+                <p>
+                    <a name="transfer_feePreview">
+                        <div class="method-name-title">
+                            <div class="d-flex bd-highlight">
+                                <div class="p-2 flex-grow-1 bd-highlight">
+                                    <h2 style="float: left;">transfer_feePreview</h2>
+                                </div>
+                                <div class="p-2 bd-highlight">
+                                    <span class="badge badge-danger">external</span>
+                                    <span class="badge badge-info">view</span>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                    <div class="box-info">
+                        <br />
+                    </div>
+                    <table class="table">
+                        <thead class="thead-light">
+                            <tr>
+                                <th scope="col"></th>
+                                <th scope="col">Type</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Natspec</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>input</td>
+                                <td></td>
+                                <td>a</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>output</td>
+                                <td></td>
+                                <td>feesAll</td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </p>
+            </div>
+            <div class="soldoc-box">
+                <p>
+                    <a name="get_btcUsd">
+                        <div class="method-name-title">
+                            <div class="d-flex bd-highlight">
+                                <div class="p-2 flex-grow-1 bd-highlight">
+                                    <h2 style="float: left;">get_btcUsd</h2>
+                                </div>
+                                <div class="p-2 bd-highlight">
+                                    <span class="badge badge-primary">public</span>
+                                    <span class="badge badge-info">view</span>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                    <div class="box-info">
+                        <br />
+                        <p>Returns current BTC&#x2F;USD rate according to Chainlink reference data contract</p>
+                    </div>
+                    <table class="table">
+                        <thead class="thead-light">
+                            <tr>
+                                <th scope="col"></th>
+                                <th scope="col">Type</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Natspec</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>output</td>
+                                <td>int256</td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </p>
+            </div>
+            <div class="soldoc-box">
+                <p>
+                    <a name="get_ethUsd">
+                        <div class="method-name-title">
+                            <div class="d-flex bd-highlight">
+                                <div class="p-2 flex-grow-1 bd-highlight">
+                                    <h2 style="float: left;">get_ethUsd</h2>
+                                </div>
+                                <div class="p-2 bd-highlight">
+                                    <span class="badge badge-primary">public</span>
+                                    <span class="badge badge-info">view</span>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                    <div class="box-info">
+                        <br />
+                        <p>Returns current ETH&#x2F;USD rate according to Chainlink reference data contract</p>
+                    </div>
+                    <table class="table">
+                        <thead class="thead-light">
+                            <tr>
+                                <th scope="col"></th>
+                                <th scope="col">Type</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Natspec</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>output</td>
+                                <td>int256</td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </p>
+            </div>
+            <div class="soldoc-box">
+                <p>
+                    <a name="getCashflowData">
+                        <div class="method-name-title">
+                            <div class="d-flex bd-highlight">
+                                <div class="p-2 flex-grow-1 bd-highlight">
+                                    <h2 style="float: left;">getCashflowData</h2>
+                                </div>
+                                <div class="p-2 bd-highlight">
+                                    <span class="badge badge-primary">public</span>
+                                    <span class="badge badge-info">view</span>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                    <div class="box-info">
+                        <br />
+                        <p>Returns cashflow data</p>
+                    </div>
+                    <table class="table">
+                        <thead class="thead-light">
+                            <tr>
+                                <th scope="col"></th>
+                                <th scope="col">Type</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Natspec</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>output</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </p>
+            </div>
+            <div class="soldoc-box">
+                <p>
+                    <a name="version">
+                        <div class="method-name-title">
+                            <div class="d-flex bd-highlight">
+                                <div class="p-2 flex-grow-1 bd-highlight">
+                                    <h2 style="float: left;">version</h2>
+                                </div>
+                                <div class="p-2 bd-highlight">
+                                    <span class="badge badge-danger">external</span>
+                                    <span class="badge badge-info">view</span>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                    <div class="box-info">
+                        <br />
+                        <p>Contract version</p>
+                    </div>
+                    <table class="table">
+                        <thead class="thead-light">
+                            <tr>
+                                <th scope="col"></th>
+                                <th scope="col">Type</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Natspec</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>output</td>
+                                <td>string</td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </p>
+            </div>
+            <div class="soldoc-box">
+                <p>
+                    <a name="unit">
+                        <div class="method-name-title">
+                            <div class="d-flex bd-highlight">
+                                <div class="p-2 flex-grow-1 bd-highlight">
+                                    <h2 style="float: left;">unit</h2>
+                                </div>
+                                <div class="p-2 bd-highlight">
+                                    <span class="badge badge-danger">external</span>
+                                    <span class="badge badge-info">view</span>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                    <div class="box-info">
+                        <br />
+                        <p>The security token unit name, e.g. &quot;TONS&quot; or carbon, &quot;Token&quot; for generic CFT tokens</p>
+                    </div>
+                    <table class="table">
+                        <thead class="thead-light">
+                            <tr>
+                                <th scope="col"></th>
+                                <th scope="col">Type</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Natspec</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>output</td>
+                                <td>string</td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </p>
+            </div>
+            <div class="soldoc-box">
+                <p>
+                    <a name="getContractType">
+                        <div class="method-name-title">
+                            <div class="d-flex bd-highlight">
+                                <div class="p-2 flex-grow-1 bd-highlight">
+                                    <h2 style="float: left;">getContractType</h2>
+                                </div>
+                                <div class="p-2 bd-highlight">
+                                    <span class="badge badge-danger">external</span>
+                                    <span class="badge badge-info">view</span>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                    <div class="box-info">
+                        <br />
+                        <p>Returns the contract type: COMMODITY (0) or CASHFLOW (1)</p>
+                    </div>
+                    <table class="table">
+                        <thead class="thead-light">
+                            <tr>
+                                <th scope="col"></th>
+                                <th scope="col">Type</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Natspec</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>output</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </p>
+            </div>
+            <div class="soldoc-box">
+                <p>
+                    <a name="getContractSeal">
+                        <div class="method-name-title">
+                            <div class="d-flex bd-highlight">
+                                <div class="p-2 flex-grow-1 bd-highlight">
+                                    <h2 style="float: left;">getContractSeal</h2>
+                                </div>
+                                <div class="p-2 bd-highlight">
+                                    <span class="badge badge-danger">external</span>
+                                    <span class="badge badge-info">view</span>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                    <div class="box-info">
+                        <br />
+                        <p>Returns whether or not the contract is sealed</p>
+                    </div>
+                    <table class="table">
+                        <thead class="thead-light">
+                            <tr>
+                                <th scope="col"></th>
+                                <th scope="col">Type</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Natspec</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>output</td>
+                                <td>bool</td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </p>
+            </div>
+            <div class="soldoc-box">
+                <p>
+                    <a name="getSecTokenTypes">
+                        <div class="method-name-title">
+                            <div class="d-flex bd-highlight">
+                                <div class="p-2 flex-grow-1 bd-highlight">
+                                    <h2 style="float: left;">getSecTokenTypes</h2>
+                                </div>
+                                <div class="p-2 bd-highlight">
+                                    <span class="badge badge-danger">external</span>
+                                    <span class="badge badge-info">view</span>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                    <div class="box-info">
+                        <br />
+                        <p>Returns current token types</p>
+                    </div>
+                    <table class="table">
+                        <thead class="thead-light">
+                            <tr>
+                                <th scope="col"></th>
+                                <th scope="col">Type</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Natspec</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>output</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </p>
+            </div>
+            <div class="soldoc-box">
+                <p>
+                    <a name="getLedgerOwners">
+                        <div class="method-name-title">
+                            <div class="d-flex bd-highlight">
+                                <div class="p-2 flex-grow-1 bd-highlight">
+                                    <h2 style="float: left;">getLedgerOwners</h2>
+                                </div>
+                                <div class="p-2 bd-highlight">
+                                    <span class="badge badge-danger">external</span>
+                                    <span class="badge badge-info">view</span>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                    <div class="box-info">
+                        <br />
+                        <p>Returns all account addresses in the ledger</p>
+                    </div>
+                    <table class="table">
+                        <thead class="thead-light">
+                            <tr>
+                                <th scope="col"></th>
+                                <th scope="col">Type</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Natspec</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>output</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </p>
+            </div>
+            <div class="soldoc-box">
+                <p>
+                    <a name="getLedgerOwnerCount">
+                        <div class="method-name-title">
+                            <div class="d-flex bd-highlight">
+                                <div class="p-2 flex-grow-1 bd-highlight">
+                                    <h2 style="float: left;">getLedgerOwnerCount</h2>
+                                </div>
+                                <div class="p-2 bd-highlight">
+                                    <span class="badge badge-danger">external</span>
+                                    <span class="badge badge-info">view</span>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                    <div class="box-info">
+                        <br />
+                        <p>Returns a single account address in the ledger</p>
+                    </div>
+                    <table class="table">
+                        <thead class="thead-light">
+                            <tr>
+                                <th scope="col"></th>
+                                <th scope="col">Type</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Natspec</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>output</td>
+                                <td>uint256</td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </p>
+            </div>
+            <div class="soldoc-box">
+                <p>
+                    <a name="getLedgerOwner">
+                        <div class="method-name-title">
+                            <div class="d-flex bd-highlight">
+                                <div class="p-2 flex-grow-1 bd-highlight">
+                                    <h2 style="float: left;">getLedgerOwner</h2>
+                                </div>
+                                <div class="p-2 bd-highlight">
+                                    <span class="badge badge-danger">external</span>
+                                    <span class="badge badge-info">view</span>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                    <div class="box-info">
+                        <br />
+                        <p>Returns a single account address in the ledger</p>
+                    </div>
+                    <table class="table">
+                        <thead class="thead-light">
+                            <tr>
+                                <th scope="col"></th>
+                                <th scope="col">Type</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Natspec</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>input</td>
+                                <td>uint256</td>
+                                <td>index</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>output</td>
+                                <td>address</td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </p>
+            </div>
+            <div class="soldoc-box">
+                <p>
+                    <a name="getLedgerEntry">
+                        <div class="method-name-title">
+                            <div class="d-flex bd-highlight">
+                                <div class="p-2 flex-grow-1 bd-highlight">
+                                    <h2 style="float: left;">getLedgerEntry</h2>
+                                </div>
+                                <div class="p-2 bd-highlight">
+                                    <span class="badge badge-danger">external</span>
+                                    <span class="badge badge-info">view</span>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                    <div class="box-info">
+                        <br />
+                        <p>Returns the ledger entry for a single account</p>
+                    </div>
+                    <table class="table">
+                        <thead class="thead-light">
+                            <tr>
+                                <th scope="col"></th>
+                                <th scope="col">Type</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Natspec</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>input</td>
+                                <td>address</td>
+                                <td>account</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>output</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </p>
+            </div>
+            <div class="soldoc-box">
+                <p>
+                    <a name="getSecToken">
+                        <div class="method-name-title">
+                            <div class="d-flex bd-highlight">
+                                <div class="p-2 flex-grow-1 bd-highlight">
+                                    <h2 style="float: left;">getSecToken</h2>
+                                </div>
+                                <div class="p-2 bd-highlight">
+                                    <span class="badge badge-danger">external</span>
+                                    <span class="badge badge-info">view</span>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                    <div class="box-info">
+                        <br />
+                        <p>Returns a token by ID</p>
+                    </div>
+                    <table class="table">
+                        <thead class="thead-light">
+                            <tr>
+                                <th scope="col"></th>
+                                <th scope="col">Type</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Natspec</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>input</td>
+                                <td>uint256</td>
+                                <td>id</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>output</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </p>
+            </div>
+            <div class="soldoc-box">
+                <p>
+                    <a name="getSecTokenBatchCount">
+                        <div class="method-name-title">
+                            <div class="d-flex bd-highlight">
+                                <div class="p-2 flex-grow-1 bd-highlight">
+                                    <h2 style="float: left;">getSecTokenBatchCount</h2>
+                                </div>
+                                <div class="p-2 bd-highlight">
+                                    <span class="badge badge-danger">external</span>
+                                    <span class="badge badge-info">view</span>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                    <div class="box-info">
+                        <br />
+                        <p>Returns the global token batch count</p>
+                    </div>
+                    <table class="table">
+                        <thead class="thead-light">
+                            <tr>
+                                <th scope="col"></th>
+                                <th scope="col">Type</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Natspec</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>output</td>
+                                <td>uint256</td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </p>
+            </div>
+            <div class="soldoc-box">
+                <p>
+                    <a name="getSecTokenBatch">
+                        <div class="method-name-title">
+                            <div class="d-flex bd-highlight">
+                                <div class="p-2 flex-grow-1 bd-highlight">
+                                    <h2 style="float: left;">getSecTokenBatch</h2>
+                                </div>
+                                <div class="p-2 bd-highlight">
+                                    <span class="badge badge-danger">external</span>
+                                    <span class="badge badge-info">view</span>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                    <div class="box-info">
+                        <br />
+                        <p>Returns a token batch by ID</p>
+                    </div>
+                    <table class="table">
+                        <thead class="thead-light">
+                            <tr>
+                                <th scope="col"></th>
+                                <th scope="col">Type</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Natspec</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>input</td>
+                                <td>uint256</td>
+                                <td>batchId</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>output</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </p>
+            </div>
+            <div class="soldoc-box">
+                <p>
+                    <a name="readOnly">
+                        <div class="method-name-title">
+                            <div class="d-flex bd-highlight">
+                                <div class="p-2 flex-grow-1 bd-highlight">
+                                    <h2 style="float: left;">readOnly</h2>
+                                </div>
+                                <div class="p-2 bd-highlight">
+                                    <span class="badge badge-danger">external</span>
+                                    <span class="badge badge-info">view</span>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                    <div class="box-info">
+                        <br />
+                        <p>Returns the current read-only contract state</p>
+                    </div>
+                    <table class="table">
+                        <thead class="thead-light">
+                            <tr>
+                                <th scope="col"></th>
+                                <th scope="col">Type</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Natspec</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>output</td>
+                                <td>bool</td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </p>
+            </div>
+            <div class="soldoc-box">
+                <p>
+                    <a name="name">
+                        <div class="method-name-title">
+                            <div class="d-flex bd-highlight">
+                                <div class="p-2 flex-grow-1 bd-highlight">
+                                    <h2 style="float: left;">name</h2>
+                                </div>
+                                <div class="p-2 bd-highlight">
+                                    <span class="badge badge-danger">external</span>
+                                    <span class="badge badge-info">view</span>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                    <div class="box-info">
+                        <br />
+                        <p>Returns the token&#39;s name</p>
+                    </div>
+                    <table class="table">
+                        <thead class="thead-light">
+                            <tr>
+                                <th scope="col"></th>
+                                <th scope="col">Type</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Natspec</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>output</td>
+                                <td>string</td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </p>
+            </div>
+            <div class="soldoc-box">
+                <p>
+                    <a name="symbol">
+                        <div class="method-name-title">
+                            <div class="d-flex bd-highlight">
+                                <div class="p-2 flex-grow-1 bd-highlight">
+                                    <h2 style="float: left;">symbol</h2>
+                                </div>
+                                <div class="p-2 bd-highlight">
+                                    <span class="badge badge-danger">external</span>
+                                    <span class="badge badge-info">view</span>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                    <div class="box-info">
+                        <br />
+                        <p>Returns the token&#39;s symbol</p>
+                    </div>
+                    <table class="table">
+                        <thead class="thead-light">
+                            <tr>
+                                <th scope="col"></th>
+                                <th scope="col">Type</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Natspec</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>output</td>
+                                <td>string</td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </p>
+            </div>
+            <div class="soldoc-box">
+                <p>
+                    <a name="decimals">
+                        <div class="method-name-title">
+                            <div class="d-flex bd-highlight">
+                                <div class="p-2 flex-grow-1 bd-highlight">
+                                    <h2 style="float: left;">decimals</h2>
+                                </div>
+                                <div class="p-2 bd-highlight">
+                                    <span class="badge badge-danger">external</span>
+                                    <span class="badge badge-info">view</span>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                    <div class="box-info">
+                        <br />
+                        <p>Returns the number of decimals to divide by when displaying the token&#39;s balance</p>
+                    </div>
+                    <table class="table">
+                        <thead class="thead-light">
+                            <tr>
+                                <th scope="col"></th>
+                                <th scope="col">Type</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Natspec</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>output</td>
+                                <td>uint8</td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </p>
+            </div>
+            <div class="soldoc-box">
+                <p>
+                    <a name="totalSupply">
+                        <div class="method-name-title">
+                            <div class="d-flex bd-highlight">
+                                <div class="p-2 flex-grow-1 bd-highlight">
+                                    <h2 style="float: left;">totalSupply</h2>
+                                </div>
+                                <div class="p-2 bd-highlight">
+                                    <span class="badge badge-danger">external</span>
+                                    <span class="badge badge-info">view</span>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                    <div class="box-info">
+                        <br />
+                        <p>Returns the total minted supply of the token</p>
+                    </div>
+                    <table class="table">
+                        <thead class="thead-light">
+                            <tr>
+                                <th scope="col"></th>
+                                <th scope="col">Type</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Natspec</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>output</td>
+                                <td>uint256</td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </p>
+            </div>
+            <div class="soldoc-box">
+                <p>
+                    <a name="balanceOf">
+                        <div class="method-name-title">
+                            <div class="d-flex bd-highlight">
+                                <div class="p-2 flex-grow-1 bd-highlight">
+                                    <h2 style="float: left;">balanceOf</h2>
+                                </div>
+                                <div class="p-2 bd-highlight">
+                                    <span class="badge badge-danger">external</span>
+                                    <span class="badge badge-info">view</span>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                    <div class="box-info">
+                        <br />
+                        <p>Returns the token balance for the supplied address</p>
+                    </div>
+                    <table class="table">
+                        <thead class="thead-light">
+                            <tr>
+                                <th scope="col"></th>
+                                <th scope="col">Type</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Natspec</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>input</td>
+                                <td>address</td>
+                                <td>account</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>output</td>
+                                <td>uint256</td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </p>
+            </div>
+            <div class="soldoc-box">
+                <p>
+                    <a name="getCcyTypes">
+                        <div class="method-name-title">
+                            <div class="d-flex bd-highlight">
+                                <div class="p-2 flex-grow-1 bd-highlight">
+                                    <h2 style="float: left;">getCcyTypes</h2>
+                                </div>
+                                <div class="p-2 bd-highlight">
+                                    <span class="badge badge-danger">external</span>
+                                    <span class="badge badge-info">view</span>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                    <div class="box-info">
+                        <br />
+                        <p>Returns the current currency types</p>
+                    </div>
+                    <table class="table">
+                        <thead class="thead-light">
+                            <tr>
+                                <th scope="col"></th>
+                                <th scope="col">Type</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Natspec</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>output</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </p>
+            </div>
+        </div>
+        <aside>
+            <span style="color: #777777;">INHERITANCE</span>
+            <ul id="inheritance" style="padding-left: 25px;" class="list-group side-list">
+            </ul>
+            <br />
+            <br />
+            <span style="color: #777777;">EVENTS</span>
+            <ul id="events" style="padding-left: 25px;" class="list-group side-list">
+            </ul>
+            <br />
+            <br />
+            <span style="color: #777777;">FUNCTIONS</span>
+            <ul id="functions" style="padding-left: 25px;" class="list-group side-list">
+                <li class="list-group-item"><a href="IPublicViews.html#getLedgerHashcode">getLedgerHashcode</a></li>
+                <li class="list-group-item"><a href="IPublicViews.html#transfer_feePreview">transfer_feePreview</a></li>
+                <li class="list-group-item"><a href="IPublicViews.html#get_btcUsd">get_btcUsd</a></li>
+                <li class="list-group-item"><a href="IPublicViews.html#get_ethUsd">get_ethUsd</a></li>
+                <li class="list-group-item"><a href="IPublicViews.html#getCashflowData">getCashflowData</a></li>
+                <li class="list-group-item"><a href="IPublicViews.html#version">version</a></li>
+                <li class="list-group-item"><a href="IPublicViews.html#unit">unit</a></li>
+                <li class="list-group-item"><a href="IPublicViews.html#getContractType">getContractType</a></li>
+                <li class="list-group-item"><a href="IPublicViews.html#getContractSeal">getContractSeal</a></li>
+                <li class="list-group-item"><a href="IPublicViews.html#getSecTokenTypes">getSecTokenTypes</a></li>
+                <li class="list-group-item"><a href="IPublicViews.html#getLedgerOwners">getLedgerOwners</a></li>
+                <li class="list-group-item"><a href="IPublicViews.html#getLedgerOwnerCount">getLedgerOwnerCount</a></li>
+                <li class="list-group-item"><a href="IPublicViews.html#getLedgerOwner">getLedgerOwner</a></li>
+                <li class="list-group-item"><a href="IPublicViews.html#getLedgerEntry">getLedgerEntry</a></li>
+                <li class="list-group-item"><a href="IPublicViews.html#getSecToken">getSecToken</a></li>
+                <li class="list-group-item"><a href="IPublicViews.html#getSecTokenBatchCount">getSecTokenBatchCount</a></li>
+                <li class="list-group-item"><a href="IPublicViews.html#getSecTokenBatch">getSecTokenBatch</a></li>
+                <li class="list-group-item"><a href="IPublicViews.html#readOnly">readOnly</a></li>
+                <li class="list-group-item"><a href="IPublicViews.html#name">name</a></li>
+                <li class="list-group-item"><a href="IPublicViews.html#symbol">symbol</a></li>
+                <li class="list-group-item"><a href="IPublicViews.html#decimals">decimals</a></li>
+                <li class="list-group-item"><a href="IPublicViews.html#totalSupply">totalSupply</a></li>
+                <li class="list-group-item"><a href="IPublicViews.html#balanceOf">balanceOf</a></li>
+                <li class="list-group-item"><a href="IPublicViews.html#getCcyTypes">getCcyTypes</a></li>
+            </ul>
+        </aside>
+    </div>
+    <script>
+        var cDirectory = (c) => ('<li class="folder">' + c.name + '<ul>' + renderTreeView(c.children) + '</ul></li>');
+        var cFile = (c) => ('<li><a href="' + c.name.replace('.sol', '') + '.html">' + c.name.replace('.sol', '') + '</a></li>');
+        function renderTreeView(inputContent) {
+            return inputContent.map((content) => content.type === 'directory' ? cDirectory(content) : cFile(content)).join('');
+        }
+        function loadDirectoryTreeView() {
+            var paths = [{"path":"./contracts/Interfaces","name":"Interfaces","children":[{"path":"contracts/Interfaces/ICcyCollateralizable.sol","name":"ICcyCollateralizable.sol","size":2562,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IChainlinkAggregator.sol","name":"IChainlinkAggregator.sol","size":672,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IDataLoadable.sol","name":"IDataLoadable.sol","size":1419,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IErc20.sol","name":"IErc20.sol","size":1885,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IOwned.sol","name":"IOwned.sol","size":739,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IPublicViews.sol","name":"IPublicViews.sol","size":4439,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IStBurnable.sol","name":"IStBurnable.sol","size":972,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IStFees.sol","name":"IStFees.sol","size":3007,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IStLedger.sol","name":"IStLedger.sol","size":2058,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IStMaster.sol","name":"IStMaster.sol","size":3913,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IStMintable.sol","name":"IStMintable.sol","size":2622,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IStPayable.sol","name":"IStPayable.sol","size":1812,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/IStTransferable.sol","name":"IStTransferable.sol","size":2307,"extension":".sol","type":"file"},{"path":"contracts/Interfaces/StMasterMock.sol.MOCK","name":"StMasterMock.sol.MOCK","size":1544,"extension":".mock","type":"file"},{"path":"contracts/Interfaces/docs","name":"docs","children":[{"path":"contracts/Interfaces/docs/.DS_Store","name":".DS_Store","size":8196,"extension":"","type":"file"},{"path":"contracts/Interfaces/docs/HYDRAX-INTEGRATION.md","name":"HYDRAX-INTEGRATION.md","size":6614,"extension":".md","type":"file"},{"path":"contracts/Interfaces/docs/OVERVIEW.md","name":"OVERVIEW.md","size":2994,"extension":".md","type":"file"}],"size":17804,"type":"directory"}],"size":47755,"type":"directory"}];
+        document.getElementById("contracts-treeview").innerHTML = renderTreeView(paths);
+        }
+        loadDirectoryTreeView();
+    </script>
+</body>
+
+</html>
