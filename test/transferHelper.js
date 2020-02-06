@@ -100,7 +100,7 @@ module.exports = {
                applyFees,
             feeAddrOwner: accounts[0], 
         });
-        console.log(`feesPreview.length=${feesPreview.length} exchangeFees[0]=`, feesPreview[0]);
+        //console.log(`feesPreview.length=${feesPreview.length} exchangeFees[0]=`, feesPreview[0]);
 
         const sumFees_tok_A = feesPreview.map(p => p.fee_tok_A).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
         const sumFees_tok_B = feesPreview.map(p => p.fee_tok_B).reduce((a,b) => Big(a).plus(Big(b)), Big(0));

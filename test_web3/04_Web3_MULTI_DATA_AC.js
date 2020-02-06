@@ -95,6 +95,8 @@ describe(`Contract Web3 Interface`, async () => {
             console.group(chalk.inverse(`MINTING FOR ${WM.addr}...`));
             for (var batchNdx = 0; batchNdx < BATCHES_PER_WHITE_MINTER ; batchNdx++) {
                 const batchFees = {
+                    ccy_mirrorFee: false,
+                    ccy_perThousand: 0,
                     fee_fixed: batchNdx * 10,
                     fee_percBips: batchNdx * 5,
                     fee_min: batchNdx * 10,

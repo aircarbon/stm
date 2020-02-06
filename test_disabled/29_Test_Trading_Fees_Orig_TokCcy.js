@@ -70,13 +70,7 @@ contract("StMaster", accounts => {
         await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        B,                    { from: accounts[0] });        
 
         // TEST - set ledger fee NATURE for A
-        const ledgerFeeTok = {
-         ccy_perThousand: 0,
-               fee_fixed: ORIG_FEES_VCS_B1.fee_fixed * 4,
-            fee_percBips: 0,
-                 fee_min: 0,
-                 fee_max: 0,
-        };
+        const ledgerFeeTok = { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: ORIG_FEES_VCS_B1.fee_fixed * 4, fee_percBips: 0, fee_min: 0, fee_max: 0, };
         await stm.setFee_TokType(CONST.tokenType.NATURE, A,              ledgerFeeTok);
         await stm.setFee_TokType(CONST.tokenType.NATURE, CONST.nullAddr, { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: 1, fee_percBips: 0, fee_min: 0, fee_max: 0 }); // to test ledger override
 
@@ -156,8 +150,7 @@ contract("StMaster", accounts => {
         await stm.fund(CONST.ccyType.SGD,                   CONST.millionCcy_cents,  A,                    { from: accounts[0] });        
 
         // TEST - set global fee structure CORSIA: 8x originator fee
-        var globalFeeTok = {
-         ccy_perThousand: 0,
+        var globalFeeTok = { ccy_mirrorFee: false, ccy_perThousand: 0,
                fee_fixed: ORIG_FEES_corsia_B1.fee_fixed    * 4,
             fee_percBips: ORIG_FEES_corsia_B1.fee_percBips * 4,
                  fee_min: ORIG_FEES_corsia_B1.fee_min      * 4,
@@ -167,12 +160,7 @@ contract("StMaster", accounts => {
         await stm.setFee_TokType(CONST.tokenType.CORSIA, B,              CONST.nullFees);
 
         // TEST - set ledger fee SGD
-        const ledgerFeeCcy = {
-               fee_fixed: 100,
-            fee_percBips: 0,
-                 fee_min: 0,
-                 fee_max: 0,
-        };
+        const ledgerFeeCcy = { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: 100, fee_percBips: 0, fee_min: 0, fee_max: 0, };
         await stm.setFee_CcyType(CONST.ccyType.SGD, A,                ledgerFeeCcy);
         await stm.setFee_CcyType(CONST.ccyType.SGD, CONST.nullAddr,   { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: 200, fee_percBips: 0, fee_min: 0, fee_max: 0 } ); // to test ledger override
 
@@ -227,7 +215,7 @@ contract("StMaster", accounts => {
         var batchNo = 1;
         for (var i = 0 ; i < M_multi.length ; i++) {
             const M = M_multi[i].account;
-            const origFee = {
+            const origFee = { ccy_mirrorFee: false, ccy_perThousand: 0,
                 fee_fixed: ORIG_FEES_VCS_B1.fee_fixed    * batchNo,
              fee_percBips: ORIG_FEES_VCS_B1.fee_percBips * batchNo,
                   fee_min: ORIG_FEES_VCS_B1.fee_min      * batchNo,
@@ -241,9 +229,9 @@ contract("StMaster", accounts => {
         for (var i = 0 ; i < M_multi.length ; i++) {
             const M = M_multi[i].account;
             const MA_qty = CONST.kt1Carbon;
-            await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        A,                    { from: accounts[0] });
+            await stm.fund(CONST.ccyType.ETH,                      CONST.oneEth_wei,        A,                    { from: accounts[0] });
             await stm.setFee_TokType(CONST.tokenType.NATURE,       CONST.nullAddr,          CONST.nullFees);
-            await stm.setFee_CcyType(CONST.ccyType.ETH,         CONST.nullAddr,          CONST.nullFees);
+            await stm.setFee_CcyType(CONST.ccyType.ETH,            CONST.nullAddr,          CONST.nullFees);
             const data_MA = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: M,                                   ledger_B: A,
                    qty_A: new BN(MA_qty),                 tokenTypeId_A: CONST.tokenType.NATURE,
@@ -263,7 +251,7 @@ contract("StMaster", accounts => {
         await stm.setFee_TokType(CONST.tokenType.NATURE, CONST.nullAddr, CONST.nullFees);
 
         // TEST - set ledger fee structure NATURE for A
-        var ledgerFees = {
+        var ledgerFees = { ccy_mirrorFee: false, ccy_perThousand: 0,
                fee_fixed: ORIG_FEES_VCS_B1.fee_fixed    * 4,
             fee_percBips: ORIG_FEES_VCS_B1.fee_percBips * 4,
                  fee_min: ORIG_FEES_VCS_B1.fee_min      * 4,
@@ -331,7 +319,7 @@ contract("StMaster", accounts => {
         var batchNo = 1;
         for (var i = 0 ; i < M_multi.length ; i++) {
             const M = M_multi[i].account;
-            const origFee = {
+            const origFee = { ccy_mirrorFee: false, ccy_perThousand: 0,
                 fee_fixed: ORIG_FEES_corsia_B1.fee_fixed    * batchNo,
              fee_percBips: ORIG_FEES_corsia_B1.fee_percBips * batchNo,
                   fee_min: ORIG_FEES_corsia_B1.fee_min      * batchNo,
@@ -367,7 +355,7 @@ contract("StMaster", accounts => {
         await stm.setFee_TokType(CONST.tokenType.CORSIA, CONST.nullAddr, CONST.nullFees);
 
         // TEST - set global fee structure CORSIA
-        var globalFee = {
+        var globalFee = { ccy_mirrorFee: false, ccy_perThousand: 0,
                fee_fixed: ORIG_FEES_corsia_B1.fee_fixed    * 10,
             fee_percBips: ORIG_FEES_corsia_B1.fee_percBips * 10,
                  fee_min: ORIG_FEES_corsia_B1.fee_min      * 10,

@@ -117,10 +117,10 @@ contract("StMaster", accounts => {
         // mint
         await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.kt1Carbon, 1,      A, origFees, [], [], { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.kt1Carbon, 1,      A, origFees, [], [], { from: accounts[0] });
-        await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        B,                   { from: accounts[0] });
+        await stm.fund(CONST.ccyType.ETH,                      CONST.oneEth_wei,        B,                   { from: accounts[0] });
 
         // set global fee - originator fee x2
-        const globalFee = { 
+        const globalFee = { ccy_mirrorFee: false, ccy_perThousand: 0,
                fee_fixed: origFees.fee_fixed * 2,
             fee_percBips: origFees.fee_percBips * 2,
                  fee_min: origFees.fee_min * 2,
@@ -160,12 +160,12 @@ contract("StMaster", accounts => {
         const origFees = { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: 0, fee_percBips: 100, fee_min: 0, fee_max: 2 };
 
         // mint
-        await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        A,                   { from: accounts[0] });
+        await stm.fund(CONST.ccyType.ETH,                      CONST.oneEth_wei,        A,                   { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.kt1Carbon, 1,      B, origFees, [], [], { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.kt1Carbon, 1,      B, origFees, [], [], { from: accounts[0] });
 
         // set ledger fee - originator fee x2
-        const ledgerFee = { 
+        const ledgerFee = { ccy_mirrorFee: false, ccy_perThousand: 0,
                fee_fixed: origFees.fee_fixed * 2,
             fee_percBips: origFees.fee_percBips * 2,
                  fee_min: origFees.fee_min * 2,
@@ -207,13 +207,13 @@ contract("StMaster", accounts => {
         const allFees = { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: 0, fee_percBips: 100, fee_min: 0, fee_max: 0 };
 
         // mint
-        await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        A,                         { from: accounts[0] });
+        await stm.fund(CONST.ccyType.ETH,                      CONST.oneEth_wei,        A,                         { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.kt1Carbon, 1,      B, CONST.nullFees, [], [], { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.kt1Carbon, 1,      B, CONST.nullFees, [], [], { from: accounts[0] });
 
         // set global fee & ledger fee
-        await stm.setFee_CcyType(CONST.ccyType.ETH,   A,              allFees);
-        await stm.setFee_CcyType(CONST.ccyType.ETH,   CONST.nullAddr, allFees);
+        await stm.setFee_CcyType(CONST.ccyType.ETH,      A,              allFees);
+        await stm.setFee_CcyType(CONST.ccyType.ETH,      CONST.nullAddr, allFees);
         await stm.setFee_TokType(CONST.tokenType.NATURE, A,              CONST.nullFees);
         await stm.setFee_TokType(CONST.tokenType.NATURE, CONST.nullAddr, CONST.nullFees);
 
@@ -248,11 +248,11 @@ contract("StMaster", accounts => {
         // mint
         await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.kt1Carbon, 1,      A, CONST.nullFees, [], [], { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.kt1Carbon, 1,      A, CONST.nullFees, [], [], { from: accounts[0] });
-        await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        B,                         { from: accounts[0] });
+        await stm.fund(CONST.ccyType.ETH,                      CONST.oneEth_wei,        B,                         { from: accounts[0] });
 
         // set global fee & ledger fee
-        await stm.setFee_CcyType(CONST.ccyType.ETH,   B,              allFees);
-        await stm.setFee_CcyType(CONST.ccyType.ETH,   CONST.nullAddr, allFees);
+        await stm.setFee_CcyType(CONST.ccyType.ETH,      B,              allFees);
+        await stm.setFee_CcyType(CONST.ccyType.ETH,      CONST.nullAddr, allFees);
         await stm.setFee_TokType(CONST.tokenType.NATURE, B,              CONST.nullFees);
         await stm.setFee_TokType(CONST.tokenType.NATURE, CONST.nullAddr, CONST.nullFees);
 
