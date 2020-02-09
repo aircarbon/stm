@@ -37,10 +37,10 @@ contract("StMaster", accounts => {
         const tokType_B = CONST.tokenType.CORSIA;
         var { qty: qty_A, M_multi: M_multi_A } = await MintAndTransfer({ tokenType: tokType_A, originatorCount: 2, batchesPerOriginator: 1, transferTo: A });
         var { qty: qty_B, M_multi: M_multi_B } = await MintAndTransfer({ tokenType: tokType_B, originatorCount: 1, batchesPerOriginator: 2, transferTo: B });
-        console.log('qty_A', qty_A.toString());
-        console.log('qty_B', qty_B.toString());
-        console.log('M_multi_A', M_multi_A);
-        console.log('M_multi_B', M_multi_B);
+        //console.log('qty_A', qty_A.toString());
+        //console.log('qty_B', qty_B.toString());
+        //console.log('M_multi_A', M_multi_A);
+        //console.log('M_multi_B', M_multi_B);
 
         // TEST - set ledger fee structure A
         var ledgerFee_A = { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: 100, fee_percBips: 10, fee_min: 100, fee_max: 200 };
@@ -71,8 +71,8 @@ contract("StMaster", accounts => {
         await CONST.logGas(web3, data.transferTx, `Multi Orig Fees`);
         //console.log('feesPreview', data.feesPreview);
 
-        console.log('qty_A', qty_A.toString());
-        console.log('qty_B', qty_B.toString());
+        //console.log('qty_A', qty_A.toString());
+        //console.log('qty_B', qty_B.toString());
 
         // TEST - contract owner has received exchange fees
         const owner_balBefore = data.owner_before.tokens.map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
@@ -136,7 +136,7 @@ contract("StMaster", accounts => {
             for (var j = 0 ; j < batchesPerOriginator ; j++) {
                 const origFee = { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: (i+j), fee_percBips: (i+j) * 10, fee_min: (i+j) * 10, fee_max: (i+j) * 100 };
                 const qty = CONST.kt1Carbon * (i + 1 + j + 1);
-                await stm.mintSecTokenBatch(tokenType, qty, 1, M, origFee, [], [], { from: accounts[0] });
+                await stm.mintSecTokenBatch(tokenType, qty, 1, M, origFee, 0, [], [], { from: accounts[0] });
                 totalTokQty += qty;
             }
         }

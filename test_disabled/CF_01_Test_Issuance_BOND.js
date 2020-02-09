@@ -89,7 +89,7 @@ contract("StMaster", accounts => {
 
     it(`cashflow - issuance (${bondPricing} bond) - should be able to mint issuance batch`, async () => {
         ISSUER = accounts[++global.TaddrNdx];
-        await stm.mintSecTokenBatch(1, ISSUANCE_QTY, 1, ISSUER, CONST.nullFees, [], [], { from: OWNER });
+        await stm.mintSecTokenBatch(1, ISSUANCE_QTY, 1, ISSUER, CONST.nullFees, 0, [], [], { from: OWNER });
     });
 
     it(`cashflow - issuance (${bondPricing} bond) - should not be able to subscribe when issuer price is not set`, async () => {

@@ -69,11 +69,11 @@ describe(`Contract Web3 Interface`, async () => {
         // setup - mint for A
         //for (var i=0 ; i < 10 ; i++) {
             const mintTx_type1 = await CONST.web3_tx('mintSecTokenBatch', [
-                CONST.tokenType.NATURE,       100000, 1,      WHITE, CONST.nullFees, [], [],
+                CONST.tokenType.NATURE,       100000, 1,      WHITE, CONST.nullFees, 0, [], [],
             ], OWNER, OWNER_privKey);
 
             const mintTx_type2 = await CONST.web3_tx('mintSecTokenBatch', [
-                CONST.tokenType.CORSIA,    100000, 1,      WHITE, CONST.nullFees, [], [],
+                CONST.tokenType.CORSIA,    100000, 1,      WHITE, CONST.nullFees, 0, [], [],
             ], OWNER, OWNER_privKey);
 
             // setup - transferOrTrade type 1: A -> GRAY_1

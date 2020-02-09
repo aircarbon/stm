@@ -76,7 +76,7 @@
 [IStMaster-MintedSecTokenBatch-uint256-uint256-address-uint256-uint256-]: IStMaster.md#IStMaster-MintedSecTokenBatch-uint256-uint256-address-uint256-uint256-
 [IStMaster-MintedSecToken-uint256-uint256-uint256-address-uint256-]: IStMaster.md#IStMaster-MintedSecToken-uint256-uint256-uint256-address-uint256-
 [IStMaster-AddedBatchMetadata-uint256-string-string-]: IStMaster.md#IStMaster-AddedBatchMetadata-uint256-string-string-
-[IStMaster-SetBatchOriginatorFee-uint256-struct-StructLib-SetFeeArgs-]: IStMaster.md#IStMaster-SetBatchOriginatorFee-uint256-struct-StructLib-SetFeeArgs-
+[IStMaster-SetBatchOriginatorFee_Token-uint256-struct-StructLib-SetFeeArgs-]: IStMaster.md#IStMaster-SetBatchOriginatorFee_Token-uint256-struct-StructLib-SetFeeArgs-
 [IStMaster-TransferedLedgerCcy-address-address-uint256-uint256-enum-IStMaster-TransferType-]: IStMaster.md#IStMaster-TransferedLedgerCcy-address-address-uint256-uint256-enum-IStMaster-TransferType-
 [IStMaster-TransferedFullSecToken-address-address-uint256-uint256-uint256-enum-IStMaster-TransferType-]: IStMaster.md#IStMaster-TransferedFullSecToken-address-address-uint256-uint256-uint256-enum-IStMaster-TransferType-
 [IStMaster-TransferedPartialSecToken-address-address-uint256-uint256-uint256-uint256-enum-IStMaster-TransferType-]: IStMaster.md#IStMaster-TransferedPartialSecToken-address-address-uint256-uint256-uint256-uint256-enum-IStMaster-TransferType-

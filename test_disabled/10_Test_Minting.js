@@ -68,7 +68,7 @@ contract("StMaster", accounts => {
     });
 
     it(`minting - should have reasonable gas cost for minting of multi-vST batches`, async () => {
-        mintTx = await stm.mintSecTokenBatch(CONST.tokenType.CORSIA, CONST.gtCarbon, 1, accounts[global.TaddrNdx], CONST.nullFees, [], [], { from: accounts[0], });
+        mintTx = await stm.mintSecTokenBatch(CONST.tokenType.CORSIA, CONST.gtCarbon, 1, accounts[global.TaddrNdx], CONST.nullFees, 0, [], [], { from: accounts[0], });
         await CONST.logGas(web3, mintTx, `Mint  1 vST`);
 
         // mintTx = await stm.mintSecTokenBatch(CONST.tokenType.CORSIA, CONST.gtCarbon, 5, accounts[global.TaddrNdx], { from: accounts[0], });
@@ -80,7 +80,7 @@ contract("StMaster", accounts => {
 
     it(`minting - should not allow non-owner to mint vST batches`, async () => {
         try {
-            await stm.mintSecTokenBatch(CONST.tokenType.CORSIA, CONST.kt1Carbon, 1, accounts[global.TaddrNdx], CONST.nullFees, [], [], { from: accounts[1], });
+            await stm.mintSecTokenBatch(CONST.tokenType.CORSIA, CONST.kt1Carbon, 1, accounts[global.TaddrNdx], CONST.nullFees, 0, [], [], { from: accounts[1], });
         } catch (ex) { 
             assert(ex.reason == 'Restricted', `unexpected: ${ex.reason}`);
             return;
@@ -90,7 +90,7 @@ contract("StMaster", accounts => {
 
     it(`minting - should not allow non-existent vST-type to be minted`, async () => {
         try {
-            await stm.mintSecTokenBatch(999, CONST.kt1Carbon, 1, accounts[global.TaddrNdx], CONST.nullFees, [], [], { from: accounts[0] });
+            await stm.mintSecTokenBatch(999, CONST.kt1Carbon, 1, accounts[global.TaddrNdx], CONST.nullFees, 0, [], [], { from: accounts[0] });
         } catch (ex) { 
             assert(ex.reason == 'Bad tokenTypeId', `unexpected: ${ex.reason}`);
             return;
@@ -193,7 +193,7 @@ contract("StMaster", accounts => {
             qtyUnit, 
             qtySecTokens, 
             receiver, 
-            CONST.nullFees, [], [],
+            CONST.nullFees, 0, [], [],
         { from: accounts[0] });
 
         // validat batch ID

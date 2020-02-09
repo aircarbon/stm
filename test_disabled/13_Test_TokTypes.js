@@ -50,14 +50,14 @@ contract("StMaster", accounts => {
         
         // mint new ST type: 2 batches 
         for (var i=0 ; i < 2 ; i++) {
-            await stm.mintSecTokenBatch(newTypeId, CONST.gtCarbon * 100, 1, accounts[global.TaddrNdx], CONST.nullFees, [], [], { from: accounts[0] });
+            await stm.mintSecTokenBatch(newTypeId, CONST.gtCarbon * 100, 1, accounts[global.TaddrNdx], CONST.nullFees, 0, [], [], { from: accounts[0] });
         }
         const batchCountAfter_Mint1 = (await stm.getSecTokenBatchCount.call()).toNumber(); 
         assert(batchCountAfter_Mint1 == batchCountBefore + 2, `unexpected max batch id ${batchCountAfter_Mint1} after minting (1)`);
 
         // mint default ST type: 4 batches 
         for (var i=0 ; i < 4 ; i++) {
-            await stm.mintSecTokenBatch(CONST.tokenType.CORSIA, CONST.gtCarbon * 100, 1, accounts[global.TaddrNdx], CONST.nullFees, [], [], { from: accounts[0] });
+            await stm.mintSecTokenBatch(CONST.tokenType.CORSIA, CONST.gtCarbon * 100, 1, accounts[global.TaddrNdx], CONST.nullFees, 0, [], [], { from: accounts[0] });
         }
         const batchCountAfter_Mint2 = (await stm.getSecTokenBatchCount.call()).toNumber();
         assert(batchCountAfter_Mint2 == batchCountBefore + 6, `unexpected max batch id ${batchCountAfter_Mint2} after minting (2)`);

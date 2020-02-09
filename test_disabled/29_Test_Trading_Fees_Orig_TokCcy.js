@@ -47,8 +47,8 @@ contract("StMaster", accounts => {
         const A = accounts[global.TaddrNdx + 1];
         const B = accounts[global.TaddrNdx + 2];
 
-        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.kt1Carbon, 1,      M, ORIG_FEES_VCS_B1, [], [], { from: accounts[0] });
-        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.kt1Carbon, 1,      M, ORIG_FEES_VCS_B2, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.kt1Carbon, 1,      M, ORIG_FEES_VCS_B1, 0, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.kt1Carbon, 1,      M, ORIG_FEES_VCS_B2, 0, [], [], { from: accounts[0] });
 
         // SETUP - M -> A: no fees
         const MA_qty = 2000;
@@ -126,9 +126,9 @@ contract("StMaster", accounts => {
         const A = accounts[global.TaddrNdx + 1];
         const B = accounts[global.TaddrNdx + 2];
 
-        await stm.mintSecTokenBatch(CONST.tokenType.CORSIA,    CONST.kt1Carbon, 1,      M, ORIG_FEES_corsia_B1, [], [], { from: accounts[0] });
-        await stm.mintSecTokenBatch(CONST.tokenType.CORSIA,    CONST.kt1Carbon, 1,      M, ORIG_FEES_corsia_B2, [], [], { from: accounts[0] });
-        await stm.mintSecTokenBatch(CONST.tokenType.CORSIA,    CONST.kt1Carbon, 1,      M, ORIG_FEES_corsia_B3, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.CORSIA,    CONST.kt1Carbon, 1,      M, ORIG_FEES_corsia_B1, 0, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.CORSIA,    CONST.kt1Carbon, 1,      M, ORIG_FEES_corsia_B2, 0, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.CORSIA,    CONST.kt1Carbon, 1,      M, ORIG_FEES_corsia_B3, 0, [], [], { from: accounts[0] });
 
         // SETUP - M -> B: no fees
         const MA_qty = 3000;
@@ -221,7 +221,7 @@ contract("StMaster", accounts => {
                   fee_min: ORIG_FEES_VCS_B1.fee_min      * batchNo,
                   fee_max: ORIG_FEES_VCS_B1.fee_max      * batchNo,                
             }
-            await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.kt1Carbon, 1,      M, origFee, [], [],   { from: accounts[0] });
+            await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.kt1Carbon, 1,      M, origFee, 0, [], [],   { from: accounts[0] });
             batchNo++;
         }
 
@@ -325,7 +325,7 @@ contract("StMaster", accounts => {
                   fee_min: ORIG_FEES_corsia_B1.fee_min      * batchNo,
                   fee_max: ORIG_FEES_corsia_B1.fee_max      * batchNo,                
             }
-            await stm.mintSecTokenBatch(CONST.tokenType.CORSIA,    CONST.kt1Carbon, 1,   M, origFee, [], [],   { from: accounts[0] });
+            await stm.mintSecTokenBatch(CONST.tokenType.CORSIA,    CONST.kt1Carbon, 1,   M, origFee, 0, [], [],   { from: accounts[0] });
             batchNo++;
         }
 

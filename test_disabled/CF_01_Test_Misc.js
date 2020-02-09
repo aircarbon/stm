@@ -69,9 +69,9 @@ contract("StMaster", accounts => {
     });
 
     it(`cashflow - misc - should not be able to mint more than one batch`, async () => {
-        await stm.mintSecTokenBatch(1, 1000, 1, accounts[1], CONST.nullFees, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(1, 1000, 1, accounts[1], CONST.nullFees, 0, [], [], { from: accounts[0] });
         try {
-            await stm.mintSecTokenBatch(1, 1000, 1, accounts[1], CONST.nullFees, [], [], { from: accounts[0] });
+            await stm.mintSecTokenBatch(1, 1000, 1, accounts[1], CONST.nullFees, 0, [], [], { from: accounts[0] });
         } catch (ex) {
             assert(ex.reason == 'Bad cashflow request', `unexpected: ${ex.reason}`);
             return;

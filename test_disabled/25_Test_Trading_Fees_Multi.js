@@ -26,8 +26,8 @@ contract("StMaster", accounts => {
 
     // ST MULTI FEES
     it(`fees (multi) - apply NATURE token fee 100 BP + 1 TONS fixed on a small trade (fee on A)`, async () => {
-        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.kt1Carbon, 1,      accounts[global.TaddrNdx + 0], CONST.nullFees, [], [], { from: accounts[0] });
-        await stm.fund(CONST.ccyType.ETH,                      CONST.oneEth_wei,        accounts[global.TaddrNdx + 1],                         { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.kt1Carbon, 1,      accounts[global.TaddrNdx + 0], CONST.nullFees, 0, [], [], { from: accounts[0] });
+        await stm.fund(CONST.ccyType.ETH,                      CONST.oneEth_wei,        accounts[global.TaddrNdx + 1],                            { from: accounts[0] });
 
         // (await stm.getFee(CONST.getFeeType.CCY, CONST.ccyType.ETH, CONST.nullAddr)).fee_fixed ==> (await stm.getFee(CONST.getFeeType.CCY, CONST.ccyType.ETH, CONST.nullAddr)).fee_fixed
 
@@ -63,8 +63,8 @@ contract("StMaster", accounts => {
     });
 
     it(`fees (multi) - apply NATURE token fee 1000 BP + 1000 TONS fixed on a large (0.5 GT) trade (fee on B)`, async () => {
-        await stm.fund(CONST.ccyType.ETH,                      CONST.oneEth_wei,        accounts[global.TaddrNdx + 0],                         { from: accounts[0] });
-        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.gtCarbon, 1,       accounts[global.TaddrNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
+        await stm.fund(CONST.ccyType.ETH,                      CONST.oneEth_wei,        accounts[global.TaddrNdx + 0],                            { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.gtCarbon, 1,       accounts[global.TaddrNdx + 1], CONST.nullFees, 0, [], [], { from: accounts[0] });
         
         // set fee structure NATURE: 10% + 1000 TONS
         const feeBps = 1000; // 1000 bp = 10%
@@ -99,8 +99,8 @@ contract("StMaster", accounts => {
 
     // CCY MULTI FEES
     it(`fees (multi) - apply ETH ccy fee 100 BP + 0.01 ETH fixed on a small trade (fee on A)`, async () => {
-        await stm.fund(CONST.ccyType.ETH,                      CONST.oneEth_wei,        accounts[global.TaddrNdx + 0],                         { from: accounts[0] });
-        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.kt1Carbon, 1,      accounts[global.TaddrNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
+        await stm.fund(CONST.ccyType.ETH,                      CONST.oneEth_wei,        accounts[global.TaddrNdx + 0],                            { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.kt1Carbon, 1,      accounts[global.TaddrNdx + 1], CONST.nullFees, 0, [], [], { from: accounts[0] });
 
         // set fee structure ETH: 1% + 1 Wei fixed
         const ethFeeBps = 100; // 100 bp = 1%
@@ -131,8 +131,8 @@ contract("StMaster", accounts => {
     });
 
     it(`fees (multi) - apply ETH ccy fee 1000 BP + 1000 ETH fixed on a large (500k ETH) trade (fee on B)`, async () => {
-        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.kt1Carbon, 1,      accounts[global.TaddrNdx + 0], CONST.nullFees, [], [], { from: accounts[0] });
-        await stm.fund(CONST.ccyType.ETH,                      CONST.millionEth_wei,    accounts[global.TaddrNdx + 1],                         { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.kt1Carbon, 1,      accounts[global.TaddrNdx + 0], CONST.nullFees, 0, [], [], { from: accounts[0] });
+        await stm.fund(CONST.ccyType.ETH,                      CONST.millionEth_wei,    accounts[global.TaddrNdx + 1],                            { from: accounts[0] });
 
         // set fee structure ETH: 10% + 1000 ETH fixed
         const ethFeeBps = 1000; // 1000 bp
@@ -164,8 +164,8 @@ contract("StMaster", accounts => {
 
     // CCY + ST MULTI FEES
     it(`fees (multi) - apply ETH ccy fee 1000 BP + 1000 ETH fixed, NATURE fee 1000 BP + 1000 TONS on a large (500k ETH / 0.5GT) trade (fees on both sides)`, async () => {
-        await stm.fund(CONST.ccyType.ETH,                      CONST.millionEth_wei,    accounts[global.TaddrNdx + 0],                         { from: accounts[0] });
-        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.gtCarbon, 1,       accounts[global.TaddrNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
+        await stm.fund(CONST.ccyType.ETH,                      CONST.millionEth_wei,    accounts[global.TaddrNdx + 0],                            { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.gtCarbon, 1,       accounts[global.TaddrNdx + 1], CONST.nullFees, 0, [], [], { from: accounts[0] });
 
         // set fee structure ETH: 10% + 1000 ETH fixed
         const ethFeeBps = 1000; // 1000 bp 
@@ -211,8 +211,8 @@ contract("StMaster", accounts => {
     });
 
     it(`fees (multi) - should not allow a transfer with insufficient ccy (fixed + percentage) to cover fees (fee on A)`, async () => {
-        await stm.fund(CONST.ccyType.ETH,                      101,                     accounts[global.TaddrNdx + 0],                         { from: accounts[0] });
-        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.kt1Carbon, 1,      accounts[global.TaddrNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
+        await stm.fund(CONST.ccyType.ETH,                      101,                     accounts[global.TaddrNdx + 0],                            { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.kt1Carbon, 1,      accounts[global.TaddrNdx + 1], CONST.nullFees, 0, [], [], { from: accounts[0] });
 
         // set fee structure ETH: 1% + 1 Wei fixed
         const ethFeeBps = 100; // 100 bp = 1%
@@ -240,8 +240,8 @@ contract("StMaster", accounts => {
 
     it(`fees (multi) - should not allow a transfer with insufficient ccy (fixed + percentage) to cover fees (fee on B)`, async () => {
         // 102,000 ETH minus 1 Wei
-        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.kt1Carbon, 1,                 accounts[global.TaddrNdx + 0], CONST.nullFees, [], [], { from: accounts[0] });
-        await stm.fund(CONST.ccyType.ETH,                      new BN("101999999999999999999999"), accounts[global.TaddrNdx + 1],                         { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.kt1Carbon, 1,                 accounts[global.TaddrNdx + 0], CONST.nullFees, 0, [], [], { from: accounts[0] });
+        await stm.fund(CONST.ccyType.ETH,                      new BN("101999999999999999999999"), accounts[global.TaddrNdx + 1],                            { from: accounts[0] });
 
         // set fee structure: 1% + 1,000 ETH
         const ethFeeBps = 100; 
@@ -269,8 +269,8 @@ contract("StMaster", accounts => {
 
     it(`fees (multi) - should not allow a transfer with insufficient carbon to cover fees (fee on A)`, async () => {
         // 102,999,999 tons
-        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    102999999999, 1,         accounts[global.TaddrNdx + 0], CONST.nullFees, [], [], { from: accounts[0] });
-        await stm.fund(CONST.ccyType.ETH,                      CONST.oneEth_wei,        accounts[global.TaddrNdx + 1],                         { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    102999999999, 1,         accounts[global.TaddrNdx + 0], CONST.nullFees, 0, [], [], { from: accounts[0] });
+        await stm.fund(CONST.ccyType.ETH,                      CONST.oneEth_wei,        accounts[global.TaddrNdx + 1],                            { from: accounts[0] });
 
         // set fee structure NATURE: 2% + 1m tons
         const feeBps = 200; 
@@ -298,8 +298,8 @@ contract("StMaster", accounts => {
 
     it(`fees (multi) - should not allow a transfer with insufficient carbon to cover fees (fee on B)`, async () => {
         // 102,999,999 tons
-        await stm.fund(CONST.ccyType.ETH,                      CONST.oneEth_wei,        accounts[global.TaddrNdx + 0],                         { from: accounts[0] });
-        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    102999999999, 1,         accounts[global.TaddrNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
+        await stm.fund(CONST.ccyType.ETH,                      CONST.oneEth_wei,        accounts[global.TaddrNdx + 0],                            { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    102999999999, 1,         accounts[global.TaddrNdx + 1], CONST.nullFees, 0, [], [], { from: accounts[0] });
 
         // set fee structure NATURE: 2% + 1m tons
         const feeBps = 200; 

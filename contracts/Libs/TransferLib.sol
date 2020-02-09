@@ -27,6 +27,9 @@ library TransferLib {
         StructLib.FeeStruct storage globalFees,
         StructLib.TransferArgs memory a
     ) public {
+        TransferVars memory v;
+        uint256 maxStId = ledgerData._tokens_currentMax_id;
+
         require(ledgerData._contractSealed, "Contract is not sealed");
         //require(a.ledger_A != a.ledger_B, "Bad transfer"); // erc20 compat: allow send-to-self -- todo: could NOP below when ledger_A == a.ledger_B
         require(a.qty_A > 0 || a.qty_B > 0 || a.ccy_amount_A > 0 || a.ccy_amount_B > 0, "Bad null transfer");
@@ -49,7 +52,8 @@ library TransferLib {
         initLedgerIfNew(ledgerData, a.ledger_B);
 
         //
-        // exchange fees (global or ledger override) - calc total payable (fixed + basis points), cap & collar
+        // exchange fees (global or ledger override) (disabled if fee-reciever[contract owner] == fee-payer)
+        // calc total payable (fixed + basis points), cap & collar
         //
         StructLib.FeeStruct storage exFeeStruct_ccy_A = ledgerData._ledger[a.ledger_A].customFees.ccyType_Set[a.ccyTypeId_A]   ? ledgerData._ledger[a.ledger_A].customFees : globalFees;
         StructLib.FeeStruct storage exFeeStruct_tok_A = ledgerData._ledger[a.ledger_A].customFees.tokType_Set[a.tokenTypeId_A] ? ledgerData._ledger[a.ledger_A].customFees : globalFees;
@@ -62,8 +66,6 @@ library TransferLib {
             fee_tok_B: a.ledger_B != a.feeAddrOwner ? calcFeeWithCapCollar(exFeeStruct_tok_B.tok[a.tokenTypeId_B], a.qty_B,                 0)       : 0,
                fee_to: a.feeAddrOwner
         });
-
-        // TODO: tests for mirroring... then originator ccy fee as % of exchange fee
 
         // apply exchange ccy fee mirroring - only ever from one side to the other
         if (exFees.fee_ccy_A > 0 && exFees.fee_ccy_B == 0) {
@@ -87,23 +89,12 @@ library TransferLib {
             }
         }
 
-        // validate currency balances - transfer amount & exchange fee
-        require(StructLib.sufficientCcy(ledgerData, a.ledger_A, a.ccyTypeId_A,
-                    a.ccy_amount_A, // amount sending
-                    a.ccy_amount_B, // amount receiving
-                    int256(exFees.fee_ccy_A) * (a.applyFees /*&& a.ccy_amount_A > 0 */? 1 : 0)), "Insufficient currency A");
-
-        require(StructLib.sufficientCcy(ledgerData, a.ledger_B, a.ccyTypeId_B,
-                    a.ccy_amount_B, // amount sending
-                    a.ccy_amount_A, // amount receiving
-                    int256(exFees.fee_ccy_B) * (a.applyFees /*&& a.ccy_amount_B > 0 */? 1 : 0)), "Insufficient currency B");
-
-        TransferVars memory v;
-        uint256 maxStId = ledgerData._tokens_currentMax_id;
+        // TODO: originator *ccy* fee as % of exchange fee
+        //....
 
         //
         // originator token fees (disabled if fee-reciever[batch originator] == fee-payer)
-        // potentially multiple: up to one originator fee per distinct token batch
+        // potentially multiple: up to one originator token fee per distinct token batch
         //
         if (a.qty_A > 0) {
             v.ts_args[0] = TransferSplitArgs({ from: a.ledger_A, to: a.ledger_B, tokenTypeId: a.tokenTypeId_A, qtyUnit: a.qty_A, transferType: TransferType.User, maxStId: maxStId });
@@ -123,7 +114,20 @@ library TransferLib {
                 v.totalOrigFee[1] += tokFee;
             }
         }
-        // validate token balances - sum exchange fee + originator fee(s)
+
+        // validate currency balances - transfer amount & fees
+        require(StructLib.sufficientCcy(ledgerData, a.ledger_A, a.ccyTypeId_A,
+                    a.ccy_amount_A, // amount sending
+                    a.ccy_amount_B, // amount receiving
+                    int256(exFees.fee_ccy_A) * (a.applyFees /*&& a.ccy_amount_A > 0 */? 1 : 0)), "Insufficient currency A");
+
+        require(StructLib.sufficientCcy(ledgerData, a.ledger_B, a.ccyTypeId_B,
+                    a.ccy_amount_B, // amount sending
+                    a.ccy_amount_A, // amount receiving
+                    int256(exFees.fee_ccy_B) * (a.applyFees /*&& a.ccy_amount_B > 0 */? 1 : 0)), "Insufficient currency B");
+
+
+        // validate token balances - sum exchange token fee + originator token fee(s)
         require(StructLib.sufficientTokens(ledgerData, a.ledger_A, a.tokenTypeId_A, a.qty_A,
                     (exFees.fee_tok_A + v.totalOrigFee[0]) * (a.applyFees && a.qty_A > 0 ? 1 : 0)), "Insufficient tokens A");
         require(StructLib.sufficientTokens(ledgerData, a.ledger_B, a.tokenTypeId_B, a.qty_B,
@@ -475,12 +479,12 @@ library TransferLib {
     //
 
     /**
-     * @dev Previews ST transfer across ledger owners
+     * @dev Previews token transfer across ledger owners
      * @param a TransferSplitArgs args
      * @return The distinct transfer-from batch IDs and the total quantity of tokens that would be transfered from each batch
      */
     struct TransferSplitPreviewReturn {
-        uint256[MAX_BATCHES_PREVIEW] batchIds; // TODO: pack these - quadratic gas cost for fixed memory
+        uint256[MAX_BATCHES_PREVIEW] batchIds; // todo: pack these - quadratic gas cost for fixed memory
         uint256[MAX_BATCHES_PREVIEW] transferQty;
         uint256 batchCount;
     }

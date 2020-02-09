@@ -77,6 +77,7 @@ library LedgerLib {
                     hashStringArray(batch.metaKeys),
                     hashStringArray(batch.metaValues),
                     hashSetFeeArgs(batch.origTokFee),
+                    batch.origCcyFee_percBips_ExFee,
                     batch.originator
                 ));
             }

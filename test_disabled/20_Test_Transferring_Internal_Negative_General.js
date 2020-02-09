@@ -46,8 +46,8 @@ contract("StMaster", accounts => {
     });
 
     it(`transferring - should not allow transfer of invalid (2^64) quantity of token units (A)`, async () => {
-        await stm.mintSecTokenBatch(CONST.tokenType.NATURE, CONST.gtCarbon, 1,             accounts[global.TaddrNdx + 0], CONST.nullFees, [], [], { from: accounts[0] });
-        await stm.fund(CONST.ccyType.SGD,                CONST.thousandCcy_cents,       accounts[global.TaddrNdx + 1],                         { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.NATURE, CONST.gtCarbon, 1,             accounts[global.TaddrNdx + 0], CONST.nullFees, 0, [], [], { from: accounts[0] });
+        await stm.fund(CONST.ccyType.SGD,                CONST.thousandCcy_cents,       accounts[global.TaddrNdx + 1],                               { from: accounts[0] });
         try {
             const qty_A = Big(2).pow(64);//.minus(1);
             await transferHelper.transferWrapper(stm, accounts, accounts[global.TaddrNdx + 0], accounts[global.TaddrNdx + 1], 
@@ -69,8 +69,8 @@ contract("StMaster", accounts => {
     });
 
     it(`transferring - should not allow transfer of invalid (2^64) quantity of token units (B)`, async () => {
-        await stm.fund(CONST.ccyType.SGD,                CONST.thousandCcy_cents,       accounts[global.TaddrNdx + 0],                         { from: accounts[0] });
-        await stm.mintSecTokenBatch(CONST.tokenType.NATURE, CONST.gtCarbon, 1,             accounts[global.TaddrNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
+        await stm.fund(CONST.ccyType.SGD,                CONST.thousandCcy_cents,       accounts[global.TaddrNdx + 0],                               { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.NATURE, CONST.gtCarbon, 1,             accounts[global.TaddrNdx + 1], CONST.nullFees, 0, [], [], { from: accounts[0] });
         try {
             const qty_A = Big(2).pow(64);//.minus(1);
             await transferHelper.transferWrapper(stm, accounts, accounts[global.TaddrNdx + 0], accounts[global.TaddrNdx + 1], 
@@ -92,10 +92,10 @@ contract("StMaster", accounts => {
     });
 
     it(`transferring - should not allow single-origin multiple-asset transfers (1)`, async () => {
-        await stm.fund(CONST.ccyType.SGD,                CONST.thousandCcy_cents,       accounts[global.TaddrNdx + 0],         { from: accounts[0] });
-        await stm.mintSecTokenBatch(CONST.tokenType.NATURE, CONST.gtCarbon, 1,             accounts[global.TaddrNdx + 0], CONST.nullFees, [], [], { from: accounts[0] });
-        await stm.fund(CONST.ccyType.SGD,                CONST.thousandCcy_cents,       accounts[global.TaddrNdx + 1],         { from: accounts[0] });
-        await stm.mintSecTokenBatch(CONST.tokenType.NATURE, CONST.gtCarbon, 1,             accounts[global.TaddrNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
+        await stm.fund(CONST.ccyType.SGD,                   CONST.thousandCcy_cents,       accounts[global.TaddrNdx + 0],                            { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.NATURE, CONST.gtCarbon, 1,             accounts[global.TaddrNdx + 0], CONST.nullFees, 0, [], [], { from: accounts[0] });
+        await stm.fund(CONST.ccyType.SGD,                   CONST.thousandCcy_cents,       accounts[global.TaddrNdx + 1],                            { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.NATURE, CONST.gtCarbon, 1,             accounts[global.TaddrNdx + 1], CONST.nullFees, 0, [], [], { from: accounts[0] });
         try {
             await transferHelper.transferWrapper(stm, accounts, accounts[global.TaddrNdx + 0], accounts[global.TaddrNdx + 1], 
                 CONST.gtCarbon,              // qty_A
@@ -116,10 +116,10 @@ contract("StMaster", accounts => {
     });
 
     it(`transferring - should not allow single-origin multiple-asset transfers (2)`, async () => {
-        await stm.fund(CONST.ccyType.SGD,                CONST.thousandCcy_cents,       accounts[global.TaddrNdx + 0],         { from: accounts[0] });
-        await stm.mintSecTokenBatch(CONST.tokenType.NATURE, CONST.gtCarbon, 1,             accounts[global.TaddrNdx + 0], CONST.nullFees, [], [], { from: accounts[0] });
-        await stm.fund(CONST.ccyType.SGD,                CONST.thousandCcy_cents,       accounts[global.TaddrNdx + 1],         { from: accounts[0] });
-        await stm.mintSecTokenBatch(CONST.tokenType.NATURE, CONST.gtCarbon, 1,             accounts[global.TaddrNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
+        await stm.fund(CONST.ccyType.SGD,                   CONST.thousandCcy_cents,       accounts[global.TaddrNdx + 0],                            { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.NATURE, CONST.gtCarbon, 1,             accounts[global.TaddrNdx + 0], CONST.nullFees, 0, [], [], { from: accounts[0] });
+        await stm.fund(CONST.ccyType.SGD,                   CONST.thousandCcy_cents,       accounts[global.TaddrNdx + 1],                            { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.NATURE, CONST.gtCarbon, 1,             accounts[global.TaddrNdx + 1], CONST.nullFees, 0, [], [], { from: accounts[0] });
         try {
             await transferHelper.transferWrapper(stm, accounts, accounts[global.TaddrNdx + 0], accounts[global.TaddrNdx + 1], 
                 0,                           // qty_A
@@ -140,10 +140,10 @@ contract("StMaster", accounts => {
     });
 
     it(`transferring - should not allow single-origin multiple-asset transfers (3)`, async () => {
-        await stm.fund(CONST.ccyType.SGD,                CONST.thousandCcy_cents,       accounts[global.TaddrNdx + 0],         { from: accounts[0] });
-        await stm.mintSecTokenBatch(CONST.tokenType.NATURE, CONST.gtCarbon, 1,             accounts[global.TaddrNdx + 0], CONST.nullFees, [], [], { from: accounts[0] });
-        await stm.fund(CONST.ccyType.SGD,                CONST.thousandCcy_cents,       accounts[global.TaddrNdx + 1],         { from: accounts[0] });
-        await stm.mintSecTokenBatch(CONST.tokenType.NATURE, CONST.gtCarbon, 1,             accounts[global.TaddrNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
+        await stm.fund(CONST.ccyType.SGD,                   CONST.thousandCcy_cents,       accounts[global.TaddrNdx + 0],                            { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.NATURE, CONST.gtCarbon, 1,             accounts[global.TaddrNdx + 0], CONST.nullFees, 0, [], [], { from: accounts[0] });
+        await stm.fund(CONST.ccyType.SGD,                   CONST.thousandCcy_cents,       accounts[global.TaddrNdx + 1],                            { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.NATURE, CONST.gtCarbon, 1,             accounts[global.TaddrNdx + 1], CONST.nullFees, 0, [], [], { from: accounts[0] });
         try {
             await transferHelper.transferWrapper(stm, accounts, accounts[global.TaddrNdx + 0], accounts[global.TaddrNdx + 1], 
                 CONST.gtCarbon,              // qty_A
@@ -244,8 +244,8 @@ contract("StMaster", accounts => {
     });
 
     it(`transferring - should not allow mismatched ccy type/amount transfers (tok A)`, async () => {
-        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.gtCarbon, 1, accounts[global.TaddrNdx + 0], CONST.nullFees, [], [], { from: accounts[0] });
-        await stm.mintSecTokenBatch(CONST.tokenType.CORSIA, CONST.gtCarbon, 1, accounts[global.TaddrNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.NATURE, CONST.gtCarbon, 1, accounts[global.TaddrNdx + 0], CONST.nullFees, 0, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.CORSIA, CONST.gtCarbon, 1, accounts[global.TaddrNdx + 1], CONST.nullFees, 0, [], [], { from: accounts[0] });
         try {
             await transferHelper.transferWrapper(stm, accounts, accounts[global.TaddrNdx + 0], accounts[global.TaddrNdx + 1], 
                 CONST.gtCarbon,              // qty_A
@@ -263,8 +263,8 @@ contract("StMaster", accounts => {
     });
 
     it(`transferring - should not allow mismatched ccy type/amount transfers (tok B)`, async () => {
-        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.gtCarbon, 1, accounts[global.TaddrNdx + 0], CONST.nullFees, [], [], { from: accounts[0] });
-        await stm.mintSecTokenBatch(CONST.tokenType.CORSIA, CONST.gtCarbon, 1, accounts[global.TaddrNdx + 1], CONST.nullFees, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.NATURE, CONST.gtCarbon, 1, accounts[global.TaddrNdx + 0], CONST.nullFees, 0, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.CORSIA, CONST.gtCarbon, 1, accounts[global.TaddrNdx + 1], CONST.nullFees, 0, [], [], { from: accounts[0] });
         try {
             await transferHelper.transferWrapper(stm, accounts, accounts[global.TaddrNdx + 0], accounts[global.TaddrNdx + 1], 
                 CONST.gtCarbon,              // qty_A

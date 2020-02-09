@@ -28,12 +28,12 @@ contract("StMaster", accounts => {
 
         // mint batches x 3 with originator fees - should be ignored by ERC20
         const testFee = { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: 1, fee_percBips: 10, fee_min: 0, fee_max: 0 };
-        await stm.mintSecTokenBatch(CONST.tokenType.NATURE, CONST.kt1Carbon, 1, WHITE, testFee, [], [], { from: accounts[0] });
-        await stm.mintSecTokenBatch(CONST.tokenType.NATURE, CONST.kt1Carbon, 1, WHITE, testFee, [], [], { from: accounts[0] });
-        await stm.mintSecTokenBatch(CONST.tokenType.NATURE, CONST.kt1Carbon, 1, WHITE, testFee, [], [], { from: accounts[0] });
-        await stm.mintSecTokenBatch(CONST.tokenType.CORSIA, CONST.kt1Carbon, 1, WHITE, testFee, [], [], { from: accounts[0] });
-        await stm.mintSecTokenBatch(CONST.tokenType.CORSIA, CONST.kt1Carbon, 1, WHITE, testFee, [], [], { from: accounts[0] });
-        await stm.mintSecTokenBatch(CONST.tokenType.CORSIA, CONST.kt1Carbon, 1, WHITE, testFee, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.NATURE, CONST.kt1Carbon, 1, WHITE, testFee, 0, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.NATURE, CONST.kt1Carbon, 1, WHITE, testFee, 0, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.NATURE, CONST.kt1Carbon, 1, WHITE, testFee, 0, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.CORSIA, CONST.kt1Carbon, 1, WHITE, testFee, 0, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.CORSIA, CONST.kt1Carbon, 1, WHITE, testFee, 0, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.CORSIA, CONST.kt1Carbon, 1, WHITE, testFee, 0, [], [], { from: accounts[0] });
 
         // set exchange fees - should be ignored by ERC20
         await stm.setFee_TokType(CONST.tokenType.NATURE, CONST.nullAddr, testFee );

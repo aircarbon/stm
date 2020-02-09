@@ -28,7 +28,7 @@ contract("StMaster", accounts => {
 
         // mint NATURE with originator fee - should be ignored by ERC20
         const testFee = { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: 1, fee_percBips: 10, fee_min: 0, fee_max: 0 };
-        await stm.mintSecTokenBatch(CONST.tokenType.NATURE, CONST.kt1Carbon, 1, WHITE, testFee, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.NATURE, CONST.kt1Carbon, 1, WHITE, testFee, 0, [], [], { from: accounts[0] });
 
         // set exchange fee NATURE - should be ignored by ERC20
         await stm.setFee_TokType(CONST.tokenType.NATURE, CONST.nullAddr, testFee );

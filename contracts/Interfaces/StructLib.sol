@@ -44,7 +44,8 @@ library StructLib {
         uint256    burnedQty;                                   // total unit qty burned from the batch
         string[]   metaKeys;                                    // metadata keys
         string[]   metaValues;                                  // metadata values
-        SetFeeArgs origTokFee;                                  // batch originator fees on all transfers of tokens from this batch
+        SetFeeArgs origTokFee;                                  // batch originator token fee on all transfers of tokens from this batch
+        uint16     origCcyFee_percBips_ExFee;                   // batch originator ccy fee on all transfers of tokens from this batch - % of exchange currency fee
         address payable originator;                             // original owner (minter) of the batch
     }
 

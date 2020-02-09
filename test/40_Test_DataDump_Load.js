@@ -96,12 +96,27 @@ contract("StMaster", accounts => {
             
             // mint
             console.log('minting for account... ', M);
-            const mintTx_B1 = await stm_cur.mintSecTokenBatch(CONST.tokenType.CORSIA, 1000 * (i+1), 1, M, batchFee,  metaKVPs.map(p => p.k), metaKVPs.map(p => p.v), { from: accounts[0] });
+            const mintTx_B1 = await stm_cur.mintSecTokenBatch(CONST.tokenType.CORSIA, 1000 * (i+1), 1, M, batchFee, 100, metaKVPs.map(p => p.k), metaKVPs.map(p => p.v), { from: accounts[0] });
             curHash = await checkHashUpdate(curHash);
             if (await stm_cur.getContractType() == CONST.contractType.COMMODITY) {
-                const mintTx_B2 = await stm_cur.mintSecTokenBatch(CONST.tokenType.NATURE,    10000 * (i+1), 1, M, batchFee, metaKVPs.map(p => p.k), metaKVPs.map(p => p.v), { from: accounts[0] });
+                const mintTx_B2 = await stm_cur.mintSecTokenBatch(CONST.tokenType.NATURE, 10000 * (i+1), 1, M, batchFee, 100, metaKVPs.map(p => p.k), metaKVPs.map(p => p.v), { from: accounts[0] });
                 curHash = await checkHashUpdate(curHash);
             }
+            const batchId = (await stm_cur.getSecTokenBatchCount.call()).toNumber();
+            
+            // add batch metadata
+            const addBatchKvpTx = await stm_cur.addMetaSecTokenBatch(batchId, "NEW_KEY", "NEW_VALUE");
+            curHash = await checkHashUpdate(curHash);
+
+            // modify batch token fee
+            const modifiedBatchFee = _.cloneDeep(batchFee);
+            modifiedBatchFee.fee_percBips = batchFee.fee_percBips / 2;
+            const modifyBatchTokenFeeTx = await stm_cur.setOriginatorFeeTokenBatch(batchId, modifiedBatchFee);
+            curHash = await checkHashUpdate(curHash);
+
+            // modify batch ccy fee
+            const modifyBatchCcyFeeTx = await stm_cur.setOriginatorFeeCurrencyBatch(batchId, 50);
+            curHash = await checkHashUpdate(curHash);
 
             // transfer to owner - batch 1 CORSIA, no fees
             const send_tx_B1 = await stm_cur.transferOrTrade({ 
@@ -126,7 +141,7 @@ contract("StMaster", accounts => {
                      ccy_amount_A: 0,                         ccyTypeId_A: 0, 
                      ccy_amount_B: 0,                         ccyTypeId_B: 0, 
                         applyFees: true,
-                        feeAddrOwner: CONST.nullAddr,
+                     feeAddrOwner: CONST.nullAddr,
                     },
                     { from: accounts[0] }
                 );

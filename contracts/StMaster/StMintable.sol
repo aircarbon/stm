@@ -19,17 +19,19 @@ contract StMintable is IStMintable,
         int64                       mintSecTokenCount,
         address payable             batchOwner,
         StructLib.SetFeeArgs memory originatorFee,
+        uint16                      origCcyFee_percBips_ExFee,
         string[] memory             metaKeys,
         string[] memory             metaValues)
     public onlyOwner() onlyWhenReadWrite() {
         TokenLib.MintSecTokenBatchArgs memory args = TokenLib.MintSecTokenBatchArgs({
-            tokenTypeId: tokenTypeId,
-                mintQty: mintQty,
-      mintSecTokenCount: mintSecTokenCount,
-             batchOwner: batchOwner,
-             origTokFee: originatorFee,
-               metaKeys: metaKeys,
-             metaValues: metaValues
+              tokenTypeId: tokenTypeId,
+                  mintQty: mintQty,
+        mintSecTokenCount: mintSecTokenCount,
+               batchOwner: batchOwner,
+               origTokFee: originatorFee,
+origCcyFee_percBips_ExFee: origCcyFee_percBips_ExFee,
+                 metaKeys: metaKeys,
+               metaValues: metaValues
         });
         TokenLib.mintSecTokenBatch(ledgerData, stTypesData, args);
     }
@@ -47,6 +49,13 @@ contract StMintable is IStMintable,
         StructLib.SetFeeArgs calldata originatorFee)
     external onlyOwner() onlyWhenReadWrite() {
         TokenLib.setOriginatorFeeTokenBatch(ledgerData, batchId, originatorFee);
+    }
+
+    function setOriginatorFeeCurrencyBatch(
+        uint64 batchId,
+        uint16 origCcyFee_percBips_ExFee)
+    external onlyOwner() onlyWhenReadWrite() {
+        TokenLib.setOriginatorFeeCurrencyBatch(ledgerData, batchId, origCcyFee_percBips_ExFee);
     }
 
     function getSecToken_countMinted()

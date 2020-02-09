@@ -32,7 +32,7 @@ contract("StMaster", accounts => {
         await stm.sealContract();
 
         ISSUER = accounts[++global.TaddrNdx];
-        await stm.mintSecTokenBatch(1, ISSUANCE_QTY, 1, ISSUER, CONST.nullFees, [], [], { from: OWNER });
+        await stm.mintSecTokenBatch(1, ISSUANCE_QTY, 1, ISSUER, CONST.nullFees, 0, [], [], { from: OWNER });
     });
 
     beforeEach(async () => {

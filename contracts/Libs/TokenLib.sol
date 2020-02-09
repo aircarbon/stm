@@ -11,7 +11,8 @@ library TokenLib {
     event MintedSecTokenBatch(uint256 indexed batchId, uint256 tokenTypeId, address indexed batchOwner, uint256 mintQty, uint256 mintSecTokenCount);
     event MintedSecToken(uint256 indexed stId, uint256 indexed batchId, uint256 tokenTypeId, address indexed ledgerOwner, uint256 mintedQty);
     event AddedBatchMetadata(uint256 indexed batchId, string key, string value);
-    event SetBatchOriginatorFee(uint256 indexed batchId, StructLib.SetFeeArgs originatorFee);
+    event SetBatchOriginatorFee_Token(uint256 indexed batchId, StructLib.SetFeeArgs originatorFee);
+    event SetBatchOriginatorFee_Currency(uint256 indexed batchId, uint16 origCcyFee_percBips_ExFee);
 
     // TOKEN TYPES
     function addSecTokenType(
@@ -56,6 +57,7 @@ library TokenLib {
         int64                mintSecTokenCount;
         address payable      batchOwner;
         StructLib.SetFeeArgs origTokFee;
+        uint16               origCcyFee_percBips_ExFee;
         string[]             metaKeys;
         string[]             metaValues;
     }
@@ -75,6 +77,7 @@ library TokenLib {
         require(a.origTokFee.fee_max >= a.origTokFee.fee_min || a.origTokFee.fee_max == 0, "Bad fee args");
         require(a.origTokFee.fee_percBips <= 10000, "Bad fee args");
         require(a.origTokFee.ccy_mirrorFee == false, "ccy_mirrorFee unsupported for token-type fee");
+        require(a.origCcyFee_percBips_ExFee <= 10000, "Bad fee args");
         require(ledgerData.contractType == StructLib.ContractType.COMMODITY, "Bad cashflow request");
 
         // ### string[] param lengths are reported as zero!
@@ -94,6 +97,7 @@ library TokenLib {
                    metaKeys: a.metaKeys,
                  metaValues: a.metaValues,
                  origTokFee: a.origTokFee,
+  origCcyFee_percBips_ExFee: a.origCcyFee_percBips_ExFee,
                  originator: a.batchOwner
         });
         ledgerData._batches[newBatch.id] = newBatch;
@@ -129,7 +133,7 @@ library TokenLib {
         ledgerData._tokens_totalMintedQty += uint256(a.mintQty);
     }
 
-    // POST-MINTING
+    // POST-MINTING: add KVP metadata
     function addMetaSecTokenBatch(
         StructLib.LedgerStruct storage ledgerData,
         uint256 batchId,
@@ -150,6 +154,7 @@ library TokenLib {
         emit AddedBatchMetadata(batchId, metaKeyNew, metaValueNew);
     }
 
+    // POST-MINTING: set batch TOKEN fee
     function setOriginatorFeeTokenBatch(
         StructLib.LedgerStruct storage ledgerData,
         uint256 batchId,
@@ -157,6 +162,8 @@ library TokenLib {
     public {
         require(ledgerData._contractSealed, "Contract is not sealed");
         require(batchId >= 1 && batchId <= ledgerData._batches_currentMax_id, "Bad batchId");
+
+        // can only lower fee after minting
         require(ledgerData._batches[batchId].origTokFee.fee_fixed >= originatorFeeNew.fee_fixed, "Bad fee args");
         require(ledgerData._batches[batchId].origTokFee.fee_percBips >= originatorFeeNew.fee_percBips, "Bad fee args");
         require(ledgerData._batches[batchId].origTokFee.fee_min >= originatorFeeNew.fee_min, "Bad fee args");
@@ -167,7 +174,24 @@ library TokenLib {
         require(originatorFeeNew.ccy_mirrorFee == false, "ccy_mirrorFee unsupported for token-type fee");
 
         ledgerData._batches[batchId].origTokFee = originatorFeeNew;
-        emit SetBatchOriginatorFee(batchId, originatorFeeNew);
+        emit SetBatchOriginatorFee_Token(batchId, originatorFeeNew);
+    }
+
+    // POST-MINTING: set batch CURRENCY fee
+    function setOriginatorFeeCurrencyBatch(
+        StructLib.LedgerStruct storage ledgerData,
+        uint64 batchId,
+        uint16 origCcyFee_percBips_ExFee)
+    public {
+        require(ledgerData._contractSealed, "Contract is not sealed");
+        require(batchId >= 1 && batchId <= ledgerData._batches_currentMax_id, "Bad batchId");
+        require(origCcyFee_percBips_ExFee <= 10000, "Bad fee args");
+
+        // can only lower fee after minting
+        require(ledgerData._batches[batchId].origCcyFee_percBips_ExFee >= origCcyFee_percBips_ExFee, "Bad fee args");
+
+        ledgerData._batches[batchId].origCcyFee_percBips_ExFee = origCcyFee_percBips_ExFee;
+        emit SetBatchOriginatorFee_Currency(batchId, origCcyFee_percBips_ExFee);
     }
 
     // BURNING

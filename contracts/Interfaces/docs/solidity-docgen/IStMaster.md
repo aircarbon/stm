@@ -76,7 +76,7 @@
 [IStMaster-MintedSecTokenBatch-uint256-uint256-address-uint256-uint256-]: #IStMaster-MintedSecTokenBatch-uint256-uint256-address-uint256-uint256-
 [IStMaster-MintedSecToken-uint256-uint256-uint256-address-uint256-]: #IStMaster-MintedSecToken-uint256-uint256-uint256-address-uint256-
 [IStMaster-AddedBatchMetadata-uint256-string-string-]: #IStMaster-AddedBatchMetadata-uint256-string-string-
-[IStMaster-SetBatchOriginatorFee-uint256-struct-StructLib-SetFeeArgs-]: #IStMaster-SetBatchOriginatorFee-uint256-struct-StructLib-SetFeeArgs-
+[IStMaster-SetBatchOriginatorFee_Token-uint256-struct-StructLib-SetFeeArgs-]: #IStMaster-SetBatchOriginatorFee_Token-uint256-struct-StructLib-SetFeeArgs-
 [IStMaster-TransferedLedgerCcy-address-address-uint256-uint256-enum-IStMaster-TransferType-]: #IStMaster-TransferedLedgerCcy-address-address-uint256-uint256-enum-IStMaster-TransferType-
 [IStMaster-TransferedFullSecToken-address-address-uint256-uint256-uint256-enum-IStMaster-TransferType-]: #IStMaster-TransferedFullSecToken-address-address-uint256-uint256-uint256-enum-IStMaster-TransferType-
 [IStMaster-TransferedPartialSecToken-address-address-uint256-uint256-uint256-uint256-enum-IStMaster-TransferType-]: #IStMaster-TransferedPartialSecToken-address-address-uint256-uint256-uint256-uint256-enum-IStMaster-TransferType-
@@ -126,7 +126,7 @@ Contrct type (CASHFLOW or COMMODITY) is set through implementing contract's ctor
 - [`MintedSecTokenBatch(uint256 batchId, uint256 tokenTypeId, address batchOwner, uint256 mintQty, uint256 mintSecTokenCount)`][IStMaster-MintedSecTokenBatch-uint256-uint256-address-uint256-uint256-]
 - [`MintedSecToken(uint256 stId, uint256 batchId, uint256 tokenTypeId, address ledgerOwner, uint256 mintedQty)`][IStMaster-MintedSecToken-uint256-uint256-uint256-address-uint256-]
 - [`AddedBatchMetadata(uint256 batchId, string key, string value)`][IStMaster-AddedBatchMetadata-uint256-string-string-]
-- [`SetBatchOriginatorFee(uint256 batchId, struct StructLib.SetFeeArgs originatorFee)`][IStMaster-SetBatchOriginatorFee-uint256-struct-StructLib-SetFeeArgs-]
+- [`SetBatchOriginatorFee_Token(uint256 batchId, struct StructLib.SetFeeArgs originatorFee)`][IStMaster-SetBatchOriginatorFee_Token-uint256-struct-StructLib-SetFeeArgs-]
 - [`TransferedLedgerCcy(address from, address to, uint256 ccyTypeId, uint256 amount, enum IStMaster.TransferType transferType)`][IStMaster-TransferedLedgerCcy-address-address-uint256-uint256-enum-IStMaster-TransferType-]
 - [`TransferedFullSecToken(address from, address to, uint256 stId, uint256 mergedToSecTokenId, uint256 qty, enum IStMaster.TransferType transferType)`][IStMaster-TransferedFullSecToken-address-address-uint256-uint256-uint256-enum-IStMaster-TransferType-]
 - [`TransferedPartialSecToken(address from, address to, uint256 splitFromSecTokenId, uint256 newSecTokenId, uint256 mergedToSecTokenId, uint256 qty, enum IStMaster.TransferType transferType)`][IStMaster-TransferedPartialSecToken-address-address-uint256-uint256-uint256-uint256-enum-IStMaster-TransferType-]
@@ -202,7 +202,7 @@ Seals the contract
 
 
 
-### <span id="IStMaster-SetBatchOriginatorFee-uint256-struct-StructLib-SetFeeArgs-"></span> `SetBatchOriginatorFee(uint256 batchId, struct StructLib.SetFeeArgs originatorFee)`
+### <span id="IStMaster-SetBatchOriginatorFee_Token-uint256-struct-StructLib-SetFeeArgs-"></span> `SetBatchOriginatorFee_Token(uint256 batchId, struct StructLib.SetFeeArgs originatorFee)`
 
 
 
