@@ -8,6 +8,7 @@ library TransferLib {
     event TransferedLedgerCcy(address indexed from, address indexed to, uint256 ccyTypeId, uint256 amount, TransferType transferType);
     event TransferedFullSecToken(address indexed from, address indexed to, uint256 indexed stId, uint256 mergedToSecTokenId, uint256 qty, TransferType transferType);
     event TransferedPartialSecToken(address indexed from, address indexed to, uint256 indexed splitFromSecTokenId, uint256 newSecTokenId, uint256 mergedToSecTokenId, uint256 qty, TransferType transferType);
+    event dbg1(uint256 batchId, uint256 S, uint256 BCS, uint256 batch_exFee_ccy, uint256 BFEE);
 
     uint256 constant MAX_BATCHES_PREVIEW = 128; // for fee previews: max distinct batch IDs that can participate in one side of a trade fee preview
 
@@ -89,9 +90,6 @@ library TransferLib {
             }
         }
 
-        // TODO: originator *ccy* fee as % of exchange fee
-        //....
-
         //
         // originator token fees (disabled if fee-reciever[batch originator] == fee-payer)
         // potentially multiple: up to one originator token fee per distinct token batch
@@ -155,17 +153,33 @@ library TransferLib {
         }
 
         //
+        // apply originator currency fees per batch (capped % of total exchange currency fee)
+        //
+        if (a.applyFees) {
+            uint256 tot_exFee_ccy = exFees.fee_ccy_A + exFees.fee_ccy_B;
+
+            // apply for A->B token batches
+            applyOriginatorCcyFees(ledgerData, v.ts_previews[0], tot_exFee_ccy, a.qty_A, a.feeAddrOwner);
+
+            // apply for B->A token batches
+            applyOriginatorCcyFees(ledgerData, v.ts_previews[1], tot_exFee_ccy, a.qty_B, a.feeAddrOwner);
+
+            // ... test: main use case is tok/ccy, with ccy-mirror exchange fee per 1000
+            // ... test: edge-case -- more tests for tok/tok swaps (same batch(es) both sides & different batch(es) both sides), with ccy-mirror exchange fee per 1000 [prefunded ccy A/B]
+        }
+
+        //
         // transfer tokens
         //
         if (a.qty_A > 0) {
             if (a.applyFees) {
-                // fee transfer
+                // exchange token fee transfer from A
                 if (exFees.fee_tok_A > 0) {
                     maxStId = transferSplitSecTokens(ledgerData, TransferSplitArgs({ from: a.ledger_A, to: a.feeAddrOwner, tokenTypeId: a.tokenTypeId_A, qtyUnit: exFees.fee_tok_A, transferType: TransferType.ExchangeFee, maxStId: maxStId }));
                     v.exchangeFeesPaidQty += uint80(exFees.fee_tok_A);
                 }
 
-                // user transfer
+                // batch token fee transfer(s) from A
                 for (uint i = 0; i < v.ts_previews[0].batchCount ; i++) { // originator token fees
                     StructLib.SecTokenBatch storage batch = ledgerData._batches[v.ts_previews[0].batchIds[i]];
                     uint256 tokFee = a.ledger_A != batch.originator ? calcFeeWithCapCollar(batch.origTokFee, v.ts_previews[0].transferQty[i], 0) : 0;
@@ -175,20 +189,21 @@ library TransferLib {
                     }
                 }
             }
-            maxStId = transferSplitSecTokens(ledgerData,
+            // user transfer from A
+             maxStId = transferSplitSecTokens(ledgerData,
                 TransferSplitArgs({ from: v.ts_args[0].from, to: v.ts_args[0].to, tokenTypeId: v.ts_args[0].tokenTypeId, qtyUnit: v.ts_args[0].qtyUnit, transferType: v.ts_args[0].transferType, maxStId: maxStId })
             );
             v.transferedQty += uint80(v.ts_args[0].qtyUnit);
         }
         if (a.qty_B > 0) {
             if (a.applyFees) {
-                // fee transfer
+                // exchange token fee transfer from B
                 if (exFees.fee_tok_B > 0) {
                     maxStId = transferSplitSecTokens(ledgerData, TransferSplitArgs({ from: a.ledger_B, to: a.feeAddrOwner, tokenTypeId: a.tokenTypeId_B, qtyUnit: exFees.fee_tok_B, transferType: TransferType.ExchangeFee, maxStId: maxStId }));
                     v.exchangeFeesPaidQty += uint80(exFees.fee_tok_B);
                 }
 
-                // user transfer
+                // batch token fee transfer(s) from B
                 for (uint i = 0; i < v.ts_previews[1].batchCount ; i++) { // originator token fees
                     StructLib.SecTokenBatch storage batch = ledgerData._batches[v.ts_previews[1].batchIds[i]];
                     uint256 tokFee = a.ledger_B != batch.originator ? calcFeeWithCapCollar(batch.origTokFee, v.ts_previews[1].transferQty[i], 0) : 0;
@@ -198,6 +213,7 @@ library TransferLib {
                     }
                 }
             }
+            // user transfer from B
             maxStId = transferSplitSecTokens(ledgerData,
                 TransferSplitArgs({ from: v.ts_args[1].from, to: v.ts_args[1].to, tokenTypeId: v.ts_args[1].tokenTypeId, qtyUnit: v.ts_args[1].qtyUnit, transferType: v.ts_args[1].transferType, maxStId: maxStId })
             );
@@ -321,7 +337,52 @@ library TransferLib {
     }
 
     //
-    // INTERNAL - ccy
+    // INTERNAL - calculate & send batch originator ccy fees (shares of exchange ccy fee)
+    //
+    function applyOriginatorCcyFees(
+        StructLib.LedgerStruct storage ledgerData,
+        TransferSplitPreviewReturn memory ts_preview,
+        uint256 tot_exFee_ccy,
+        uint256 tot_qty,
+        address feeAddrOwner
+    )
+    private {
+        // batch originator ccy fee - get total bips across all batches
+        for (uint i = 0; i < ts_preview.batchCount ; i++) {
+            StructLib.SecTokenBatch storage batch = ledgerData._batches[ts_preview.batchIds[i]];
+            ts_preview.TC += uint256(batch.origCcyFee_percBips_ExFee);
+        }
+        ts_preview.TC_capped = ts_preview.TC;
+        if (ts_preview.TC_capped > 10000) ts_preview.TC_capped = 10000; // cap
+
+        // calc each batch's share of total bips and of capped bips
+        for (uint i = 0; i < ts_preview.batchCount ; i++) {
+            StructLib.SecTokenBatch storage batch = ledgerData._batches[ts_preview.batchIds[i]];
+ 
+            // batch share - bips
+            //uint256 S = (uint256(batch.origCcyFee_percBips_ExFee) * 10000/*ratio to basis points*/) / ts_preview.TC;
+ 
+            // batch capped share - bips
+            //uint256 BCS = (((S * 1000000/*increase precision*/) / 10000/*basis points*/) * ts_preview.TC_capped) / 1000000/*decrease precision*/;
+
+            // batch share of total qty sent - pro-rata with qty sent
+            uint256 batch_exFee_ccy = (((ts_preview.transferQty[i] * 1000000/*increase precision*/) / tot_qty) * tot_exFee_ccy) / 1000000/*decrease precision*/;
+
+            // batch fee - capped share of exchange ccy fee
+            //uint256 BFEE = (((BCS * 1000000/*increase precision*/) / 10000/*basis points*/) * tot_exFee_ccy) / 1000000/*decrease precision*/;
+            uint256 BFEE = (((uint256(batch.origCcyFee_percBips_ExFee) * 1000000/*increase precision*/) / 10000/*basis points*/) * batch_exFee_ccy) / 1000000/*decrease precision*/;
+
+            emit dbg1(batch.id, 0, 0, batch_exFee_ccy, BFEE);
+
+            // #### very wrong -- can't be as a % of [tot_exFee_ccy] -- must be as a % of this batches share of tot_exFee_ccy!!
+            // i.e. share of [tot_exFee_ccy] weighted by batch QTY sent vs. total QTY sent...
+
+            // TODO: send from feeAddrOwner to batch originator
+        }
+    }
+
+    //
+    // INTERNAL - transfer ccy
     //
     struct TransferCcyArgs {
         address      from;
@@ -487,6 +548,10 @@ library TransferLib {
         uint256[MAX_BATCHES_PREVIEW] batchIds; // todo: pack these - quadratic gas cost for fixed memory
         uint256[MAX_BATCHES_PREVIEW] transferQty;
         uint256 batchCount;
+
+        // calc fields for batch originator ccy fee - % of exchange currency fee
+        uint256 TC;        // total cut        - sum originator batch origCcyFee_percBips_ExFee for all batches
+        uint256 TC_capped; // total cut capped - capped (10000 bps) total cut
     }
     function transferSplitSecTokens_Preview(
         StructLib.LedgerStruct storage ledgerData,
@@ -500,7 +565,9 @@ library TransferLib {
         ret = TransferSplitPreviewReturn({
                batchIds: batchIds,
             transferQty: transferQty,
-             batchCount: 0
+             batchCount: 0,
+                     TC: 0,
+              TC_capped: 0
         });
 
         // get distinct batches affected - needed for fixed-size return array declaration
@@ -511,8 +578,8 @@ library TransferLib {
         uint256 remainingToTransfer = uint256(a.qtyUnit);
         while (remainingToTransfer > 0) {
             uint256 stId = from_stIds[0];
-            uint64 stQty = ledgerData._sts[stId].currentQty; //ledgerData._sts_currentQty[stId];
-            uint64 fromBatchId = ledgerData._sts[stId].batchId; //ledgerData._sts_batchId[stId];
+            uint64 stQty = ledgerData._sts[stId].currentQty;
+            uint64 fromBatchId = ledgerData._sts[stId].batchId;
 
             // add to list of distinct batches, maintain transfer quantity from each batch
             bool knownBatch = false;
@@ -576,7 +643,7 @@ library TransferLib {
     private view returns(uint256 totalFee) {
         uint256 feeAmount = fs.fee_fixed +
                     (((receiveAmount * 1/*default precision*/ / 1000/*per thousand*/) * fs.ccy_perThousand) / 1/*default precision*/) +
-                    (((sendAmount * 1000000/*increase precision*/ / 10000/*basis points*/) * fs.fee_percBips) / 1000000/*increase precision*/);
+                    (((sendAmount * 1000000/*increase precision*/ / 10000/*basis points*/) * fs.fee_percBips) / 1000000/*decrease precision*/);
         if (sendAmount > 0) {
             if (feeAmount > fs.fee_max && fs.fee_max > 0) return fs.fee_max;
             if (feeAmount < fs.fee_min && fs.fee_min > 0) return fs.fee_min;

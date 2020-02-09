@@ -21,7 +21,7 @@ contract("StMaster", accounts => {
             console.log(`addrNdx: ${global.TaddrNdx} - contract @ ${stm.address} (owner: ${accounts[0]})`);
     });
 
-    it(`minting originator fee - should allow minting of originator fee on a batch`, async () => {
+    it(`minting originator tok fee - should allow minting with an originator token fee on a batch`, async () => {
         const M = accounts[global.TaddrNdx];
         const origFee = { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: 1, fee_percBips: 10, fee_min: 1, fee_max: 10 }
         await stm.mintSecTokenBatch(CONST.tokenType.CORSIA, CONST.kt1Carbon, 1, M, origFee, 0, [], [], { from: accounts[0] });
@@ -34,18 +34,18 @@ contract("StMaster", accounts => {
         assert(batch.origTokFee.fee_max      == origFee.fee_max,       'unexpected originator fee_min on minted batch');
     });
 
-    it(`minting originator fee - should allow minting of collared, uncapped batch fee`, async () => {
+    it(`minting originator tok fee - should allow minting of collared, uncapped batch token fee`, async () => {
         const M = accounts[global.TaddrNdx];
         const origFee = { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: 10, fee_percBips: 10, fee_min: 10, fee_max: 0 }
         await stm.mintSecTokenBatch(CONST.tokenType.CORSIA, CONST.kt1Carbon, 1, M, origFee, 0, [], [], { from: accounts[0] });
     });
-    it(`minting originator fee - should allow minting of uncollared, capped batch fee`, async () => {
+    it(`minting originator tok fee - should allow minting of uncollared, capped batch token fee`, async () => {
         const M = accounts[global.TaddrNdx];
         const origFee = { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: 10, fee_percBips: 10, fee_min: 0, fee_max: 10 }
         await stm.mintSecTokenBatch(CONST.tokenType.CORSIA, CONST.kt1Carbon, 1, M, origFee, 0, [], [], { from: accounts[0] });
     });
 
-    it(`minting originator fee - should allow decreasing of collared, uncapped batch fee`, async () => {
+    it(`minting originator tok fee - should allow decreasing of collared, uncapped batch token fee`, async () => {
         const M = accounts[global.TaddrNdx];
         const origFee1 = { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: 100, fee_percBips: 10, fee_min: 10, fee_max: 0 }
         await stm.mintSecTokenBatch(CONST.tokenType.NATURE, CONST.kt1Carbon, 1, M, origFee1, 0, [], [],   { from: accounts[0] });
@@ -55,7 +55,7 @@ contract("StMaster", accounts => {
         await stm.setOriginatorFeeTokenBatch(batchId, origFee2, { from: accounts[0] });
     });
 
-    it(`minting originator fee - should allow decreasing of batch fee after minting`, async () => {
+    it(`minting originator tok fee - should allow decreasing of batch token fee after minting`, async () => {
         const M = accounts[global.TaddrNdx];
         const origFee1 = { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: 10, fee_percBips: 10, fee_min: 10, fee_max: 10 }
         await stm.mintSecTokenBatch(CONST.tokenType.NATURE, CONST.kt1Carbon, 1, M, origFee1, 0, [], [],   { from: accounts[0] });
@@ -87,7 +87,7 @@ contract("StMaster", accounts => {
         await stm.setOriginatorFeeTokenBatch(batchId, origFee2, { from: accounts[0] });
     });
 
-    it(`minting originator fee - should not allow increasing of batch fees after minting (fee_fixed)`, async () => {
+    it(`minting originator tok fee - should not allow increasing of batch token fee after minting`, async () => {
         const M = accounts[global.TaddrNdx];
         const origFee1 = { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: 1, fee_percBips: 10, fee_min: 1, fee_max: 10 }
         await stm.mintSecTokenBatch(CONST.tokenType.NATURE, CONST.kt1Carbon, 1, M, origFee1, 0, [], [],   { from: accounts[0] });
@@ -111,7 +111,7 @@ contract("StMaster", accounts => {
         catch (ex) { assert(ex.reason == 'Bad fee args', `unexpected: ${ex.reason}`); }
     });
 
-    it(`minting originator fee - should not allow non-owner to edit batch fee after minting`, async () => {
+    it(`minting originator tok fee - should not allow non-owner to edit batch token fee after minting`, async () => {
         const M = accounts[global.TaddrNdx];
         const origFee1 = { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: 1, fee_percBips: 10, fee_min: 1, fee_max: 10 };
         await stm.mintSecTokenBatch(CONST.tokenType.NATURE, CONST.kt1Carbon, 1, M, origFee1, 0, [], [],   { from: accounts[0] });
@@ -124,7 +124,7 @@ contract("StMaster", accounts => {
         assert.fail('expected contract exception');
     });
 
-    it(`minting originator fee - should not allow minting batch fee cap < collar`, async () => {
+    it(`minting originator tok fee - should not allow minting batch token fee cap < collar`, async () => {
         const M = accounts[global.TaddrNdx];
         var origFee;
         origFee = { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: 1, fee_percBips: 10, fee_min: 10, fee_max: 0 }; // no cap
@@ -135,7 +135,7 @@ contract("StMaster", accounts => {
         } catch (ex) { assert(ex.reason == 'Bad fee args', `unexpected: ${ex.reason}`); return; }
         assert.fail('expected contract exception');
     });
-    it(`minting originator fee - should not allow setting of batch fee cap < collar`, async () => {
+    it(`minting originator tok fee - should not allow setting of batch token fee cap < collar`, async () => {
         const M = accounts[global.TaddrNdx];
         var origFee;
 
@@ -152,7 +152,7 @@ contract("StMaster", accounts => {
         assert.fail('expected contract exception');        
     });
 
-    it(`minting originator fee - should not allow minting batch fee basis points > 10000`, async () => {
+    it(`minting originator tok fee - should not allow minting batch token fee basis points > 10000`, async () => {
         const M = accounts[global.TaddrNdx];
         try {
             const origFee = { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: 1, fee_percBips: 10001, fee_min: 10, fee_max: 0 }; // bad basis points
@@ -160,7 +160,7 @@ contract("StMaster", accounts => {
         } catch (ex) { assert(ex.reason == 'Bad fee args', `unexpected: ${ex.reason}`); return; }
         assert.fail('expected contract exception');        
     });
-    it(`minting originator fee - should not allow setting of batch fee basis points > 10000`, async () => {
+    it(`minting originator tok fee - should not allow setting of batch token fee basis points > 10000`, async () => {
         const M = accounts[global.TaddrNdx];
         var origFee;
         origFee = { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: 1, fee_percBips: 10, fee_min: 10, fee_max: 0 };

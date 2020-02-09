@@ -77,10 +77,10 @@ contract("StMaster", accounts => {
         // TEST - contract owner has received exchange fees
         const owner_balBefore = data.owner_before.tokens.map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
         const owner_balAfter  =  data.owner_after.tokens.map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
-        console.log('owner_balBefore', owner_balBefore.toString());
-        console.log('owner_balAfter', owner_balAfter.toString());
-        console.log('data.exchangeFee_tok_A', data.exchangeFee_tok_A.toString());
-        console.log('data.exchangeFee_tok_B', data.exchangeFee_tok_B.toString());
+        //console.log('owner_balBefore', owner_balBefore.toString());
+        //console.log('owner_balAfter', owner_balAfter.toString());
+        //console.log('data.exchangeFee_tok_A', data.exchangeFee_tok_A.toString());
+        //console.log('data.exchangeFee_tok_B', data.exchangeFee_tok_B.toString());
         assert(Big(owner_balAfter).eq(Big(owner_balBefore).plus(Big(data.exchangeFee_tok_A)).plus(Big(data.exchangeFee_tok_B))), 'unexpected contract owner token balance after transfer');
         
         // TEST - originators (M[]) have each received their batch fee
