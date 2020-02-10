@@ -62,7 +62,6 @@ contract("StMaster", accounts => {
         }
     });
 
-    // CCY FEE -- 3 USD per THOUSAND RECEIVED, MIRRORED
     it(`fees (ccy per 1000 received, mirrored) - apply mirrored USD ccy fee 3 USD/1000 tokens received on trades (0.1KT, 1KT, 1.5T, 11KT) (global fee on B)`, async () => {
         const A = accounts[global.TaddrNdx + 0]
         const B = accounts[global.TaddrNdx + 1]

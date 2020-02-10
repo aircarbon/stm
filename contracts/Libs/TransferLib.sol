@@ -8,7 +8,7 @@ library TransferLib {
     event TransferedLedgerCcy(address indexed from, address indexed to, uint256 ccyTypeId, uint256 amount, TransferType transferType);
     event TransferedFullSecToken(address indexed from, address indexed to, uint256 indexed stId, uint256 mergedToSecTokenId, uint256 qty, TransferType transferType);
     event TransferedPartialSecToken(address indexed from, address indexed to, uint256 indexed splitFromSecTokenId, uint256 newSecTokenId, uint256 mergedToSecTokenId, uint256 qty, TransferType transferType);
-    event dbg1(uint256 batchId, uint256 S, uint256 BCS, uint256 batch_exFee_ccy, uint256 BFEE);
+    event dbg1(uint256 batchId, uint256 S, uint256 BCS, uint256 batchQty, uint256 totQty, uint256 batch_exFee_ccy, uint256 BFEE);
 
     uint256 constant MAX_BATCHES_PREVIEW = 128; // for fee previews: max distinct batch IDs that can participate in one side of a trade fee preview
 
@@ -358,10 +358,10 @@ library TransferLib {
         // calc each batch's share of total bips and of capped bips
         for (uint i = 0; i < ts_preview.batchCount ; i++) {
             StructLib.SecTokenBatch storage batch = ledgerData._batches[ts_preview.batchIds[i]];
- 
+
             // batch share - bips
             //uint256 S = (uint256(batch.origCcyFee_percBips_ExFee) * 10000/*ratio to basis points*/) / ts_preview.TC;
- 
+
             // batch capped share - bips
             //uint256 BCS = (((S * 1000000/*increase precision*/) / 10000/*basis points*/) * ts_preview.TC_capped) / 1000000/*decrease precision*/;
 
@@ -372,7 +372,7 @@ library TransferLib {
             //uint256 BFEE = (((BCS * 1000000/*increase precision*/) / 10000/*basis points*/) * tot_exFee_ccy) / 1000000/*decrease precision*/;
             uint256 BFEE = (((uint256(batch.origCcyFee_percBips_ExFee) * 1000000/*increase precision*/) / 10000/*basis points*/) * batch_exFee_ccy) / 1000000/*decrease precision*/;
 
-            emit dbg1(batch.id, 0, 0, batch_exFee_ccy, BFEE);
+            emit dbg1(batch.id, 0, 0, ts_preview.transferQty[i], tot_qty, batch_exFee_ccy, BFEE);
 
             // #### very wrong -- can't be as a % of [tot_exFee_ccy] -- must be as a % of this batches share of tot_exFee_ccy!!
             // i.e. share of [tot_exFee_ccy] weighted by batch QTY sent vs. total QTY sent...
