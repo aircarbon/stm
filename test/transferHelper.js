@@ -161,6 +161,10 @@ module.exports = {
         // console.log(`ccyTypeId_B=${ccyTypeId_B} totalCcy_ExFees_after[ccyTypeId_B]=${totalCcy_ExFees_after[ccyTypeId_B]}`);
 
         // validate fees
+        var orig_tot_ccyFees = new BN(0);
+        var orig_ccyFee_toA = new BN(0);
+        var orig_ccyFee_toB = new BN(0);
+
         if (applyFees) {
 
             // validate ccy fee events & global totals
@@ -169,9 +173,17 @@ module.exports = {
             eventCcy_fees[ccyTypeId_B] = new BN(0);
             if (ccy_amount_A > 0 || ccy_amount_B > 0) {
                 truffleAssert.eventEmitted(transferTx, 'TransferedLedgerCcy', ev => { 
-                    if (ev.transferType != CONST.transferType.USER) { 
+                    //if (ev.transferType != CONST.transferType.USER) { 
+                    if (ev.transferType == CONST.transferType.EXCHANGE_FEE) { 
                         eventCcy_fees[ev.ccyTypeId] = eventCcy_fees[ev.ccyTypeId].add(ev.amount);
-                        //console.log(`FEE: ${ev.from} --> ${ev.to} ccyTypeId=${ev.ccyTypeId} ... amount=${Number(ev.amount)} >> eventCcy_fees[ev.ccyTypeId]=${eventCcy_fees[ev.ccyTypeId].toString()}`);
+                        //console.log(`EXCHANGE CCY FEE: ${ev.from} --> ${ev.to} ccyTypeId=${ev.ccyTypeId} ... amount=${Number(ev.amount)} >> eventCcy_fees[ev.ccyTypeId]=${eventCcy_fees[ev.ccyTypeId].toString()}`);
+                    }
+
+                    if (ev.transferType == CONST.transferType.ORIG_FEE) { 
+                        orig_tot_ccyFees = orig_tot_ccyFees.add(ev.amount);
+                        //console.log(`ORIGINATOR CCY FEE: ${ev.from} --> ${ev.to} ccyTypeId=${ev.ccyTypeId} ... amount=${Number(ev.amount)} >> orig_tot_ccyFees=${orig_tot_ccyFees.toString()}`);
+                        if (ev.to == ledger_A) orig_ccyFee_toA = orig_ccyFee_toA.add(ev.amount);
+                        if (ev.to == ledger_B) orig_ccyFee_toB = orig_ccyFee_toB.add(ev.amount);
                     }
                     return true;
                 });
@@ -285,11 +297,18 @@ module.exports = {
             // console.log('Big(deltaCcy_fromA[ccyTypeId_A])', Big(deltaCcy_fromA[ccyTypeId_A]).toFixed());
 
             assert(A_bal_aft_ccyA.minus(A_bal_bef_ccyA).plus(Big(fee_ccy_A)).eq(Big(deltaCcy_fromA[ccyTypeId_A]).times(+1)),
-                `unexpected ledger A balance ${A_bal_aft_ccyA.toFixed()} after transfer A -> B amount ${ccy_amount_A} ccy type ${ccyTypeId_A}`);
+                `(1) unexpected ledger A balance ${A_bal_aft_ccyA.toFixed()} after transfer A -> B amount ${ccy_amount_A} ccy type ${ccyTypeId_A}`);
+
+            //console.log('B_bal_bef_ccyA', B_bal_bef_ccyA.toFixed());
+            //console.log('B_bal_aft_ccyA', B_bal_aft_ccyA.toFixed());
+            //console.log('orig_ccyFee_toB', orig_ccyFee_toB.toString());
+            //console.log('Big(deltaCcy_fromA[ccyTypeId_A])', Big(deltaCcy_fromA[ccyTypeId_A]).toFixed());
+            //console.log('exchangeFee_ccy_B', exchangeFee_ccy_B.toString());
 
             assert(B_bal_aft_ccyA.minus(B_bal_bef_ccyA).eq(Big(deltaCcy_fromA[ccyTypeId_A]).times(-1)
+                    .plus(Big(orig_ccyFee_toB.toString())) // orig ccy fee paid by owner to B
                     .minus(Big(exchangeFee_ccy_B.toString()))), // ex ccy-fee mirror
-                `unexpected ledger B balance ${B_bal_aft_ccyA.toFixed()} after transfer A -> B amount ${ccy_amount_A} ccy type ${ccyTypeId_A}`);
+                `(2) unexpected ledger B balance ${B_bal_aft_ccyA.toFixed()} after transfer A -> B amount ${ccy_amount_A} ccy type ${ccyTypeId_A}`);
         }
 
         // validate currency ledger balances are updated: B -> A
@@ -305,11 +324,12 @@ module.exports = {
             // console.log('deltaCcy_fromA[ccyTypeId_B]', deltaCcy_fromA[ccyTypeId_B].toString());
 
             assert(B_bal_aft_ccyB.minus(B_bal_bef_ccyB).plus(Big(fee_ccy_B)).eq(Big(deltaCcy_fromA[ccyTypeId_B]).times(-1)),
-                `unexpected ledger B balance ${B_bal_aft_ccyB} after transfer B -> A amount ${ccy_amount_B} ccy type ${ccyTypeId_B}`);
+                `(1) unexpected ledger B balance ${B_bal_aft_ccyB} after transfer B -> A amount ${ccy_amount_B} ccy type ${ccyTypeId_B}`);
 
             assert(A_bal_aft_ccyB.minus(A_bal_bef_ccyB).eq(Big(deltaCcy_fromA[ccyTypeId_B]).times(+1)
+                    .plus(Big(orig_ccyFee_toA.toString())) // orig ccy fee paid by owner to A
                     .minus(Big(exchangeFee_ccy_A.toString()))), // ex ccy-fee mirror
-                `unexpected ledger A balance ${A_bal_aft_ccyB} after transfer B -> A amount ${ccy_amount_B} ccy type ${ccyTypeId_B}`);
+                `(2) unexpected ledger A balance ${A_bal_aft_ccyB} after transfer B -> A amount ${ccy_amount_B} ccy type ${ccyTypeId_B}`);
         }
 
         // validate currency global totals
@@ -324,10 +344,16 @@ module.exports = {
             if (ccy_amount_A > 0) {
                 expectedCcy_tfd[ccyTypeId_A] = expectedCcy_tfd[ccyTypeId_A].plus(Big(fee_ccy_A));
                 expectedCcy_tfd[ccyTypeId_A] = expectedCcy_tfd[ccyTypeId_A].plus(Big(exchangeFee_ccy_B.toString())); // ex ccy-fee mirror
+
+                expectedCcy_tfd[ccyTypeId_A] = expectedCcy_tfd[ccyTypeId_A].plus(Big(orig_ccyFee_toA.toString())); // orig ccy fee paid by owner to A
+                expectedCcy_tfd[ccyTypeId_A] = expectedCcy_tfd[ccyTypeId_A].plus(Big(orig_ccyFee_toB.toString())); // orig ccy fee paid by owner to B
             }
             if (ccy_amount_B > 0) {
                 expectedCcy_tfd[ccyTypeId_B] = expectedCcy_tfd[ccyTypeId_B].plus(Big(fee_ccy_B));
                 expectedCcy_tfd[ccyTypeId_B] = expectedCcy_tfd[ccyTypeId_B].plus(Big(exchangeFee_ccy_A.toString())); // ex ccy-fee mirror
+
+                expectedCcy_tfd[ccyTypeId_B] = expectedCcy_tfd[ccyTypeId_B].plus(Big(orig_ccyFee_toA.toString())); // orig ccy fee paid by owner to A
+                expectedCcy_tfd[ccyTypeId_B] = expectedCcy_tfd[ccyTypeId_B].plus(Big(orig_ccyFee_toB.toString())); // orig ccy fee paid by owner to B
             }
         }
         // console.log('                       fee_ccy_A', fee_ccy_A.toString());
@@ -546,6 +572,7 @@ module.exports = {
             exchangeFee_tok_A,          exchangeFee_tok_B,
             exchangeFee_ccy_A,          exchangeFee_ccy_B,
             feesPreview,
+            orig_ccyFee_toA,            orig_ccyFee_toB,
         };
     },
 

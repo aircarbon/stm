@@ -139,7 +139,7 @@ library TransferLib {
             transferCcy(ledgerData, TransferCcyArgs({ from: a.ledger_A, to: a.ledger_B, ccyTypeId: a.ccyTypeId_A, amount: uint256(a.ccy_amount_A), transferType: TransferType.User }));
         }
         if (a.applyFees && exFees.fee_ccy_A > 0) {
-            // fee transfer from A
+            // exchange fee transfer from A
             transferCcy(ledgerData, TransferCcyArgs({ from: a.ledger_A, to: a.feeAddrOwner, ccyTypeId: a.ccyTypeId_A, amount: exFees.fee_ccy_A, transferType: TransferType.ExchangeFee }));
         }
 
@@ -148,7 +148,7 @@ library TransferLib {
             transferCcy(ledgerData, TransferCcyArgs({ from: a.ledger_B, to: a.ledger_A, ccyTypeId: a.ccyTypeId_B, amount: uint256(a.ccy_amount_B), transferType: TransferType.User }));
         }
         if (a.applyFees && exFees.fee_ccy_B > 0) {
-            // fee transfer from B
+            // exchange fee transfer from B
             transferCcy(ledgerData, TransferCcyArgs({ from: a.ledger_B, to: a.feeAddrOwner, ccyTypeId: a.ccyTypeId_B, amount: exFees.fee_ccy_B, transferType: TransferType.ExchangeFee }));
         }
 
@@ -158,14 +158,17 @@ library TransferLib {
         if (a.applyFees) {
             uint256 tot_exFee_ccy = exFees.fee_ccy_A + exFees.fee_ccy_B;
 
-            // apply for A->B token batches
-            applyOriginatorCcyFees(ledgerData, v.ts_previews[0], tot_exFee_ccy, a.qty_A, a.feeAddrOwner);
+            if (tot_exFee_ccy > 0) {
+                require(a.ccyTypeId_A != 0 || a.ccyTypeId_B != 0, "Unexpected: undefined currency types");
+                if (a.ccyTypeId_A != 0 && a.ccyTypeId_B != 0) require(a.ccyTypeId_A == a.ccyTypeId_B, "Unexpected: mirrored currency type mismatch");
+                uint256 ccyTypeId = a.ccyTypeId_A != 0 ? a.ccyTypeId_A : a.ccyTypeId_B;
 
-            // apply for B->A token batches
-            applyOriginatorCcyFees(ledgerData, v.ts_previews[1], tot_exFee_ccy, a.qty_B, a.feeAddrOwner);
+                // apply for A->B token batches
+                applyOriginatorCcyFees(ledgerData, v.ts_previews[0], tot_exFee_ccy, a.qty_A, a.feeAddrOwner, ccyTypeId);
 
-            // ... test: main use case is tok/ccy, with ccy-mirror exchange fee per 1000
-            // ... test: edge-case -- more tests for tok/tok swaps (same batch(es) both sides & different batch(es) both sides), with ccy-mirror exchange fee per 1000 [prefunded ccy A/B]
+                // apply for B->A token batches
+                applyOriginatorCcyFees(ledgerData, v.ts_previews[1], tot_exFee_ccy, a.qty_B, a.feeAddrOwner, ccyTypeId);
+            }
         }
 
         //
@@ -344,7 +347,8 @@ library TransferLib {
         TransferSplitPreviewReturn memory ts_preview,
         uint256 tot_exFee_ccy,
         uint256 tot_qty,
-        address feeAddrOwner
+        address feeAddrOwner,
+        uint256 ccyTypeId
     )
     private {
         // batch originator ccy fee - get total bips across all batches
@@ -359,25 +363,16 @@ library TransferLib {
         for (uint i = 0; i < ts_preview.batchCount ; i++) {
             StructLib.SecTokenBatch storage batch = ledgerData._batches[ts_preview.batchIds[i]];
 
-            // batch share - bips
-            //uint256 S = (uint256(batch.origCcyFee_percBips_ExFee) * 10000/*ratio to basis points*/) / ts_preview.TC;
-
-            // batch capped share - bips
-            //uint256 BCS = (((S * 1000000/*increase precision*/) / 10000/*basis points*/) * ts_preview.TC_capped) / 1000000/*decrease precision*/;
-
             // batch share of total qty sent - pro-rata with qty sent
             uint256 batch_exFee_ccy = (((ts_preview.transferQty[i] * 1000000/*increase precision*/) / tot_qty) * tot_exFee_ccy) / 1000000/*decrease precision*/;
 
             // batch fee - capped share of exchange ccy fee
-            //uint256 BFEE = (((BCS * 1000000/*increase precision*/) / 10000/*basis points*/) * tot_exFee_ccy) / 1000000/*decrease precision*/;
             uint256 BFEE = (((uint256(batch.origCcyFee_percBips_ExFee) * 1000000/*increase precision*/) / 10000/*basis points*/) * batch_exFee_ccy) / 1000000/*decrease precision*/;
 
             emit dbg1(batch.id, 0, 0, ts_preview.transferQty[i], tot_qty, batch_exFee_ccy, BFEE);
 
-            // #### very wrong -- can't be as a % of [tot_exFee_ccy] -- must be as a % of this batches share of tot_exFee_ccy!!
-            // i.e. share of [tot_exFee_ccy] weighted by batch QTY sent vs. total QTY sent...
-
-            // TODO: send from feeAddrOwner to batch originator
+            // currency fee transfer: from exchange owner account to batch originator
+            transferCcy(ledgerData, TransferCcyArgs({ from: feeAddrOwner, to: batch.originator, ccyTypeId: ccyTypeId, amount: BFEE, transferType: TransferType.OriginatorFee }));
         }
     }
 

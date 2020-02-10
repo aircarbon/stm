@@ -24,10 +24,19 @@ contract("StMaster", accounts => {
             console.log(`addrNdx: ${global.TaddrNdx} - contract @ ${stm.address} (owner: ${accounts[0]})`);
     });
 
-    // TODO: actually do the sends in TransferLib (+ transferHelper update)
+    // TODO: global totals for orig ccy fees
+
+    // TODO: test multiple originators 
+    // TODO: test neither A/B in trade or originators (i.e. mint, transfer, then trade)
+
+    // ... pro-rata per batch - explain
+    // ... rounding (1 cent ccy units) - explain
+    // ... tok/tok (below) probably can't apply ccy orig (or exchange) fee - explain
+    // ...  test: edge-case -- test for tok/tok swaps (same batch(es) both sides & different batch(es) both sides), with ccy-mirror *exchange fee* per 1000 [*prefunded* ccy A/B]
+    //          THIS PROBABLY WON'T WORK -- transferLib has no supplied currencyType to use for exchange fee!
 
     // ORIG CCY FEE -- (SINGLE BATCH, SHARE OF 3 USD per THOUSAND RECEIVED, SYMMETRIC MIRRORED)
-    /*it(`fees (orig ccy fee - from per 1000 received, symmetric mirrored, single batch) - apply mirrored USD ccy fee 3 USD/1000 tokens received on trade (global fee on A)`, async () => {
+    it(`fees (orig ccy fee - from per 1000 received, symmetric mirrored, single batch) - apply mirrored USD ccy fee 3 USD/1000 tokens received on trade (global fee on A)`, async () => {
         const A = accounts[global.TaddrNdx + 0];
         const B = accounts[global.TaddrNdx + 1];
 
@@ -48,7 +57,8 @@ contract("StMaster", accounts => {
             const transferAmountTok = new BN(transferAmountsTok[i]);
             const expectedFeeCcy = Math.floor(Number(transferAmountTok.toString()) / 1000) * ccy_perThousand
                                     * 2; // ex ccy-fee mirror - symmetric
-            console.log('expectedFeeCcy', expectedFeeCcy);
+            
+            //console.log('expectedFeeCcy', expectedFeeCcy);
             const data = await transferHelper.transferLedger({ stm, accounts,
                     ledger_A: A,                                         ledger_B: B,
                        qty_A: 0,                                    tokenTypeId_A: 0,
@@ -57,12 +67,13 @@ contract("StMaster", accounts => {
                 ccy_amount_B: 0,                                      ccyTypeId_B: 0,
                    applyFees: true,
             });
-            truffleAssert.prettyPrintEmittedEvents(data.transferTx);
+            //truffleAssert.prettyPrintEmittedEvents(data.transferTx);
 
             // test contract owner has received expected ccy fee
             const owner_balBefore = data.owner_before.ccys.filter(p => p.ccyTypeId == CONST.ccyType.USD).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
             const owner_balAfter  =  data.owner_after.ccys.filter(p => p.ccyTypeId == CONST.ccyType.USD).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
-            assert(owner_balAfter == Number(owner_balBefore) + Number(expectedFeeCcy), 'unexpected contract owner (fee receiver) ccy balance after transfer');
+            assert(owner_balAfter == Number(owner_balBefore) + Number(expectedFeeCcy) - Number(data.orig_ccyFee_toA.toString()) - Number(data.orig_ccyFee_toB.toString()),
+                'unexpected contract owner (fee receiver) ccy balance after transfer');
         }
     });
 
@@ -87,7 +98,8 @@ contract("StMaster", accounts => {
             const transferAmountTok = new BN(transferAmountsTok[i]);
             const expectedFeeCcy = Math.floor(Number(transferAmountTok.toString()) / 1000) * ccy_perThousand
                                     * 2; // ex ccy-fee mirror - symmetric
-            console.log('expectedFeeCcy', expectedFeeCcy);
+            
+            //console.log('expectedFeeCcy', expectedFeeCcy);
             const data = await transferHelper.transferLedger({ stm, accounts,
                     ledger_A: A,                                         ledger_B: B,
                        qty_A: transferAmountTok,                    tokenTypeId_A: CONST.tokenType.NATURE,
@@ -96,17 +108,18 @@ contract("StMaster", accounts => {
                 ccy_amount_B: transferAmountCcy,                      ccyTypeId_B: CONST.ccyType.USD,
                    applyFees: true,
             });
-            truffleAssert.prettyPrintEmittedEvents(data.transferTx);
+            //truffleAssert.prettyPrintEmittedEvents(data.transferTx);
 
             // test contract owner has received expected ccy fee
             const owner_balBefore = data.owner_before.ccys.filter(p => p.ccyTypeId == CONST.ccyType.USD).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
             const owner_balAfter  =  data.owner_after.ccys.filter(p => p.ccyTypeId == CONST.ccyType.USD).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
-            assert(owner_balAfter == Number(owner_balBefore) + Number(expectedFeeCcy), 'unexpected contract owner (fee receiver) ccy balance after transfer');
+            assert(owner_balAfter == Number(owner_balBefore) + Number(expectedFeeCcy) - Number(data.orig_ccyFee_toA.toString()) - Number(data.orig_ccyFee_toB.toString()),
+                'unexpected contract owner (fee receiver) ccy balance after transfer');
         }
-    });*/
+    });
 
     // ORIG CCY FEE -- (MULTIPLE BALANCED BATCHES, SHARE OF 3 USD per THOUSAND RECEIVED, SYMMETRIC MIRRORED)
-    /*it(`fees (orig ccy fee - from per 1000 received, symmetric mirrored, on multi/balanced batches) - apply mirrored USD ccy fee 3 USD/1000 tokens received on trade (global fee on A)`, async () => {
+    it(`fees (orig ccy fee - from per 1000 received, symmetric mirrored, on multi/balanced batches) - apply mirrored USD ccy fee 3 USD/1000 tokens received on trade (global fee on A)`, async () => {
         const A = accounts[global.TaddrNdx + 0];
         const B = accounts[global.TaddrNdx + 1];
 
@@ -129,7 +142,8 @@ contract("StMaster", accounts => {
             const transferAmountTok = new BN(transferAmountsTok[i]);
             const expectedFeeCcy = Math.max(Math.floor(Number(transferAmountTok.toString()) / 1000) * ccy_perThousand, fee_min)
                                     * 2; // ex ccy-fee mirror - symmetric
-            console.log('expectedFeeCcy', expectedFeeCcy);
+            
+            //console.log('expectedFeeCcy', expectedFeeCcy);
             const data = await transferHelper.transferLedger({ stm, accounts,
                     ledger_A: A,                                         ledger_B: B,
                        qty_A: 0,                                    tokenTypeId_A: 0,
@@ -138,12 +152,13 @@ contract("StMaster", accounts => {
                 ccy_amount_B: 0,                                      ccyTypeId_B: 0,
                    applyFees: true,
             });
-            truffleAssert.prettyPrintEmittedEvents(data.transferTx);
+            //truffleAssert.prettyPrintEmittedEvents(data.transferTx);
 
             // test contract owner has received expected ccy fee
             const owner_balBefore = data.owner_before.ccys.filter(p => p.ccyTypeId == CONST.ccyType.USD).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
             const owner_balAfter  =  data.owner_after.ccys.filter(p => p.ccyTypeId == CONST.ccyType.USD).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
-            assert(owner_balAfter == Number(owner_balBefore) + Number(expectedFeeCcy), 'unexpected contract owner (fee receiver) ccy balance after transfer');
+            assert(owner_balAfter == Number(owner_balBefore) + Number(expectedFeeCcy) - Number(data.orig_ccyFee_toA.toString()) - Number(data.orig_ccyFee_toB.toString()),
+                'unexpected contract owner (fee receiver) ccy balance after transfer');
         }
     });
 
@@ -170,7 +185,8 @@ contract("StMaster", accounts => {
             const transferAmountTok = new BN(transferAmountsTok[i]);
             const expectedFeeCcy = Math.max(Math.floor(Number(transferAmountTok.toString()) / 1000) * ccy_perThousand, fee_min)
                                     * 2; // ex ccy-fee mirror - symmetric
-            console.log('expectedFeeCcy', expectedFeeCcy);
+            
+            //console.log('expectedFeeCcy', expectedFeeCcy);
             const data = await transferHelper.transferLedger({ stm, accounts,
                     ledger_A: A,                                         ledger_B: B,
                        qty_A: transferAmountTok,                    tokenTypeId_A: CONST.tokenType.NATURE,
@@ -179,12 +195,13 @@ contract("StMaster", accounts => {
                 ccy_amount_B: transferAmountCcy,                      ccyTypeId_B: CONST.ccyType.USD,
                    applyFees: true,
             });
-            truffleAssert.prettyPrintEmittedEvents(data.transferTx);
+            //truffleAssert.prettyPrintEmittedEvents(data.transferTx);
 
             // test contract owner has received expected ccy fee
             const owner_balBefore = data.owner_before.ccys.filter(p => p.ccyTypeId == CONST.ccyType.USD).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
             const owner_balAfter  =  data.owner_after.ccys.filter(p => p.ccyTypeId == CONST.ccyType.USD).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
-            assert(owner_balAfter == Number(owner_balBefore) + Number(expectedFeeCcy), 'unexpected contract owner (fee receiver) ccy balance after transfer');
+            assert(owner_balAfter == Number(owner_balBefore) + Number(expectedFeeCcy) - Number(data.orig_ccyFee_toA.toString()) - Number(data.orig_ccyFee_toB.toString()),
+                'unexpected contract owner (fee receiver) ccy balance after transfer');
         }
     });
 
@@ -212,7 +229,8 @@ contract("StMaster", accounts => {
             const transferAmountTok = new BN(transferAmountsTok[i]);
             const expectedFeeCcy = Math.max(Math.floor(Number(transferAmountTok.toString()) / 1000) * ccy_perThousand, fee_min)
                                     * 2; // ex ccy-fee mirror - symmetric
-            console.log('expectedFeeCcy', expectedFeeCcy);
+            
+            //console.log('expectedFeeCcy', expectedFeeCcy);
             const data = await transferHelper.transferLedger({ stm, accounts,
                     ledger_A: A,                                         ledger_B: B,
                        qty_A: 0,                                    tokenTypeId_A: 0,
@@ -221,12 +239,13 @@ contract("StMaster", accounts => {
                 ccy_amount_B: 0,                                      ccyTypeId_B: 0,
                    applyFees: true,
             });
-            truffleAssert.prettyPrintEmittedEvents(data.transferTx);
+            //truffleAssert.prettyPrintEmittedEvents(data.transferTx);
 
             // test contract owner has received expected ccy fee
             const owner_balBefore = data.owner_before.ccys.filter(p => p.ccyTypeId == CONST.ccyType.USD).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
             const owner_balAfter  =  data.owner_after.ccys.filter(p => p.ccyTypeId == CONST.ccyType.USD).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
-            assert(owner_balAfter == Number(owner_balBefore) + Number(expectedFeeCcy), 'unexpected contract owner (fee receiver) ccy balance after transfer');
+            assert(owner_balAfter == Number(owner_balBefore) + Number(expectedFeeCcy) - Number(data.orig_ccyFee_toA.toString()) - Number(data.orig_ccyFee_toB.toString()),
+                'unexpected contract owner (fee receiver) ccy balance after transfer');
         }
     });
 
@@ -253,7 +272,8 @@ contract("StMaster", accounts => {
             const transferAmountTok = new BN(transferAmountsTok[i]);
             const expectedFeeCcy = Math.max(Math.floor(Number(transferAmountTok.toString()) / 1000) * ccy_perThousand, fee_min)
                                     * 2; // ex ccy-fee mirror - symmetric
-            console.log('expectedFeeCcy', expectedFeeCcy);
+            
+            //console.log('expectedFeeCcy', expectedFeeCcy);
             const data = await transferHelper.transferLedger({ stm, accounts,
                     ledger_A: A,                                         ledger_B: B,
                        qty_A: transferAmountTok,                    tokenTypeId_A: CONST.tokenType.NATURE,
@@ -262,17 +282,18 @@ contract("StMaster", accounts => {
                 ccy_amount_B: transferAmountCcy,                      ccyTypeId_B: CONST.ccyType.USD,
                    applyFees: true,
             });
-            truffleAssert.prettyPrintEmittedEvents(data.transferTx);
+            //truffleAssert.prettyPrintEmittedEvents(data.transferTx);
 
             // test contract owner has received expected ccy fee
             const owner_balBefore = data.owner_before.ccys.filter(p => p.ccyTypeId == CONST.ccyType.USD).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
             const owner_balAfter  =  data.owner_after.ccys.filter(p => p.ccyTypeId == CONST.ccyType.USD).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
-            assert(owner_balAfter == Number(owner_balBefore) + Number(expectedFeeCcy), 'unexpected contract owner (fee receiver) ccy balance after transfer');
+            assert(owner_balAfter == Number(owner_balBefore) + Number(expectedFeeCcy) - Number(data.orig_ccyFee_toA.toString()) - Number(data.orig_ccyFee_toB.toString()),
+                'unexpected contract owner (fee receiver) ccy balance after transfer');
         }
-    });*/
+    });
 
     // ORIG CCY FEE -- (MULTIPLE UNBALANCED BATCHES, SHARE OF 3 USD per THOUSAND RECEIVED, ASYMMETRIC MIRRORED)
-    /*it(`fees (orig ccy fee - per 1000 received, asymmetric mirrored, on multi/unbalanced batches) - apply asymmetrical mirrored ledger override USD ccy fee 6 USD/1000 tokens received, capped USD 60, on trade (ledger fee on A)`, async () => {
+    it(`fees (orig ccy fee - per 1000 received, asymmetric mirrored, on multi/unbalanced batches) - apply asymmetrical mirrored ledger override USD ccy fee 6 USD/1000 tokens received, capped USD 60, on trade (ledger fee on A)`, async () => {
         const A = accounts[global.TaddrNdx + 0]
         const B = accounts[global.TaddrNdx + 1]
 
@@ -304,10 +325,9 @@ contract("StMaster", accounts => {
 
             const expectedFeeCcy = expectedFeeCcy_A + expectedFeeCcy_B;
             
-            console.log('expectedFeeCcy_A', expectedFeeCcy_A);
-            console.log('expectedFeeCcy_B', expectedFeeCcy_B);
-            console.log('expectedFeeCcy', expectedFeeCcy);
-
+            // console.log('expectedFeeCcy_A', expectedFeeCcy_A);
+            // console.log('expectedFeeCcy_B', expectedFeeCcy_B);
+            // console.log('expectedFeeCcy', expectedFeeCcy);
             const data = await transferHelper.transferLedger({ stm, accounts,
                     ledger_A: A,                                         ledger_B: B,
                        qty_A: 0,                                    tokenTypeId_A: 0,
@@ -316,12 +336,13 @@ contract("StMaster", accounts => {
                 ccy_amount_B: 0,                                      ccyTypeId_B: 0,
                    applyFees: true,
             });
-            truffleAssert.prettyPrintEmittedEvents(data.transferTx);
+            //truffleAssert.prettyPrintEmittedEvents(data.transferTx);
 
             // test contract owner has received expected ccy fee
             const owner_balBefore = data.owner_before.ccys.filter(p => p.ccyTypeId == CONST.ccyType.USD).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
             const owner_balAfter  =  data.owner_after.ccys.filter(p => p.ccyTypeId == CONST.ccyType.USD).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
-            assert(owner_balAfter == Number(owner_balBefore) + Number(expectedFeeCcy), 'unexpected contract owner (fee receiver) ccy balance after transfer');
+            assert(owner_balAfter == Number(owner_balBefore) + Number(expectedFeeCcy) - Number(data.orig_ccyFee_toA.toString()) - Number(data.orig_ccyFee_toB.toString()),
+                'unexpected contract owner (fee receiver) ccy balance after transfer');
         }
     });
 
@@ -357,10 +378,9 @@ contract("StMaster", accounts => {
 
             const expectedFeeCcy = expectedFeeCcy_A + expectedFeeCcy_B;
             
-            console.log('expectedFeeCcy_A', expectedFeeCcy_A);
-            console.log('expectedFeeCcy_B', expectedFeeCcy_B);
-            console.log('expectedFeeCcy', expectedFeeCcy);
-
+            // console.log('expectedFeeCcy_A', expectedFeeCcy_A);
+            // console.log('expectedFeeCcy_B', expectedFeeCcy_B);
+            // console.log('expectedFeeCcy', expectedFeeCcy);
             const data = await transferHelper.transferLedger({ stm, accounts,
                     ledger_A: A,                                         ledger_B: B,
                        qty_A: transferAmountTok,                    tokenTypeId_A: CONST.tokenType.NATURE,
@@ -369,12 +389,13 @@ contract("StMaster", accounts => {
                 ccy_amount_B: transferAmountCcy,                      ccyTypeId_B: CONST.ccyType.USD,
                    applyFees: true,
             });
-            truffleAssert.prettyPrintEmittedEvents(data.transferTx);
+            //truffleAssert.prettyPrintEmittedEvents(data.transferTx);
 
             // test contract owner has received expected ccy fee
             const owner_balBefore = data.owner_before.ccys.filter(p => p.ccyTypeId == CONST.ccyType.USD).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
             const owner_balAfter  =  data.owner_after.ccys.filter(p => p.ccyTypeId == CONST.ccyType.USD).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
-            assert(owner_balAfter == Number(owner_balBefore) + Number(expectedFeeCcy), 'unexpected contract owner (fee receiver) ccy balance after transfer');
+            assert(owner_balAfter == Number(owner_balBefore) + Number(expectedFeeCcy) - Number(data.orig_ccyFee_toA.toString()) - Number(data.orig_ccyFee_toB.toString()),
+                'unexpected contract owner (fee receiver) ccy balance after transfer');
         }
-    });*/
+    });
 });
