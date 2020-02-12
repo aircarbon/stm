@@ -20,10 +20,10 @@ contract("StMaster", accounts => {
     });
     
     it(`funding - should allow funding of SGD`, async () => {
-        await fundLedger({ ccyTypeId: CONST.ccyType.SGD, amount: CONST.thousandCcy_cents, receiver: accounts[global.TaddrNdx]});
+        await fundLedger({ ccyTypeId: CONST.ccyType.USD, amount: CONST.thousandCcy_cents, receiver: accounts[global.TaddrNdx]});
     });
     it(`funding - should allow funding of extreme values of USD`, async () => {
-        await fundLedger({ ccyTypeId: CONST.ccyType.SGD, amount: CONST.millionCcy_cents * 1000 * 1000, receiver: accounts[global.TaddrNdx]});
+        await fundLedger({ ccyTypeId: CONST.ccyType.USD, amount: CONST.millionCcy_cents * 1000 * 1000, receiver: accounts[global.TaddrNdx]});
     });
 
     it(`funding - should allow funding of ETH`, async () => {
@@ -55,28 +55,28 @@ contract("StMaster", accounts => {
 
     it(`funding - should allow repeated funding`, async () => {
         for (var i=0 ; i < 10 ; i++) {
-            await fundLedger({ ccyTypeId: CONST.ccyType.SGD, amount: CONST.thousandCcy_cents, receiver: accounts[global.TaddrNdx]});
+            await fundLedger({ ccyTypeId: CONST.ccyType.USD, amount: CONST.thousandCcy_cents, receiver: accounts[global.TaddrNdx]});
         }
     });
 
     it(`funding - should have reasonable gas cost for funding`, async () => {
-        const fundTx = await stm.fund(CONST.ccyType.SGD, CONST.thousandCcy_cents, accounts[global.TaddrNdx], { from: accounts[0] });
+        const fundTx = await stm.fund(CONST.ccyType.USD, CONST.thousandCcy_cents, accounts[global.TaddrNdx], { from: accounts[0] });
         await CONST.logGas(web3, fundTx, `Funding`);
     });
 
     it(`funding - should allow minting and funding on same ledger entry`, async () => {
         await stm.mintSecTokenBatch(CONST.tokenType.NATURE, CONST.gtCarbon, 1, accounts[global.TaddrNdx], CONST.nullFees, 0, [], [], { from: accounts[0] });
-        await stm.fund(CONST.ccyType.SGD, CONST.thousandCcy_cents, accounts[global.TaddrNdx],                                        { from: accounts[0] });
+        await stm.fund(CONST.ccyType.USD, CONST.thousandCcy_cents, accounts[global.TaddrNdx],                                        { from: accounts[0] });
         const ledgerEntryAfter = await stm.getLedgerEntry(accounts[global.TaddrNdx]);
 
         assert(ledgerEntryAfter.tokens.length == 1, 'unexpected eeu count in ledger entry after minting & funding');
         assert(Number(ledgerEntryAfter.tokens_sumQty) == Number(CONST.gtCarbon), 'invalid kg sum in ledger entry after minting & funding');
-        assert(ledgerEntryAfter.ccys.find(p => p.ccyTypeId == CONST.ccyType.SGD).balance == CONST.thousandCcy_cents, 'unexpected usd balance in ledger entry after minting & funding');
+        assert(ledgerEntryAfter.ccys.find(p => p.ccyTypeId == CONST.ccyType.USD).balance == CONST.thousandCcy_cents, 'unexpected usd balance in ledger entry after minting & funding');
     });
 
     it(`funding - should not allow non-owner to fund a ledger entry`, async () => {
         try {
-            await stm.fund(CONST.ccyType.SGD, 100, accounts[global.TaddrNdx], { from: accounts[1] });
+            await stm.fund(CONST.ccyType.USD, 100, accounts[global.TaddrNdx], { from: accounts[1] });
         } catch (ex) { 
             assert(ex.reason == 'Restricted', `unexpected: ${ex.reason}`);
             return;
@@ -96,7 +96,7 @@ contract("StMaster", accounts => {
 
     it(`funding - should not allow invalid amounts`, async () => {
         try {
-            await stm.fund(CONST.ccyType.SGD, -1, accounts[global.TaddrNdx], { from: accounts[0] });
+            await stm.fund(CONST.ccyType.USD, -1, accounts[global.TaddrNdx], { from: accounts[0] });
         } catch (ex) { 
             assert(ex.reason == 'Min. amount 1', `unexpected: ${ex.reason}`);
             return;
@@ -107,7 +107,7 @@ contract("StMaster", accounts => {
     it(`funding - should not allow when contract is read only`, async () => {
         try {
             await stm.setReadOnly(true, { from: accounts[0] });
-            await stm.fund(CONST.ccyType.SGD, 100, accounts[global.TaddrNdx], { from: accounts[0] });
+            await stm.fund(CONST.ccyType.USD, 100, accounts[global.TaddrNdx], { from: accounts[0] });
         } catch (ex) { 
             assert(ex.reason == 'Read-only', `unexpected: ${ex.reason}`);
             await stm.setReadOnly(false, { from: accounts[0] });

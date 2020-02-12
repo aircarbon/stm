@@ -147,7 +147,7 @@ contract("StMaster", accounts => {
         assert(Big(MA_B_balAfter).eq(Big(MA_qty)), 'test setup failed');
 
         // SETUP - A: fund, so ready to trade with B
-        await stm.fund(CONST.ccyType.SGD,                   CONST.millionCcy_cents,  A,                    { from: accounts[0] });        
+        await stm.fund(CONST.ccyType.USD,                   CONST.millionCcy_cents,  A,                    { from: accounts[0] });        
 
         // TEST - set global fee structure CORSIA: 8x originator fee
         var globalFeeTok = { ccy_mirrorFee: false, ccy_perThousand: 0,
@@ -161,8 +161,8 @@ contract("StMaster", accounts => {
 
         // TEST - set ledger fee SGD
         const ledgerFeeCcy = { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: 100, fee_percBips: 0, fee_min: 0, fee_max: 0, };
-        await stm.setFee_CcyType(CONST.ccyType.SGD, A,                ledgerFeeCcy);
-        await stm.setFee_CcyType(CONST.ccyType.SGD, CONST.nullAddr,   { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: 200, fee_percBips: 0, fee_min: 0, fee_max: 0 } ); // to test ledger override
+        await stm.setFee_CcyType(CONST.ccyType.USD, A,                ledgerFeeCcy);
+        await stm.setFee_CcyType(CONST.ccyType.USD, CONST.nullAddr,   { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: 200, fee_percBips: 0, fee_min: 0, fee_max: 0 } ); // to test ledger override
 
         // TEST - transfer
         const transferAmountTokQty = new BN(1500);
@@ -171,7 +171,7 @@ contract("StMaster", accounts => {
                 ledger_A: A,                                   ledger_B: B,
                    qty_A: 0,                              tokenTypeId_A: 0,
                    qty_B: transferAmountTokQty,           tokenTypeId_B: CONST.tokenType.CORSIA,
-            ccy_amount_A: CONST.hundredCcy_cents,           ccyTypeId_A: CONST.ccyType.SGD,
+            ccy_amount_A: CONST.hundredCcy_cents,           ccyTypeId_A: CONST.ccyType.USD,
             ccy_amount_B: 0,                                ccyTypeId_B: 0,
                applyFees: true,
         });
@@ -183,8 +183,8 @@ contract("StMaster", accounts => {
         const owner_balAfter  =  data.owner_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.CORSIA).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
         assert(Big(owner_balAfter).eq(Big(owner_balBefore).plus(Big(data.exchangeFee_tok_B))), 'unexpected fee receiver token balance after transfer');
         
-        const owner_balCcyBefore = data.owner_before.ccys.filter(p => p.ccyTypeId == CONST.ccyType.SGD)[0].balance;
-        const owner_balCcyAfter  =  data.owner_after.ccys.filter(p => p.ccyTypeId == CONST.ccyType.SGD)[0].balance;
+        const owner_balCcyBefore = data.owner_before.ccys.filter(p => p.ccyTypeId == CONST.ccyType.USD)[0].balance;
+        const owner_balCcyAfter  =  data.owner_after.ccys.filter(p => p.ccyTypeId == CONST.ccyType.USD)[0].balance;
         assert(Big(owner_balCcyAfter).eq(Big(ledgerFeeCcy.fee_fixed)), 'unexpected contract owner currency balance after transfer (1)');
         assert(Big(owner_balCcyAfter).eq(Big(owner_balCcyBefore).plus(Big(data.exchangeFee_ccy_A))), 'unexpected contract owner currency balance after transfer (2)');
 

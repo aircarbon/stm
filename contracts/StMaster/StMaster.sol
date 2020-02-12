@@ -127,10 +127,10 @@ contract StMaster is IStMaster, IPublicViews,
             stTypesData._tokenTypeNames[2] = 'AirCarbon Nature Token';
             stTypesData._tokenTypeNames[3] = 'AirCarbon Premium Token';
             stTypesData._count_tokenTypes = 3;
-            ccyTypesData._ccyTypes[4] = StructLib.Ccy({ id: 1, name: 'USD', unit: 'cents',      decimals: 2 });
+            ccyTypesData._ccyTypes[1] = StructLib.Ccy({ id: 1, name: 'USD', unit: 'cents',      decimals: 2 });
             ccyTypesData._ccyTypes[2] = StructLib.Ccy({ id: 2, name: 'ETH', unit: 'Wei',        decimals: 18 });
             ccyTypesData._ccyTypes[3] = StructLib.Ccy({ id: 3, name: 'BTC', unit: 'Satoshi',    decimals: 8 });
-          //ccyTypesData._ccyTypes[1] = StructLib.Ccy({ id: 4, name: 'SGD', unit: 'cents',      decimals: 2 });
+          //ccyTypesData._ccyTypes[4] = StructLib.Ccy({ id: 4, name: 'SGD', unit: 'cents',      decimals: 2 });
           //ccyTypesData._ccyTypes[5] = StructLib.Ccy({ id: 5, name: 'EUR', unit: 'euro cents', decimals: 2 });
           //ccyTypesData._ccyTypes[6] = StructLib.Ccy({ id: 6, name: 'HKD', unit: 'cents',      decimals: 2 });
           //ccyTypesData._ccyTypes[7] = StructLib.Ccy({ id: 7, name: 'GBP', unit: 'pence',      decimals: 2 });

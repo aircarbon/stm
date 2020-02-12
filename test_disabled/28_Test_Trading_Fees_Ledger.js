@@ -264,7 +264,7 @@ contract("StMaster", accounts => {
         assert((await stm.getFee(CONST.getFeeType.CCY, CONST.ccyType.ETH, A)).fee_min == ethFeeMin, 'unexpected ETH min fee after setting ETH fee structure');
 
         // set different (irrelevant) ledger fee USD for A
-        await stm.setFee_CcyType(CONST.ccyType.SGD, A, { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: ethFeeFix+1, fee_percBips: ethFeeBps+1, fee_min: ethFeeMin+1, fee_max: 0 } );
+        await stm.setFee_CcyType(CONST.ccyType.USD, A, { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: ethFeeFix+1, fee_percBips: ethFeeBps+1, fee_min: ethFeeMin+1, fee_max: 0 } );
 
         // transfer, with fee structure applied
         const transferAmountCcy = new BN(CONST.tenthEth_wei);
@@ -319,7 +319,7 @@ contract("StMaster", accounts => {
         assert((await stm.getFee(CONST.getFeeType.CCY, CONST.ccyType.ETH, A)).fee_min == ethFeeMin, 'unexpected ccy min fee after clearing ledger fee structure');
 
         // set different (irrelevant) ledger fee USD for A
-        await stm.setFee_CcyType(CONST.ccyType.SGD, A, { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: ethFeeFix+1, fee_percBips: ethFeeBps+1, fee_min: ethFeeMin+1, fee_max: 0 } );
+        await stm.setFee_CcyType(CONST.ccyType.USD, A, { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: ethFeeFix+1, fee_percBips: ethFeeBps+1, fee_min: ethFeeMin+1, fee_max: 0 } );
 
         // transfer, with fee structure applied - expect global fee structure
         const transferAmountCcy = new BN(CONST.tenthEth_wei);
@@ -369,7 +369,7 @@ contract("StMaster", accounts => {
         assert((await stm.getFee(CONST.getFeeType.CCY, CONST.ccyType.ETH, B)).fee_max == ethFeeMax, 'unexpected ccy max fee after clearing ledger fee structure');
 
         // set different (irrelevant) ledger fee USD for B
-        await stm.setFee_CcyType(CONST.ccyType.SGD, B, { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: ethFeeFix+1, fee_percBips: ethFeeBps+1, fee_min: 0, fee_max: 0 } );
+        await stm.setFee_CcyType(CONST.ccyType.USD, B, { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: ethFeeFix+1, fee_percBips: ethFeeBps+1, fee_min: 0, fee_max: 0 } );
 
         // transfer, with fee structure applied
         const transferAmountCcy = new BN(CONST.millionEth_wei).div(new BN(2)); // 500k
@@ -426,7 +426,7 @@ contract("StMaster", accounts => {
         assert((await stm.getFee(CONST.getFeeType.CCY, CONST.ccyType.ETH, B)).fee_max == ethFeeMax, 'unexpected ccy max fee after clearing ledger fee structure');
 
         // set different (irrelevant) ledger fee USD for B
-        await stm.setFee_CcyType(CONST.ccyType.SGD, B, { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: ethFeeFix+1, fee_percBips: ethFeeBps+1, fee_min: 0, fee_max: 0 } );
+        await stm.setFee_CcyType(CONST.ccyType.USD, B, { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: ethFeeFix+1, fee_percBips: ethFeeBps+1, fee_min: 0, fee_max: 0 } );
 
         // transfer, with fee structure applied - expect global fee structure
         const transferAmountCcy = new BN(CONST.millionEth_wei).div(new BN(4)); // 250k

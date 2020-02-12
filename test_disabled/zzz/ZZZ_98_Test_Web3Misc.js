@@ -35,11 +35,11 @@ contract("StMaster", accounts => {
         const A = accounts[0];
         
         // fund with truffle
-        //const truffle_fundTx = await stm.fund(CONST.ccyType.SGD, CONST.hundredCcy_cents, A, { from: accounts[0] });
+        //const truffle_fundTx = await stm.fund(CONST.ccyType.USD, CONST.hundredCcy_cents, A, { from: accounts[0] });
 
         // fund $100 - web3
         var paramsData = contract.methods
-            .fund(CONST.ccyType.SGD, CONST.hundredCcy_cents, A)
+            .fund(CONST.ccyType.USD, CONST.hundredCcy_cents, A)
             .encodeABI(); 
         var web3_fundTx = new ejs.Transaction({
                nonce: await web3.eth.getTransactionCount(account, "pending"),
@@ -72,13 +72,13 @@ contract("StMaster", accounts => {
 
         // getLedgerEntry - truffle
         const truffle_ledgerEntry = await stm.getLedgerEntry(A);
-        const truffle_balance = truffle_ledgerEntry.ccys.find(p => p.ccyTypeId == CONST.ccyType.SGD).balance;
+        const truffle_balance = truffle_ledgerEntry.ccys.find(p => p.ccyTypeId == CONST.ccyType.USD).balance;
         console.log('truffle_balance', truffle_balance);
         assert(truffle_balance == 10000, 'unexpected truffle balance after funding');
         
         // getLedgerEntry - web3
         const web3_ledgerEntry = await contract.methods.getLedgerEntry(A).call();
-        const web3_balance = web3_ledgerEntry.ccys.find(p => p.ccyTypeId == CONST.ccyType.SGD).balance;
+        const web3_balance = web3_ledgerEntry.ccys.find(p => p.ccyTypeId == CONST.ccyType.USD).balance;
         console.log('web3_balance (BN)', web3_balance);
         console.log('web3_balance.toString()', web3_balance.toString());
 

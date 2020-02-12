@@ -137,7 +137,7 @@ contract("StMaster", accounts => {
         const setFeeTx = await stm.setFee_CcyType(CONST.ccyType.ETH, CONST.nullAddr, { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: 0, fee_percBips: ethFeePercBips, fee_min: 0, fee_max: 0 } );
         truffleAssert.eventEmitted(setFeeTx, 'SetFeeCcyBps', ev => ev.ccyTypeId == CONST.ccyType.ETH && ev.fee_ccy_PercBips == ethFeePercBips && ev.ledgerOwner == CONST.nullAddr);
         assert((await stm.getFee(CONST.getFeeType.CCY, CONST.ccyType.ETH, CONST.nullAddr)).fee_percBips == ethFeePercBips, 'unexpected ETH percentage fee after setting ETH fee structure');
-        assert((await stm.getFee(CONST.getFeeType.CCY, CONST.ccyType.SGD, CONST.nullAddr)).fee_percBips == 0, 'unexpected USD percentage fee after setting ETH fee structure');
+        assert((await stm.getFee(CONST.getFeeType.CCY, CONST.ccyType.USD, CONST.nullAddr)).fee_percBips == 0, 'unexpected USD percentage fee after setting ETH fee structure');
 
         // transfer, with fee structure applied
         const transferAmountCcy = new BN(100); // Wei
@@ -159,14 +159,14 @@ contract("StMaster", accounts => {
 
     it(`fees (percentage) - apply USD ccy fee 1 BP on a trade (fee on B)`, async () => {
         await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.kt1Carbon, 1,      accounts[global.TaddrNdx + 0], CONST.nullFees, 0, [], [], { from: accounts[0] });
-        await stm.fund(CONST.ccyType.SGD,                      CONST.millionCcy_cents,  accounts[global.TaddrNdx + 1],                            { from: accounts[0] });
+        await stm.fund(CONST.ccyType.USD,                      CONST.millionCcy_cents,  accounts[global.TaddrNdx + 1],                            { from: accounts[0] });
 
         // set fee structure USD: 0.01% 
         const usdFeePercBips = 1; // 1 bp = 0.01%
         //const setFeeTx = await stm.setFee_CcyType_PercBips(CONST.ccyType.USD, usdFeePercBips);
-        const setFeeTx = await stm.setFee_CcyType(CONST.ccyType.SGD, CONST.nullAddr, { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: 0, fee_percBips: usdFeePercBips, fee_min: 0, fee_max: 0 } );
-        truffleAssert.eventEmitted(setFeeTx, 'SetFeeCcyBps', ev => ev.ccyTypeId == CONST.ccyType.SGD && ev.fee_ccy_PercBips == usdFeePercBips && ev.ledgerOwner == CONST.nullAddr);
-        assert((await stm.getFee(CONST.getFeeType.CCY, CONST.ccyType.SGD, CONST.nullAddr)).fee_percBips == usdFeePercBips, 'unexpected USD percentage fee after setting USD fee structure');
+        const setFeeTx = await stm.setFee_CcyType(CONST.ccyType.USD, CONST.nullAddr, { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: 0, fee_percBips: usdFeePercBips, fee_min: 0, fee_max: 0 } );
+        truffleAssert.eventEmitted(setFeeTx, 'SetFeeCcyBps', ev => ev.ccyTypeId == CONST.ccyType.USD && ev.fee_ccy_PercBips == usdFeePercBips && ev.ledgerOwner == CONST.nullAddr);
+        assert((await stm.getFee(CONST.getFeeType.CCY, CONST.ccyType.USD, CONST.nullAddr)).fee_percBips == usdFeePercBips, 'unexpected USD percentage fee after setting USD fee structure');
 
         // transfer, with fee structure applied
         const transferAmountCcy = new BN(10000); // 100$ = 10,000 cents
@@ -176,13 +176,13 @@ contract("StMaster", accounts => {
                    qty_A: 750,                                                           tokenTypeId_A: CONST.tokenType.NATURE,
                    qty_B: 0,                                                             tokenTypeId_B: 0,
             ccy_amount_A: 0,                                                               ccyTypeId_A: 0,
-            ccy_amount_B: transferAmountCcy,                                               ccyTypeId_B: CONST.ccyType.SGD,
+            ccy_amount_B: transferAmountCcy,                                               ccyTypeId_B: CONST.ccyType.USD,
                applyFees: true,
         });
 
         // test contract owner has received expected ETH fee
-        const owner_balBefore = data.owner_before.ccys.filter(p => p.ccyTypeId == CONST.ccyType.SGD).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
-        const owner_balAfter  =  data.owner_after.ccys.filter(p => p.ccyTypeId == CONST.ccyType.SGD).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
+        const owner_balBefore = data.owner_before.ccys.filter(p => p.ccyTypeId == CONST.ccyType.USD).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
+        const owner_balAfter  =  data.owner_after.ccys.filter(p => p.ccyTypeId == CONST.ccyType.USD).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
         assert(owner_balAfter == Number(owner_balBefore) + Number(expectedFeeCcy), 'unexpected contract owner (fee receiver) USD balance after transfer');
     });
 
@@ -263,14 +263,14 @@ contract("StMaster", accounts => {
     });
 
     it(`fees (percentage) - should have reasonable gas cost for two-sided USD ccy & CORSIA ST transfer (fees on both sides)`, async () => {
-        await stm.fund(CONST.ccyType.SGD,                   CONST.millionCcy_cents,  accounts[global.TaddrNdx + 0],                            { from: accounts[0] });
+        await stm.fund(CONST.ccyType.USD,                   CONST.millionCcy_cents,  accounts[global.TaddrNdx + 0],                            { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.CORSIA, CONST.kt1Carbon, 1,      accounts[global.TaddrNdx + 1], CONST.nullFees, 0, [], [], { from: accounts[0] });
 
         // set fee structure USD: 100 bp (1%)
         const ccyFeeBips = 100;
-        const setCcyFeeTx = await stm.setFee_CcyType(CONST.ccyType.SGD, CONST.nullAddr, { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: 0, fee_percBips: ccyFeeBips, fee_min: 0, fee_max: 0 } );
-        truffleAssert.eventEmitted(setCcyFeeTx, 'SetFeeCcyBps', ev => ev.ccyTypeId == CONST.ccyType.SGD && ev.fee_ccy_PercBips == ccyFeeBips && ev.ledgerOwner == CONST.nullAddr);
-        assert((await stm.getFee(CONST.getFeeType.CCY, CONST.ccyType.SGD, CONST.nullAddr)).fee_percBips == ccyFeeBips, 'unexpected USD basis points fee after setting USD fee structure');
+        const setCcyFeeTx = await stm.setFee_CcyType(CONST.ccyType.USD, CONST.nullAddr, { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: 0, fee_percBips: ccyFeeBips, fee_min: 0, fee_max: 0 } );
+        truffleAssert.eventEmitted(setCcyFeeTx, 'SetFeeCcyBps', ev => ev.ccyTypeId == CONST.ccyType.USD && ev.fee_ccy_PercBips == ccyFeeBips && ev.ledgerOwner == CONST.nullAddr);
+        assert((await stm.getFee(CONST.getFeeType.CCY, CONST.ccyType.USD, CONST.nullAddr)).fee_percBips == ccyFeeBips, 'unexpected USD basis points fee after setting USD fee structure');
 
         // set fee structure CORSIA: 100 bp (1%)
         const carbonFeeBps = 100;
@@ -289,14 +289,14 @@ contract("StMaster", accounts => {
                 ledger_A: accounts[global.TaddrNdx + 0],                              ledger_B: accounts[global.TaddrNdx + 1],
                    qty_A: 0,                                                     tokenTypeId_A: 0,
                    qty_B: transferAmountCarbon,                                  tokenTypeId_B: CONST.tokenType.CORSIA,
-            ccy_amount_A: transferAmountCcy,                                       ccyTypeId_A: CONST.ccyType.SGD,
+            ccy_amount_A: transferAmountCcy,                                       ccyTypeId_A: CONST.ccyType.USD,
             ccy_amount_B: 0,                                                       ccyTypeId_B: 0,
                applyFees: true,
         });
 
         // test contract owner has received expected USD fee
-        const owner_balBefore = data.owner_before.ccys.filter(p => p.ccyTypeId == CONST.ccyType.SGD).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
-        const owner_balAfter  =  data.owner_after.ccys.filter(p => p.ccyTypeId == CONST.ccyType.SGD).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
+        const owner_balBefore = data.owner_before.ccys.filter(p => p.ccyTypeId == CONST.ccyType.USD).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
+        const owner_balAfter  =  data.owner_after.ccys.filter(p => p.ccyTypeId == CONST.ccyType.USD).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
         assert(owner_balAfter == Number(owner_balBefore) + Number(expectedFeeCcy), 'unexpected contract owner (fee receiver) USD balance after transfer');
         
         // test contract owner has received expected carbon CORSIA fee
@@ -308,14 +308,14 @@ contract("StMaster", accounts => {
     });
 
     it(`fees (percentage) - should have reasonable gas cost for two-sided transfer (eeu/ccy) (fee on ccy)`, async () => {
-        await stm.fund(CONST.ccyType.SGD,                   CONST.millionCcy_cents,  accounts[global.TaddrNdx + 0],                            { from: accounts[0] });
+        await stm.fund(CONST.ccyType.USD,                   CONST.millionCcy_cents,  accounts[global.TaddrNdx + 0],                            { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.CORSIA, CONST.kt1Carbon, 1,      accounts[global.TaddrNdx + 1], CONST.nullFees, 0, [], [], { from: accounts[0] });
 
         // set fee structure USD: 100 bp (1%)
         const ccyFeeBips = 100;
-        const setCcyFeeTx = await stm.setFee_CcyType(CONST.ccyType.SGD, CONST.nullAddr, { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: 0, fee_percBips: ccyFeeBips, fee_min: 0, fee_max: 0 } );
-        truffleAssert.eventEmitted(setCcyFeeTx, 'SetFeeCcyBps', ev => ev.ccyTypeId == CONST.ccyType.SGD && ev.fee_ccy_PercBips == ccyFeeBips && ev.ledgerOwner == CONST.nullAddr);
-        assert((await stm.getFee(CONST.getFeeType.CCY, CONST.ccyType.SGD, CONST.nullAddr)).fee_percBips == ccyFeeBips, 'unexpected USD basis points fee after setting USD fee structure');
+        const setCcyFeeTx = await stm.setFee_CcyType(CONST.ccyType.USD, CONST.nullAddr, { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: 0, fee_percBips: ccyFeeBips, fee_min: 0, fee_max: 0 } );
+        truffleAssert.eventEmitted(setCcyFeeTx, 'SetFeeCcyBps', ev => ev.ccyTypeId == CONST.ccyType.USD && ev.fee_ccy_PercBips == ccyFeeBips && ev.ledgerOwner == CONST.nullAddr);
+        assert((await stm.getFee(CONST.getFeeType.CCY, CONST.ccyType.USD, CONST.nullAddr)).fee_percBips == ccyFeeBips, 'unexpected USD basis points fee after setting USD fee structure');
 
         // set fee structure CORSIA: 0 bp (0%)
         const carbonFeeBps = 0;
@@ -333,15 +333,15 @@ contract("StMaster", accounts => {
                 ledger_A: accounts[global.TaddrNdx + 0],                              ledger_B: accounts[global.TaddrNdx + 1],
                    qty_A: 0,                                                     tokenTypeId_A: 0,
                    qty_B: transferAmountCarbon,                                  tokenTypeId_B: CONST.tokenType.CORSIA,
-            ccy_amount_A: transferAmountCcy,                                       ccyTypeId_A: CONST.ccyType.SGD,
+            ccy_amount_A: transferAmountCcy,                                       ccyTypeId_A: CONST.ccyType.USD,
             ccy_amount_B: 0,                                                       ccyTypeId_B: 0,
                applyFees: true,
         });
         //truffleAssert.prettyPrintEmittedEvents(data.transferTx);
 
         // test contract owner has received expected USD fee
-        const owner_balBefore = data.owner_before.ccys.filter(p => p.ccyTypeId == CONST.ccyType.SGD).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
-        const owner_balAfter  =  data.owner_after.ccys.filter(p => p.ccyTypeId == CONST.ccyType.SGD).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
+        const owner_balBefore = data.owner_before.ccys.filter(p => p.ccyTypeId == CONST.ccyType.USD).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
+        const owner_balAfter  =  data.owner_after.ccys.filter(p => p.ccyTypeId == CONST.ccyType.USD).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
         assert(owner_balAfter == Number(owner_balBefore) + Number(expectedFeeCcy), 'unexpected contract owner (fee receiver) USD balance after transfer');
         
         // test contract owner has received expected carbon CORSIA fee
@@ -353,13 +353,13 @@ contract("StMaster", accounts => {
     });
 
     it(`fees (percentage) - should have reasonable gas cost for two-sided transfer (eeu/ccy) (fee on eeu)`, async () => {
-        await stm.fund(CONST.ccyType.SGD,                   CONST.millionCcy_cents,  accounts[global.TaddrNdx + 0],                            { from: accounts[0] });
+        await stm.fund(CONST.ccyType.USD,                   CONST.millionCcy_cents,  accounts[global.TaddrNdx + 0],                            { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.CORSIA, CONST.kt1Carbon, 1,      accounts[global.TaddrNdx + 1], CONST.nullFees, 0, [], [], { from: accounts[0] });
 
         // set fee structure USD: 0%
         const ccyFeeBips = 0;
-        const setCcyFeeTx = await stm.setFee_CcyType(CONST.ccyType.SGD, CONST.nullAddr, { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: 0, fee_percBips: ccyFeeBips, fee_min: 0, fee_max: 0 } );
-        assert((await stm.getFee(CONST.getFeeType.CCY, CONST.ccyType.SGD, CONST.nullAddr)).fee_percBips == ccyFeeBips, 'unexpected USD basis points fee after setting USD fee structure');
+        const setCcyFeeTx = await stm.setFee_CcyType(CONST.ccyType.USD, CONST.nullAddr, { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: 0, fee_percBips: ccyFeeBips, fee_min: 0, fee_max: 0 } );
+        assert((await stm.getFee(CONST.getFeeType.CCY, CONST.ccyType.USD, CONST.nullAddr)).fee_percBips == ccyFeeBips, 'unexpected USD basis points fee after setting USD fee structure');
 
         // set fee structure CORSIA: 10 bp (0.1%)
         const carbonFeeBps = 10;
@@ -378,15 +378,15 @@ contract("StMaster", accounts => {
                 ledger_A: accounts[global.TaddrNdx + 0],                              ledger_B: accounts[global.TaddrNdx + 1],
                    qty_A: 0,                                                     tokenTypeId_A: 0,
                    qty_B: transferAmountCarbon,                                  tokenTypeId_B: CONST.tokenType.CORSIA,
-            ccy_amount_A: transferAmountCcy,                                       ccyTypeId_A: CONST.ccyType.SGD,
+            ccy_amount_A: transferAmountCcy,                                       ccyTypeId_A: CONST.ccyType.USD,
             ccy_amount_B: 0,                                                       ccyTypeId_B: 0,
                applyFees: true,
         });
         //truffleAssert.prettyPrintEmittedEvents(data.transferTx);
 
         // test contract owner has received expected USD fee
-        const owner_balBefore = data.owner_before.ccys.filter(p => p.ccyTypeId == CONST.ccyType.SGD).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
-        const owner_balAfter  =  data.owner_after.ccys.filter(p => p.ccyTypeId == CONST.ccyType.SGD).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
+        const owner_balBefore = data.owner_before.ccys.filter(p => p.ccyTypeId == CONST.ccyType.USD).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
+        const owner_balAfter  =  data.owner_after.ccys.filter(p => p.ccyTypeId == CONST.ccyType.USD).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
         assert(owner_balAfter == Number(owner_balBefore) + Number(expectedFeeCcy), 'unexpected contract owner (fee receiver) USD balance after transfer');
         
         // test contract owner has received expected carbon CORSIA fee
@@ -398,12 +398,12 @@ contract("StMaster", accounts => {
     });
 
     it(`fees (percentage) - should round fees to zero for minimal transfers (ccy & carbon)`, async () => {
-        await stm.fund(CONST.ccyType.SGD,                   CONST.millionCcy_cents,  accounts[global.TaddrNdx + 0],                            { from: accounts[0] });
+        await stm.fund(CONST.ccyType.USD,                   CONST.millionCcy_cents,  accounts[global.TaddrNdx + 0],                            { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.CORSIA, CONST.kt1Carbon, 1,      accounts[global.TaddrNdx + 1], CONST.nullFees, 0, [], [], { from: accounts[0] });
 
         // set % fees to 1bp = 0.01%
         const ccyFeeBips = 1, carbonFeeBps = 1;
-        await stm.setFee_CcyType(CONST.ccyType.SGD, CONST.nullAddr,      { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: 0, fee_percBips: ccyFeeBips,   fee_min: 0, fee_max: 0 } );
+        await stm.setFee_CcyType(CONST.ccyType.USD, CONST.nullAddr,      { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: 0, fee_percBips: ccyFeeBips,   fee_min: 0, fee_max: 0 } );
         await stm.setFee_TokType(CONST.tokenType.CORSIA, CONST.nullAddr, { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: 0, fee_percBips: carbonFeeBps, fee_min: 0, fee_max: 0 } );
 
         const transferAmountCcy = new BN(100); // 100 cents
@@ -416,13 +416,13 @@ contract("StMaster", accounts => {
                 ledger_A: accounts[global.TaddrNdx + 0],                    ledger_B: accounts[global.TaddrNdx + 1],
                    qty_A: 0,                                           tokenTypeId_A: 0,
                    qty_B: transferAmountCarbon,                        tokenTypeId_B: CONST.tokenType.CORSIA,
-            ccy_amount_A: transferAmountCcy,                             ccyTypeId_A: CONST.ccyType.SGD,
+            ccy_amount_A: transferAmountCcy,                             ccyTypeId_A: CONST.ccyType.USD,
             ccy_amount_B: 0,                                             ccyTypeId_B: 0,
                applyFees: true,
         });
 
-        const owner_balBefore = data.owner_before.ccys.filter(p => p.ccyTypeId == CONST.ccyType.SGD).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
-        const owner_balAfter  =  data.owner_after.ccys.filter(p => p.ccyTypeId == CONST.ccyType.SGD).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
+        const owner_balBefore = data.owner_before.ccys.filter(p => p.ccyTypeId == CONST.ccyType.USD).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
+        const owner_balAfter  =  data.owner_after.ccys.filter(p => p.ccyTypeId == CONST.ccyType.USD).map(p => p.balance).reduce((a,b) => Number(a) + Number(b), 0);
         assert(owner_balAfter == Number(owner_balBefore) + Number(expectedFeeCcy), 'unexpected contract owner (fee receiver) USD balance after transfer');
         
         // test contract owner has received expected carbon CORSIA fee
@@ -433,7 +433,7 @@ contract("StMaster", accounts => {
     
     it(`fees (percentage) - should not allow non-owner to set global fee structure (ccy)`, async () => {
         try {
-            const tx1 = await stm.setFee_CcyType(CONST.ccyType.SGD, CONST.nullAddr, { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: 0, fee_percBips: 1, fee_min: 0, fee_max: 0 }, { from: accounts[1] });
+            const tx1 = await stm.setFee_CcyType(CONST.ccyType.USD, CONST.nullAddr, { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: 0, fee_percBips: 1, fee_min: 0, fee_max: 0 }, { from: accounts[1] });
         } catch (ex) { 
             assert(ex.reason == 'Restricted', `unexpected: ${ex.reason}`);
             return;
@@ -452,10 +452,10 @@ contract("StMaster", accounts => {
     });
 
     it(`fees (percentage) - should not allow a transfer with insufficient ccy to cover fees`, async () => {
-        await stm.fund(CONST.ccyType.SGD,                   CONST.millionCcy_cents,  accounts[global.TaddrNdx + 0],                            { from: accounts[0] });
+        await stm.fund(CONST.ccyType.USD,                   CONST.millionCcy_cents,  accounts[global.TaddrNdx + 0],                            { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.CORSIA, CONST.kt1Carbon, 1,      accounts[global.TaddrNdx + 1], CONST.nullFees, 0, [], [], { from: accounts[0] });
 
-        await stm.setFee_CcyType(CONST.ccyType.SGD, CONST.nullAddr,      { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: 0, fee_percBips: 1, fee_min: 0, fee_max: 0 } );
+        await stm.setFee_CcyType(CONST.ccyType.USD, CONST.nullAddr,      { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: 0, fee_percBips: 1, fee_min: 0, fee_max: 0 } );
         await stm.setFee_TokType(CONST.tokenType.CORSIA, CONST.nullAddr, { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: 0, fee_percBips: 0, fee_min: 0, fee_max: 0 } );
 
         try {
@@ -463,7 +463,7 @@ contract("StMaster", accounts => {
                     ledger_A: accounts[global.TaddrNdx + 0],                                      ledger_B: accounts[global.TaddrNdx + 1],
                        qty_A: 0,                                                             tokenTypeId_A: 0,
                        qty_B: new BN(CONST.kt1Carbon),                                       tokenTypeId_B: CONST.tokenType.CORSIA,
-                ccy_amount_A: new BN(CONST.millionCcy_cents),                                  ccyTypeId_A: CONST.ccyType.SGD,
+                ccy_amount_A: new BN(CONST.millionCcy_cents),                                  ccyTypeId_A: CONST.ccyType.USD,
                 ccy_amount_B: 0,                                                               ccyTypeId_B: 0,
                    applyFees: true,
             });
@@ -477,10 +477,10 @@ contract("StMaster", accounts => {
     });
 
     it(`fees (percentage) - should not allow a transfer with insufficient carbon to cover fees`, async () => {
-        await stm.fund(CONST.ccyType.SGD,                   CONST.millionCcy_cents,  accounts[global.TaddrNdx + 0],                            { from: accounts[0] });
+        await stm.fund(CONST.ccyType.USD,                   CONST.millionCcy_cents,  accounts[global.TaddrNdx + 0],                            { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.CORSIA, CONST.gtCarbon, 1,       accounts[global.TaddrNdx + 1], CONST.nullFees, 0, [], [], { from: accounts[0] });
 
-        await stm.setFee_CcyType(CONST.ccyType.SGD, CONST.nullAddr,      { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: 0, fee_percBips: 0, fee_min: 0, fee_max: 0 } );
+        await stm.setFee_CcyType(CONST.ccyType.USD, CONST.nullAddr,      { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: 0, fee_percBips: 0, fee_min: 0, fee_max: 0 } );
         await stm.setFee_TokType(CONST.tokenType.CORSIA, CONST.nullAddr, { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: 0, fee_percBips: 1, fee_min: 0, fee_max: 0 } );
 
         try {
@@ -488,7 +488,7 @@ contract("StMaster", accounts => {
                     ledger_A: accounts[global.TaddrNdx + 0],                                      ledger_B: accounts[global.TaddrNdx + 1],
                        qty_A: 0,                                                             tokenTypeId_A: 0,
                        qty_B: new BN(CONST.gtCarbon),                                        tokenTypeId_B: CONST.tokenType.CORSIA,
-                ccy_amount_A: new BN(CONST.millionCcy_cents),                                  ccyTypeId_A: CONST.ccyType.SGD,
+                ccy_amount_A: new BN(CONST.millionCcy_cents),                                  ccyTypeId_A: CONST.ccyType.USD,
                 ccy_amount_B: 0,                                                               ccyTypeId_B: 0,
                    applyFees: true,
             });

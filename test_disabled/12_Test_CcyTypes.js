@@ -5,7 +5,7 @@ const CONST = require('../const.js');
 contract("StMaster", accounts => {
     var stm;
 
-    const countDefaultCcyTypes = 7;
+    const countDefaultCcyTypes = 3;
 
     before(async function () {
         stm = await st.deployed();
@@ -24,7 +24,7 @@ contract("StMaster", accounts => {
         const types = (await stm.getCcyTypes()).ccyTypes;
         assert(types.length == countDefaultCcyTypes, 'unexpected default ccy type count');
 
-        assert(types[0].name == 'SGD', 'unexpected default ccy type name 1');
+        assert(types[0].name == 'USD', 'unexpected default ccy type name 1');
         assert(types[0].unit == 'cents', 'unexpected default ccy type unit 1');
         assert(types[0].id == 1, 'unexpected default ccy type id 1');
 

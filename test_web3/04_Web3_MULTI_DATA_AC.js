@@ -102,8 +102,9 @@ describe(`Contract Web3 Interface`, async () => {
                     fee_min: batchNdx * 10,
                     fee_max: batchNdx * 50,
                 };
+                const origCcyFee_percBips_ExFee = batchFees.fee_percBips;
                 const mintTx = await CONST.web3_tx('mintSecTokenBatch', [
-                    (batchNdx % curTokTypes.length) + 1, ((batchNdx+1) * 1000000), 1, WM.addr, batchFees, [], [],
+                    (batchNdx % curTokTypes.length) + 1, ((batchNdx+1) * 1000000), 1, WM.addr, batchFees, origCcyFee_percBips_ExFee, [], [],
                 ], OWNER, OWNER_privKey);
             }
             console.groupEnd();
