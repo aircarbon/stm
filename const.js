@@ -34,7 +34,7 @@ const blocksFromMonths = (months) => Math.ceil(blocksFromDays(months * 30.42));
 //
 // MAIN: deployer definitions -- contract ctor() params
 //
-const contractVer = "0.96g";
+const contractVer = "0.96h";
 const contractProps = {
     COMMODITY: {
         contractVer: contractVer,
@@ -135,13 +135,13 @@ EXCHANGE_FEE: 1,
 
     // ccy types (contract data)
     ccyType: Object.freeze({
-        SGD: 1,
+        USD: 1,
         ETH: 2,
         BTC: 3,
-        USD: 4,
-        EUR: 5,
-        HKD: 6,
-        GBP: 7
+        // SGD: 4,
+        // EUR: 5,
+        // HKD: 6,
+        // GBP: 7
     }), 
 
     // eeu qty constants

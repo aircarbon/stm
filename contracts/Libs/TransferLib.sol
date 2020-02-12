@@ -8,7 +8,7 @@ library TransferLib {
     event TransferedLedgerCcy(address indexed from, address indexed to, uint256 ccyTypeId, uint256 amount, TransferType transferType);
     event TransferedFullSecToken(address indexed from, address indexed to, uint256 indexed stId, uint256 mergedToSecTokenId, uint256 qty, TransferType transferType);
     event TransferedPartialSecToken(address indexed from, address indexed to, uint256 indexed splitFromSecTokenId, uint256 newSecTokenId, uint256 mergedToSecTokenId, uint256 qty, TransferType transferType);
-    event dbg1(uint256 batchId, uint256 S, uint256 BCS, uint256 batchQty, uint256 totQty, uint256 batch_exFee_ccy, uint256 BFEE);
+    //event dbg1(uint256 batchId, uint256 S, uint256 BCS, uint256 batchQty, uint256 totQty, uint256 batch_exFee_ccy, uint256 BFEE);
 
     uint256 constant MAX_BATCHES_PREVIEW = 128; // for fee previews: max distinct batch IDs that can participate in one side of a trade fee preview
 
@@ -65,7 +65,17 @@ library TransferLib {
             fee_ccy_B: a.ledger_B != a.feeAddrOwner ? calcFeeWithCapCollar(exFeeStruct_ccy_B.ccy[a.ccyTypeId_B],   uint256(a.ccy_amount_B), a.qty_A) : 0,
             fee_tok_A: a.ledger_A != a.feeAddrOwner ? calcFeeWithCapCollar(exFeeStruct_tok_A.tok[a.tokenTypeId_A], a.qty_A,                 0)       : 0,
             fee_tok_B: a.ledger_B != a.feeAddrOwner ? calcFeeWithCapCollar(exFeeStruct_tok_B.tok[a.tokenTypeId_B], a.qty_B,                 0)       : 0,
-               fee_to: a.feeAddrOwner
+               fee_to: a.feeAddrOwner,
+       origTokFee_qty: 0,
+   origTokFee_batchId: 0,
+    origTokFee_struct: StructLib.SetFeeArgs({
+               fee_fixed: 0,
+            fee_percBips: 0,
+                 fee_min: 0,
+                 fee_max: 0,
+         ccy_perThousand: 0,
+           ccy_mirrorFee: false
+        })
         });
 
         // apply exchange ccy fee mirroring - only ever from one side to the other
@@ -266,7 +276,17 @@ library TransferLib {
             fee_ccy_B: a.ledger_B != a.feeAddrOwner && a.ccy_amount_B > 0 ? calcFeeWithCapCollar(exFeeStruct_ccy_B.ccy[a.ccyTypeId_B], uint256(a.ccy_amount_B), a.qty_A) : 0,
             fee_tok_A: a.ledger_A != a.feeAddrOwner && a.qty_A > 0        ? calcFeeWithCapCollar(exFeeStruct_tok_A.tok[a.tokenTypeId_A], a.qty_A,               0)       : 0,
             fee_tok_B: a.ledger_B != a.feeAddrOwner && a.qty_B > 0        ? calcFeeWithCapCollar(exFeeStruct_tok_B.tok[a.tokenTypeId_B], a.qty_B,               0)       : 0,
-               fee_to: feeAddrOwner
+               fee_to: feeAddrOwner,
+       origTokFee_qty: 0,
+   origTokFee_batchId: 0,
+    origTokFee_struct: StructLib.SetFeeArgs({
+               fee_fixed: 0,
+            fee_percBips: 0,
+                 fee_min: 0,
+                 fee_max: 0,
+         ccy_perThousand: 0,
+           ccy_mirrorFee: false
+        })
         });
 
         // apply exchange ccy fee mirroring - only ever from one side to the other
@@ -303,7 +323,10 @@ library TransferLib {
                         fee_ccy_B: 0,
                         fee_tok_A: calcFeeWithCapCollar(batch.origTokFee, preview.transferQty[i], 0),
                         fee_tok_B: 0,
-                        fee_to: batch.originator
+                           fee_to: batch.originator,
+                   origTokFee_qty: preview.transferQty[i],
+               origTokFee_batchId: preview.batchIds[i],
+                origTokFee_struct: batch.origTokFee
                     });
                 }
             }
@@ -318,7 +341,10 @@ library TransferLib {
                         fee_ccy_B: 0,
                         fee_tok_A: 0,
                         fee_tok_B: calcFeeWithCapCollar(batch.origTokFee, preview.transferQty[i], 0),
-                        fee_to: batch.originator
+                           fee_to: batch.originator,
+                   origTokFee_qty: preview.transferQty[i],
+               origTokFee_batchId: preview.batchIds[i],
+                origTokFee_struct: batch.origTokFee
                     });
                 }
             }
@@ -369,7 +395,7 @@ library TransferLib {
             // batch fee - capped share of exchange ccy fee
             uint256 BFEE = (((uint256(batch.origCcyFee_percBips_ExFee) * 1000000/*increase precision*/) / 10000/*basis points*/) * batch_exFee_ccy) / 1000000/*decrease precision*/;
 
-            emit dbg1(batch.id, 0, 0, ts_preview.transferQty[i], tot_qty, batch_exFee_ccy, BFEE);
+            //emit dbg1(batch.id, 0, 0, ts_preview.transferQty[i], tot_qty, batch_exFee_ccy, BFEE);
 
             // currency fee transfer: from exchange owner account to batch originator
             transferCcy(ledgerData, TransferCcyArgs({ from: feeAddrOwner, to: batch.originator, ccyTypeId: ccyTypeId, amount: BFEE, transferType: TransferType.OriginatorFee }));
@@ -540,7 +566,7 @@ library TransferLib {
      * @return The distinct transfer-from batch IDs and the total quantity of tokens that would be transfered from each batch
      */
     struct TransferSplitPreviewReturn {
-        uint256[MAX_BATCHES_PREVIEW] batchIds; // todo: pack these - quadratic gas cost for fixed memory
+        uint64[MAX_BATCHES_PREVIEW] batchIds; // todo: pack these - quadratic gas cost for fixed memory
         uint256[MAX_BATCHES_PREVIEW] transferQty;
         uint256 batchCount;
 
@@ -555,7 +581,7 @@ library TransferLib {
     returns(TransferSplitPreviewReturn memory ret)
     {
         // init ret - grotesque, but can't return (or have as local var) a dynamic array
-        uint256[MAX_BATCHES_PREVIEW] memory batchIds;
+        uint64[MAX_BATCHES_PREVIEW] memory batchIds;
         uint256[MAX_BATCHES_PREVIEW] memory transferQty;
         ret = TransferSplitPreviewReturn({
                batchIds: batchIds,
