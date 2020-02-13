@@ -5,7 +5,9 @@ const acmJson = require('../build/contracts/StMaster.json');
 const Web3 = require('web3');
 const abi = acmJson['abi'];
 const EthereumJsTx = require('ethereumjs-tx');
+const BN = require('bn.js');
 
+const transferHelper = require('../test/transferHelper.js');
 const CONST = require('../const.js');
 
 contract("StMaster", accounts => {

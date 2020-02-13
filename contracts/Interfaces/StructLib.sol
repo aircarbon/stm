@@ -206,7 +206,7 @@ library StructLib {
         uint256 fee_tok_B;       // token fee paid by B
         address fee_to;          // fees paid to
 
-        uint256    origTokFee_qty;     // for originator token fees: token quantity being sent by A or B
+        uint256    origTokFee_qty;     // for originator token fees: token quantity from batch being sent by A or B
         uint64     origTokFee_batchId; // for originator token fees: batch ID supplying the sent token quantity
         SetFeeArgs origTokFee_struct;  // for originator token fees: batch originator token fee structure
     }

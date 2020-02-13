@@ -43,15 +43,15 @@ contract("StMaster", accounts => {
     it(`funding - should allow funding of USD`, async () => {
         await fundLedger({ ccyTypeId: CONST.ccyType.USD, amount: CONST.thousandCcy_cents, receiver: accounts[global.TaddrNdx]});
     });
-    it(`funding - should allow funding of EUR`, async () => {
-        await fundLedger({ ccyTypeId: CONST.ccyType.EUR, amount: CONST.thousandCcy_cents, receiver: accounts[global.TaddrNdx]});
-    });
-    it(`funding - should allow funding of HKD`, async () => {
-        await fundLedger({ ccyTypeId: CONST.ccyType.HKD, amount: CONST.thousandCcy_cents, receiver: accounts[global.TaddrNdx]});
-    });
-    it(`funding - should allow funding of GBP`, async () => {
-        await fundLedger({ ccyTypeId: CONST.ccyType.GBP, amount: CONST.thousandCcy_cents, receiver: accounts[global.TaddrNdx]});
-    });
+    // it(`funding - should allow funding of EUR`, async () => {
+    //     await fundLedger({ ccyTypeId: CONST.ccyType.EUR, amount: CONST.thousandCcy_cents, receiver: accounts[global.TaddrNdx]});
+    // });
+    // it(`funding - should allow funding of HKD`, async () => {
+    //     await fundLedger({ ccyTypeId: CONST.ccyType.HKD, amount: CONST.thousandCcy_cents, receiver: accounts[global.TaddrNdx]});
+    // });
+    // it(`funding - should allow funding of GBP`, async () => {
+    //     await fundLedger({ ccyTypeId: CONST.ccyType.GBP, amount: CONST.thousandCcy_cents, receiver: accounts[global.TaddrNdx]});
+    // });
 
     it(`funding - should allow repeated funding`, async () => {
         for (var i=0 ; i < 10 ; i++) {

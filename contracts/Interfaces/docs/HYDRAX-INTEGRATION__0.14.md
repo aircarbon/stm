@@ -1,23 +1,22 @@
 
-# Exchange Integration Spec - draft v0.12
+# Exchange Integration Spec - v0.14
 HydraX (HX) <-> AirCarbon [SekTokMaster (STM)]
 
-> ac-ex-api v1 - transferOrTrade() ** ASAP ** [AC]
-
+> ac-ex-api v0.1 - transferOrTrade() [AC] > DONE
 > 2FA, IP whitelisting, password complexity max. [HX]
-> admin view: additional field for this [HX]
+> demo: trading through ac-ex-api from HX front-end, two test accounts [HX]
 
-## General - Testnet Contract
-STM v0.96f - Ropsten: 0x3c2BECBfd7e8efeD686887D2fFEbBEBaD1448CA1
+## Testnet Contract
+STM v0.96h - Ropsten: 0x67ad1C9D3a1059E3CD6BA3186840d2dcf81dAA19
 
-## General - Contract Explorer
+## Contract Explorer
 https://dev-explorer.aircarbon.co
 
-## General - Public Web3 Views
-See ../IPublicViews.sol
+## Dev Private Permissioned API
+https://dev-ac-ex-api.aircarbon.co/
 
-## General -- Dev Private Permissioned API
-```ac-ex-api``` *TBD*
+## Public Web3 Views
+See ../IPublicViews.sol
 
 ## New Account Opening
 The most important (phase 1) aspect is to link a HX account ID with an STM account ID (in ETH account format).
