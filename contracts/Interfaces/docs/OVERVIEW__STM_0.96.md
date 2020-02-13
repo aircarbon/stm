@@ -33,10 +33,4 @@ Core features of STM include:
 * Each batch is uniquely identifiable by a uint64 ID and contains supplementary metadata in string KVP format, including IPFS document hash(es).
 * Ledger entries consist of a mapping of token types to token IDs, and a mapping of currency types to currency (collateral) balances.
 
-## Web3 Public Interface
-see: ./IPublicViews.html ...
-
-## Exchange Private Interface
-TODO
-
 
