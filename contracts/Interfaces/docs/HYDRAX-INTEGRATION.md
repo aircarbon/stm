@@ -18,16 +18,13 @@ https://dev-ac-ex-api.aircarbon.co/
 ### USAGE
 
 #### FIRST STEP - AUTHENTICATION
-
 The API requires the following key in order to access endpoints:
 282fba18-f680-4de8-a2fb-17f39c22d7da
 
 If using the API viewer, click on Authorize button and enter the key.
 
 #### TRADING - Endpoint: /trade/transfer
-
 Request body schema:
-
 ```json
 {
   "ccySender": {
@@ -44,7 +41,6 @@ Request body schema:
 ```
 
 How to test on the API viewer:
-
 1. Click on end point (expand view)
 2. Click on Try it out
 3. Enter transaction body. You may test with this data:
@@ -66,9 +62,7 @@ How to test on the API viewer:
 5. If successfull, 'Response body' should return transaction hash.
 
 __Useful information__
-
 Token Types:
-
 ```
   {id: 1, type: "AirCarbon CORSIA Token"}
   {id: 2, type: "AirCarbon Nature Token"}
@@ -76,17 +70,13 @@ Token Types:
 ```
 
 Currency Types:
-
 ```
   {id: 1, type: "USD", unit: "cents", decimal: 2}
   {id: 2, type: "ETH", unit: "Wei", decimal: 18}
   {id: 3, type: "BTC", unit: "Satoshi", decimal: 8}
 ```
 
-
-
 #### CONTRACT INFORMATION - Endpoint: /info
-
 Returns the contract information currently operating in the following format:
 ```
 {

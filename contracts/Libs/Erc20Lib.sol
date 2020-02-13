@@ -21,16 +21,6 @@ library Erc20Lib {
     }
 
     // TRANSFER
-    // struct Erc20TransferLibArgs {
-    //     StructLib.LedgerStruct  ledgerData;
-    //     StructLib.StTypesStruct  stTypesData;
-    //     StructLib.CcyTypesStruct  ccyTypesData;
-    //     StructLib.Erc20Struct  erc20Data;
-    //     StructLib.FeeStruct  globalFees;
-    //     address owner; // fees: disabled for erc20 - not used
-    //     address recipient;
-    //     uint256 amount;
-    // }
     function transfer(
         StructLib.LedgerStruct storage ledgerData,
         StructLib.StTypesStruct storage stTypesData,

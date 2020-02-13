@@ -2,7 +2,6 @@ const Big = require('big.js');
 
 const Web3 = require('web3');
 const web3 = new Web3();
-//const _gasPriceEth = web3.utils.fromWei(web3.utils.toWei("20", "gwei"), 'ether');
 const _ethUsd = 150;
 
 const bip39 = require('bip39');

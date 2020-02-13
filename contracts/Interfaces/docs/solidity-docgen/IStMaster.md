@@ -77,6 +77,7 @@
 [IStMaster-MintedSecToken-uint256-uint256-uint256-address-uint256-]: #IStMaster-MintedSecToken-uint256-uint256-uint256-address-uint256-
 [IStMaster-AddedBatchMetadata-uint256-string-string-]: #IStMaster-AddedBatchMetadata-uint256-string-string-
 [IStMaster-SetBatchOriginatorFee_Token-uint256-struct-StructLib-SetFeeArgs-]: #IStMaster-SetBatchOriginatorFee_Token-uint256-struct-StructLib-SetFeeArgs-
+[IStMaster-SetBatchOriginatorFee_Currency-uint256-uint16-]: #IStMaster-SetBatchOriginatorFee_Currency-uint256-uint16-
 [IStMaster-TransferedLedgerCcy-address-address-uint256-uint256-enum-IStMaster-TransferType-]: #IStMaster-TransferedLedgerCcy-address-address-uint256-uint256-enum-IStMaster-TransferType-
 [IStMaster-TransferedFullSecToken-address-address-uint256-uint256-uint256-enum-IStMaster-TransferType-]: #IStMaster-TransferedFullSecToken-address-address-uint256-uint256-uint256-enum-IStMaster-TransferType-
 [IStMaster-TransferedPartialSecToken-address-address-uint256-uint256-uint256-uint256-enum-IStMaster-TransferType-]: #IStMaster-TransferedPartialSecToken-address-address-uint256-uint256-uint256-uint256-enum-IStMaster-TransferType-
@@ -88,13 +89,15 @@
 [IStMaster-SetFeeCcyMin-uint256-address-uint256-]: #IStMaster-SetFeeCcyMin-uint256-address-uint256-
 [IStMaster-SetFeeTokMax-uint256-address-uint256-]: #IStMaster-SetFeeTokMax-uint256-address-uint256-
 [IStMaster-SetFeeCcyMax-uint256-address-uint256-]: #IStMaster-SetFeeCcyMax-uint256-address-uint256-
+[IStMaster-SetFeeCcyPerThousand-uint256-address-uint256-]: #IStMaster-SetFeeCcyPerThousand-uint256-address-uint256-
 [IStMaster-Transfer-address-address-uint256-]: #IStMaster-Transfer-address-address-uint256-
 [IStMaster-Approval-address-address-uint256-]: #IStMaster-Approval-address-address-uint256-
 [IStMaster-IssuanceSubscribed-address-address-uint256-uint256-uint256-uint256-]: #IStMaster-IssuanceSubscribed-address-address-uint256-uint256-uint256-uint256-
 [IStMintable]: IStMintable.md#IStMintable
-[IStMintable-mintSecTokenBatch-uint256-uint256-int64-address-payable-struct-StructLib-SetFeeArgs-string---string---]: IStMintable.md#IStMintable-mintSecTokenBatch-uint256-uint256-int64-address-payable-struct-StructLib-SetFeeArgs-string---string---
+[IStMintable-mintSecTokenBatch-uint256-uint256-int64-address-payable-struct-StructLib-SetFeeArgs-uint16-string---string---]: IStMintable.md#IStMintable-mintSecTokenBatch-uint256-uint256-int64-address-payable-struct-StructLib-SetFeeArgs-uint16-string---string---
 [IStMintable-addMetaSecTokenBatch-uint64-string-string-]: IStMintable.md#IStMintable-addMetaSecTokenBatch-uint64-string-string-
 [IStMintable-setOriginatorFeeTokenBatch-uint64-struct-StructLib-SetFeeArgs-]: IStMintable.md#IStMintable-setOriginatorFeeTokenBatch-uint64-struct-StructLib-SetFeeArgs-
+[IStMintable-setOriginatorFeeCurrencyBatch-uint64-uint16-]: IStMintable.md#IStMintable-setOriginatorFeeCurrencyBatch-uint64-uint16-
 [IStMintable-getSecToken_countMinted--]: IStMintable.md#IStMintable-getSecToken_countMinted--
 [IStMintable-getSecToken_totalMintedQty--]: IStMintable.md#IStMintable-getSecToken_totalMintedQty--
 [IStPayable]: IStPayable.md#IStPayable
@@ -106,7 +109,7 @@
 [IStTransferable-getSecToken_totalTransferedQty--]: IStTransferable.md#IStTransferable-getSecToken_totalTransferedQty--
 [StructLib]: StructLib.md#StructLib
 [StructLib-sufficientTokens-struct-StructLib-LedgerStruct-address-uint256-uint256-uint256-]: StructLib.md#StructLib-sufficientTokens-struct-StructLib-LedgerStruct-address-uint256-uint256-uint256-
-[StructLib-sufficientCcy-struct-StructLib-LedgerStruct-address-uint256-int256-int256-]: StructLib.md#StructLib-sufficientCcy-struct-StructLib-LedgerStruct-address-uint256-int256-int256-
+[StructLib-sufficientCcy-struct-StructLib-LedgerStruct-address-uint256-int256-int256-int256-]: StructLib.md#StructLib-sufficientCcy-struct-StructLib-LedgerStruct-address-uint256-int256-int256-int256-
 ## <span id="IStMaster"></span> `IStMaster`
 
 Security Token Master
@@ -127,6 +130,7 @@ Contrct type (CASHFLOW or COMMODITY) is set through implementing contract's ctor
 - [`MintedSecToken(uint256 stId, uint256 batchId, uint256 tokenTypeId, address ledgerOwner, uint256 mintedQty)`][IStMaster-MintedSecToken-uint256-uint256-uint256-address-uint256-]
 - [`AddedBatchMetadata(uint256 batchId, string key, string value)`][IStMaster-AddedBatchMetadata-uint256-string-string-]
 - [`SetBatchOriginatorFee_Token(uint256 batchId, struct StructLib.SetFeeArgs originatorFee)`][IStMaster-SetBatchOriginatorFee_Token-uint256-struct-StructLib-SetFeeArgs-]
+- [`SetBatchOriginatorFee_Currency(uint256 batchId, uint16 origCcyFee_percBips_ExFee)`][IStMaster-SetBatchOriginatorFee_Currency-uint256-uint16-]
 - [`TransferedLedgerCcy(address from, address to, uint256 ccyTypeId, uint256 amount, enum IStMaster.TransferType transferType)`][IStMaster-TransferedLedgerCcy-address-address-uint256-uint256-enum-IStMaster-TransferType-]
 - [`TransferedFullSecToken(address from, address to, uint256 stId, uint256 mergedToSecTokenId, uint256 qty, enum IStMaster.TransferType transferType)`][IStMaster-TransferedFullSecToken-address-address-uint256-uint256-uint256-enum-IStMaster-TransferType-]
 - [`TransferedPartialSecToken(address from, address to, uint256 splitFromSecTokenId, uint256 newSecTokenId, uint256 mergedToSecTokenId, uint256 qty, enum IStMaster.TransferType transferType)`][IStMaster-TransferedPartialSecToken-address-address-uint256-uint256-uint256-uint256-enum-IStMaster-TransferType-]
@@ -138,6 +142,7 @@ Contrct type (CASHFLOW or COMMODITY) is set through implementing contract's ctor
 - [`SetFeeCcyMin(uint256 ccyTypeId, address ledgerOwner, uint256 fee_ccy_Min)`][IStMaster-SetFeeCcyMin-uint256-address-uint256-]
 - [`SetFeeTokMax(uint256 tokenTypeId, address ledgerOwner, uint256 fee_token_Max)`][IStMaster-SetFeeTokMax-uint256-address-uint256-]
 - [`SetFeeCcyMax(uint256 ccyTypeId, address ledgerOwner, uint256 fee_ccy_Max)`][IStMaster-SetFeeCcyMax-uint256-address-uint256-]
+- [`SetFeeCcyPerThousand(uint256 ccyTypeId, address ledgerOwner, uint256 fee_ccy_perThousand)`][IStMaster-SetFeeCcyPerThousand-uint256-address-uint256-]
 - [`Transfer(address from, address to, uint256 value)`][IStMaster-Transfer-address-address-uint256-]
 - [`Approval(address owner, address spender, uint256 value)`][IStMaster-Approval-address-address-uint256-]
 - [`IssuanceSubscribed(address subscriber, address issuer, uint256 weiSent, uint256 weiChange, uint256 tokensSubscribed, uint256 weiPrice)`][IStMaster-IssuanceSubscribed-address-address-uint256-uint256-uint256-uint256-]
@@ -208,6 +213,12 @@ Seals the contract
 
 
 
+### <span id="IStMaster-SetBatchOriginatorFee_Currency-uint256-uint16-"></span> `SetBatchOriginatorFee_Currency(uint256 batchId, uint16 origCcyFee_percBips_ExFee)`
+
+
+
+
+
 ### <span id="IStMaster-TransferedLedgerCcy-address-address-uint256-uint256-enum-IStMaster-TransferType-"></span> `TransferedLedgerCcy(address from, address to, uint256 ccyTypeId, uint256 amount, enum IStMaster.TransferType transferType)`
 
 
@@ -269,6 +280,12 @@ Seals the contract
 
 
 ### <span id="IStMaster-SetFeeCcyMax-uint256-address-uint256-"></span> `SetFeeCcyMax(uint256 ccyTypeId, address ledgerOwner, uint256 fee_ccy_Max)`
+
+
+
+
+
+### <span id="IStMaster-SetFeeCcyPerThousand-uint256-address-uint256-"></span> `SetFeeCcyPerThousand(uint256 ccyTypeId, address ledgerOwner, uint256 fee_ccy_perThousand)`
 
 
 

@@ -3,8 +3,10 @@ pragma experimental ABIEncoderV2;
 
 import "../Interfaces/StructLib.sol";
 import "./TransferLib.sol";
-//import "./TokenLib.sol";
 
+//
+// WIP - out of scope
+//
 library PayableLib {
     event IssuanceSubscribed(address indexed subscriber, address indexed issuer, uint256 weiSent, uint256 weiChange, uint256 tokensSubscribed, uint256 weiPrice);
 

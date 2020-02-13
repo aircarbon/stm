@@ -7,14 +7,14 @@ STM is an Ethereum contract comprising:
     
     (b) ERC20 (partial) implementation (exc. transferFrom, transferFrom, approve) and permission semantics on withdrawn tokens, and
     
-    (c) ETH subscriber cashflow processing of (USD-priced or ETH-priced) token issuances, and (d) (WIP) ETH issuer cashflow processing of CFT-equity or CFT-loan payments. 
+    (c) WIP: ETH subscriber cashflow processing of (USD-priced or ETH-priced) token issuances, and (d) ETH issuer cashflow processing of CFT-equity or CFT-loan payments. 
 
 STM is configured at deployment time to one of the following two types:
 * Commodity token (CT): a semi-fungible (multi-batch), multi-type commodity underlying; or
 * Cashflow token (CFT): a fully-fungible (single-batch), single-type cashflow-generating underlying.
 
 ## Functionality: Core (CT)
-Core features of STM include:
+Features of STM include:
 * Multi-type token & multi-currency (collateral) ledger
 * Minting of tokens in batch(es) *[permission: owner-only]*
 * Funding and withdrawing of collateralized ledger fiat and crypto currency *[permission: owner-only]*
@@ -27,6 +27,9 @@ Core features of STM include:
 * Extensibility: adding currency and token types *[permission: owner-only]*
 * Upgradability: 100% data storage coverage for batched data write functions, mapped 1-1 with public read views, for verifiable cross-contract backup/restore *[permission: owner-only]*
 * Verifiability: 100% data storage coverage of aggregated global keccak256 hash *[permission: public]*
+
+## Functionality: Cashflow (CFT)
+* WIP/out of scope
 
 ## Core Design: Ledger
 * Tokens are uniquely identifiable by a uint256 ID, are associated with a unique token type uint256 ID and are minted as part of a token batch.

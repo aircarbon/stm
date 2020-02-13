@@ -87,13 +87,12 @@ module.exports = async function (deployer) {
             //console.dir(deployer);
 
             // get ABI-encoded ctor params (for etherscan contract verification)
-                // ## https://github.com/ethereumjs/ethereumjs-abi/issues/69
-                //const ejs_abi = require('ethereumjs-abi');
-                //var encodedArgs = ejs_abi.encode(stm.abi, "balanceOf(uint256 address)", [ "0x0000000000000000000000000000000000000000" ])
-                //console.log('encodedArgs', encodedArgs.toString('hex'));
+            // ## https://github.com/ethereumjs/ethereumjs-abi/issues/69
+            //const ejs_abi = require('ethereumjs-abi');
+            //var encodedArgs = ejs_abi.encode(stm.abi, "balanceOf(uint256 address)", [ "0x0000000000000000000000000000000000000000" ])
+            //console.log('encodedArgs', encodedArgs.toString('hex'));
             // TODO: try https://github.com/Zoltu/ethereum-abi-encoder ...
 
-            // 
             const MNEMONIC = require('../dev_mnemonic.js').MNEMONIC;
             const accountAndKey = await CONST.getAccountAndKey(0, MNEMONIC);
             const OWNER = accountAndKey.addr;

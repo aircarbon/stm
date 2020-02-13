@@ -77,6 +77,7 @@
 [IStMaster-MintedSecToken-uint256-uint256-uint256-address-uint256-]: IStMaster.md#IStMaster-MintedSecToken-uint256-uint256-uint256-address-uint256-
 [IStMaster-AddedBatchMetadata-uint256-string-string-]: IStMaster.md#IStMaster-AddedBatchMetadata-uint256-string-string-
 [IStMaster-SetBatchOriginatorFee_Token-uint256-struct-StructLib-SetFeeArgs-]: IStMaster.md#IStMaster-SetBatchOriginatorFee_Token-uint256-struct-StructLib-SetFeeArgs-
+[IStMaster-SetBatchOriginatorFee_Currency-uint256-uint16-]: IStMaster.md#IStMaster-SetBatchOriginatorFee_Currency-uint256-uint16-
 [IStMaster-TransferedLedgerCcy-address-address-uint256-uint256-enum-IStMaster-TransferType-]: IStMaster.md#IStMaster-TransferedLedgerCcy-address-address-uint256-uint256-enum-IStMaster-TransferType-
 [IStMaster-TransferedFullSecToken-address-address-uint256-uint256-uint256-enum-IStMaster-TransferType-]: IStMaster.md#IStMaster-TransferedFullSecToken-address-address-uint256-uint256-uint256-enum-IStMaster-TransferType-
 [IStMaster-TransferedPartialSecToken-address-address-uint256-uint256-uint256-uint256-enum-IStMaster-TransferType-]: IStMaster.md#IStMaster-TransferedPartialSecToken-address-address-uint256-uint256-uint256-uint256-enum-IStMaster-TransferType-
@@ -88,13 +89,15 @@
 [IStMaster-SetFeeCcyMin-uint256-address-uint256-]: IStMaster.md#IStMaster-SetFeeCcyMin-uint256-address-uint256-
 [IStMaster-SetFeeTokMax-uint256-address-uint256-]: IStMaster.md#IStMaster-SetFeeTokMax-uint256-address-uint256-
 [IStMaster-SetFeeCcyMax-uint256-address-uint256-]: IStMaster.md#IStMaster-SetFeeCcyMax-uint256-address-uint256-
+[IStMaster-SetFeeCcyPerThousand-uint256-address-uint256-]: IStMaster.md#IStMaster-SetFeeCcyPerThousand-uint256-address-uint256-
 [IStMaster-Transfer-address-address-uint256-]: IStMaster.md#IStMaster-Transfer-address-address-uint256-
 [IStMaster-Approval-address-address-uint256-]: IStMaster.md#IStMaster-Approval-address-address-uint256-
 [IStMaster-IssuanceSubscribed-address-address-uint256-uint256-uint256-uint256-]: IStMaster.md#IStMaster-IssuanceSubscribed-address-address-uint256-uint256-uint256-uint256-
 [IStMintable]: IStMintable.md#IStMintable
-[IStMintable-mintSecTokenBatch-uint256-uint256-int64-address-payable-struct-StructLib-SetFeeArgs-string---string---]: IStMintable.md#IStMintable-mintSecTokenBatch-uint256-uint256-int64-address-payable-struct-StructLib-SetFeeArgs-string---string---
+[IStMintable-mintSecTokenBatch-uint256-uint256-int64-address-payable-struct-StructLib-SetFeeArgs-uint16-string---string---]: IStMintable.md#IStMintable-mintSecTokenBatch-uint256-uint256-int64-address-payable-struct-StructLib-SetFeeArgs-uint16-string---string---
 [IStMintable-addMetaSecTokenBatch-uint64-string-string-]: IStMintable.md#IStMintable-addMetaSecTokenBatch-uint64-string-string-
 [IStMintable-setOriginatorFeeTokenBatch-uint64-struct-StructLib-SetFeeArgs-]: IStMintable.md#IStMintable-setOriginatorFeeTokenBatch-uint64-struct-StructLib-SetFeeArgs-
+[IStMintable-setOriginatorFeeCurrencyBatch-uint64-uint16-]: IStMintable.md#IStMintable-setOriginatorFeeCurrencyBatch-uint64-uint16-
 [IStMintable-getSecToken_countMinted--]: IStMintable.md#IStMintable-getSecToken_countMinted--
 [IStMintable-getSecToken_totalMintedQty--]: IStMintable.md#IStMintable-getSecToken_totalMintedQty--
 [IStPayable]: IStPayable.md#IStPayable
@@ -106,7 +109,7 @@
 [IStTransferable-getSecToken_totalTransferedQty--]: IStTransferable.md#IStTransferable-getSecToken_totalTransferedQty--
 [StructLib]: #StructLib
 [StructLib-sufficientTokens-struct-StructLib-LedgerStruct-address-uint256-uint256-uint256-]: #StructLib-sufficientTokens-struct-StructLib-LedgerStruct-address-uint256-uint256-uint256-
-[StructLib-sufficientCcy-struct-StructLib-LedgerStruct-address-uint256-int256-int256-]: #StructLib-sufficientCcy-struct-StructLib-LedgerStruct-address-uint256-int256-int256-
+[StructLib-sufficientCcy-struct-StructLib-LedgerStruct-address-uint256-int256-int256-int256-]: #StructLib-sufficientCcy-struct-StructLib-LedgerStruct-address-uint256-int256-int256-int256-
 ## <span id="StructLib"></span> `StructLib`
 
 
@@ -114,7 +117,7 @@
 
 
 - [`sufficientTokens(struct StructLib.LedgerStruct ledgerData, address ledger, uint256 tokenTypeId, uint256 qty, uint256 fee)`][StructLib-sufficientTokens-struct-StructLib-LedgerStruct-address-uint256-uint256-uint256-]
-- [`sufficientCcy(struct StructLib.LedgerStruct ledgerData, address ledger, uint256 ccyTypeId, int256 amount, int256 fee)`][StructLib-sufficientCcy-struct-StructLib-LedgerStruct-address-uint256-int256-int256-]
+- [`sufficientCcy(struct StructLib.LedgerStruct ledgerData, address ledger, uint256 ccyTypeId, int256 sending, int256 receiving, int256 fee)`][StructLib-sufficientCcy-struct-StructLib-LedgerStruct-address-uint256-int256-int256-int256-]
 
 ### <span id="StructLib-sufficientTokens-struct-StructLib-LedgerStruct-address-uint256-uint256-uint256-"></span> `sufficientTokens(struct StructLib.LedgerStruct ledgerData, address ledger, uint256 tokenTypeId, uint256 qty, uint256 fee) → bool` (public)
 
@@ -123,7 +126,7 @@ Checks if the supplied ledger owner holds at least the specified quantity of sup
 
 
 
-### <span id="StructLib-sufficientCcy-struct-StructLib-LedgerStruct-address-uint256-int256-int256-"></span> `sufficientCcy(struct StructLib.LedgerStruct ledgerData, address ledger, uint256 ccyTypeId, int256 amount, int256 fee) → bool` (public)
+### <span id="StructLib-sufficientCcy-struct-StructLib-LedgerStruct-address-uint256-int256-int256-int256-"></span> `sufficientCcy(struct StructLib.LedgerStruct ledgerData, address ledger, uint256 ccyTypeId, int256 sending, int256 receiving, int256 fee) → bool` (public)
 
 Checks if the supplied ledger owner holds at least the specified amount of supplied currency type
 

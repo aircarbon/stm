@@ -17,6 +17,17 @@ import "../Interfaces/StructLib.sol";
 contract StMaster is IStMaster, IPublicViews,
     StMintable, StBurnable, Collateralizable, StTransferable, DataLoadable {
 
+    // === STM (AC COMMODITY) ===
+    // TODO: SafeMath
+    // TODO: ERC20 authorize + re-entrancy guards, and .call instead of .transfer
+    // todo: drop fee_fixed completely (it's == fee_min)
+    // todo: etherscan -> verify contract interfaces? -- needs ctor bytecode
+    // todo: change internalTransfer so it can operate on *any* stTypeId
+
+    // (others)
+    // todo: SCP - show totalSupply() for erc20's
+    // todo: SCP - use decimals fields for erc20 (send/exchange text fields, or at least round to .decimals before passing to API)
+
     // contract properties
     string public name;
 
@@ -65,37 +76,6 @@ contract StMaster is IStMaster, IPublicViews,
     event Approval(address indexed owner, address indexed spender, uint256 value);
     // PayableLib events
     event IssuanceSubscribed(address indexed subscriber, address indexed issuer, uint256 weiSent, uint256 weiChange, uint256 tokensSubscribed, uint256 weiPrice);
-
-    // PRI 0 ** COMMODITY ==>>> 
-    //   (a) 3x token-types [Corsia, Premium, Nature] --> consolidated KVP format for Corsia
-
-
-    //
-    // PRI 1 ** CASHFLOWS (J 1+3) ==>>> MVP -- CFT CORE (aiming for *no whitelisting*, i.e. all external control ERC20 accounts)
-    //
-    //      TODO: pri1 - test - exchange fees on subscriptions
-    //      TODO: pri1 - new  - eth fees on subscriptions (new fee-type)
-    //      TODO: pri2 - issuerPayments (BOND) v0 basic (no validations, i.e. eq-path only?)
-    //      TODO: pri3 - wallet auto-converts
-    //      TODO: pri4 - (eq-type) changing issuancePrice mid-issuance
-    //
-    // others...
-    // TODO: update solc (max v == 0.6.1 ?)
-    // TODO: etherscan -> verify contract (without code bodies?)
-    // TOOD: SCP - show totalSupply() for erc20's
-    // TODO: SCP - use decimals fields for erc20 (send/exchange text fields, or at least round to .decimals before passing to API)
-    //
-    // CLEANUP: reduce # of libs for less deployment pain?
-    // StMaster     6142526
-    // TransferLib  2300475
-    // TokenLib     1876567
-    // LedgerLib    1709851
-    // CcyLib       948476
-    // PayableLib   895495
-    // LoadLib      878583
-    // Erc20Lib     504580
-    // FeeLib       577162
-    // StructLib    170684
 
     constructor(
         StructLib.ContractType        _contractType,
@@ -152,48 +132,7 @@ contract StMaster is IStMaster, IPublicViews,
         ledgerData._ledgerOwners.push(owner);
     }
 
-    //
-    // -- LAUNCH LIST --
-    //
-    // ADMIN:
-    //   > fee preview on transfer
-    //   > batch fee on mint
-    //   > explorer v1
-    //   > all accounts[0] refs and privkey to move to config
-    //   > [add ccy-type, add eeu-type (can run from truffle, not needed)]
-    //
-    // PROD AWS
-    //   > me to setup, sole account
-    //   > me to deploy (how much manual?)
-    //   > me to set config
-    //
-    // SOL
-    //   > TODO: bunch libs to reduce # of deployments needed
-    //   > TODO: cleanup (SafeMath) + audit...
-    //
-    //   > todo: increase/finalize MAX_BATCHES_PREVIEW
-    //   > todo: drop fee_fixed completely (it's == fee_min)
-    //
-    //   > todo: change internalTransfer so it can operate on *any* stTypeId... (???) > still needed now that nature != premium != corsia?
-    //   > todo: ERC20 authorize() support (???)
-    //
-    // TODO: Thom - get ETH re. mainnet testing
-    // (todo: infura - ropsten deployment)
-    //    > CLEANUP: SafeMath...
-    //
-    // ====== MAINNET ======
-    //
-    // BONDING CURVES... can we use them?
-    //
-    // WITHDRAW FEES - (whitelist => erc20) - defer
-    //
-    // SPLITTING TX'S - defer
-    //  ** fee-preview: returns enough data (qty?) for an orchestrator to split up a large multi-batch transfer TX into separate components?
-    //    >> with MAX_BATCHES_PREVIEW exceeded ... change to more(bool) ... ?
-    //  ** fee-preview: tests general / using it for splitting multi-batch transfers
-    //
-
-    // TODO: for updateable libs - proxy dispatcher
+    // todo: for updateable libs - proxy dispatcher
     // https://blog.openzeppelin.com/proxy-libraries-in-solidity-79fbe4b970fd/
     // test lib...
     /*mapping(uint256 => St2x.SecTokenBatch) __batches;

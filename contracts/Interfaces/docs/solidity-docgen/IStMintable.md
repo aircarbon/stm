@@ -77,6 +77,7 @@
 [IStMaster-MintedSecToken-uint256-uint256-uint256-address-uint256-]: IStMaster.md#IStMaster-MintedSecToken-uint256-uint256-uint256-address-uint256-
 [IStMaster-AddedBatchMetadata-uint256-string-string-]: IStMaster.md#IStMaster-AddedBatchMetadata-uint256-string-string-
 [IStMaster-SetBatchOriginatorFee_Token-uint256-struct-StructLib-SetFeeArgs-]: IStMaster.md#IStMaster-SetBatchOriginatorFee_Token-uint256-struct-StructLib-SetFeeArgs-
+[IStMaster-SetBatchOriginatorFee_Currency-uint256-uint16-]: IStMaster.md#IStMaster-SetBatchOriginatorFee_Currency-uint256-uint16-
 [IStMaster-TransferedLedgerCcy-address-address-uint256-uint256-enum-IStMaster-TransferType-]: IStMaster.md#IStMaster-TransferedLedgerCcy-address-address-uint256-uint256-enum-IStMaster-TransferType-
 [IStMaster-TransferedFullSecToken-address-address-uint256-uint256-uint256-enum-IStMaster-TransferType-]: IStMaster.md#IStMaster-TransferedFullSecToken-address-address-uint256-uint256-uint256-enum-IStMaster-TransferType-
 [IStMaster-TransferedPartialSecToken-address-address-uint256-uint256-uint256-uint256-enum-IStMaster-TransferType-]: IStMaster.md#IStMaster-TransferedPartialSecToken-address-address-uint256-uint256-uint256-uint256-enum-IStMaster-TransferType-
@@ -88,13 +89,15 @@
 [IStMaster-SetFeeCcyMin-uint256-address-uint256-]: IStMaster.md#IStMaster-SetFeeCcyMin-uint256-address-uint256-
 [IStMaster-SetFeeTokMax-uint256-address-uint256-]: IStMaster.md#IStMaster-SetFeeTokMax-uint256-address-uint256-
 [IStMaster-SetFeeCcyMax-uint256-address-uint256-]: IStMaster.md#IStMaster-SetFeeCcyMax-uint256-address-uint256-
+[IStMaster-SetFeeCcyPerThousand-uint256-address-uint256-]: IStMaster.md#IStMaster-SetFeeCcyPerThousand-uint256-address-uint256-
 [IStMaster-Transfer-address-address-uint256-]: IStMaster.md#IStMaster-Transfer-address-address-uint256-
 [IStMaster-Approval-address-address-uint256-]: IStMaster.md#IStMaster-Approval-address-address-uint256-
 [IStMaster-IssuanceSubscribed-address-address-uint256-uint256-uint256-uint256-]: IStMaster.md#IStMaster-IssuanceSubscribed-address-address-uint256-uint256-uint256-uint256-
 [IStMintable]: #IStMintable
-[IStMintable-mintSecTokenBatch-uint256-uint256-int64-address-payable-struct-StructLib-SetFeeArgs-string---string---]: #IStMintable-mintSecTokenBatch-uint256-uint256-int64-address-payable-struct-StructLib-SetFeeArgs-string---string---
+[IStMintable-mintSecTokenBatch-uint256-uint256-int64-address-payable-struct-StructLib-SetFeeArgs-uint16-string---string---]: #IStMintable-mintSecTokenBatch-uint256-uint256-int64-address-payable-struct-StructLib-SetFeeArgs-uint16-string---string---
 [IStMintable-addMetaSecTokenBatch-uint64-string-string-]: #IStMintable-addMetaSecTokenBatch-uint64-string-string-
 [IStMintable-setOriginatorFeeTokenBatch-uint64-struct-StructLib-SetFeeArgs-]: #IStMintable-setOriginatorFeeTokenBatch-uint64-struct-StructLib-SetFeeArgs-
+[IStMintable-setOriginatorFeeCurrencyBatch-uint64-uint16-]: #IStMintable-setOriginatorFeeCurrencyBatch-uint64-uint16-
 [IStMintable-getSecToken_countMinted--]: #IStMintable-getSecToken_countMinted--
 [IStMintable-getSecToken_totalMintedQty--]: #IStMintable-getSecToken_totalMintedQty--
 [IStPayable]: IStPayable.md#IStPayable
@@ -106,7 +109,7 @@
 [IStTransferable-getSecToken_totalTransferedQty--]: IStTransferable.md#IStTransferable-getSecToken_totalTransferedQty--
 [StructLib]: StructLib.md#StructLib
 [StructLib-sufficientTokens-struct-StructLib-LedgerStruct-address-uint256-uint256-uint256-]: StructLib.md#StructLib-sufficientTokens-struct-StructLib-LedgerStruct-address-uint256-uint256-uint256-
-[StructLib-sufficientCcy-struct-StructLib-LedgerStruct-address-uint256-int256-int256-]: StructLib.md#StructLib-sufficientCcy-struct-StructLib-LedgerStruct-address-uint256-int256-int256-
+[StructLib-sufficientCcy-struct-StructLib-LedgerStruct-address-uint256-int256-int256-int256-]: StructLib.md#StructLib-sufficientCcy-struct-StructLib-LedgerStruct-address-uint256-int256-int256-int256-
 ## <span id="IStMintable"></span> `IStMintable`
 
 Token minting
@@ -115,14 +118,15 @@ Token minting
 
 - [`onlyOwner()`][IOwned-onlyOwner--]
 - [`onlyWhenReadWrite()`][IOwned-onlyWhenReadWrite--]
-- [`mintSecTokenBatch(uint256 tokenTypeId, uint256 mintQty, int64 mintSecTokenCount, address payable batchOwner, struct StructLib.SetFeeArgs originatorFee, string[] metaKeys, string[] metaValues)`][IStMintable-mintSecTokenBatch-uint256-uint256-int64-address-payable-struct-StructLib-SetFeeArgs-string---string---]
+- [`mintSecTokenBatch(uint256 tokenTypeId, uint256 mintQty, int64 mintSecTokenCount, address payable batchOwner, struct StructLib.SetFeeArgs originatorFee, uint16 origCcyFee_percBips_ExFee, string[] metaKeys, string[] metaValues)`][IStMintable-mintSecTokenBatch-uint256-uint256-int64-address-payable-struct-StructLib-SetFeeArgs-uint16-string---string---]
 - [`addMetaSecTokenBatch(uint64 batchId, string metaKeyNew, string metaValueNew)`][IStMintable-addMetaSecTokenBatch-uint64-string-string-]
 - [`setOriginatorFeeTokenBatch(uint64 batchId, struct StructLib.SetFeeArgs originatorFee)`][IStMintable-setOriginatorFeeTokenBatch-uint64-struct-StructLib-SetFeeArgs-]
+- [`setOriginatorFeeCurrencyBatch(uint64 batchId, uint16 origCcyFee_percBips_ExFee)`][IStMintable-setOriginatorFeeCurrencyBatch-uint64-uint16-]
 - [`getSecToken_countMinted()`][IStMintable-getSecToken_countMinted--]
 - [`getSecToken_totalMintedQty()`][IStMintable-getSecToken_totalMintedQty--]
 - [`setReadOnly(bool _readOnly)`][IOwned-setReadOnly-bool-]
 
-### <span id="IStMintable-mintSecTokenBatch-uint256-uint256-int64-address-payable-struct-StructLib-SetFeeArgs-string---string---"></span> `mintSecTokenBatch(uint256 tokenTypeId, uint256 mintQty, int64 mintSecTokenCount, address payable batchOwner, struct StructLib.SetFeeArgs originatorFee, string[] metaKeys, string[] metaValues)` (public)
+### <span id="IStMintable-mintSecTokenBatch-uint256-uint256-int64-address-payable-struct-StructLib-SetFeeArgs-uint16-string---string---"></span> `mintSecTokenBatch(uint256 tokenTypeId, uint256 mintQty, int64 mintSecTokenCount, address payable batchOwner, struct StructLib.SetFeeArgs originatorFee, uint16 origCcyFee_percBips_ExFee, string[] metaKeys, string[] metaValues)` (public)
 
 Mints and assigns ownership of a new token batch
 
@@ -138,7 +142,14 @@ Adds a new metadata entry (KVP) to the specified token batch
 
 ### <span id="IStMintable-setOriginatorFeeTokenBatch-uint64-struct-StructLib-SetFeeArgs-"></span> `setOriginatorFeeTokenBatch(uint64 batchId, struct StructLib.SetFeeArgs originatorFee)` (external)
 
-Sets (overwrites if present) the originator fee structure for the specified token batch
+Sets (overwrites if present) the originator token fee structure for the specified token batch
+
+
+
+
+### <span id="IStMintable-setOriginatorFeeCurrencyBatch-uint64-uint16-"></span> `setOriginatorFeeCurrencyBatch(uint64 batchId, uint16 origCcyFee_percBips_ExFee)` (external)
+
+Sets (overwrites if present) the originator currency fee structure (basis points of exchange currency fee) for the specified token batch
 
 
 

@@ -12,9 +12,20 @@ import "../Libs/PayableLib.sol";
 
 import "../Interfaces/IChainlinkAggregator.sol";
 
+//
+// WIP - out of scope
+//
 contract StPayable is
     IStPayable,
     StFees {
+
+    // === CFT ===
+    // PRI 1 ** CASHFLOWS (J 1+3) ==>>> MVP -- CFT CORE (aiming for *no whitelisting*, i.e. all external control ERC20 accounts)
+    //      TODO: pri1 - test - exchange fees on subscriptions
+    //      TODO: pri1 - new  - eth fees on subscriptions (new fee-type)
+    //      TODO: pri2 - issuerPayments (BOND) v0 basic (no validations, i.e. eq-path only?)
+    //      TODO: pri3 - wallet auto-converts
+    //      TODO: pri4 - (eq-type) changing issuancePrice mid-issuance
 
     StructLib.CashflowStruct cashflowData;
 
