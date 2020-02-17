@@ -47,17 +47,17 @@ contract StFees is IStFees,
     }
 
     function getSecToken_totalExchangeFeesPaidQty()
-    external view onlyOwner() returns (uint256) {
+    external view /*onlyOwner()*/ returns (uint256) {
         return ledgerData._tokens_total.exchangeFeesPaidQty;
     }
 
     function getSecToken_totalOriginatorFeesPaidQty()
-    external view onlyOwner() returns (uint256) {
+    external view /*onlyOwner()*/ returns (uint256) {
         return ledgerData._tokens_total.originatorFeesPaidQty;
     }
 
     function getCcy_totalExchangeFeesPaid(uint256 ccyTypeId)
-    external view onlyOwner() returns (uint256) {
+    external view /*onlyOwner()*/ returns (uint256) {
         return ledgerData._ccyType_totalFeesPaid[ccyTypeId];
     }
 

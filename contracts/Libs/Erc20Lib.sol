@@ -8,16 +8,24 @@ library Erc20Lib {
     event Transfer(address indexed from, address indexed to, uint256 value);
     event Approval(address indexed owner, address indexed spender, uint256 value);
 
-    // WHITELIST -- todo: move seal to ledger
-    function whitelist(
-        StructLib.LedgerStruct storage ledgerData,
-        StructLib.Erc20Struct storage erc20Data,
-        address addr)
-    public {
+    // WHITELIST - add
+    function whitelist(StructLib.LedgerStruct storage ledgerData, StructLib.Erc20Struct storage erc20Data, address addr) public {
         require(!erc20Data._whitelisted[addr], "Already whitelisted");
         require(!ledgerData._contractSealed, "Contract is sealed");
         erc20Data._whitelist.push(addr);
         erc20Data._whitelisted[addr] = true;
+    }
+
+    // WHITELIST - get next, and advance current index
+    function getWhitelistNext(StructLib.LedgerStruct storage ledgerData, StructLib.Erc20Struct storage erc20Data) public view returns (address) {
+        require(ledgerData._contractSealed, "Contract is not sealed");
+        require(erc20Data._nextWhitelistNdx < erc20Data._whitelist.length, "Insufficient whitelist entries");
+        return erc20Data._whitelist[erc20Data._nextWhitelistNdx];
+    }
+    function incWhitelistNext(StructLib.LedgerStruct storage ledgerData, StructLib.Erc20Struct storage erc20Data) public {
+        require(ledgerData._contractSealed, "Contract is not sealed");
+        require(erc20Data._nextWhitelistNdx < erc20Data._whitelist.length, "Insufficient whitelist entries");
+        erc20Data._nextWhitelistNdx++;
     }
 
     // TRANSFER

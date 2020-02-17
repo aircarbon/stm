@@ -29,7 +29,7 @@ contract Collateralizable is ICcyCollateralizable,
     }
 
     function getTotalCcyFunded(uint256 ccyTypeId)
-    external view onlyOwner() returns (uint256) {
+    external view /*onlyOwner()*/ returns (uint256) {
         return ledgerData._ccyType_totalFunded[ccyTypeId];
     }
 
@@ -41,7 +41,7 @@ contract Collateralizable is ICcyCollateralizable,
     }
 
     function getTotalCcyWithdrawn(uint256 ccyTypeId)
-    external view onlyOwner() returns (uint256) {
+    external view /*onlyOwner()*/ returns (uint256) {
         return ledgerData._ccyType_totalWithdrawn[ccyTypeId];
     }
 }

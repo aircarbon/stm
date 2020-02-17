@@ -29,12 +29,20 @@ contract StErc20 is StFees, IErc20 {
         decimals = _decimals;
     }
 
-    // WHITELIST
-    function whitelist(address addr) public {
+    // WHITELIST - add entry & retreive full whitelist
+    function whitelist(address addr) public onlyOwner() {
         Erc20Lib.whitelist(ledgerData, erc20Data, addr);
     }
     function getWhitelist() external view returns (address[] memory) {
         return erc20Data._whitelist;
+    }
+
+    // WHITELIST - get next entry and advance ndx
+    function getWhitelistNext() external view returns (address) {
+        return Erc20Lib.getWhitelistNext(ledgerData, erc20Data);
+    }
+    function incWhitelistNext() public onlyOwner() onlyWhenReadWrite() {
+        Erc20Lib.incWhitelistNext(ledgerData, erc20Data);
     }
 
     // ERC20 - CORE

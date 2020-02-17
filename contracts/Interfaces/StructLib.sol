@@ -146,6 +146,7 @@ library StructLib {
     struct Erc20Struct {
         address[] _whitelist;
         mapping(address => bool) _whitelisted;
+        uint256 _nextWhitelistNdx;
     }
 
     // CASHFLOW STRUCTURE

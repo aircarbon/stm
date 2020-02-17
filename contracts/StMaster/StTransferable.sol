@@ -34,17 +34,17 @@ contract StTransferable is Owned,
 
     uint256 constant MAX_BATCHES_PREVIEW = 128; // library constants not accessible in contract; must duplicate TransferLib value
     function transfer_feePreview(StructLib.TransferArgs calldata a)
-    external view onlyOwner() returns (StructLib.FeesCalc[1 + MAX_BATCHES_PREVIEW * 2] memory feesAll) {
+    external view /*onlyOwner()*/ returns (StructLib.FeesCalc[1 + MAX_BATCHES_PREVIEW * 2] memory feesAll) {
         return TransferLib.transfer_feePreview(ledgerData, globalFees, owner, a);
     }
 
     function getCcy_totalTransfered(uint256 ccyTypeId)
-    external view onlyOwner() returns (uint256) {
+    external view /*onlyOwner()*/ returns (uint256) {
         return ledgerData._ccyType_totalTransfered[ccyTypeId];
     }
 
     function getSecToken_totalTransferedQty()
-    external view onlyOwner() returns (uint256) {
+    external view /*onlyOwner()*/ returns (uint256) {
         return ledgerData._tokens_total.transferedQty;
     }
 }
