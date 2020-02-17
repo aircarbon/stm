@@ -143,6 +143,16 @@ module.exports = {
         );
         //await CONST.logGas(web3, transferTx, `TransferHelper`);
 
+        // validate trade events
+        if (qty_A > 0 && ccy_amount_B > 0) { // trade tokens A <--> currecncy B
+            truffleAssert.eventEmitted(transferTx, 'TradedCcyTok', ev => 
+                ev.ccyTypeId == ccyTypeId_B && ev.tokTypeId == tokenTypeId_A && Big(ev.ccyAmount).eq(Big(ccy_amount_B)) && Big(ev.tokQty).eq(Big(qty_A)));
+        }
+        if (qty_B > 0 && ccy_amount_A > 0) { // trade tokens B <--> currecncy A
+            truffleAssert.eventEmitted(transferTx, 'TradedCcyTok', 
+                ev => ev.ccyTypeId == ccyTypeId_A && ev.tokTypeId == tokenTypeId_B && Big(ev.ccyAmount).eq(Big(ccy_amount_A)) && Big(ev.tokQty).eq(Big(qty_B)));
+        }
+
         // ledger entries after
         ledgerA_after = await stm.getLedgerEntry(ledger_A);
         ledgerB_after = await stm.getLedgerEntry(ledger_B);

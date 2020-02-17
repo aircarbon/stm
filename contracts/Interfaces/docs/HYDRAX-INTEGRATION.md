@@ -156,6 +156,10 @@ HX UI for a logged-in user to view a deposit address for deposit of tokens from 
 * > Phase 1 - read only: the UI only needs to show the ```stm_account``` for the logged-in user.
 * > Phase 1 - for detection of deposited funds: suggest that the "deposit tokens" screen polls ```getLedgerEntry``` to display deposit balance updates in near real-time.
 
+// Beta (6th Marc) / UAT (31st March)
+
+## Account Admin: (1) HX -> open new account ... (2) HX -> pwd change
+
 ## Exchange: Withdraw & Deposit (Currency Collateral)
 
 HX UI for a logged-in user to request withdrawal of currency (fiat or crypto) from AC custody to their own wallet or fiat account.
