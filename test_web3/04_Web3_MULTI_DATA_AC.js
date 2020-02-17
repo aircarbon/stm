@@ -23,6 +23,11 @@ const WHITE_BUYER_COUNT = 2;
 const BUYS_PER_WHITE_BUYER = 3;
 const WHITE_BUYERS = [];
 
+// whitelisted manual test accounts
+const TEST_ACCOUNT_START_NDX = WHITE_BUYER_START_NDX + WHITE_BUYER_COUNT;
+const TEST_ACCOUNT_COUNT = 20;
+const TEST_ACCOUNTS = [];
+
 const GRAY_NDX = 800;
 var GRAY, GRAY_privKey;
 
@@ -53,7 +58,7 @@ describe(`Contract Web3 Interface`, async () => {
         // setup whitelist: minters
         for (var whiteNdx = WHITE_MINTER_START_NDX; whiteNdx < WHITE_MINTER_START_NDX + WHITE_MINTER_COUNT; whiteNdx++) {
             x = await CONST.getAccountAndKey(whiteNdx);
-            //console.log(chalk.inverse(`SETUP MINTER: ${x.addr}`));
+            console.log(chalk.inverse(`SETUP MINTER @ndx ${whiteNdx}: ${x.addr}`));
             WHITE_MINTERS.push({ndx: whiteNdx, addr: x.addr, privKey: x.privKey});
             try {
                 const whitelistTx = await CONST.web3_tx('whitelist', [ x.addr ], OWNER, OWNER_privKey);
@@ -63,13 +68,23 @@ describe(`Contract Web3 Interface`, async () => {
         // setup whitelist: buyers
         for (var whiteNdx = WHITE_BUYER_START_NDX; whiteNdx < WHITE_BUYER_START_NDX + WHITE_BUYER_COUNT; whiteNdx++) {
             x = await CONST.getAccountAndKey(whiteNdx);
-            //console.log(chalk.inverse(`SETUP BUYER: ${x.addr}`));
+            console.log(chalk.inverse(`SETUP BUYER @ndx ${whiteNdx}: ${x.addr}`));
             WHITE_BUYERS.push({ndx: whiteNdx, addr: x.addr, privKey: x.privKey});
             try {
                 const whitelistTx = await CONST.web3_tx('whitelist', [ x.addr ], OWNER, OWNER_privKey);
             } catch(ex) { console.warn(ex); }
         }
-        
+
+        // setup whitelist: manual testing exchange accounts
+        for (var testAccountNdx = TEST_ACCOUNT_START_NDX; testAccountNdx < TEST_ACCOUNT_START_NDX + TEST_ACCOUNT_COUNT; testAccountNdx++) {
+            x = await CONST.getAccountAndKey(testAccountNdx);
+            console.log(chalk.inverse(`SETUP TEST_ACCOUNT @ndx ${testAccountNdx}: ${x.addr}`));
+            TEST_ACCOUNTS.push({ndx: testAccountNdx, addr: x.addr, privKey: x.privKey});
+            try {
+                const whitelistTx = await CONST.web3_tx('whitelist', [ x.addr ], OWNER, OWNER_privKey);
+            } catch(ex) { console.warn(ex); }
+        }
+
         // seal
         if (!sealedStatus) {
             const sealTx = await CONST.web3_tx('sealContract', [], OWNER, OWNER_privKey);
@@ -181,9 +196,7 @@ describe(`Contract Web3 Interface`, async () => {
             await CONST.web3_tx('transfer', [ BUYER.addr, buyerLedger.tokens_sumQty.toString() ], GRAY, GRAY_privKey);
             console.groupEnd();
         }
-       
     });
-   
 });
 
   
