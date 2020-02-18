@@ -4,7 +4,9 @@ const CONST = require('../const.js');
 
 contract("StMaster", accounts => {
     var stm;
-    const WHITELIST_COUNT = 10;
+    const WHITELIST_COUNT = 20;
+    const WHITELIST_RESERVED_COUNT = 10; // the contract reserves the first ten addresses for internal/test/exchange use
+    const ALLOCATABLE_COUNT = WHITELIST_COUNT - WHITELIST_RESERVED_COUNT;
 
     before(async function () {  
         stm = await st.deployed();
@@ -84,11 +86,11 @@ contract("StMaster", accounts => {
 
     // retrieve-next up to max
     it(`whitelist - retrieve next - should be able to retrieve up to maximum whitelisted address`, async () => {
-        for (var i=0 ; i < WHITELIST_COUNT ; i++) {
+        for (var i=0 ; i < ALLOCATABLE_COUNT ; i++) {
             const wl = await stm.getWhitelistNext();
             await stm.incWhitelistNext();
             //console.log(`wl: ${wl} - accounts[i]: ${accounts[i]}`);
-            assert(wl.toLowerCase() == accounts[i].toLowerCase(), 'Unexpected whitelist address from contract');
+            assert(wl.toLowerCase() == accounts[i + WHITELIST_RESERVED_COUNT].toLowerCase(), 'Unexpected whitelist address from contract');
         }
     });
     it(`whitelist - retrieve next - not be able to retrieve (1) beyond maximum whitelisted address`, async () => {

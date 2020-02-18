@@ -11,8 +11,11 @@ const CONST = require('../const.js');
 const OWNER_NDX = 0;
 var OWNER, OWNER_privKey;
 
+// internal/reserved whitelisted - the contract reserves the first ten addresses for internal/test/exchange use
+const WHITELIST_RESERVED_COUNT = 10;
+
 // whitelisted minters
-const WHITE_MINTER_START_NDX = 1;
+const WHITE_MINTER_START_NDX = WHITELIST_RESERVED_COUNT;// + 1;
 const WHITE_MINTER_COUNT = 2;
 const BATCHES_PER_WHITE_MINTER = 4;
 const WHITE_MINTERS = [];
@@ -54,6 +57,16 @@ describe(`Contract Web3 Interface`, async () => {
 
         const sealedStatus = await CONST.web3_call('getContractSeal', []);
         //assert(sealedStatus == false, 'contract is already sealed');
+
+        // setup whitelist: reserved/internal
+        for (var reservedNdx = 0; reservedNdx < WHITELIST_RESERVED_COUNT; reservedNdx++) {
+            x = await CONST.getAccountAndKey(reservedNdx);
+            console.log(chalk.inverse(`SETUP RESERVED WL @ndx ${reservedNdx}: ${x.addr}`));
+            WHITE_MINTERS.push({ndx: reservedNdx, addr: x.addr, privKey: x.privKey});
+            try {
+                const whitelistTx = await CONST.web3_tx('whitelist', [ x.addr ], OWNER, OWNER_privKey);
+            } catch(ex) { console.warn(ex); } // swallow - ropsten doesn't include the revert msg
+        }
 
         // setup whitelist: minters
         for (var whiteNdx = WHITE_MINTER_START_NDX; whiteNdx < WHITE_MINTER_START_NDX + WHITE_MINTER_COUNT; whiteNdx++) {

@@ -17,7 +17,7 @@ process.env.WEB3_NETWORK_ID = Number(process.env.NETWORK_ID || 888);
   const contractSealed = await CONST.web3_call('getContractSeal', []);
   console.log('contractSealed: ', contractSealed);
   if (!contractSealed) {
-    const WHITELIST_COUNT = 10;
+    const WHITELIST_COUNT = 20;
     console.group('WHITELISTING...');
     for (var i=0 ; i < WHITELIST_COUNT ; i++) { // note - we include account[0] owner account in the whitelist
       x = await CONST.getAccountAndKey(i);

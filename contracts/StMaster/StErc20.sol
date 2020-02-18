@@ -27,8 +27,16 @@ contract StErc20 is StFees, IErc20 {
     constructor(string memory _symbol, uint8 _decimals) internal {
         symbol = _symbol;
         decimals = _decimals;
+
+        // this index is used for allocating whitelist addresses to users (getWhitelistNext()))
+        // we skip/reserve the first ten whitelisted address (0 = owner, 1-9 for expansion)
+        erc20Data._nextWhitelistNdx = 10;
     }
 
+    //
+    // TODO: ### data-load setter for erc20Data._nextWhitelistNdx ###
+    //       move WL stuff out of erc20
+    //
     // WHITELIST - add entry & retreive full whitelist
     function whitelist(address addr) public onlyOwner() {
         Erc20Lib.whitelist(ledgerData, erc20Data, addr);
@@ -36,7 +44,6 @@ contract StErc20 is StFees, IErc20 {
     function getWhitelist() external view returns (address[] memory) {
         return erc20Data._whitelist;
     }
-
     // WHITELIST - get next entry and advance ndx
     function getWhitelistNext() external view returns (address) {
         return Erc20Lib.getWhitelistNext(ledgerData, erc20Data);
@@ -44,6 +51,7 @@ contract StErc20 is StFees, IErc20 {
     function incWhitelistNext() public onlyOwner() onlyWhenReadWrite() {
         Erc20Lib.incWhitelistNext(ledgerData, erc20Data);
     }
+    function getWhitelistNextNdx() external view returns (uint256) { return erc20Data._nextWhitelistNdx; }
 
     // ERC20 - CORE
     function totalSupply() public view returns (uint256) {
