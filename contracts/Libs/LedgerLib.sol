@@ -64,6 +64,7 @@ library LedgerLib {
                 ledgerHash = keccak256(abi.encodePacked(ledgerHash, erc20Data._whitelist[whitelistNdx]));
             }
         }
+        ledgerHash = keccak256(abi.encodePacked(ledgerHash, erc20Data._nextWhitelistNdx));
 
         // hash batches
         for (uint256 batchId = 1; batchId <= ledgerData._batches_currentMax_id; batchId++) {

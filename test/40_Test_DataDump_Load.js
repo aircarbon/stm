@@ -39,7 +39,7 @@ contract("StMaster", accounts => {
     it(`data dump - should be able to read all contract data`, async function () {
         if (await stm_cur.getContractType() == CONST.contractType.CASHFLOW) this.skip();
 
-        const ENTRY_COUNT = 1;
+        const WHITELIST_COUNT = 15;
         var curHash = await stm_cur.getLedgerHashcode();
 
         // ccy types
@@ -57,12 +57,16 @@ contract("StMaster", accounts => {
         }
 
         // whitelist
-        for (let i=0 ; i < ENTRY_COUNT + 1; i++)
+        for (let i=0 ; i < WHITELIST_COUNT + 1; i++)
             await stm_cur.whitelist(accounts[i]);
         const whitelist = await stm_cur.getWhitelist();
         console.log(`Whitelist: ${whitelist.join(', ')}`);
         curHash = await checkHashUpdate(curHash);
         stm_cur.sealContract();
+
+        // allocate next whitelist entry
+        const wl = await stm_cur.getWhitelistNext();
+        await stm_cur.incWhitelistNext();
 
         // exchange fee - ccy's
         for (let i=0 ; i < ccyTypesData.ccyTypes.length; i++) {
@@ -84,7 +88,7 @@ contract("StMaster", accounts => {
 
         // ledger - batches
         const MM = [];
-        for (let i=1 ; i <= ENTRY_COUNT ; i++) { // test data - mint for accounts after owner, move some to owner
+        for (let i=1 ; i <= WHITELIST_COUNT ; i++) { // test data - mint for accounts after owner, move some to owner
 
             const M = accounts[i];
             MM.push(M);
@@ -251,6 +255,9 @@ contract("StMaster", accounts => {
         stm_new.whitelist(accounts[555]); // simulate a new contract owner (first whitelist entry, by convention) -- i.e. we can upgrade contract with a new privkey
         const curWL = (await stm_cur.getWhitelist()), newWL = (await stm_new.getWhitelist()), loadWL = _.differenceWith(curWL.slice(1), newWL.slice(1), _.isEqual);
         _.forEach(loadWL, async (p) => await stm_new.whitelist(p));
+
+        // set whitelist index
+        stm_new.setWhitelistNextNdx(await stm_cur.getWhitelistNextNdx());
 
         // currencies - load exchange fees, set total funded & withdrawn
         _.forEach(curCcys.ccyTypes, async (p) => { 

@@ -33,10 +33,7 @@ contract StErc20 is StFees, IErc20 {
         erc20Data._nextWhitelistNdx = 10;
     }
 
-    //
-    // TODO: ### data-load setter for erc20Data._nextWhitelistNdx ###
-    //       move WL stuff out of erc20
-    //
+    // todo: move WL stuff out of erc20
     // WHITELIST - add entry & retreive full whitelist
     function whitelist(address addr) public onlyOwner() {
         Erc20Lib.whitelist(ledgerData, erc20Data, addr);
@@ -52,6 +49,7 @@ contract StErc20 is StFees, IErc20 {
         Erc20Lib.incWhitelistNext(ledgerData, erc20Data);
     }
     function getWhitelistNextNdx() external view returns (uint256) { return erc20Data._nextWhitelistNdx; }
+    function setWhitelistNextNdx(uint256 v) public onlyOwner() { erc20Data._nextWhitelistNdx = v; }
 
     // ERC20 - CORE
     function totalSupply() public view returns (uint256) {
