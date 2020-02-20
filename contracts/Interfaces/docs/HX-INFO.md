@@ -3,8 +3,8 @@ Returns the contract information currently operating in the following format:
 ```
 {
   "networkId": "3",
-  "contractName": "AirCarbon__v0.96h",
-  "version": "0.96h",
-  "address": "0x67ad1C9D3a1059E3CD6BA3186840d2dcf81dAA19"
+  "contractName": "AirCarbon__v0.96i",
+  "version": "0.96i",
+  "address": "0x6494170A9b2C1DA79d4C3B16757836DC53fd026D"
 }
 ```

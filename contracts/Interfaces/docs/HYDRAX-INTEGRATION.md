@@ -7,7 +7,7 @@ HydraX (HX) <-> AirCarbon [SekTokMaster (STM)]
 > demo: trading through ac-ex-api from HX front-end, two test accounts [HX]
 
 ## Testnet Contract
-STM v0.96h - Ropsten: 0x67ad1C9D3a1059E3CD6BA3186840d2dcf81dAA19
+See ./HX-INFO.md
 
 ## Contract Explorer
 https://dev-explorer.aircarbon.co
