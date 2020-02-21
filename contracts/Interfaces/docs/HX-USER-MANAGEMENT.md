@@ -32,7 +32,7 @@ How to test on the API viewer:
   }
   ```
 4. Click on Execute
-5. If successfull, 'Response body' should return transaction hash.
+5. If successfull, 'Response body' should returns account address.
 
 #### EDIT USER - Endpoint: /user/editUser
 Request body schema:
@@ -61,4 +61,4 @@ How to test on the API viewer:
   }
   ```
 4. Click on Execute
-5. If successfull, 'Response body' should return transaction hash.
+5. If successfull, 'Response body' should returns 'User updated.'.
