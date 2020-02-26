@@ -6,7 +6,7 @@ The API requires the following key in order to access endpoints:
 
 If using the API viewer, click on Authorize button and enter the key.
 
-#### ADD USER - Endpoint: /user/addUser
+#### ADD USER - Endpoint: /user
 Request body schema:
 ```json
 {
@@ -34,18 +34,16 @@ How to test on the API viewer:
 4. Click on Execute
 5. If successfully, 'Response body' should returns account address.
 
-#### EDIT USER - Endpoint: /user/editUser
+#### EDIT USER - Endpoint: /user/{hxUid}
 Request body schema:
 __Only include parameters that need to be updated__
 
 ```json
 {
-  "hxUid": "string",   // required
   "userName": "string",
   "pwdSha256": "string",
   "firstName": "string",
   "lastName": "string",
-  "newHXUid": "string"
 }
 ```
 
