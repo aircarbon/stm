@@ -16,11 +16,11 @@ const WEB3_GWEI_GAS_BID = '10';
 const WEB3_GAS_LIMIT = 5000000;
 
 // CFD helpers
-const nullCashflowArgs = { cashflowType: 0, 
-    //wei_maxIssuance: 0, 
+const nullCashflowArgs = { cashflowType: 0,
+    //wei_maxIssuance: 0,
     //wei_currentPrice: 0,
     term_Blks: 0, bond_bps: 0, bond_int_EveryBlks: 0 };
-const cashflowType = Object.freeze({ 
+const cashflowType = Object.freeze({
     BOND: 0,
     EQUITY: 1,
 });
@@ -92,7 +92,7 @@ module.exports = {
 
     getTestContextWeb3: () => getTestContextWeb3(),
     getAccountAndKey: async (accountNdx, mnemonic) => getAccountAndKey(accountNdx, mnemonic),
-    
+
     web3_sendEthTestAddr: (sendFromNdx, sendToAddr, ethValue) => web3_sendEthTestAddr(sendFromNdx, sendToAddr, ethValue),
     web3_call: (methodName, methodArgs) => web3_call(methodName, methodArgs),
     web3_tx: (methodName, methodArgs, fromAddr, fromPrivKey) => web3_tx(methodName, methodArgs, fromAddr, fromPrivKey),
@@ -141,7 +141,7 @@ EXCHANGE_FEE: 1,
         // EUR: 5,
         // HKD: 6,
         // GBP: 7
-    }), 
+    }),
 
     // eeu qty constants
     kt1Carbon: 1000,                      // 1000 qty (tons) = 1 kiloton
@@ -154,12 +154,12 @@ EXCHANGE_FEE: 1,
     thousandCcy_cents: Big(1000 * 100).toFixed(),
      millionCcy_cents: Big(1000 * 1000 * 100).toFixed(),
      billionCcy_cents: Big(1000).times(1000).times(1000).times(100).toFixed(),
-    thousandthEth_wei: Big(web3.utils.toWei("1", "ether") / 1000).toFixed(),                  // "1000000000000000", 
-     hundredthEth_wei: Big(web3.utils.toWei("1", "ether") / 100).toFixed(),                   // "10000000000000000", 
-         tenthEth_wei: Big(web3.utils.toWei("1", "ether") / 10).toFixed(),                    // "100000000000000000", 
-           oneEth_wei: Big(web3.utils.toWei("1", "ether")).toFixed(),                         // "1000000000000000000", 
-      thousandEth_wei: Big(web3.utils.toWei("1", "ether") * 1000).toFixed(),                  // "1000000000000000000000", 
-       millionEth_wei: Big(web3.utils.toWei("1", "ether")).times(1000).times(1000).toFixed(), // "1000000000000000000000000", 
+    thousandthEth_wei: Big(web3.utils.toWei("1", "ether") / 1000).toFixed(),                  // "1000000000000000",
+     hundredthEth_wei: Big(web3.utils.toWei("1", "ether") / 100).toFixed(),                   // "10000000000000000",
+         tenthEth_wei: Big(web3.utils.toWei("1", "ether") / 10).toFixed(),                    // "100000000000000000",
+           oneEth_wei: Big(web3.utils.toWei("1", "ether")).toFixed(),                         // "1000000000000000000",
+      thousandEth_wei: Big(web3.utils.toWei("1", "ether") * 1000).toFixed(),                  // "1000000000000000000000",
+       millionEth_wei: Big(web3.utils.toWei("1", "ether")).times(1000).times(1000).toFixed(), // "1000000000000000000000000",
      hundredthBtc_sat: Big(1000000).toFixed(),
          tenthBtc_sat: Big(10000000).toFixed(),
            oneBtc_sat: Big(100000000).toFixed(),
@@ -188,8 +188,8 @@ EXCHANGE_FEE: 1,
     }
 };
 
-function getTestContextWeb3() { 
-    const context = 
+function getTestContextWeb3() {
+    const context =
             // DM
             process.env.WEB3_NETWORK_ID == 888 ? { web3: new Web3('http://127.0.0.1:8545'),  ethereumTxChain: {} }
 
@@ -214,7 +214,7 @@ async function getAccountAndKey(accountNdx, mnemonic) {
     const hdk = hdkey.fromMasterSeed(seed);
     const addr_node = hdk.derivePath(`m/44'/60'/0'/0/${accountNdx}`);
     const addr = addr_node.getWallet().getAddressString();
-    const privKeyBytes = addr_node.getWallet().getPrivateKey();        
+    const privKeyBytes = addr_node.getWallet().getPrivateKey();
     //console.dir(privKeyBytes);
     const privKeyHex = privKeyBytes.toString('hex');
     //console.log('privKeyHex', privKeyHex);
