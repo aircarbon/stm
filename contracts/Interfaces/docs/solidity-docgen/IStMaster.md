@@ -81,6 +81,7 @@
 [IStMaster-TransferedLedgerCcy-address-address-uint256-uint256-enum-IStMaster-TransferType-]: #IStMaster-TransferedLedgerCcy-address-address-uint256-uint256-enum-IStMaster-TransferType-
 [IStMaster-TransferedFullSecToken-address-address-uint256-uint256-uint256-enum-IStMaster-TransferType-]: #IStMaster-TransferedFullSecToken-address-address-uint256-uint256-uint256-enum-IStMaster-TransferType-
 [IStMaster-TransferedPartialSecToken-address-address-uint256-uint256-uint256-uint256-enum-IStMaster-TransferType-]: #IStMaster-TransferedPartialSecToken-address-address-uint256-uint256-uint256-uint256-enum-IStMaster-TransferType-
+[IStMaster-TradedCcyTok-uint256-uint256-uint256-uint256-]: #IStMaster-TradedCcyTok-uint256-uint256-uint256-uint256-
 [IStMaster-SetFeeTokFix-uint256-address-uint256-]: #IStMaster-SetFeeTokFix-uint256-address-uint256-
 [IStMaster-SetFeeCcyFix-uint256-address-uint256-]: #IStMaster-SetFeeCcyFix-uint256-address-uint256-
 [IStMaster-SetFeeTokBps-uint256-address-uint256-]: #IStMaster-SetFeeTokBps-uint256-address-uint256-
@@ -134,6 +135,7 @@ Contrct type (CASHFLOW or COMMODITY) is set through implementing contract's ctor
 - [`TransferedLedgerCcy(address from, address to, uint256 ccyTypeId, uint256 amount, enum IStMaster.TransferType transferType)`][IStMaster-TransferedLedgerCcy-address-address-uint256-uint256-enum-IStMaster-TransferType-]
 - [`TransferedFullSecToken(address from, address to, uint256 stId, uint256 mergedToSecTokenId, uint256 qty, enum IStMaster.TransferType transferType)`][IStMaster-TransferedFullSecToken-address-address-uint256-uint256-uint256-enum-IStMaster-TransferType-]
 - [`TransferedPartialSecToken(address from, address to, uint256 splitFromSecTokenId, uint256 newSecTokenId, uint256 mergedToSecTokenId, uint256 qty, enum IStMaster.TransferType transferType)`][IStMaster-TransferedPartialSecToken-address-address-uint256-uint256-uint256-uint256-enum-IStMaster-TransferType-]
+- [`TradedCcyTok(uint256 ccyTypeId, uint256 ccyAmount, uint256 tokTypeId, uint256 tokQty)`][IStMaster-TradedCcyTok-uint256-uint256-uint256-uint256-]
 - [`SetFeeTokFix(uint256 tokenTypeId, address ledgerOwner, uint256 fee_tokenQty_Fixed)`][IStMaster-SetFeeTokFix-uint256-address-uint256-]
 - [`SetFeeCcyFix(uint256 ccyTypeId, address ledgerOwner, uint256 fee_ccy_Fixed)`][IStMaster-SetFeeCcyFix-uint256-address-uint256-]
 - [`SetFeeTokBps(uint256 tokenTypeId, address ledgerOwner, uint256 fee_token_PercBips)`][IStMaster-SetFeeTokBps-uint256-address-uint256-]
@@ -232,6 +234,12 @@ Seals the contract
 
 
 ### <span id="IStMaster-TransferedPartialSecToken-address-address-uint256-uint256-uint256-uint256-enum-IStMaster-TransferType-"></span> `TransferedPartialSecToken(address from, address to, uint256 splitFromSecTokenId, uint256 newSecTokenId, uint256 mergedToSecTokenId, uint256 qty, enum IStMaster.TransferType transferType)`
+
+
+
+
+
+### <span id="IStMaster-TradedCcyTok-uint256-uint256-uint256-uint256-"></span> `TradedCcyTok(uint256 ccyTypeId, uint256 ccyAmount, uint256 tokTypeId, uint256 tokQty)`
 
 
 

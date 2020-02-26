@@ -13,7 +13,7 @@ contract("StMaster", accounts => {
         if (await stm.getContractType() == CONST.contractType.CASHFLOW) this.skip();
     });
 
-    // -- ORDERD TESTS --
+    // -- ORDERED TESTS --
 
     it(`whitelist - should be able to add whitelist addresses`, async () => {
         // whitelist (exchange-controlled accounts) all accounts up to graylist test start
@@ -43,7 +43,7 @@ contract("StMaster", accounts => {
         }
         assert.fail('expected contract exception');
     }); 
-    it(`whitelist - retrieve - should not allow increment of next whitelist address when contract is read only`, async () => {
+    it(`whitelist - retrieve next - should not allow increment of next whitelist address when contract is read only`, async () => {
         try { 
             await stm.setReadOnly(true, { from: accounts[0] });
             await stm.incWhitelistNext();
@@ -57,13 +57,13 @@ contract("StMaster", accounts => {
     }); 
 
     // retrieve-next: not sealed
-    it(`whitelist - retrieve next - not be able to retrieve (1) next whitelist address if contract is not sealed`, async () => {
+    it(`whitelist - retrieve next - should not be able to retrieve (1) next whitelist address if contract is not sealed`, async () => {
         try { await stm.getWhitelistNext.call(); } catch (ex) {
             assert(ex.toString().includes('Contract is not sealed'), `unexpected: ${ex.toString()}`); return;
         }
         assert.fail('expected contract exception');
     }); 
-    it(`whitelist - retrieve - not be able to increment (2) next whitelist address if contract is not sealed`, async () => {
+    it(`whitelist - retrieve next - should not be able to increment (2) next whitelist address if contract is not sealed`, async () => {
         try { await stm.incWhitelistNext(); } catch (ex) {
             assert(ex.reason == 'Contract is not sealed', `unexpected: ${ex.reason}`); return;
         }
@@ -76,6 +76,13 @@ contract("StMaster", accounts => {
             assert(ex.reason == 'Already whitelisted', `unexpected: ${ex.reason}`); return;
         }
         assert.fail('expected contract exception');
+    });
+
+    // retrieve-next pointer at correct initial value
+    it(`whitelist - retrieve next - should reserve the first n whitelist address(es)`, async () => {
+        const wlNdx = await stm.getWhitelistNextNdx();
+        console.log(`wlNdx: ${wlNdx}`);
+        assert(wlNdx == 10, 'Unexpected whitelist next index');
     });
 
     // seal
@@ -93,13 +100,13 @@ contract("StMaster", accounts => {
             assert(wl.toLowerCase() == accounts[i + WHITELIST_RESERVED_COUNT].toLowerCase(), 'Unexpected whitelist address from contract');
         }
     });
-    it(`whitelist - retrieve next - not be able to retrieve (1) beyond maximum whitelisted address`, async () => {
-        try {  await stm.getWhitelistNext(); } catch (ex) {
+    it(`whitelist - retrieve next - should not be able to retrieve (1) beyond maximum whitelisted address`, async () => {
+        try { await stm.getWhitelistNext(); } catch (ex) {
             assert(ex.toString().includes('Insufficient whitelist entries'), `unexpected: ${ex.toString()}`); return;
         }
         assert.fail('expected contract exception');
     });
-    it(`whitelist - retrieve next - not be able to increment (2) beyond maximum whitelisted address`, async () => {
+    it(`whitelist - retrieve next - should not be able to increment (2) beyond maximum whitelisted address`, async () => {
         try { await stm.incWhitelistNext(); } catch (ex) {
             assert(ex.reason == 'Insufficient whitelist entries', `unexpected: ${ex.reason}`); return;
         }

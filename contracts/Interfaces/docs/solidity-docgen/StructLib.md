@@ -81,6 +81,7 @@
 [IStMaster-TransferedLedgerCcy-address-address-uint256-uint256-enum-IStMaster-TransferType-]: IStMaster.md#IStMaster-TransferedLedgerCcy-address-address-uint256-uint256-enum-IStMaster-TransferType-
 [IStMaster-TransferedFullSecToken-address-address-uint256-uint256-uint256-enum-IStMaster-TransferType-]: IStMaster.md#IStMaster-TransferedFullSecToken-address-address-uint256-uint256-uint256-enum-IStMaster-TransferType-
 [IStMaster-TransferedPartialSecToken-address-address-uint256-uint256-uint256-uint256-enum-IStMaster-TransferType-]: IStMaster.md#IStMaster-TransferedPartialSecToken-address-address-uint256-uint256-uint256-uint256-enum-IStMaster-TransferType-
+[IStMaster-TradedCcyTok-uint256-uint256-uint256-uint256-]: IStMaster.md#IStMaster-TradedCcyTok-uint256-uint256-uint256-uint256-
 [IStMaster-SetFeeTokFix-uint256-address-uint256-]: IStMaster.md#IStMaster-SetFeeTokFix-uint256-address-uint256-
 [IStMaster-SetFeeCcyFix-uint256-address-uint256-]: IStMaster.md#IStMaster-SetFeeCcyFix-uint256-address-uint256-
 [IStMaster-SetFeeTokBps-uint256-address-uint256-]: IStMaster.md#IStMaster-SetFeeTokBps-uint256-address-uint256-
