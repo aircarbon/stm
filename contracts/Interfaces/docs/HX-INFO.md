@@ -14,9 +14,9 @@ Returns the contract information currently operating in the following format:
 
 ### IMPORTANT NOTE:
 
-The smart contract will only operate over accounts addresses that are whitelabled. This is done by design.
-Each user account created on the system is assigned a whitelabeled account address. There's a limited 
-number of whitelabeled accounts, and once the limit is reached no more user accounts can be created.
+The smart contract will only operate over accounts addresses that are whitelisted. This is done by design.
+Each user account created on the system is assigned a whitelisted account address. There's a limited 
+number of whitelisted accounts, and once the limit is reached no more user accounts can be created.
 
 The response body includes the number of available and total whitelisted accounts addresses.
 
