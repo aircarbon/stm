@@ -80,6 +80,8 @@ module.exports = {
       gas: 7800000, // node reported limit: 7,984,363
       gasPrice: web3.utils.toWei(gweiDeployment, "gwei"),
       networkCheckTimeout: 30000,
+      
+      confirmations: 2,    // # of confs to wait between deployments. (default: 0)
 
       skipDryRun: true,
       timeoutBlocks: 200, // but web3 always times out at 50 blocks?!
