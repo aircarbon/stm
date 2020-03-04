@@ -71,13 +71,14 @@ library CcyLib {
         //uint256 fundAmount = uint256(amount);
 
         // create ledger entry as required
-        if (ledgerData._ledger[ledgerOwner].exists == false) {
-            ledgerData._ledger[ledgerOwner] = StructLib.Ledger({
-                      exists: true,
-                  customFees: StructLib.FeeStruct()
-            });
-            ledgerData._ledgerOwners.push(ledgerOwner);
-        }
+        StructLib.initLedgerIfNew(ledgerData, ledgerOwner);
+        // if (ledgerData._ledger[ledgerOwner].exists == false) {
+        //     ledgerData._ledger[ledgerOwner] = StructLib.Ledger({
+        //               exists: true,
+        //           customFees: StructLib.FeeStruct()
+        //     });
+        //     ledgerData._ledgerOwners.push(ledgerOwner);
+        // }
 
         // update ledger balance
         ledgerData._ledger[ledgerOwner].ccyType_balance[ccyTypeId] += amount;

@@ -50,8 +50,8 @@ library TransferLib {
         if (a.qty_B > 0) require(a.tokenTypeId_B > 0, "Bad tokenTypeId_B");
 
         // erc20 support - initialize ledger entry if not known
-        initLedgerIfNew(ledgerData, a.ledger_A);
-        initLedgerIfNew(ledgerData, a.ledger_B);
+        StructLib.initLedgerIfNew(ledgerData, a.ledger_A);
+        StructLib.initLedgerIfNew(ledgerData, a.ledger_B);
 
         //
         // exchange fees (global or ledger override) (disabled if fee-reciever[contract owner] == fee-payer)
@@ -357,20 +357,6 @@ library TransferLib {
                     });
                 }
             }
-        }
-    }
-
-    //
-    // INTERNAL - util
-    //
-    function initLedgerIfNew (
-        StructLib.LedgerStruct storage ledgerData,
-        address addr
-    )
-    private {
-        if (!ledgerData._ledger[addr].exists) {
-            ledgerData._ledger[addr] = StructLib.Ledger({ exists: true, customFees: StructLib.FeeStruct() });
-            ledgerData._ledgerOwners.push(addr);
         }
     }
 

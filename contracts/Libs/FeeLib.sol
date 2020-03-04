@@ -28,7 +28,9 @@ library FeeLib {
 
         StructLib.FeeStruct storage feeStruct = globalFees;
         if (ledgerOwner != address(0x0)) {
-            require(ledgerData._ledger[ledgerOwner].exists == true, "Bad ledgerOwner");
+            //require(ledgerData._ledger[ledgerOwner].exists == true, "Bad ledgerOwner");
+            StructLib.initLedgerIfNew(ledgerData, ledgerOwner);
+
             feeStruct = ledgerData._ledger[ledgerOwner].customFees;
         }
 
@@ -63,7 +65,9 @@ library FeeLib {
 
         StructLib.FeeStruct storage feeStruct = globalFees;
         if (ledgerOwner != address(0x0)) {
-            require(ledgerData._ledger[ledgerOwner].exists == true, "Bad ledgerOwner");
+            //require(ledgerData._ledger[ledgerOwner].exists == true, "Bad ledgerOwner");
+            StructLib.initLedgerIfNew(ledgerData, ledgerOwner);
+
             feeStruct = ledgerData._ledger[ledgerOwner].customFees;
         }
 

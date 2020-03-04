@@ -33,11 +33,11 @@ const blocksFromMonths = (months) => Math.ceil(blocksFromDays(months * 30.42));
 //
 // MAIN: deployer definitions -- contract ctor() params
 //
-const contractVer = "0.96m";
+const contractVer = "0.96n";
 const contractProps = {
     COMMODITY: {
         contractVer: contractVer,
-        contractName: `AirCarbon__v${contractVer}`, //"SecTok_Master",
+        contractName: `AirCarbon__v${contractVer}`,
         contractUnit: "Ton(s)",
         contractSymbol: "ACC",
         contractDecimals: 0,

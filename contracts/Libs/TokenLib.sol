@@ -105,13 +105,14 @@ library TokenLib {
         emit MintedSecTokenBatch(newBatch.id, a.tokenTypeId, a.batchOwner, uint256(a.mintQty), uint256(a.mintSecTokenCount));
 
         // create ledger entry as required
-        if (ledgerData._ledger[a.batchOwner].exists == false) {
-            ledgerData._ledger[a.batchOwner] = StructLib.Ledger({
-                    exists: true,
-                customFees: StructLib.FeeStruct()
-            });
-            ledgerData._ledgerOwners.push(a.batchOwner);
-        }
+        StructLib.initLedgerIfNew(ledgerData, a.batchOwner);
+        // if (ledgerData._ledger[a.batchOwner].exists == false) {
+        //     ledgerData._ledger[a.batchOwner] = StructLib.Ledger({
+        //             exists: true,
+        //         customFees: StructLib.FeeStruct()
+        //     });
+        //     ledgerData._ledgerOwners.push(a.batchOwner);
+        // }
 
         // mint & assign STs
         for (int256 ndx = 0; ndx < a.mintSecTokenCount; ndx++) {

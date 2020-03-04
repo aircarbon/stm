@@ -213,6 +213,22 @@ library StructLib {
     }
 
     /**
+     * @notice Creates a new ledger entry, if not already existing
+     * @param ledgerData Ledger data
+     * @param addr Ledger entry address
+     */
+    function initLedgerIfNew (
+        StructLib.LedgerStruct storage ledgerData,
+        address addr
+    )
+    public {
+        if (!ledgerData._ledger[addr].exists) {
+            ledgerData._ledger[addr] = StructLib.Ledger({ exists: true, customFees: StructLib.FeeStruct() });
+            ledgerData._ledgerOwners.push(addr);
+        }
+    }
+
+    /**
      * @notice Checks if the supplied ledger owner holds at least the specified quantity of supplied ST type
      * @param ledger Ledger owner
      * @param tokenTypeId ST type

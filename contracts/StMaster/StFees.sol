@@ -22,6 +22,9 @@ contract StFees is IStFees,
     // GLOBAL FEES
     StructLib.FeeStruct globalFees;
 
+    constructor() public {
+    }
+
     function getFee(GetFeeType feeType, uint256 typeId, address ledgerOwner)
     external view onlyOwner() returns(StructLib.SetFeeArgs memory) {
         StructLib.FeeStruct storage fs = ledgerOwner == address(0x0) ? globalFees : ledgerData._ledger[ledgerOwner].customFees;

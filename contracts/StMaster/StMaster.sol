@@ -116,6 +116,21 @@ contract StMaster is IStMaster, IPublicViews,
           //ccyTypesData._ccyTypes[6] = StructLib.Ccy({ id: 6, name: 'HKD', unit: 'cents',      decimals: 2 });
           //ccyTypesData._ccyTypes[7] = StructLib.Ccy({ id: 7, name: 'GBP', unit: 'pence',      decimals: 2 });
             ccyTypesData._count_ccyTypes = 3;
+
+            // set default ccy fee USD: $3/1000 mirrored
+            StructLib.SetFeeArgs memory feeArgsGlobalUsd = StructLib.SetFeeArgs({
+                   fee_fixed: 0,
+                fee_percBips: 0,
+                     fee_min: 300,      // min $3.00
+                     fee_max: 0,
+             ccy_perThousand: 300,      // $3.00 per thousand tokens received
+               ccy_mirrorFee: true      // mirrored - token sender pays, too
+            });
+            FeeLib.setFee_CcyType(ledgerData, ccyTypesData, globalFees,
+                1,            // USD
+                address(0x0), // global fee
+                feeArgsGlobalUsd
+            );
         }
         else if (_contractType == StructLib.ContractType.CASHFLOW) {
             stTypesData._tokenTypeNames[1] = 'UNI_TOKEN'; //contractName;

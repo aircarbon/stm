@@ -26,6 +26,13 @@ contract("StMaster", accounts => {
             console.log(`addrNdx: ${global.TaddrNdx} - contract @ ${stm.address} (owner: ${accounts[0]})`);
     });
 
+    it(`setup - should have default USD $3/1000 tokens, mirrored`, async () => {
+        const gfUsd = await stm.getFee(CONST.getFeeType.CCY, CONST.ccyType.USD, CONST.nullAddr);
+        assert(gfUsd.fee_min == 300, 'unexpected global fee USD fee_min');
+        assert(gfUsd.ccy_perThousand == 300, 'unexpected global fee USD ccy_perThousand');
+        assert(gfUsd.ccy_mirrorFee == true, 'unexpected global fee USD ccy_mirrorFee');
+    });
+
     // https://iancoleman.io/bip39/#english
     it(`misc - bip39 - should be able to use a maximum entropy (24 word = 512-bit) BIP39 mnemonic (BIP44 HD)`, async () => {
         for (let i=0 ; i < 10 ; i++) {
