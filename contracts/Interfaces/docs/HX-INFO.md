@@ -1,7 +1,7 @@
 #### CONTRACT INFORMATION - Endpoint: /info
 Returns the contract information currently operating in the following format:
 
-```
+```json
 {
   "networkId": "3",
   "contractName": "AirCarbon__v0.96k",
