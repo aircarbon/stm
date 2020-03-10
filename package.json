@@ -10,7 +10,7 @@
     "scripts": {
         "test": "truffle test",
         "solium:lint": "solium lint -d ./contracts",
-        "migrate": "rimraf -rf ./build/contracts && truffle migrate",
+        "migrate": "rimraf -rf ./build/contracts && truffle migrate --reset",
         "console": "truffle console",
         "dev": "truffle develop"
     },
