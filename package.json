@@ -10,14 +10,14 @@
     "scripts": {
         "test": "truffle test",
         "solium:lint": "solium lint -d ./contracts",
-        "migrate": "rimraf -rf ./build/contracts && truffle migrate",
+        "migrate": "rimraf -rf ./build/contracts && truffle migrate --network development --reset",
         "console": "truffle console",
         "dev": "truffle develop"
     },
     "keywords": [],
     "license": "MIT",
     "dependencies": {
-        "@babel/runtime": "^7.6.3",
+        "@babel/runtime": "^7.8.7",
         "big.js": "^5.2.2",
         "bip39": "^3.0.2",
         "bn.js": "^5.1.1",
