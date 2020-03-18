@@ -38,9 +38,21 @@ contract StErc20 is StFees, IErc20 {
     function whitelist(address addr) public onlyOwner() {
         Erc20Lib.whitelist(ledgerData, erc20Data, addr);
     }
+    function whitelistMany(address[] memory addr) public onlyOwner() {
+        for (uint256 i = 0; i < addr.length; i++) {
+            Erc20Lib.whitelist(ledgerData, erc20Data, addr[i]);
+        }
+    }
     function getWhitelist() external view returns (address[] memory) {
         return erc20Data._whitelist;
     }
+    function getWhitelistCount() external view returns (uint256) {
+        return erc20Data._whitelist.length;
+    }
+    function isWhitelisted(address addr) external view returns (bool) {
+        return erc20Data._whitelisted[addr];
+    }
+
     // WHITELIST - get next entry and advance ndx
     function getWhitelistNext() external view returns (address) {
         return Erc20Lib.getWhitelistNext(ledgerData, erc20Data);

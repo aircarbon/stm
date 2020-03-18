@@ -196,7 +196,7 @@ contract("StMaster", accounts => {
             CONST.nullFees, 0, [], [],
         { from: accounts[0] });
 
-        // validat batch ID
+        // validate batch ID
         const maxBatchIdAfter = (await stm.getSecTokenBatchCount.call()).toNumber();
         assert(maxBatchIdAfter == maxBatchIdBefore + 1, 'unexpected batch id after minting');
 
@@ -251,6 +251,9 @@ contract("StMaster", accounts => {
             assert(eeu.mintedQty == qtyUnit / qtySecTokens, 'unexpected vST minted TONS value after minting');
             assert(eeu.currentQty == qtyUnit / qtySecTokens, 'unexpected vST remaining (unburned) TONS value after minting');
         }
+
+        // validate total minted field
+        assert(ledgerEntryAfter.tokens_sumQtyMinted - ledgerEntryBefore.tokens_sumQtyMinted == qtyUnit, 'unexpected tokens_sumQtyMinted before vs. after');
 
         return batchId;
     }

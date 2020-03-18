@@ -101,7 +101,7 @@ library LedgerLib {
                 // hash token type id list
                 ledgerHash = keccak256(abi.encodePacked(ledgerHash, stIds));
 
-                // hash token type ledger fee
+                // hash token type ledger fees
                 if (entry.customFees.tokType_Set[stTypeId]) {
                     ledgerHash = keccak256(abi.encodePacked(ledgerHash, hashSetFeeArgs(entry.customFees.tok[stTypeId])));
                 }
@@ -117,6 +117,10 @@ library LedgerLib {
                     ledgerHash = keccak256(abi.encodePacked(ledgerHash, hashSetFeeArgs(entry.customFees.ccy[ccyTypeId])));
                 }
             }
+
+            // hash ledger entry total minted & burned counts
+            ledgerHash = keccak256(abi.encodePacked(ledgerHash, entry.tokens_sumQtyMinted));
+            ledgerHash = keccak256(abi.encodePacked(ledgerHash, entry.tokens_sumQtyBurned));
         }
 
         // walk all tokens (including those fully deleted from the ledger by burn()), hash
@@ -221,10 +225,12 @@ library LedgerLib {
         }
 
         StructLib.LedgerReturn memory ret = StructLib.LedgerReturn({
-            exists: ledgerData._ledger[account].exists,
-            tokens: tokens,
-     tokens_sumQty: tokens_sumQty,
-              ccys: ccys
+             exists: ledgerData._ledger[account].exists,
+             tokens: tokens,
+      tokens_sumQty: tokens_sumQty,
+               ccys: ccys,
+tokens_sumQtyMinted: ledgerData._ledger[account].tokens_sumQtyMinted,
+tokens_sumQtyBurned: ledgerData._ledger[account].tokens_sumQtyBurned
         });
         return ret;
     }

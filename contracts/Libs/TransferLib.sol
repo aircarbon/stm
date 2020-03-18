@@ -9,7 +9,7 @@ library TransferLib {
     event TransferedFullSecToken(address indexed from, address indexed to, uint256 indexed stId, uint256 mergedToSecTokenId, uint256 qty, TransferType transferType);
     event TransferedPartialSecToken(address indexed from, address indexed to, uint256 indexed splitFromSecTokenId, uint256 newSecTokenId, uint256 mergedToSecTokenId, uint256 qty, TransferType transferType);
     //event dbg1(uint256 batchId, uint256 S, uint256 BCS, uint256 batchQty, uint256 totQty, uint256 batch_exFee_ccy, uint256 BFEE);
-    event TradedCcyTok(uint256 indexed ccyTypeId, uint256 ccyAmount, uint256 indexed tokTypeId, uint256 tokQty);
+    event TradedCcyTok(uint256 ccyTypeId, uint256 ccyAmount, uint256 tokTypeId, address indexed tokensFrom, address indexed ccyFrom, uint256 tokQty);
 
     uint256 constant MAX_BATCHES_PREVIEW = 128; // for fee previews: max distinct batch IDs that can participate in one side of a trade fee preview
 
@@ -242,10 +242,10 @@ library TransferLib {
 
         // emit trade events
         if (a.ccy_amount_A > 0 && a.qty_B > 0) {
-            emit TradedCcyTok(a.ccyTypeId_A, uint256(a.ccy_amount_A), a.tokenTypeId_B, a.qty_B);
+            emit TradedCcyTok(a.ccyTypeId_A, uint256(a.ccy_amount_A), a.tokenTypeId_B, a.ledger_B, a.ledger_A, a.qty_B);
         }
         if (a.ccy_amount_B > 0 && a.qty_A > 0) {
-            emit TradedCcyTok(a.ccyTypeId_B, uint256(a.ccy_amount_B), a.tokenTypeId_A, a.qty_A);
+            emit TradedCcyTok(a.ccyTypeId_B, uint256(a.ccy_amount_B), a.tokenTypeId_A, a.ledger_A, a.ledger_B, a.qty_A);
         }
     }
 

@@ -20,7 +20,9 @@ library LoadLib {
     function createLedgerEntry(
         StructLib.LedgerStruct storage ledgerData,
         address ledgerEntryOwner,
-        StructLib.LedgerCcyReturn[] memory ccys
+        StructLib.LedgerCcyReturn[] memory ccys,
+        uint256 tokens_sumQtyMinted,
+        uint256 tokens_sumQtyBurned
     )
     public {
         require(!ledgerData._contractSealed, "Contract is sealed");
@@ -30,8 +32,10 @@ library LoadLib {
         }
 
         ledgerData._ledger[ledgerEntryOwner] = StructLib.Ledger({
-                exists: true,
-            customFees: StructLib.FeeStruct()
+                         exists: true,
+                     customFees: StructLib.FeeStruct(),
+            tokens_sumQtyMinted: tokens_sumQtyMinted,
+            tokens_sumQtyBurned: tokens_sumQtyBurned
         });
 
         for (uint256 i = 0 ; i < ccys.length ; i++) {

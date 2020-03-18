@@ -21,9 +21,11 @@ contract DataLoadable is IDataLoadable,
 
     function createLedgerEntry(
         address ledgerEntryOwner,
-        StructLib.LedgerCcyReturn[] memory ccys
+        StructLib.LedgerCcyReturn[] memory ccys,
+        uint256 tokens_sumQtyMinted,
+        uint256 tokens_sumQtyBurned
     ) public onlyOwner() {
-        LoadLib.createLedgerEntry(ledgerData, ledgerEntryOwner, ccys);
+        LoadLib.createLedgerEntry(ledgerData, ledgerEntryOwner, ccys, tokens_sumQtyMinted, tokens_sumQtyBurned);
     }
 
     function addSecToken(

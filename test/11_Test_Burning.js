@@ -58,6 +58,12 @@ contract("StMaster", accounts => {
         const ledgerAfter = await stm.getLedgerEntry(accounts[global.TaddrNdx]);
         assert(ledgerAfter.tokens_sumQty == ledgerBefore.tokens_sumQty / 2, 'unexpected ledger TONS after burn');
 
+        // check ledger total burned
+        //console.log('ledgerBefore.tokens_sumQtyBurned', ledgerBefore.tokens_sumQtyBurned)
+        //console.log('ledgerAfter.tokens_sumQtyBurned', ledgerAfter.tokens_sumQtyBurned)
+        //console.log('burnTokQty', burnTokQty)
+        assert(ledgerAfter.tokens_sumQtyBurned - ledgerBefore.tokens_sumQtyBurned == burnTokQty, 'unexpected tokens_sumQtyBurned before vs after');
+
         // check batch
         const batchAfter = await stm.getSecTokenBatch(eeuAfter.batchId);
         assert(batchAfter.burnedQty == burnTokQty, 'unexpected batch burned TONS value on batch after burn');

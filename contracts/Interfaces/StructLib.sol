@@ -54,6 +54,9 @@ library StructLib {
         mapping(uint256 => uint256[]) tokenType_stIds;          // SecTokenTypeId -> stId[] of all owned STs
         mapping(uint256 => int256)    ccyType_balance;          // CcyTypeId -> balance -- SIGNED! WE MAY WANT TO SUPPORT -VE BALANCES LATER...
         StructLib.FeeStruct           customFees;               // global fee override - per ledger entry
+
+        uint256                       tokens_sumQtyMinted;      // tests - TODO
+        uint256                       tokens_sumQtyBurned;      // tests - TODO
     }
 
     struct LedgerReturn {                                       // ledger return structure
@@ -61,6 +64,8 @@ library StructLib {
         LedgerSecTokenReturn[] tokens;                          // STs with types & sizes (in contract base unit) information - v2
         uint256                tokens_sumQty;                   // retained for caller convenience - v1
         LedgerCcyReturn[]      ccys;                            // currency balances
+        uint256                tokens_sumQtyMinted;
+        uint256                tokens_sumQtyBurned;
     }
         struct LedgerSecTokenReturn {
             uint256 stId;
@@ -89,7 +94,7 @@ library StructLib {
             uint256 id;                                         // global sequential id: 1-based
             uint256 mintedQty;                                  // initial unit qty minted in the ST
             uint256 currentQty;                                 // current (variable) unit qty in the ST (i.e. burned = currentQty - mintedQty)
-            uint64 batchId;                                     // parent batch of the ST
+            uint64  batchId;                                    // parent batch of the ST
         }
     struct PackedStTotals {
         uint80 transferedQty;
@@ -223,7 +228,12 @@ library StructLib {
     )
     public {
         if (!ledgerData._ledger[addr].exists) {
-            ledgerData._ledger[addr] = StructLib.Ledger({ exists: true, customFees: StructLib.FeeStruct() });
+            ledgerData._ledger[addr] = StructLib.Ledger({
+                 exists: true,
+             customFees: StructLib.FeeStruct(),
+    tokens_sumQtyMinted: 0,
+    tokens_sumQtyBurned: 0
+            });
             ledgerData._ledgerOwners.push(addr);
         }
     }

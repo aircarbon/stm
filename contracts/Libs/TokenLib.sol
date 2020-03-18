@@ -132,6 +132,8 @@ library TokenLib {
 
         ledgerData._tokens_currentMax_id += uint256(a.mintSecTokenCount);
         ledgerData._tokens_totalMintedQty += uint256(a.mintQty);
+
+        ledgerData._ledger[a.batchOwner].tokens_sumQtyMinted += uint256(a.mintQty); //***
     }
 
     // POST-MINTING: add KVP metadata
@@ -261,5 +263,7 @@ library TokenLib {
             }
         }
         ledgerData._tokens_totalBurnedQty += uint256(burnQty);
+
+        ledgerData._ledger[ledgerOwner].tokens_sumQtyBurned += uint256(burnQty); //***
     }
 }

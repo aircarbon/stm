@@ -60,7 +60,7 @@ contract StMaster is IStMaster, IPublicViews,
     event TransferedLedgerCcy(address indexed from, address indexed to, uint256 ccyTypeId, uint256 amount, TransferType transferType);
     event TransferedFullSecToken(address indexed from, address indexed to, uint256 indexed stId, uint256 mergedToSecTokenId, uint256 qty, TransferType transferType);
     event TransferedPartialSecToken(address indexed from, address indexed to, uint256 indexed splitFromSecTokenId, uint256 newSecTokenId, uint256 mergedToSecTokenId, uint256 qty, TransferType transferType);
-    event TradedCcyTok(uint256 indexed ccyTypeId, uint256 ccyAmount, uint256 indexed tokTypeId, uint256 tokQty);
+    event TradedCcyTok(uint256 ccyTypeId, uint256 ccyAmount, uint256 tokTypeId, address indexed tokensFrom, address indexed ccyFrom, uint256 tokQty);
     //event dbg1(uint256 batchId, uint256 S, uint256 BCS, uint256 batchQty, uint256 totQty, uint256 batch_exFee_ccy, uint256 BFEE);
     // FeeLib events
     event SetFeeTokFix(uint256 tokenTypeId, address indexed ledgerOwner, uint256 fee_tokenQty_Fixed);
@@ -109,13 +109,13 @@ contract StMaster is IStMaster, IPublicViews,
             stTypesData._tokenTypeNames[3] = 'AirCarbon Premium Token';
             stTypesData._count_tokenTypes = 3;
             ccyTypesData._ccyTypes[1] = StructLib.Ccy({ id: 1, name: 'USD', unit: 'cents',      decimals: 2 });
-            ccyTypesData._ccyTypes[2] = StructLib.Ccy({ id: 2, name: 'ETH', unit: 'Wei',        decimals: 18 });
-            ccyTypesData._ccyTypes[3] = StructLib.Ccy({ id: 3, name: 'BTC', unit: 'Satoshi',    decimals: 8 });
+          //ccyTypesData._ccyTypes[2] = StructLib.Ccy({ id: 2, name: 'ETH', unit: 'Wei',        decimals: 18 });
+          //ccyTypesData._ccyTypes[3] = StructLib.Ccy({ id: 3, name: 'BTC', unit: 'Satoshi',    decimals: 8 });
           //ccyTypesData._ccyTypes[4] = StructLib.Ccy({ id: 4, name: 'SGD', unit: 'cents',      decimals: 2 });
           //ccyTypesData._ccyTypes[5] = StructLib.Ccy({ id: 5, name: 'EUR', unit: 'euro cents', decimals: 2 });
           //ccyTypesData._ccyTypes[6] = StructLib.Ccy({ id: 6, name: 'HKD', unit: 'cents',      decimals: 2 });
           //ccyTypesData._ccyTypes[7] = StructLib.Ccy({ id: 7, name: 'GBP', unit: 'pence',      decimals: 2 });
-            ccyTypesData._count_ccyTypes = 3;
+            ccyTypesData._count_ccyTypes = 1;
 
             // set default ccy fee USD: $3/1000 mirrored
             StructLib.SetFeeArgs memory feeArgsGlobalUsd = StructLib.SetFeeArgs({
@@ -142,8 +142,10 @@ contract StMaster is IStMaster, IPublicViews,
 
         // create ledger entry for contract owner - transfer fees are paid to this ledger entry
         ledgerData._ledger[owner] = StructLib.Ledger({
-            exists: true,
-        customFees: StructLib.FeeStruct()
+                 exists: true,
+             customFees: StructLib.FeeStruct(),
+    tokens_sumQtyMinted: 0,
+    tokens_sumQtyBurned: 0
         });
         ledgerData._ledgerOwners.push(owner);
     }
