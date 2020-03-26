@@ -41,7 +41,7 @@ contract("StMaster", accounts => {
         const carbonTokQtyTransferAmount = 750;
         const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: accounts[global.TaddrNdx + 0],       ledger_B: accounts[global.TaddrNdx + 1],
-                   qty_A: carbonTokQtyTransferAmount,         tokenTypeId_A: CONST.tokenType.NATURE,
+                   qty_A: carbonTokQtyTransferAmount,     tokenTypeId_A: CONST.tokenType.NATURE,
                    qty_B: 0,                              tokenTypeId_B: 0,
             ccy_amount_A: 0,                                ccyTypeId_A: 0,
             ccy_amount_B: CONST.oneEth_wei,                 ccyTypeId_B: CONST.ccyType.ETH,
