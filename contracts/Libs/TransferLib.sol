@@ -658,7 +658,7 @@ library TransferLib {
     )
     private view returns(uint256 totalFee) {
         uint256 feeAmount = fs.fee_fixed +
-                    (((receiveAmount * 1/*default precision*/ / 1000/*per thousand*/) * fs.ccy_perThousand) / 1/*default precision*/) +
+                    (((receiveAmount * 1000000/*increase precision*/ / 1000/*per thousand*/) * fs.ccy_perThousand) / 1000000/*decrease precision*/) +
                     (((sendAmount * 1000000/*increase precision*/ / 10000/*basis points*/) * fs.fee_percBips) / 1000000/*decrease precision*/);
         if (sendAmount > 0) {
             if (feeAmount > fs.fee_max && fs.fee_max > 0) return fs.fee_max;

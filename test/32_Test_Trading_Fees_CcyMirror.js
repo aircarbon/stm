@@ -37,12 +37,12 @@ contract("StMaster", accounts => {
         truffleAssert.eventEmitted(setFeeTx, 'SetFeeCcyPerThousand', ev => ev.ccyTypeId == CONST.ccyType.USD && ev.fee_ccy_perThousand == ccy_perThousand && ev.ledgerOwner == CONST.nullAddr);
         assert((await stm.getFee(CONST.getFeeType.CCY, CONST.ccyType.USD, CONST.nullAddr)).ccy_perThousand == ccy_perThousand, 'unexpected fee per thousand received after setting ccy fee structure');
 
-        const transferAmountsTok = [1000, 1500, 11000, 100];
+        const transferAmountsTok = [800, 1000, 1500, 11000, 100];
         for (var i = 0 ; i < transferAmountsTok.length ; i++) {
             // transfer, with fee structure applied
             const transferAmountCcy = new BN(10000); // 100$ = 10,000 cents
             const transferAmountTok = new BN(transferAmountsTok[i]);
-            const expectedFeeCcy = Math.floor(Number(transferAmountTok.toString()) / 1000) * ccy_perThousand
+            const expectedFeeCcy = /*Math.floor*/(Number(transferAmountTok.toString()) / 1000) * ccy_perThousand
                                     * 2; // exchange ccy-fee mirror
             //console.log('expectedFeeCcy', expectedFeeCcy);
             const data = await transferHelper.transferLedger({ stm, accounts,
@@ -79,7 +79,7 @@ contract("StMaster", accounts => {
             // transfer, with fee structure applied
             const transferAmountCcy = new BN(10000); // 100$ = 10,000 cents
             const transferAmountTok = new BN(transferAmountsTok[i]);
-            const expectedFeeCcy = Math.floor(Number(transferAmountTok.toString()) / 1000) * ccy_perThousand
+            const expectedFeeCcy = /*Math.floor*/(Number(transferAmountTok.toString()) / 1000) * ccy_perThousand
                                     * 2; // exchange ccy-fee mirror
             //console.log('expectedFeeCcy', expectedFeeCcy);
             const data = await transferHelper.transferLedger({ stm, accounts,
@@ -120,10 +120,10 @@ contract("StMaster", accounts => {
             const transferAmountTok = new BN(transferAmountsTok[i]);
 
             // A - ledger fee (ccy sender)
-            const expectedFeeCcy_A = Math.max(Math.min(Math.floor(Number(transferAmountTok.toString()) / 1000) * ledger_feePerThousand, ledger_feeMax), ledger_feeMin);
+            const expectedFeeCcy_A = Math.max(Math.min(/*Math.floor*/(Number(transferAmountTok.toString()) / 1000) * ledger_feePerThousand, ledger_feeMax), ledger_feeMin);
             
             // B - global ccy fee (ccy mirrored - asymmetric)
-            const expectedFeeCcy_B = Math.max(Math.min(Math.floor(Number(transferAmountTok.toString()) / 1000) * exchange_feePerThousand, exchange_feeMax), exchange_feeMin);
+            const expectedFeeCcy_B = Math.max(Math.min(/*Math.floor*/(Number(transferAmountTok.toString()) / 1000) * exchange_feePerThousand, exchange_feeMax), exchange_feeMin);
 
             const expectedFeeCcy = expectedFeeCcy_A + expectedFeeCcy_B;
 
@@ -165,10 +165,10 @@ contract("StMaster", accounts => {
             const transferAmountTok = new BN(transferAmountsTok[i]);
 
             // A - ledger fee (ccy sender)
-            const expectedFeeCcy_A = Math.max(Math.min(Math.floor(Number(transferAmountTok.toString()) / 1000) * ledger_feePerThousand, ledger_feeMax), ledger_feeMin);
+            const expectedFeeCcy_A = Math.max(Math.min(/*Math.floor*/(Number(transferAmountTok.toString()) / 1000) * ledger_feePerThousand, ledger_feeMax), ledger_feeMin);
             
             // B - global ccy fee (ccy mirrored - asymmetric)
-            const expectedFeeCcy_B = Math.max(Math.min(Math.floor(Number(transferAmountTok.toString()) / 1000) * exchange_feePerThousand, exchange_feeMax), exchange_feeMin);
+            const expectedFeeCcy_B = Math.max(Math.min(/*Math.floor*/(Number(transferAmountTok.toString()) / 1000) * exchange_feePerThousand, exchange_feeMax), exchange_feeMin);
 
             const expectedFeeCcy = expectedFeeCcy_A + expectedFeeCcy_B;
             

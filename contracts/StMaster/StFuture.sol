@@ -23,8 +23,8 @@ FUTURES - notes 26/MAR/2020
 
   (d) "take or pay" for each open position/trade:
      * get current "reference price" = P0
-     * P1 = last ref price used for the position/trade OR entry price of the position/trade
-     * delta = P0 - P1 = D_REF = "take or pay"
+     * P1 = last ref price used for the position/trade OR entry price of the position/trade (if first time being marked for take or pay)
+     * delta D_REF = P0 - P1 = "take or pay" amount
      * then add/sub D_REF from the cash balance
      * the net/net D_REF across all open positions should be zero (each trade has a corresponding counter-trade)
 

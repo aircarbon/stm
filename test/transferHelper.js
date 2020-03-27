@@ -65,7 +65,7 @@ module.exports = {
             const perThousand = lf.ccy_perThousand > 0 ? Big(lf.ccy_perThousand) : Big(gf.ccy_perThousand);
             fee_ccy_A = Big(Math.floor(fix
                 .plus((Big(ccy_amount_A).div(10000)).times(bps))
-                .plus(Big(Math.floor((Big(qty_B).div(1000)))).times(perThousand))
+                .plus(Big(/*Math.floor*/((Big(qty_B).div(1000)))).times(perThousand))
             ));
             if (fee_ccy_A.gt(max) && max.gt(0)) fee_ccy_A = max;
             if (fee_ccy_A.lt(min) && min.gt(0)) fee_ccy_A = min;
@@ -83,7 +83,7 @@ module.exports = {
             const perThousand = lf.ccy_perThousand > 0 ? Big(lf.ccy_perThousand) : Big(gf.ccy_perThousand);
             fee_ccy_B = Big(Math.floor(fix
                 .plus((Big(ccy_amount_B).div(10000)).times(bps))
-                .plus(Big(Math.floor((Big(qty_A).div(1000)))).times(perThousand))
+                .plus(Big(/*Math.floor*/((Big(qty_A).div(1000)))).times(perThousand))
             ));
             if (fee_ccy_B.gt(max) && max.gt(0)) fee_ccy_B = max;
             if (fee_ccy_B.lt(min) && min.gt(0)) fee_ccy_B = min;

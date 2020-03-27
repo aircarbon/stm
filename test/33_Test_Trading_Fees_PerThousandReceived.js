@@ -37,12 +37,12 @@ contract("StMaster", accounts => {
         truffleAssert.eventEmitted(setFeeTx, 'SetFeeCcyPerThousand', ev => ev.ccyTypeId == CONST.ccyType.USD && ev.fee_ccy_perThousand == ccy_perThousand && ev.ledgerOwner == CONST.nullAddr);
         assert((await stm.getFee(CONST.getFeeType.CCY, CONST.ccyType.USD, CONST.nullAddr)).ccy_perThousand == ccy_perThousand, 'unexpected fee per thousand received after setting ccy fee structure');
 
-        const transferAmountsTok = [1000, 1500, 11000, 100];
+        const transferAmountsTok = [1500, 1000, 11000, 100];
         for (var i = 0 ; i < transferAmountsTok.length ; i++) {
             // transfer, with fee structure applied
             const transferAmountCcy = new BN(10000); // 100$ = 10,000 cents
             const transferAmountTok = new BN(transferAmountsTok[i]);
-            const expectedFeeCcy = Math.floor(Number(transferAmountTok.toString()) / 1000) * ccy_perThousand;
+            const expectedFeeCcy = /*Math.floor*/(Number(transferAmountTok.toString()) / 1000) * ccy_perThousand;
             //console.log('expectedFeeCcy', expectedFeeCcy);
             const data = await transferHelper.transferLedger({ stm, accounts,
                     ledger_A: A,                                         ledger_B: B,
@@ -77,7 +77,7 @@ contract("StMaster", accounts => {
             // transfer, with fee structure applied
             const transferAmountCcy = new BN(10000); // 100$ = 10,000 cents
             const transferAmountTok = new BN(transferAmountsTok[i]);
-            const expectedFeeCcy = Math.floor(Number(transferAmountTok.toString()) / 1000) * ccy_perThousand;
+            const expectedFeeCcy = /*Math.floor*/(Number(transferAmountTok.toString()) / 1000) * ccy_perThousand;
             //console.log('expectedFeeCcy', expectedFeeCcy);
             const data = await transferHelper.transferLedger({ stm, accounts,
                     ledger_A: A,                                         ledger_B: B,
@@ -113,7 +113,7 @@ contract("StMaster", accounts => {
             // transfer, with fee structure applied
             const transferAmountCcy = new BN(10000); // 100$ = 10,000 cents
             const transferAmountTok = new BN(transferAmountsTok[i]);
-            const expectedFeeCcy = Math.max(Math.min(Math.floor(Number(transferAmountTok.toString()) / 1000) * ccy_perThousand, fee_max), fee_min);
+            const expectedFeeCcy = Math.max(Math.min(/*Math.floor*/(Number(transferAmountTok.toString()) / 1000) * ccy_perThousand, fee_max), fee_min);
             //console.log('expectedFeeCcy', expectedFeeCcy);
             const data = await transferHelper.transferLedger({ stm, accounts,
                     ledger_A: A,                                         ledger_B: B,
@@ -149,7 +149,7 @@ contract("StMaster", accounts => {
             // transfer, with fee structure applied
             const transferAmountCcy = new BN(10000); // 100$ = 10,000 cents
             const transferAmountTok = new BN(transferAmountsTok[i]);
-            const expectedFeeCcy = Math.max(Math.min(Math.floor(Number(transferAmountTok.toString()) / 1000) * ccy_perThousand, fee_max), fee_min);
+            const expectedFeeCcy = Math.max(Math.min(/*Math.floor*/(Number(transferAmountTok.toString()) / 1000) * ccy_perThousand, fee_max), fee_min);
             //console.log('expectedFeeCcy', expectedFeeCcy);
             const data = await transferHelper.transferLedger({ stm, accounts,
                     ledger_A: A,                                         ledger_B: B,
