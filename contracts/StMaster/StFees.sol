@@ -34,7 +34,7 @@ contract StFees is IStFees,
             fee_percBips: fa[typeId].fee_percBips,
                  fee_min: fa[typeId].fee_min,
                  fee_max: fa[typeId].fee_max,
-         ccy_perThousand: fa[typeId].ccy_perThousand,
+         ccy_perMillion: fa[typeId].ccy_perMillion,
            ccy_mirrorFee: fa[typeId].ccy_mirrorFee
         });
     }

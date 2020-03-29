@@ -16,8 +16,8 @@ module.exports = {
             applyFees,
         } = a;
         // console.dir(a);
-        // console.log('ccyTypeId_A', ccyTypeId_A);
-        // console.log('ccyTypeId_B', ccyTypeId_B);
+        //console.log('ccyTypeId_A', ccyTypeId_A);
+        //console.log('ccyTypeId_B', ccyTypeId_B);
 
         // ledger entries before
         var ledgerA_before, ledgerA_after;
@@ -62,10 +62,10 @@ module.exports = {
             const bps = lf.fee_percBips > 0 ? Big(lf.fee_percBips) : Big(gf.fee_percBips); 
             const min = lf.fee_min > 0 ? Big(lf.fee_min) : Big(gf.fee_min);
             const max = lf.fee_max > 0 ? Big(lf.fee_max) : Big(gf.fee_max);
-            const perThousand = lf.ccy_perThousand > 0 ? Big(lf.ccy_perThousand) : Big(gf.ccy_perThousand);
+            const perMillion = lf.ccy_perMillion > 0 ? Big(lf.ccy_perMillion) : Big(gf.ccy_perMillion);
             fee_ccy_A = Big(Math.floor(fix
                 .plus((Big(ccy_amount_A).div(10000)).times(bps))
-                .plus(Big(/*Math.floor*/((Big(qty_B).div(1000)))).times(perThousand))
+                .plus(Big(/*Math.floor*/((Big(qty_B).div(1000000)))).times(perMillion))
             ));
             if (fee_ccy_A.gt(max) && max.gt(0)) fee_ccy_A = max;
             if (fee_ccy_A.lt(min) && min.gt(0)) fee_ccy_A = min;
@@ -80,10 +80,10 @@ module.exports = {
             const bps = lf.fee_percBips > 0 ? Big(lf.fee_percBips) : Big(gf.fee_percBips);
             const min = lf.fee_min > 0 ? Big(lf.fee_min) : Big(gf.fee_min);
             const max = lf.fee_max > 0 ? Big(lf.fee_max) : Big(gf.fee_max);
-            const perThousand = lf.ccy_perThousand > 0 ? Big(lf.ccy_perThousand) : Big(gf.ccy_perThousand);
+            const perMillion = lf.ccy_perMillion > 0 ? Big(lf.ccy_perMillion) : Big(gf.ccy_perMillion);
             fee_ccy_B = Big(Math.floor(fix
                 .plus((Big(ccy_amount_B).div(10000)).times(bps))
-                .plus(Big(/*Math.floor*/((Big(qty_A).div(1000)))).times(perThousand))
+                .plus(Big(/*Math.floor*/((Big(qty_A).div(1000000)))).times(perMillion))
             ));
             if (fee_ccy_B.gt(max) && max.gt(0)) fee_ccy_B = max;
             if (fee_ccy_B.lt(min) && min.gt(0)) fee_ccy_B = min;
@@ -313,12 +313,11 @@ module.exports = {
             assert(A_bal_aft_ccyA.minus(A_bal_bef_ccyA).plus(Big(fee_ccy_A)).eq(Big(deltaCcy_fromA[ccyTypeId_A]).times(+1)),
                 `(1) unexpected ledger A balance ${A_bal_aft_ccyA.toFixed()} after transfer A -> B amount ${ccy_amount_A} ccy type ${ccyTypeId_A}`);
 
-            //console.log('B_bal_bef_ccyA', B_bal_bef_ccyA.toFixed());
-            //console.log('B_bal_aft_ccyA', B_bal_aft_ccyA.toFixed());
-            //console.log('orig_ccyFee_toB', orig_ccyFee_toB.toString());
-            //console.log('Big(deltaCcy_fromA[ccyTypeId_A])', Big(deltaCcy_fromA[ccyTypeId_A]).toFixed());
-            //console.log('exchangeFee_ccy_B', exchangeFee_ccy_B.toString());
-
+            // console.log('B_bal_bef_ccyA', B_bal_bef_ccyA.toFixed());
+            // console.log('B_bal_aft_ccyA', B_bal_aft_ccyA.toFixed());
+            // console.log('orig_ccyFee_toB', orig_ccyFee_toB.toString());
+            // console.log('Big(deltaCcy_fromA[ccyTypeId_A])', Big(deltaCcy_fromA[ccyTypeId_A]).toFixed());
+            // console.log('exchangeFee_ccy_B', exchangeFee_ccy_B.toString());
             assert(B_bal_aft_ccyA.minus(B_bal_bef_ccyA).eq(Big(deltaCcy_fromA[ccyTypeId_A]).times(-1)
                     .plus(Big(orig_ccyFee_toB.toString())) // orig ccy fee paid by owner to B
                     .minus(Big(exchangeFee_ccy_B.toString()))), // ex ccy-fee mirror

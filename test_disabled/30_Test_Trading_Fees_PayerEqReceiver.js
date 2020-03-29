@@ -34,11 +34,11 @@ contract("StMaster", accounts => {
     it(`fees (fee payer=receiver) - global/ledger/originator token fees should not be applied when fee sender is fee receiver (fee on A, contract owner & batch originator)`, async () => {
         const A = accounts[0]; // sender is contract owner, exchange fee receiver, and batch originator fee receiver
         const B = accounts[global.TaddrNdx + 1];
-        const allFees = { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: 0, fee_percBips: 100, fee_min: 0, fee_max: 0 };
+        const allFees = { ccy_mirrorFee: false, ccy_perMillion: 0, fee_fixed: 0, fee_percBips: 100, fee_min: 0, fee_max: 0 };
 
         // mint
-        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.kt1Carbon, 1,      A, allFees, 0, [], [], { from: accounts[0] });
-        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.kt1Carbon, 1,      A, allFees, 0, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.KT_CARBON, 1,      A, allFees, 0, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.KT_CARBON, 1,      A, allFees, 0, [], [], { from: accounts[0] });
         await stm.fund(CONST.ccyType.ETH,                      CONST.oneEth_wei,        B,                     { from: accounts[0] });
 
         // set global fee & ledger fee
@@ -73,12 +73,12 @@ contract("StMaster", accounts => {
     it(`fees (fee payer=receiver) - global/ledger/originator token fees should not be applied when fee sender is fee receiver (fee on B, contract owner & batch originator)`, async () => {
         const A = accounts[global.TaddrNdx + 0];
         const B = accounts[0]; // sender is contract owner, exchange fee receiver, and batch originator fee receiver
-        const allFees = { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: 0, fee_percBips: 100, fee_min: 0, fee_max: 0 };
+        const allFees = { ccy_mirrorFee: false, ccy_perMillion: 0, fee_fixed: 0, fee_percBips: 100, fee_min: 0, fee_max: 0 };
 
         // mint
         await stm.fund(CONST.ccyType.ETH,                      CONST.oneEth_wei,        A,                     { from: accounts[0] });
-        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.kt1Carbon, 1,      B, allFees, 0, [], [], { from: accounts[0] });
-        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.kt1Carbon, 1,      B, allFees, 0, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.KT_CARBON, 1,      B, allFees, 0, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.KT_CARBON, 1,      B, allFees, 0, [], [], { from: accounts[0] });
 
         // set global fee & ledger fee
         await stm.setFee_TokType(CONST.tokenType.NATURE, B,              allFees );
@@ -112,15 +112,15 @@ contract("StMaster", accounts => {
     it(`fees (fee payer=receiver) - originator token fee should not be applied (global should be) when fee sender is fee receiver (fee on A, batch originator)`, async () => {
         const A = accounts[global.TaddrNdx + 0]; // sender is batch originator 
         const B = accounts[global.TaddrNdx + 1];
-        const origFees = { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: 0, fee_percBips: 100, fee_min: 0, fee_max: 2 };
+        const origFees = { ccy_mirrorFee: false, ccy_perMillion: 0, fee_fixed: 0, fee_percBips: 100, fee_min: 0, fee_max: 2 };
 
         // mint
-        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.kt1Carbon, 1,      A, origFees, 0, [], [], { from: accounts[0] });
-        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.kt1Carbon, 1,      A, origFees, 0, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.KT_CARBON, 1,      A, origFees, 0, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.KT_CARBON, 1,      A, origFees, 0, [], [], { from: accounts[0] });
         await stm.fund(CONST.ccyType.ETH,                      CONST.oneEth_wei,        B,                      { from: accounts[0] });
 
         // set global fee - originator fee x2
-        const globalFee = { ccy_mirrorFee: false, ccy_perThousand: 0,
+        const globalFee = { ccy_mirrorFee: false, ccy_perMillion: 0,
                fee_fixed: origFees.fee_fixed * 2,
             fee_percBips: origFees.fee_percBips * 2,
                  fee_min: origFees.fee_min * 2,
@@ -157,15 +157,15 @@ contract("StMaster", accounts => {
     it(`fees (fee payer=receiver) - originator token fee should not be applied (ledger should be) when fee sender is fee receiver (fee on B, batch originator)`, async () => {
         const A = accounts[global.TaddrNdx + 0]; 
         const B = accounts[global.TaddrNdx + 1]; // sender is batch originator 
-        const origFees = { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: 0, fee_percBips: 100, fee_min: 0, fee_max: 2 };
+        const origFees = { ccy_mirrorFee: false, ccy_perMillion: 0, fee_fixed: 0, fee_percBips: 100, fee_min: 0, fee_max: 2 };
 
         // mint
         await stm.fund(CONST.ccyType.ETH,                      CONST.oneEth_wei,        A,                      { from: accounts[0] });
-        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.kt1Carbon, 1,      B, origFees, 0, [], [], { from: accounts[0] });
-        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.kt1Carbon, 1,      B, origFees, 0, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.KT_CARBON, 1,      B, origFees, 0, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.KT_CARBON, 1,      B, origFees, 0, [], [], { from: accounts[0] });
 
         // set ledger fee - originator fee x2
-        const ledgerFee = { ccy_mirrorFee: false, ccy_perThousand: 0,
+        const ledgerFee = { ccy_mirrorFee: false, ccy_perMillion: 0,
                fee_fixed: origFees.fee_fixed * 2,
             fee_percBips: origFees.fee_percBips * 2,
                  fee_min: origFees.fee_min * 2,
@@ -204,12 +204,12 @@ contract("StMaster", accounts => {
     it(`fees (fee payer=receiver) - global/ledger currency fee should not be applied when fee sender is fee receiver (fee on A, contract owner)`, async () => {
         const A = accounts[0]; // sender is contract owner, exchange fee receiver
         const B = accounts[global.TaddrNdx + 1];
-        const allFees = { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: 0, fee_percBips: 100, fee_min: 0, fee_max: 0 };
+        const allFees = { ccy_mirrorFee: false, ccy_perMillion: 0, fee_fixed: 0, fee_percBips: 100, fee_min: 0, fee_max: 0 };
 
         // mint
         await stm.fund(CONST.ccyType.ETH,                      CONST.oneEth_wei,        A,                            { from: accounts[0] });
-        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.kt1Carbon, 1,      B, CONST.nullFees, 0, [], [], { from: accounts[0] });
-        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.kt1Carbon, 1,      B, CONST.nullFees, 0, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.KT_CARBON, 1,      B, CONST.nullFees, 0, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.KT_CARBON, 1,      B, CONST.nullFees, 0, [], [], { from: accounts[0] });
 
         // set global fee & ledger fee
         await stm.setFee_CcyType(CONST.ccyType.ETH,      A,              allFees);
@@ -243,11 +243,11 @@ contract("StMaster", accounts => {
     it(`fees (fee payer=receiver) - global/ledger currency fee should not be applied when fee sender is fee receiver (fee on B, contract owner)`, async () => {
         const A = accounts[global.TaddrNdx + 1];
         const B = accounts[0]; // sender is contract owner (exchange fee receiver)
-        const allFees = { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: 0, fee_percBips: 100, fee_min: 0, fee_max: 0 };
+        const allFees = { ccy_mirrorFee: false, ccy_perMillion: 0, fee_fixed: 0, fee_percBips: 100, fee_min: 0, fee_max: 0 };
 
         // mint
-        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.kt1Carbon, 1,      A, CONST.nullFees, 0, [], [], { from: accounts[0] });
-        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.kt1Carbon, 1,      A, CONST.nullFees, 0, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.KT_CARBON, 1,      A, CONST.nullFees, 0, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.KT_CARBON, 1,      A, CONST.nullFees, 0, [], [], { from: accounts[0] });
         await stm.fund(CONST.ccyType.ETH,                      CONST.oneEth_wei,        B,                            { from: accounts[0] });
 
         // set global fee & ledger fee

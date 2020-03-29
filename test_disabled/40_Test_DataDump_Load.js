@@ -71,7 +71,7 @@ contract("StMaster", accounts => {
         // exchange fee - ccy's
         for (let i=0 ; i < ccyTypesData.ccyTypes.length; i++) {
             const ccyType = ccyTypesData.ccyTypes[i];
-            const setFee = await stm_cur.setFee_CcyType(ccyType.id, CONST.nullAddr, { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: i+1, fee_percBips: (i+1)*100, fee_min: (i+1), fee_max: (i+1+100) } );
+            const setFee = await stm_cur.setFee_CcyType(ccyType.id, CONST.nullAddr, { ccy_mirrorFee: false, ccy_perMillion: 0, fee_fixed: i+1, fee_percBips: (i+1)*100, fee_min: (i+1), fee_max: (i+1+100) } );
             const x = await stm_cur.getFee(CONST.getFeeType.CCY, ccyType.id, CONST.nullAddr);
             console.log(`Exchange Fee: ccyTypeId=${ccyType.id} { x.fee_fixed=${x.fee_fixed} / x.fee_percBips=${x.fee_percBips} / x.fee_min=${x.fee_min} / x.fee_max=${x.fee_max} }`);
             curHash = await checkHashUpdate(curHash);
@@ -80,7 +80,7 @@ contract("StMaster", accounts => {
         // exchange fee - tok's
         for (let i=0 ; i < stTypesData.tokenTypes.length; i++) {
             const tokType = stTypesData.tokenTypes[i];
-            const setFee = await stm_cur.setFee_TokType(tokType.id, CONST.nullAddr, { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: i+1, fee_percBips: (i+1)*100, fee_min: (i+1), fee_max: (i+1+100) } );
+            const setFee = await stm_cur.setFee_TokType(tokType.id, CONST.nullAddr, { ccy_mirrorFee: false, ccy_perMillion: 0, fee_fixed: i+1, fee_percBips: (i+1)*100, fee_min: (i+1), fee_max: (i+1+100) } );
             const x = await stm_cur.getFee(CONST.getFeeType.TOK, tokType.id, CONST.nullAddr);
             console.log(`Exchange Fee: tokType=${tokType.id} { x.fee_fixed=${x.fee_fixed} / x.fee_percBips=${x.fee_percBips} / x.fee_min=${x.fee_min} / x.fee_max=${x.fee_max} }`);
             curHash = await checkHashUpdate(curHash);
@@ -92,7 +92,7 @@ contract("StMaster", accounts => {
 
             const M = accounts[i];
             MM.push(M);
-            const batchFee = { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: i+1, fee_percBips: (i+1)*100, fee_min: (i+1), fee_max: (i+1+100) };
+            const batchFee = { ccy_mirrorFee: false, ccy_perMillion: 0, fee_fixed: i+1, fee_percBips: (i+1)*100, fee_min: (i+1), fee_max: (i+1+100) };
             const metaKVPs = [
                 { k: `DATADUMP_TEST_${i+1}`,        v: `${i+1}` },
                 { k: `DATADUMP_TEST2_${(i+1)*100}`, v: `${(i+1)*100}` },
@@ -189,7 +189,7 @@ contract("StMaster", accounts => {
                     curHash = await checkHashUpdate(curHash);
 
                 // set ledger ccy fee
-                await stm_cur.setFee_CcyType(ccyType.id, entryOwner, { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: i+2+j+2, fee_percBips: (i+2+j+2)*100, fee_min: (i+2+j+2), fee_max: (i+2+j+2+100) } );
+                await stm_cur.setFee_CcyType(ccyType.id, entryOwner, { ccy_mirrorFee: false, ccy_perMillion: 0, fee_fixed: i+2+j+2, fee_percBips: (i+2+j+2)*100, fee_min: (i+2+j+2), fee_max: (i+2+j+2+100) } );
                 if (entryOwner != accounts[0])
                     curHash = await checkHashUpdate(curHash);
             }
@@ -199,7 +199,7 @@ contract("StMaster", accounts => {
                 const tokType = stTypesData.tokenTypes[k];
 
                 // set ledger token fee
-                await stm_cur.setFee_TokType(tokType.id, entryOwner, { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: k+4+j+4, fee_percBips: (k+4+j+4)*100, fee_min: (k+4+j+4), fee_max: (k+4+j+4+100) } );
+                await stm_cur.setFee_TokType(tokType.id, entryOwner, { ccy_mirrorFee: false, ccy_perMillion: 0, fee_fixed: k+4+j+4, fee_percBips: (k+4+j+4)*100, fee_min: (k+4+j+4), fee_max: (k+4+j+4+100) } );
                 if (entryOwner != accounts[0])
                     curHash = await checkHashUpdate(curHash);
             }

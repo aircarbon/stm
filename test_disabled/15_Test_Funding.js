@@ -19,26 +19,26 @@ contract("StMaster", accounts => {
             console.log(`addrNdx: ${global.TaddrNdx} - contract @ ${stm.address} (owner: ${accounts[0]})`);
     });
     
-    it(`funding - should allow funding of SGD`, async () => {
+    it(`funding - should allow funding of USD`, async () => {
         await fundLedger({ ccyTypeId: CONST.ccyType.USD, amount: CONST.thousandCcy_cents, receiver: accounts[global.TaddrNdx]});
     });
     it(`funding - should allow funding of extreme values of USD`, async () => {
         await fundLedger({ ccyTypeId: CONST.ccyType.USD, amount: CONST.millionCcy_cents * 1000 * 1000, receiver: accounts[global.TaddrNdx]});
     });
 
-    it(`funding - should allow funding of ETH`, async () => {
-        await fundLedger({ ccyTypeId: CONST.ccyType.ETH, amount: CONST.oneEth_wei, receiver: accounts[global.TaddrNdx]});
-    });
-    it(`funding - should allow funding of extreme values of ETH`, async () => {
-        await fundLedger({ ccyTypeId: CONST.ccyType.ETH, amount: CONST.millionEth_wei, receiver: accounts[global.TaddrNdx]});
-    });
+    // it(`funding - should allow funding of ETH`, async () => {
+    //     await fundLedger({ ccyTypeId: CONST.ccyType.ETH, amount: CONST.oneEth_wei, receiver: accounts[global.TaddrNdx]});
+    // });
+    // it(`funding - should allow funding of extreme values of ETH`, async () => {
+    //     await fundLedger({ ccyTypeId: CONST.ccyType.ETH, amount: CONST.millionEth_wei, receiver: accounts[global.TaddrNdx]});
+    // });
 
-    it(`funding - should allow funding of BTC`, async () => {
-        await fundLedger({ ccyTypeId: CONST.ccyType.BTC, amount: CONST.oneBtc_sat, receiver: accounts[global.TaddrNdx]});
-    });
-    it(`funding - should allow funding of extreme values of BTC`, async () => {
-        await fundLedger({ ccyTypeId: CONST.ccyType.BTC, amount: CONST.millionBtc_sat, receiver: accounts[global.TaddrNdx]});
-    });
+    // it(`funding - should allow funding of BTC`, async () => {
+    //     await fundLedger({ ccyTypeId: CONST.ccyType.BTC, amount: CONST.oneBtc_sat, receiver: accounts[global.TaddrNdx]});
+    // });
+    // it(`funding - should allow funding of extreme values of BTC`, async () => {
+    //     await fundLedger({ ccyTypeId: CONST.ccyType.BTC, amount: CONST.millionBtc_sat, receiver: accounts[global.TaddrNdx]});
+    // });
 
     it(`funding - should allow funding of USD`, async () => {
         await fundLedger({ ccyTypeId: CONST.ccyType.USD, amount: CONST.thousandCcy_cents, receiver: accounts[global.TaddrNdx]});
@@ -65,12 +65,12 @@ contract("StMaster", accounts => {
     });
 
     it(`funding - should allow minting and funding on same ledger entry`, async () => {
-        await stm.mintSecTokenBatch(CONST.tokenType.NATURE, CONST.gtCarbon, 1, accounts[global.TaddrNdx], CONST.nullFees, 0, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.NATURE, CONST.GT_CARBON, 1, accounts[global.TaddrNdx], CONST.nullFees, 0, [], [], { from: accounts[0] });
         await stm.fund(CONST.ccyType.USD, CONST.thousandCcy_cents, accounts[global.TaddrNdx],                                        { from: accounts[0] });
         const ledgerEntryAfter = await stm.getLedgerEntry(accounts[global.TaddrNdx]);
 
         assert(ledgerEntryAfter.tokens.length == 1, 'unexpected eeu count in ledger entry after minting & funding');
-        assert(Number(ledgerEntryAfter.tokens_sumQty) == Number(CONST.gtCarbon), 'invalid kg sum in ledger entry after minting & funding');
+        assert(Number(ledgerEntryAfter.tokens_sumQty) == Number(CONST.GT_CARBON), 'invalid kg sum in ledger entry after minting & funding');
         assert(ledgerEntryAfter.ccys.find(p => p.ccyTypeId == CONST.ccyType.USD).balance == CONST.thousandCcy_cents, 'unexpected usd balance in ledger entry after minting & funding');
     });
 

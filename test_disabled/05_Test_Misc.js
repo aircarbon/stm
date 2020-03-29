@@ -26,10 +26,10 @@ contract("StMaster", accounts => {
             console.log(`addrNdx: ${global.TaddrNdx} - contract @ ${stm.address} (owner: ${accounts[0]})`);
     });
 
-    it(`setup - should have default USD $3/1000 tokens, mirrored`, async () => {
+    it(`setup - should have default USD $3/1m tokens, mirrored`, async () => {
         const gfUsd = await stm.getFee(CONST.getFeeType.CCY, CONST.ccyType.USD, CONST.nullAddr);
         assert(gfUsd.fee_min == 300, 'unexpected global fee USD fee_min');
-        assert(gfUsd.ccy_perThousand == 300, 'unexpected global fee USD ccy_perThousand');
+        assert(gfUsd.ccy_perMillion == 300, 'unexpected global fee USD ccy_perMillion');
         assert(gfUsd.ccy_mirrorFee == true, 'unexpected global fee USD ccy_mirrorFee');
     });
 

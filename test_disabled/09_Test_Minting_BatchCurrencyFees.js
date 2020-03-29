@@ -23,7 +23,7 @@ contract("StMaster", accounts => {
 
     it(`minting originator ccy fee - should allow minting with a batch originator currency fee on a batch`, async () => {
         const M = accounts[global.TaddrNdx];
-        await stm.mintSecTokenBatch(CONST.tokenType.CORSIA, CONST.kt1Carbon, 1, M, CONST.nullFees, 100, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.CORSIA, CONST.KT_CARBON, 1, M, CONST.nullFees, 100, [], [], { from: accounts[0] });
         const batchId = await stm.getSecTokenBatchCount.call();
         const batch = await stm.getSecTokenBatch(batchId);
         assert(batch.originator == M, 'unexpected originator on minted batch');
@@ -32,14 +32,14 @@ contract("StMaster", accounts => {
 
     it(`minting originator ccy fee - should allow decreasing of batch currency fee on a batch`, async () => {
         const M = accounts[global.TaddrNdx];
-        await stm.mintSecTokenBatch(CONST.tokenType.NATURE, CONST.kt1Carbon, 1, M, CONST.nullFees, 100, [], [],   { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.NATURE, CONST.KT_CARBON, 1, M, CONST.nullFees, 100, [], [],   { from: accounts[0] });
         const batchId = await stm.getSecTokenBatchCount.call();
         await stm.setOriginatorFeeCurrencyBatch(batchId, 50, { from: accounts[0] });
     });
 
     it(`minting originator ccy fee - should not allow increasing of batch currency fee after minting`, async () => {
         const M = accounts[global.TaddrNdx];
-        await stm.mintSecTokenBatch(CONST.tokenType.NATURE, CONST.kt1Carbon, 1, M, CONST.nullFees, 100, [], [],   { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.NATURE, CONST.KT_CARBON, 1, M, CONST.nullFees, 100, [], [],   { from: accounts[0] });
         const batchId = await stm.getSecTokenBatchCount.call();
         var origFee2;
 
@@ -49,7 +49,7 @@ contract("StMaster", accounts => {
 
     it(`minting originator ccy fee - should not allow non-owner to edit batch currency fee after minting`, async () => {
         const M = accounts[global.TaddrNdx];
-        await stm.mintSecTokenBatch(CONST.tokenType.NATURE, CONST.kt1Carbon, 1, M, CONST.nullFees, 100, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.NATURE, CONST.KT_CARBON, 1, M, CONST.nullFees, 100, [], [], { from: accounts[0] });
         const batchId = await stm.getSecTokenBatchCount.call();
         try {
             await stm.setOriginatorFeeCurrencyBatch(batchId, 101, { from: accounts[1] })
@@ -60,13 +60,13 @@ contract("StMaster", accounts => {
     it(`minting originator ccy fee - should not allow minting batch currency fee basis points > 10000`, async () => {
         const M = accounts[global.TaddrNdx];
         try {
-            await stm.mintSecTokenBatch(CONST.tokenType.NATURE, CONST.kt1Carbon, 1, M, CONST.nullFees, 10001, [], [], { from: accounts[0] });
+            await stm.mintSecTokenBatch(CONST.tokenType.NATURE, CONST.KT_CARBON, 1, M, CONST.nullFees, 10001, [], [], { from: accounts[0] });
         } catch (ex) { assert(ex.reason == 'Bad fee args', `unexpected: ${ex.reason}`); return; }
         assert.fail('expected contract exception');        
     });
     it(`minting originator ccy fee - should not allow setting of batch currency fee basis points > 10000`, async () => {
         const M = accounts[global.TaddrNdx];
-        await stm.mintSecTokenBatch(CONST.tokenType.NATURE, CONST.kt1Carbon, 1, M, CONST.nullFees, 100, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.NATURE, CONST.KT_CARBON, 1, M, CONST.nullFees, 100, [], [], { from: accounts[0] });
         const batchId = await stm.getSecTokenBatchCount.call();
         try {
             await stm.setOriginatorFeeCurrencyBatch(batchId, 10001, { from: accounts[0] });

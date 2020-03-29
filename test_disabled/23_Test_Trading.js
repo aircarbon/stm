@@ -23,7 +23,7 @@ contract("StMaster", accounts => {
     });
 
     it(`trading - should allow two-sided (vST <-> ccy) transfer (A <-> B) across ledger entries`, async () => {
-        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.kt1Carbon, 1,      accounts[global.TaddrNdx + 0], CONST.nullFees, 0, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.KT_CARBON, 1,      accounts[global.TaddrNdx + 0], CONST.nullFees, 0, [], [], { from: accounts[0] });
         await stm.fund(CONST.ccyType.ETH,                      CONST.oneEth_wei,        accounts[global.TaddrNdx + 1],                            { from: accounts[0] });
         const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: accounts[global.TaddrNdx + 0],       ledger_B: accounts[global.TaddrNdx + 1],
@@ -40,7 +40,7 @@ contract("StMaster", accounts => {
 
     it(`trading - should allow two-sided (ccy <-> vST) transfer (A <-> B) across ledger entries`, async () => {
         await stm.fund(CONST.ccyType.ETH,                      CONST.oneEth_wei,        accounts[global.TaddrNdx + 0],                            { from: accounts[0] });
-        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.kt1Carbon, 1,      accounts[global.TaddrNdx + 1], CONST.nullFees, 0, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.KT_CARBON, 1,      accounts[global.TaddrNdx + 1], CONST.nullFees, 0, [], [], { from: accounts[0] });
         const data = await transferHelper.transferLedger({ stm, accounts, 
                  ledger_A: accounts[global.TaddrNdx + 0],         ledger_B: accounts[global.TaddrNdx + 1],
                     qty_A: 0,                                tokenTypeId_A: 0,
@@ -55,7 +55,7 @@ contract("StMaster", accounts => {
     });
 
     it(`trading - should have reasonable gas cost for two-sided transfer`, async () => {
-        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.kt1Carbon, 1,      accounts[global.TaddrNdx + 0], CONST.nullFees, 0, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.KT_CARBON, 1,      accounts[global.TaddrNdx + 0], CONST.nullFees, 0, [], [], { from: accounts[0] });
         await stm.fund(CONST.ccyType.ETH,                      CONST.oneEth_wei,        accounts[global.TaddrNdx + 1],                            { from: accounts[0] });
         const data = await transferHelper.transferLedger({ stm, accounts, 
                  ledger_A: accounts[global.TaddrNdx + 0],         ledger_B: accounts[global.TaddrNdx + 1],

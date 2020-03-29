@@ -23,6 +23,8 @@ contract("StMaster", accounts => {
     });
 
     it(`transferring ccy - should allow one-sided transfer (A -> B) of one currency (USD) across ledger entries`, async () => {
+        await stm.setFee_CcyType(CONST.ccyType.USD, CONST.nullAddr, CONST.nullFees);
+
         await stm.fund(CONST.ccyType.USD, CONST.thousandCcy_cents,       accounts[global.TaddrNdx + 0], { from: accounts[0] });
         await stm.fund(CONST.ccyType.USD, CONST.thousandCcy_cents,       accounts[global.TaddrNdx + 1], { from: accounts[0] });
         await transferHelper.transferLedger({ stm, accounts, 

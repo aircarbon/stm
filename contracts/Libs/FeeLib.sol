@@ -12,7 +12,7 @@ library FeeLib {
     event SetFeeCcyMin(uint256 ccyTypeId, address indexed ledgerOwner, uint256 fee_ccy_Min);
     event SetFeeTokMax(uint256 tokenTypeId, address indexed ledgerOwner, uint256 fee_token_Max);
     event SetFeeCcyMax(uint256 ccyTypeId, address indexed ledgerOwner, uint256 fee_ccy_Max);
-    event SetFeeCcyPerThousand(uint256 ccyTypeId, address indexed ledgerOwner, uint256 fee_ccy_perThousand);
+    event SetFeeCcyperMillion(uint256 ccyTypeId, address indexed ledgerOwner, uint256 fee_ccy_perMillion);
 
     function setFee_TokType(
         StructLib.LedgerStruct storage ledgerData,
@@ -23,7 +23,7 @@ library FeeLib {
         StructLib.SetFeeArgs memory a)
     public {
         require(tokenTypeId >= 1 && tokenTypeId <= stTypesData._count_tokenTypes, "Bad tokenTypeId");
-        require(a.ccy_perThousand == 0, "ccy_perThousand unsupported for token-type fee");
+        require(a.ccy_perMillion == 0, "ccy_perMillion unsupported for token-type fee");
         require(a.ccy_mirrorFee == false, "ccy_mirrorFee unsupported for token-type fee");
 
         StructLib.FeeStruct storage feeStruct = globalFees;
@@ -71,7 +71,7 @@ library FeeLib {
             feeStruct = ledgerData._ledger[ledgerOwner].customFees;
         }
 
-        feeStruct.ccyType_Set[ccyTypeId] = a.fee_fixed != 0 || a.fee_percBips != 0 || a.fee_min != 0 || a.fee_max != 0 || a.ccy_perThousand != 0;
+        feeStruct.ccyType_Set[ccyTypeId] = a.fee_fixed != 0 || a.fee_percBips != 0 || a.fee_min != 0 || a.fee_max != 0 || a.ccy_perMillion != 0;
 
         if (feeStruct.ccy[ccyTypeId].fee_fixed != a.fee_fixed || a.fee_fixed != 0)
             emit SetFeeCcyFix(ccyTypeId, ledgerOwner, a.fee_fixed);
@@ -90,9 +90,9 @@ library FeeLib {
         feeStruct.ccy[ccyTypeId].fee_max = a.fee_max;
 
         // urgh
-        if (feeStruct.ccy[ccyTypeId].ccy_perThousand != a.ccy_perThousand || a.ccy_perThousand != 0)
-            emit SetFeeCcyPerThousand(ccyTypeId, ledgerOwner, a.ccy_perThousand);
-        feeStruct.ccy[ccyTypeId].ccy_perThousand = a.ccy_perThousand;
+        if (feeStruct.ccy[ccyTypeId].ccy_perMillion != a.ccy_perMillion || a.ccy_perMillion != 0)
+            emit SetFeeCcyperMillion(ccyTypeId, ledgerOwner, a.ccy_perMillion);
+        feeStruct.ccy[ccyTypeId].ccy_perMillion = a.ccy_perMillion;
 
         // urgh ^2
         feeStruct.ccy[ccyTypeId].ccy_mirrorFee = a.ccy_mirrorFee;

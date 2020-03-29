@@ -24,26 +24,27 @@ contract("StMaster", accounts => {
             console.log(`addrNdx: ${global.TaddrNdx} - contract @ ${stm.address} (owner: ${accounts[0]})`);
     });
 
-    // CCY -- 3 USD per THOUSAND RECEIVED
-    it(`fees (ccy per 1000 received) - apply USD ccy fee 3 USD/1000 tokens received on trades (0.1KT, 1KT, 1.5T, 11KT) (global fee on A)`, async () => {
+    // CCY -- 3 USD per Million RECEIVED
+    it(`fees (ccy per million received) - apply USD ccy fee 3 USD/1m tokens received on trades (0.1KT, 1KT, 1.5KT, 11KT) (global fee on A)`, async () => {
         const A = accounts[global.TaddrNdx + 0]
         const B = accounts[global.TaddrNdx + 1]
         await stm.fund(CONST.ccyType.USD,                      CONST.millionCcy_cents,  A,                            { from: accounts[0] });
-        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.mtCarbon,  1,      B, CONST.nullFees, 0, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.MT_CARBON,  1,     B, CONST.nullFees, 0, [], [], { from: accounts[0] });
 
-        // set global fee: ccy 3.00 /per thousand qty received
-        const ccy_perThousand = 300; // $3
-        const setFeeTx = await stm.setFee_CcyType(CONST.ccyType.USD, CONST.nullAddr, { ccy_mirrorFee: false, ccy_perThousand, fee_fixed: 0, fee_percBips: 0, fee_min: 0, fee_max: 0 } );
-        truffleAssert.eventEmitted(setFeeTx, 'SetFeeCcyPerThousand', ev => ev.ccyTypeId == CONST.ccyType.USD && ev.fee_ccy_perThousand == ccy_perThousand && ev.ledgerOwner == CONST.nullAddr);
-        assert((await stm.getFee(CONST.getFeeType.CCY, CONST.ccyType.USD, CONST.nullAddr)).ccy_perThousand == ccy_perThousand, 'unexpected fee per thousand received after setting ccy fee structure');
+        // set global fee: ccy 3.00 /per Million qty received
+        const ccy_perMillion = 300; // $3
+        const setFeeTx = await stm.setFee_CcyType(CONST.ccyType.USD, CONST.nullAddr, { ccy_mirrorFee: false, ccy_perMillion, fee_fixed: 0, fee_percBips: 0, fee_min: 0, fee_max: 0 } );
+        truffleAssert.eventEmitted(setFeeTx, 'SetFeeCcyperMillion', ev => ev.ccyTypeId == CONST.ccyType.USD && ev.fee_ccy_perMillion == ccy_perMillion && ev.ledgerOwner == CONST.nullAddr);
+        assert((await stm.getFee(CONST.getFeeType.CCY, CONST.ccyType.USD, CONST.nullAddr)).ccy_perMillion == ccy_perMillion, 'unexpected fee per Million received after setting ccy fee structure');
 
-        const transferAmountsTok = [1500, 1000, 11000, 100];
+        const transferAmountsTok = [CONST.KT_CARBON * 0.1, CONST.KT_CARBON * 15, CONST.KT_CARBON * 1, CONST.KT_CARBON * 11];
         for (var i = 0 ; i < transferAmountsTok.length ; i++) {
             // transfer, with fee structure applied
             const transferAmountCcy = new BN(10000); // 100$ = 10,000 cents
             const transferAmountTok = new BN(transferAmountsTok[i]);
-            const expectedFeeCcy = /*Math.floor*/(Number(transferAmountTok.toString()) / 1000) * ccy_perThousand;
-            //console.log('expectedFeeCcy', expectedFeeCcy);
+            const expectedFeeCcy = //Math.floor
+                                    (Number(transferAmountTok.toString()) / 1000000) * ccy_perMillion;
+            console.log('expectedFeeCcy', expectedFeeCcy);
             const data = await transferHelper.transferLedger({ stm, accounts,
                     ledger_A: A,                                         ledger_B: B,
                        qty_A: 0,                                    tokenTypeId_A: 0,
@@ -60,24 +61,25 @@ contract("StMaster", accounts => {
         }
     });
 
-    it(`fees (ccy per 1000 received) - apply USD ccy fee 3 USD/1000 tokens received on trades (0.1KT, 1KT, 1.5T, 11KT) (global fee on B)`, async () => {
+    it(`fees (ccy per million received) - apply USD ccy fee 3 USD/1m tokens received on trades (0.1KT, 1KT, 1.5KT, 11KT) (global fee on B)`, async () => {
         const A = accounts[global.TaddrNdx + 0]
         const B = accounts[global.TaddrNdx + 1]
-        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.mtCarbon,  1,      A, CONST.nullFees, 0, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.MT_CARBON,  1,     A, CONST.nullFees, 0, [], [], { from: accounts[0] });
         await stm.fund(CONST.ccyType.USD,                      CONST.millionCcy_cents,  B,                            { from: accounts[0] });
 
-        // set global fee: ccy 3.00 /per thousand qty received
-        const ccy_perThousand = 300; // $3
-        const setFeeTx = await stm.setFee_CcyType(CONST.ccyType.USD, CONST.nullAddr, { ccy_mirrorFee: false, ccy_perThousand, fee_fixed: 0, fee_percBips: 0, fee_min: 0, fee_max: 0 } );
-        truffleAssert.eventEmitted(setFeeTx, 'SetFeeCcyPerThousand', ev => ev.ccyTypeId == CONST.ccyType.USD && ev.fee_ccy_perThousand == ccy_perThousand && ev.ledgerOwner == CONST.nullAddr);
-        assert((await stm.getFee(CONST.getFeeType.CCY, CONST.ccyType.USD, CONST.nullAddr)).ccy_perThousand == ccy_perThousand, 'unexpected fee per thousand received after setting ccy fee structure');
+        // set global fee: ccy 3.00 /per Million qty received
+        const ccy_perMillion = 300; // $3
+        const setFeeTx = await stm.setFee_CcyType(CONST.ccyType.USD, CONST.nullAddr, { ccy_mirrorFee: false, ccy_perMillion, fee_fixed: 0, fee_percBips: 0, fee_min: 0, fee_max: 0 } );
+        truffleAssert.eventEmitted(setFeeTx, 'SetFeeCcyperMillion', ev => ev.ccyTypeId == CONST.ccyType.USD && ev.fee_ccy_perMillion == ccy_perMillion && ev.ledgerOwner == CONST.nullAddr);
+        assert((await stm.getFee(CONST.getFeeType.CCY, CONST.ccyType.USD, CONST.nullAddr)).ccy_perMillion == ccy_perMillion, 'unexpected fee per Million received after setting ccy fee structure');
 
-        const transferAmountsTok = [1000, 1500, 11000, 100];
+        const transferAmountsTok = [CONST.KT_CARBON * 0.1, CONST.KT_CARBON * 15, CONST.KT_CARBON * 1, CONST.KT_CARBON * 11];
         for (var i = 0 ; i < transferAmountsTok.length ; i++) {
             // transfer, with fee structure applied
             const transferAmountCcy = new BN(10000); // 100$ = 10,000 cents
             const transferAmountTok = new BN(transferAmountsTok[i]);
-            const expectedFeeCcy = /*Math.floor*/(Number(transferAmountTok.toString()) / 1000) * ccy_perThousand;
+            const expectedFeeCcy = //Math.floor
+                                    (Number(transferAmountTok.toString()) / 1000000) * ccy_perMillion;
             //console.log('expectedFeeCcy', expectedFeeCcy);
             const data = await transferHelper.transferLedger({ stm, accounts,
                     ledger_A: A,                                         ledger_B: B,
@@ -95,25 +97,26 @@ contract("StMaster", accounts => {
         }
     });
 
-    it(`fees (ccy per 1000 received) - apply ledger override USD ccy fee 6 USD/1000 tokens received, capped USD 60, on trades (0.1KT, 1KT, 1.5T, 11KT) (ledger fee on A)`, async () => {
+    it(`fees (ccy per million received) - apply ledger override USD ccy fee 6 USD/1m tokens received, capped USD 60, on trades (0.1KT, 1KT, 1.5KT, 11KT) (ledger fee on A)`, async () => {
         const A = accounts[global.TaddrNdx + 0]
         const B = accounts[global.TaddrNdx + 1]
         await stm.fund(CONST.ccyType.USD,                      CONST.millionCcy_cents,  A,                            { from: accounts[0] });
-        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.mtCarbon,  1,      B, CONST.nullFees, 0, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.MT_CARBON,  1,     B, CONST.nullFees, 0, [], [], { from: accounts[0] });
 
-        // set global fee: ccy 3.00 /per thousand qty received
-        const setExchangeFeeTx = await stm.setFee_CcyType(CONST.ccyType.USD, CONST.nullAddr, { ccy_mirrorFee: false, ccy_perThousand: 300, fee_fixed: 0, fee_percBips: 0, fee_min: 0, fee_max: 0 } );
+        // set global fee: ccy 3.00 /per Million qty received
+        const setExchangeFeeTx = await stm.setFee_CcyType(CONST.ccyType.USD, CONST.nullAddr, { ccy_mirrorFee: false, ccy_perMillion: 300, fee_fixed: 0, fee_percBips: 0, fee_min: 0, fee_max: 0 } );
 
-        // set ledger override fee: ccy 6.00 /per thousand qty received, cap 60.00
-        const ccy_perThousand = 600, fee_max = 6000, fee_min = 100; // $6, $60, $1
-        const setLedgerFeeTx = await stm.setFee_CcyType(CONST.ccyType.USD, A, { ccy_mirrorFee: false, ccy_perThousand, fee_fixed: 0, fee_percBips: 0, fee_min, fee_max } );
+        // set ledger override fee: ccy 6.00 /per Million qty received, cap 60.00
+        const ccy_perMillion = 600, fee_max = 6000, fee_min = 100; // $6, $60, $1
+        const setLedgerFeeTx = await stm.setFee_CcyType(CONST.ccyType.USD, A, { ccy_mirrorFee: false, ccy_perMillion, fee_fixed: 0, fee_percBips: 0, fee_min, fee_max } );
 
-        const transferAmountsTok = [11000, 1000, 1500, 100];
+        const transferAmountsTok = [CONST.KT_CARBON * 0.1, CONST.KT_CARBON * 15, CONST.KT_CARBON * 1, CONST.KT_CARBON * 11];
         for (var i = 0 ; i < transferAmountsTok.length ; i++) {
             // transfer, with fee structure applied
             const transferAmountCcy = new BN(10000); // 100$ = 10,000 cents
             const transferAmountTok = new BN(transferAmountsTok[i]);
-            const expectedFeeCcy = Math.max(Math.min(/*Math.floor*/(Number(transferAmountTok.toString()) / 1000) * ccy_perThousand, fee_max), fee_min);
+            const expectedFeeCcy = Math.max(Math.min(//Math.floor
+                                                     (Number(transferAmountTok.toString()) / 1000000) * ccy_perMillion, fee_max), fee_min);
             //console.log('expectedFeeCcy', expectedFeeCcy);
             const data = await transferHelper.transferLedger({ stm, accounts,
                     ledger_A: A,                                         ledger_B: B,
@@ -131,25 +134,26 @@ contract("StMaster", accounts => {
         }
     });
 
-    it(`fees (ccy per 1000 received) - apply ledger override USD ccy fee 6 USD/1000 tokens received, max USD 60, min USD 1, on trades (0.1KT, 1KT, 1.5T, 11KT) (ledger fee on B)`, async () => {
+    it(`fees (ccy per million received) - apply ledger override USD ccy fee 6 USD/1m tokens received, max USD 60, min USD 1, on trades (0.1KT, 1KT, 1.5KT, 11KT) (ledger fee on B)`, async () => {
         const A = accounts[global.TaddrNdx + 0]
         const B = accounts[global.TaddrNdx + 1]
-        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.mtCarbon,  1,      A, CONST.nullFees, 0, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.MT_CARBON,  1,     A, CONST.nullFees, 0, [], [], { from: accounts[0] });
         await stm.fund(CONST.ccyType.USD,                      CONST.millionCcy_cents,  B,                            { from: accounts[0] });
 
-        // set global fee: ccy 3.00 /per thousand qty received
-        const setExchangeFeeTx = await stm.setFee_CcyType(CONST.ccyType.USD, CONST.nullAddr, { ccy_mirrorFee: false, ccy_perThousand: 300, fee_fixed: 0, fee_percBips: 0, fee_min: 0, fee_max: 0 } );
+        // set global fee: ccy 3.00 /per Million qty received
+        const setExchangeFeeTx = await stm.setFee_CcyType(CONST.ccyType.USD, CONST.nullAddr, { ccy_mirrorFee: false, ccy_perMillion: 300, fee_fixed: 0, fee_percBips: 0, fee_min: 0, fee_max: 0 } );
 
-        // set ledger override fee: ccy 6.00 /per thousand qty received, cap 60.00, collar 1.00
-        const ccy_perThousand = 600, fee_max = 6000, fee_min = 100; // $6, $60, $1
-        const setLedgerFeeTx = await stm.setFee_CcyType(CONST.ccyType.USD, B, { ccy_mirrorFee: false, ccy_perThousand, fee_fixed: 0, fee_percBips: 0, fee_min, fee_max } );
+        // set ledger override fee: ccy 6.00 /per Million qty received, cap 60.00, collar 1.00
+        const ccy_perMillion = 600, fee_max = 6000, fee_min = 100; // $6, $60, $1
+        const setLedgerFeeTx = await stm.setFee_CcyType(CONST.ccyType.USD, B, { ccy_mirrorFee: false, ccy_perMillion, fee_fixed: 0, fee_percBips: 0, fee_min, fee_max } );
 
-        const transferAmountsTok = [100, 11000, 1000, 1500];
+        const transferAmountsTok = [CONST.KT_CARBON * 0.1, CONST.KT_CARBON * 15, CONST.KT_CARBON * 1, CONST.KT_CARBON * 11];
         for (var i = 0 ; i < transferAmountsTok.length ; i++) {
             // transfer, with fee structure applied
             const transferAmountCcy = new BN(10000); // 100$ = 10,000 cents
             const transferAmountTok = new BN(transferAmountsTok[i]);
-            const expectedFeeCcy = Math.max(Math.min(/*Math.floor*/(Number(transferAmountTok.toString()) / 1000) * ccy_perThousand, fee_max), fee_min);
+            const expectedFeeCcy = Math.max(Math.min(//Math.floor
+                                                     (Number(transferAmountTok.toString()) / 1000000) * ccy_perMillion, fee_max), fee_min);
             //console.log('expectedFeeCcy', expectedFeeCcy);
             const data = await transferHelper.transferLedger({ stm, accounts,
                     ledger_A: A,                                         ledger_B: B,

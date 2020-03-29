@@ -29,15 +29,15 @@ contract("StMaster", accounts => {
         await withdrawLedger({ ccyTypeId: CONST.ccyType.USD, amount: CONST.millionCcy_cents * 1000 * 1000, withdrawer: accounts[global.TaddrNdx] });
     });
 
-    it(`withdrawing - should allow withdrawing of ETH`, async () => {
-        await stm.fund(CONST.ccyType.ETH, CONST.oneEth_wei, accounts[global.TaddrNdx], { from: accounts[0] });
-        await withdrawLedger({ ccyTypeId: CONST.ccyType.ETH, amount: CONST.oneEth_wei, withdrawer: accounts[global.TaddrNdx] });
-    });
+    // it(`withdrawing - should allow withdrawing of ETH`, async () => {
+    //     await stm.fund(CONST.ccyType.ETH, CONST.oneEth_wei, accounts[global.TaddrNdx], { from: accounts[0] });
+    //     await withdrawLedger({ ccyTypeId: CONST.ccyType.ETH, amount: CONST.oneEth_wei, withdrawer: accounts[global.TaddrNdx] });
+    // });
 
-    it(`withdrawing - should allow withdrawing of extreme values of ETH`, async () => {
-        await stm.fund(CONST.ccyType.ETH, CONST.millionEth_wei, accounts[global.TaddrNdx], { from: accounts[0] });
-        await withdrawLedger({ ccyTypeId: CONST.ccyType.ETH, amount: CONST.millionEth_wei, withdrawer: accounts[global.TaddrNdx] });
-    });
+    // it(`withdrawing - should allow withdrawing of extreme values of ETH`, async () => {
+    //     await stm.fund(CONST.ccyType.ETH, CONST.millionEth_wei, accounts[global.TaddrNdx], { from: accounts[0] });
+    //     await withdrawLedger({ ccyTypeId: CONST.ccyType.ETH, amount: CONST.millionEth_wei, withdrawer: accounts[global.TaddrNdx] });
+    // });
 
     it(`withdrawing - should allow repeated withdrawing`, async () => {
         await stm.fund(CONST.ccyType.USD, 3, accounts[global.TaddrNdx]);
@@ -55,13 +55,13 @@ contract("StMaster", accounts => {
     });
 
     it(`withdrawing - should allow minting, funding and withdrawing on same ledger entry`, async () => {
-        await stm.mintSecTokenBatch(CONST.tokenType.NATURE, CONST.gtCarbon, 1, accounts[global.TaddrNdx], CONST.nullFees, 0, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.NATURE, CONST.GT_CARBON, 1, accounts[global.TaddrNdx], CONST.nullFees, 0, [], [], { from: accounts[0] });
         await stm.fund(CONST.ccyType.USD, CONST.thousandCcy_cents, accounts[global.TaddrNdx],                                        { from: accounts[0] });
         await withdrawLedger({ ccyTypeId: CONST.ccyType.USD, amount: CONST.thousandCcy_cents / 2, withdrawer: accounts[global.TaddrNdx] });
         const ledgerEntryAfter = await stm.getLedgerEntry(accounts[global.TaddrNdx]);
 
         assert(ledgerEntryAfter.tokens.length == 1, 'unexpected eeu count in ledger entry after minting, funding & withdrawing');
-        assert(Number(ledgerEntryAfter.tokens_sumQty) == Number(CONST.gtCarbon), 'invalid kg sum in ledger entry after minting, funding & withdrawing');
+        assert(Number(ledgerEntryAfter.tokens_sumQty) == Number(CONST.GT_CARBON), 'invalid kg sum in ledger entry after minting, funding & withdrawing');
         assert(ledgerEntryAfter.ccys.find(p => p.ccyTypeId == CONST.ccyType.USD).balance == CONST.thousandCcy_cents / 2, 'unexpected usd balance in ledger entry after minting, funding & withdrawing');
     });
 

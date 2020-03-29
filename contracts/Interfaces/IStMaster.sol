@@ -40,7 +40,7 @@ import "../Interfaces/StructLib.sol";
     event SetFeeCcyMin(uint256 ccyTypeId, address indexed ledgerOwner, uint256 fee_ccy_Min);
     event SetFeeTokMax(uint256 tokenTypeId, address indexed ledgerOwner, uint256 fee_token_Max);
     event SetFeeCcyMax(uint256 ccyTypeId, address indexed ledgerOwner, uint256 fee_ccy_Max);
-    event SetFeeCcyPerThousand(uint256 ccyTypeId, address indexed ledgerOwner, uint256 fee_ccy_perThousand);
+    event SetFeeCcyperMillion(uint256 ccyTypeId, address indexed ledgerOwner, uint256 fee_ccy_perMillion);
     // Erc20Lib events
     event Transfer(address indexed from, address indexed to, uint256 value);
     event Approval(address indexed owner, address indexed spender, uint256 value);

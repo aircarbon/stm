@@ -33,12 +33,12 @@ const blocksFromMonths = (months) => Math.ceil(blocksFromDays(months * 30.42));
 //
 // MAIN: deployer definitions -- contract ctor() params
 //
-const contractVer = "0.96q";
+const contractVer = "0.96r";
 const contractProps = {
     COMMODITY: {
         contractVer: contractVer,
         contractName: `AirCarbon__v${contractVer}`,
-        contractUnit: "Ton(s)",
+        contractUnit: "KG", //"Ton(s)",
         contractSymbol: "ACC",
         contractDecimals: 0,
         cashflowArgs: nullCashflowArgs,
@@ -99,7 +99,7 @@ module.exports = {
 
     nullFees: {
         ccy_mirrorFee: false,
-        ccy_perThousand: 0,
+        ccy_perMillion: 0,
         fee_fixed: 0,
         fee_percBips: 0,
         fee_min: 0,
@@ -143,10 +143,16 @@ EXCHANGE_FEE: 1,
         // GBP: 7
     }),
 
-    // eeu qty constants
-    kt1Carbon: 1000,                      // 1000 qty (tons) = 1 kiloton
-     mtCarbon: 1000 * 1000,               // 1^6 qty (tons) = 1 megaton
-     gtCarbon: 1000 * 1000 * 1000,        // 1^9 qty (tons) = 1 gigaton
+    // eeu qty constants - tons
+    // KT_CARBON: 1000,                      // 1000 qty (tons) = 1 kiloton
+    // MT_CARBON: 1000 * 1000,               // 1^6 qty (tons) = 1 megaton
+    // GT_CARBON: 1000 * 1000 * 1000,        // 1^9 qty (tons) = 1 gigaton
+
+    // eeu qty constants - kg
+    T1_CARBON: 1000,                         //  1^3 kg =            1 ton
+    KT_CARBON: 1000 * 1000,                  //  1^6 kg = 1^3 tons = 1 kiloton
+    MT_CARBON: 1000 * 1000 * 1000,           //  1^9 kg = 1^6 tons = 1 megaton
+    GT_CARBON: 1000 * 1000 * 1000 * 1000,    // 1^12 kg = 1^9 tons = 1 gigaton
 
     // ccy constants
          oneCcy_cents: Big(1 * 100).toFixed(),

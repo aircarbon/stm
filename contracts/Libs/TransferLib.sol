@@ -74,7 +74,7 @@ library TransferLib {
             fee_percBips: 0,
                  fee_min: 0,
                  fee_max: 0,
-         ccy_perThousand: 0,
+         ccy_perMillion: 0,
            ccy_mirrorFee: false
         })
         });
@@ -293,7 +293,7 @@ library TransferLib {
             fee_percBips: 0,
                  fee_min: 0,
                  fee_max: 0,
-         ccy_perThousand: 0,
+         ccy_perMillion: 0,
            ccy_mirrorFee: false
         })
         });
@@ -635,7 +635,7 @@ library TransferLib {
     //
 
     /**
-     * @notice Calculates capped & collared { fixed + basis points + fixed per thousand consideration = total fee } based on the supplied fee structure
+     * @notice Calculates capped & collared { fixed + basis points + fixed per Million consideration = total fee } based on the supplied fee structure
      * @param feeStructure Token or currency type fee structure mapping
      * @param sendAmount Amount being sent (token quantity or currency value)
      * @param receiveAmount Consideration value (tokens or currency) being received in return (if any)
@@ -658,7 +658,7 @@ library TransferLib {
     )
     private view returns(uint256 totalFee) {
         uint256 feeAmount = fs.fee_fixed +
-                    (((receiveAmount * 1000000/*increase precision*/ / 1000/*per thousand*/) * fs.ccy_perThousand) / 1000000/*decrease precision*/) +
+                    (((receiveAmount * 1000000000/*increase precision*/ / 1000000/*per million*/) * fs.ccy_perMillion) / 1000000000/*decrease precision*/) +
                     (((sendAmount * 1000000/*increase precision*/ / 10000/*basis points*/) * fs.fee_percBips) / 1000000/*decrease precision*/);
         if (sendAmount > 0) {
             if (feeAmount > fs.fee_max && fs.fee_max > 0) return fs.fee_max;

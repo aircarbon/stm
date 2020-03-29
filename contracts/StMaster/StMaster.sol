@@ -71,7 +71,7 @@ contract StMaster is IStMaster, IPublicViews,
     event SetFeeCcyMin(uint256 ccyTypeId, address indexed ledgerOwner, uint256 fee_ccy_Min);
     event SetFeeTokMax(uint256 tokenTypeId, address indexed ledgerOwner, uint256 fee_token_Max);
     event SetFeeCcyMax(uint256 ccyTypeId, address indexed ledgerOwner, uint256 fee_ccy_Max);
-    event SetFeeCcyPerThousand(uint256 ccyTypeId, address indexed ledgerOwner, uint256 fee_ccy_perThousand);
+    event SetFeeCcyperMillion(uint256 ccyTypeId, address indexed ledgerOwner, uint256 fee_ccy_perMillion);
     // Erc20Lib events
     event Transfer(address indexed from, address indexed to, uint256 value);
     event Approval(address indexed owner, address indexed spender, uint256 value);
@@ -109,13 +109,13 @@ contract StMaster is IStMaster, IPublicViews,
             stTypesData._tokenTypeNames[3] = 'AirCarbon Premium Token';
             stTypesData._count_tokenTypes = 3;
             ccyTypesData._ccyTypes[1] = StructLib.Ccy({ id: 1, name: 'USD', unit: 'cents',      decimals: 2 });
-          //ccyTypesData._ccyTypes[2] = StructLib.Ccy({ id: 2, name: 'ETH', unit: 'Wei',        decimals: 18 });
-          //ccyTypesData._ccyTypes[3] = StructLib.Ccy({ id: 3, name: 'BTC', unit: 'Satoshi',    decimals: 8 });
+            ccyTypesData._ccyTypes[2] = StructLib.Ccy({ id: 2, name: 'ETH', unit: 'Wei',        decimals: 18 });
+            ccyTypesData._ccyTypes[3] = StructLib.Ccy({ id: 3, name: 'BTC', unit: 'Satoshi',    decimals: 8 });
           //ccyTypesData._ccyTypes[4] = StructLib.Ccy({ id: 4, name: 'SGD', unit: 'cents',      decimals: 2 });
           //ccyTypesData._ccyTypes[5] = StructLib.Ccy({ id: 5, name: 'EUR', unit: 'euro cents', decimals: 2 });
           //ccyTypesData._ccyTypes[6] = StructLib.Ccy({ id: 6, name: 'HKD', unit: 'cents',      decimals: 2 });
           //ccyTypesData._ccyTypes[7] = StructLib.Ccy({ id: 7, name: 'GBP', unit: 'pence',      decimals: 2 });
-            ccyTypesData._count_ccyTypes = 1;
+            ccyTypesData._count_ccyTypes = 3;
 
             // set default ccy fee USD: $3/1000 mirrored
             StructLib.SetFeeArgs memory feeArgsGlobalUsd = StructLib.SetFeeArgs({
@@ -123,7 +123,7 @@ contract StMaster is IStMaster, IPublicViews,
                 fee_percBips: 0,
                      fee_min: 300,      // min $3.00
                      fee_max: 0,
-             ccy_perThousand: 300,      // $3.00 per thousand tokens received
+             ccy_perMillion: 300,      // $3.00 per Million tokens received
                ccy_mirrorFee: true      // mirrored - token sender pays, too
             });
             FeeLib.setFee_CcyType(ledgerData, ccyTypesData, globalFees,

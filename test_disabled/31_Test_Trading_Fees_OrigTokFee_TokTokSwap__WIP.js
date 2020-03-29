@@ -43,12 +43,12 @@ contract("StMaster", accounts => {
         //console.log('M_multi_B', M_multi_B);
 
         // TEST - set ledger fee structure A
-        var ledgerFee_A = { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: 100, fee_percBips: 10, fee_min: 100, fee_max: 200 };
+        var ledgerFee_A = { ccy_mirrorFee: false, ccy_perMillion: 0, fee_fixed: 100, fee_percBips: 10, fee_min: 100, fee_max: 200 };
         await stm.setFee_TokType(tokType_A, A,              ledgerFee_A);
         await stm.setFee_TokType(tokType_A, CONST.nullAddr, CONST.nullFees);
 
         // TEST - set global fee structure B
-        var globalFee_B = { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: 50, fee_percBips: 5, fee_min: 50, fee_max: 100 };
+        var globalFee_B = { ccy_mirrorFee: false, ccy_perMillion: 0, fee_fixed: 50, fee_percBips: 5, fee_min: 50, fee_max: 100 };
         await stm.setFee_TokType(tokType_B, CONST.nullAddr, globalFee_B);
         await stm.setFee_TokType(tokType_B, B,              CONST.nullFees);
 
@@ -134,8 +134,8 @@ contract("StMaster", accounts => {
         for (var i = 0 ; i < M_multi.length ; i++) {
             const M = M_multi[i].account;
             for (var j = 0 ; j < batchesPerOriginator ; j++) {
-                const origFee = { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: (i+j), fee_percBips: (i+j) * 10, fee_min: (i+j) * 10, fee_max: (i+j) * 100 };
-                const qty = CONST.kt1Carbon * (i + 1 + j + 1);
+                const origFee = { ccy_mirrorFee: false, ccy_perMillion: 0, fee_fixed: (i+j), fee_percBips: (i+j) * 10, fee_min: (i+j) * 10, fee_max: (i+j) * 100 };
+                const qty = CONST.KT_CARBON * (i + 1 + j + 1);
                 await stm.mintSecTokenBatch(tokenType, qty, 1, M, origFee, 0, [], [], { from: accounts[0] });
                 totalTokQty += qty;
             }
