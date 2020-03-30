@@ -12,7 +12,7 @@ library FeeLib {
     event SetFeeCcyMin(uint256 ccyTypeId, address indexed ledgerOwner, uint256 fee_ccy_Min);
     event SetFeeTokMax(uint256 tokenTypeId, address indexed ledgerOwner, uint256 fee_token_Max);
     event SetFeeCcyMax(uint256 ccyTypeId, address indexed ledgerOwner, uint256 fee_ccy_Max);
-    event SetFeeCcyperMillion(uint256 ccyTypeId, address indexed ledgerOwner, uint256 fee_ccy_perMillion);
+    event SetFeeCcyPerMillion(uint256 ccyTypeId, address indexed ledgerOwner, uint256 fee_ccy_perMillion);
 
     function setFee_TokType(
         StructLib.LedgerStruct storage ledgerData,
@@ -91,7 +91,7 @@ library FeeLib {
 
         // urgh
         if (feeStruct.ccy[ccyTypeId].ccy_perMillion != a.ccy_perMillion || a.ccy_perMillion != 0)
-            emit SetFeeCcyperMillion(ccyTypeId, ledgerOwner, a.ccy_perMillion);
+            emit SetFeeCcyPerMillion(ccyTypeId, ledgerOwner, a.ccy_perMillion);
         feeStruct.ccy[ccyTypeId].ccy_perMillion = a.ccy_perMillion;
 
         // urgh ^2

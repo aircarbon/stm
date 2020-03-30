@@ -71,7 +71,7 @@ contract StMaster is IStMaster, IPublicViews,
     event SetFeeCcyMin(uint256 ccyTypeId, address indexed ledgerOwner, uint256 fee_ccy_Min);
     event SetFeeTokMax(uint256 tokenTypeId, address indexed ledgerOwner, uint256 fee_token_Max);
     event SetFeeCcyMax(uint256 ccyTypeId, address indexed ledgerOwner, uint256 fee_ccy_Max);
-    event SetFeeCcyperMillion(uint256 ccyTypeId, address indexed ledgerOwner, uint256 fee_ccy_perMillion);
+    event SetFeeCcyPerMillion(uint256 ccyTypeId, address indexed ledgerOwner, uint256 fee_ccy_perMillion);
     // Erc20Lib events
     event Transfer(address indexed from, address indexed to, uint256 value);
     event Approval(address indexed owner, address indexed spender, uint256 value);
@@ -123,7 +123,7 @@ contract StMaster is IStMaster, IPublicViews,
                 fee_percBips: 0,
                      fee_min: 300,      // min $3.00
                      fee_max: 0,
-             ccy_perMillion: 300,      // $3.00 per Million tokens received
+              ccy_perMillion: 300,      // $3.00 per Million tokens received
                ccy_mirrorFee: true      // mirrored - token sender pays, too
             });
             FeeLib.setFee_CcyType(ledgerData, ccyTypesData, globalFees,
