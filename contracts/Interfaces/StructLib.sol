@@ -25,13 +25,16 @@ library StructLib {
     struct SecTokenTypeReturn {
         uint256 id;
         string  name;
+        SettlementType settlementType;
     }
     struct GetSecTokenTypesReturn {
         SecTokenTypeReturn[] tokenTypes;
     }
 
+    enum SettlementType { SPOT, FUTURE }
     struct StTypesStruct { // ** DATA_DUMP: OK
-        mapping(uint256 => string) _tokenTypeNames;             // typeId (1-based) -> typeName
+        mapping(uint256 => string)         _tokenTypeNames;     // typeId (1-based) -> typeName
+        mapping(uint256 => SettlementType) _tokenTypeSettlement;
         uint256 _count_tokenTypes;
     }
 

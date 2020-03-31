@@ -33,7 +33,7 @@ const blocksFromMonths = (months) => Math.ceil(blocksFromDays(months * 30.42));
 //
 // MAIN: deployer definitions -- contract ctor() params
 //
-const contractVer = "0.96r";
+const contractVer = "0.97a";
 const contractProps = {
     COMMODITY: {
         contractVer: contractVer,
@@ -112,6 +112,11 @@ module.exports = {
     }),
 
     cashflowType: cashflowType,
+
+    settlementType: Object.freeze({
+        SPOT: 0,
+        FUTURE: 1,
+    }),
 
     getFeeType: Object.freeze({
         CCY: 0,

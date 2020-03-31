@@ -16,11 +16,12 @@ contract StLedger is IStLedger,
     StructLib.StTypesStruct stTypesData;
     StructLib.CcyTypesStruct ccyTypesData;
 
-    function addSecTokenType(string memory name)
+    function addSecTokenType(string memory name, StructLib.SettlementType settlementType)
     public onlyOwner() onlyWhenReadWrite() {
-        TokenLib.addSecTokenType(ledgerData, stTypesData, name);
+        TokenLib.addSecTokenType(ledgerData, stTypesData, name, settlementType);
     }
 
+    // ###
     function getSecTokenTypes()
     external view returns (StructLib.GetSecTokenTypesReturn memory) {
         return TokenLib.getSecTokenTypes(stTypesData);

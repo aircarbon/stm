@@ -50,6 +50,7 @@ library LedgerLib {
         // hash token types & exchange token fees
         for (uint256 stTypeId = 1; stTypeId <= stTypesData._count_tokenTypes; stTypeId++) {
             ledgerHash = keccak256(abi.encodePacked(ledgerHash, stTypesData._tokenTypeNames[stTypeId]));
+            ledgerHash = keccak256(abi.encodePacked(ledgerHash, stTypesData._tokenTypeSettlement[stTypeId]));
 
             if (globalFees.tokType_Set[stTypeId]) {
                 ledgerHash = keccak256(abi.encodePacked(ledgerHash, hashSetFeeArgs(globalFees.tok[stTypeId])));

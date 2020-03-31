@@ -18,7 +18,8 @@ library TokenLib {
     function addSecTokenType(
         StructLib.LedgerStruct storage ledgerData,
         StructLib.StTypesStruct storage stTypesData,
-        string memory name)
+        string memory name,
+        StructLib.SettlementType settlementType)
     public {
         require(ledgerData.contractType == StructLib.ContractType.COMMODITY, "Bad cashflow request");
 
@@ -39,8 +40,9 @@ library TokenLib {
 
         for (uint256 tokenTypeId = 1; tokenTypeId <= stTypesData._count_tokenTypes; tokenTypeId++) {
             tokenTypes[tokenTypeId - 1] = StructLib.SecTokenTypeReturn({
-                id: tokenTypeId,
-              name: stTypesData._tokenTypeNames[tokenTypeId]
+                    id: tokenTypeId,
+                  name: stTypesData._tokenTypeNames[tokenTypeId],
+        settlementType: stTypesData._tokenTypeSettlement[tokenTypeId]
             });
         }
 

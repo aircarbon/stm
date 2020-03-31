@@ -51,7 +51,7 @@ contract("StMaster", accounts => {
         // token types
         const stTypesData = await stm_cur.getSecTokenTypes();
         if (await stm_cur.getContractType() == CONST.contractType.COMMODITY) {
-            await stm_cur.addSecTokenType('NEW_TOK_TYPE', { from: accounts[0] });
+            await stm_cur.addSecTokenType('NEW_TOK_TYPE', CONST.settlementType.SPOT, { from: accounts[0] });
             console.log(`St Types: ${stTypesData.tokenTypes.map(p => p.name).join(', ')}`);
             curHash = await checkHashUpdate(curHash);
         }
@@ -249,7 +249,7 @@ contract("StMaster", accounts => {
         _.forEach(loadCcys, async (p) => await stm_new.addCcyType(p.name, p.unit, p.decimals));
 
         const curToks = await stm_cur.getSecTokenTypes(), newToks = await stm_new.getSecTokenTypes(), loadToks = _.differenceWith(curToks.tokenTypes, newToks.tokenTypes, _.isEqual);
-        _.forEach(loadToks, async (p) => await stm_new.addSecTokenType(p.name));
+        _.forEach(loadToks, async (p) => await stm_new.addSecTokenType(p.name, CONST.settlementType.SPOT));
 
         // load whitelist
         stm_new.whitelist(accounts[555]); // simulate a new contract owner (first whitelist entry, by convention) -- i.e. we can upgrade contract with a new privkey

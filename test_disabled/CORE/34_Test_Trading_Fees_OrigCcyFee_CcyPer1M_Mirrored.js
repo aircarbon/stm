@@ -24,12 +24,6 @@ contract("StMaster", accounts => {
             console.log(`addrNdx: ${global.TaddrNdx} - contract @ ${stm.address} (owner: ${accounts[0]})`);
     });
 
-    // TODO: per_thousand -> per_million
-    // TODO: feesPerAccount - check events can derive
-    // TODO: withdraw/deposit - string [reason], emit in event
-
-    // TODO: global totals for orig ccy fees (?) - check events can derive
-
     // ORIG CCY FEE -- (SINGLE BATCH, SHARE OF 3 USD per Million RECEIVED, SYMMETRIC MIRRORED)
     it(`fees (orig ccy fee - from per million received, symmetric mirrored, single batch) - apply mirrored USD ccy fee 3 USD/1m tokens received on trade (global fee on A)`, async () => {
         const A = accounts[global.TaddrNdx + 0];

@@ -24,9 +24,14 @@ describe(`Contract Web3 Interface`, async () => {
     before(async function () {
     });
 
-    it(`web3 direct - getLedgerHashcode()`, async () => {
-        const cfd = await CONST.web3_call('getCashflowData', [])
-        console.log('getCashflowData', cfd);
+    it(`web3 direct - block time estimates...`, async () => {
+        const { web3, ethereumTxChain } = CONST.getTestContextWeb3();
+        
+        var timestamp_est = 1479642530; // block 1
+        for (var i=1 ; i < 100 ; i++) {
+            const b = await web3.eth.getBlock(i);
+            console.log(`${b.timestamp}`);
+        }
     });
 });
 

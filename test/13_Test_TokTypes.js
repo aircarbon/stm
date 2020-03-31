@@ -36,7 +36,7 @@ contract("StMaster", accounts => {
 
     it(`token types - should be able to use newly added ST types`, async () => {
         // add new ST type
-        const addSecTokenTx = await stm.addSecTokenType('NEW_TYPE_NAME_2');
+        const addSecTokenTx = await stm.addSecTokenType('NEW_TYPE_NAME_2', CONST.settlementType.SPOT);
         const types = (await stm.getSecTokenTypes()).tokenTypes;
         assert(types.filter(p => p.name == 'NEW_TYPE_NAME_2')[0].id == countDefaultSecSecTokenTypes + 1, 'unexpected/missing new eeu type (2)');
         truffleAssert.eventEmitted(addSecTokenTx, 'AddedSecTokenType', ev => ev.id == countDefaultSecSecTokenTypes + 1 && ev.name == 'NEW_TYPE_NAME_2');
@@ -70,7 +70,7 @@ contract("StMaster", accounts => {
 
     it(`token types - should not allow non-owner to add an ST type`, async () => {
         try {
-            await stm.addSecTokenType('NEW_TYPE_NAME_3', { from: accounts[1] });
+            await stm.addSecTokenType('NEW_TYPE_NAME_3', CONST.settlementType.SPOT, { from: accounts[1] });
         } catch (ex) { 
             assert(ex.reason == 'Restricted', `unexpected: ${ex.reason}`);
             return; 
@@ -81,7 +81,7 @@ contract("StMaster", accounts => {
     it(`token types - should not allow adding an existing ST type name`, async () => {
         try {
             const types = (await stm.getSecTokenTypes()).tokenTypes;
-            await stm.addSecTokenType(types[0].name, { from: accounts[0] });
+            await stm.addSecTokenType(types[0].name, CONST.settlementType.SPOT, { from: accounts[0] });
         } catch (ex) { 
             assert(ex.reason == 'Duplicate name', `unexpected: ${ex.reason}`);
             return; 
@@ -92,7 +92,7 @@ contract("StMaster", accounts => {
     it(`token types - should not allow adding an ST type when contract is read only`, async () => {
         try {
             await stm.setReadOnly(true, { from: accounts[0] });
-            await stm.addSecTokenType('NEW_TYPE_NAME_4', { from: accounts[0] });
+            await stm.addSecTokenType('NEW_TYPE_NAME_4', CONST.settlementType.SPOT, { from: accounts[0] });
         } catch (ex) { 
             assert(ex.reason == 'Read-only', `unexpected: ${ex.reason}`);
             await stm.setReadOnly(false, { from: accounts[0] });

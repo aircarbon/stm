@@ -92,7 +92,7 @@ contract("StMaster", accounts => {
     })
 
     it(`fees (percentage) - apply large (>1 batch ST size) token fee 5000 BP on a trade on a newly added ST type`, async () => {
-        await stm.addSecTokenType('TEST_EEU_TYPE');
+        await stm.addSecTokenType('TEST_EEU_TYPE', CONST.settlementType.SPOT);
         const types = (await stm.getSecTokenTypes()).tokenTypes;
         const newTypeId = types.filter(p => p.name == 'TEST_EEU_TYPE')[0].id;
 
