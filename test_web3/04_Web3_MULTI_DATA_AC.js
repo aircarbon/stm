@@ -35,6 +35,10 @@ const TEST_ACCOUNTS = [];
 const GRAY_NDX = 800;
 var GRAY, GRAY_privKey;
 
+// if false, will produce an empty state: only whitelisted accounts + sealed
+// if true, will perform a number of test actions: setting fees, minting, trading, etc.
+const EXEC_TEST_ACTIONS = false;
+
 //
 // populates larger volumes of random/representative test data
 //
@@ -57,19 +61,9 @@ describe(`Contract Web3 Interface`, async () => {
         const sendEthTx = await CONST.web3_sendEthTestAddr(0, GRAY, "0.01"); // setup - fund GRAY eth
 
         const sealedStatus = await CONST.web3_call('getContractSeal', []);
-        //assert(sealedStatus == false, 'contract is already sealed');
 
         // setup whitelist: reserved/internal
         var whiteNdx = 0;
-        // for (; whiteNdx < WHITELIST_RESERVED_COUNT; whiteNdx++) {
-        //     x = await CONST.getAccountAndKey(whiteNdx);
-        //     console.log(chalk.inverse(`SETUP RESERVED WL @ndx ${whiteNdx}: ${x.addr}`));
-        //     WHITE_RESERVED.push({ndx: whiteNdx, addr: x.addr, privKey: x.privKey});
-        //     try {
-        //         const whitelistTx = await CONST.web3_tx('whitelist', [ x.addr ], OWNER, OWNER_privKey);
-        //         assert((await CONST.web3_call('isWhitelisted', [x.addr])) == true, 'not whitelisted');
-        //     } catch(ex) { console.warn(ex); } // swallow - ropsten doesn't include the revert msg
-        // }
         const submittedToWhitelist = []
         var wlMany = [], whitelistTx
         for (whiteNdx = 0; whiteNdx < WHITELIST_RESERVED_COUNT; whiteNdx++) {
@@ -87,16 +81,7 @@ describe(`Contract Web3 Interface`, async () => {
         }
         submittedToWhitelist.concat(wlMany);
 
-        // setup whitelist: minters
-        // for (; whiteNdx < WHITE_MINTER_START_NDX + WHITE_MINTER_COUNT; whiteNdx++) {
-        //     x = await CONST.getAccountAndKey(whiteNdx);
-        //     console.log(chalk.inverse(`SETUP MINTER @ndx ${whiteNdx}: ${x.addr}`));
-        //     WHITE_MINTERS.push({ndx: whiteNdx, addr: x.addr, privKey: x.privKey});
-        //     try {
-        //         const whitelistTx = await CONST.web3_tx('whitelist', [ x.addr ], OWNER, OWNER_privKey);
-        //         assert((await CONST.web3_call('isWhitelisted', [x.addr])) == true, 'not whitelisted');
-        //     } catch(ex) { console.warn(ex); }
-        // }
+        // setup whitelist: test minters
         wlMany = []
         for (whiteNdx = WHITELIST_RESERVED_COUNT; whiteNdx < WHITE_MINTER_START_NDX + WHITE_MINTER_COUNT; whiteNdx++) {
             x = await CONST.getAccountAndKey(whiteNdx);
@@ -113,16 +98,7 @@ describe(`Contract Web3 Interface`, async () => {
         }
         submittedToWhitelist.concat(wlMany);
 
-        // setup whitelist: buyers
-        // for (; whiteNdx < WHITE_BUYER_START_NDX + WHITE_BUYER_COUNT; whiteNdx++) {
-        //     x = await CONST.getAccountAndKey(whiteNdx);
-        //     console.log(chalk.inverse(`SETUP BUYER @ndx ${whiteNdx}: ${x.addr}`));
-        //     WHITE_BUYERS.push({ndx: whiteNdx, addr: x.addr, privKey: x.privKey});
-        //     try {
-        //         const whitelistTx = await CONST.web3_tx('whitelist', [ x.addr ], OWNER, OWNER_privKey);
-        //         assert((await CONST.web3_call('isWhitelisted', [x.addr])) == true, 'not whitelisted');
-        //     } catch(ex) { console.warn(ex); }
-        // }
+        // setup whitelist: test buyers
         wlMany = []
         for (whiteNdx = WHITE_MINTER_START_NDX + WHITE_MINTER_COUNT; whiteNdx < WHITE_BUYER_START_NDX + WHITE_BUYER_COUNT; whiteNdx++) {
             x = await CONST.getAccountAndKey(whiteNdx);
@@ -140,15 +116,6 @@ describe(`Contract Web3 Interface`, async () => {
         submittedToWhitelist.concat(wlMany);
 
         // setup whitelist: manual testing exchange accounts
-        // for (; whiteNdx < TEST_ACCOUNT_START_NDX + TEST_ACCOUNT_COUNT; whiteNdx++) {
-        //     x = await CONST.getAccountAndKey(whiteNdx);
-        //     console.log(chalk.inverse(`SETUP TEST_ACCOUNT @ndx ${whiteNdx}: ${x.addr}`));
-        //     TEST_ACCOUNTS.push({ndx: whiteNdx, addr: x.addr, privKey: x.privKey});
-        //     try {
-        //         const whitelistTx = await CONST.web3_tx('whitelist', [ x.addr ], OWNER, OWNER_privKey);
-        //         assert((await CONST.web3_call('isWhitelisted', [x.addr])) == true, 'not whitelisted');
-        //     } catch(ex) { console.warn(ex); }
-        // }
         wlMany = []
         for (whiteNdx = WHITE_BUYER_START_NDX + WHITE_BUYER_COUNT; whiteNdx < TEST_ACCOUNT_START_NDX + TEST_ACCOUNT_COUNT; whiteNdx++) {
             x = await CONST.getAccountAndKey(whiteNdx);
@@ -183,20 +150,23 @@ describe(`Contract Web3 Interface`, async () => {
             const sealTx = await CONST.web3_tx('sealContract', [], OWNER, OWNER_privKey);
         }
 
-        // add sec token type
-        if (!(await CONST.web3_call('getSecTokenTypes',[])).tokenTypes.some(p => p.name == 'NEW_TOK_TYPE_A')) {
-            await CONST.web3_tx('addSecTokenType', [ 'NEW_TOK_TYPE_A' ], OWNER, OWNER_privKey);
-        }
+        if (EXEC_TEST_ACTIONS) {
+            // add sec token type
+            if (!(await CONST.web3_call('getSecTokenTypes',[])).tokenTypes.some(p => p.name == 'NEW_TOK_TYPE_A')) {
+                await CONST.web3_tx('addSecTokenType', [ 'NEW_TOK_TYPE_A' ], OWNER, OWNER_privKey);
+            }
 
-        // add ccy type
-        if (!(await CONST.web3_call('getCcyTypes',[])).ccyTypes.some(p => p.name == 'NEW_CCY_TYPE_A')) {
-            await CONST.web3_tx('addCcyType', [ 'NEW_CCY_TYPE_A', 'cents', 2 ], OWNER, OWNER_privKey);
+            // add ccy type
+            if (!(await CONST.web3_call('getCcyTypes',[])).ccyTypes.some(p => p.name == 'NEW_CCY_TYPE_A')) {
+                await CONST.web3_tx('addCcyType', [ 'NEW_CCY_TYPE_A', 'cents', 2 ], OWNER, OWNER_privKey);
+            }
         }
     });
 
     it(`web3 direct - multi - should be able to mint multiple batches for all whitelist minters`, async () => {
-        const curTokTypes = (await CONST.web3_call('getSecTokenTypes', [])).tokenTypes;
+        if (!EXEC_TEST_ACTIONS) { console.log('skipping (!EXEC_TEST_ACTIONS)'); return; }
 
+        const curTokTypes = (await CONST.web3_call('getSecTokenTypes', [])).tokenTypes;
         for (var whiteNdx = 0; whiteNdx < WHITE_MINTERS.length ; whiteNdx++) {
             const WM = WHITE_MINTERS[whiteNdx];
             
@@ -220,6 +190,8 @@ describe(`Contract Web3 Interface`, async () => {
     });
 
     it(`web3 direct - multi - should be able to fund (tokens & ccy), trade & withdraw (tokens & ccy) for all whitelist buyers`, async () => {
+        if (!EXEC_TEST_ACTIONS) { console.log('skipping (!EXEC_TEST_ACTIONS)'); return; }
+
         const curTokTypes = (await CONST.web3_call('getSecTokenTypes', [])).tokenTypes;
         const ccyTypes = (await CONST.web3_call('getCcyTypes', [])).ccyTypes;
 
@@ -236,11 +208,6 @@ describe(`Contract Web3 Interface`, async () => {
                 const SELLER = WHITE_MINTERS[(whiteNdx+buyNdx) % WHITE_MINTERS.length];
                 const minterLedger = (await CONST.web3_call('getLedgerEntry', [SELLER.addr]));
                 const minterTokTypeId = minterLedger.tokens[0].tokenTypeId.toString();
-                //console.log(`WM ${WM.addr}:`);
-                //console.dir(minter.tokens_sumQty.toString());
-                //console.dir(minter.tokens.length);
-                //console.dir(minter.tokens[0].tokenTypeId.toString());
-                //console.dir(minter.tokens[0].currentQty.toString());
 
                 const exchangeCcyFee = { ccy_mirrorFee: false, ccy_perMillion: 0, fee_fixed: buyNdx * 11, fee_percBips: buyNdx * 6, fee_min: buyNdx * 11, fee_max: buyNdx * 51, };
                 const ledgerCcyFee =   { ccy_mirrorFee: false, ccy_perMillion: 0, fee_fixed: buyNdx * 12, fee_percBips: buyNdx * 7, fee_min: buyNdx * 12, fee_max: buyNdx * 52, };
