@@ -30,7 +30,7 @@ library TokenLib {
         }
 
         if (settlementType == StructLib.SettlementType.FUTURE) {
-            require(expiryTimestamp > 1585699708, "Bad future expiry");
+            require(expiryTimestamp > 1585699708, "Bad expiry");
             require(underylerTypeId > 0 && underylerTypeId <= stTypesData._tt_Count, "Bad underylerTypeId");
             require(stTypesData._tt_Settle[underylerTypeId] == StructLib.SettlementType.SPOT, "Bad underyler settlement type");
         }

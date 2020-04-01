@@ -104,9 +104,9 @@ contract StMaster is IStMaster, IPublicViews,
 
         // set token & ccy types
         if (_contractType == StructLib.ContractType.COMMODITY) {
-            stTypesData._tt_Name[1] = 'AirCarbon CORSIA Token';
-            stTypesData._tt_Name[2] = 'AirCarbon Nature Token';
-            stTypesData._tt_Name[3] = 'AirCarbon Premium Token';
+            stTypesData._tt_Name[1] = 'AirCarbon CORSIA Token';     stTypesData._tt_Settle[1] = StructLib.SettlementType.SPOT;
+            stTypesData._tt_Name[2] = 'AirCarbon Nature Token';     stTypesData._tt_Settle[2] = StructLib.SettlementType.SPOT;
+            stTypesData._tt_Name[3] = 'AirCarbon Premium Token';    stTypesData._tt_Settle[3] = StructLib.SettlementType.SPOT;
             stTypesData._tt_Count = 3;
             ccyTypesData._ct_Ccy[1] = StructLib.Ccy({ id: 1, name: 'USD', unit: 'cents',      decimals: 2 });
             ccyTypesData._ct_Ccy[2] = StructLib.Ccy({ id: 2, name: 'ETH', unit: 'Wei',        decimals: 18 });

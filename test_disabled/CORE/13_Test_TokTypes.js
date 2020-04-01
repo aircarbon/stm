@@ -70,7 +70,7 @@ contract("StMaster", accounts => {
 
     it(`token types - should not allow non-owner to add an ST type`, async () => {
         try {
-            await stm.addSecTokenType('NEW_TYPE_NAME_3', CONST.settlementType.SPOT, 0, 0, { from: accounts[1] });
+            await stm.addSecTokenType(`NEW_TYPE_NAME_${new Date().getTime()}`, CONST.settlementType.SPOT, 0, 0, { from: accounts[1] });
         } catch (ex) { 
             assert(ex.reason == 'Restricted', `unexpected: ${ex.reason}`);
             return; 
@@ -92,13 +92,34 @@ contract("StMaster", accounts => {
     it(`token types - should not allow adding an ST type when contract is read only`, async () => {
         try {
             await stm.setReadOnly(true, { from: accounts[0] });
-            await stm.addSecTokenType('NEW_TYPE_NAME_4', CONST.settlementType.SPOT, 0, 0, { from: accounts[0] });
+            await stm.addSecTokenType(`NEW_TYPE_NAME_${new Date().getTime()}`, CONST.settlementType.SPOT, 0, 0, { from: accounts[0] });
         } catch (ex) { 
             assert(ex.reason == 'Read-only', `unexpected: ${ex.reason}`);
             await stm.setReadOnly(false, { from: accounts[0] });
             return;
         }
         await stm.setReadOnly(false, { from: accounts[0] });
+        assert.fail('expected contract exception');
+    });
+
+    it(`token types - should not allow adding a spot ST type with an expiry time`, async () => {
+        try {
+            await stm.addSecTokenType(`NEW_TYPE_NAME_${new Date().getTime()}`, CONST.settlementType.SPOT, new Date().getTime(), 0, { from: accounts[0] });
+        } catch (ex) { 
+            assert(ex.reason == 'Invalid expiryTimestamp', `unexpected: ${ex.reason}`);
+            return;
+        }
+        assert.fail('expected contract exception');
+    });
+
+    it(`token types - should not allow adding a spot ST type with an underlyer`, async () => {
+        const spotTypes = (await stm.getSecTokenTypes()).tokenTypes.filter(p => p.settlementType == CONST.settlementType.SPOT);
+        try {
+            await stm.addSecTokenType(`NEW_TYPE_NAME_${new Date().getTime()}`, CONST.settlementType.SPOT, 0, spotTypes[0].id, { from: accounts[0] });
+        } catch (ex) { 
+            assert(ex.reason == 'Invalid underylerTypeId', `unexpected: ${ex.reason}`);
+            return;
+        }
         assert.fail('expected contract exception');
     });
 });
