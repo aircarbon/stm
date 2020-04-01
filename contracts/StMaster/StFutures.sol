@@ -4,10 +4,13 @@ FUTURES - notes 26/MAR/2020
 
 (1) new token-type: JUL_28_2020, AUG_28_2020, etc., i.e. rolling/continuously added -- > and with an expiry date <
     //
-    // todo: add timestamp to tok-type, for expiry datetime
+    // done: add timestamp to tok-type, for expiry datetime
     //       no trade after expiry timestamp - must be enforced off-chain for now (but a chainlink for block->timestamp data means it could be done on-chain)
     //
-    // todo: add deriv-of param for FT tok-type... i.e. UNDERLYER... (mus be a SPOT tok-type)
+    // done: add deriv-of param for FT tok-type... i.e. UNDERLYER... (mus be a SPOT tok-type)
+    //
+    // TESTS...
+    //
 
 (2) token-type gets flag: SPOT || FUTURE
 (3) token-type FUTURE can be short sold, i.e. -ve tokenQty would be ok

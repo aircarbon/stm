@@ -26,7 +26,12 @@ contract("StMaster", accounts => {
             console.log(`addrNdx: ${global.TaddrNdx} - contract @ ${stm.address} (owner: ${accounts[0]})`);
     });
 
-    it(`FT misc - add future tok-type`, async () => {
+    // * can add fut type (+ve)
+    // * spot type add can't have expiry or underlyer (-ve)
+    // * ft type add can't have bad expiry time (too low)
+    // * ft type add can't have non-existent underlyer type id
+    // * ft type add can't have non-spot (ft) underlyer type 
+    it(`FT types - add future tok-type`, async () => {
 
         //...
         await stm.addSecTokenType('NEW_TYPE_NAME', CONST.settlementType.FUTURE, 0, 0 ); 

@@ -12,7 +12,7 @@ const OWNER_NDX = 0;
 var OWNER, OWNER_privKey;
 
 // internal/reserved whitelisted - the contract reserves the first ten addresses for internal/test/exchange use
-const WHITELIST_RESERVED_COUNT = 10;
+const WHITELIST_RESERVED_COUNT = 10; // static - don't change: should match the hardcoded value in the smart contract
 const WHITE_RESERVED = [];
 
 // whitelisted minters

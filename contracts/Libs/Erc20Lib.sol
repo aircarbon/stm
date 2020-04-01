@@ -26,11 +26,6 @@ library Erc20Lib {
         require(erc20Data._nextWhitelistNdx < erc20Data._whitelist.length, "Insufficient whitelist entries");
         erc20Data._nextWhitelistNdx++;
     }
-    // WHITELIST - get [all]
-    function getWhitelistAll(StructLib.LedgerStruct storage ledgerData, StructLib.Erc20Struct storage erc20Data) public view returns (address[] memory) {
-        require(ledgerData._contractSealed, "Contract is not sealed");
-        return erc20Data._whitelist;
-    }
 
     // TRANSFER
     function transfer(
