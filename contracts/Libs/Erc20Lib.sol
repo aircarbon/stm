@@ -8,15 +8,14 @@ library Erc20Lib {
     event Transfer(address indexed from, address indexed to, uint256 value);
     event Approval(address indexed owner, address indexed spender, uint256 value);
 
-    // WHITELIST - add
+    // WHITELIST - add [single]
     function whitelist(StructLib.LedgerStruct storage ledgerData, StructLib.Erc20Struct storage erc20Data, address addr) public {
         require(!erc20Data._whitelisted[addr], "Already whitelisted");
         require(!ledgerData._contractSealed, "Contract is sealed");
         erc20Data._whitelist.push(addr);
         erc20Data._whitelisted[addr] = true;
     }
-
-    // WHITELIST - get next, and advance current index
+    // WHITELIST - get next, and advance current index [single]
     function getWhitelistNext(StructLib.LedgerStruct storage ledgerData, StructLib.Erc20Struct storage erc20Data) public view returns (address) {
         require(ledgerData._contractSealed, "Contract is not sealed");
         require(erc20Data._nextWhitelistNdx < erc20Data._whitelist.length, "Insufficient whitelist entries");
@@ -26,6 +25,11 @@ library Erc20Lib {
         require(ledgerData._contractSealed, "Contract is not sealed");
         require(erc20Data._nextWhitelistNdx < erc20Data._whitelist.length, "Insufficient whitelist entries");
         erc20Data._nextWhitelistNdx++;
+    }
+    // WHITELIST - get [all]
+    function getWhitelistAll(StructLib.LedgerStruct storage ledgerData, StructLib.Erc20Struct storage erc20Data) public view returns (address[] memory) {
+        require(ledgerData._contractSealed, "Contract is not sealed");
+        return erc20Data._whitelist;
     }
 
     // TRANSFER
@@ -40,7 +44,7 @@ library Erc20Lib {
         uint256 remainingToTransfer = amount;
         while (remainingToTransfer > 0) {
             // iterate ST types
-            for (uint256 tokenTypeId = 1; tokenTypeId <= stTypesData._count_tokenTypes; tokenTypeId++) {
+            for (uint256 tokenTypeId = 1; tokenTypeId <= stTypesData._tt_Count; tokenTypeId++) {
 
                 // sum qty tokens of this type
                 uint256[] memory tokenType_stIds = ledgerData._ledger[msg.sender].tokenType_stIds[tokenTypeId];

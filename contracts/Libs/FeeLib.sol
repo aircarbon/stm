@@ -22,7 +22,7 @@ library FeeLib {
         address ledgerOwner,
         StructLib.SetFeeArgs memory a)
     public {
-        require(tokenTypeId >= 1 && tokenTypeId <= stTypesData._count_tokenTypes, "Bad tokenTypeId");
+        require(tokenTypeId >= 1 && tokenTypeId <= stTypesData._tt_Count, "Bad tokenTypeId");
         require(a.ccy_perMillion == 0, "ccy_perMillion unsupported for token-type fee");
         require(a.ccy_mirrorFee == false, "ccy_mirrorFee unsupported for token-type fee");
 
@@ -61,7 +61,7 @@ library FeeLib {
         address ledgerOwner,
         StructLib.SetFeeArgs memory a)
     public {
-        require(ccyTypeId >= 1 && ccyTypeId <= ccyTypesData._count_ccyTypes, "Bad ccyTypeId");
+        require(ccyTypeId >= 1 && ccyTypeId <= ccyTypesData._ct_Count, "Bad ccyTypeId");
 
         StructLib.FeeStruct storage feeStruct = globalFees;
         if (ledgerOwner != address(0x0)) {

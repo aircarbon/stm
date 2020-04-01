@@ -28,7 +28,8 @@ contract("StMaster", accounts => {
 
     it(`FT misc - add future tok-type`, async () => {
 
-        await stm.addSecTokenType('NEW_TYPE_NAME', CONST.settlementType.FUTURE, ); 
+        //...
+        await stm.addSecTokenType('NEW_TYPE_NAME', CONST.settlementType.FUTURE, 0, 0 ); 
 
     });
 

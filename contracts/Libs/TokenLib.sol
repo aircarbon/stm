@@ -5,7 +5,7 @@ import "../Interfaces/StructLib.sol";
 import "./FeeLib.sol";
 
 library TokenLib {
-    event AddedSecTokenType(uint256 id, string name);
+    event AddedSecTokenType(uint256 id, string name, StructLib.SettlementType settlementType, uint64 expiryTimestamp, uint256 underylerTypeId);
     event BurnedFullSecToken(uint256 indexed stId, uint256 tokenTypeId, address indexed ledgerOwner, uint256 burnedQty);
     event BurnedPartialSecToken(uint256 indexed stId, uint256 tokenTypeId, address indexed ledgerOwner, uint256 burnedQty);
     event MintedSecTokenBatch(uint256 indexed batchId, uint256 tokenTypeId, address indexed batchOwner, uint256 mintQty, uint256 mintSecTokenCount);
@@ -19,30 +19,50 @@ library TokenLib {
         StructLib.LedgerStruct storage ledgerData,
         StructLib.StTypesStruct storage stTypesData,
         string memory name,
-        StructLib.SettlementType settlementType)
+        StructLib.SettlementType settlementType,
+        uint64 expiryTimestamp,
+        uint256 underylerTypeId
+        )
     public {
         require(ledgerData.contractType == StructLib.ContractType.COMMODITY, "Bad cashflow request");
-
-        for (uint256 tokenTypeId = 1; tokenTypeId <= stTypesData._count_tokenTypes; tokenTypeId++) {
-            require(keccak256(abi.encodePacked(stTypesData._tokenTypeNames[tokenTypeId])) != keccak256(abi.encodePacked(name)), "Duplicate name");
+        for (uint256 tokenTypeId = 1; tokenTypeId <= stTypesData._tt_Count; tokenTypeId++) {
+            require(keccak256(abi.encodePacked(stTypesData._tt_Name[tokenTypeId])) != keccak256(abi.encodePacked(name)), "Duplicate name");
         }
 
-        stTypesData._count_tokenTypes++;
-        stTypesData._tokenTypeNames[stTypesData._count_tokenTypes] = name;
-        emit AddedSecTokenType(stTypesData._count_tokenTypes, name);
+        if (settlementType == StructLib.SettlementType.FUTURE) {
+            require(expiryTimestamp > 1585699708, "Bad future expiry");
+            require(underylerTypeId > 0 && underylerTypeId <= stTypesData._tt_Count, "Bad underylerTypeId");
+            require(stTypesData._tt_Settle[underylerTypeId] == StructLib.SettlementType.SPOT, "Bad underyler settlement type");
+        }
+        else if (settlementType == StructLib.SettlementType.SPOT) {
+            require(expiryTimestamp == 0, "Invalid expiryTimestamp");
+            require(underylerTypeId == 0, "Invalid underylerTypeId");
+        }
+
+        stTypesData._tt_Count++;
+        stTypesData._tt_Name[stTypesData._tt_Count] = name;
+        stTypesData._tt_Settle[stTypesData._tt_Count] = settlementType;
+        if (settlementType == StructLib.SettlementType.FUTURE) {
+            stTypesData._tt_Expiry[stTypesData._tt_Count] = expiryTimestamp;
+            stTypesData._tt_Underlyer[stTypesData._tt_Count] = underylerTypeId;
+        }
+
+        emit AddedSecTokenType(stTypesData._tt_Count, name, settlementType, expiryTimestamp, underylerTypeId);
     }
 
     function getSecTokenTypes(
         StructLib.StTypesStruct storage stTypesData)
     public view returns (StructLib.GetSecTokenTypesReturn memory) {
         StructLib.SecTokenTypeReturn[] memory tokenTypes;
-        tokenTypes = new StructLib.SecTokenTypeReturn[](stTypesData._count_tokenTypes);
+        tokenTypes = new StructLib.SecTokenTypeReturn[](stTypesData._tt_Count);
 
-        for (uint256 tokenTypeId = 1; tokenTypeId <= stTypesData._count_tokenTypes; tokenTypeId++) {
+        for (uint256 tokenTypeId = 1; tokenTypeId <= stTypesData._tt_Count; tokenTypeId++) {
             tokenTypes[tokenTypeId - 1] = StructLib.SecTokenTypeReturn({
                     id: tokenTypeId,
-                  name: stTypesData._tokenTypeNames[tokenTypeId],
-        settlementType: stTypesData._tokenTypeSettlement[tokenTypeId]
+                  name: stTypesData._tt_Name[tokenTypeId],
+        settlementType: stTypesData._tt_Settle[tokenTypeId],
+       expiryTimestamp: stTypesData._tt_Expiry[tokenTypeId],
+           underlyerId: stTypesData._tt_Underlyer[tokenTypeId]
             });
         }
 
@@ -70,7 +90,7 @@ library TokenLib {
     public {
 
         require(ledgerData._contractSealed, "Contract is not sealed");
-        require(a.tokenTypeId >= 1 && a.tokenTypeId <= stTypesData._count_tokenTypes, "Bad tokenTypeId");
+        require(a.tokenTypeId >= 1 && a.tokenTypeId <= stTypesData._tt_Count, "Bad tokenTypeId");
         //require(a.mintSecTokenCount >= 1, "Minimum one ST required");
         //require(a.mintQty % a.mintSecTokenCount == 0, "mintQty must divide evenly into mintSecTokenCount");
         require(a.mintSecTokenCount == 1, "Set mintSecTokenCount 1");
@@ -211,7 +231,7 @@ library TokenLib {
         require(ledgerData._contractSealed, "Contract is not sealed");
         require(ledgerData._ledger[ledgerOwner].exists == true, "Bad ledgerOwner");
         require(burnQty >= 0x1 && burnQty <= 0xffffffffffffffff, "Bad burnQty"); // max uint64
-        require(tokenTypeId >= 1 && tokenTypeId <= stTypesData._count_tokenTypes, "Bad tokenTypeId");
+        require(tokenTypeId >= 1 && tokenTypeId <= stTypesData._tt_Count, "Bad tokenTypeId");
 
         // check ledger owner has sufficient tokens of supplied type
         require(StructLib.sufficientTokens(ledgerData, ledgerOwner, tokenTypeId, uint256(burnQty), 0) == true, "Insufficient tokens");

@@ -47,7 +47,7 @@ contract StMaster is IStMaster, IPublicViews,
     event CcyFundedLedger(uint256 ccyTypeId, address indexed ledgerOwner, int256 amount);
     event CcyWithdrewLedger(uint256 ccyTypeId, address indexed ledgerOwner, int256 amount);
     // TokenLib events
-    event AddedSecTokenType(uint256 id, string name);
+    event AddedSecTokenType(uint256 id, string name, StructLib.SettlementType settlementType, uint64 expiryTimestamp, uint256 underylerTypeId);
     event BurnedFullSecToken(uint256 indexed stId, uint256 tokenTypeId, address indexed ledgerOwner, uint256 burnedQty);
     event BurnedPartialSecToken(uint256 indexed stId, uint256 tokenTypeId, address indexed ledgerOwner, uint256 burnedQty);
     event MintedSecTokenBatch(uint256 indexed batchId, uint256 tokenTypeId, address indexed batchOwner, uint256 mintQty, uint256 mintSecTokenCount);
@@ -104,18 +104,18 @@ contract StMaster is IStMaster, IPublicViews,
 
         // set token & ccy types
         if (_contractType == StructLib.ContractType.COMMODITY) {
-            stTypesData._tokenTypeNames[1] = 'AirCarbon CORSIA Token';
-            stTypesData._tokenTypeNames[2] = 'AirCarbon Nature Token';
-            stTypesData._tokenTypeNames[3] = 'AirCarbon Premium Token';
-            stTypesData._count_tokenTypes = 3;
-            ccyTypesData._ccyTypes[1] = StructLib.Ccy({ id: 1, name: 'USD', unit: 'cents',      decimals: 2 });
-            ccyTypesData._ccyTypes[2] = StructLib.Ccy({ id: 2, name: 'ETH', unit: 'Wei',        decimals: 18 });
-            ccyTypesData._ccyTypes[3] = StructLib.Ccy({ id: 3, name: 'BTC', unit: 'Satoshi',    decimals: 8 });
-          //ccyTypesData._ccyTypes[4] = StructLib.Ccy({ id: 4, name: 'SGD', unit: 'cents',      decimals: 2 });
-          //ccyTypesData._ccyTypes[5] = StructLib.Ccy({ id: 5, name: 'EUR', unit: 'euro cents', decimals: 2 });
-          //ccyTypesData._ccyTypes[6] = StructLib.Ccy({ id: 6, name: 'HKD', unit: 'cents',      decimals: 2 });
-          //ccyTypesData._ccyTypes[7] = StructLib.Ccy({ id: 7, name: 'GBP', unit: 'pence',      decimals: 2 });
-            ccyTypesData._count_ccyTypes = 3;
+            stTypesData._tt_Name[1] = 'AirCarbon CORSIA Token';
+            stTypesData._tt_Name[2] = 'AirCarbon Nature Token';
+            stTypesData._tt_Name[3] = 'AirCarbon Premium Token';
+            stTypesData._tt_Count = 3;
+            ccyTypesData._ct_Ccy[1] = StructLib.Ccy({ id: 1, name: 'USD', unit: 'cents',      decimals: 2 });
+            ccyTypesData._ct_Ccy[2] = StructLib.Ccy({ id: 2, name: 'ETH', unit: 'Wei',        decimals: 18 });
+            ccyTypesData._ct_Ccy[3] = StructLib.Ccy({ id: 3, name: 'BTC', unit: 'Satoshi',    decimals: 8 });
+          //ccyTypesData._ct_Ccy[4] = StructLib.Ccy({ id: 4, name: 'SGD', unit: 'cents',      decimals: 2 });
+          //ccyTypesData._ct_Ccy[5] = StructLib.Ccy({ id: 5, name: 'EUR', unit: 'euro cents', decimals: 2 });
+          //ccyTypesData._ct_Ccy[6] = StructLib.Ccy({ id: 6, name: 'HKD', unit: 'cents',      decimals: 2 });
+          //ccyTypesData._ct_Ccy[7] = StructLib.Ccy({ id: 7, name: 'GBP', unit: 'pence',      decimals: 2 });
+            ccyTypesData._ct_Count = 3;
 
             // set default ccy fee USD: $3/1000 mirrored
             StructLib.SetFeeArgs memory feeArgsGlobalUsd = StructLib.SetFeeArgs({
@@ -133,10 +133,10 @@ contract StMaster is IStMaster, IPublicViews,
             );
         }
         else if (_contractType == StructLib.ContractType.CASHFLOW) {
-            stTypesData._tokenTypeNames[1] = 'UNI_TOKEN'; //contractName;
-            stTypesData._count_tokenTypes = 1;
-            ccyTypesData._ccyTypes[1] = StructLib.Ccy({ id: 1, name: 'ETH', unit: 'Wei',        decimals: 18 });
-            ccyTypesData._count_ccyTypes = 1;
+            stTypesData._tt_Name[1] = 'UNI_TOKEN'; //contractName;
+            stTypesData._tt_Count = 1;
+            ccyTypesData._ct_Ccy[1] = StructLib.Ccy({ id: 1, name: 'ETH', unit: 'Wei',        decimals: 18 });
+            ccyTypesData._ct_Count = 1;
         }
         else revert('Bad contract type');
 

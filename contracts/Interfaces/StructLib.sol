@@ -17,25 +17,29 @@ library StructLib {
     }
 
     struct CcyTypesStruct { // ** DATA_DUMP: OK
-        mapping(uint256 => Ccy) _ccyTypes;                     // typeId (1-based) -> ccy
-        uint256 _count_ccyTypes;
+        mapping(uint256 => Ccy) _ct_Ccy;                        // typeId (1-based) -> ccy
+        uint256 _ct_Count;
     }
 
-    // ST TYPES
+    // ST TOKEN-TYPES
     struct SecTokenTypeReturn {
-        uint256 id;
-        string  name;
+        uint256        id;
+        string         name;
         SettlementType settlementType;
+        uint64         expiryTimestamp;
+        uint256        underlyerId;
     }
     struct GetSecTokenTypesReturn {
         SecTokenTypeReturn[] tokenTypes;
     }
 
-    enum SettlementType { SPOT, FUTURE }
+    enum SettlementType { UNDEFINED, SPOT, FUTURE }
     struct StTypesStruct { // ** DATA_DUMP: OK
-        mapping(uint256 => string)         _tokenTypeNames;     // typeId (1-based) -> typeName
-        mapping(uint256 => SettlementType) _tokenTypeSettlement;
-        uint256 _count_tokenTypes;
+        mapping(uint256 => string)         _tt_Name;            // typeId (1-based) -> typeName
+        mapping(uint256 => SettlementType) _tt_Settle;
+        mapping(uint256 => uint64)         _tt_Expiry;
+        mapping(uint256 => uint256)        _tt_Underlyer;
+        uint256 _tt_Count;
     }
 
     // TOKEN BATCH

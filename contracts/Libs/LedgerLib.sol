@@ -36,8 +36,8 @@ library LedgerLib {
         ));
 
         // hash currency types & exchange currency fees
-        for (uint256 ccyTypeId = 1; ccyTypeId <= ccyTypesData._count_ccyTypes; ccyTypeId++) {
-            StructLib.Ccy storage ccy = ccyTypesData._ccyTypes[ccyTypeId];
+        for (uint256 ccyTypeId = 1; ccyTypeId <= ccyTypesData._ct_Count; ccyTypeId++) {
+            StructLib.Ccy storage ccy = ccyTypesData._ct_Ccy[ccyTypeId];
             ledgerHash = keccak256(abi.encodePacked(ledgerHash,
                 ccy.id, ccy.name, ccy.unit, ccy.decimals
             ));
@@ -48,9 +48,9 @@ library LedgerLib {
         }
 
         // hash token types & exchange token fees
-        for (uint256 stTypeId = 1; stTypeId <= stTypesData._count_tokenTypes; stTypeId++) {
-            ledgerHash = keccak256(abi.encodePacked(ledgerHash, stTypesData._tokenTypeNames[stTypeId]));
-            ledgerHash = keccak256(abi.encodePacked(ledgerHash, stTypesData._tokenTypeSettlement[stTypeId]));
+        for (uint256 stTypeId = 1; stTypeId <= stTypesData._tt_Count; stTypeId++) {
+            ledgerHash = keccak256(abi.encodePacked(ledgerHash, stTypesData._tt_Name[stTypeId]));
+            ledgerHash = keccak256(abi.encodePacked(ledgerHash, stTypesData._tt_Settle[stTypeId]));
 
             if (globalFees.tokType_Set[stTypeId]) {
                 ledgerHash = keccak256(abi.encodePacked(ledgerHash, hashSetFeeArgs(globalFees.tok[stTypeId])));
@@ -96,7 +96,7 @@ library LedgerLib {
                 ledgerHash = keccak256(abi.encodePacked(ledgerHash, entryOwner));
 
             // hash ledger tokens & custom fee, by token types
-            for (uint256 stTypeId = 1; stTypeId <= stTypesData._count_tokenTypes; stTypeId++) {
+            for (uint256 stTypeId = 1; stTypeId <= stTypesData._tt_Count; stTypeId++) {
                 uint256[] storage stIds = entry.tokenType_stIds[stTypeId];
 
                 // hash token type id list
@@ -109,7 +109,7 @@ library LedgerLib {
             }
 
             // hash ledger currency balances & custom fees
-            for (uint256 ccyTypeId = 1; ccyTypeId <= ccyTypesData._count_ccyTypes; ccyTypeId++) {
+            for (uint256 ccyTypeId = 1; ccyTypeId <= ccyTypesData._ct_Count; ccyTypeId++) {
                 // hash currency type balance
                 ledgerHash = keccak256(abi.encodePacked(ledgerHash, entry.ccyType_balance[ccyTypeId]));
 
@@ -146,7 +146,7 @@ library LedgerLib {
         ledgerHash = keccak256(abi.encodePacked(ledgerHash, uint256(ledgerData._tokens_total.transferedQty)));
         ledgerHash = keccak256(abi.encodePacked(ledgerHash, uint256(ledgerData._tokens_total.exchangeFeesPaidQty)));
         ledgerHash = keccak256(abi.encodePacked(ledgerHash, uint256(ledgerData._tokens_total.originatorFeesPaidQty)));
-        for (uint256 ccyTypeId = 1; ccyTypeId <= ccyTypesData._count_ccyTypes; ccyTypeId++) {
+        for (uint256 ccyTypeId = 1; ccyTypeId <= ccyTypesData._ct_Count; ccyTypeId++) {
             ledgerHash = keccak256(abi.encodePacked(ledgerHash, uint256(ledgerData._ccyType_totalFunded[ccyTypeId])));
             ledgerHash = keccak256(abi.encodePacked(ledgerHash, uint256(ledgerData._ccyType_totalWithdrawn[ccyTypeId])));
             ledgerHash = keccak256(abi.encodePacked(ledgerHash, uint256(ledgerData._ccyType_totalTransfered[ccyTypeId])));
@@ -186,14 +186,14 @@ library LedgerLib {
 
         // count total # of tokens across all types
         uint256 countAllSecTokens = 0;
-        for (uint256 tokenTypeId = 1; tokenTypeId <= stTypesData._count_tokenTypes; tokenTypeId++) {
+        for (uint256 tokenTypeId = 1; tokenTypeId <= stTypesData._tt_Count; tokenTypeId++) {
             countAllSecTokens += ledgerData._ledger[account].tokenType_stIds[tokenTypeId].length;
         }
 
         // flatten ST IDs and sum sizes across types
         tokens = new StructLib.LedgerSecTokenReturn[](countAllSecTokens);
         uint256 flatSecTokenNdx = 0;
-        for (uint256 tokenTypeId = 1; tokenTypeId <= stTypesData._count_tokenTypes; tokenTypeId++) {
+        for (uint256 tokenTypeId = 1; tokenTypeId <= stTypesData._tt_Count; tokenTypeId++) {
             uint256[] memory tokenType_stIds = ledgerData._ledger[account].tokenType_stIds[tokenTypeId];
             for (uint256 ndx = 0; ndx < tokenType_stIds.length; ndx++) {
                 uint256 stId = tokenType_stIds[ndx];
@@ -205,7 +205,7 @@ library LedgerLib {
                 tokens[flatSecTokenNdx] = StructLib.LedgerSecTokenReturn({
                            stId: stId,
                     tokenTypeId: tokenTypeId,
-                  tokenTypeName: stTypesData._tokenTypeNames[tokenTypeId],
+                  tokenTypeName: stTypesData._tt_Name[tokenTypeId],
                         batchId: ledgerData._sts[stId].batchId,
                       mintedQty: ledgerData._sts[stId].mintedQty,
                      currentQty: ledgerData._sts[stId].currentQty
@@ -215,12 +215,12 @@ library LedgerLib {
         }
 
         // populate balances for each currency type
-        ccys = new StructLib.LedgerCcyReturn[](ccyTypesData._count_ccyTypes);
-        for (uint256 ccyTypeId = 1; ccyTypeId <= ccyTypesData._count_ccyTypes; ccyTypeId++) {
+        ccys = new StructLib.LedgerCcyReturn[](ccyTypesData._ct_Count);
+        for (uint256 ccyTypeId = 1; ccyTypeId <= ccyTypesData._ct_Count; ccyTypeId++) {
             ccys[ccyTypeId - 1] = StructLib.LedgerCcyReturn({
                    ccyTypeId: ccyTypeId,
-                        name: ccyTypesData._ccyTypes[ccyTypeId].name,
-                        unit: ccyTypesData._ccyTypes[ccyTypeId].unit,
+                        name: ccyTypesData._ct_Ccy[ccyTypeId].name,
+                        unit: ccyTypesData._ct_Ccy[ccyTypeId].unit,
                      balance: ledgerData._ledger[account].ccyType_balance[ccyTypeId]
             });
         }
