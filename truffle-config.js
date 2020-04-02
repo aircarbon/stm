@@ -68,7 +68,7 @@ module.exports = {
       host: process.env.GANACHE_HOST || "127.0.0.1",
       port: 8545,
       network_id: "*", // see: getTestContextWeb3() for dev network_id convention
-      gas: 7800000,
+      gas: 7900000,
       gasPrice: web3.utils.toWei(gweiDeployment, "gwei")
     },
 

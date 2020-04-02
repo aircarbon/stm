@@ -10,6 +10,7 @@ const FeeLib = artifacts.require('./FeeLib.sol');
 const Erc20Lib = artifacts.require('./Erc20Lib.sol');
 const LoadLib = artifacts.require('./LoadLib.sol');
 const PayableLib = artifacts.require('./PayableLib.sol');
+const FuturesLib = artifacts.require('./FuturesLib.sol');
 
 const StMaster = artifacts.require('./StMaster.sol');
 
@@ -39,6 +40,7 @@ module.exports = async function (deployer) {
         deployer.link(StructLib, LedgerLib);
         deployer.link(StructLib, TransferLib);
         deployer.link(StructLib, FeeLib);
+        deployer.link(StructLib, FuturesLib);
 
         deployer.link(StructLib, StMaster);
 
@@ -68,6 +70,9 @@ module.exports = async function (deployer) {
 
     return deployer.deploy(PayableLib).then(async payableLib => { 
         deployer.link(PayableLib, StMaster);
+
+    return deployer.deploy(FuturesLib).then(async futuresLib => { 
+        deployer.link(FuturesLib, StMaster);
         
         //console.log('cashflowArgs', CONST.contractProps[type].cashflowArgs);
         
@@ -120,6 +125,7 @@ module.exports = async function (deployer) {
             }
         }).catch(err => { console.error('failed deployment: StMaster', err); });
     
+    }).catch(err => { console.error('failed deployment: FuturesLib', err); });
     }).catch(err => { console.error('failed deployment: PayableLib', err); });
     }).catch(err => { console.error('failed deployment: DataLib', err); });
     }).catch(err => { console.error('failed deployment: Erc20Lib', err); });
