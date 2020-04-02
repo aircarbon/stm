@@ -56,13 +56,13 @@ contract("StMaster", accounts => {
 
         // check ledger
         const ledgerAfter = await stm.getLedgerEntry(accounts[global.TaddrNdx]);
-        assert(ledgerAfter.tokens_sumQty == ledgerBefore.tokens_sumQty / 2, 'unexpected ledger TONS after burn');
+        assert(ledgerAfter.spot_sumQty == ledgerBefore.spot_sumQty / 2, 'unexpected ledger TONS after burn');
 
         // check ledger total burned
-        //console.log('ledgerBefore.tokens_sumQtyBurned', ledgerBefore.tokens_sumQtyBurned)
-        //console.log('ledgerAfter.tokens_sumQtyBurned', ledgerAfter.tokens_sumQtyBurned)
+        //console.log('ledgerBefore.spot_sumQtyBurned', ledgerBefore.spot_sumQtyBurned)
+        //console.log('ledgerAfter.spot_sumQtyBurned', ledgerAfter.spot_sumQtyBurned)
         //console.log('burnTokQty', burnTokQty)
-        assert(ledgerAfter.tokens_sumQtyBurned - ledgerBefore.tokens_sumQtyBurned == burnTokQty, 'unexpected tokens_sumQtyBurned before vs after');
+        assert(ledgerAfter.spot_sumQtyBurned - ledgerBefore.spot_sumQtyBurned == burnTokQty, 'unexpected spot_sumQtyBurned before vs after');
 
         // check batch
         const batchAfter = await stm.getSecTokenBatch(eeuAfter.batchId);
@@ -104,7 +104,7 @@ contract("StMaster", accounts => {
 
         // check ledger
         const ledgerAfter = await stm.getLedgerEntry(accounts[global.TaddrNdx]);
-        assert(ledgerAfter.tokens_sumQty == 0, 'unexpected ledger TONS after burn');
+        assert(ledgerAfter.spot_sumQty == 0, 'unexpected ledger TONS after burn');
         assert(ledgerAfter.tokens.length == 0, 'unexpected ledger ST entry after burn');
 
         // check batch
@@ -162,7 +162,7 @@ contract("StMaster", accounts => {
         // check ledger
         const ledgerAfter = await stm.getLedgerEntry(accounts[global.TaddrNdx]);
         //console.dir(ledgerAfter);
-        assert(ledgerAfter.tokens_sumQty == expectRemainTokQty, 'unexpected ledger TONS after burn');
+        assert(ledgerAfter.spot_sumQty == expectRemainTokQty, 'unexpected ledger TONS after burn');
         assert(ledgerAfter.tokens.length == 1, 'unexpected ledger ST entry after burn');
 
         // check batches
@@ -228,7 +228,7 @@ contract("StMaster", accounts => {
 
         // check ledger
         const ledgerAfter = await stm.getLedgerEntry(accounts[global.TaddrNdx]);
-        assert(ledgerAfter.tokens_sumQty == expectRemainTokQty, 'unexpected ledger TONS after burn');
+        assert(ledgerAfter.spot_sumQty == expectRemainTokQty, 'unexpected ledger TONS after burn');
         assert(ledgerAfter.tokens.length == 3, 'unexpected ledger ST entry after burn');
         assert(ledgerAfter.tokens.every(p => p.tokenTypeId == CONST.tokenType.CORSIA), 'unexpected eeu composition on ledger after burn');
 

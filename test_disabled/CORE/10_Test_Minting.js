@@ -239,7 +239,7 @@ contract("StMaster", accounts => {
         assert(ledgerEntryAfter.tokens.map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0) ==
                ledgerEntryBefore.tokens.map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0) + qtyUnit,
                'invalid kg in ledger entry eeus');
-        assert(Number(ledgerEntryAfter.tokens_sumQty) == Number(ledgerEntryBefore.tokens_sumQty) + qtyUnit, 'invalid kg sum ledger entry');
+        assert(Number(ledgerEntryAfter.spot_sumQty) == Number(ledgerEntryBefore.spot_sumQty) + qtyUnit, 'invalid kg sum ledger entry');
 
         // validate STs minted
         for (var ndx = ledgerEntryBefore.tokens.length; ndx < ledgerEntryAfter.tokens.length; ndx++) {
@@ -253,7 +253,7 @@ contract("StMaster", accounts => {
         }
 
         // validate total minted field
-        assert(ledgerEntryAfter.tokens_sumQtyMinted - ledgerEntryBefore.tokens_sumQtyMinted == qtyUnit, 'unexpected tokens_sumQtyMinted before vs. after');
+        assert(ledgerEntryAfter.spot_sumQtyMinted - ledgerEntryBefore.spot_sumQtyMinted == qtyUnit, 'unexpected spot_sumQtyMinted before vs. after');
 
         return batchId;
     }

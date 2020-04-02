@@ -69,7 +69,7 @@ contract StErc20 is StFees, IErc20 {
     }
     function balanceOf(address account) public view returns (uint256) {
         StructLib.LedgerReturn memory ret = LedgerLib.getLedgerEntry(ledgerData, stTypesData, ccyTypesData, account);
-        return ret.tokens_sumQty;
+        return ret.spot_sumQty;
     }
     function transfer(address recipient, uint256 amount) public returns (bool) {
         require(balanceOf(msg.sender) >= amount, "Insufficient tokens");

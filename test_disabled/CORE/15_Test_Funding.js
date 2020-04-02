@@ -70,7 +70,7 @@ contract("StMaster", accounts => {
         const ledgerEntryAfter = await stm.getLedgerEntry(accounts[global.TaddrNdx]);
 
         assert(ledgerEntryAfter.tokens.length == 1, 'unexpected eeu count in ledger entry after minting & funding');
-        assert(Number(ledgerEntryAfter.tokens_sumQty) == Number(CONST.GT_CARBON), 'invalid kg sum in ledger entry after minting & funding');
+        assert(Number(ledgerEntryAfter.spot_sumQty) == Number(CONST.GT_CARBON), 'invalid kg sum in ledger entry after minting & funding');
         assert(ledgerEntryAfter.ccys.find(p => p.ccyTypeId == CONST.ccyType.USD).balance == CONST.thousandCcy_cents, 'unexpected usd balance in ledger entry after minting & funding');
     });
 

@@ -88,8 +88,8 @@ contract("StMaster", accounts => {
 
         const GRAY_after = await stm.getLedgerEntry(GRAY_1);
         const WHITE_after = await stm.getLedgerEntry(WHITE);
-        assert(GRAY_after.tokens_sumQty == 0, 'unexpected graylist ledger GRAY_1 quantity after');     
-        assert(WHITE_after.tokens_sumQty == 6000, 'unexpected whitelist ledger WHITE quantity after');     
+        assert(GRAY_after.spot_sumQty == 0, 'unexpected graylist ledger GRAY_1 quantity after');     
+        assert(WHITE_after.spot_sumQty == 6000, 'unexpected whitelist ledger WHITE quantity after');     
     }
 
     it(`erc20 multi-type - should be able to send 2 types / 3 batches from graylist addr to graylist addr (erc20 => erc20)`, async () => {
@@ -103,7 +103,7 @@ contract("StMaster", accounts => {
         
         const GRAY1_after = await stm.getLedgerEntry(GRAY_1);
         const GRAY2_after = await stm.getLedgerEntry(GRAY_2);
-        assert(GRAY1_after.tokens_sumQty == 0, 'unexpected graylist ledger GRAY_1 quantity after');     
-        assert(GRAY2_after.tokens_sumQty == 6000, 'unexpected graylist ledger GRAY_2 quantity after');     
+        assert(GRAY1_after.spot_sumQty == 0, 'unexpected graylist ledger GRAY_1 quantity after');     
+        assert(GRAY2_after.spot_sumQty == 6000, 'unexpected graylist ledger GRAY_2 quantity after');     
     }
 });

@@ -103,15 +103,15 @@ contract("StMaster", accounts => {
         ), 'unexpected issuer balance after');
 
         // expect tokens are moved
-        // console.log('  sub_ledgerBefore.tokens_sumQty', sub_ledgerBefore.tokens_sumQty);
-        // console.log('   sub_ledgerAfter.tokens_sumQty', sub_ledgerAfter.tokens_sumQty);
-        // console.log('issuer_ledgerBefore.tokens_sumQty', issuer_ledgerBefore.tokens_sumQty);
-        // console.log(' issuer_ledgerAfter.tokens_sumQty', issuer_ledgerAfter.tokens_sumQty);
+        // console.log('  sub_ledgerBefore.spot_sumQty', sub_ledgerBefore.spot_sumQty);
+        // console.log('   sub_ledgerAfter.spot_sumQty', sub_ledgerAfter.spot_sumQty);
+        // console.log('issuer_ledgerBefore.spot_sumQty', issuer_ledgerBefore.spot_sumQty);
+        // console.log(' issuer_ledgerAfter.spot_sumQty', issuer_ledgerAfter.spot_sumQty);
         if (wei_subAmountSent > 0) {
-            assert(Big(issuer_ledgerAfter.tokens_sumQty).lt(Big(issuer_ledgerBefore.tokens_sumQty)), 'unexpected issuer token balance after');
-            assert(Big(sub_ledgerAfter.tokens_sumQty).gt(Big(sub_ledgerBefore.tokens_sumQty)), 'unexpected subscriber token balance after');
-            assert(Big(sub_ledgerBefore.tokens_sumQty).plus(issuer_ledgerBefore.tokens_sumQty).eq(
-                Big(sub_ledgerAfter.tokens_sumQty).plus(Big(issuer_ledgerAfter.tokens_sumQty))
+            assert(Big(issuer_ledgerAfter.spot_sumQty).lt(Big(issuer_ledgerBefore.spot_sumQty)), 'unexpected issuer token balance after');
+            assert(Big(sub_ledgerAfter.spot_sumQty).gt(Big(sub_ledgerBefore.spot_sumQty)), 'unexpected subscriber token balance after');
+            assert(Big(sub_ledgerBefore.spot_sumQty).plus(issuer_ledgerBefore.spot_sumQty).eq(
+                Big(sub_ledgerAfter.spot_sumQty).plus(Big(issuer_ledgerAfter.spot_sumQty))
             ), 'unexpected total sum tokens after');
         }
         return count_expectedTokens.toString();

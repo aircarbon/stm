@@ -21,8 +21,8 @@ import "../Libs/LoadLib.sol";
     function createLedgerEntry(
         address ledgerEntryOwner,
         StructLib.LedgerCcyReturn[] memory ccys,
-        uint256 tokens_sumQtyMinted,
-        uint256 tokens_sumQtyBurned
+        uint256 spot_sumQtyMinted,
+        uint256 spot_sumQtyBurned
     ) public onlyOwner() { revert("Not implemented"); }
 
     function addSecToken(

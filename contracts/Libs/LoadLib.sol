@@ -21,8 +21,8 @@ library LoadLib {
         StructLib.LedgerStruct storage ledgerData,
         address ledgerEntryOwner,
         StructLib.LedgerCcyReturn[] memory ccys,
-        uint256 tokens_sumQtyMinted,
-        uint256 tokens_sumQtyBurned
+        uint256 spot_sumQtyMinted,
+        uint256 spot_sumQtyBurned
     )
     public {
         require(!ledgerData._contractSealed, "Contract is sealed");
@@ -34,8 +34,8 @@ library LoadLib {
         ledgerData._ledger[ledgerEntryOwner] = StructLib.Ledger({
                          exists: true,
                      customFees: StructLib.FeeStruct(),
-            tokens_sumQtyMinted: tokens_sumQtyMinted,
-            tokens_sumQtyBurned: tokens_sumQtyBurned
+            spot_sumQtyMinted: spot_sumQtyMinted,
+            spot_sumQtyBurned: spot_sumQtyBurned
         });
 
         for (uint256 i = 0 ; i < ccys.length ; i++) {
@@ -46,7 +46,7 @@ library LoadLib {
     function addSecToken(
         StructLib.LedgerStruct storage ledgerData,
         address ledgerEntryOwner,
-        uint64 batchId, uint256 stId, uint256 tokenTypeId, uint64 mintedQty, uint64 currentQty
+        uint64 batchId, uint256 stId, uint256 tokenTypeId, int64 mintedQty, int64 currentQty
     )
     public {
         require(!ledgerData._contractSealed, "Contract is sealed");

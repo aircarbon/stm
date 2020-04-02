@@ -34,8 +34,8 @@ contract("StMaster", accounts => {
         });
         assert(data.ledgerA_before.ccys.find(p => p.ccyTypeId == CONST.ccyType.ETH).balance == 0, 'unexpected ledger A currency before');
         assert(data.ledgerA_after.ccys.find(p => p.ccyTypeId == CONST.ccyType.ETH).balance > 0, 'unexpected ledger A currency after');
-        assert(data.ledgerB_before.tokens_sumQty == 0, 'unexpected ledger B ST quantity before');
-        assert(data.ledgerB_after.tokens_sumQty > 0, 'unexpected ledger B ST quantity after');
+        assert(data.ledgerB_before.spot_sumQty == 0, 'unexpected ledger B ST quantity before');
+        assert(data.ledgerB_after.spot_sumQty > 0, 'unexpected ledger B ST quantity after');
     });
 
     it(`trading - should allow two-sided (ccy <-> vST) transfer (A <-> B) across ledger entries`, async () => {
@@ -48,8 +48,8 @@ contract("StMaster", accounts => {
              ccy_amount_A: CONST.oneEth_wei,                   ccyTypeId_A: CONST.ccyType.ETH,
              ccy_amount_B: 0,                                  ccyTypeId_B: 0,
         });
-        assert(data.ledgerA_before.tokens_sumQty == 0, 'unexpected ledger A ST quantity before');
-        assert(data.ledgerA_after.tokens_sumQty > 0, 'unexpected ledger A ST quantity after');
+        assert(data.ledgerA_before.spot_sumQty == 0, 'unexpected ledger A ST quantity before');
+        assert(data.ledgerA_after.spot_sumQty > 0, 'unexpected ledger A ST quantity after');
         assert(data.ledgerB_before.ccys.find(p => p.ccyTypeId == CONST.ccyType.ETH).balance == 0, 'unexpected ledger B currency before');
         assert(data.ledgerB_after.ccys.find(p => p.ccyTypeId == CONST.ccyType.ETH).balance > 0, 'unexpected ledger B currency after');
     });

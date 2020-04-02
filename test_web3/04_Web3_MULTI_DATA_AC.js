@@ -253,7 +253,7 @@ describe(`Contract Web3 Interface`, async () => {
             // deposit tokens back (erc20 in)
             console.group(chalk.inverse(`DEPOSITING ALL FOR ${BUYER.addr}...`));
             const grayLedger = (await CONST.web3_call('getLedgerEntry', [GRAY]));
-            await CONST.web3_tx('transfer', [ BUYER.addr, buyerLedger.tokens_sumQty.toString() ], GRAY, GRAY_privKey);
+            await CONST.web3_tx('transfer', [ BUYER.addr, buyerLedger.spot_sumQty.toString() ], GRAY, GRAY_privKey);
             console.groupEnd();
 
             // leave USD fee per million at $3 mirrored

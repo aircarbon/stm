@@ -45,7 +45,8 @@ library Erc20Lib {
                 uint256[] memory tokenType_stIds = ledgerData._ledger[msg.sender].tokenType_stIds[tokenTypeId];
                 uint256 qtyType;
                 for (uint256 ndx = 0; ndx < tokenType_stIds.length; ndx++) {
-                    qtyType += ledgerData._sts[tokenType_stIds[ndx]].currentQty;
+                    require(ledgerData._sts[tokenType_stIds[ndx]].currentQty > 0, "Unexpected token quantity");
+                    qtyType += uint256(ledgerData._sts[tokenType_stIds[ndx]].currentQty);
                 }
 
                 // transfer this type up to required amount

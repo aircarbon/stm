@@ -14,7 +14,7 @@ contract StBurnable is Owned, StLedger {
     function burnTokens(
         address ledgerOwner,
         uint256 tokenTypeId,
-        uint256 burnQty)
+        int256  burnQty)
     public onlyOwner() onlyWhenReadWrite() {
         TokenLib.burnTokens(ledgerData, stTypesData, ledgerOwner, tokenTypeId, burnQty);
     }

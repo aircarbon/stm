@@ -144,8 +144,8 @@ contract StMaster is IStMaster, IPublicViews,
         ledgerData._ledger[owner] = StructLib.Ledger({
                  exists: true,
              customFees: StructLib.FeeStruct(),
-    tokens_sumQtyMinted: 0,
-    tokens_sumQtyBurned: 0
+      spot_sumQtyMinted: 0,
+      spot_sumQtyBurned: 0
         });
         ledgerData._ledgerOwners.push(owner);
     }

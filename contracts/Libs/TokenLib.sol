@@ -94,7 +94,8 @@ library TokenLib {
         //require(a.mintSecTokenCount >= 1, "Minimum one ST required");
         //require(a.mintQty % a.mintSecTokenCount == 0, "mintQty must divide evenly into mintSecTokenCount");
         require(a.mintSecTokenCount == 1, "Set mintSecTokenCount 1");
-        require(a.mintQty >= 0x1 && a.mintQty <= 0xffffffffffffffff, "Bad mintQty"); // max uint64
+        //require(a.mintQty >= 0x1 && a.mintQty <= 0xffffffffffffffff, "Bad mintQty"); // max uint64
+        require(a.mintQty >= 0x1 && a.mintQty <= 0x7fffffffffffffff, "Bad mintQty"); // max int64
         require(uint256(ledgerData._batches_currentMax_id) + 1 <= 0xffffffffffffffff, "Too many batches");
         require(a.origTokFee.fee_max >= a.origTokFee.fee_min || a.origTokFee.fee_max == 0, "Bad fee args");
         require(a.origTokFee.fee_percBips <= 10000, "Bad fee args");
@@ -141,12 +142,12 @@ library TokenLib {
             uint256 newId = ledgerData._tokens_currentMax_id + 1 + uint256(ndx);
 
             // mint ST
-            uint64 stQty = uint64(a.mintQty) / uint64(a.mintSecTokenCount);
+            int64 stQty = int64(a.mintQty) / int64(a.mintSecTokenCount);
             ledgerData._sts[newId].batchId = uint64(newBatch.id);
             ledgerData._sts[newId].mintedQty = stQty;
             ledgerData._sts[newId].currentQty = stQty;
 
-            emit MintedSecToken(newId, newBatch.id, a.tokenTypeId, a.batchOwner, stQty);
+            emit MintedSecToken(newId, newBatch.id, a.tokenTypeId, a.batchOwner, uint256(stQty));
 
             // assign
             ledgerData._ledger[a.batchOwner].tokenType_stIds[a.tokenTypeId].push(newId);
@@ -155,7 +156,7 @@ library TokenLib {
         ledgerData._tokens_currentMax_id += uint256(a.mintSecTokenCount);
         ledgerData._tokens_totalMintedQty += uint256(a.mintQty);
 
-        ledgerData._ledger[a.batchOwner].tokens_sumQtyMinted += uint256(a.mintQty); //***
+        ledgerData._ledger[a.batchOwner].spot_sumQtyMinted += uint256(a.mintQty); //***
     }
 
     // POST-MINTING: add KVP metadata
@@ -225,16 +226,17 @@ library TokenLib {
         StructLib.StTypesStruct storage stTypesData,
         address ledgerOwner,
         uint256 tokenTypeId,
-        uint256 burnQty // accept 256 bits, so we can downcast and test if in 64-bit range
+        int256 burnQty // accept 256 bits, so we can downcast and test if in 64-bit range
     )
     public {
         require(ledgerData._contractSealed, "Contract is not sealed");
         require(ledgerData._ledger[ledgerOwner].exists == true, "Bad ledgerOwner");
-        require(burnQty >= 0x1 && burnQty <= 0xffffffffffffffff, "Bad burnQty"); // max uint64
+        //require(burnQty >= 0x1 && burnQty <= 0xffffffffffffffff, "Bad burnQty"); // max uint64
+        require(burnQty >= 0x1 && burnQty <= 0x7fffffffffffffff, "Bad burnQty"); // max int64
         require(tokenTypeId >= 1 && tokenTypeId <= stTypesData._tt_Count, "Bad tokenTypeId");
 
         // check ledger owner has sufficient tokens of supplied type
-        require(StructLib.sufficientTokens(ledgerData, ledgerOwner, tokenTypeId, uint256(burnQty), 0) == true, "Insufficient tokens");
+        require(StructLib.sufficientTokens(ledgerData, ledgerOwner, tokenTypeId, int256(burnQty), 0) == true, "Insufficient tokens");
         // uint256 kgAvailable = 0;
         // for (uint i = 0; i < ledgerData._ledger[ledgerOwner].tokenType_stIds[tokenTypeId].length; i++) {
         //     kgAvailable += ledgerData._sts_currentQty[ledgerData._ledger[ledgerOwner].tokenType_stIds[tokenTypeId][i]];
@@ -244,14 +246,13 @@ library TokenLib {
 
         // burn (i.e. delete or resize) sufficient ST(s)
         uint256 ndx = 0;
-        //uint256 remainingToBurn = uint256(burnQty);
-        uint64 remainingToBurn = uint64(burnQty);
+        int64 remainingToBurn = int64(burnQty);
 
         while (remainingToBurn > 0) {
             uint256[] storage tokenType_stIds = ledgerData._ledger[ledgerOwner].tokenType_stIds[tokenTypeId];
             uint256 stId = tokenType_stIds[ndx];
-            uint64 stQty = ledgerData._sts[stId].currentQty; //ledgerData._sts_currentQty[stId];
-            uint64 batchId = ledgerData._sts[stId].batchId; //ledgerData._sts_batchId[stId];
+            int64 stQty = ledgerData._sts[stId].currentQty;
+            uint64 batchId = ledgerData._sts[stId].batchId;
 
             if (remainingToBurn >= stQty) {
                 // burn the full ST
@@ -264,10 +265,10 @@ library TokenLib {
                 //ledgerData._ledger[ledgerOwner].tokenType_sumQty[tokenTypeId] -= stQty;
 
                 // burn from batch
-                ledgerData._batches[batchId].burnedQty += stQty;
+                ledgerData._batches[batchId].burnedQty += uint256(stQty);
 
                 remainingToBurn -= stQty;
-                emit BurnedFullSecToken(stId, tokenTypeId, ledgerOwner, stQty);
+                emit BurnedFullSecToken(stId, tokenTypeId, ledgerOwner, uint256(stQty));
             }
             else {
                 // resize the ST (partial burn)
@@ -278,14 +279,14 @@ library TokenLib {
                 //ledgerData._ledger[ledgerOwner].tokenType_sumQty[tokenTypeId] -= remainingToBurn;
 
                 // burn from batch
-                ledgerData._batches[batchId].burnedQty += remainingToBurn;
+                ledgerData._batches[batchId].burnedQty += uint256(remainingToBurn);
 
-                emit BurnedPartialSecToken(stId, tokenTypeId, ledgerOwner, remainingToBurn);
+                emit BurnedPartialSecToken(stId, tokenTypeId, ledgerOwner, uint256(remainingToBurn));
                 remainingToBurn = 0;
             }
         }
         ledgerData._tokens_totalBurnedQty += uint256(burnQty);
 
-        ledgerData._ledger[ledgerOwner].tokens_sumQtyBurned += uint256(burnQty); //***
+        ledgerData._ledger[ledgerOwner].spot_sumQtyBurned += uint256(burnQty);
     }
 }

@@ -61,26 +61,25 @@ library StructLib {
         mapping(uint256 => uint256[]) tokenType_stIds;          // SecTokenTypeId -> stId[] of all owned STs
         mapping(uint256 => int256)    ccyType_balance;          // CcyTypeId -> balance -- SIGNED! WE MAY WANT TO SUPPORT -VE BALANCES LATER...
         StructLib.FeeStruct           customFees;               // global fee override - per ledger entry
-
-        uint256                       tokens_sumQtyMinted;      // tests - TODO
-        uint256                       tokens_sumQtyBurned;      // tests - TODO
+        uint256                       spot_sumQtyMinted;
+        uint256                       spot_sumQtyBurned;
     }
 
     struct LedgerReturn {                                       // ledger return structure
         bool                   exists;
         LedgerSecTokenReturn[] tokens;                          // STs with types & sizes (in contract base unit) information - v2
-        uint256                tokens_sumQty;                   // retained for caller convenience - v1
+        uint256                spot_sumQty;                     // retained for caller convenience - v1 [SPOT types only]
         LedgerCcyReturn[]      ccys;                            // currency balances
-        uint256                tokens_sumQtyMinted;
-        uint256                tokens_sumQtyBurned;
+        uint256                spot_sumQtyMinted;               // [SPOT types only]
+        uint256                spot_sumQtyBurned;               // [SPOT types only]
     }
         struct LedgerSecTokenReturn {
             uint256 stId;
             uint256 tokenTypeId;
             string  tokenTypeName;
             uint64  batchId;
-            uint256 mintedQty;
-            uint256 currentQty;
+            int64   mintedQty;
+            int64   currentQty;
         }
         struct LedgerCcyReturn {
             uint256 ccyTypeId;
@@ -93,14 +92,14 @@ library StructLib {
     // *** PACKED SECURITY TOKEN ***
     struct PackedSt { // ** DATA_DUMP: OK
         uint64 batchId;
-        uint64 mintedQty;
-        uint64 currentQty;
+        int64 mintedQty; //*
+        int64 currentQty; //*
     }
         struct SecTokenReturn {
             bool    exists;                                     // for existence check by id
             uint256 id;                                         // global sequential id: 1-based
-            uint256 mintedQty;                                  // initial unit qty minted in the ST
-            uint256 currentQty;                                 // current (variable) unit qty in the ST (i.e. burned = currentQty - mintedQty)
+            int256  mintedQty;                                  //* // initial unit qty minted in the ST
+            int256  currentQty;                                 //* // current (variable) unit qty in the ST (i.e. burned = currentQty - mintedQty)
             uint64  batchId;                                    // parent batch of the ST
         }
     struct PackedStTotals {
@@ -150,7 +149,7 @@ library StructLib {
         uint256 fee_percBips;    // ccy & tok: transfer/trade - add a basis points a, if any - in basis points, i.e. minimum % = 1bp = 1/100 of 1% = 0.0001x
         uint256 fee_min;         // ccy & tok: transfer/trade - collar for a (if >0)
         uint256 fee_max;         // ccy & tok: transfer/trade - and cap for a (if >0)
-        uint256 ccy_perMillion; // ccy only: trade - fixed ccy fee per million of trade counterparty's consideration token qty
+        uint256 ccy_perMillion;  // ccy only: trade - fixed ccy fee per million of trade counterparty's consideration token qty
         bool    ccy_mirrorFee;   // ccy only: trade - apply this ccy fee structure to counterparty's ccy balance, post trade
     }
 
@@ -190,38 +189,42 @@ library StructLib {
         // TODO: getCashflowStatus() ==> returns in default or not, based on block.number # and issuer payment history...
     }
 
-    // TRANSFERS
+    // SPOT TRANSFER ARGS
     struct TransferArgs {
         address ledger_A;
         address ledger_B;
-
         uint256 qty_A;           // ST quantity moving from A (excluding fees, if any)
         uint256 tokenTypeId_A;   // ST type moving from A
-
         uint256 qty_B;           // ST quantity moving from B (excluding fees, if any)
         uint256 tokenTypeId_B;   // ST type moving from B
-
         int256  ccy_amount_A;    // currency amount moving from A (excluding fees, if any)
                                  // (signed value: ledger ccyType_balance supports (theoretical) -ve balances)
         uint256 ccyTypeId_A;     // currency type moving from A
-
         int256  ccy_amount_B;    // currency amount moving from B (excluding fees, if any)
                                  // (signed value: ledger ccyType_balance supports (theoretical) -ve balances)
         uint256 ccyTypeId_B;     // currency type moving from B
-
         bool    applyFees;       // apply global fee structure to the transfer (both legs)
         address feeAddrOwner;    // exchange fees: receive address
     }
     struct FeesCalc {
-        uint256 fee_ccy_A;       // currency fee paid by A
-        uint256 fee_ccy_B;       // currency fee paid by B
-        uint256 fee_tok_A;       // token fee paid by A
-        uint256 fee_tok_B;       // token fee paid by B
-        address fee_to;          // fees paid to
-
+        uint256    fee_ccy_A;          // currency fee paid by A
+        uint256    fee_ccy_B;          // currency fee paid by B
+        uint256    fee_tok_A;          // token fee paid by A
+        uint256    fee_tok_B;          // token fee paid by B
+        address    fee_to;             // fees paid to
         uint256    origTokFee_qty;     // for originator token fees: token quantity from batch being sent by A or B
         uint64     origTokFee_batchId; // for originator token fees: batch ID supplying the sent token quantity
         SetFeeArgs origTokFee_struct;  // for originator token fees: batch originator token fee structure
+    }
+
+    // FUTURES OPEN POSITION ARGS
+    struct FuturesPositionArgs {
+        address ledger_A;
+        address ledger_B;
+        int256  qty_A;         //### SIGNED - ST legger type needs to be able to accept <0 ...
+        int256  qty_B;         //### SIGNED - ST legger type needs to be able to accept <0 ...
+        uint256 price;
+        // TODO...
     }
 
     /**
@@ -238,8 +241,8 @@ library StructLib {
             ledgerData._ledger[addr] = StructLib.Ledger({
                  exists: true,
              customFees: StructLib.FeeStruct(),
-    tokens_sumQtyMinted: 0,
-    tokens_sumQtyBurned: 0
+    spot_sumQtyMinted: 0,
+    spot_sumQtyBurned: 0
             });
             ledgerData._ledgerOwners.push(addr);
         }
@@ -253,11 +256,10 @@ library StructLib {
      */
     function sufficientTokens(
         StructLib.LedgerStruct storage ledgerData,
-        address ledger, uint256 tokenTypeId, uint256 qty, uint256 fee
+        address ledger, uint256 tokenTypeId, int256 qty, int256 fee
     ) public view returns (bool) {
-        uint256 qtyAvailable = 0;
+        int256 qtyAvailable = 0;
         for (uint i = 0; i < ledgerData._ledger[ledger].tokenType_stIds[tokenTypeId].length; i++) {
-            //qtyAvailable += ledgerData._sts_currentQty[ledgerData._ledger[ledger].tokenType_stIds[tokenTypeId][i]];
             qtyAvailable += ledgerData._sts[ledgerData._ledger[ledger].tokenType_stIds[tokenTypeId][i]].currentQty;
         }
         return qtyAvailable >= qty + fee;

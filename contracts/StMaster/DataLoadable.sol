@@ -22,15 +22,15 @@ contract DataLoadable is IDataLoadable,
     function createLedgerEntry(
         address ledgerEntryOwner,
         StructLib.LedgerCcyReturn[] memory ccys,
-        uint256 tokens_sumQtyMinted,
-        uint256 tokens_sumQtyBurned
+        uint256 spot_sumQtyMinted,
+        uint256 spot_sumQtyBurned
     ) public onlyOwner() {
-        LoadLib.createLedgerEntry(ledgerData, ledgerEntryOwner, ccys, tokens_sumQtyMinted, tokens_sumQtyBurned);
+        LoadLib.createLedgerEntry(ledgerData, ledgerEntryOwner, ccys, spot_sumQtyMinted, spot_sumQtyBurned);
     }
 
     function addSecToken(
         address ledgerEntryOwner,
-        uint64 batchId, uint256 stId, uint256 tokenTypeId, uint64 mintedQty, uint64 currentQty
+        uint64 batchId, uint256 stId, uint256 tokenTypeId, int64 mintedQty, int64 currentQty
     ) public onlyOwner() {
         LoadLib.addSecToken(ledgerData,
             ledgerEntryOwner, batchId, stId, tokenTypeId, mintedQty, currentQty

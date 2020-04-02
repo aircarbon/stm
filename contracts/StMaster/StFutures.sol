@@ -1,19 +1,51 @@
+pragma solidity ^0.5.13;
+pragma experimental ABIEncoderV2;
+
+import "../Interfaces/IStFutures.sol";
+
+import "./Owned.sol";
+import "./StLedger.sol";
+import "./StFees.sol";
+import "./StErc20.sol";
+import "./StPayable.sol";
+
+import "../Interfaces/StructLib.sol";
+import "../Libs/FuturesLib.sol";
+import "../Libs/Erc20Lib.sol";
+import "../Libs/LedgerLib.sol";
+
 /*
+TODO: no trade FT types after expiry timestamp - ** must be enforced off-chain ** (a chainlink for block->timestamp mapping could let it be done on-chain)
+====
 
 FUTURES - notes 26/MAR/2020
 
 (1) new token-type: JUL_28_2020, AUG_28_2020, etc., i.e. rolling/continuously added -- > and with an expiry date <
-    //
     // done: add timestamp to tok-type, for expiry datetime
-    //       no trade after expiry timestamp - must be enforced off-chain for now (but a chainlink for block->timestamp data means it could be done on-chain)
-    //
     // done: add deriv-of param for FT tok-type... i.e. UNDERLYER... (mus be a SPOT tok-type)
-    //
-    // TESTS...
-    //
+(2) done: token-type gets flag: SPOT || FUTURE
 
-(2) token-type gets flag: SPOT || FUTURE
 (3) token-type FUTURE can be short sold, i.e. -ve tokenQty would be ok
+   >> STs would "auto-mint" on position opening -- price would be a property of the ST ...
+   >> no "swap" of STs/ccy would take place: a -ve qty ST would balance out a +ve qty ST on the other side (same priced ST -ve qty)... NOT A "TRADE"
+
+   WIP: refactor ST internals to allow -ve qty (bounds check[s] changes?)
+
+   >> same ledger: can be long FT1 and short FT1 at same time, with different prices
+   optimization: if both positions are processed (taken/paid) then they can be netted solely on the basis of qty
+   (price doesn't come into it: they are already processed/net flat through the take/pay job)
+
+   >> margin: v1 can apply a simple flat % (e.g. 20%) - reserved margin_required = 20% * notional_size
+   e.g. 1000 contracts at $1 price = $1000 notional * 20% = $200 margin_required [reserved amount] -- IT NEVER CHANGES (assuming 20% is same value on each take/pay cycle)
+
+   >> then, after take/pay job has run (and updated cash balance) - if ledger's cash balance < margin_requried either (a) margin-call or (b) liquidate
+
+===
+
+ >> build toy model first (C#)? to run take/pay & margin modeling over various scenarios
+ .... https://www.cmegroup.com/trading/equity-index/fairvalue.html
+
+===
 
 (4) "open interest" = when first trade done on FUTURE token-type
 (5) trade mechancics are same as CASH token-type, except that:
@@ -41,5 +73,14 @@ FUTURES - notes 26/MAR/2020
 >> NEED TRADE-LEVEL DATA, i.e. entry price for each trade of each position
 
 >> COULD KEEP BOTH IN CONTRACT DATA, IF WE PURGE AFTER POSITION CLOSE? (events would give the historic values?)
-
 */
+
+contract StFutures is Owned,
+    IStFutures,
+    StLedger, StFees, StErc20, StPayable {
+
+    function openPosition(StructLib.FuturesPositionArgs memory a)
+    public onlyOwner() onlyWhenReadWrite() {
+      FuturesLib.openPosition(ledgerData, globalFees, a);
+    }
+}

@@ -189,7 +189,7 @@ library PayableLib {
 
         //address payable I = issueBatch.originator;
         uint256 B = issueBatch.mintedQty;
-        uint256 I = issuerSt.currentQty;
+        uint256 I = uint256(issuerSt.currentQty);
         uint256 S = B - I;
         //uint256 r = cashflowData.args.bond_bps;
         //uint256 p = cashflowData.wei_currentPrice;
@@ -216,7 +216,7 @@ library PayableLib {
                     for (uint256 stNdx = 0; stNdx < stIds.length; stNdx++) {
                         StructLib.PackedSt storage st = ledgerData._sts[stIds[stNdx]];
 
-                        uint256 sharePerc = S * 1000000/*precision*/ / st.currentQty;
+                        uint256 sharePerc = S * 1000000/*precision*/ / uint256(st.currentQty);
                         uint256 shareWei = msg.value * 1000000/*precision*/ / sharePerc;
 
                         addr.transfer(shareWei);
@@ -248,8 +248,8 @@ library PayableLib {
                 uint256[] storage issuer_stIds = ledgerData._ledger[issueBatch.originator].tokenType_stIds[1]; // CFT: uni-type
                 StructLib.PackedSt storage issuerSt = ledgerData._sts[issuer_stIds[0]];
                 ret.qty_issuanceMax = issueBatch.mintedQty;
-                ret.qty_issuanceRemaining = issuerSt.currentQty;
-                ret.qty_issuanceSold = issueBatch.mintedQty - issuerSt.currentQty;
+                ret.qty_issuanceRemaining = uint256(issuerSt.currentQty);
+                ret.qty_issuanceSold = uint256(issueBatch.mintedQty) - uint256(issuerSt.currentQty);
             }
         }
         return ret;

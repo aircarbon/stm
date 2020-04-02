@@ -286,7 +286,7 @@ contract("StMaster", accounts => {
             const curEntry = await stm_cur.getLedgerEntry(curEntryOwner);
 
             // create ledger entry, populate with currency balances
-            await stm_new.createLedgerEntry(curEntryOwner, curEntry.ccys, curEntry.tokens_sumQtyMinted, curEntry.tokens_sumQtyBurned);
+            await stm_new.createLedgerEntry(curEntryOwner, curEntry.ccys, curEntry.spot_sumQtyMinted, curEntry.spot_sumQtyBurned);
 
             // set ledger ccy fees
             for (p of curCcys.ccyTypes) await stm_new.setFee_CcyType(p.id, curEntryOwner, (await stm_cur.getFee(CONST.getFeeType.CCY, p.id, curEntryOwner)));

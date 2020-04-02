@@ -35,8 +35,8 @@ library TransferLib {
         require(ledgerData._contractSealed, "Contract is not sealed");
         //require(a.ledger_A != a.ledger_B, "Bad transfer"); // erc20 compat: allow send-to-self -- todo: could NOP below when ledger_A == a.ledger_B
         require(a.qty_A > 0 || a.qty_B > 0 || a.ccy_amount_A > 0 || a.ccy_amount_B > 0, "Bad null transfer");
-        require(a.qty_A <= 0xffffffffffffffff, "Bad qty_A");
-        require(a.qty_B <= 0xffffffffffffffff, "Bad qty_B");
+        require(a.qty_A <= 0x7FFFFFFFFFFFFFFF, "Bad qty_A"); //* (2^64 /2: max signed int64) [was: 0xffffffffffffffff]
+        require(a.qty_B <= 0x7FFFFFFFFFFFFFFF, "Bad qty_B"); //*
 
         // disallow single origin multiple asset type transfers
         require(!((a.qty_A > 0 && a.ccy_amount_A > 0) || (a.qty_B > 0 && a.ccy_amount_B > 0)), "Bad transfer types");
@@ -137,10 +137,10 @@ library TransferLib {
 
 
         // validate token balances - sum exchange token fee + originator token fee(s)
-        require(StructLib.sufficientTokens(ledgerData, a.ledger_A, a.tokenTypeId_A, a.qty_A,
-                    (exFees.fee_tok_A + v.totalOrigFee[0]) * (a.applyFees && a.qty_A > 0 ? 1 : 0)), "Insufficient tokens A");
-        require(StructLib.sufficientTokens(ledgerData, a.ledger_B, a.tokenTypeId_B, a.qty_B,
-                    (exFees.fee_tok_B + v.totalOrigFee[1]) * (a.applyFees && a.qty_B > 0 ? 1 : 0)), "Insufficient tokens B");
+        require(StructLib.sufficientTokens(ledgerData, a.ledger_A, a.tokenTypeId_A, int256(a.qty_A),
+                    int256((exFees.fee_tok_A + v.totalOrigFee[0]) * (a.applyFees && a.qty_A > 0 ? 1 : 0))), "Insufficient tokens A");
+        require(StructLib.sufficientTokens(ledgerData, a.ledger_B, a.tokenTypeId_B, int256(a.qty_B),
+                    int256((exFees.fee_tok_B + v.totalOrigFee[1]) * (a.applyFees && a.qty_B > 0 ? 1 : 0))), "Insufficient tokens B");
 
         //
         // transfer currencies
@@ -434,7 +434,7 @@ library TransferLib {
     }
     struct TransferSpltVars {
         uint256 ndx;
-        uint64 remainingToTransfer;
+        int64 remainingToTransfer;
         bool mergedExisting;
     }
     function transferSplitSecTokens(
@@ -442,17 +442,19 @@ library TransferLib {
         TransferSplitArgs memory a
     )
     private returns (uint256 updatedMaxStId) {
+
         uint256[] storage from_stIds = ledgerData._ledger[a.from].tokenType_stIds[a.tokenTypeId];
         uint256[] storage to_stIds = ledgerData._ledger[a.to].tokenType_stIds[a.tokenTypeId];
 
         // walk tokens - transfer sufficient STs (last one may get split)
         TransferSpltVars memory v;
-        v.remainingToTransfer = uint64(a.qtyUnit);
+        require(a.qtyUnit >= 0 && a.qtyUnit <= 0x7FFFFFFFFFFFFFFF, "Bad qtyUnit"); // max signed int64
+        v.remainingToTransfer = int64(a.qtyUnit);
 
         uint256 maxStId = a.maxStId;
         while (v.remainingToTransfer > 0) {
             uint256 stId = from_stIds[v.ndx];
-            uint64 stQty = ledgerData._sts[stId].currentQty;
+            int64 stQty = ledgerData._sts[stId].currentQty;
 
             if (v.remainingToTransfer >= stQty) {
 
@@ -485,7 +487,7 @@ library TransferLib {
                     // TRANSFER - if no existing destination ST from same batch
                     //if (!mergedExisting) {
                         to_stIds.push(stId);
-                        emit TransferedFullSecToken(a.from, a.to, stId, 0, stQty, a.transferType);
+                        emit TransferedFullSecToken(a.from, a.to, stId, 0, uint256(stQty), a.transferType);
                     //}
                 //ledgerData._ledger[to].tokenType_sumQty[tokenTypeId] += stQty;                //* gas - DROP DONE - only used internally, validation params
 
@@ -515,7 +517,7 @@ library TransferLib {
 
                             v.mergedExisting = true;
 
-                            emit TransferedPartialSecToken(a.from, a.to, stId, 0, to_stIds[i], v.remainingToTransfer, a.transferType);
+                            emit TransferedPartialSecToken(a.from, a.to, stId, 0, to_stIds[i], uint256(v.remainingToTransfer), a.transferType);
                             break;
                         }
                     }
@@ -533,7 +535,7 @@ library TransferLib {
 
                         to_stIds.push(maxStId + 1); // gas: 94k
 
-                        emit TransferedPartialSecToken(a.from, a.to, stId, maxStId + 1, 0, v.remainingToTransfer, a.transferType); // gas: 11k
+                        emit TransferedPartialSecToken(a.from, a.to, stId, maxStId + 1, 0, uint256(v.remainingToTransfer), a.transferType); // gas: 11k
 
                         maxStId++;
                     }
@@ -591,17 +593,18 @@ library TransferLib {
         require(from_stIds.length > 0, "No tokens");
 
         uint256 from_stIds_length = from_stIds.length;
-        uint256 remainingToTransfer = uint256(a.qtyUnit);
+        require(a.qtyUnit >= 0 && a.qtyUnit <= 0x7FFFFFFFFFFFFFFF, "Bad qtyUnit"); // max signed int64
+        int64 remainingToTransfer = int64(a.qtyUnit);
         while (remainingToTransfer > 0) {
             uint256 stId = from_stIds[0];
-            uint64 stQty = ledgerData._sts[stId].currentQty;
+            int64 stQty = ledgerData._sts[stId].currentQty;
             uint64 fromBatchId = ledgerData._sts[stId].batchId;
 
             // add to list of distinct batches, maintain transfer quantity from each batch
             bool knownBatch = false;
             for (uint i = 0; i < ret.batchCount; i++) {
                 if (ret.batchIds[i] == fromBatchId) {
-                    ret.transferQty[i] += remainingToTransfer >= stQty ? stQty : remainingToTransfer;
+                    ret.transferQty[i] += uint256(remainingToTransfer >= stQty ? stQty : remainingToTransfer);
                     knownBatch = true;
                     break;
                 }
@@ -609,7 +612,7 @@ library TransferLib {
             if (!knownBatch) {
                 require(ret.batchCount < MAX_BATCHES_PREVIEW, "Too many batches: try sending a smaller amount");
                 ret.batchIds[ret.batchCount] = fromBatchId;
-                ret.transferQty[ret.batchCount] = remainingToTransfer >= stQty ? stQty : remainingToTransfer;
+                ret.transferQty[ret.batchCount] = uint256(remainingToTransfer >= stQty ? stQty : remainingToTransfer);
                 ret.batchCount++;
             }
 

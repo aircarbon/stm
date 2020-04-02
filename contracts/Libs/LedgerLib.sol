@@ -120,8 +120,8 @@ library LedgerLib {
             }
 
             // hash ledger entry total minted & burned counts
-            ledgerHash = keccak256(abi.encodePacked(ledgerHash, entry.tokens_sumQtyMinted));
-            ledgerHash = keccak256(abi.encodePacked(ledgerHash, entry.tokens_sumQtyBurned));
+            ledgerHash = keccak256(abi.encodePacked(ledgerHash, entry.spot_sumQtyMinted));
+            ledgerHash = keccak256(abi.encodePacked(ledgerHash, entry.spot_sumQtyBurned));
         }
 
         // walk all tokens (including those fully deleted from the ledger by burn()), hash
@@ -182,7 +182,7 @@ library LedgerLib {
     public view returns (StructLib.LedgerReturn memory) {
         StructLib.LedgerSecTokenReturn[] memory tokens;
         StructLib.LedgerCcyReturn[] memory ccys;
-        uint256 tokens_sumQty = 0;
+        uint256 spot_sumQty = 0;
 
         // count total # of tokens across all types
         uint256 countAllSecTokens = 0;
@@ -198,8 +198,10 @@ library LedgerLib {
             for (uint256 ndx = 0; ndx < tokenType_stIds.length; ndx++) {
                 uint256 stId = tokenType_stIds[ndx];
 
-                // sum ST sizes - convenience for caller
-                tokens_sumQty += ledgerData._sts[stId].currentQty;
+                // sum ST sizes - convenience for caller - only applicable for spot (+ve qty) token types
+                if (stTypesData._tt_Settle[tokenTypeId] == StructLib.SettlementType.SPOT) {
+                    spot_sumQty += uint256(ledgerData._sts[stId].currentQty);
+                }
 
                 // STs by type
                 tokens[flatSecTokenNdx] = StructLib.LedgerSecTokenReturn({
@@ -228,10 +230,10 @@ library LedgerLib {
         StructLib.LedgerReturn memory ret = StructLib.LedgerReturn({
              exists: ledgerData._ledger[account].exists,
              tokens: tokens,
-      tokens_sumQty: tokens_sumQty,
+        spot_sumQty: spot_sumQty,
                ccys: ccys,
-tokens_sumQtyMinted: ledgerData._ledger[account].tokens_sumQtyMinted,
-tokens_sumQtyBurned: ledgerData._ledger[account].tokens_sumQtyBurned
+  spot_sumQtyMinted: ledgerData._ledger[account].spot_sumQtyMinted,
+  spot_sumQtyBurned: ledgerData._ledger[account].spot_sumQtyBurned
         });
         return ret;
     }
