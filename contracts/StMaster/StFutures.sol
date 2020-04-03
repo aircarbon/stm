@@ -15,7 +15,7 @@ import "../Libs/Erc20Lib.sol";
 import "../Libs/LedgerLib.sol";
 
 /*
-TODO: no trade FT types after expiry timestamp - ** must be enforced off-chain ** (a chainlink for block->timestamp mapping could let it be done on-chain)
+TODO: no open of positions on FT types after expiry timestamp - ** must be enforced off-chain ** (a chainlink for block->timestamp mapping could let it be done on-chain)
 ====
 
 FUTURES - notes 26/MAR/2020
@@ -26,25 +26,35 @@ FUTURES - notes 26/MAR/2020
 (2) done: token-type gets flag: SPOT || FUTURE
 
 (3) token-type FUTURE can be short sold, i.e. -ve tokenQty would be ok
-   >> STs would "auto-mint" on position opening -- price would be a property of the ST ...
-   >> no "swap" of STs/ccy would take place: a -ve qty ST would balance out a +ve qty ST on the other side (same priced ST -ve qty)... NOT A "TRADE"
+   // done: refactor ST internals to allow -ve qty (inc. bounds check[s] changes)
 
-   WIP: refactor ST internals to allow -ve qty (bounds check[s] changes?)
+   >> STs would "auto-mint" on position opening -- price would be a property of the ST ...
+        (no "swap" of STs/ccy would take place: a -ve qty ST would balance out a +ve qty ST on the other side (same priced ST -ve qty)... NOT A "TRADE")
 
    >> same ledger: can be long FT1 and short FT1 at same time, with different prices
-   optimization: if both positions are processed (taken/paid) then they can be netted solely on the basis of qty
-   (price doesn't come into it: they are already processed/net flat through the take/pay job)
+   optimization: if both positions are processed (taken/paid) then they can be netted solely on the basis of qty -
+     i.e. entry_price is ONLY relevant on the FIRST take/pay cycle...
 
    >> margin: v1 can apply a simple flat % (e.g. 20%) - reserved margin_required = 20% * notional_size
    e.g. 1000 contracts at $1 price = $1000 notional * 20% = $200 margin_required [reserved amount] -- IT NEVER CHANGES (assuming 20% is same value on each take/pay cycle)
 
    >> then, after take/pay job has run (and updated cash balance) - if ledger's cash balance < margin_requried either (a) margin-call or (b) liquidate
 
-===
+=== IMPLEMENTATION:
 
- >> build toy model first (C#)? to run take/pay & margin modeling over various scenarios
- .... https://www.cmegroup.com/trading/equity-index/fairvalue.html
+(0) ADD FT
+  (0.1) TODO: create empty batch
+  (0.2) TODO: needs reference ccy to be assigned also in FT type
+(1) OPEN
+  (1.1) auto-mint both sides +ve / -ve, assign price P into both STs, assign LastMarkPrice (LMP) -1 into both STs
+  (1.2) UpdateSetAside: sum MarginRequired for *all* open positions (not just this one!) - write TotalMarginRequired[ccyId] to ledger
+(2) MARK (param: ftTypeId, MarkPrice [MP])
+  (2.1) TakeOrPay [2 updates: LMP + Ccy] - use (MP - LMP) or (MP - P) when LMP == -1
+  (2.2) NetPositions (auto-burn/shrink) - should only ever be ONE net ST per FT-type after TakeOrPay
+  (2.3) LiquidatePositions
 
+ >> JS test framework, with various price series and event series (position opens/closes)
+ 
 ===
 
 (4) "open interest" = when first trade done on FUTURE token-type
