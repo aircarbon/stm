@@ -31,6 +31,7 @@ library Erc20Lib {
     function transfer(
         StructLib.LedgerStruct storage ledgerData,
         StructLib.StTypesStruct storage stTypesData,
+        StructLib.CcyTypesStruct storage ccyTypesData,
         StructLib.FeeStruct storage globalFees, address owner, // fees: disabled for erc20 - not used
         address recipient, uint256 amount
     ) public returns (bool) {
@@ -67,7 +68,7 @@ library Erc20Lib {
                            applyFees: false,
                         feeAddrOwner: owner
                     });
-                    TransferLib.transferOrTrade(ledgerData, globalFees, a);
+                    TransferLib.transferOrTrade(ledgerData, ccyTypesData, globalFees, a);
                     remainingToTransfer -= qtyTransfer;
                 }
             }

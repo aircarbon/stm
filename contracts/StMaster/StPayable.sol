@@ -45,7 +45,7 @@ contract StPayable is
     }
 
     function() external payable onlyWhenReadWrite() {
-        PayableLib.pay(ledgerData, cashflowData, globalFees, owner, get_ethUsd());
+        PayableLib.pay(ledgerData, cashflowData, ccyTypesData, globalFees, owner, get_ethUsd());
     }
 
     function setIssuerValues(

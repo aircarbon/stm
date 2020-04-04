@@ -11,11 +11,12 @@ import "./StTransferable.sol";
 import "./StErc20.sol";
 import "./StPayable.sol";
 import "./DataLoadable.sol";
+import "./StFutures.sol";
 
 import "../Interfaces/StructLib.sol";
 
 contract StMaster is IStMaster, IPublicViews,
-    StMintable, StBurnable, Collateralizable, StTransferable, DataLoadable {
+    StMintable, StBurnable, Collateralizable, StTransferable, DataLoadable, StFutures {
 
     // === STM (AC COMMODITY) ===
     // TODO: SafeMath

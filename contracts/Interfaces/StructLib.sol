@@ -28,6 +28,7 @@ library StructLib {
         SettlementType settlementType;
         uint64         expiryTimestamp;
         uint256        underlyerId;
+        uint256        refCcyId;
     }
     struct GetSecTokenTypesReturn {
         SecTokenTypeReturn[] tokenTypes;
@@ -37,8 +38,9 @@ library StructLib {
     struct StTypesStruct { // ** DATA_DUMP: OK
         mapping(uint256 => string)         _tt_Name;            // typeId (1-based) -> typeName
         mapping(uint256 => SettlementType) _tt_Settle;
-        mapping(uint256 => uint64)         _tt_Expiry;
-        mapping(uint256 => uint256)        _tt_Underlyer;
+        mapping(uint256 => uint64)         _tt_Expiry;          // futures
+        mapping(uint256 => uint256)        _tt_Underlyer;       // futures
+        mapping(uint256 => uint256)        _tt_RefCcyId;        // futures
         uint256 _tt_Count;
     }
 
@@ -219,12 +221,12 @@ library StructLib {
 
     // FUTURES OPEN POSITION ARGS
     struct FuturesPositionArgs {
-        address ledger_A;
-        address ledger_B;
-        int256  qty_A;         //### SIGNED - ST legger type needs to be able to accept <0 ...
-        int256  qty_B;         //### SIGNED - ST legger type needs to be able to accept <0 ...
-        uint256 price;
-        // TODO...
+        uint256  tokTypeId;
+        address  ledger_A;
+        address  ledger_B;
+        int256   qty_A;
+        int256   qty_B;
+        uint256  price;
     }
 
     /**

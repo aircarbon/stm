@@ -18,21 +18,23 @@ library TokenLib {
     function addSecTokenType(
         StructLib.LedgerStruct storage ledgerData,
         StructLib.StTypesStruct storage stTypesData,
+        StructLib.CcyTypesStruct storage ccyTypesData,
         string memory name,
         StructLib.SettlementType settlementType,
         uint64 expiryTimestamp,
-        uint256 underylerTypeId
+        uint256 underylerTypeId,
+        uint256 refCcyId
         )
     public {
         require(ledgerData.contractType == StructLib.ContractType.COMMODITY, "Bad cashflow request");
         for (uint256 tokenTypeId = 1; tokenTypeId <= stTypesData._tt_Count; tokenTypeId++) {
             require(keccak256(abi.encodePacked(stTypesData._tt_Name[tokenTypeId])) != keccak256(abi.encodePacked(name)), "Duplicate name");
         }
-
         if (settlementType == StructLib.SettlementType.FUTURE) {
             require(expiryTimestamp > 1585699708, "Bad expiry");
             require(underylerTypeId > 0 && underylerTypeId <= stTypesData._tt_Count, "Bad underylerTypeId");
             require(stTypesData._tt_Settle[underylerTypeId] == StructLib.SettlementType.SPOT, "Bad underyler settlement type");
+            require(refCcyId > 0 && refCcyId <= ccyTypesData._ct_Count, "Bad refCcyId");
         }
         else if (settlementType == StructLib.SettlementType.SPOT) {
             require(expiryTimestamp == 0, "Invalid expiryTimestamp");
@@ -42,9 +44,12 @@ library TokenLib {
         stTypesData._tt_Count++;
         stTypesData._tt_Name[stTypesData._tt_Count] = name;
         stTypesData._tt_Settle[stTypesData._tt_Count] = settlementType;
+
+        // futures
         if (settlementType == StructLib.SettlementType.FUTURE) {
             stTypesData._tt_Expiry[stTypesData._tt_Count] = expiryTimestamp;
             stTypesData._tt_Underlyer[stTypesData._tt_Count] = underylerTypeId;
+            stTypesData._tt_RefCcyId[stTypesData._tt_Count] = refCcyId;
         }
 
         emit AddedSecTokenType(stTypesData._tt_Count, name, settlementType, expiryTimestamp, underylerTypeId);
@@ -62,7 +67,8 @@ library TokenLib {
                   name: stTypesData._tt_Name[tokenTypeId],
         settlementType: stTypesData._tt_Settle[tokenTypeId],
        expiryTimestamp: stTypesData._tt_Expiry[tokenTypeId],
-           underlyerId: stTypesData._tt_Underlyer[tokenTypeId]
+           underlyerId: stTypesData._tt_Underlyer[tokenTypeId],
+              refCcyId: stTypesData._tt_RefCcyId[tokenTypeId]
             });
         }
 

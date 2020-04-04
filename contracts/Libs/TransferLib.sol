@@ -26,6 +26,7 @@ library TransferLib {
     }
     function transferOrTrade(
         StructLib.LedgerStruct storage ledgerData,
+        StructLib.CcyTypesStruct storage ccyTypesData,
         StructLib.FeeStruct storage globalFees,
         StructLib.TransferArgs memory a
     ) public {
@@ -44,8 +45,8 @@ library TransferLib {
         // disallow currency swaps - we need consistent ccy types on each sides for ccy fee mirroring
         require(a.ccyTypeId_A == 0 || a.ccyTypeId_B == 0, "Bad ccy swap");
 
-        if (a.ccy_amount_A > 0) require(a.ccyTypeId_A > 0, "Bad ccyTypeId A");
-        if (a.ccy_amount_B > 0) require(a.ccyTypeId_B > 0, "Bad ccyTypeId B");
+        if (a.ccy_amount_A > 0) require(a.ccyTypeId_A > 0 && a.ccyTypeId_A <= ccyTypesData._ct_Count, "Bad ccyTypeId A");
+        if (a.ccy_amount_B > 0) require(a.ccyTypeId_B > 0 && a.ccyTypeId_B <= ccyTypesData._ct_Count, "Bad ccyTypeId B");
         if (a.qty_A > 0) require(a.tokenTypeId_A > 0, "Bad tokenTypeId_A");
         if (a.qty_B > 0) require(a.tokenTypeId_B > 0, "Bad tokenTypeId_B");
 
@@ -293,7 +294,7 @@ library TransferLib {
             fee_percBips: 0,
                  fee_min: 0,
                  fee_max: 0,
-         ccy_perMillion: 0,
+          ccy_perMillion: 0,
            ccy_mirrorFee: false
         })
         });

@@ -16,7 +16,12 @@ contract IStLedger is IOwned {
      * @notice Adds a new ST type
      * @param name New ST type name
      */
-    function addSecTokenType(string memory name, StructLib.SettlementType settlementType, uint64 expiryTimestamp, uint256 underylerTypeId)
+    function addSecTokenType(
+        string memory name,
+        StructLib.SettlementType settlementType,
+        uint64 expiryTimestamp,
+        uint256 underylerTypeId,
+        uint256 refCcyId)
     public onlyOwner() onlyWhenReadWrite() { revert("Not implemented"); }
 
     // /**

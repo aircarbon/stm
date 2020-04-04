@@ -29,7 +29,7 @@ contract StTransferable is Owned,
         require(!(a.qty_B > 0 && !erc20Data._whitelisted[a.ledger_B]), "Not whitelisted (B)");
 
         a.feeAddrOwner = owner;
-        TransferLib.transferOrTrade(ledgerData, globalFees, a);
+        TransferLib.transferOrTrade(ledgerData, ccyTypesData, globalFees, a);
     }
 
     uint256 constant MAX_BATCHES_PREVIEW = 128; // library constants not accessible in contract; must duplicate TransferLib value

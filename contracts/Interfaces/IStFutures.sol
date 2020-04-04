@@ -18,6 +18,6 @@ import "../Libs/LedgerLib.sol";
      * @dev xxx
      * @param a StructLib.TransferArgs arguments
      */
-    function openPosition(StructLib.FuturesPositionArgs memory a)
+    function openFtPos(StructLib.FuturesPositionArgs memory a)
     public onlyOwner() onlyWhenReadWrite() { revert("Not implemented"); }
 }

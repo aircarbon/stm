@@ -77,6 +77,7 @@ contract StErc20 is StFees, IErc20 {
         return Erc20Lib.transfer(
             ledgerData,
             stTypesData,
+            ccyTypesData,
             globalFees,
             owner,
             recipient, amount // erc20 args

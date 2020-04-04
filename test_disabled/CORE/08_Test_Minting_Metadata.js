@@ -17,7 +17,7 @@ contract("StMaster", accounts => {
         // { k: 'REGISTRY_TYPE',         v: 'VERRA_VCS' },
         // { k: 'PROJECT_ID',            v: '959' }, // int
         // { k: 'PROJECT_URL',           v: 'https://www.vcsprojectdatabase.org/#/project_details/959' }
-        // { k: 'ISSUANCE_URL',          v: 'https://www.vcsprojectdatabase.org/index-no-tabs.html#/vcu_details_report/165504' },
+        // { k: 'ISSUANCE_URL',          v: 'https://www.vcsprojectdatabase.org/index-no-tabs.html#/vcu_details_report/182909' },
         // { k: 'ISSUANCE_SERIAL_RANGE', v: '7144-374222312-374242311-VCU-007-MER-UY-14-959-01012012-31122012-0' }
     ];
     const nature_ExampleKvps = [

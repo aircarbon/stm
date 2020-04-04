@@ -1,6 +1,8 @@
 const st = artifacts.require('StMaster');
 const truffleAssert = require('truffle-assertions');
 const _ = require('lodash');
+const { DateTime } = require('luxon');
+
 const CONST = require('../const.js');
 
 contract("StMaster", accounts => {
@@ -36,10 +38,11 @@ contract("StMaster", accounts => {
         const cashflowData = await stm_cur.getCashflowData();
     });
 
-    it(`data dump - should be able to read all contract data`, async function () {
+    it(`data dump - should be able to set (and then read) all contract data`, async function () {
         if (await stm_cur.getContractType() == CONST.contractType.CASHFLOW) this.skip();
 
-        const WHITELIST_COUNT = 15;
+        const WHITELIST_COUNT = 11;
+        const TEST_ADDR_COUNT = 2;
         var curHash = await stm_cur.getLedgerHashcode();
 
         // ccy types
@@ -48,11 +51,20 @@ contract("StMaster", accounts => {
         console.log(`Ccy Types: ${ccyTypesData.ccyTypes.map(p => p.name).join(', ')}`);
         curHash = await checkHashUpdate(curHash);
 
-        // token types
+        // token types (spot & future)
         const stTypesData = await stm_cur.getSecTokenTypes();
+        console.log(`St Types: ${stTypesData.tokenTypes.map(p => p.name).join(', ')}`);
         if (await stm_cur.getContractType() == CONST.contractType.COMMODITY) {
-            await stm_cur.addSecTokenType('NEW_TOK_TYPE', CONST.settlementType.SPOT, 0, 0, { from: accounts[0] });
-            console.log(`St Types: ${stTypesData.tokenTypes.map(p => p.name).join(', ')}`);
+            
+            // add spot type
+            await stm_cur.addSecTokenType('NEW_TOK_SPOT_TYPE', CONST.settlementType.SPOT, 0, 0, 0, { from: accounts[0] });
+            
+            // add spot type
+            const spotTypes = (await stm_cur.getSecTokenTypes()).tokenTypes.filter(p => p.settlementType == CONST.settlementType.SPOT);
+            const ccyTypes = (await stm_cur.getCcyTypes()).ccyTypes;
+                await stm_cur.addSecTokenType('NEW_TOK_FT_TYPE', CONST.settlementType.FUTURE,
+                DateTime.local().toMillis(), spotTypes[0].id, ccyTypes[0].id, { from: accounts[0] }); 
+
             curHash = await checkHashUpdate(curHash);
         }
 
@@ -88,7 +100,7 @@ contract("StMaster", accounts => {
 
         // ledger - batches
         const MM = [];
-        for (let i=1 ; i <= WHITELIST_COUNT ; i++) { // test data - mint for accounts after owner, move some to owner
+        for (let i=1 ; i <= /*WHITELIST_COUNT*/TEST_ADDR_COUNT ; i++) { // test data - mint for accounts after owner, move some to owner
 
             const M = accounts[i];
             MM.push(M);
@@ -249,7 +261,7 @@ contract("StMaster", accounts => {
         _.forEach(loadCcys, async (p) => await stm_new.addCcyType(p.name, p.unit, p.decimals));
 
         const curToks = await stm_cur.getSecTokenTypes(), newToks = await stm_new.getSecTokenTypes(), loadToks = _.differenceWith(curToks.tokenTypes, newToks.tokenTypes, _.isEqual);
-        _.forEach(loadToks, async (p) => await stm_new.addSecTokenType(p.name, CONST.settlementType.SPOT, 0, 0));
+        _.forEach(loadToks, async (p) => await stm_new.addSecTokenType(p.name, p.settlementType, p.expiryTimestamp, p.underlyerId, p.refCcyId));
 
         // load whitelist
         stm_new.whitelist(accounts[555]); // simulate a new contract owner (first whitelist entry, by convention) -- i.e. we can upgrade contract with a new privkey

@@ -43,10 +43,10 @@ FUTURES - notes 26/MAR/2020
 === IMPLEMENTATION:
 
 (0) ADD FT
-  (0.1) TODO: create empty batch
-  (0.2) TODO: needs reference ccy to be assigned also in FT type
+  (0.2) done: needs reference ccy to be assigned also in FT type
+  (0.1) TODO? create empty "virtual" batch -- or could FT STs exist without a batch at all?
 (1) OPEN
-  (1.1) auto-mint both sides +ve / -ve, assign price P into both STs, assign LastMarkPrice (LMP) -1 into both STs
+  (1.1) auto-mint both sides +ve / -ve, assign price P into both STs, assign LastMarkPrice (LMP) -1 into both STs - always new STs (NetPositions will collapse them later...)
   (1.2) UpdateSetAside: sum MarginRequired for *all* open positions (not just this one!) - write TotalMarginRequired[ccyId] to ledger
 (2) MARK (param: ftTypeId, MarkPrice [MP])
   (2.1) TakeOrPay [2 updates: LMP + Ccy] - use (MP - LMP) or (MP - P) when LMP == -1
@@ -54,7 +54,7 @@ FUTURES - notes 26/MAR/2020
   (2.3) LiquidatePositions
 
  >> JS test framework, with various price series and event series (position opens/closes)
- 
+
 ===
 
 (4) "open interest" = when first trade done on FUTURE token-type
@@ -89,8 +89,8 @@ contract StFutures is Owned,
     IStFutures,
     StLedger, StFees, StErc20, StPayable {
 
-    function openPosition(StructLib.FuturesPositionArgs memory a)
+    function openFtPos(StructLib.FuturesPositionArgs memory a)
     public onlyOwner() onlyWhenReadWrite() {
-      FuturesLib.openPosition(ledgerData, globalFees, a);
+      FuturesLib.openFtPos(ledgerData, stTypesData, ccyTypesData, globalFees, a);
     }
 }
