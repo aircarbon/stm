@@ -57,13 +57,16 @@ contract("StMaster", accounts => {
         if (await stm_cur.getContractType() == CONST.contractType.COMMODITY) {
             
             // add spot type
-            await stm_cur.addSecTokenType('NEW_TOK_SPOT_TYPE', CONST.settlementType.SPOT, 0, 0, 0, { from: accounts[0] });
+            await stm_cur.addSecTokenType('NEW_TOK_SPOT_TYPE', CONST.settlementType.SPOT, CONST.nullFutureArgs, { from: accounts[0] });
             
             // add future type
             const spotTypes = (await stm_cur.getSecTokenTypes()).tokenTypes.filter(p => p.settlementType == CONST.settlementType.SPOT);
             const ccyTypes = (await stm_cur.getCcyTypes()).ccyTypes;
-                await stm_cur.addSecTokenType('NEW_TOK_FT_TYPE', CONST.settlementType.FUTURE,
-                    DateTime.local().toMillis(), spotTypes[0].id, ccyTypes[0].id, { from: accounts[0] }); 
+                await stm_cur.addSecTokenType('NEW_TOK_FT_TYPE', CONST.settlementType.FUTURE, {
+                    expiryTimestamp: DateTime.local().toMillis(),
+                    underylerTypeId: spotTypes[0].id, 
+                           refCcyId: ccyTypes[0].id 
+                }, { from: accounts[0] }); 
 
             curHash = await checkHashUpdate(curHash);
         }
@@ -245,7 +248,11 @@ contract("StMaster", accounts => {
         _.forEach(loadCcys, async (p) => await stm_new.addCcyType(p.name, p.unit, p.decimals));
 
         const curToks = await stm_cur.getSecTokenTypes(), newToks = await stm_new.getSecTokenTypes(), loadToks = _.differenceWith(curToks.tokenTypes, newToks.tokenTypes, _.isEqual);
-        _.forEach(loadToks, async (p) => await stm_new.addSecTokenType(p.name, p.settlementType, p.expiryTimestamp, p.underlyerId, p.refCcyId));
+        _.forEach(loadToks, async (p) => await stm_new.addSecTokenType(p.name, p.settlementType, { 
+            expiryTimestamp: p.expiryTimestamp,
+                underlyerId: p.underlyerId, 
+                   refCcyId: p.refCcyId 
+        }));
 
         // load whitelist
         stm_new.whitelist(accounts[555]); // simulate a new contract owner (first whitelist entry, by convention) -- i.e. we can upgrade contract with a new privkey

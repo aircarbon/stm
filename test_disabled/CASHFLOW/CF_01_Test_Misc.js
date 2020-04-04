@@ -37,7 +37,7 @@ contract("StMaster", accounts => {
 
     it(`cashflow - misc - should not be able add token types`, async () => {
         try {
-            await stm.addSecTokenType('NEW_TYPE_NAME', CONST.settlementType.SPOT, 0, 0, 0);
+            await stm.addSecTokenType('NEW_TYPE_NAME', CONST.settlementType.SPOT, CONST.nullFutureArgs);
         } catch (ex) {
             assert(ex.reason == 'Bad cashflow request', `unexpected: ${ex.reason}`);
             return;

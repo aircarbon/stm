@@ -43,6 +43,11 @@ library StructLib {
         mapping(uint256 => uint256)        _tt_RefCcyId;        // futures
         uint256 _tt_Count;
     }
+        struct FutureTokenArgs {
+            uint64  expiryTimestamp;
+            uint256 underylerTypeId;
+            uint256 refCcyId;
+        }
 
     // TOKEN BATCH
     struct SecTokenBatch { // ** DATA_DUMP: OK

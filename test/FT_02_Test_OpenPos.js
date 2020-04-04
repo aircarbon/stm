@@ -30,14 +30,22 @@ contract("StMaster", accounts => {
 
         // add test FT type - USD
         const ftTestName_USD = `FT_USD_${new Date().getTime()}`;
-        const addFtTx_USD = await stm.addSecTokenType(ftTestName_USD, CONST.settlementType.FUTURE, DateTime.local().plus({ days: 30 }).toMillis(), spotTypes[0].id, ccyTypes.find(p => p.name === 'USD').id);
+        const addFtTx_USD = await stm.addSecTokenType(ftTestName_USD, CONST.settlementType.FUTURE, {
+              expiryTimestamp: DateTime.local().plus({ days: 30 }).toMillis(),
+              underylerTypeId: spotTypes[0].id,
+                     refCcyId: ccyTypes.find(p => p.name === 'USD').id 
+        });
         usdFT = (await stm.getSecTokenTypes()).tokenTypes.filter(p => p.settlementType == CONST.settlementType.FUTURE).filter(p => p.name == ftTestName_USD)[0];
         usdFT_underlyer = spotTypes.filter(p => p.id == usdFT.underlyerId)[0];
         usdFT_refCcy = ccyTypes.filter(p => p.id == usdFT.refCcyId)[0];
 
         // add test FT type - ETH
         const ftTestName_ETH = `FT_ETH_${new Date().getTime()}`;
-        const addFtTx_ETH = await stm.addSecTokenType(ftTestName_ETH, CONST.settlementType.FUTURE, DateTime.local().plus({ days: 30 }).toMillis(), spotTypes[0].id, ccyTypes.find(p => p.name === 'ETH').id);
+        const addFtTx_ETH = await stm.addSecTokenType(ftTestName_ETH, CONST.settlementType.FUTURE, { 
+            expiryTimestamp: DateTime.local().plus({ days: 30 }).toMillis(),
+            underylerTypeId: spotTypes[0].id,
+                   refCcyId: ccyTypes.find(p => p.name === 'ETH').id 
+        });
         ethFT = (await stm.getSecTokenTypes()).tokenTypes.filter(p => p.settlementType == CONST.settlementType.FUTURE).filter(p => p.name == ftTestName_ETH)[0];
         ethFT_underlyer = spotTypes.filter(p => p.id == ethFT.underlyerId)[0];
         ethFT_refCcy = ccyTypes.filter(p => p.id == ethFT.refCcyId)[0];

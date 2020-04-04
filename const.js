@@ -106,6 +106,12 @@ module.exports = {
         fee_max: 0,
     },
 
+    nullFutureArgs: {
+        expiryTimestamp: 0,
+        underylerTypeId: 0,
+               refCcyId: 0
+    },
+
     contractType: Object.freeze({
         COMMODITY: 0,
         CASHFLOW: 1,

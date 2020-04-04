@@ -5,7 +5,7 @@ import "../Interfaces/StructLib.sol";
 import "./FeeLib.sol";
 
 library TokenLib {
-    event AddedSecTokenType(uint256 id, string name, StructLib.SettlementType settlementType, uint64 expiryTimestamp, uint256 underylerTypeId);
+    event AddedSecTokenType(uint256 id, string name, StructLib.SettlementType settlementType, uint64 expiryTimestamp, uint256 underylerTypeId, uint256 refCcyId);
     event BurnedFullSecToken(uint256 indexed stId, uint256 tokenTypeId, address indexed ledgerOwner, uint256 burnedQty);
     event BurnedPartialSecToken(uint256 indexed stId, uint256 tokenTypeId, address indexed ledgerOwner, uint256 burnedQty);
     event MintedSecTokenBatch(uint256 indexed batchId, uint256 tokenTypeId, address indexed batchOwner, uint256 mintQty, uint256 mintSecTokenCount);
@@ -21,9 +21,10 @@ library TokenLib {
         StructLib.CcyTypesStruct storage ccyTypesData,
         string memory name,
         StructLib.SettlementType settlementType,
-        uint64 expiryTimestamp,
-        uint256 underylerTypeId,
-        uint256 refCcyId
+        StructLib.FutureTokenArgs memory ft
+        // uint64 expiryTimestamp,
+        // uint256 underylerTypeId,
+        // uint256 refCcyId
         )
     public {
         require(ledgerData.contractType == StructLib.ContractType.COMMODITY, "Bad cashflow request");
@@ -31,14 +32,15 @@ library TokenLib {
             require(keccak256(abi.encodePacked(stTypesData._tt_Name[tokenTypeId])) != keccak256(abi.encodePacked(name)), "Duplicate name");
         }
         if (settlementType == StructLib.SettlementType.FUTURE) {
-            require(expiryTimestamp > 1585699708, "Bad expiry");
-            require(underylerTypeId > 0 && underylerTypeId <= stTypesData._tt_Count, "Bad underylerTypeId");
-            require(stTypesData._tt_Settle[underylerTypeId] == StructLib.SettlementType.SPOT, "Bad underyler settlement type");
-            require(refCcyId > 0 && refCcyId <= ccyTypesData._ct_Count, "Bad refCcyId");
+            require(ft.expiryTimestamp > 1585699708, "Bad expiry");
+            require(ft.underylerTypeId > 0 && ft.underylerTypeId <= stTypesData._tt_Count, "Bad underylerTypeId");
+            require(stTypesData._tt_Settle[ft.underylerTypeId] == StructLib.SettlementType.SPOT, "Bad underyler settlement type");
+            require(ft.refCcyId > 0 && ft.refCcyId <= ccyTypesData._ct_Count, "Bad refCcyId");
         }
         else if (settlementType == StructLib.SettlementType.SPOT) {
-            require(expiryTimestamp == 0, "Invalid expiryTimestamp");
-            require(underylerTypeId == 0, "Invalid underylerTypeId");
+            require(ft.expiryTimestamp == 0, "Invalid expiryTimestamp");
+            require(ft.underylerTypeId == 0, "Invalid underylerTypeId");
+            require(ft.refCcyId == 0, "Invalid refCcyId");
         }
 
         stTypesData._tt_Count++;
@@ -47,12 +49,12 @@ library TokenLib {
 
         // futures
         if (settlementType == StructLib.SettlementType.FUTURE) {
-            stTypesData._tt_Expiry[stTypesData._tt_Count] = expiryTimestamp;
-            stTypesData._tt_Underlyer[stTypesData._tt_Count] = underylerTypeId;
-            stTypesData._tt_RefCcyId[stTypesData._tt_Count] = refCcyId;
+            stTypesData._tt_Expiry[stTypesData._tt_Count] = ft.expiryTimestamp;
+            stTypesData._tt_Underlyer[stTypesData._tt_Count] = ft.underylerTypeId;
+            stTypesData._tt_RefCcyId[stTypesData._tt_Count] = ft.refCcyId;
         }
 
-        emit AddedSecTokenType(stTypesData._tt_Count, name, settlementType, expiryTimestamp, underylerTypeId);
+        emit AddedSecTokenType(stTypesData._tt_Count, name, settlementType, ft.expiryTimestamp, ft.underylerTypeId, ft.refCcyId);
     }
 
     function getSecTokenTypes(

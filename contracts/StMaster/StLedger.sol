@@ -19,12 +19,16 @@ contract StLedger is IStLedger,
     function addSecTokenType(
         string memory name,
         StructLib.SettlementType settlementType,
-        uint64 expiryTimestamp,
-        uint256 underylerTypeId,
-        uint256 refCcyId
+        StructLib.FutureTokenArgs memory ft
+        // uint64 expiryTimestamp,
+        // uint256 underylerTypeId,
+        // uint256 refCcyId
     )
     public onlyOwner() onlyWhenReadWrite() {
-        TokenLib.addSecTokenType(ledgerData, stTypesData, ccyTypesData, name, settlementType, expiryTimestamp, underylerTypeId, refCcyId);
+        TokenLib.addSecTokenType(ledgerData, stTypesData, ccyTypesData, name, settlementType,
+            ft
+            //expiryTimestamp, underylerTypeId, refCcyId
+        );
     }
 
     function getSecTokenTypes()
