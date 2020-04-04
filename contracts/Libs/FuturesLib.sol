@@ -4,6 +4,7 @@ pragma experimental ABIEncoderV2;
 import "../Interfaces/StructLib.sol";
 
 library FuturesLib {
+    event FutureOpenInterest(address indexed long, address indexed short, uint256 tokTypeId, uint256 qty, uint256 price);
 
     //
     // PUBLIC - open futures position
@@ -27,12 +28,43 @@ library FuturesLib {
         require(a.tokTypeId >= 0 && a.tokTypeId <= stTypesData._tt_Count, "Bad tokTypeId");
         require(stTypesData._tt_Settle[a.tokTypeId] == StructLib.SettlementType.FUTURE, "Invalid (non-future) tokTypeId");
 
-        require(a.price > 0, "Bad price");
+        require(a.price <= 0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF && a.price > 0, "Bad price"); // max signed int128, non-zero
 
+        // ****
         // TODO: need to compute margin requirement - for validation re. position opening
         //       (should be a *view* that the FuturesMaintenance job can call and reuse...)
+        // ****
 
-        // TODO: use existing mint/burn() fn's for "auto-minting" both balanced sides
-        //       but in "auto" mode --> NO GLOBAL COUNTER UPDATES i.e. spot_sumQtyMinted / spot_sumQtyBurned don't update for FT mints/burns...
+        // create ledger entries as required
+        StructLib.initLedgerIfNew(ledgerData, a.ledger_A);
+        StructLib.initLedgerIfNew(ledgerData, a.ledger_B);
+
+        // auto-mint ("batchless") balanced STs on each side of the position
+        // (note: no global counter updates [_spot_totalMintedQty, spot_sumQtyMinted] for FT auto-mints)
+        uint256 newId_A = ledgerData._tokens_currentMax_id + 1;
+        uint256 newId_B = ledgerData._tokens_currentMax_id + 2;
+
+        //ledgerData._sts[newId_A].batchId = 0; // batchless
+        ledgerData._sts[newId_A].mintedQty = int64(a.qty_A);
+        ledgerData._sts[newId_A].currentQty = int64(a.qty_A);
+        ledgerData._sts[newId_A].ft_price = int128(a.price);
+        ledgerData._sts[newId_A].ft_lastMarkPrice = -1;
+
+        //ledgerData._sts[newId_B].batchId = 0;
+        ledgerData._sts[newId_B].mintedQty = int64(a.qty_B);
+        ledgerData._sts[newId_B].currentQty = int64(a.qty_B);
+        ledgerData._sts[newId_B].ft_price = int128(a.price);
+        ledgerData._sts[newId_B].ft_lastMarkPrice = -1;
+
+        ledgerData._tokens_currentMax_id += 2;
+
+        // assign STs to ledgers
+        ledgerData._ledger[a.ledger_A].tokenType_stIds[a.tokTypeId].push(newId_A);
+        ledgerData._ledger[a.ledger_B].tokenType_stIds[a.tokTypeId].push(newId_B);
+
+        if (a.qty_A > 0)
+            emit FutureOpenInterest(a.ledger_A, a.ledger_B, a.tokTypeId, uint256(a.qty_A), uint256(a.price));
+        else
+            emit FutureOpenInterest(a.ledger_B, a.ledger_A, a.tokTypeId, uint256(a.qty_B), uint256(a.price));
     }
 }

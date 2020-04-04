@@ -78,6 +78,8 @@ contract StMaster is IStMaster, IPublicViews,
     event Approval(address indexed owner, address indexed spender, uint256 value);
     // PayableLib events
     event IssuanceSubscribed(address indexed subscriber, address indexed issuer, uint256 weiSent, uint256 weiChange, uint256 tokensSubscribed, uint256 weiPrice);
+    // FuturesLib events
+    event FutureOpenInterest(address indexed long, address indexed short, uint256 tokTypeId, uint256 qty, uint256 price);
 
     constructor(
         StructLib.ContractType        _contractType,

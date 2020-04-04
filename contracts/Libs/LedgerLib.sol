@@ -132,7 +132,13 @@ library LedgerLib {
         for (uint256 stId = 1; stId <= ledgerData._tokens_currentMax_id; stId++) {
             StructLib.PackedSt memory st = ledgerData._sts[stId];
 
-            ledgerHash = keccak256(abi.encodePacked(ledgerHash, st.batchId, st.mintedQty, st.currentQty));
+            ledgerHash = keccak256(abi.encodePacked(ledgerHash,
+                st.batchId,
+                st.mintedQty,
+                st.currentQty,
+                st.ft_price,
+                st.ft_lastMarkPrice
+            ));
 
             // consistency check
             chk.totalCur += uint256(st.currentQty);
@@ -140,16 +146,16 @@ library LedgerLib {
         }
 
         // consistency check - global totals vs. all STs
-        require(chk.totalMinted == ledgerData._tokens_totalMintedQty, "Consistency check failed (1)");
-        require(chk.totalMinted - chk.totalCur == ledgerData._tokens_totalBurnedQty, "Consistency check failed (2)");
+        require(chk.totalMinted == ledgerData._spot_totalMintedQty, "Consistency check failed (1)");
+        require(chk.totalMinted - chk.totalCur == ledgerData._spot_totalBurnedQty, "Consistency check failed (2)");
 
         // hash totals & counters
         ledgerHash = keccak256(abi.encodePacked(ledgerHash, ledgerData._tokens_currentMax_id));
-        ledgerHash = keccak256(abi.encodePacked(ledgerHash, ledgerData._tokens_totalMintedQty));
-        ledgerHash = keccak256(abi.encodePacked(ledgerHash, ledgerData._tokens_totalBurnedQty));
-        ledgerHash = keccak256(abi.encodePacked(ledgerHash, uint256(ledgerData._tokens_total.transferedQty)));
-        ledgerHash = keccak256(abi.encodePacked(ledgerHash, uint256(ledgerData._tokens_total.exchangeFeesPaidQty)));
-        ledgerHash = keccak256(abi.encodePacked(ledgerHash, uint256(ledgerData._tokens_total.originatorFeesPaidQty)));
+        ledgerHash = keccak256(abi.encodePacked(ledgerHash, ledgerData._spot_totalMintedQty));
+        ledgerHash = keccak256(abi.encodePacked(ledgerHash, ledgerData._spot_totalBurnedQty));
+        ledgerHash = keccak256(abi.encodePacked(ledgerHash, uint256(ledgerData._spot_total.transferedQty)));
+        ledgerHash = keccak256(abi.encodePacked(ledgerHash, uint256(ledgerData._spot_total.exchangeFeesPaidQty)));
+        ledgerHash = keccak256(abi.encodePacked(ledgerHash, uint256(ledgerData._spot_total.originatorFeesPaidQty)));
         for (uint256 ccyTypeId = 1; ccyTypeId <= ccyTypesData._ct_Count; ccyTypeId++) {
             ledgerHash = keccak256(abi.encodePacked(ledgerHash, uint256(ledgerData._ccyType_totalFunded[ccyTypeId])));
             ledgerHash = keccak256(abi.encodePacked(ledgerHash, uint256(ledgerData._ccyType_totalWithdrawn[ccyTypeId])));
@@ -214,7 +220,9 @@ library LedgerLib {
                   tokenTypeName: stTypesData._tt_Name[tokenTypeId],
                         batchId: ledgerData._sts[stId].batchId,
                       mintedQty: ledgerData._sts[stId].mintedQty,
-                     currentQty: ledgerData._sts[stId].currentQty
+                     currentQty: ledgerData._sts[stId].currentQty,
+                       ft_price: ledgerData._sts[stId].ft_price,
+               ft_lastMarkPrice: ledgerData._sts[stId].ft_lastMarkPrice
                 });
                 flatSecTokenNdx++;
             }

@@ -135,13 +135,6 @@ library TokenLib {
 
         // create ledger entry as required
         StructLib.initLedgerIfNew(ledgerData, a.batchOwner);
-        // if (ledgerData._ledger[a.batchOwner].exists == false) {
-        //     ledgerData._ledger[a.batchOwner] = StructLib.Ledger({
-        //             exists: true,
-        //         customFees: StructLib.FeeStruct()
-        //     });
-        //     ledgerData._ledgerOwners.push(a.batchOwner);
-        // }
 
         // mint & assign STs
         for (int256 ndx = 0; ndx < a.mintSecTokenCount; ndx++) {
@@ -155,14 +148,14 @@ library TokenLib {
 
             emit MintedSecToken(newId, newBatch.id, a.tokenTypeId, a.batchOwner, uint256(stQty));
 
-            // assign
+            // assign ST to ledger
             ledgerData._ledger[a.batchOwner].tokenType_stIds[a.tokenTypeId].push(newId);
         }
 
         ledgerData._tokens_currentMax_id += uint256(a.mintSecTokenCount);
-        ledgerData._tokens_totalMintedQty += uint256(a.mintQty);
 
-        ledgerData._ledger[a.batchOwner].spot_sumQtyMinted += uint256(a.mintQty); //***
+        ledgerData._spot_totalMintedQty += uint256(a.mintQty);
+        ledgerData._ledger[a.batchOwner].spot_sumQtyMinted += uint256(a.mintQty);
     }
 
     // POST-MINTING: add KVP metadata
@@ -291,8 +284,8 @@ library TokenLib {
                 remainingToBurn = 0;
             }
         }
-        ledgerData._tokens_totalBurnedQty += uint256(burnQty);
 
+        ledgerData._spot_totalBurnedQty += uint256(burnQty);
         ledgerData._ledger[ledgerOwner].spot_sumQtyBurned += uint256(burnQty);
     }
 }

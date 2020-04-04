@@ -54,16 +54,4 @@ contract("StMaster", accounts => {
         assert(data.ledgerB_after.ccys.find(p => p.ccyTypeId == CONST.ccyType.ETH).balance > 0, 'unexpected ledger B currency after');
     });
 
-    it(`trading - should have reasonable gas cost for two-sided transfer`, async () => {
-        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.KT_CARBON, 1,      accounts[global.TaddrNdx + 0], CONST.nullFees, 0, [], [], { from: accounts[0] });
-        await stm.fund(CONST.ccyType.ETH,                      CONST.oneEth_wei,        accounts[global.TaddrNdx + 1],                            { from: accounts[0] });
-        const data = await transferHelper.transferLedger({ stm, accounts, 
-                 ledger_A: accounts[global.TaddrNdx + 0],         ledger_B: accounts[global.TaddrNdx + 1],
-                    qty_A: 500,                              tokenTypeId_A: CONST.tokenType.NATURE,
-                    qty_B: 0,                                tokenTypeId_B: 0,
-             ccy_amount_A: 0,                                  ccyTypeId_A: 0,
-             ccy_amount_B: CONST.oneEth_wei,                   ccyTypeId_B: CONST.ccyType.ETH,
-        });
-        await CONST.logGas(web3, data.transferTx, `0.5 vST trade eeu/ccy (A <-> B)`);
-    });
 });

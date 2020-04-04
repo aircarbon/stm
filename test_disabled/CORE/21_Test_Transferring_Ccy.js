@@ -74,33 +74,6 @@ contract("StMaster", accounts => {
     //     });
     // });
 
-    it(`transferring ccy - should have reasonable gas cost for one-sided currency transfer (A -> B), aka. fund movement`, async () => {
-        await stm.fund(CONST.ccyType.ETH, CONST.oneEth_wei,              accounts[global.TaddrNdx + 0], { from: accounts[0] });
-        await stm.fund(CONST.ccyType.ETH, 0,                             accounts[global.TaddrNdx + 1], { from: accounts[0] });
-        const data = await transferHelper.transferLedger({ stm, accounts, 
-                ledger_A: accounts[global.TaddrNdx + 0],        ledger_B: accounts[global.TaddrNdx + 1],
-                   qty_A: 0,                               tokenTypeId_A: 0,
-                   qty_B: 0,                               tokenTypeId_B: 0,
-            ccy_amount_A: CONST.oneEth_wei,                  ccyTypeId_A: CONST.ccyType.ETH,
-            ccy_amount_B: 0,                                 ccyTypeId_B: 0,
-        });
-        await CONST.logGas(web3, data.transferTx, `ccy one-way (A -> B)`);
-    });
-
-    // ccy-swaps - deprecated (to support exchange ccy fee mirroring)
-    // it(`transferring ccy - should have reasonable gas cost for two-sided currency transfer (A <-> B)`, async () => {
-    //     await stm.fund(CONST.ccyType.ETH, CONST.oneEth_wei,              accounts[global.TaddrNdx + 0], { from: accounts[0] });
-    //     await stm.fund(CONST.ccyType.ETH, CONST.oneEth_wei,              accounts[global.TaddrNdx + 1], { from: accounts[0] });
-    //     const data = await transferHelper.transferLedger({ stm, accounts, 
-    //             ledger_A: accounts[global.TaddrNdx + 0],         ledger_B: accounts[global.TaddrNdx + 1],
-    //                qty_A: 0,                                tokenTypeId_A: 0,
-    //                qty_B: 0,                                tokenTypeId_B: 0,
-    //         ccy_amount_A: 10000000,                           ccyTypeId_A: CONST.ccyType.ETH,
-    //         ccy_amount_B: 50000000,                           ccyTypeId_B: CONST.ccyType.ETH,
-    //     });
-    //     await CONST.logGas(web3, data.transferTx, `ccy two-way (A <-> B)`);
-    // });
-
     it(`transferring ccy - should not allow one-sided transfer (A -> B) of an invalid currency value`, async () => {
         await stm.fund(CONST.ccyType.USD, CONST.thousandCcy_cents,       accounts[global.TaddrNdx + 0], { from: accounts[0] });
         await stm.fund(CONST.ccyType.USD, CONST.thousandCcy_cents,       accounts[global.TaddrNdx + 1], { from: accounts[0] });

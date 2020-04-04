@@ -65,7 +65,7 @@ contract StErc20 is StFees, IErc20 {
 
     // ERC20 - CORE
     function totalSupply() public view returns (uint256) {
-        return ledgerData._tokens_totalMintedQty - ledgerData._tokens_totalBurnedQty;
+        return ledgerData._spot_totalMintedQty - ledgerData._spot_totalBurnedQty;
     }
     function balanceOf(address account) public view returns (uint256) {
         StructLib.LedgerReturn memory ret = LedgerLib.getLedgerEntry(ledgerData, stTypesData, ccyTypesData, account);

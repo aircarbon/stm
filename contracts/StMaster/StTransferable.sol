@@ -45,6 +45,6 @@ contract StTransferable is Owned,
 
     function getSecToken_totalTransferedQty()
     external view /*onlyOwner()*/ returns (uint256) {
-        return ledgerData._tokens_total.transferedQty;
+        return ledgerData._spot_total.transferedQty;
     }
 }

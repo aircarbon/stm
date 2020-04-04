@@ -46,11 +46,13 @@ contract StLedger is IStLedger,
 
     function getSecToken(uint256 id) external view returns (StructLib.SecTokenReturn memory) {
         return StructLib.SecTokenReturn({
-                exists: ledgerData._sts[id].batchId != 0,
+                exists: ledgerData._sts[id].mintedQty != 0,
                     id: id,
              mintedQty: ledgerData._sts[id].mintedQty,
             currentQty: ledgerData._sts[id].currentQty,
-               batchId: ledgerData._sts[id].batchId
+               batchId: ledgerData._sts[id].batchId,
+              ft_price: ledgerData._sts[id].ft_price,
+      ft_lastMarkPrice: ledgerData._sts[id].ft_lastMarkPrice
         });
     }
 

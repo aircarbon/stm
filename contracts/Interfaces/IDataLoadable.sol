@@ -27,7 +27,8 @@ import "../Libs/LoadLib.sol";
 
     function addSecToken(
         address ledgerEntryOwner,
-        uint64 batchId, uint256 stId, uint256 tokenTypeId, int64 mintedQty, int64 currentQty
+        uint64 batchId, uint256 stId, uint256 tokenTypeId, int64 mintedQty, int64 currentQty,
+        int128 ft_price, int128 ft_lastMarkPrice
     ) public onlyOwner() { revert("Not implemented"); }
 
     function setTokenTotals(

@@ -23,19 +23,6 @@ contract("StMaster", accounts => {
             console.log(`addrNdx: ${global.TaddrNdx} - contract @ ${stm.address} (owner: ${accounts[0]})`);
     });
 
-    it(`transferring tok - should have reasonable gas cost for one-sided 0.5 vST transfer (A -> B), aka. carbon movement`, async () => {
-        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.KT_CARBON, 1,      accounts[global.TaddrNdx + 0], CONST.nullFees, 0, [], [], { from: accounts[0] });
-        await stm.fund(CONST.ccyType.ETH,                      0,                       accounts[global.TaddrNdx + 1],                            { from: accounts[0] });
-        const data = await transferHelper.transferLedger({ stm, accounts, 
-                ledger_A: accounts[global.TaddrNdx + 0],         ledger_B: accounts[global.TaddrNdx + 1],
-                   qty_A: 750,                              tokenTypeId_A: CONST.tokenType.NATURE,
-                   qty_B: 0,                                tokenTypeId_B: 0,
-            ccy_amount_A: 0,                                  ccyTypeId_A: 0,
-            ccy_amount_B: 0,                                  ccyTypeId_B: 0,
-        });
-        await CONST.logGas(web3, data.transferTx, `0.5 vST one-way (A -> B)`);
-    });
-
     // one-sided kg transfer, no consideration, 1 full ST
     it(`transferring tok - should allow one-sided transfer (A -> B) of 1.0 vST (NATURE) across ledger entries`, async () => {
         await stm.mintSecTokenBatch(CONST.tokenType.NATURE, CONST.GT_CARBON, 1,       accounts[global.TaddrNdx + 0], CONST.nullFees, 0, [], [], { from: accounts[0] });

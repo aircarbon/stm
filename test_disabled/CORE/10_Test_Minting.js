@@ -67,16 +67,6 @@ contract("StMaster", accounts => {
         assert(ledgerEntryAfter.tokens.length == totalMintedSecTokens, 'invalid eeu qty in ledger entry');
     });
 
-    it(`minting - should have reasonable gas cost for minting of multi-vST batches`, async () => {
-        mintTx = await stm.mintSecTokenBatch(CONST.tokenType.CORSIA, CONST.GT_CARBON, 1, accounts[global.TaddrNdx], CONST.nullFees, 0, [], [], { from: accounts[0], });
-        await CONST.logGas(web3, mintTx, `Mint  1 vST`);
-
-        // mintTx = await stm.mintSecTokenBatch(CONST.tokenType.CORSIA, CONST.GT_CARBON, 5, accounts[global.TaddrNdx], { from: accounts[0], });
-        //await CONST.logGas(web3, mintTx, `Mint  5 vST`);
-
-        // var mintTx = await stm.mintSecTokenBatch(CONST.tokenType.CORSIA, CONST.GT_CARBON, 10, accounts[global.TaddrNdx], { from: accounts[0] });
-        //await CONST.logGas(web3, mintTx, `Mint 10 vST`);
-    });
 
     it(`minting - should not allow non-owner to mint vST batches`, async () => {
         try {

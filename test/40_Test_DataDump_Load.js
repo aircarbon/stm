@@ -59,11 +59,11 @@ contract("StMaster", accounts => {
             // add spot type
             await stm_cur.addSecTokenType('NEW_TOK_SPOT_TYPE', CONST.settlementType.SPOT, 0, 0, 0, { from: accounts[0] });
             
-            // add spot type
+            // add future type
             const spotTypes = (await stm_cur.getSecTokenTypes()).tokenTypes.filter(p => p.settlementType == CONST.settlementType.SPOT);
             const ccyTypes = (await stm_cur.getCcyTypes()).ccyTypes;
                 await stm_cur.addSecTokenType('NEW_TOK_FT_TYPE', CONST.settlementType.FUTURE,
-                DateTime.local().toMillis(), spotTypes[0].id, ccyTypes[0].id, { from: accounts[0] }); 
+                    DateTime.local().toMillis(), spotTypes[0].id, ccyTypes[0].id, { from: accounts[0] }); 
 
             curHash = await checkHashUpdate(curHash);
         }
@@ -98,11 +98,13 @@ contract("StMaster", accounts => {
             curHash = await checkHashUpdate(curHash);
         }
 
-        // ledger - batches
+        // populate trades (batches, fees) & future positions
         const MM = [];
         for (let i=1 ; i <= /*WHITELIST_COUNT*/TEST_ADDR_COUNT ; i++) { // test data - mint for accounts after owner, move some to owner
 
             const M = accounts[i];
+            console.log('minting, setting fees, trading, burning & open future position for account... ', M);
+
             MM.push(M);
             const batchFee = { ccy_mirrorFee: false, ccy_perMillion: 0, fee_fixed: i+1, fee_percBips: (i+1)*100, fee_min: (i+1), fee_max: (i+1+100) };
             const metaKVPs = [
@@ -111,7 +113,6 @@ contract("StMaster", accounts => {
             ];
             
             // mint
-            console.log('minting for account... ', M);
             const mintTx_B1 = await stm_cur.mintSecTokenBatch(CONST.tokenType.CORSIA, 1000 * (i+1), 1, M, batchFee, 100, metaKVPs.map(p => p.k), metaKVPs.map(p => p.v), { from: accounts[0] });
             curHash = await checkHashUpdate(curHash);
             if (await stm_cur.getContractType() == CONST.contractType.COMMODITY) {
@@ -171,10 +172,23 @@ contract("StMaster", accounts => {
             // burn - full, batch 2 NATURE
             const burn_tx_B2 = await stm_cur.burnTokens(M, CONST.tokenType.NATURE, 100);
             curHash = await checkHashUpdate(curHash);
+
+            // open futures position
+            const ftTypes = (await stm_cur.getSecTokenTypes()).tokenTypes.filter(p => p.settlementType == CONST.settlementType.FUTURE);
+            const openFtPosTx = await stm_cur.openFtPos({ 
+                tokTypeId: ftTypes[0].id, 
+                 ledger_A: accounts[i], 
+                 ledger_B: accounts[i - 1],
+                    qty_A: +1 * ((i+1) * 100),
+                    qty_B: -1 * ((i+1) * 100),
+                    price: (i+1) * 100,
+            });
+            curHash = await checkHashUpdate(curHash);
         }
+
         const batchCount = await stm_cur.getSecTokenBatchCount.call();
         for (let i=1 ; i <= batchCount; i++) { // read all
-            const x = await stm_cur.getSecTokenBatch(i); // --> StructLib.SecTokenBatch
+            const x = await stm_cur.getSecTokenBatch(i);
             console.log(`Batch Data: id=${i} mintedQty=${x.mintedQty} burnedQty=${x.burnedQty} metaKeys=${x.metaKeys.join()} metaValues=${x.metaValues.join()} { x.fee_fixed=${x.origTokFee.fee_fixed} / x.fee_percBips=${x.origTokFee.fee_percBips} / x.fee_min=${x.origTokFee.fee_min} / x.fee_max=${x.origTokFee.fee_max} }`);
         }
 
@@ -185,7 +199,8 @@ contract("StMaster", accounts => {
         
         for (let j=0 ; j < entryCount; j++) { // fund, withdraw & set ledger ccy & tok type fees
             const entryOwner = await stm_cur.getLedgerOwner(j);
-            
+            console.log('funding, withdrawing, setting ledger ccy & token fees for account... ', entryOwner);
+
             // for all ccy types
             for (let i=0 ; i < ccyTypesData.ccyTypes.length; i++) { // test ccy data 
                 const ccyType = ccyTypesData.ccyTypes[i];
@@ -216,37 +231,6 @@ contract("StMaster", accounts => {
                     curHash = await checkHashUpdate(curHash);
             }
         }
-
-        // ledger entries: iterate, read all
-        // for (let i=0 ; i < entryCount; i++) {
-        //     //const entry = entries[i]; // ## NON-PAGED
-        //     const entryOwner = await stm.getLedgerOwner(i); // DATA_DUMP: individual fetches
-        //     const x = await stm.getLedgerEntry(entryOwner);
-        //     console.log(`Ledger Entry: ${entryOwner} tok.stId=[ ${x.tokens.map(p => p.stId).join(', ')} ] ccy.bal=[${x.ccys.map(p => `{ccyId=${p.ccyTypeId} bal=${p.balance}}`).join(', ')}]`);
-            
-        //     for (let j=0 ; j < x.ccys.length; j++) { // ledger ccy type fee
-        //         const ccy = x.ccys[j];
-        //         const x2 = await stm.getFee(CONST.getFeeType.CCY, ccy.ccyTypeId, entryOwner);
-        //         console.log(`\tLedger Fee: ccyId=${ccy.ccyTypeId} { x2.fee_fixed=${x2.fee_fixed} / x2.fee_percBips=${x2.fee_percBips} / x2.fee_min=${x2.fee_min} / x2.fee_max=${x2.fee_max} }`)
-        //     }
-
-        //     const stTypeIds = [];
-        //     const tokens = [];
-        //     for (let j=0 ; j < x.tokens.length; j++) { // get ledger token types
-        //         const st = x.tokens[j];
-        //         if (!stTypeIds.includes(st.tokenTypeId)) stTypeIds.push(st.tokenTypeId);
-
-        //         tokens.push(await stm.getSecToken(st.stId));
-        //     }
-
-        //     for (let j=0 ; j < stTypeIds.length; j++) { // ledger tok type fee
-        //         const x2 = await stm.getFee(CONST.getFeeType.TOK, stTypeIds[j], entryOwner);
-        //         console.log(`\tLedger Fee: stTypeId=${stTypeIds[j]} { x2.fee_fixed=${x2.fee_fixed} / x2.fee_percBips=${x2.fee_percBips} / x2.fee_min=${x2.fee_min} / x2.fee_max=${x2.fee_max} }`)
-        //     }
-
-        //     // ledger tokens
-        //     console.log(`\tLedger Tokens: [ ${tokens.map(p => `{ id: ${p.id}, batchId: ${p.batchId} curQty: ${p.currentQty}, mintedQty: ${p.mintedQty} }`).join(', ')} ]`);
-        // }
     });
 
     it(`data load - should be able to initialize a new contract with data from old`, async () => {
@@ -313,7 +297,9 @@ contract("StMaster", accounts => {
                     p.stId,
                     p.tokenTypeId,
                     p.mintedQty,
-                    p.currentQty
+                    p.currentQty,
+                    p.ft_price,
+                    p.ft_lastMarkPrice
                 );
             }
         }

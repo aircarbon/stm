@@ -21,6 +21,6 @@ contract StBurnable is Owned, StLedger {
 
     function getSecToken_totalBurnedQty()
     external view /*onlyOwner()*/ returns (uint256 count) {
-        return ledgerData._tokens_totalBurnedQty;
+        return ledgerData._spot_totalBurnedQty;
     }
 }

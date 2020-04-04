@@ -48,12 +48,6 @@ contract("StMaster", accounts => {
         assert(ledger.ccys.find(p => p.ccyTypeId == CONST.ccyType.USD).balance == 0, 'unexpected ledger balance after repeated withdrawing');
     });
 
-    it(`withdrawing - should have reasonable gas cost for withdrawing`, async () => {
-        await stm.fund(CONST.ccyType.USD, CONST.thousandCcy_cents, accounts[global.TaddrNdx], { from: accounts[0] });
-        const withdrawTx = await stm.withdraw(CONST.ccyType.USD, CONST.thousandCcy_cents, accounts[global.TaddrNdx], { from: accounts[0] });
-        await CONST.logGas(web3, withdrawTx, `Withdrawing`);
-    });
-
     it(`withdrawing - should allow minting, funding and withdrawing on same ledger entry`, async () => {
         await stm.mintSecTokenBatch(CONST.tokenType.NATURE, CONST.GT_CARBON, 1, accounts[global.TaddrNdx], CONST.nullFees, 0, [], [], { from: accounts[0] });
         await stm.fund(CONST.ccyType.USD, CONST.thousandCcy_cents, accounts[global.TaddrNdx],                                        { from: accounts[0] });

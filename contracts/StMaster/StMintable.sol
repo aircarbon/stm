@@ -59,12 +59,12 @@ origCcyFee_percBips_ExFee: origCcyFee_percBips_ExFee,
     }
 
     function getSecToken_countMinted()
-    external view /*onlyOwner()*/ returns (uint256) {
+    external view returns (uint256) {
         return ledgerData._tokens_currentMax_id; // 1-based
     }
 
     function getSecToken_totalMintedQty()
-    external view /*onlyOwner()*/ returns (uint256) {
-        return ledgerData._tokens_totalMintedQty;
+    external view returns (uint256) {
+        return ledgerData._spot_totalMintedQty;
     }
 }

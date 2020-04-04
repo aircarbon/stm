@@ -46,13 +46,16 @@ library LoadLib {
     function addSecToken(
         StructLib.LedgerStruct storage ledgerData,
         address ledgerEntryOwner,
-        uint64 batchId, uint256 stId, uint256 tokenTypeId, int64 mintedQty, int64 currentQty
+        uint64 batchId, uint256 stId, uint256 tokenTypeId, int64 mintedQty, int64 currentQty,
+        int128 ft_price, int128 ft_lastMarkPrice
     )
     public {
         require(!ledgerData._contractSealed, "Contract is sealed");
         ledgerData._sts[stId].batchId = batchId;
         ledgerData._sts[stId].mintedQty = mintedQty;
         ledgerData._sts[stId].currentQty = currentQty;
+        ledgerData._sts[stId].ft_price = ft_price;
+        ledgerData._sts[stId].ft_lastMarkPrice = ft_lastMarkPrice;
         ledgerData._ledger[ledgerEntryOwner].tokenType_stIds[tokenTypeId].push(stId);
     }
 
@@ -63,13 +66,13 @@ library LoadLib {
     )
     public {
         require(!ledgerData._contractSealed, "Contract is sealed");
-        ledgerData._tokens_total.exchangeFeesPaidQty = packed_ExchangeFeesPaidQty;
-        ledgerData._tokens_total.originatorFeesPaidQty = packed_OriginatorFeesPaidQty;
-        ledgerData._tokens_total.transferedQty = packed_TransferedQty;
+        ledgerData._spot_total.exchangeFeesPaidQty = packed_ExchangeFeesPaidQty;
+        ledgerData._spot_total.originatorFeesPaidQty = packed_OriginatorFeesPaidQty;
+        ledgerData._spot_total.transferedQty = packed_TransferedQty;
 
         ledgerData._tokens_currentMax_id = currentMax_id;
-        ledgerData._tokens_totalMintedQty = totalMintedQty;
-        ledgerData._tokens_totalBurnedQty = totalBurnedQty;
+        ledgerData._spot_totalMintedQty = totalMintedQty;
+        ledgerData._spot_totalBurnedQty = totalBurnedQty;
     }
 
     function setTotalCcyFunded(

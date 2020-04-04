@@ -82,6 +82,8 @@ library StructLib {
             uint64  batchId;
             int64   mintedQty;
             int64   currentQty;
+            int128  ft_price;
+            int128  ft_lastMarkPrice;
         }
         struct LedgerCcyReturn {
             uint256 ccyTypeId;
@@ -90,19 +92,22 @@ library StructLib {
             int256  balance;
         }
 
-
     // *** PACKED SECURITY TOKEN ***
     struct PackedSt { // ** DATA_DUMP: OK
-        uint64 batchId;
-        int64 mintedQty; //*
-        int64 currentQty; //*
+        uint64 batchId;                                         // can be zero for "batchless" future "auto-minted" tokens; non-zero for spot tok-types
+        int64  mintedQty;                                       // existence check field: should never be non-zero
+        int64  currentQty;
+        int128 ft_price;                                        // [FUTURE types only] -- *** TODO: more inputs on DataLoad... ###
+        int128 ft_lastMarkPrice;                                // [FUTURE types only] -- *** TODO: more inputs on DataLoad... ###
     }
-        struct SecTokenReturn {
+        struct SecTokenReturn { // todo: drop this - use LedgerSecTokenReturn (would need tokTypeId to be packed in PackedSt struct...)
             bool    exists;                                     // for existence check by id
             uint256 id;                                         // global sequential id: 1-based
-            int256  mintedQty;                                  //* // initial unit qty minted in the ST
-            int256  currentQty;                                 //* // current (variable) unit qty in the ST (i.e. burned = currentQty - mintedQty)
+            int256  mintedQty;                                  // initial unit qty minted in the ST
+            int256  currentQty;                                 // current (variable) unit qty in the ST (i.e. burned = currentQty - mintedQty)
             uint64  batchId;                                    // parent batch of the ST
+            int128  ft_price;                                   // entry price of the future position
+            int128  ft_lastMarkPrice;                           // last marked reference price for the future position, or -1 if never marked
         }
     struct PackedStTotals {
         uint80 transferedQty;
@@ -126,10 +131,9 @@ library StructLib {
         address[] _ledgerOwners;                                // list of ledger owners (accounts)
 
         // global totals
-        uint256 _tokens_totalMintedQty;                         // TODO: split by type
-        uint256 _tokens_totalBurnedQty;                         // TODO: split by type
-
-        PackedStTotals _tokens_total;
+        uint256 _spot_totalMintedQty;                           // [SPOT types only] - todo: split by type?
+        uint256 _spot_totalBurnedQty;                           // [SPOT types only] - todo: split by type?
+        PackedStTotals _spot_total;                             // [SPOT types only] - todo: split by type?
 
         mapping(uint256 => uint256) _ccyType_totalFunded;
         mapping(uint256 => uint256) _ccyType_totalWithdrawn;
@@ -226,7 +230,7 @@ library StructLib {
         address  ledger_B;
         int256   qty_A;
         int256   qty_B;
-        uint256  price;
+        int256   price; // signed, so we can explicitly test for <0 (otherwise -ve values are silently wrapped by web3 to unsigned values)
     }
 
     /**
@@ -243,8 +247,8 @@ library StructLib {
             ledgerData._ledger[addr] = StructLib.Ledger({
                  exists: true,
              customFees: StructLib.FeeStruct(),
-    spot_sumQtyMinted: 0,
-    spot_sumQtyBurned: 0
+      spot_sumQtyMinted: 0,
+      spot_sumQtyBurned: 0
             });
             ledgerData._ledgerOwners.push(addr);
         }
