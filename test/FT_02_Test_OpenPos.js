@@ -32,7 +32,7 @@ contract("StMaster", accounts => {
         const ftTestName_USD = `FT_USD_${new Date().getTime()}`;
         const addFtTx_USD = await stm.addSecTokenType(ftTestName_USD, CONST.settlementType.FUTURE, {
               expiryTimestamp: DateTime.local().plus({ days: 30 }).toMillis(),
-              underylerTypeId: spotTypes[0].id,
+              underlyerTypeId: spotTypes[0].id,
                      refCcyId: ccyTypes.find(p => p.name === 'USD').id 
         });
         usdFT = (await stm.getSecTokenTypes()).tokenTypes.filter(p => p.settlementType == CONST.settlementType.FUTURE).filter(p => p.name == ftTestName_USD)[0];
@@ -43,7 +43,7 @@ contract("StMaster", accounts => {
         const ftTestName_ETH = `FT_ETH_${new Date().getTime()}`;
         const addFtTx_ETH = await stm.addSecTokenType(ftTestName_ETH, CONST.settlementType.FUTURE, { 
             expiryTimestamp: DateTime.local().plus({ days: 30 }).toMillis(),
-            underylerTypeId: spotTypes[0].id,
+            underlyerTypeId: spotTypes[0].id,
                    refCcyId: ccyTypes.find(p => p.name === 'ETH').id 
         });
         ethFT = (await stm.getSecTokenTypes()).tokenTypes.filter(p => p.settlementType == CONST.settlementType.FUTURE).filter(p => p.name == ftTestName_ETH)[0];
@@ -57,13 +57,13 @@ contract("StMaster", accounts => {
             console.log(`addrNdx: ${global.TaddrNdx} - contract @ ${stm.address} (owner: ${accounts[0]})`);
     });
 
-    it(`FT - should allow opening of a futures position with USD ref currency`, async () => {
+    it(`FT positions - should allow opening of a futures position with USD ref currency`, async () => {
         const A = accounts[global.TaddrNdx], B = accounts[global.TaddrNdx + 1];
         const x = await futuresHelper.openFtPos({ stm, accounts, tokTypeId: usdFT.id, ledger_A: A, ledger_B: B, qty_A: +1000, qty_B: -1000, price: 100 });
         //truffleAssert.prettyPrintEmittedEvents(x.tx);
     });
 
-    it(`FT - should allow opening of a (large qty * price) futures position with ETH ref currency`, async () => {
+    it(`FT positions - should allow opening of a (large qty * price) futures position with ETH ref currency`, async () => {
         const A = accounts[global.TaddrNdx], B = accounts[global.TaddrNdx + 1];
         const x = await futuresHelper.openFtPos({ stm, accounts, tokTypeId: ethFT.id, ledger_A: A, ledger_B: B,
             qty_A: +1000000000,
@@ -73,7 +73,7 @@ contract("StMaster", accounts => {
         //truffleAssert.prettyPrintEmittedEvents(x.tx);
     });
 
-    it(`FT - should not allow non-owner to open a futures position`, async () => {
+    it(`FT positions - should not allow non-owner to open a futures position`, async () => {
         const A = accounts[global.TaddrNdx], B = accounts[global.TaddrNdx + 1];
         try {
             const x = await stm.openFtPos({ tokTypeId: usdFT.id, ledger_A: A, ledger_B: B, qty_A: +10, qty_B: -10, price: 100 }, { from: accounts[1] });
@@ -82,7 +82,7 @@ contract("StMaster", accounts => {
         assert.fail('expected contract exception');
     });
 
-    it(`FT - should not be able to open a futures position when read only`, async () => {
+    it(`FT positions - should not be able to open a futures position when read only`, async () => {
         const A = accounts[global.TaddrNdx], B = accounts[global.TaddrNdx + 1];
         try {
             await stm.setReadOnly(true, { from: accounts[0] });
@@ -97,7 +97,7 @@ contract("StMaster", accounts => {
         assert.fail('expected contract exception');
     });
 
-    it(`FT - should not be able to open a futures position without two distinct parties`, async () => {
+    it(`FT positions - should not be able to open a futures position without two distinct parties`, async () => {
         const A = accounts[global.TaddrNdx];
         try {
             const x = await futuresHelper.openFtPos({ stm, accounts, tokTypeId: usdFT.id, ledger_A: A, ledger_B: A, qty_A: +10, qty_B: -10, price: 100 });
@@ -106,7 +106,7 @@ contract("StMaster", accounts => {
         assert.fail('expected contract exception');
     });
 
-    it(`FT - should not be able to open a futures position with mismatched quantities`, async () => {
+    it(`FT positions - should not be able to open a futures position with mismatched quantities`, async () => {
         const A = accounts[global.TaddrNdx], B = accounts[global.TaddrNdx + 1];
         try {
             const x = await futuresHelper.openFtPos({ stm, accounts, tokTypeId: usdFT.id, ledger_A: A, ledger_B: B, qty_A: +10, qty_B: -11, price: 100 });
@@ -115,7 +115,7 @@ contract("StMaster", accounts => {
         assert.fail('expected contract exception');
     });
 
-    it(`FT - should not be able to open a futures position with invalid (0) quantities`, async () => {
+    it(`FT positions - should not be able to open a futures position with invalid (0) quantities`, async () => {
         const A = accounts[global.TaddrNdx], B = accounts[global.TaddrNdx + 1];
         try {
             const x = await futuresHelper.openFtPos({ stm, accounts, tokTypeId: usdFT.id, ledger_A: A, ledger_B: B, qty_A: 0, qty_B: 0, price: 100 });
@@ -124,7 +124,7 @@ contract("StMaster", accounts => {
         assert.fail('expected contract exception');
     });
 
-    it(`FT - should not be able to open a futures position with invalid (too large/small for signed int64) quantities`, async () => {
+    it(`FT positions - should not be able to open a futures position with invalid (too large/small for signed int64) quantities`, async () => {
         const A = accounts[global.TaddrNdx], B = accounts[global.TaddrNdx + 1];
         try {
             const bn = new BN(2).pow(new BN(64)).div(new BN(2));//.sub(new BN(1));
@@ -136,7 +136,7 @@ contract("StMaster", accounts => {
         assert.fail('expected contract exception');
     });
 
-    it(`FT - should not be able to open a futures position with invalid (0) price`, async () => {
+    it(`FT positions - should not be able to open a futures position with invalid (0) price`, async () => {
         const A = accounts[global.TaddrNdx], B = accounts[global.TaddrNdx + 1];
         try {
             const x = await futuresHelper.openFtPos({ stm, accounts, tokTypeId: usdFT.id, ledger_A: A, ledger_B: B, qty_A: -1, qty_B: +1, price: 0 });
@@ -145,7 +145,7 @@ contract("StMaster", accounts => {
         assert.fail('expected contract exception');
     });
 
-    it(`FT - should not be able to open a futures position with invalid (<0) price`, async () => {
+    it(`FT positions - should not be able to open a futures position with invalid (<0) price`, async () => {
         const A = accounts[global.TaddrNdx], B = accounts[global.TaddrNdx + 1];
         try {
             const x = await futuresHelper.openFtPos({ stm, accounts, tokTypeId: usdFT.id, ledger_A: A, ledger_B: B, qty_A: +1, qty_B: -1, price: -1 });
@@ -154,7 +154,7 @@ contract("StMaster", accounts => {
         assert.fail('expected contract exception');
     });
 
-    it(`FT - should not be able to open a futures position with invalid (too large for signed int128) price`, async () => {
+    it(`FT positions - should not be able to open a futures position with invalid (too large for signed int128) price`, async () => {
         const A = accounts[global.TaddrNdx], B = accounts[global.TaddrNdx + 1];
         try {
             const bn = new BN(2).pow(new BN(128)).div(new BN(2));//.sub(new BN(1));

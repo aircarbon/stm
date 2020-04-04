@@ -108,7 +108,7 @@ module.exports = {
 
     nullFutureArgs: {
         expiryTimestamp: 0,
-        underylerTypeId: 0,
+        underlyerTypeId: 0,
                refCcyId: 0
     },
 

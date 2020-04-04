@@ -31,7 +31,7 @@ library FuturesLib {
         require(a.price <= 0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF && a.price > 0, "Bad price"); // max signed int128, non-zero
 
         // ****
-        // TODO: need to compute margin requirement - for validation re. position opening
+        // WIP/TODO: need to compute margin requirement - for validation re. position opening
         //       (should be a *view* that the FuturesMaintenance job can call and reuse...)
         //      * init_margin + var_margin = tot_margin ...
         //          (%) --> record/set against FT-tok-type...

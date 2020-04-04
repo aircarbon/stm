@@ -45,7 +45,7 @@ library StructLib {
     }
         struct FutureTokenArgs {
             uint64  expiryTimestamp;
-            uint256 underylerTypeId;
+            uint256 underlyerTypeId;
             uint256 refCcyId;
         }
 

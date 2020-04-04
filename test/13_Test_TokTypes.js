@@ -106,7 +106,7 @@ contract("StMaster", accounts => {
         try {
             await stm.addSecTokenType(`NEW_TYPE_NAME_${new Date().getTime()}`, CONST.settlementType.SPOT, { 
                 expiryTimestamp: new Date().getTime(),
-                underylerTypeId: 0,
+                underlyerTypeId: 0,
                        refCcyId: 0
             }, { from: accounts[0] });
         } catch (ex) { 
@@ -120,11 +120,11 @@ contract("StMaster", accounts => {
         try {
             await stm.addSecTokenType(`NEW_TYPE_NAME_${new Date().getTime()}`, CONST.settlementType.SPOT, { 
                 expiryTimestamp: 0,
-                underylerTypeId: CONST.tokenType.CORSIA,
+                underlyerTypeId: CONST.tokenType.CORSIA,
                        refCcyId: 0
             }, { from: accounts[0] });
         } catch (ex) { 
-            assert(ex.reason == 'Invalid underylerTypeId', `unexpected: ${ex.reason}`);
+            assert(ex.reason == 'Invalid underlyerTypeId', `unexpected: ${ex.reason}`);
             return;
         }
         assert.fail('expected contract exception');
@@ -135,7 +135,7 @@ contract("StMaster", accounts => {
         try {
             await stm.addSecTokenType(`NEW_TYPE_NAME_${new Date().getTime()}`, CONST.settlementType.SPOT, { 
                 expiryTimestamp: 0,
-                underylerTypeId: 0,
+                underlyerTypeId: 0,
                        refCcyId: CONST.ccyType.USD, 
             }, { from: accounts[0] });
         } catch (ex) { 

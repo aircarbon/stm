@@ -64,7 +64,7 @@ contract("StMaster", accounts => {
             const ccyTypes = (await stm_cur.getCcyTypes()).ccyTypes;
                 await stm_cur.addSecTokenType('NEW_TOK_FT_TYPE', CONST.settlementType.FUTURE, {
                     expiryTimestamp: DateTime.local().toMillis(),
-                    underylerTypeId: spotTypes[0].id, 
+                    underlyerTypeId: spotTypes[0].id, 
                            refCcyId: ccyTypes[0].id 
                 }, { from: accounts[0] }); 
 
@@ -250,7 +250,7 @@ contract("StMaster", accounts => {
         const curToks = await stm_cur.getSecTokenTypes(), newToks = await stm_new.getSecTokenTypes(), loadToks = _.differenceWith(curToks.tokenTypes, newToks.tokenTypes, _.isEqual);
         _.forEach(loadToks, async (p) => await stm_new.addSecTokenType(p.name, p.settlementType, { 
             expiryTimestamp: p.expiryTimestamp,
-                underlyerId: p.underlyerId, 
+            underlyerTypeId: p.underlyerId, 
                    refCcyId: p.refCcyId 
         }));
 

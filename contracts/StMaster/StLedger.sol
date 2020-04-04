@@ -21,13 +21,13 @@ contract StLedger is IStLedger,
         StructLib.SettlementType settlementType,
         StructLib.FutureTokenArgs memory ft
         // uint64 expiryTimestamp,
-        // uint256 underylerTypeId,
+        // uint256 underlyerTypeId,
         // uint256 refCcyId
     )
     public onlyOwner() onlyWhenReadWrite() {
         TokenLib.addSecTokenType(ledgerData, stTypesData, ccyTypesData, name, settlementType,
             ft
-            //expiryTimestamp, underylerTypeId, refCcyId
+            //expiryTimestamp, underlyerTypeId, refCcyId
         );
     }
 

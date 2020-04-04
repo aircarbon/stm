@@ -23,7 +23,7 @@ contract IStLedger is IOwned {
         StructLib.SettlementType settlementType,
         StructLib.FutureTokenArgs memory ft
         //uint64 expiryTimestamp,
-        //uint256 underylerTypeId,
+        //uint256 underlyerTypeId,
         //uint256 refCcyId
     )
     public onlyOwner() onlyWhenReadWrite() { revert("Not implemented"); }

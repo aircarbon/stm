@@ -27,7 +27,7 @@ contract("StMaster", accounts => {
         //console.log('TOTAL COST USD $: ', totalCostUsd.toFixed(2)); // 50 = $10 one by one
 
         const whitelist = await stm.getWhitelist();
-        //console.log(`*** WHITELIST ***\n`, whitelist); 
+        //console.log(`*** WHITELIST ***\n`, whitelist);
     });
 
     // whitelist & retrieve-next: owner-only & read-only 
