@@ -178,7 +178,6 @@ EXCHANGE_FEE: 1,
       thousandBtc_sat: Big(100000000).times(1000).toFixed(),
        millionBtc_sat: Big(100000000).times(1000000).toFixed(),
 
-
     // gas approx values - for cost estimations
     //gasPriceEth: _gasPriceEth,
     //     ethUsd: _ethUsd,

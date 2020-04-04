@@ -97,8 +97,8 @@ library StructLib {
         uint64 batchId;                                         // can be zero for "batchless" future "auto-minted" tokens; non-zero for spot tok-types
         int64  mintedQty;                                       // existence check field: should never be non-zero
         int64  currentQty;
-        int128 ft_price;                                        // [FUTURE types only] -- *** TODO: more inputs on DataLoad... ###
-        int128 ft_lastMarkPrice;                                // [FUTURE types only] -- *** TODO: more inputs on DataLoad... ###
+        int128 ft_price;                                        // [FUTURE types only]
+        int128 ft_lastMarkPrice;                                // [FUTURE types only]
     }
         struct SecTokenReturn { // todo: drop this - use LedgerSecTokenReturn (would need tokTypeId to be packed in PackedSt struct...)
             bool    exists;                                     // for existence check by id

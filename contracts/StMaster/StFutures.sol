@@ -44,10 +44,10 @@ FUTURES - notes 26/MAR/2020
 
 (0) ADD FT
   (0.2) done: needs reference ccy to be assigned also in FT type
-  (0.1) TODO? create empty "virtual" batch -- or could FT STs exist without a batch at all?
 (1) OPEN
-  (1.1) auto-mint both sides +ve / -ve, assign price P into both STs, assign LastMarkPrice (LMP) -1 into both STs - always new STs (NetPositions will collapse them later...)
-  (1.2) UpdateSetAside: sum MarginRequired for *all* open positions (not just this one!) - write TotalMarginRequired[ccyId] to ledger
+  (1.1) done: auto-mint both sides +ve / -ve, assign price P into both STs, assign LastMarkPrice (LMP) -1 into both STs - always new STs (NetPositions will collapse them later...)
+  (1.2) TODO: UpdateSetAside: sum MarginRequired for *all* open positions (not just this one!) - write TotalMarginRequired[ccyId] to ledger...
+  
 (2) MARK (param: ftTypeId, MarkPrice [MP])
   (2.1) TakeOrPay [2 updates: LMP + Ccy] - use (MP - LMP) or (MP - P) when LMP == -1
   (2.2) NetPositions (auto-burn/shrink) - should only ever be ONE net ST per FT-type after TakeOrPay
