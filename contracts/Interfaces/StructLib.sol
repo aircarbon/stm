@@ -26,9 +26,10 @@ library StructLib {
         uint256        id;
         string         name;
         SettlementType settlementType;
-        uint64         expiryTimestamp;
-        uint256        underlyerId;
-        uint256        refCcyId;
+        //uint64         expiryTimestamp;
+        //uint256        underlyerId;
+        //uint256        refCcyId;
+        FutureTokenTypeArgs ft;
     }
     struct GetSecTokenTypesReturn {
         SecTokenTypeReturn[] tokenTypes;
@@ -36,18 +37,17 @@ library StructLib {
 
     enum SettlementType { UNDEFINED, SPOT, FUTURE }
     struct StTypesStruct { // ** DATA_DUMP: OK
-        mapping(uint256 => string)          _tt_Name;           // typeId (1-based) -> typeName
-        mapping(uint256 => SettlementType)  _tt_Settle;
-        mapping(uint256 => FutureTokenArgs) _tt_ft;             // futures args
-        //mapping(uint256 => uint64)         _tt_Expiry;          // futures
-        //mapping(uint256 => uint256)        _tt_Underlyer;       // futures
-        //mapping(uint256 => uint256)        _tt_RefCcyId;        // futures
+        mapping(uint256 => string)              _tt_Name;       // typeId (1-based) -> typeName
+        mapping(uint256 => SettlementType)      _tt_Settle;
+        mapping(uint256 => FutureTokenTypeArgs) _tt_ft;         // futures args
         uint256 _tt_Count;
     }
-    struct FutureTokenArgs {
+    struct FutureTokenTypeArgs {
         uint64  expiryTimestamp;
         uint256 underlyerTypeId;
         uint256 refCcyId;
+        uint16  initMarginBips;                                 // initial margin - set only once at future token-type creation
+        uint16  varMarginBips;                                  // variation margin - updated on each pass of SettleFutures job
     }
 
     // TOKEN BATCH

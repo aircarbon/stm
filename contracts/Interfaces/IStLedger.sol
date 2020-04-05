@@ -21,7 +21,7 @@ contract IStLedger is IOwned {
     function addSecTokenType(
         string memory name,
         StructLib.SettlementType settlementType,
-        StructLib.FutureTokenArgs memory ft
+        StructLib.FutureTokenTypeArgs memory ft
         //uint64 expiryTimestamp,
         //uint256 underlyerTypeId,
         //uint256 refCcyId

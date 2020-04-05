@@ -21,7 +21,7 @@ library TokenLib {
         StructLib.CcyTypesStruct storage ccyTypesData,
         string memory name,
         StructLib.SettlementType settlementType,
-        StructLib.FutureTokenArgs memory ft
+        StructLib.FutureTokenTypeArgs memory ft
     )
     public {
         require(ledgerData.contractType == StructLib.ContractType.COMMODITY, "Bad cashflow request");
@@ -63,9 +63,7 @@ library TokenLib {
                     id: tokenTypeId,
                   name: stTypesData._tt_Name[tokenTypeId],
         settlementType: stTypesData._tt_Settle[tokenTypeId],
-       expiryTimestamp: stTypesData._tt_ft[tokenTypeId].expiryTimestamp,
-           underlyerId: stTypesData._tt_ft[tokenTypeId].underlyerTypeId,
-              refCcyId: stTypesData._tt_ft[tokenTypeId].refCcyId
+                    ft: stTypesData._tt_ft[tokenTypeId]
             });
         }
 

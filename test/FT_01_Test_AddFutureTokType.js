@@ -38,16 +38,21 @@ contract("StMaster", accounts => {
         const spotTypes = (await stm.getSecTokenTypes()).tokenTypes.filter(p => p.settlementType == CONST.settlementType.SPOT);
         const ccyTypes = (await stm.getCcyTypes()).ccyTypes;
         const ftName = `FT_TEST1_${new Date().getTime()}`;
-        const addFtTx = await stm.addSecTokenType(ftName, CONST.settlementType.FUTURE, { 
+        const addFtTx = await stm.addSecTokenType(ftName, CONST.settlementType.FUTURE, { ...CONST.nullFutureArgs,
             expiryTimestamp: expirySG.toMillis(), 
             underlyerTypeId: spotTypes[0].id, 
-                   refCcyId: ccyTypes[0].id 
+                   refCcyId: ccyTypes[0].id,
+             initMarginBips: 1000,
+              varMarginBips: 1500,
         });
         const ftType = (await stm.getSecTokenTypes()).tokenTypes.find(p => p.name == ftName);
         assert(ftType !== undefined);
         assert(ftType.settlementType == CONST.settlementType.FUTURE);
-        assert(ftType.underlyerId == spotTypes[0].id);
-        assert(ftType.refCcyId == ccyTypes[0].id);
+        assert(ftType.ft.expiryTimestamp == expirySG.toMillis());
+        assert(ftType.ft.underlyerTypeId == spotTypes[0].id);
+        assert(ftType.ft.refCcyId == ccyTypes[0].id);
+        assert(ftType.ft.initMarginBips == 1000);
+        assert(ftType.ft.varMarginBips == 1500);
     });
 
     it(`FT types - should not be able to add a future with an invalid expiry time`, async () => {
@@ -57,10 +62,9 @@ contract("StMaster", accounts => {
         // console.log('allTypes', allTypes);
         const ccyTypes = (await stm.getCcyTypes()).ccyTypes;
         try {
-            const addFtTx = await stm.addSecTokenType(`FT_TEST2_${new Date().getTime()}`, CONST.settlementType.FUTURE, { 
-                expiryTimestamp: 0, 
+            const addFtTx = await stm.addSecTokenType(`FT_TEST2_${new Date().getTime()}`, CONST.settlementType.FUTURE, { ...CONST.nullFutureArgs,
                 underlyerTypeId: spotTypes[0].id, 
-                       refCcyId: ccyTypes[0].id
+                       refCcyId: ccyTypes[0].id,
             });
         }
         catch (ex) { assert(ex.reason == 'Bad expiry', `unexpected: ${ex.reason}`); return; }
@@ -70,10 +74,9 @@ contract("StMaster", accounts => {
     it(`FT types - should not be able to add a future on invalid (non-existent) underlyer`, async () => {
         const ccyTypes = (await stm.getCcyTypes()).ccyTypes;
         try {
-            const addFtTx = await stm.addSecTokenType(`FT_TEST3_${new Date().getTime()}`, CONST.settlementType.FUTURE, { 
+            const addFtTx = await stm.addSecTokenType(`FT_TEST3_${new Date().getTime()}`, CONST.settlementType.FUTURE, { ...CONST.nullFutureArgs,
                 expiryTimestamp: DateTime.local().toMillis(), 
-                underlyerTypeId: 0, 
-                       refCcyId: ccyTypes[0].id 
+                       refCcyId: ccyTypes[0].id,
             });
         }
         catch (ex) { assert(ex.reason == 'Bad underlyerTypeId', `unexpected: ${ex.reason}`); return; }
@@ -83,13 +86,13 @@ contract("StMaster", accounts => {
     it(`FT types - should not be able to add a future on invalid (non-spot) underlyer`, async () => {
         const spotTypes = (await stm.getSecTokenTypes()).tokenTypes.filter(p => p.settlementType == CONST.settlementType.SPOT);
         const ccyTypes = (await stm.getCcyTypes()).ccyTypes;
-        const addFtTx_ok = await stm.addSecTokenType(`FT_TEST4_${new Date().getTime()}`, CONST.settlementType.FUTURE, { 
-            expiryTimestamp: DateTime.local().toMillis(), underlyerTypeId: spotTypes[0].id, refCcyId: ccyTypes[0].id 
+        const addFtTx_ok = await stm.addSecTokenType(`FT_TEST4_${new Date().getTime()}`, CONST.settlementType.FUTURE, { ...CONST.nullFutureArgs,
+            expiryTimestamp: DateTime.local().toMillis(), underlyerTypeId: spotTypes[0].id, refCcyId: ccyTypes[0].id,
         });
         const ftTypes = (await stm.getSecTokenTypes()).tokenTypes.filter(p => p.settlementType == CONST.settlementType.FUTURE);
         try {
-            const addFtTx_err = await stm.addSecTokenType(`FT_TEST5_${new Date().getTime()}`, CONST.settlementType.FUTURE, { 
-                expiryTimestamp: DateTime.local().toMillis(), underlyerTypeId: ftTypes[0].id, refCcyId: ccyTypes[0].id 
+            const addFtTx_err = await stm.addSecTokenType(`FT_TEST5_${new Date().getTime()}`, CONST.settlementType.FUTURE, {  ...CONST.nullFutureArgs,
+                expiryTimestamp: DateTime.local().toMillis(), underlyerTypeId: ftTypes[0].id, refCcyId: ccyTypes[0].id, 
             });
         }
         catch (ex) { assert(ex.reason == 'Bad underyler settlement type', `unexpected: ${ex.reason}`); return; }
@@ -99,8 +102,8 @@ contract("StMaster", accounts => {
     it(`FT types - should not be able to add a future with an invalid (non-existent) reference currency`, async () => {
         const spotTypes = (await stm.getSecTokenTypes()).tokenTypes.filter(p => p.settlementType == CONST.settlementType.SPOT);
         try {
-            const addFtTx = await stm.addSecTokenType(`FT_TEST6_${new Date().getTime()}`, CONST.settlementType.FUTURE, { 
-                expiryTimestamp: DateTime.local().toMillis(), underlyerTypeId: spotTypes[0].id, refCcyId: 0
+            const addFtTx = await stm.addSecTokenType(`FT_TEST6_${new Date().getTime()}`, CONST.settlementType.FUTURE, { ...CONST.nullFutureArgs,
+                expiryTimestamp: DateTime.local().toMillis(), underlyerTypeId: spotTypes[0].id, refCcyId: 0,
             });
         }
         catch (ex) { assert(ex.reason == 'Bad refCcyId', `unexpected: ${ex.reason}`); return; }

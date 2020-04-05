@@ -2,7 +2,7 @@ const Big = require('big.js');
 
 const Web3 = require('web3');
 const web3 = new Web3();
-const _ethUsd = 150;
+const ETH_USD = 144;
 
 const bip39 = require('bip39');
 const hdkey = require('ethereumjs-wallet/hdkey');
@@ -33,7 +33,7 @@ const blocksFromMonths = (months) => Math.ceil(blocksFromDays(months * 30.42));
 //
 // MAIN: deployer definitions -- contract ctor() params
 //
-const contractVer = "0.97a";
+const contractVer = "0.97b";
 const contractProps = {
     COMMODITY: {
         contractVer: contractVer,
@@ -98,18 +98,20 @@ module.exports = {
     web3_tx: (methodName, methodArgs, fromAddr, fromPrivKey) => web3_tx(methodName, methodArgs, fromAddr, fromPrivKey),
 
     nullFees: {
-        ccy_mirrorFee: false,
+         ccy_mirrorFee: false,
         ccy_perMillion: 0,
-        fee_fixed: 0,
-        fee_percBips: 0,
-        fee_min: 0,
-        fee_max: 0,
+             fee_fixed: 0,
+            e_percBips: 0,
+               fee_min: 0,
+               fee_max: 0,
     },
 
     nullFutureArgs: {
         expiryTimestamp: 0,
         underlyerTypeId: 0,
-               refCcyId: 0
+               refCcyId: 0,
+         initMarginBips: 0,
+          varMarginBips: 0,
     },
 
     contractType: Object.freeze({
@@ -198,7 +200,7 @@ EXCHANGE_FEE: 1,
         //console.log('actualGasPriceEth', actualGasPriceEth);
 
         const weiCost = web3Tx.gasPrice * truffleTx.receipt.gasUsed;
-        const usdCost = actualGasPriceEth * truffleTx.receipt.gasUsed * _ethUsd;
+        const usdCost = actualGasPriceEth * truffleTx.receipt.gasUsed * ETH_USD;
 
         console.log(`>>> gasUsed - ${desc}: ${truffleTx.receipt.gasUsed} @${actualGasPriceEth} ETH/gas = Ξ${(actualGasPriceEth * truffleTx.receipt.gasUsed).toFixed(4)} ~= $${(usdCost).toFixed(4)}`);
         return { usdCost, weiCost };
