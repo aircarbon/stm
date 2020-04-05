@@ -35,7 +35,7 @@ contract("StMaster", accounts => {
               underlyerTypeId: spotTypes[0].id,
                      refCcyId: ccyTypes.find(p => p.name === 'USD').id 
         });
-        usdFT = (await stm.getSecTokenTypes()).tokenTypes.filter(p => p.settlementType == CONST.settlementType.FUTURE).filter(p => p.name == ftTestName_USD)[0];
+        usdFT = (await stm.getSecTokenTypes()).tokenTypes.filter(p => p.name == ftTestName_USD)[0];
         usdFT_underlyer = spotTypes.filter(p => p.id == usdFT.underlyerId)[0];
         usdFT_refCcy = ccyTypes.filter(p => p.id == usdFT.refCcyId)[0];
 
@@ -46,7 +46,7 @@ contract("StMaster", accounts => {
             underlyerTypeId: spotTypes[0].id,
                    refCcyId: ccyTypes.find(p => p.name === 'ETH').id 
         });
-        ethFT = (await stm.getSecTokenTypes()).tokenTypes.filter(p => p.settlementType == CONST.settlementType.FUTURE).filter(p => p.name == ftTestName_ETH)[0];
+        ethFT = (await stm.getSecTokenTypes()).tokenTypes.filter(p => p.name == ftTestName_ETH)[0];
         ethFT_underlyer = spotTypes.filter(p => p.id == ethFT.underlyerId)[0];
         ethFT_refCcy = ccyTypes.filter(p => p.id == ethFT.refCcyId)[0];
     });
@@ -57,13 +57,13 @@ contract("StMaster", accounts => {
             console.log(`addrNdx: ${global.TaddrNdx} - contract @ ${stm.address} (owner: ${accounts[0]})`);
     });
 
-    it(`FT positions - should allow opening of a futures position with USD ref currency`, async () => {
+    it(`FT positions - should be able to open a futures position with USD ref currency`, async () => {
         const A = accounts[global.TaddrNdx], B = accounts[global.TaddrNdx + 1];
         const x = await futuresHelper.openFtPos({ stm, accounts, tokTypeId: usdFT.id, ledger_A: A, ledger_B: B, qty_A: +1000, qty_B: -1000, price: 100 });
         //truffleAssert.prettyPrintEmittedEvents(x.tx);
     });
 
-    it(`FT positions - should allow opening of a (large qty * price) futures position with ETH ref currency`, async () => {
+    it(`FT positions - should be able to open a (large qty * price) futures position with ETH ref currency`, async () => {
         const A = accounts[global.TaddrNdx], B = accounts[global.TaddrNdx + 1];
         const x = await futuresHelper.openFtPos({ stm, accounts, tokTypeId: ethFT.id, ledger_A: A, ledger_B: B,
             qty_A: +1000000000,

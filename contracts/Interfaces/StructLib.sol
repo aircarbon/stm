@@ -36,18 +36,19 @@ library StructLib {
 
     enum SettlementType { UNDEFINED, SPOT, FUTURE }
     struct StTypesStruct { // ** DATA_DUMP: OK
-        mapping(uint256 => string)         _tt_Name;            // typeId (1-based) -> typeName
-        mapping(uint256 => SettlementType) _tt_Settle;
-        mapping(uint256 => uint64)         _tt_Expiry;          // futures
-        mapping(uint256 => uint256)        _tt_Underlyer;       // futures
-        mapping(uint256 => uint256)        _tt_RefCcyId;        // futures
+        mapping(uint256 => string)          _tt_Name;           // typeId (1-based) -> typeName
+        mapping(uint256 => SettlementType)  _tt_Settle;
+        mapping(uint256 => FutureTokenArgs) _tt_ft;             // futures args
+        //mapping(uint256 => uint64)         _tt_Expiry;          // futures
+        //mapping(uint256 => uint256)        _tt_Underlyer;       // futures
+        //mapping(uint256 => uint256)        _tt_RefCcyId;        // futures
         uint256 _tt_Count;
     }
-        struct FutureTokenArgs {
-            uint64  expiryTimestamp;
-            uint256 underlyerTypeId;
-            uint256 refCcyId;
-        }
+    struct FutureTokenArgs {
+        uint64  expiryTimestamp;
+        uint256 underlyerTypeId;
+        uint256 refCcyId;
+    }
 
     // TOKEN BATCH
     struct SecTokenBatch { // ** DATA_DUMP: OK

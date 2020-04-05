@@ -22,10 +22,7 @@ library TokenLib {
         string memory name,
         StructLib.SettlementType settlementType,
         StructLib.FutureTokenArgs memory ft
-        // uint64 expiryTimestamp,
-        // uint256 underlyerTypeId,
-        // uint256 refCcyId
-        )
+    )
     public {
         require(ledgerData.contractType == StructLib.ContractType.COMMODITY, "Bad cashflow request");
         for (uint256 tokenTypeId = 1; tokenTypeId <= stTypesData._tt_Count; tokenTypeId++) {
@@ -49,9 +46,7 @@ library TokenLib {
 
         // futures
         if (settlementType == StructLib.SettlementType.FUTURE) {
-            stTypesData._tt_Expiry[stTypesData._tt_Count] = ft.expiryTimestamp;
-            stTypesData._tt_Underlyer[stTypesData._tt_Count] = ft.underlyerTypeId;
-            stTypesData._tt_RefCcyId[stTypesData._tt_Count] = ft.refCcyId;
+            stTypesData._tt_ft[stTypesData._tt_Count] = ft;
         }
 
         emit AddedSecTokenType(stTypesData._tt_Count, name, settlementType, ft.expiryTimestamp, ft.underlyerTypeId, ft.refCcyId);
@@ -68,9 +63,9 @@ library TokenLib {
                     id: tokenTypeId,
                   name: stTypesData._tt_Name[tokenTypeId],
         settlementType: stTypesData._tt_Settle[tokenTypeId],
-       expiryTimestamp: stTypesData._tt_Expiry[tokenTypeId],
-           underlyerId: stTypesData._tt_Underlyer[tokenTypeId],
-              refCcyId: stTypesData._tt_RefCcyId[tokenTypeId]
+       expiryTimestamp: stTypesData._tt_ft[tokenTypeId].expiryTimestamp,
+           underlyerId: stTypesData._tt_ft[tokenTypeId].underlyerTypeId,
+              refCcyId: stTypesData._tt_ft[tokenTypeId].refCcyId
             });
         }
 
