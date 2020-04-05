@@ -16,22 +16,22 @@ library PayableLib {
     //
 
     function setIssuerValues(
-        StructLib.LedgerStruct storage ledgerData,
+        StructLib.LedgerStruct storage ld,
         StructLib.CashflowStruct storage cashflowData,
         uint256 wei_currentPrice,
         uint256 cents_currentPrice,
         uint256 qty_saleAllocation
     ) public {
-        require(ledgerData._contractSealed, "Contract is not sealed");
+        require(ld._contractSealed, "Contract is not sealed");
 
-        require(ledgerData._batches_currentMax_id == 1, "Bad cashflow request: no minted batch");
-        StructLib.SecTokenBatch storage issueBatch = ledgerData._batches[1];
+        require(ld._batches_currentMax_id == 1, "Bad cashflow request: no minted batch");
+        StructLib.SecTokenBatch storage issueBatch = ld._batches[1];
 
         require(msg.sender == issueBatch.originator, "Bad cashflow request: access denied");
 
         // qty_saleAllocation is the *cummulative* amount allowable for sale;
         // i.e. it can't be set < the currently sold amount, and it can't be set > the total issuance monobatch size
-        StructLib.CashflowStruct memory current = getCashflowData(ledgerData, cashflowData);
+        StructLib.CashflowStruct memory current = getCashflowData(ld, cashflowData);
         require(qty_saleAllocation <= current.qty_issuanceMax, "Bad cashflow request: qty_saleAllocation too large");
         require(qty_saleAllocation >= current.qty_issuanceSold, "Bad cashflow request: qty_saleAllocation too small");
 
@@ -61,36 +61,36 @@ library PayableLib {
 
     // v1: multi-sub
     function pay(
-        StructLib.LedgerStruct storage ledgerData,
+        StructLib.LedgerStruct storage ld,
         StructLib.CashflowStruct storage cashflowData,
-        StructLib.CcyTypesStruct storage ccyTypesData,
+        StructLib.CcyTypesStruct storage ctd,
         StructLib.FeeStruct storage globalFees, address owner,
         int256 ethSat_UsdCents
     )
     public {
-        require(ledgerData.contractType == StructLib.ContractType.CASHFLOW, "Bad commodity request");
-        require(ledgerData._contractSealed, "Contract is not sealed");
-        require(ledgerData._batches_currentMax_id == 1, "Bad cashflow request: no minted batch");
+        require(ld.contractType == StructLib.ContractType.CASHFLOW, "Bad commodity request");
+        require(ld._contractSealed, "Contract is not sealed");
+        require(ld._batches_currentMax_id == 1, "Bad cashflow request: no minted batch");
         require(cashflowData.wei_currentPrice > 0 || cashflowData.cents_currentPrice > 0, "Bad cashflow request: no price set");
         require(cashflowData.wei_currentPrice == 0 || cashflowData.cents_currentPrice == 0, "Bad cashflow request: ambiguous price set");
         if (cashflowData.cents_currentPrice > 0) require(ethSat_UsdCents > 0, "Bad cashflow request: the end is nigh");
 
         // get issuer
-        StructLib.SecTokenBatch storage issueBatch = ledgerData._batches[1];
+        StructLib.SecTokenBatch storage issueBatch = ld._batches[1];
 
         // process payment
         if (msg.sender == issueBatch.originator) {
-            //processIssuerPayment(ledgerData, cashflowData, issueBatch, globalFees, owner); // sender is issuer
+            //processIssuerPayment(ld, cashflowData, issueBatch, globalFees, owner); // sender is issuer
         }
         else {
-            processSubscriberPayment(ledgerData, cashflowData, ccyTypesData, issueBatch, globalFees, owner, ethSat_UsdCents); // all other senders
+            processSubscriberPayment(ld, cashflowData, ctd, issueBatch, globalFees, owner, ethSat_UsdCents); // all other senders
         }
     }
 
     function processSubscriberPayment(
-        StructLib.LedgerStruct storage ledgerData,
+        StructLib.LedgerStruct storage ld,
         StructLib.CashflowStruct storage cashflowData,
-        StructLib.CcyTypesStruct storage ccyTypesData,
+        StructLib.CcyTypesStruct storage ctd,
         StructLib.SecTokenBatch storage issueBatch,
         StructLib.FeeStruct storage globalFees, address owner,
         int256 ethSat_UsdCents
@@ -138,7 +138,7 @@ library PayableLib {
                    applyFees: false,
                 feeAddrOwner: owner
             });
-            TransferLib.transferOrTrade(ledgerData, ccyTypesData, globalFees, a);
+            TransferLib.transferOrTrade(ld, ctd, globalFees, a);
         }
 
         // todo: issuance fees (set then clear ledgerFee?)
@@ -178,7 +178,7 @@ library PayableLib {
     // TODO: ### caller needs to be able to specify a batch / offset (~5m gas / ~23k transfer per holder ~= 250 max holders!!)
     //
     function processIssuerPayment(
-        StructLib.LedgerStruct storage ledgerData,
+        StructLib.LedgerStruct storage ld,
         StructLib.CashflowStruct storage cashflowData,
         StructLib.SecTokenBatch storage issueBatch,
         StructLib.FeeStruct storage globalFees, address owner
@@ -186,8 +186,8 @@ library PayableLib {
     private {
         // TODO: restrict msg.value upper bound so no overflow -- esp. wrt. precision hack below!!
 
-        uint256[] storage issuer_stIds = ledgerData._ledger[issueBatch.originator].tokenType_stIds[1];
-        StructLib.PackedSt storage issuerSt = ledgerData._sts[issuer_stIds[0]];
+        uint256[] storage issuer_stIds = ld._ledger[issueBatch.originator].tokenType_stIds[1];
+        StructLib.PackedSt storage issuerSt = ld._sts[issuer_stIds[0]];
 
         //address payable I = issueBatch.originator;
         uint256 B = issueBatch.mintedQty;
@@ -210,13 +210,13 @@ library PayableLib {
 
             // walk all ST IDs except issuerSt...
             // pay (ST qty / S) * (msg.value - fee)...
-            for (uint256 addrNdx = 0; addrNdx < ledgerData._ledgerOwners.length; addrNdx++) {
-                address payable addr = address(uint160(ledgerData._ledgerOwners[addrNdx]));
+            for (uint256 addrNdx = 0; addrNdx < ld._ledgerOwners.length; addrNdx++) {
+                address payable addr = address(uint160(ld._ledgerOwners[addrNdx]));
                 if (addr != issueBatch.originator) {
-                    StructLib.Ledger storage ledger = ledgerData._ledger[addr];
+                    StructLib.Ledger storage ledger = ld._ledger[addr];
                     uint256[] storage stIds = ledger.tokenType_stIds[1];
                     for (uint256 stNdx = 0; stNdx < stIds.length; stNdx++) {
-                        StructLib.PackedSt storage st = ledgerData._sts[stIds[stNdx]];
+                        StructLib.PackedSt storage st = ld._sts[stIds[stNdx]];
 
                         uint256 sharePerc = S * 1000000/*precision*/ / uint256(st.currentQty);
                         uint256 shareWei = msg.value * 1000000/*precision*/ / sharePerc;
@@ -238,17 +238,17 @@ library PayableLib {
     //...
 
     function getCashflowData(
-        StructLib.LedgerStruct storage ledgerData,
+        StructLib.LedgerStruct storage ld,
         StructLib.CashflowStruct storage cashflowData
     )
     public view returns(StructLib.CashflowStruct memory) {
         StructLib.CashflowStruct memory ret = cashflowData;
 
-        if (ledgerData.contractType == StructLib.ContractType.CASHFLOW) {
-            if (ledgerData._batches_currentMax_id == 1) {
-                StructLib.SecTokenBatch storage issueBatch = ledgerData._batches[1]; // CFT: uni-batch
-                uint256[] storage issuer_stIds = ledgerData._ledger[issueBatch.originator].tokenType_stIds[1]; // CFT: uni-type
-                StructLib.PackedSt storage issuerSt = ledgerData._sts[issuer_stIds[0]];
+        if (ld.contractType == StructLib.ContractType.CASHFLOW) {
+            if (ld._batches_currentMax_id == 1) {
+                StructLib.SecTokenBatch storage issueBatch = ld._batches[1]; // CFT: uni-batch
+                uint256[] storage issuer_stIds = ld._ledger[issueBatch.originator].tokenType_stIds[1]; // CFT: uni-type
+                StructLib.PackedSt storage issuerSt = ld._sts[issuer_stIds[0]];
                 ret.qty_issuanceMax = issueBatch.mintedQty;
                 ret.qty_issuanceRemaining = uint256(issuerSt.currentQty);
                 ret.qty_issuanceSold = uint256(issueBatch.mintedQty) - uint256(issuerSt.currentQty);

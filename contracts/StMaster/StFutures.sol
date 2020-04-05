@@ -95,6 +95,6 @@ contract StFutures is Owned,
 
     function openFtPos(StructLib.FuturesPositionArgs memory a)
     public onlyOwner() onlyWhenReadWrite() {
-      FuturesLib.openFtPos(ledgerData, stTypesData, ccyTypesData, globalFees, a);
+      FuturesLib.openFtPos(ld, std, ctd, globalFees, a);
     }
 }

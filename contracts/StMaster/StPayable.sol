@@ -45,7 +45,7 @@ contract StPayable is
     }
 
     function() external payable onlyWhenReadWrite() {
-        PayableLib.pay(ledgerData, cashflowData, ccyTypesData, globalFees, owner, get_ethUsd());
+        PayableLib.pay(ld, cashflowData, ctd, globalFees, owner, get_ethUsd());
     }
 
     function setIssuerValues(
@@ -56,7 +56,7 @@ contract StPayable is
         uint256 qty_saleAllocation
     ) external onlyWhenReadWrite() {
         PayableLib.setIssuerValues(
-            ledgerData,
+            ld,
             cashflowData,
             wei_currentPrice,
             cents_currentPrice,
@@ -65,6 +65,6 @@ contract StPayable is
     }
 
     function getCashflowData() public view returns(StructLib.CashflowStruct memory) {
-        return PayableLib.getCashflowData(ledgerData, cashflowData);
+        return PayableLib.getCashflowData(ld, cashflowData);
     }
 }

@@ -243,22 +243,22 @@ library StructLib {
 
     /**
      * @notice Creates a new ledger entry, if not already existing
-     * @param ledgerData Ledger data
+     * @param ld Ledger data
      * @param addr Ledger entry address
      */
     function initLedgerIfNew(
-        StructLib.LedgerStruct storage ledgerData,
+        StructLib.LedgerStruct storage ld,
         address addr
     )
     public {
-        if (!ledgerData._ledger[addr].exists) {
-            ledgerData._ledger[addr] = StructLib.Ledger({
+        if (!ld._ledger[addr].exists) {
+            ld._ledger[addr] = StructLib.Ledger({
                  exists: true,
              customFees: StructLib.FeeStruct(),
       spot_sumQtyMinted: 0,
       spot_sumQtyBurned: 0
             });
-            ledgerData._ledgerOwners.push(addr);
+            ld._ledgerOwners.push(addr);
         }
     }
 
@@ -269,12 +269,12 @@ library StructLib {
      * @param qty Validation quantity in contract base unit
      */
     function sufficientTokens(
-        StructLib.LedgerStruct storage ledgerData,
+        StructLib.LedgerStruct storage ld,
         address ledger, uint256 tokenTypeId, int256 qty, int256 fee
     ) public view returns (bool) {
         int256 qtyAvailable = 0;
-        for (uint i = 0; i < ledgerData._ledger[ledger].tokenType_stIds[tokenTypeId].length; i++) {
-            qtyAvailable += ledgerData._sts[ledgerData._ledger[ledger].tokenType_stIds[tokenTypeId][i]].currentQty;
+        for (uint i = 0; i < ld._ledger[ledger].tokenType_stIds[tokenTypeId].length; i++) {
+            qtyAvailable += ld._sts[ld._ledger[ledger].tokenType_stIds[tokenTypeId][i]].currentQty;
         }
         return qtyAvailable >= qty + fee;
     }
@@ -288,12 +288,12 @@ library StructLib {
      * @param fee Fee to be paid
      */
     function sufficientCcy(
-        StructLib.LedgerStruct storage ledgerData,
+        StructLib.LedgerStruct storage ld,
         address ledger, uint256 ccyTypeId, int256 sending, int256 receiving, int256 fee
     ) public view returns (bool) {
 
-        return (ledgerData._ledger[ledger].ccyType_balance[ccyTypeId]
-                + receiving - ledgerData._ledger[ledger].ccyType_reserved[ccyTypeId]
+        return (ld._ledger[ledger].ccyType_balance[ccyTypeId]
+                + receiving - ld._ledger[ledger].ccyType_reserved[ccyTypeId]
                ) >= sending + fee;
     }
 
@@ -304,13 +304,13 @@ library StructLib {
      * @param reservedAmount Reserved amount to set
      */
     function setReservedCcy(
-        StructLib.LedgerStruct storage ledgerData,
-        StructLib.CcyTypesStruct storage ccyTypesData,
+        StructLib.LedgerStruct storage ld,
+        StructLib.CcyTypesStruct storage ctd,
         address ledger, uint256 ccyTypeId, int256 reservedAmount
     ) public {
-        require(ccyTypeId >= 1 && ccyTypeId <= ccyTypesData._ct_Count, "Bad ccyTypeId");
-        initLedgerIfNew(ledgerData, ledger);
-        require(ledgerData._ledger[ledger].ccyType_balance[ccyTypeId] >= reservedAmount, "Reservation exceeds balance");
-        ledgerData._ledger[ledger].ccyType_reserved[ccyTypeId] = reservedAmount;
+        require(ccyTypeId >= 1 && ccyTypeId <= ctd._ct_Count, "Bad ccyTypeId");
+        initLedgerIfNew(ld, ledger);
+        require(ld._ledger[ledger].ccyType_balance[ccyTypeId] >= reservedAmount, "Reservation exceeds balance");
+        ld._ledger[ledger].ccyType_reserved[ccyTypeId] = reservedAmount;
     }
 }

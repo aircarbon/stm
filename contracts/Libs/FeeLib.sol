@@ -15,23 +15,23 @@ library FeeLib {
     event SetFeeCcyPerMillion(uint256 ccyTypeId, address indexed ledgerOwner, uint256 fee_ccy_perMillion);
 
     function setFee_TokType(
-        StructLib.LedgerStruct storage ledgerData,
-        StructLib.StTypesStruct storage stTypesData,
+        StructLib.LedgerStruct storage ld,
+        StructLib.StTypesStruct storage std,
         StructLib.FeeStruct storage globalFees,
         uint256 tokenTypeId,
         address ledgerOwner,
         StructLib.SetFeeArgs memory a)
     public {
-        require(tokenTypeId >= 1 && tokenTypeId <= stTypesData._tt_Count, "Bad tokenTypeId");
+        require(tokenTypeId >= 1 && tokenTypeId <= std._tt_Count, "Bad tokenTypeId");
         require(a.ccy_perMillion == 0, "ccy_perMillion unsupported for token-type fee");
         require(a.ccy_mirrorFee == false, "ccy_mirrorFee unsupported for token-type fee");
 
         StructLib.FeeStruct storage feeStruct = globalFees;
         if (ledgerOwner != address(0x0)) {
-            //require(ledgerData._ledger[ledgerOwner].exists == true, "Bad ledgerOwner");
-            StructLib.initLedgerIfNew(ledgerData, ledgerOwner);
+            //require(ld._ledger[ledgerOwner].exists == true, "Bad ledgerOwner");
+            StructLib.initLedgerIfNew(ld, ledgerOwner);
 
-            feeStruct = ledgerData._ledger[ledgerOwner].customFees;
+            feeStruct = ld._ledger[ledgerOwner].customFees;
         }
 
         feeStruct.tokType_Set[tokenTypeId] = a.fee_fixed != 0 || a.fee_percBips != 0 || a.fee_min != 0 || a.fee_max != 0;
@@ -54,21 +54,21 @@ library FeeLib {
     }
 
     function setFee_CcyType(
-        StructLib.LedgerStruct storage ledgerData,
-        StructLib.CcyTypesStruct storage ccyTypesData,
+        StructLib.LedgerStruct storage ld,
+        StructLib.CcyTypesStruct storage ctd,
         StructLib.FeeStruct storage globalFees,
         uint256 ccyTypeId,
         address ledgerOwner,
         StructLib.SetFeeArgs memory a)
     public {
-        require(ccyTypeId >= 1 && ccyTypeId <= ccyTypesData._ct_Count, "Bad ccyTypeId");
+        require(ccyTypeId >= 1 && ccyTypeId <= ctd._ct_Count, "Bad ccyTypeId");
 
         StructLib.FeeStruct storage feeStruct = globalFees;
         if (ledgerOwner != address(0x0)) {
-            //require(ledgerData._ledger[ledgerOwner].exists == true, "Bad ledgerOwner");
-            StructLib.initLedgerIfNew(ledgerData, ledgerOwner);
+            //require(ld._ledger[ledgerOwner].exists == true, "Bad ledgerOwner");
+            StructLib.initLedgerIfNew(ld, ledgerOwner);
 
-            feeStruct = ledgerData._ledger[ledgerOwner].customFees;
+            feeStruct = ld._ledger[ledgerOwner].customFees;
         }
 
         feeStruct.ccyType_Set[ccyTypeId] = a.fee_fixed != 0 || a.fee_percBips != 0 || a.fee_min != 0 || a.fee_max != 0 || a.ccy_perMillion != 0;

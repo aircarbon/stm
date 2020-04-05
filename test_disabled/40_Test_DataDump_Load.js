@@ -30,8 +30,8 @@ contract("StMaster", accounts => {
 
     it(`data dump - should be able to read without gas fees`, async () => {
         var curHash = await stm_cur.getLedgerHashcode();
-        const ccyTypesData = await stm_cur.getCcyTypes();
-        const stTypesData = await stm_cur.getSecTokenTypes();
+        const ctd = await stm_cur.getCcyTypes();
+        const std = await stm_cur.getSecTokenTypes();
         const whitelist = await stm_cur.getWhitelist();
         const allLedgerOwners = await stm_cur.getLedgerOwners();
         const ledgerEntry = await stm_cur.getLedgerEntry(accounts[0]);
@@ -47,13 +47,13 @@ contract("StMaster", accounts => {
 
         // ccy types
         await stm_cur.addCcyType('TEST_CCY_TYPE', 'TEST_UNIT', 42);
-        const ccyTypesData = await stm_cur.getCcyTypes();
-        console.log(`Ccy Types: ${ccyTypesData.ccyTypes.map(p => p.name).join(', ')}`);
+        const ctd = await stm_cur.getCcyTypes();
+        console.log(`Ccy Types: ${ctd.ccyTypes.map(p => p.name).join(', ')}`);
         curHash = await checkHashUpdate(curHash);
 
         // token types (spot & future)
-        const stTypesData = await stm_cur.getSecTokenTypes();
-        console.log(`St Types: ${stTypesData.tokenTypes.map(p => p.name).join(', ')}`);
+        const std = await stm_cur.getSecTokenTypes();
+        console.log(`St Types: ${std.tokenTypes.map(p => p.name).join(', ')}`);
         if (await stm_cur.getContractType() == CONST.contractType.COMMODITY) {
             
             // add spot type
@@ -90,8 +90,8 @@ contract("StMaster", accounts => {
         await stm_cur.incWhitelistNext();
 
         // exchange fee - ccy's
-        for (let i=0 ; i < ccyTypesData.ccyTypes.length; i++) {
-            const ccyType = ccyTypesData.ccyTypes[i];
+        for (let i=0 ; i < ctd.ccyTypes.length; i++) {
+            const ccyType = ctd.ccyTypes[i];
             const setFee = await stm_cur.setFee_CcyType(ccyType.id, CONST.nullAddr, { ccy_mirrorFee: false, ccy_perMillion: 0, fee_fixed: i+1, fee_percBips: (i+1)*100, fee_min: (i+1), fee_max: (i+1+100) } );
             const x = await stm_cur.getFee(CONST.getFeeType.CCY, ccyType.id, CONST.nullAddr);
             console.log(`Exchange Fee: ccyTypeId=${ccyType.id} { x.fee_fixed=${x.fee_fixed} / x.fee_percBips=${x.fee_percBips} / x.fee_min=${x.fee_min} / x.fee_max=${x.fee_max} }`);
@@ -99,8 +99,8 @@ contract("StMaster", accounts => {
         }
 
         // exchange fee - tok's
-        for (let i=0 ; i < stTypesData.tokenTypes.length; i++) {
-            const tokType = stTypesData.tokenTypes[i];
+        for (let i=0 ; i < std.tokenTypes.length; i++) {
+            const tokType = std.tokenTypes[i];
             const setFee = await stm_cur.setFee_TokType(tokType.id, CONST.nullAddr, { ccy_mirrorFee: false, ccy_perMillion: 0, fee_fixed: i+1, fee_percBips: (i+1)*100, fee_min: (i+1), fee_max: (i+1+100) } );
             const x = await stm_cur.getFee(CONST.getFeeType.TOK, tokType.id, CONST.nullAddr);
             console.log(`Exchange Fee: tokType=${tokType.id} { x.fee_fixed=${x.fee_fixed} / x.fee_percBips=${x.fee_percBips} / x.fee_min=${x.fee_min} / x.fee_max=${x.fee_max} }`);
@@ -209,8 +209,8 @@ contract("StMaster", accounts => {
             console.log('funding, withdrawing, setting ledger ccy & token fees for account... ', entryOwner);
 
             // for all ccy types
-            for (let i=0 ; i < ccyTypesData.ccyTypes.length; i++) { // test ccy data 
-                const ccyType = ccyTypesData.ccyTypes[i];
+            for (let i=0 ; i < ctd.ccyTypes.length; i++) { // test ccy data 
+                const ccyType = ctd.ccyTypes[i];
             
                 // fund to ledger
                 const fundAmount = (j+1)*100+(i+1), reserveAmount = (j+1)*50+(i+1), withdrawAmount = (j+1)*25+(i+1);
@@ -231,9 +231,9 @@ contract("StMaster", accounts => {
             }
 
             // for all token types
-            for (let k=0 ; k < stTypesData.tokenTypes.length; k++) {
+            for (let k=0 ; k < std.tokenTypes.length; k++) {
                 // set ledger token fee
-                const tokType = stTypesData.tokenTypes[k];
+                const tokType = std.tokenTypes[k];
                 await stm_cur.setFee_TokType(tokType.id, entryOwner, { ccy_mirrorFee: false, ccy_perMillion: 0, fee_fixed: k+4+j+4, fee_percBips: (k+4+j+4)*100, fee_min: (k+4+j+4), fee_max: (k+4+j+4+100) } );
                 if (entryOwner != accounts[0]) curHash = await checkHashUpdate(curHash);
             }

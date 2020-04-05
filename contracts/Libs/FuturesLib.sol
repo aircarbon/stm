@@ -10,13 +10,13 @@ library FuturesLib {
     // PUBLIC - open futures position
     //
     function openFtPos(
-        StructLib.LedgerStruct storage ledgerData,
-        StructLib.StTypesStruct storage stTypesData,
-        StructLib.CcyTypesStruct storage ccyTypesData,
+        StructLib.LedgerStruct storage ld,
+        StructLib.StTypesStruct storage std,
+        StructLib.CcyTypesStruct storage ctd,
         StructLib.FeeStruct storage globalFees,
         StructLib.FuturesPositionArgs memory a
     ) public {
-        require(ledgerData._contractSealed, "Contract is not sealed");
+        require(ld._contractSealed, "Contract is not sealed");
 
         require(a.ledger_A != a.ledger_B, "Bad transfer");
 
@@ -25,8 +25,8 @@ library FuturesLib {
                 a.qty_A != 0 && a.qty_B != 0,  "Bad quantity"); // min/max signed int64, non-zero
         require(a.qty_A + a.qty_B == 0, "Quantity mismatch");
 
-        require(a.tokTypeId >= 0 && a.tokTypeId <= stTypesData._tt_Count, "Bad tokTypeId");
-        require(stTypesData._tt_Settle[a.tokTypeId] == StructLib.SettlementType.FUTURE, "Invalid (non-future) tokTypeId");
+        require(a.tokTypeId >= 0 && a.tokTypeId <= std._tt_Count, "Bad tokTypeId");
+        require(std._tt_Settle[a.tokTypeId] == StructLib.SettlementType.FUTURE, "Invalid (non-future) tokTypeId");
 
         require(a.price <= 0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF && a.price > 0, "Bad price"); // max signed int128, non-zero
 
@@ -55,31 +55,31 @@ library FuturesLib {
         // TESTS...
 
         // create ledger entries as required
-        StructLib.initLedgerIfNew(ledgerData, a.ledger_A);
-        StructLib.initLedgerIfNew(ledgerData, a.ledger_B);
+        StructLib.initLedgerIfNew(ld, a.ledger_A);
+        StructLib.initLedgerIfNew(ld, a.ledger_B);
 
         // auto-mint ("batchless") balanced STs on each side of the position
         // (note: no global counter updates [_spot_totalMintedQty, spot_sumQtyMinted] for FT auto-mints)
-        uint256 newId_A = ledgerData._tokens_currentMax_id + 1;
-        uint256 newId_B = ledgerData._tokens_currentMax_id + 2;
+        uint256 newId_A = ld._tokens_currentMax_id + 1;
+        uint256 newId_B = ld._tokens_currentMax_id + 2;
 
-        //ledgerData._sts[newId_A].batchId = 0; // batchless
-        ledgerData._sts[newId_A].mintedQty = int64(a.qty_A);
-        ledgerData._sts[newId_A].currentQty = int64(a.qty_A);
-        ledgerData._sts[newId_A].ft_price = int128(a.price);
-        ledgerData._sts[newId_A].ft_lastMarkPrice = -1;
+        //ld._sts[newId_A].batchId = 0; // batchless
+        ld._sts[newId_A].mintedQty = int64(a.qty_A);
+        ld._sts[newId_A].currentQty = int64(a.qty_A);
+        ld._sts[newId_A].ft_price = int128(a.price);
+        ld._sts[newId_A].ft_lastMarkPrice = -1;
 
-        //ledgerData._sts[newId_B].batchId = 0;
-        ledgerData._sts[newId_B].mintedQty = int64(a.qty_B);
-        ledgerData._sts[newId_B].currentQty = int64(a.qty_B);
-        ledgerData._sts[newId_B].ft_price = int128(a.price);
-        ledgerData._sts[newId_B].ft_lastMarkPrice = -1;
+        //ld._sts[newId_B].batchId = 0;
+        ld._sts[newId_B].mintedQty = int64(a.qty_B);
+        ld._sts[newId_B].currentQty = int64(a.qty_B);
+        ld._sts[newId_B].ft_price = int128(a.price);
+        ld._sts[newId_B].ft_lastMarkPrice = -1;
 
-        ledgerData._tokens_currentMax_id += 2;
+        ld._tokens_currentMax_id += 2;
 
         // assign STs to ledgers
-        ledgerData._ledger[a.ledger_A].tokenType_stIds[a.tokTypeId].push(newId_A);
-        ledgerData._ledger[a.ledger_B].tokenType_stIds[a.tokTypeId].push(newId_B);
+        ld._ledger[a.ledger_A].tokenType_stIds[a.tokTypeId].push(newId_A);
+        ld._ledger[a.ledger_B].tokenType_stIds[a.tokTypeId].push(newId_B);
 
         if (a.qty_A > 0)
             emit FutureOpenInterest(a.ledger_A, a.ledger_B, a.tokTypeId, uint256(a.qty_A), uint256(a.price));

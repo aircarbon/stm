@@ -17,7 +17,7 @@ import "../Libs/Erc20Lib.sol";
   */
 contract StErc20 is StFees, IErc20 {
 
-    StructLib.Erc20Struct erc20Data;
+    StructLib.Erc20Struct erc20d;
 
     // ERC20 - OPTIONAL
     // StMaster: string public name();
@@ -30,54 +30,54 @@ contract StErc20 is StFees, IErc20 {
 
         // this index is used for allocating whitelist addresses to users (getWhitelistNext()))
         // we skip/reserve the first ten whitelisted address (0 = owner, 1-9 for expansion)
-        erc20Data._nextWhitelistNdx = 10;
+        erc20d._nextWhitelistNdx = 10;
     }
 
     // todo: move WL stuff out of erc20
     // WHITELIST - add entry & retreive full whitelist
     function whitelist(address addr) public onlyOwner() {
-        Erc20Lib.whitelist(ledgerData, erc20Data, addr);
+        Erc20Lib.whitelist(ld, erc20d, addr);
     }
     function whitelistMany(address[] memory addr) public onlyOwner() {
         for (uint256 i = 0; i < addr.length; i++) {
-            Erc20Lib.whitelist(ledgerData, erc20Data, addr[i]);
+            Erc20Lib.whitelist(ld, erc20d, addr[i]);
         }
     }
     function getWhitelist() external view returns (address[] memory) {
-        return erc20Data._whitelist;
+        return erc20d._whitelist;
     }
     function getWhitelistCount() external view returns (uint256) {
-        return erc20Data._whitelist.length;
+        return erc20d._whitelist.length;
     }
     function isWhitelisted(address addr) external view returns (bool) {
-        return erc20Data._whitelisted[addr];
+        return erc20d._whitelisted[addr];
     }
 
     // WHITELIST - get next entry and advance ndx
     function getWhitelistNext() external view returns (address) {
-        return Erc20Lib.getWhitelistNext(ledgerData, erc20Data);
+        return Erc20Lib.getWhitelistNext(ld, erc20d);
     }
     function incWhitelistNext() public onlyOwner() onlyWhenReadWrite() {
-        Erc20Lib.incWhitelistNext(ledgerData, erc20Data);
+        Erc20Lib.incWhitelistNext(ld, erc20d);
     }
-    function getWhitelistNextNdx() external view returns (uint256) { return erc20Data._nextWhitelistNdx; }
-    function setWhitelistNextNdx(uint256 v) public onlyOwner() { erc20Data._nextWhitelistNdx = v; }
+    function getWhitelistNextNdx() external view returns (uint256) { return erc20d._nextWhitelistNdx; }
+    function setWhitelistNextNdx(uint256 v) public onlyOwner() { erc20d._nextWhitelistNdx = v; }
 
     // ERC20 - CORE
     function totalSupply() public view returns (uint256) {
-        return ledgerData._spot_totalMintedQty - ledgerData._spot_totalBurnedQty;
+        return ld._spot_totalMintedQty - ld._spot_totalBurnedQty;
     }
     function balanceOf(address account) public view returns (uint256) {
-        StructLib.LedgerReturn memory ret = LedgerLib.getLedgerEntry(ledgerData, stTypesData, ccyTypesData, account);
+        StructLib.LedgerReturn memory ret = LedgerLib.getLedgerEntry(ld, std, ctd, account);
         return ret.spot_sumQty;
     }
     function transfer(address recipient, uint256 amount) public returns (bool) {
         require(balanceOf(msg.sender) >= amount, "Insufficient tokens");
 
         return Erc20Lib.transfer(
-            ledgerData,
-            stTypesData,
-            ccyTypesData,
+            ld,
+            std,
+            ctd,
             globalFees,
             owner,
             recipient, amount // erc20 args

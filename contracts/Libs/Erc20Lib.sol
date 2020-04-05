@@ -9,45 +9,45 @@ library Erc20Lib {
     event Approval(address indexed owner, address indexed spender, uint256 value);
 
     // WHITELIST - add [single]
-    function whitelist(StructLib.LedgerStruct storage ledgerData, StructLib.Erc20Struct storage erc20Data, address addr) public {
-        require(!erc20Data._whitelisted[addr], "Already whitelisted");
-        require(!ledgerData._contractSealed, "Contract is sealed");
-        erc20Data._whitelist.push(addr);
-        erc20Data._whitelisted[addr] = true;
+    function whitelist(StructLib.LedgerStruct storage ld, StructLib.Erc20Struct storage erc20d, address addr) public {
+        require(!erc20d._whitelisted[addr], "Already whitelisted");
+        require(!ld._contractSealed, "Contract is sealed");
+        erc20d._whitelist.push(addr);
+        erc20d._whitelisted[addr] = true;
     }
     // WHITELIST - get next, and advance current index [single]
-    function getWhitelistNext(StructLib.LedgerStruct storage ledgerData, StructLib.Erc20Struct storage erc20Data) public view returns (address) {
-        require(ledgerData._contractSealed, "Contract is not sealed");
-        require(erc20Data._nextWhitelistNdx < erc20Data._whitelist.length, "Insufficient whitelist entries");
-        return erc20Data._whitelist[erc20Data._nextWhitelistNdx];
+    function getWhitelistNext(StructLib.LedgerStruct storage ld, StructLib.Erc20Struct storage erc20d) public view returns (address) {
+        require(ld._contractSealed, "Contract is not sealed");
+        require(erc20d._nextWhitelistNdx < erc20d._whitelist.length, "Insufficient whitelist entries");
+        return erc20d._whitelist[erc20d._nextWhitelistNdx];
     }
-    function incWhitelistNext(StructLib.LedgerStruct storage ledgerData, StructLib.Erc20Struct storage erc20Data) public {
-        require(ledgerData._contractSealed, "Contract is not sealed");
-        require(erc20Data._nextWhitelistNdx < erc20Data._whitelist.length, "Insufficient whitelist entries");
-        erc20Data._nextWhitelistNdx++;
+    function incWhitelistNext(StructLib.LedgerStruct storage ld, StructLib.Erc20Struct storage erc20d) public {
+        require(ld._contractSealed, "Contract is not sealed");
+        require(erc20d._nextWhitelistNdx < erc20d._whitelist.length, "Insufficient whitelist entries");
+        erc20d._nextWhitelistNdx++;
     }
 
     // TRANSFER
     function transfer(
-        StructLib.LedgerStruct storage ledgerData,
-        StructLib.StTypesStruct storage stTypesData,
-        StructLib.CcyTypesStruct storage ccyTypesData,
+        StructLib.LedgerStruct storage ld,
+        StructLib.StTypesStruct storage std,
+        StructLib.CcyTypesStruct storage ctd,
         StructLib.FeeStruct storage globalFees, address owner, // fees: disabled for erc20 - not used
         address recipient, uint256 amount
     ) public returns (bool) {
-        require(ledgerData._contractSealed, "Contract is not sealed");
+        require(ld._contractSealed, "Contract is not sealed");
 
         uint256 remainingToTransfer = amount;
         while (remainingToTransfer > 0) {
             // iterate ST types
-            for (uint256 tokenTypeId = 1; tokenTypeId <= stTypesData._tt_Count; tokenTypeId++) {
+            for (uint256 tokenTypeId = 1; tokenTypeId <= std._tt_Count; tokenTypeId++) {
 
                 // sum qty tokens of this type
-                uint256[] memory tokenType_stIds = ledgerData._ledger[msg.sender].tokenType_stIds[tokenTypeId];
+                uint256[] memory tokenType_stIds = ld._ledger[msg.sender].tokenType_stIds[tokenTypeId];
                 uint256 qtyType;
                 for (uint256 ndx = 0; ndx < tokenType_stIds.length; ndx++) {
-                    require(ledgerData._sts[tokenType_stIds[ndx]].currentQty > 0, "Unexpected token quantity");
-                    qtyType += uint256(ledgerData._sts[tokenType_stIds[ndx]].currentQty);
+                    require(ld._sts[tokenType_stIds[ndx]].currentQty > 0, "Unexpected token quantity");
+                    qtyType += uint256(ld._sts[tokenType_stIds[ndx]].currentQty);
                 }
 
                 // transfer this type up to required amount
@@ -68,7 +68,7 @@ library Erc20Lib {
                            applyFees: false,
                         feeAddrOwner: owner
                     });
-                    TransferLib.transferOrTrade(ledgerData, ccyTypesData, globalFees, a);
+                    TransferLib.transferOrTrade(ld, ctd, globalFees, a);
                     remainingToTransfer -= qtyTransfer;
                 }
             }

@@ -33,7 +33,7 @@ origCcyFee_percBips_ExFee: origCcyFee_percBips_ExFee,
                  metaKeys: metaKeys,
                metaValues: metaValues
         });
-        TokenLib.mintSecTokenBatch(ledgerData, stTypesData, args);
+        TokenLib.mintSecTokenBatch(ld, std, args);
     }
 
     function addMetaSecTokenBatch(
@@ -41,30 +41,30 @@ origCcyFee_percBips_ExFee: origCcyFee_percBips_ExFee,
         string calldata metaKeyNew,
         string calldata metaValueNew)
     external onlyOwner() onlyWhenReadWrite() {
-        TokenLib.addMetaSecTokenBatch(ledgerData, batchId, metaKeyNew, metaValueNew);
+        TokenLib.addMetaSecTokenBatch(ld, batchId, metaKeyNew, metaValueNew);
     }
 
     function setOriginatorFeeTokenBatch(
         uint64 batchId,
         StructLib.SetFeeArgs calldata originatorFee)
     external onlyOwner() onlyWhenReadWrite() {
-        TokenLib.setOriginatorFeeTokenBatch(ledgerData, batchId, originatorFee);
+        TokenLib.setOriginatorFeeTokenBatch(ld, batchId, originatorFee);
     }
 
     function setOriginatorFeeCurrencyBatch(
         uint64 batchId,
         uint16 origCcyFee_percBips_ExFee)
     external onlyOwner() onlyWhenReadWrite() {
-        TokenLib.setOriginatorFeeCurrencyBatch(ledgerData, batchId, origCcyFee_percBips_ExFee);
+        TokenLib.setOriginatorFeeCurrencyBatch(ld, batchId, origCcyFee_percBips_ExFee);
     }
 
     function getSecToken_countMinted()
     external view returns (uint256) {
-        return ledgerData._tokens_currentMax_id; // 1-based
+        return ld._tokens_currentMax_id; // 1-based
     }
 
     function getSecToken_totalMintedQty()
     external view returns (uint256) {
-        return ledgerData._spot_totalMintedQty;
+        return ld._spot_totalMintedQty;
     }
 }

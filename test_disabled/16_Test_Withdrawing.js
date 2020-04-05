@@ -125,7 +125,7 @@ contract("StMaster", accounts => {
         try {
             await stm.withdraw(CONST.ccyType.USD, 0, accounts[global.TaddrNdx], { from: accounts[0] });
         } catch (ex) { 
-            assert(ex.reason == 'Min. amount 1', `unexpected: ${ex.reason}`);
+            assert(ex.reason == 'Bad amount', `unexpected: ${ex.reason}`);
             return; 
         }
         assert.fail('expected contract exception');
@@ -135,7 +135,7 @@ contract("StMaster", accounts => {
         try {
             await stm.withdraw(CONST.ccyType.USD, -1, accounts[global.TaddrNdx], { from: accounts[0] });
         } catch (ex) { 
-            assert(ex.reason == 'Min. amount 1', `unexpected: ${ex.reason}`);
+            assert(ex.reason == 'Bad amount', `unexpected: ${ex.reason}`);
             return;
         }
         assert.fail('expected contract exception');

@@ -16,11 +16,11 @@ contract StBurnable is Owned, StLedger {
         uint256 tokenTypeId,
         int256  burnQty)
     public onlyOwner() onlyWhenReadWrite() {
-        TokenLib.burnTokens(ledgerData, stTypesData, ledgerOwner, tokenTypeId, burnQty);
+        TokenLib.burnTokens(ld, std, ledgerOwner, tokenTypeId, burnQty);
     }
 
     function getSecToken_totalBurnedQty()
     external view /*onlyOwner()*/ returns (uint256 count) {
-        return ledgerData._spot_totalBurnedQty;
+        return ld._spot_totalBurnedQty;
     }
 }
