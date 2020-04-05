@@ -26,19 +26,19 @@ contract("StMaster", accounts => {
         await fundLedger({ ccyTypeId: CONST.ccyType.USD, amount: CONST.millionCcy_cents * 1000 * 1000, receiver: accounts[global.TaddrNdx]});
     });
 
-    // it(`funding - should allow funding of ETH`, async () => {
-    //     await fundLedger({ ccyTypeId: CONST.ccyType.ETH, amount: CONST.oneEth_wei, receiver: accounts[global.TaddrNdx]});
-    // });
-    // it(`funding - should allow funding of extreme values of ETH`, async () => {
-    //     await fundLedger({ ccyTypeId: CONST.ccyType.ETH, amount: CONST.millionEth_wei, receiver: accounts[global.TaddrNdx]});
-    // });
+    it(`funding - should allow funding of ETH`, async () => {
+        await fundLedger({ ccyTypeId: CONST.ccyType.ETH, amount: CONST.oneEth_wei, receiver: accounts[global.TaddrNdx]});
+    });
+    it(`funding - should allow funding of extreme values of ETH`, async () => {
+        await fundLedger({ ccyTypeId: CONST.ccyType.ETH, amount: CONST.millionEth_wei, receiver: accounts[global.TaddrNdx]});
+    });
 
-    // it(`funding - should allow funding of BTC`, async () => {
-    //     await fundLedger({ ccyTypeId: CONST.ccyType.BTC, amount: CONST.oneBtc_sat, receiver: accounts[global.TaddrNdx]});
-    // });
-    // it(`funding - should allow funding of extreme values of BTC`, async () => {
-    //     await fundLedger({ ccyTypeId: CONST.ccyType.BTC, amount: CONST.millionBtc_sat, receiver: accounts[global.TaddrNdx]});
-    // });
+    it(`funding - should allow funding of BTC`, async () => {
+        await fundLedger({ ccyTypeId: CONST.ccyType.BTC, amount: CONST.oneBtc_sat, receiver: accounts[global.TaddrNdx]});
+    });
+    it(`funding - should allow funding of extreme values of BTC`, async () => {
+        await fundLedger({ ccyTypeId: CONST.ccyType.BTC, amount: CONST.millionBtc_sat, receiver: accounts[global.TaddrNdx]});
+    });
 
     it(`funding - should allow funding of USD`, async () => {
         await fundLedger({ ccyTypeId: CONST.ccyType.USD, amount: CONST.thousandCcy_cents, receiver: accounts[global.TaddrNdx]});

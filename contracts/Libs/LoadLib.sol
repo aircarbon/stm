@@ -34,12 +34,13 @@ library LoadLib {
         ledgerData._ledger[ledgerEntryOwner] = StructLib.Ledger({
                          exists: true,
                      customFees: StructLib.FeeStruct(),
-            spot_sumQtyMinted: spot_sumQtyMinted,
-            spot_sumQtyBurned: spot_sumQtyBurned
+              spot_sumQtyMinted: spot_sumQtyMinted,
+              spot_sumQtyBurned: spot_sumQtyBurned
         });
 
         for (uint256 i = 0 ; i < ccys.length ; i++) {
             ledgerData._ledger[ledgerEntryOwner].ccyType_balance[ccys[i].ccyTypeId] = ccys[i].balance;
+            ledgerData._ledger[ledgerEntryOwner].ccyType_reserved[ccys[i].ccyTypeId] = ccys[i].reserved;
         }
     }
 

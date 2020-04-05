@@ -45,10 +45,9 @@ import "../Libs/TokenLib.sol";
      * @param ledgerOwner Ledger owner to fund
      */
     function fund(uint256 ccyTypeId,
-                  int256  amount, // signed value: ledger ccyType_balance supports (theoretical) -ve balances
+                  int256  amount, // signed value: ledger supports -ve balances
                   address ledgerOwner)
     public onlyOwner() onlyWhenReadWrite() { revert("Not implemented"); }
-
 
     /**
      * @notice Withdraws the specified amount and type of collateralized currency from the specified ledger entry
@@ -57,7 +56,7 @@ import "../Libs/TokenLib.sol";
      * @param ledgerOwner ledger owner to withdraw from
      */
     function withdraw(uint256 ccyTypeId,
-                      int256  amount, // signed value: ledger ccyType_balance supports (theoretical) -ve balances
+                      int256  amount,
                       address ledgerOwner)
     public onlyOwner() onlyWhenReadWrite() { revert("Not implemented"); }
 

@@ -34,12 +34,25 @@ library FuturesLib {
         // WIP/TODO: need to compute margin requirement - for validation re. position opening
         //       (should be a *view* that the FuturesMaintenance job can call and reuse...)
         //      * init_margin + var_margin = tot_margin ...
-        //          (%) --> record/set against FT-tok-type...
-        //
-        //          addSecTokType() FT        ==> +initMarginBps [required]
-        //          setFutureVarationMargin() ==> +varMarginBps  [def: 0]
-        //
         // ****
+        //
+        // var tot_margin = CurrentReservedBalance(); //ComputeTotalMarginOpenPositions(ledger) // view?
+        // var new_margin = tot_margin + this_margin
+        // if (TotalBalance(ledger) < new_margin) {
+        //    SetReservedBalance(new_margin);
+        //    open position...
+        // }
+        // else {
+        //    reject()
+        //}
+        // so we only add to the reservedBalance on position open
+        //   ...and subtract from it, on position closing/netting; (--> i.e. no need for computeAllPositions margin fn.)
+
+        // PREP...
+        // (1) SetReserved(ccyId, ledger, amount) ==> structLib...
+        // (2) transferTrade -> change to check (balance-reserved)
+        // (3) withdraw      -> change to check (balance-reserved)
+        // TESTS...
 
         // create ledger entries as required
         StructLib.initLedgerIfNew(ledgerData, a.ledger_A);

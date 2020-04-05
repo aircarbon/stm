@@ -64,7 +64,11 @@ library StructLib {
     struct Ledger {
         bool                          exists;                   // for existance check by address
         mapping(uint256 => uint256[]) tokenType_stIds;          // SecTokenTypeId -> stId[] of all owned STs
-        mapping(uint256 => int256)    ccyType_balance;          // CcyTypeId -> balance -- SIGNED! WE MAY WANT TO SUPPORT -VE BALANCES LATER...
+
+        mapping(uint256 => int256)    ccyType_balance;          // CcyTypeId -> spot/total cash balance -- signed, for potentil -ve balances
+        mapping(uint256 => int256)    ccyType_reserved;         // CcyTypeId -> total margin requirement [FUTURES]
+                                                                // implied: available = balance - reserved
+
         StructLib.FeeStruct           customFees;               // global fee override - per ledger entry
         uint256                       spot_sumQtyMinted;
         uint256                       spot_sumQtyBurned;
@@ -93,6 +97,7 @@ library StructLib {
             string  name;
             string  unit;
             int256  balance;
+            int256  reserved;
         }
 
     // *** PACKED SECURITY TOKEN ***
@@ -207,10 +212,10 @@ library StructLib {
         uint256 qty_B;           // ST quantity moving from B (excluding fees, if any)
         uint256 tokenTypeId_B;   // ST type moving from B
         int256  ccy_amount_A;    // currency amount moving from A (excluding fees, if any)
-                                 // (signed value: ledger ccyType_balance supports (theoretical) -ve balances)
+                                 // (signed value: ledger supports -ve balances)
         uint256 ccyTypeId_A;     // currency type moving from A
         int256  ccy_amount_B;    // currency amount moving from B (excluding fees, if any)
-                                 // (signed value: ledger ccyType_balance supports (theoretical) -ve balances)
+                                 // (signed value: ledger supports -ve balances)
         uint256 ccyTypeId_B;     // currency type moving from B
         bool    applyFees;       // apply global fee structure to the transfer (both legs)
         address feeAddrOwner;    // exchange fees: receive address
@@ -241,7 +246,7 @@ library StructLib {
      * @param ledgerData Ledger data
      * @param addr Ledger entry address
      */
-    function initLedgerIfNew (
+    function initLedgerIfNew(
         StructLib.LedgerStruct storage ledgerData,
         address addr
     )
@@ -286,7 +291,26 @@ library StructLib {
         StructLib.LedgerStruct storage ledgerData,
         address ledger, uint256 ccyTypeId, int256 sending, int256 receiving, int256 fee
     ) public view returns (bool) {
-        return ledgerData._ledger[ledger].ccyType_balance[ccyTypeId] + receiving >= sending + fee;
+
+        return (ledgerData._ledger[ledger].ccyType_balance[ccyTypeId]
+                + receiving - ledgerData._ledger[ledger].ccyType_reserved[ccyTypeId]
+               ) >= sending + fee;
     }
 
+    /**
+     * @notice Sets the reserved (unavailable, margined) currency amount for the specified ledger owner
+     * @param ledger Ledger owner
+     * @param ccyTypeId currency type
+     * @param reservedAmount Reserved amount to set
+     */
+    function setReservedCcy(
+        StructLib.LedgerStruct storage ledgerData,
+        StructLib.CcyTypesStruct storage ccyTypesData,
+        address ledger, uint256 ccyTypeId, int256 reservedAmount
+    ) public {
+        require(ccyTypeId >= 1 && ccyTypeId <= ccyTypesData._ct_Count, "Bad ccyTypeId");
+        initLedgerIfNew(ledgerData, ledger);
+        require(ledgerData._ledger[ledger].ccyType_balance[ccyTypeId] >= reservedAmount, "Reservation exceeds balance");
+        ledgerData._ledger[ledger].ccyType_reserved[ccyTypeId] = reservedAmount;
+    }
 }

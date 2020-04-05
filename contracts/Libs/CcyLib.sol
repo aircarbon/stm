@@ -60,7 +60,7 @@ library CcyLib {
         StructLib.LedgerStruct storage ledgerData,
         StructLib.CcyTypesStruct storage ccyTypesData,
         uint256 ccyTypeId,
-        int256  amount, // signed value: ledger ccyType_balance supports (theoretical) -ve balances
+        int256  amount, // signed value: ledger supports -ve balances
         address ledgerOwner)
     public {
         require(ledgerData._contractSealed, "Contract is not sealed");
@@ -94,13 +94,15 @@ library CcyLib {
         StructLib.LedgerStruct storage ledgerData,
         StructLib.CcyTypesStruct storage ccyTypesData,
         uint256 ccyTypeId,
-        int256  amount, // signed value: ledger ccyType_balance supports (theoretical) -ve balances
+        int256  amount,
         address ledgerOwner)
     public {
         require(ledgerData._contractSealed, "Contract is not sealed");
         require(ccyTypeId >= 1 && ccyTypeId <= ccyTypesData._ct_Count, "Bad ccyTypeId");
         require(amount > 0, "Min. amount 1"); // disallow negative withdrawing
         require(ledgerData._ledger[ledgerOwner].exists == true, "Bad ledgerOwner");
+
+        // TODO: reserved...
         require(ledgerData._ledger[ledgerOwner].ccyType_balance[ccyTypeId] >= amount, "Insufficient balance");
 
         // update ledger balance

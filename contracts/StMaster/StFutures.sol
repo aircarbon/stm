@@ -15,7 +15,11 @@ import "../Libs/Erc20Lib.sol";
 import "../Libs/LedgerLib.sol";
 
 /*
+
+BREAKING: getLedgerEntry / LedgerCcyReturn: balance ==> { balance, reserved, } // HX+admin should limit spot BUYs to (balance-reserved)
+
 TODO: no open of positions on FT types after expiry timestamp - ** must be enforced off-chain ** (a chainlink for block->timestamp mapping could let it be done on-chain)
+
 ====
 
 FUTURES - notes 26/MAR/2020

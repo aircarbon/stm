@@ -116,8 +116,9 @@ library LedgerLib {
 
             // hash ledger currency balances & custom fees
             for (uint256 ccyTypeId = 1; ccyTypeId <= ccyTypesData._ct_Count; ccyTypeId++) {
-                // hash currency type balance
+                // hash currency type balance & reservation
                 ledgerHash = keccak256(abi.encodePacked(ledgerHash, entry.ccyType_balance[ccyTypeId]));
+                ledgerHash = keccak256(abi.encodePacked(ledgerHash, entry.ccyType_reserved[ccyTypeId]));
 
                 // hash currency type ledger fee
                 if (entry.customFees.ccyType_Set[ccyTypeId]) {
@@ -237,7 +238,8 @@ library LedgerLib {
                    ccyTypeId: ccyTypeId,
                         name: ccyTypesData._ct_Ccy[ccyTypeId].name,
                         unit: ccyTypesData._ct_Ccy[ccyTypeId].unit,
-                     balance: ledgerData._ledger[account].ccyType_balance[ccyTypeId]
+                     balance: ledgerData._ledger[account].ccyType_balance[ccyTypeId],
+                    reserved: ledgerData._ledger[account].ccyType_reserved[ccyTypeId]
             });
         }
 

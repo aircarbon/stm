@@ -15,6 +15,8 @@ const CONST = require('../const.js');
 contract("StMaster", accounts => {
     var stm;
     var usdFT, usdFT_underlyer, usdFT_refCcy; // usd FT
+    
+    var ccyTypes, spotTypes;
 
     before(async function () {
         stm = await st.deployed();

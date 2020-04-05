@@ -122,10 +122,10 @@ contract("StMaster", accounts => {
             ];
             
             // mint
-            const mintTx_B1 = await stm_cur.mintSecTokenBatch(CONST.tokenType.CORSIA, 1000 * (i+1), 1, M, batchFee, 100, metaKVPs.map(p => p.k), metaKVPs.map(p => p.v), { from: accounts[0] });
+            const mintTx_B1 = await stm_cur.mintSecTokenBatch(CONST.tokenType.CORSIA, 1000 * (i+1), 1, M, batchFee, 100, metaKVPs.map(p => p.k), metaKVPs.map(p => p.v), );
             curHash = await checkHashUpdate(curHash);
             if (await stm_cur.getContractType() == CONST.contractType.COMMODITY) {
-                const mintTx_B2 = await stm_cur.mintSecTokenBatch(CONST.tokenType.NATURE, 10000 * (i+1), 1, M, batchFee, 100, metaKVPs.map(p => p.k), metaKVPs.map(p => p.v), { from: accounts[0] });
+                const mintTx_B2 = await stm_cur.mintSecTokenBatch(CONST.tokenType.NATURE, 10000 * (i+1), 1, M, batchFee, 100, metaKVPs.map(p => p.k), metaKVPs.map(p => p.v), );
                 curHash = await checkHashUpdate(curHash);
             }
             const batchId = (await stm_cur.getSecTokenBatchCount.call()).toNumber();
@@ -154,7 +154,6 @@ contract("StMaster", accounts => {
                        applyFees: false,
                     feeAddrOwner: CONST.nullAddr,
                 },
-                { from: accounts[0] }
             );
             curHash = await checkHashUpdate(curHash);
 
@@ -169,7 +168,6 @@ contract("StMaster", accounts => {
                         applyFees: true,
                      feeAddrOwner: CONST.nullAddr,
                     },
-                    { from: accounts[0] }
                 );
                 curHash = await checkHashUpdate(curHash);
             }
@@ -215,29 +213,29 @@ contract("StMaster", accounts => {
                 const ccyType = ccyTypesData.ccyTypes[i];
             
                 // fund to ledger
-                await stm_cur.fund(ccyType.id, (j+1)*100+(i+1), entryOwner, { from: accounts[0] });
-                if (entryOwner != accounts[0])
-                    curHash = await checkHashUpdate(curHash);
+                const fundAmount = (j+1)*100+(i+1), reserveAmount = (j+1)*50+(i+1), withdrawAmount = (j+1)*25+(i+1);
+                await stm_cur.fund(ccyType.id, fundAmount, entryOwner);
+                if (entryOwner != accounts[0]) curHash = await checkHashUpdate(curHash);
+
+                // reserve on ledger
+                await stm_cur.setReservedCcy(ccyType.id, reserveAmount, entryOwner);
+                if (entryOwner != accounts[0]) curHash = await checkHashUpdate(curHash);
 
                 // withdraw from ledger
-                await stm_cur.withdraw(ccyType.id, 1, entryOwner, { from: accounts[0] });
-                if (entryOwner != accounts[0])
-                    curHash = await checkHashUpdate(curHash);
+                await stm_cur.withdraw(ccyType.id, withdrawAmount, entryOwner);
+                if (entryOwner != accounts[0]) curHash = await checkHashUpdate(curHash);
 
                 // set ledger ccy fee
                 await stm_cur.setFee_CcyType(ccyType.id, entryOwner, { ccy_mirrorFee: false, ccy_perMillion: 0, fee_fixed: i+2+j+2, fee_percBips: (i+2+j+2)*100, fee_min: (i+2+j+2), fee_max: (i+2+j+2+100) } );
-                if (entryOwner != accounts[0])
-                    curHash = await checkHashUpdate(curHash);
+                if (entryOwner != accounts[0]) curHash = await checkHashUpdate(curHash);
             }
 
             // for all token types
             for (let k=0 ; k < stTypesData.tokenTypes.length; k++) {
-                const tokType = stTypesData.tokenTypes[k];
-
                 // set ledger token fee
+                const tokType = stTypesData.tokenTypes[k];
                 await stm_cur.setFee_TokType(tokType.id, entryOwner, { ccy_mirrorFee: false, ccy_perMillion: 0, fee_fixed: k+4+j+4, fee_percBips: (k+4+j+4)*100, fee_min: (k+4+j+4), fee_max: (k+4+j+4+100) } );
-                if (entryOwner != accounts[0])
-                    curHash = await checkHashUpdate(curHash);
+                if (entryOwner != accounts[0]) curHash = await checkHashUpdate(curHash);
             }
         }
     });

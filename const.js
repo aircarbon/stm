@@ -101,7 +101,7 @@ module.exports = {
          ccy_mirrorFee: false,
         ccy_perMillion: 0,
              fee_fixed: 0,
-            e_percBips: 0,
+          fee_percBips: 0,
                fee_min: 0,
                fee_max: 0,
     },

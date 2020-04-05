@@ -55,7 +55,6 @@ library TokenLib {
         emit AddedSecTokenType(stTypesData._tt_Count, name, settlementType, ft.expiryTimestamp, ft.underlyerTypeId, ft.refCcyId, ft.initMarginBips, ft.varMarginBips);
     }
 
-    // TODO: new fields for data load + hashcode...
     function setFutureTokenVariationMargin(
         StructLib.StTypesStruct storage stTypesData, uint256 tokenTypeId, uint16 varMarginBips
     )
