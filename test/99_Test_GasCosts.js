@@ -31,7 +31,7 @@ contract("StMaster", accounts => {
                       refCcyId: ccyTypes.find(p => p.name === 'USD').id,
         });
         usdFT = (await stm.getSecTokenTypes()).tokenTypes.filter(p => p.name == ftTestName_USD)[0];
-        usdFT_underlyer = spotTypes.filter(p => p.id == usdFT.underlyerId)[0];
+        usdFT_underlyer = spotTypes.filter(p => p.id == usdFT.ft.underlyerTypeId)[0];
         usdFT_refCcy = ccyTypes.filter(p => p.id == usdFT.refCcyId)[0];
     });
 

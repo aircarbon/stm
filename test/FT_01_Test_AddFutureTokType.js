@@ -55,7 +55,7 @@ contract("StMaster", accounts => {
         assert(ftType.ft.varMarginBips == 1500);
     });
 
-    it(`FT types - should not be able to add a future with an invalid expiry time`, async () => {
+    it(`FT types - should not be able to add a future with an invalid (unset) expiry time`, async () => {
         const allTypes = (await stm.getSecTokenTypes()).tokenTypes;
         const spotTypes = allTypes.filter(p => p.settlementType == CONST.settlementType.SPOT);
         // console.log('spotTypes', spotTypes);
@@ -82,7 +82,6 @@ contract("StMaster", accounts => {
         catch (ex) { assert(ex.reason == 'Bad underlyerTypeId', `unexpected: ${ex.reason}`); return; }
         assert.fail('expected contract exception');
     });
-
     it(`FT types - should not be able to add a future on invalid (non-spot) underlyer`, async () => {
         const spotTypes = (await stm.getSecTokenTypes()).tokenTypes.filter(p => p.settlementType == CONST.settlementType.SPOT);
         const ccyTypes = (await stm.getCcyTypes()).ccyTypes;
@@ -107,6 +106,52 @@ contract("StMaster", accounts => {
             });
         }
         catch (ex) { assert(ex.reason == 'Bad refCcyId', `unexpected: ${ex.reason}`); return; }
+        assert.fail('expected contract exception');
+    });
+
+    it(`FT types - should not be able to add a future with an invalid (> 10000) initial margin`, async () => {
+        const spotTypes = (await stm.getSecTokenTypes()).tokenTypes.filter(p => p.settlementType == CONST.settlementType.SPOT);
+        const ccyTypes = (await stm.getCcyTypes()).ccyTypes;
+        try {
+            const addFtTx = await stm.addSecTokenType(`FT_TEST6_${new Date().getTime()}`, CONST.settlementType.FUTURE, { ...CONST.nullFutureArgs,
+                expiryTimestamp: DateTime.local().toMillis(), underlyerTypeId: spotTypes[0].id, refCcyId: ccyTypes[0].id, initMarginBips: 10001,
+            });
+        }
+        catch (ex) { assert(ex.reason == 'Bad initMarginBips', `unexpected: ${ex.reason}`); return; }
+        assert.fail('expected contract exception');
+    });
+    it(`FT types - should not be able to add a future with an invalid (< 0) initial margin`, async () => {
+        const spotTypes = (await stm.getSecTokenTypes()).tokenTypes.filter(p => p.settlementType == CONST.settlementType.SPOT);
+        const ccyTypes = (await stm.getCcyTypes()).ccyTypes;
+        try {
+            const addFtTx = await stm.addSecTokenType(`FT_TEST6_${new Date().getTime()}`, CONST.settlementType.FUTURE, { ...CONST.nullFutureArgs,
+                expiryTimestamp: DateTime.local().toMillis(), underlyerTypeId: spotTypes[0].id, refCcyId: ccyTypes[0].id, initMarginBips: -1,
+            });
+        }
+        catch (ex) { assert(ex.reason == 'Bad initMarginBips', `unexpected: ${ex.reason}`); return; }
+        assert.fail('expected contract exception');
+    });
+
+    it(`FT types - should not be able to add a future with an invalid (> 10000) variation margin`, async () => {
+        const spotTypes = (await stm.getSecTokenTypes()).tokenTypes.filter(p => p.settlementType == CONST.settlementType.SPOT);
+        const ccyTypes = (await stm.getCcyTypes()).ccyTypes;
+        try {
+            const addFtTx = await stm.addSecTokenType(`FT_TEST6_${new Date().getTime()}`, CONST.settlementType.FUTURE, { ...CONST.nullFutureArgs,
+                expiryTimestamp: DateTime.local().toMillis(), underlyerTypeId: spotTypes[0].id, refCcyId: ccyTypes[0].id, varMarginBips: 10001,
+            });
+        }
+        catch (ex) { assert(ex.reason == 'Bad varMarginBips', `unexpected: ${ex.reason}`); return; }
+        assert.fail('expected contract exception');
+    });
+    it(`FT types - should not be able to add a future with an invalid (< 0) variation margin`, async () => {
+        const spotTypes = (await stm.getSecTokenTypes()).tokenTypes.filter(p => p.settlementType == CONST.settlementType.SPOT);
+        const ccyTypes = (await stm.getCcyTypes()).ccyTypes;
+        try {
+            const addFtTx = await stm.addSecTokenType(`FT_TEST6_${new Date().getTime()}`, CONST.settlementType.FUTURE, { ...CONST.nullFutureArgs,
+                expiryTimestamp: DateTime.local().toMillis(), underlyerTypeId: spotTypes[0].id, refCcyId: ccyTypes[0].id, varMarginBips: -1,
+            });
+        }
+        catch (ex) { assert(ex.reason == 'Bad varMarginBips', `unexpected: ${ex.reason}`); return; }
         assert.fail('expected contract exception');
     });
 });

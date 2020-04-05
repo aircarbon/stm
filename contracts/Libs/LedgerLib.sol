@@ -52,12 +52,11 @@ library LedgerLib {
             ledgerHash = keccak256(abi.encodePacked(ledgerHash, stTypesData._tt_Name[stTypeId]));
             ledgerHash = keccak256(abi.encodePacked(ledgerHash, stTypesData._tt_Settle[stTypeId]));
 
-            // ledgerHash = keccak256(abi.encodePacked(ledgerHash, stTypesData._tt_Expiry[stTypeId]));
-            // ledgerHash = keccak256(abi.encodePacked(ledgerHash, stTypesData._tt_Underlyer[stTypeId]));
-            // ledgerHash = keccak256(abi.encodePacked(ledgerHash, stTypesData._tt_RefCcyId[stTypeId]));
             ledgerHash = keccak256(abi.encodePacked(ledgerHash, stTypesData._tt_ft[stTypeId].expiryTimestamp));
             ledgerHash = keccak256(abi.encodePacked(ledgerHash, stTypesData._tt_ft[stTypeId].underlyerTypeId));
             ledgerHash = keccak256(abi.encodePacked(ledgerHash, stTypesData._tt_ft[stTypeId].refCcyId));
+            ledgerHash = keccak256(abi.encodePacked(ledgerHash, stTypesData._tt_ft[stTypeId].initMarginBips));
+            ledgerHash = keccak256(abi.encodePacked(ledgerHash, stTypesData._tt_ft[stTypeId].varMarginBips));
 
             if (globalFees.tokType_Set[stTypeId]) {
                 ledgerHash = keccak256(abi.encodePacked(ledgerHash, hashSetFeeArgs(globalFees.tok[stTypeId])));

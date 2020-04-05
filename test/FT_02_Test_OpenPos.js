@@ -36,7 +36,7 @@ contract("StMaster", accounts => {
                      refCcyId: ccyTypes.find(p => p.name === 'USD').id,
         });
         usdFT = (await stm.getSecTokenTypes()).tokenTypes.filter(p => p.name == ftTestName_USD)[0];
-        usdFT_underlyer = spotTypes.filter(p => p.id == usdFT.underlyerId)[0];
+        usdFT_underlyer = spotTypes.filter(p => p.id == usdFT.ft.underlyerTypeId)[0];
         usdFT_refCcy = ccyTypes.filter(p => p.id == usdFT.refCcyId)[0];
 
         // add test FT type - ETH
@@ -47,7 +47,7 @@ contract("StMaster", accounts => {
                    refCcyId: ccyTypes.find(p => p.name === 'ETH').id,
            });
         ethFT = (await stm.getSecTokenTypes()).tokenTypes.filter(p => p.name == ftTestName_ETH)[0];
-        ethFT_underlyer = spotTypes.filter(p => p.id == ethFT.underlyerId)[0];
+        ethFT_underlyer = spotTypes.filter(p => p.id == ethFT.ft.underlyerTypeId)[0];
         ethFT_refCcy = ccyTypes.filter(p => p.id == ethFT.refCcyId)[0];
     });
 
@@ -82,7 +82,6 @@ contract("StMaster", accounts => {
         catch (ex) { assert(ex.reason == 'Restricted', `unexpected: ${ex.reason}`); return; }
         assert.fail('expected contract exception');
     });
-
     it(`FT positions - should not be able to open a futures position when read only`, async () => {
         const A = accounts[global.TaddrNdx], B = accounts[global.TaddrNdx + 1];
         try {

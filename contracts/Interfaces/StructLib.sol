@@ -23,12 +23,9 @@ library StructLib {
 
     // ST TOKEN-TYPES
     struct SecTokenTypeReturn {
-        uint256        id;
-        string         name;
-        SettlementType settlementType;
-        //uint64         expiryTimestamp;
-        //uint256        underlyerId;
-        //uint256        refCcyId;
+        uint256             id;
+        string              name;
+        SettlementType      settlementType;
         FutureTokenTypeArgs ft;
     }
     struct GetSecTokenTypesReturn {

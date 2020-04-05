@@ -22,9 +22,16 @@ contract IStLedger is IOwned {
         string memory name,
         StructLib.SettlementType settlementType,
         StructLib.FutureTokenTypeArgs memory ft
-        //uint64 expiryTimestamp,
-        //uint256 underlyerTypeId,
-        //uint256 refCcyId
+    )
+    public onlyOwner() onlyWhenReadWrite() { revert("Not implemented"); }
+
+    /**
+     * @notice Updates variation margin on a future token-type
+     * @param tokenTypeId Future token type ID
+     * @param varMarginBips New variation margin to set, in basis points
+     */
+    function setFutureTokenVariationMargin(
+        uint256 tokenTypeId, uint16 varMarginBips
     )
     public onlyOwner() onlyWhenReadWrite() { revert("Not implemented"); }
 }

@@ -5,7 +5,8 @@ import "../Interfaces/StructLib.sol";
 import "./FeeLib.sol";
 
 library TokenLib {
-    event AddedSecTokenType(uint256 id, string name, StructLib.SettlementType settlementType, uint64 expiryTimestamp, uint256 underlyerTypeId, uint256 refCcyId);
+    event AddedSecTokenType(uint256 id, string name, StructLib.SettlementType settlementType, uint64 expiryTimestamp, uint256 underlyerTypeId, uint256 refCcyId, uint16 initMarginBips, uint16 varMarginBips);
+    event SetFutureTokenVariationMargin(uint256 tokenTypeId, uint16 varMarginBips);
     event BurnedFullSecToken(uint256 indexed stId, uint256 tokenTypeId, address indexed ledgerOwner, uint256 burnedQty);
     event BurnedPartialSecToken(uint256 indexed stId, uint256 tokenTypeId, address indexed ledgerOwner, uint256 burnedQty);
     event MintedSecTokenBatch(uint256 indexed batchId, uint256 tokenTypeId, address indexed batchOwner, uint256 mintQty, uint256 mintSecTokenCount);
@@ -33,6 +34,8 @@ library TokenLib {
             require(ft.underlyerTypeId > 0 && ft.underlyerTypeId <= stTypesData._tt_Count, "Bad underlyerTypeId");
             require(stTypesData._tt_Settle[ft.underlyerTypeId] == StructLib.SettlementType.SPOT, "Bad underyler settlement type");
             require(ft.refCcyId > 0 && ft.refCcyId <= ccyTypesData._ct_Count, "Bad refCcyId");
+            require(ft.initMarginBips < 10000, "Bad initMarginBips");
+            require(ft.varMarginBips < 10000, "Bad varMarginBips");
         }
         else if (settlementType == StructLib.SettlementType.SPOT) {
             require(ft.expiryTimestamp == 0, "Invalid expiryTimestamp");
@@ -49,7 +52,19 @@ library TokenLib {
             stTypesData._tt_ft[stTypesData._tt_Count] = ft;
         }
 
-        emit AddedSecTokenType(stTypesData._tt_Count, name, settlementType, ft.expiryTimestamp, ft.underlyerTypeId, ft.refCcyId);
+        emit AddedSecTokenType(stTypesData._tt_Count, name, settlementType, ft.expiryTimestamp, ft.underlyerTypeId, ft.refCcyId, ft.initMarginBips, ft.varMarginBips);
+    }
+
+    // TODO: new fields for data load + hashcode...
+    function setFutureTokenVariationMargin(
+        StructLib.StTypesStruct storage stTypesData, uint256 tokenTypeId, uint16 varMarginBips
+    )
+    public {
+        require(tokenTypeId >= 1 && tokenTypeId <= stTypesData._tt_Count, "Bad tokenTypeId");
+        require(stTypesData._tt_Settle[tokenTypeId] == StructLib.SettlementType.FUTURE, "Bad token settlement type");
+        require(varMarginBips < 10000, "Bad varMarginBips");
+        stTypesData._tt_ft[tokenTypeId].varMarginBips = varMarginBips;
+        emit SetFutureTokenVariationMargin(tokenTypeId, varMarginBips);
     }
 
     function getSecTokenTypes(

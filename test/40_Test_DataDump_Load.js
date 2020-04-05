@@ -62,12 +62,18 @@ contract("StMaster", accounts => {
             // add future type
             const spotTypes = (await stm_cur.getSecTokenTypes()).tokenTypes.filter(p => p.settlementType == CONST.settlementType.SPOT);
             const ccyTypes = (await stm_cur.getCcyTypes()).ccyTypes;
-                await stm_cur.addSecTokenType('NEW_TOK_FT_TYPE', CONST.settlementType.FUTURE, {
+            await stm_cur.addSecTokenType('NEW_TOK_FT_TYPE', CONST.settlementType.FUTURE, {
                     expiryTimestamp: DateTime.local().toMillis(),
                     underlyerTypeId: spotTypes[0].id, 
-                           refCcyId: ccyTypes[0].id 
+                           refCcyId: ccyTypes[0].id,
+                     initMarginBips: 1000,
+                      varMarginBips: 500,
                 }, { from: accounts[0] }); 
+            curHash = await checkHashUpdate(curHash);
 
+            // update future variation margin
+            const ft = (await stm_cur.getSecTokenTypes()).tokenTypes.filter(p => p.settlementType == CONST.settlementType.FUTURE)[0];
+            await stm_cur.setFutureTokenVariationMargin(ft.id, 600);
             curHash = await checkHashUpdate(curHash);
         }
 
@@ -249,9 +255,11 @@ contract("StMaster", accounts => {
 
         const curToks = await stm_cur.getSecTokenTypes(), newToks = await stm_new.getSecTokenTypes(), loadToks = _.differenceWith(curToks.tokenTypes, newToks.tokenTypes, _.isEqual);
         _.forEach(loadToks, async (p) => await stm_new.addSecTokenType(p.name, p.settlementType, { 
-            expiryTimestamp: p.expiryTimestamp,
-            underlyerTypeId: p.underlyerId, 
-                   refCcyId: p.refCcyId 
+            expiryTimestamp: p.ft.expiryTimestamp,
+            underlyerTypeId: p.ft.underlyerTypeId, 
+                   refCcyId: p.ft.refCcyId,
+             initMarginBips: p.ft.initMarginBips,
+              varMarginBips: p.ft.varMarginBips, 
         }));
 
         // load whitelist

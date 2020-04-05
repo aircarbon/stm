@@ -16,7 +16,8 @@ import "../Interfaces/StructLib.sol";
     event CcyFundedLedger(uint256 ccyTypeId, address indexed ledgerOwner, int256 amount);
     event CcyWithdrewLedger(uint256 ccyTypeId, address indexed ledgerOwner, int256 amount);
     // TokenLib events
-    event AddedSecTokenType(uint256 id, string name, StructLib.SettlementType settlementType, uint64 expiryTimestamp, uint256 underlyerTypeId, uint256 refCcyId);
+    event AddedSecTokenType(uint256 id, string name, StructLib.SettlementType settlementType, uint64 expiryTimestamp, uint256 underlyerTypeId, uint256 refCcyId, uint16 initMarginBips, uint16 varMarginBips);
+    event SetFutureTokenVariationMargin(uint256 tokenTypeId, uint16 varMarginBips);
     event BurnedFullSecToken(uint256 indexed stId, uint256 tokenTypeId, address indexed ledgerOwner, uint256 burnedQty);
     event BurnedPartialSecToken(uint256 indexed stId, uint256 tokenTypeId, address indexed ledgerOwner, uint256 burnedQty);
     event MintedSecTokenBatch(uint256 indexed batchId, uint256 tokenTypeId, address indexed batchOwner, uint256 mintQty, uint256 mintSecTokenCount);
