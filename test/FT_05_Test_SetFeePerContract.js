@@ -45,24 +45,24 @@ contract("StMaster", accounts => {
             console.log(`addrNdx: ${global.TaddrNdx} - contract @ ${stm.address} (owner: ${accounts[0]})`);
     });
 
-    it(`FT var margin - should be able to set variation margin on a futures token type`, async () => {
-        const tx = await stm.setFuture_VariationMargin(usdFT.id, 42);
+    it(`FT fee per contract - should be able to set fee on a futures token type`, async () => {
+        const tx = await stm.setFuture_FeePerContract(usdFT.id, 300);
         const tt = (await stm.getSecTokenTypes()).tokenTypes.filter(p => p.id == usdFT.id)[0];
-        assert(tt.ft.varMarginBips = 42);
-        truffleAssert.eventEmitted(tx, 'SetFutureVariationMargin', ev => ev.tokenTypeId == usdFT.id && ev.varMarginBips == 42);
+        assert(tt.ft.feePerContract = 300);
+        truffleAssert.eventEmitted(tx, 'SetFutureFeePerContract', ev => ev.tokenTypeId == usdFT.id && ev.feePerContract == 300);
     });
 
-    it(`FT var margin - should not allow non-owner to set variation margin on a futures token type`, async () => {
+    it(`FT fee per contract - should not allow non-owner to set variation margin on a futures token type`, async () => {
         try {
-            const x = await stm.setFuture_VariationMargin(usdFT.id, 43, { from: accounts[1] });
+            const x = await stm.setFuture_FeePerContract(usdFT.id, 301, { from: accounts[1] });
         }
         catch (ex) { assert(ex.reason == 'Restricted', `unexpected: ${ex.reason}`); return; }
         assert.fail('expected contract exception');
     });
-    it(`FT var margin - should not be able to set variation margin on a futures token type when read only`, async () => {
+    it(`FT fee per contract - should not be able to set fee on a futures token type when read only`, async () => {
         try {
             await stm.setReadOnly(true, { from: accounts[0] });
-            const x = await stm.setFuture_VariationMargin(usdFT.id, 44);
+            const x = await stm.setFuture_FeePerContract(usdFT.id, 302);
             await stm.setReadOnly(false, { from: accounts[0] });
         }
         catch (ex) { 
@@ -73,33 +73,18 @@ contract("StMaster", accounts => {
         assert.fail('expected contract exception');
     });
 
-    it(`FT var margin - should not be able to set variation margin on an invalid (non-existent) token type`, async () => {
+    it(`FT fee per contract - should not be able to set fee on an invalid (non-existent) token type`, async () => {
         try {
-            const x = await stm.setFuture_VariationMargin(0xdeaddead, 45);
+            const x = await stm.setFuture_FeePerContract(0xdeaddead, 303);
         }
         catch (ex) { assert(ex.reason == 'Bad tokenTypeId', `unexpected: ${ex.reason}`); return; }
         assert.fail('expected contract exception');
     });
-    it(`FT var margin - should not be able to set variation margin on a spot token type`, async () => {
+    it(`FT fee per contract - should not be able to set fee on a spot token type`, async () => {
         try {
-            const x = await stm.setFuture_VariationMargin(spotTypes[0].id, 46);
+            const x = await stm.setFuture_FeePerContract(spotTypes[0].id, 46);
         }
         catch (ex) { assert(ex.reason == 'Bad token settlement type', `unexpected: ${ex.reason}`); return; }
-        assert.fail('expected contract exception');
-    });
-
-    it(`FT var margin - should not be able to set an invalid (> 10000) variation margin on a futures token type`, async () => {
-        try {
-            const x = await stm.setFuture_VariationMargin(usdFT.id, 10001);
-        }
-        catch (ex) { assert(ex.reason == 'Bad varMarginBips', `unexpected: ${ex.reason}`); return; }
-        assert.fail('expected contract exception');
-    });
-    it(`FT var margin - should not be able to set an invalid (< 0) variation margin on a futures token type`, async () => {
-        try {
-            const x = await stm.setFuture_VariationMargin(usdFT.id, -1);
-        }
-        catch (ex) { assert(ex.reason == 'Bad varMarginBips', `unexpected: ${ex.reason}`); return; }
         assert.fail('expected contract exception');
     });
 });

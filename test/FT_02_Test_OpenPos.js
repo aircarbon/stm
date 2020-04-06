@@ -34,6 +34,7 @@ contract("StMaster", accounts => {
               expiryTimestamp: DateTime.local().plus({ days: 30 }).toMillis(),
               underlyerTypeId: spotTypes[0].id,
                      refCcyId: ccyTypes.find(p => p.name === 'USD').id,
+                 contractSize: 1000,
         });
         usdFT = (await stm.getSecTokenTypes()).tokenTypes.filter(p => p.name == ftTestName_USD)[0];
         usdFT_underlyer = spotTypes.filter(p => p.id == usdFT.ft.underlyerTypeId)[0];
@@ -45,6 +46,7 @@ contract("StMaster", accounts => {
             expiryTimestamp: DateTime.local().plus({ days: 30 }).toMillis(),
             underlyerTypeId: spotTypes[0].id,
                    refCcyId: ccyTypes.find(p => p.name === 'ETH').id,
+               contractSize: 1000,
            });
         ethFT = (await stm.getSecTokenTypes()).tokenTypes.filter(p => p.name == ftTestName_ETH)[0];
         ethFT_underlyer = spotTypes.filter(p => p.id == ethFT.ft.underlyerTypeId)[0];

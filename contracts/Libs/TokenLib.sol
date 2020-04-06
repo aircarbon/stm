@@ -6,7 +6,8 @@ import "./FeeLib.sol";
 
 library TokenLib {
     event AddedSecTokenType(uint256 id, string name, StructLib.SettlementType settlementType, uint64 expiryTimestamp, uint256 underlyerTypeId, uint256 refCcyId, uint16 initMarginBips, uint16 varMarginBips);
-    event SetFutureTokenVariationMargin(uint256 tokenTypeId, uint16 varMarginBips);
+    event SetFutureVariationMargin(uint256 tokenTypeId, uint16 varMarginBips);
+    event SetFutureFeePerContract(uint256 tokenTypeId, uint256 feePerContract);
     event BurnedFullSecToken(uint256 indexed stId, uint256 tokenTypeId, address indexed ledgerOwner, uint256 burnedQty);
     event BurnedPartialSecToken(uint256 indexed stId, uint256 tokenTypeId, address indexed ledgerOwner, uint256 burnedQty);
     event MintedSecTokenBatch(uint256 indexed batchId, uint256 tokenTypeId, address indexed batchOwner, uint256 mintQty, uint256 mintSecTokenCount);
@@ -36,11 +37,14 @@ library TokenLib {
             require(ft.refCcyId > 0 && ft.refCcyId <= ctd._ct_Count, "Bad refCcyId");
             require(ft.initMarginBips < 10000, "Bad initMarginBips");
             require(ft.varMarginBips < 10000, "Bad varMarginBips");
+            require(ft.contractSize > 0, "Bad contractSize");
         }
         else if (settlementType == StructLib.SettlementType.SPOT) {
             require(ft.expiryTimestamp == 0, "Invalid expiryTimestamp");
             require(ft.underlyerTypeId == 0, "Invalid underlyerTypeId");
             require(ft.refCcyId == 0, "Invalid refCcyId");
+            require(ft.contractSize == 0, "Invalid contractSize");
+            require(ft.feePerContract == 0, "Invalid feePerContract");
         }
 
         std._tt_Count++;
@@ -55,7 +59,17 @@ library TokenLib {
         emit AddedSecTokenType(std._tt_Count, name, settlementType, ft.expiryTimestamp, ft.underlyerTypeId, ft.refCcyId, ft.initMarginBips, ft.varMarginBips);
     }
 
-    function setFutureTokenVariationMargin(
+    function setFuture_FeePerContract(
+        StructLib.StTypesStruct storage std, uint256 tokenTypeId, uint256 feePerContract
+    )
+    public {
+        require(tokenTypeId >= 1 && tokenTypeId <= std._tt_Count, "Bad tokenTypeId");
+        require(std._tt_Settle[tokenTypeId] == StructLib.SettlementType.FUTURE, "Bad token settlement type");
+        std._tt_ft[tokenTypeId].feePerContract = feePerContract;
+        emit SetFutureFeePerContract(tokenTypeId, feePerContract);
+    }
+
+    function setFuture_VariationMargin(
         StructLib.StTypesStruct storage std, uint256 tokenTypeId, uint16 varMarginBips
     )
     public {
@@ -63,7 +77,7 @@ library TokenLib {
         require(std._tt_Settle[tokenTypeId] == StructLib.SettlementType.FUTURE, "Bad token settlement type");
         require(varMarginBips < 10000, "Bad varMarginBips");
         std._tt_ft[tokenTypeId].varMarginBips = varMarginBips;
-        emit SetFutureTokenVariationMargin(tokenTypeId, varMarginBips);
+        emit SetFutureVariationMargin(tokenTypeId, varMarginBips);
     }
 
     function getSecTokenTypes(

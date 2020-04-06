@@ -30,12 +30,21 @@ library FuturesLib {
 
         require(a.price <= 0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF && a.price > 0, "Bad price"); // max signed int128, non-zero
 
+        // **** TODO: FT property - multplier, e.g. 1000 (so one FT = 1000 tons)
+        // **** TODO: FT property - fees - $x for y contracts
+        // calc/apply fees...
+
         // ****
-        // WIP/TODO: need to compute margin requirement - for validation re. position opening
-        //       (should be a *view* that the FuturesMaintenance job can call and reuse...)
-        //      * init_margin + var_margin = tot_margin ...
-        // ****
+        // WIP: need to compute margin requirement - for validation re. position opening
         //
+        // uint16 totMarginBips = std._tt_ft[a.tokTypeId].initMarginBips +
+        //                        std._tt_ft[a.tokTypeId].varMarginBips;
+        // int256 notional = ...
+        // int256 reserved_A = (((int256(totMarginBips) * 1000000/*increase precision*/) / 10000/*basis points*/) * batch_exFee_ccy) / 1000000/*decrease precision*/;
+
+        // int256 newReserved_A = ld._ledger.ccyType_reserved[a.ledger_A] + reserved_A;
+        // int256 newReserved_B = ld._ledger.ccyType_reserved[a.ledger_B] + reserved_B;
+
         // var tot_margin = CurrentReservedBalance(); //ComputeTotalMarginOpenPositions(ledger) // view?
         // var new_margin = tot_margin + this_margin
         // if (TotalBalance(ledger) < new_margin) {
@@ -48,11 +57,9 @@ library FuturesLib {
         // so we only add to the reservedBalance on position open
         //   ...and subtract from it, on position closing/netting; (--> i.e. no need for computeAllPositions margin fn.)
 
-        // PREP...
-        // (1) SetReserved(ccyId, ledger, amount) ==> structLib...
-        // (2) transferTrade -> change to check (balance-reserved)
-        // (3) withdraw      -> change to check (balance-reserved)
-        // TESTS...
+        // DONE: (1) SetReserved(ccyId, ledger, amount) ==> structLib...
+        // DONE: (2) transferTrade -> change to check (balance-reserved)
+        // DONE: (3) withdraw      -> change to check (balance-reserved)
 
         // create ledger entries as required
         StructLib.initLedgerIfNew(ld, a.ledger_A);

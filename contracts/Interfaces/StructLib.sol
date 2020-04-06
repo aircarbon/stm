@@ -44,7 +44,9 @@ library StructLib {
         uint256 underlyerTypeId;
         uint256 refCcyId;
         uint16  initMarginBips;                                 // initial margin - set only once at future token-type creation
-        uint16  varMarginBips;                                  // variation margin - updated on each pass of SettleFutures job
+        uint16  varMarginBips;                                  // variation margin - can be updated after token-type creation
+        uint16  contractSize;                                   // contract size - set only once at future token-type creation
+        uint256 feePerContract;                                 // paid by both sides in refCcyId - can be updated after token-type creation
     }
 
     // TOKEN BATCH
@@ -114,7 +116,7 @@ library StructLib {
             int256  mintedQty;                                  // initial unit qty minted in the ST
             int256  currentQty;                                 // current (variable) unit qty in the ST (i.e. burned = currentQty - mintedQty)
             uint64  batchId;                                    // parent batch of the ST
-            int128  ft_price;                                   // entry price of the future position
+            int128  ft_price;                                   // entry price of the future position   
             int128  ft_lastMarkPrice;                           // last marked reference price for the future position, or -1 if never marked
         }
     struct PackedStTotals {

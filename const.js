@@ -112,6 +112,8 @@ module.exports = {
                refCcyId: 0,
          initMarginBips: 0,
           varMarginBips: 0,
+           contractSize: 0,
+         feePerContract: 0,
     },
 
     contractType: Object.freeze({

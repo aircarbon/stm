@@ -44,6 +44,7 @@ contract("StMaster", accounts => {
                    refCcyId: ccyTypes[0].id,
              initMarginBips: 1000,
               varMarginBips: 1500,
+               contractSize: 1000,
         });
         const ftType = (await stm.getSecTokenTypes()).tokenTypes.find(p => p.name == ftName);
         assert(ftType !== undefined);
@@ -65,6 +66,7 @@ contract("StMaster", accounts => {
             const addFtTx = await stm.addSecTokenType(`FT_TEST2_${new Date().getTime()}`, CONST.settlementType.FUTURE, { ...CONST.nullFutureArgs,
                 underlyerTypeId: spotTypes[0].id, 
                        refCcyId: ccyTypes[0].id,
+                   contractSize: 1000,
             });
         }
         catch (ex) { assert(ex.reason == 'Bad expiry', `unexpected: ${ex.reason}`); return; }
@@ -77,6 +79,7 @@ contract("StMaster", accounts => {
             const addFtTx = await stm.addSecTokenType(`FT_TEST3_${new Date().getTime()}`, CONST.settlementType.FUTURE, { ...CONST.nullFutureArgs,
                 expiryTimestamp: DateTime.local().toMillis(), 
                        refCcyId: ccyTypes[0].id,
+                   contractSize: 1000,
             });
         }
         catch (ex) { assert(ex.reason == 'Bad underlyerTypeId', `unexpected: ${ex.reason}`); return; }
@@ -86,12 +89,12 @@ contract("StMaster", accounts => {
         const spotTypes = (await stm.getSecTokenTypes()).tokenTypes.filter(p => p.settlementType == CONST.settlementType.SPOT);
         const ccyTypes = (await stm.getCcyTypes()).ccyTypes;
         const addFtTx_ok = await stm.addSecTokenType(`FT_TEST4_${new Date().getTime()}`, CONST.settlementType.FUTURE, { ...CONST.nullFutureArgs,
-            expiryTimestamp: DateTime.local().toMillis(), underlyerTypeId: spotTypes[0].id, refCcyId: ccyTypes[0].id,
+            expiryTimestamp: DateTime.local().toMillis(), underlyerTypeId: spotTypes[0].id, refCcyId: ccyTypes[0].id, contractSize: 1000,
         });
         const ftTypes = (await stm.getSecTokenTypes()).tokenTypes.filter(p => p.settlementType == CONST.settlementType.FUTURE);
         try {
             const addFtTx_err = await stm.addSecTokenType(`FT_TEST5_${new Date().getTime()}`, CONST.settlementType.FUTURE, {  ...CONST.nullFutureArgs,
-                expiryTimestamp: DateTime.local().toMillis(), underlyerTypeId: ftTypes[0].id, refCcyId: ccyTypes[0].id, 
+                expiryTimestamp: DateTime.local().toMillis(), underlyerTypeId: ftTypes[0].id, refCcyId: ccyTypes[0].id, contractSize: 1000,
             });
         }
         catch (ex) { assert(ex.reason == 'Bad underyler settlement type', `unexpected: ${ex.reason}`); return; }
@@ -102,7 +105,7 @@ contract("StMaster", accounts => {
         const spotTypes = (await stm.getSecTokenTypes()).tokenTypes.filter(p => p.settlementType == CONST.settlementType.SPOT);
         try {
             const addFtTx = await stm.addSecTokenType(`FT_TEST6_${new Date().getTime()}`, CONST.settlementType.FUTURE, { ...CONST.nullFutureArgs,
-                expiryTimestamp: DateTime.local().toMillis(), underlyerTypeId: spotTypes[0].id, refCcyId: 0,
+                expiryTimestamp: DateTime.local().toMillis(), underlyerTypeId: spotTypes[0].id, refCcyId: 0, contractSize: 1000,
             });
         }
         catch (ex) { assert(ex.reason == 'Bad refCcyId', `unexpected: ${ex.reason}`); return; }
@@ -114,7 +117,7 @@ contract("StMaster", accounts => {
         const ccyTypes = (await stm.getCcyTypes()).ccyTypes;
         try {
             const addFtTx = await stm.addSecTokenType(`FT_TEST6_${new Date().getTime()}`, CONST.settlementType.FUTURE, { ...CONST.nullFutureArgs,
-                expiryTimestamp: DateTime.local().toMillis(), underlyerTypeId: spotTypes[0].id, refCcyId: ccyTypes[0].id, initMarginBips: 10001,
+                expiryTimestamp: DateTime.local().toMillis(), underlyerTypeId: spotTypes[0].id, refCcyId: ccyTypes[0].id, initMarginBips: 10001, contractSize: 1000,
             });
         }
         catch (ex) { assert(ex.reason == 'Bad initMarginBips', `unexpected: ${ex.reason}`); return; }
@@ -125,7 +128,7 @@ contract("StMaster", accounts => {
         const ccyTypes = (await stm.getCcyTypes()).ccyTypes;
         try {
             const addFtTx = await stm.addSecTokenType(`FT_TEST6_${new Date().getTime()}`, CONST.settlementType.FUTURE, { ...CONST.nullFutureArgs,
-                expiryTimestamp: DateTime.local().toMillis(), underlyerTypeId: spotTypes[0].id, refCcyId: ccyTypes[0].id, initMarginBips: -1,
+                expiryTimestamp: DateTime.local().toMillis(), underlyerTypeId: spotTypes[0].id, refCcyId: ccyTypes[0].id, initMarginBips: -1, contractSize: 1000,
             });
         }
         catch (ex) { assert(ex.reason == 'Bad initMarginBips', `unexpected: ${ex.reason}`); return; }
@@ -137,7 +140,7 @@ contract("StMaster", accounts => {
         const ccyTypes = (await stm.getCcyTypes()).ccyTypes;
         try {
             const addFtTx = await stm.addSecTokenType(`FT_TEST6_${new Date().getTime()}`, CONST.settlementType.FUTURE, { ...CONST.nullFutureArgs,
-                expiryTimestamp: DateTime.local().toMillis(), underlyerTypeId: spotTypes[0].id, refCcyId: ccyTypes[0].id, varMarginBips: 10001,
+                expiryTimestamp: DateTime.local().toMillis(), underlyerTypeId: spotTypes[0].id, refCcyId: ccyTypes[0].id, varMarginBips: 10001, contractSize: 1000,
             });
         }
         catch (ex) { assert(ex.reason == 'Bad varMarginBips', `unexpected: ${ex.reason}`); return; }
@@ -148,10 +151,22 @@ contract("StMaster", accounts => {
         const ccyTypes = (await stm.getCcyTypes()).ccyTypes;
         try {
             const addFtTx = await stm.addSecTokenType(`FT_TEST6_${new Date().getTime()}`, CONST.settlementType.FUTURE, { ...CONST.nullFutureArgs,
-                expiryTimestamp: DateTime.local().toMillis(), underlyerTypeId: spotTypes[0].id, refCcyId: ccyTypes[0].id, varMarginBips: -1,
+                expiryTimestamp: DateTime.local().toMillis(), underlyerTypeId: spotTypes[0].id, refCcyId: ccyTypes[0].id, varMarginBips: -1, contractSize: 1000,
             });
         }
         catch (ex) { assert(ex.reason == 'Bad varMarginBips', `unexpected: ${ex.reason}`); return; }
+        assert.fail('expected contract exception');
+    });
+
+    it(`FT types - should not be able to add a future with an invalid (0) contract size`, async () => {
+        const spotTypes = (await stm.getSecTokenTypes()).tokenTypes.filter(p => p.settlementType == CONST.settlementType.SPOT);
+        const ccyTypes = (await stm.getCcyTypes()).ccyTypes;
+        try {
+            const addFtTx = await stm.addSecTokenType(`FT_TEST6_${new Date().getTime()}`, CONST.settlementType.FUTURE, { ...CONST.nullFutureArgs,
+                expiryTimestamp: DateTime.local().toMillis(), underlyerTypeId: spotTypes[0].id, refCcyId: ccyTypes[0].id, contractSize: 0,
+            });
+        }
+        catch (ex) { assert(ex.reason == 'Bad contractSize', `unexpected: ${ex.reason}`); return; }
         assert.fail('expected contract exception');
     });
 });

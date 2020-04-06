@@ -63,17 +63,23 @@ contract("StMaster", accounts => {
             const spotTypes = (await stm_cur.getSecTokenTypes()).tokenTypes.filter(p => p.settlementType == CONST.settlementType.SPOT);
             const ccyTypes = (await stm_cur.getCcyTypes()).ccyTypes;
             await stm_cur.addSecTokenType('NEW_TOK_FT_TYPE', CONST.settlementType.FUTURE, {
-                    expiryTimestamp: DateTime.local().toMillis(),
-                    underlyerTypeId: spotTypes[0].id, 
-                           refCcyId: ccyTypes[0].id,
-                     initMarginBips: 1000,
-                      varMarginBips: 500,
-                }, { from: accounts[0] }); 
+                expiryTimestamp: DateTime.local().toMillis(),
+                underlyerTypeId: spotTypes[0].id, 
+                       refCcyId: ccyTypes[0].id,
+                 initMarginBips: 1000,
+                  varMarginBips: 500,
+                   contractSize: 1000,
+                 feePerContract: 300,
+            });
             curHash = await checkHashUpdate(curHash);
+            const ft = (await stm_cur.getSecTokenTypes()).tokenTypes.filter(p => p.settlementType == CONST.settlementType.FUTURE)[0];
 
             // update future variation margin
-            const ft = (await stm_cur.getSecTokenTypes()).tokenTypes.filter(p => p.settlementType == CONST.settlementType.FUTURE)[0];
-            await stm_cur.setFutureTokenVariationMargin(ft.id, 600);
+            await stm_cur.setFuture_VariationMargin(ft.id, 600);
+            curHash = await checkHashUpdate(curHash);
+
+            //... update future fee per contract
+            await stm.setFuture_FeePerContract(ft.id, 301);
             curHash = await checkHashUpdate(curHash);
         }
 
@@ -252,13 +258,7 @@ contract("StMaster", accounts => {
         _.forEach(loadCcys, async (p) => await stm_new.addCcyType(p.name, p.unit, p.decimals));
 
         const curToks = await stm_cur.getSecTokenTypes(), newToks = await stm_new.getSecTokenTypes(), loadToks = _.differenceWith(curToks.tokenTypes, newToks.tokenTypes, _.isEqual);
-        _.forEach(loadToks, async (p) => await stm_new.addSecTokenType(p.name, p.settlementType, { 
-            expiryTimestamp: p.ft.expiryTimestamp,
-            underlyerTypeId: p.ft.underlyerTypeId, 
-                   refCcyId: p.ft.refCcyId,
-             initMarginBips: p.ft.initMarginBips,
-              varMarginBips: p.ft.varMarginBips, 
-        }));
+        _.forEach(loadToks, async (p) => await stm_new.addSecTokenType(p.name, p.settlementType, p.ft));
 
         // load whitelist
         stm_new.whitelist(accounts[555]); // simulate a new contract owner (first whitelist entry, by convention) -- i.e. we can upgrade contract with a new privkey

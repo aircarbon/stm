@@ -24,9 +24,14 @@ contract StLedger is IStLedger,
         TokenLib.addSecTokenType(ld, std, ctd, name, settlementType, ft);
     }
 
-    function setFutureTokenVariationMargin(uint256 tokenTypeId, uint16 varMarginBips)
+    function setFuture_VariationMargin(uint256 tokenTypeId, uint16 varMarginBips)
     public onlyOwner() onlyWhenReadWrite() {
-        TokenLib.setFutureTokenVariationMargin(std, tokenTypeId, varMarginBips);
+        TokenLib.setFuture_VariationMargin(std, tokenTypeId, varMarginBips);
+    }
+
+    function setFuture_FeePerContract(uint256 tokenTypeId, uint256 feePerContract)
+    public onlyOwner() onlyWhenReadWrite() {
+        TokenLib.setFuture_FeePerContract(std, tokenTypeId, feePerContract);
     }
 
     function setReservedCcy(uint256 ccyTypeId, int256 reservedAmount, address ledger)
