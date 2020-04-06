@@ -79,7 +79,7 @@ contract("StMaster", accounts => {
             curHash = await checkHashUpdate(curHash);
 
             //... update future fee per contract
-            await stm.setFuture_FeePerContract(ft.id, 301);
+            await stm_cur.setFuture_FeePerContract(ft.id, 301);
             curHash = await checkHashUpdate(curHash);
         }
 
