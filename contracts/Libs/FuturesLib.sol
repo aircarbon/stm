@@ -42,16 +42,16 @@ library FuturesLib {
         require(StructLib.sufficientCcy(ld, a.ledger_B, std._tt_ft[a.tokTypeId].refCcyId, 0, 0, fee), "Insufficient currency B");
         StructLib.transferCcy(ld, StructLib.TransferCcyArgs({ from: a.ledger_A, to: owner, ccyTypeId: std._tt_ft[a.tokTypeId].refCcyId, amount: uint256(fee), transferType: StructLib.TransferType.ExchangeFee }));
         StructLib.transferCcy(ld, StructLib.TransferCcyArgs({ from: a.ledger_B, to: owner, ccyTypeId: std._tt_ft[a.tokTypeId].refCcyId, amount: uint256(fee), transferType: StructLib.TransferType.ExchangeFee }));
-        // TODO: TESTS for fees...
 
         // ****
-        // WIP: need to compute margin requirement - for validation re. position opening
-        //      (done) FT property - contractSize, e.g. 1000 (so one FT = 1000 tons)
+        // WIP: compute margin requirement - for validation re. position opening
+        //          (done) FT property - contractSize, e.g. 1000 (so one FT = 1000 tons)
         //
         // uint16 totMarginBips = std._tt_ft[a.tokTypeId].initMarginBips +
         //                        std._tt_ft[a.tokTypeId].varMarginBips;
-        // int256 notional = ...
-        // int256 reserved_A = (((int256(totMarginBips) * 1000000/*increase precision*/) / 10000/*basis points*/) * batch_exFee_ccy) / 1000000/*decrease precision*/;
+        // int256 notional = ... posQty * contractSize * posPrice ?
+        // int256 reserved_A = (((int256(totMarginBips) * 1000000/*increase precision*/) / 10000/*basis points*/) * notional) / 1000000/*decrease precision*/;
+        //...
 
         // int256 newReserved_A = ld._ledger.ccyType_reserved[a.ledger_A] + reserved_A;
         // int256 newReserved_B = ld._ledger.ccyType_reserved[a.ledger_B] + reserved_B;

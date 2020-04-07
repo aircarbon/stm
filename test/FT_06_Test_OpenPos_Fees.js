@@ -59,53 +59,53 @@ contract("StMaster", accounts => {
             console.log(`addrNdx: ${global.TaddrNdx} - contract @ ${stm.address} (owner: ${accounts[0]})`);
     });
 
-    // it(`FT position fees - should be able apply two-sided mirrored USD fees on an new futures position`, async () => {
-    //     const A = accounts[global.TaddrNdx], B = accounts[global.TaddrNdx + 1];
+    it(`FT position fees - should be able apply two-sided mirrored USD fees on an new futures position`, async () => {
+        const A = accounts[global.TaddrNdx], B = accounts[global.TaddrNdx + 1];
         
-    //     const FEE = new BN(300), POS_QTY = new BN(1000);
-    //     await stm.setFuture_FeePerContract(usdFT.id, FEE);
-    //     await stm.fund(CONST.ccyType.USD, FEE.mul(POS_QTY).toString(), A);
-    //     await stm.fund(CONST.ccyType.USD, FEE.mul(POS_QTY).toString(), B);
+        const FEE = new BN(300), POS_QTY = new BN(1000);
+        await stm.setFuture_FeePerContract(usdFT.id, FEE);
+        await stm.fund(CONST.ccyType.USD, FEE.mul(POS_QTY).toString(), A);
+        await stm.fund(CONST.ccyType.USD, FEE.mul(POS_QTY).toString(), B);
         
-    //     const x = await futuresHelper.openFtPos({ stm, accounts, tokTypeId: usdFT.id, ledger_A: A, ledger_B: B, qty_A: POS_QTY, qty_B: POS_QTY.neg(), price: 100 });
-    //     await CONST.logGas(web3, x.tx, `Open futures position (USD)`);
-    //     //truffleAssert.prettyPrintEmittedEvents(x.tx);
-    // });
-    // it(`FT positions fees - should be able apply large two-sided mirrored ETH fees on an new futures position`, async () => {
-    //     const A = accounts[global.TaddrNdx], B = accounts[global.TaddrNdx + 1];
+        const x = await futuresHelper.openFtPos({ stm, accounts, tokTypeId: usdFT.id, ledger_A: A, ledger_B: B, qty_A: POS_QTY, qty_B: POS_QTY.neg(), price: 100 });
+        await CONST.logGas(web3, x.tx, `Open futures position (USD)`);
+        //truffleAssert.prettyPrintEmittedEvents(x.tx);
+    });
+    it(`FT positions fees - should be able apply large two-sided mirrored ETH fees on an new futures position`, async () => {
+        const A = accounts[global.TaddrNdx], B = accounts[global.TaddrNdx + 1];
         
-    //     const FEE = new BN(CONST.oneEth_wei), POS_QTY = new BN(1000000000);
-    //     await stm.setFuture_FeePerContract(ethFT.id, FEE);
-    //     await stm.fund(ethFT.ft.refCcyId, FEE.mul(POS_QTY), A);
-    //     await stm.fund(ethFT.ft.refCcyId, FEE.mul(POS_QTY), B);
+        const FEE = new BN(CONST.oneEth_wei), POS_QTY = new BN(1000000000);
+        await stm.setFuture_FeePerContract(ethFT.id, FEE);
+        await stm.fund(ethFT.ft.refCcyId, FEE.mul(POS_QTY), A);
+        await stm.fund(ethFT.ft.refCcyId, FEE.mul(POS_QTY), B);
 
-    //     const x = await futuresHelper.openFtPos({ stm, accounts, tokTypeId: ethFT.id, ledger_A: A, ledger_B: B, qty_A: POS_QTY, qty_B: POS_QTY.neg(), price: CONST.millionEth_wei });
-    //     await CONST.logGas(web3, x.tx, `Open futures position (ETH)`);
-    //     //truffleAssert.prettyPrintEmittedEvents(x.tx);
-    // });
+        const x = await futuresHelper.openFtPos({ stm, accounts, tokTypeId: ethFT.id, ledger_A: A, ledger_B: B, qty_A: POS_QTY, qty_B: POS_QTY.neg(), price: CONST.millionEth_wei });
+        await CONST.logGas(web3, x.tx, `Open futures position (ETH)`);
+        //truffleAssert.prettyPrintEmittedEvents(x.tx);
+    });
 
-    // it(`FT positions fees - should not allow a futures position to be opened with insufficient (balance) USD to cover fees (A)`, async () => {
-    //     const A = accounts[global.TaddrNdx], B = accounts[global.TaddrNdx + 1];
-    //     const FEE = new BN(300), POS_QTY = new BN(1000);
-    //     await stm.setFuture_FeePerContract(usdFT.id, FEE);
-    //     await stm.fund(CONST.ccyType.USD, FEE.mul(POS_QTY).toString(), B);
-    //     try {
-    //         const x = await futuresHelper.openFtPos({ stm, accounts, tokTypeId: usdFT.id, ledger_A: A, ledger_B: B, qty_A: POS_QTY, qty_B: POS_QTY.neg(), price: 100 });
-    //     }
-    //     catch (ex) { assert(ex.reason == 'Insufficient currency A', `unexpected: ${ex.reason}`); return; }
-    //     assert.fail('expected contract exception');
-    // });
-    // it(`FT positions fees - should not allow a futures position to be opened with insufficient (balance) USD to cover fees (B)`, async () => {
-    //     const A = accounts[global.TaddrNdx], B = accounts[global.TaddrNdx + 1];
-    //     const FEE = new BN(300), POS_QTY = new BN(1000);
-    //     await stm.setFuture_FeePerContract(usdFT.id, FEE);
-    //     await stm.fund(CONST.ccyType.USD, FEE.mul(POS_QTY).toString(), A);
-    //     try {
-    //         const x = await futuresHelper.openFtPos({ stm, accounts, tokTypeId: usdFT.id, ledger_A: A, ledger_B: B, qty_A: POS_QTY, qty_B: POS_QTY.neg(), price: 100 });
-    //     }
-    //     catch (ex) { assert(ex.reason == 'Insufficient currency B', `unexpected: ${ex.reason}`); return; }
-    //     assert.fail('expected contract exception');
-    // });
+    it(`FT positions fees - should not allow a futures position to be opened with insufficient (balance) USD to cover fees (A)`, async () => {
+        const A = accounts[global.TaddrNdx], B = accounts[global.TaddrNdx + 1];
+        const FEE = new BN(300), POS_QTY = new BN(1000);
+        await stm.setFuture_FeePerContract(usdFT.id, FEE);
+        await stm.fund(CONST.ccyType.USD, FEE.mul(POS_QTY).toString(), B);
+        try {
+            const x = await futuresHelper.openFtPos({ stm, accounts, tokTypeId: usdFT.id, ledger_A: A, ledger_B: B, qty_A: POS_QTY, qty_B: POS_QTY.neg(), price: 100 });
+        }
+        catch (ex) { assert(ex.reason == 'Insufficient currency A', `unexpected: ${ex.reason}`); return; }
+        assert.fail('expected contract exception');
+    });
+    it(`FT positions fees - should not allow a futures position to be opened with insufficient (balance) USD to cover fees (B)`, async () => {
+        const A = accounts[global.TaddrNdx], B = accounts[global.TaddrNdx + 1];
+        const FEE = new BN(300), POS_QTY = new BN(1000);
+        await stm.setFuture_FeePerContract(usdFT.id, FEE);
+        await stm.fund(CONST.ccyType.USD, FEE.mul(POS_QTY).toString(), A);
+        try {
+            const x = await futuresHelper.openFtPos({ stm, accounts, tokTypeId: usdFT.id, ledger_A: A, ledger_B: B, qty_A: POS_QTY, qty_B: POS_QTY.neg(), price: 100 });
+        }
+        catch (ex) { assert(ex.reason == 'Insufficient currency B', `unexpected: ${ex.reason}`); return; }
+        assert.fail('expected contract exception');
+    });
 
     it(`FT positions fees - should not allow a futures position to be opened with insufficient (unreserved) USD to cover fees (A)`, async () => {
         const A = accounts[global.TaddrNdx], B = accounts[global.TaddrNdx + 1];
