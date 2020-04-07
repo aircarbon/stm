@@ -41,7 +41,7 @@ contract IStLedger is IOwned {
      * @param feePerContract New fee per contract, paid in future reference currency by each side of open interest position
      */
     function setFuture_FeePerContract(
-        uint256 tokenTypeId, uint256 feePerContract
+        uint256 tokenTypeId, uint128 feePerContract
     )
     public onlyOwner() onlyWhenReadWrite() { revert("Not implemented"); }
 }

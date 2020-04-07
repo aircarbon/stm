@@ -6,6 +6,9 @@ import "../Interfaces/StructLib.sol";
 library FuturesLib {
     event FutureOpenInterest(address indexed long, address indexed short, uint256 tokTypeId, uint256 qty, uint256 price);
 
+    // enum TransferType { User, ExchangeFee, OriginatorFee }
+    // event TransferedLedgerCcy(address indexed from, address indexed to, uint256 ccyTypeId, uint256 amount, TransferType transferType);
+
     //
     // PUBLIC - open futures position
     //
@@ -14,7 +17,8 @@ library FuturesLib {
         StructLib.StTypesStruct storage std,
         StructLib.CcyTypesStruct storage ctd,
         StructLib.FeeStruct storage globalFees,
-        StructLib.FuturesPositionArgs memory a
+        StructLib.FuturesPositionArgs memory a,
+        address owner
     ) public {
         require(ld._contractSealed, "Contract is not sealed");
 
@@ -22,7 +26,7 @@ library FuturesLib {
 
         require(a.qty_A <= 0x7FFFFFFFFFFFFFFF && a.qty_B <= 0x7FFFFFFFFFFFFFFF &&
                 a.qty_A >= -0x7FFFFFFFFFFFFFFF && a.qty_B >= -0x7FFFFFFFFFFFFFFF &&
-                a.qty_A != 0 && a.qty_B != 0,  "Bad quantity"); // min/max signed int64, non-zero
+                a.qty_A != 0 && a.qty_B != 0, "Bad quantity"); // min/max signed int64, non-zero
         require(a.qty_A + a.qty_B == 0, "Quantity mismatch");
 
         require(a.tokTypeId >= 0 && a.tokTypeId <= std._tt_Count, "Bad tokTypeId");
@@ -30,12 +34,19 @@ library FuturesLib {
 
         require(a.price <= 0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF && a.price > 0, "Bad price"); // max signed int128, non-zero
 
-        // **** TODO: FT property - multplier, e.g. 1000 (so one FT = 1000 tons)
-        // **** TODO: FT property - fees - $x for y contracts
-        // calc/apply fees...
+        // handle fees
+        int256 posSize = (a.qty_A < 0 ? a.qty_B : a.qty_A);
+        int256 fee = std._tt_ft[a.tokTypeId].feePerContract * posSize;
+        require(fee >= 0, "Unexpected fee value");
+        require(StructLib.sufficientCcy(ld, a.ledger_A, std._tt_ft[a.tokTypeId].refCcyId, 0, 0, fee), "Insufficient currency A");
+        require(StructLib.sufficientCcy(ld, a.ledger_B, std._tt_ft[a.tokTypeId].refCcyId, 0, 0, fee), "Insufficient currency B");
+        StructLib.transferCcy(ld, StructLib.TransferCcyArgs({ from: a.ledger_A, to: owner, ccyTypeId: std._tt_ft[a.tokTypeId].refCcyId, amount: uint256(fee), transferType: StructLib.TransferType.ExchangeFee }));
+        StructLib.transferCcy(ld, StructLib.TransferCcyArgs({ from: a.ledger_B, to: owner, ccyTypeId: std._tt_ft[a.tokTypeId].refCcyId, amount: uint256(fee), transferType: StructLib.TransferType.ExchangeFee }));
+        // TODO: TESTS for fees...
 
         // ****
         // WIP: need to compute margin requirement - for validation re. position opening
+        //      (done) FT property - contractSize, e.g. 1000 (so one FT = 1000 tons)
         //
         // uint16 totMarginBips = std._tt_ft[a.tokTypeId].initMarginBips +
         //                        std._tt_ft[a.tokTypeId].varMarginBips;

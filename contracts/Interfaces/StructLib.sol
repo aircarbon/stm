@@ -1,6 +1,35 @@
 pragma solidity ^0.5.13;
+pragma experimental ABIEncoderV2;
 
 library StructLib {
+
+    // EVENTS - SHARED (FuturesLib & TransferLib)
+    enum TransferType { User, ExchangeFee, OriginatorFee }
+    event TransferedLedgerCcy(address indexed from, address indexed to, uint256 ccyTypeId, uint256 amount, TransferType transferType);
+
+    //
+    // INTERNAL - transfer ccy
+    //
+    struct TransferCcyArgs { // todo move - structlib...
+        address      from;
+        address      to;
+        uint256      ccyTypeId;
+        uint256      amount;
+        StructLib.TransferType transferType;
+    }
+    function transferCcy(
+        StructLib.LedgerStruct storage ld,
+        TransferCcyArgs memory a)
+    public {
+        ld._ledger[a.from].ccyType_balance[a.ccyTypeId] -= int256(a.amount);
+        ld._ledger[a.to].ccyType_balance[a.ccyTypeId] += int256(a.amount);
+        ld._ccyType_totalTransfered[a.ccyTypeId] += a.amount;
+        emit StructLib.TransferedLedgerCcy(a.from, a.to, a.ccyTypeId, a.amount, a.transferType);
+
+        if (a.transferType == StructLib.TransferType.ExchangeFee) {
+            ld._ccyType_totalFeesPaid[a.ccyTypeId] += a.amount;
+        }
+    }
 
     // CONTRACT TYPE
     enum ContractType { COMMODITY, CASHFLOW }
@@ -46,7 +75,7 @@ library StructLib {
         uint16  initMarginBips;                                 // initial margin - set only once at future token-type creation
         uint16  varMarginBips;                                  // variation margin - can be updated after token-type creation
         uint16  contractSize;                                   // contract size - set only once at future token-type creation
-        uint256 feePerContract;                                 // paid by both sides in refCcyId - can be updated after token-type creation
+        uint128 feePerContract;                                 // paid by both sides in refCcyId - can be updated after token-type creation
     }
 
     // TOKEN BATCH

@@ -4,11 +4,8 @@ pragma experimental ABIEncoderV2;
 import "../Interfaces/StructLib.sol";
 
 library TransferLib {
-    enum TransferType { User, ExchangeFee, OriginatorFee }
-    event TransferedLedgerCcy(address indexed from, address indexed to, uint256 ccyTypeId, uint256 amount, TransferType transferType);
-    event TransferedFullSecToken(address indexed from, address indexed to, uint256 indexed stId, uint256 mergedToSecTokenId, uint256 qty, TransferType transferType);
-    event TransferedPartialSecToken(address indexed from, address indexed to, uint256 indexed splitFromSecTokenId, uint256 newSecTokenId, uint256 mergedToSecTokenId, uint256 qty, TransferType transferType);
-    //event dbg1(uint256 batchId, uint256 S, uint256 BCS, uint256 batchQty, uint256 totQty, uint256 batch_exFee_ccy, uint256 BFEE);
+    event TransferedFullSecToken(address indexed from, address indexed to, uint256 indexed stId, uint256 mergedToSecTokenId, uint256 qty, StructLib.TransferType transferType);
+    event TransferedPartialSecToken(address indexed from, address indexed to, uint256 indexed splitFromSecTokenId, uint256 newSecTokenId, uint256 mergedToSecTokenId, uint256 qty, StructLib.TransferType transferType);
     event TradedCcyTok(uint256 ccyTypeId, uint256 ccyAmount, uint256 tokTypeId, address indexed tokensFrom, address indexed ccyFrom, uint256 tokQty);
 
     uint256 constant MAX_BATCHES_PREVIEW = 128; // for fee previews: max distinct batch IDs that can participate in one side of a trade fee preview
@@ -107,7 +104,7 @@ library TransferLib {
         // potentially multiple: up to one originator token fee per distinct token batch
         //
         if (a.qty_A > 0) {
-            v.ts_args[0] = TransferSplitArgs({ from: a.ledger_A, to: a.ledger_B, tokenTypeId: a.tokenTypeId_A, qtyUnit: a.qty_A, transferType: TransferType.User, maxStId: maxStId });
+            v.ts_args[0] = TransferSplitArgs({ from: a.ledger_A, to: a.ledger_B, tokenTypeId: a.tokenTypeId_A, qtyUnit: a.qty_A, transferType: StructLib.TransferType.User, maxStId: maxStId });
             v.ts_previews[0] = transferSplitSecTokens_Preview(ld, v.ts_args[0]);
             for (uint i = 0; i < v.ts_previews[0].batchCount ; i++) {
                 StructLib.SecTokenBatch storage batch = ld._batches[v.ts_previews[0].batchIds[i]];
@@ -116,7 +113,7 @@ library TransferLib {
             }
         }
         if (a.qty_B > 0) {
-            v.ts_args[1] = TransferSplitArgs({ from: a.ledger_B, to: a.ledger_A, tokenTypeId: a.tokenTypeId_B, qtyUnit: a.qty_B, transferType: TransferType.User, maxStId: maxStId });
+            v.ts_args[1] = TransferSplitArgs({ from: a.ledger_B, to: a.ledger_A, tokenTypeId: a.tokenTypeId_B, qtyUnit: a.qty_B, transferType: StructLib.TransferType.User, maxStId: maxStId });
             v.ts_previews[1] = transferSplitSecTokens_Preview(ld, v.ts_args[1]);
             for (uint i = 0; i < v.ts_previews[1].batchCount ; i++) {
                 StructLib.SecTokenBatch storage batch = ld._batches[v.ts_previews[1].batchIds[i]];
@@ -136,7 +133,6 @@ library TransferLib {
                     a.ccy_amount_A, // amount receiving
                     int256(exFees.fee_ccy_B) * (a.applyFees /*&& a.ccy_amount_B > 0 */? 1 : 0)), "Insufficient currency B");
 
-
         // validate token balances - sum exchange token fee + originator token fee(s)
         require(StructLib.sufficientTokens(ld, a.ledger_A, a.tokenTypeId_A, int256(a.qty_A),
                     int256((exFees.fee_tok_A + v.totalOrigFee[0]) * (a.applyFees && a.qty_A > 0 ? 1 : 0))), "Insufficient tokens A");
@@ -148,20 +144,20 @@ library TransferLib {
         //
         if (a.ccy_amount_A > 0) {
             // user transfer from A
-            transferCcy(ld, TransferCcyArgs({ from: a.ledger_A, to: a.ledger_B, ccyTypeId: a.ccyTypeId_A, amount: uint256(a.ccy_amount_A), transferType: TransferType.User }));
+            StructLib.transferCcy(ld, StructLib.TransferCcyArgs({ from: a.ledger_A, to: a.ledger_B, ccyTypeId: a.ccyTypeId_A, amount: uint256(a.ccy_amount_A), transferType: StructLib.TransferType.User }));
         }
         if (a.applyFees && exFees.fee_ccy_A > 0) {
             // exchange fee transfer from A
-            transferCcy(ld, TransferCcyArgs({ from: a.ledger_A, to: a.feeAddrOwner, ccyTypeId: a.ccyTypeId_A, amount: exFees.fee_ccy_A, transferType: TransferType.ExchangeFee }));
+            StructLib.transferCcy(ld, StructLib.TransferCcyArgs({ from: a.ledger_A, to: a.feeAddrOwner, ccyTypeId: a.ccyTypeId_A, amount: exFees.fee_ccy_A, transferType: StructLib.TransferType.ExchangeFee }));
         }
 
         if (a.ccy_amount_B > 0) {
             // user transfer from B
-            transferCcy(ld, TransferCcyArgs({ from: a.ledger_B, to: a.ledger_A, ccyTypeId: a.ccyTypeId_B, amount: uint256(a.ccy_amount_B), transferType: TransferType.User }));
+            StructLib.transferCcy(ld, StructLib.TransferCcyArgs({ from: a.ledger_B, to: a.ledger_A, ccyTypeId: a.ccyTypeId_B, amount: uint256(a.ccy_amount_B), transferType: StructLib.TransferType.User }));
         }
         if (a.applyFees && exFees.fee_ccy_B > 0) {
             // exchange fee transfer from B
-            transferCcy(ld, TransferCcyArgs({ from: a.ledger_B, to: a.feeAddrOwner, ccyTypeId: a.ccyTypeId_B, amount: exFees.fee_ccy_B, transferType: TransferType.ExchangeFee }));
+            StructLib.transferCcy(ld, StructLib.TransferCcyArgs({ from: a.ledger_B, to: a.feeAddrOwner, ccyTypeId: a.ccyTypeId_B, amount: exFees.fee_ccy_B, transferType: StructLib.TransferType.ExchangeFee }));
         }
 
         //
@@ -190,7 +186,7 @@ library TransferLib {
             if (a.applyFees) {
                 // exchange token fee transfer from A
                 if (exFees.fee_tok_A > 0) {
-                    maxStId = transferSplitSecTokens(ld, TransferSplitArgs({ from: a.ledger_A, to: a.feeAddrOwner, tokenTypeId: a.tokenTypeId_A, qtyUnit: exFees.fee_tok_A, transferType: TransferType.ExchangeFee, maxStId: maxStId }));
+                    maxStId = transferSplitSecTokens(ld, TransferSplitArgs({ from: a.ledger_A, to: a.feeAddrOwner, tokenTypeId: a.tokenTypeId_A, qtyUnit: exFees.fee_tok_A, transferType: StructLib.TransferType.ExchangeFee, maxStId: maxStId }));
                     v.exchangeFeesPaidQty += uint80(exFees.fee_tok_A);
                 }
 
@@ -199,7 +195,7 @@ library TransferLib {
                     StructLib.SecTokenBatch storage batch = ld._batches[v.ts_previews[0].batchIds[i]];
                     uint256 tokFee = a.ledger_A != batch.originator ? calcFeeWithCapCollar(batch.origTokFee, v.ts_previews[0].transferQty[i], 0) : 0;
                     if (tokFee > 0) {
-                        maxStId = transferSplitSecTokens(ld, TransferSplitArgs({ from: a.ledger_A, to: batch.originator, tokenTypeId: a.tokenTypeId_A, qtyUnit: tokFee, transferType: TransferType.OriginatorFee, maxStId: maxStId }));
+                        maxStId = transferSplitSecTokens(ld, TransferSplitArgs({ from: a.ledger_A, to: batch.originator, tokenTypeId: a.tokenTypeId_A, qtyUnit: tokFee, transferType: StructLib.TransferType.OriginatorFee, maxStId: maxStId }));
                         v.originatorFeesPaidQty += uint80(tokFee);
                     }
                 }
@@ -214,7 +210,7 @@ library TransferLib {
             if (a.applyFees) {
                 // exchange token fee transfer from B
                 if (exFees.fee_tok_B > 0) {
-                    maxStId = transferSplitSecTokens(ld, TransferSplitArgs({ from: a.ledger_B, to: a.feeAddrOwner, tokenTypeId: a.tokenTypeId_B, qtyUnit: exFees.fee_tok_B, transferType: TransferType.ExchangeFee, maxStId: maxStId }));
+                    maxStId = transferSplitSecTokens(ld, TransferSplitArgs({ from: a.ledger_B, to: a.feeAddrOwner, tokenTypeId: a.tokenTypeId_B, qtyUnit: exFees.fee_tok_B, transferType: StructLib.TransferType.ExchangeFee, maxStId: maxStId }));
                     v.exchangeFeesPaidQty += uint80(exFees.fee_tok_B);
                 }
 
@@ -223,7 +219,7 @@ library TransferLib {
                     StructLib.SecTokenBatch storage batch = ld._batches[v.ts_previews[1].batchIds[i]];
                     uint256 tokFee = a.ledger_B != batch.originator ? calcFeeWithCapCollar(batch.origTokFee, v.ts_previews[1].transferQty[i], 0) : 0;
                     if (tokFee > 0) {
-                        maxStId = transferSplitSecTokens(ld, TransferSplitArgs({ from: a.ledger_B, to: batch.originator, tokenTypeId: a.tokenTypeId_B, qtyUnit: tokFee, transferType: TransferType.OriginatorFee, maxStId: maxStId }));
+                        maxStId = transferSplitSecTokens(ld, TransferSplitArgs({ from: a.ledger_B, to: batch.originator, tokenTypeId: a.tokenTypeId_B, qtyUnit: tokFee, transferType: StructLib.TransferType.OriginatorFee, maxStId: maxStId }));
                         v.originatorFeesPaidQty += uint80(tokFee);
                     }
                 }
@@ -267,7 +263,7 @@ library TransferLib {
         // SPLITTING
         // want to *also* return the # of full & partial ST transfers, involved in *ALL* the transfer actions (not just fees)
         // each set of { partialCount, fullCount } should be grouped by transfer-type: USER, EX_FEE, ORIG_FEE
-        // transfer could then take params: { transferType: partialStart, partialEnd, fullStart, fullEnd } -- basically pagination of the sub-transfers
+        // transfer could then take params: { StructLib.TransferType: partialStart, partialEnd, fullStart, fullEnd } -- basically pagination of the sub-transfers
         //
         // TEST SETUP COULD BE: ~100 minted batches 1 ton each, and move 99 tons A-B (type USER, multi-batch)
         //       try to make orchestrator that batches by (eg.) 10...
@@ -324,7 +320,7 @@ library TransferLib {
         // originator token fee(s) - per batch
         uint256 maxStId = ld._tokens_currentMax_id;
         if (a.qty_A > 0) {
-            TransferSplitPreviewReturn memory preview = transferSplitSecTokens_Preview(ld, TransferSplitArgs({ from: a.ledger_A, to: a.ledger_B, tokenTypeId: a.tokenTypeId_A, qtyUnit: a.qty_A, transferType: TransferType.User, maxStId: maxStId }));
+            TransferSplitPreviewReturn memory preview = transferSplitSecTokens_Preview(ld, TransferSplitArgs({ from: a.ledger_A, to: a.ledger_B, tokenTypeId: a.tokenTypeId_A, qtyUnit: a.qty_A, transferType: StructLib.TransferType.User, maxStId: maxStId }));
             for (uint i = 0; i < preview.batchCount ; i++) {
                 StructLib.SecTokenBatch storage batch = ld._batches[preview.batchIds[i]];
                 if (a.ledger_A != batch.originator) {
@@ -342,7 +338,7 @@ library TransferLib {
             }
         }
         if (a.qty_B > 0) {
-            TransferSplitPreviewReturn memory preview = transferSplitSecTokens_Preview(ld, TransferSplitArgs({ from: a.ledger_B, to: a.ledger_A, tokenTypeId: a.tokenTypeId_B, qtyUnit: a.qty_B, transferType: TransferType.User, maxStId: maxStId }));
+            TransferSplitPreviewReturn memory preview = transferSplitSecTokens_Preview(ld, TransferSplitArgs({ from: a.ledger_B, to: a.ledger_A, tokenTypeId: a.tokenTypeId_B, qtyUnit: a.qty_B, transferType: StructLib.TransferType.User, maxStId: maxStId }));
             for (uint i = 0; i < preview.batchCount ; i++) {
                 StructLib.SecTokenBatch storage batch = ld._batches[preview.batchIds[i]];
                 if (a.ledger_B != batch.originator) {
@@ -394,31 +390,7 @@ library TransferLib {
             //emit dbg1(batch.id, 0, 0, ts_preview.transferQty[i], tot_qty, batch_exFee_ccy, BFEE);
 
             // currency fee transfer: from exchange owner account to batch originator
-            transferCcy(ld, TransferCcyArgs({ from: feeAddrOwner, to: batch.originator, ccyTypeId: ccyTypeId, amount: BFEE, transferType: TransferType.OriginatorFee }));
-        }
-    }
-
-    //
-    // INTERNAL - transfer ccy
-    //
-    struct TransferCcyArgs {
-        address      from;
-        address      to;
-        uint256      ccyTypeId;
-        uint256      amount;
-        TransferType transferType;
-    }
-    function transferCcy(
-        StructLib.LedgerStruct storage ld,
-        TransferCcyArgs memory a)
-    private {
-        ld._ledger[a.from].ccyType_balance[a.ccyTypeId] -= int256(a.amount);
-        ld._ledger[a.to].ccyType_balance[a.ccyTypeId] += int256(a.amount);
-        ld._ccyType_totalTransfered[a.ccyTypeId] += a.amount;
-        emit TransferedLedgerCcy(a.from, a.to, a.ccyTypeId, a.amount, a.transferType);
-
-        if (a.transferType == TransferType.ExchangeFee) {
-            ld._ccyType_totalFeesPaid[a.ccyTypeId] += a.amount;
+            StructLib.transferCcy(ld, StructLib.TransferCcyArgs({ from: feeAddrOwner, to: batch.originator, ccyTypeId: ccyTypeId, amount: BFEE, transferType: StructLib.TransferType.OriginatorFee }));
         }
     }
 
@@ -430,7 +402,7 @@ library TransferLib {
         address      to;
         uint256      tokenTypeId;
         uint256      qtyUnit;
-        TransferType transferType;
+        StructLib.TransferType transferType;
         uint256      maxStId;
     }
     struct TransferSpltVars {
@@ -481,7 +453,7 @@ library TransferLib {
                     //         _sts_currentQty[stId] = 0;
                     //         _sts_mintedQty[stId] = 0;
                     //         mergedExisting = true;
-                    //         emit TransferedFullSecToken(a.from, a.to, stId, to_stIds[i], stQty, transferType);
+                    //         emit TransferedFullSecToken(a.from, a.to, stId, to_stIds[i], stQty, StructLib.TransferType);
                     //         break;
                     //     }
                     // }

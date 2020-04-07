@@ -29,7 +29,7 @@ contract StLedger is IStLedger,
         TokenLib.setFuture_VariationMargin(std, tokenTypeId, varMarginBips);
     }
 
-    function setFuture_FeePerContract(uint256 tokenTypeId, uint256 feePerContract)
+    function setFuture_FeePerContract(uint256 tokenTypeId, uint128 feePerContract)
     public onlyOwner() onlyWhenReadWrite() {
         TokenLib.setFuture_FeePerContract(std, tokenTypeId, feePerContract);
     }

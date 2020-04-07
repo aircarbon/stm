@@ -60,7 +60,7 @@ library TokenLib {
     }
 
     function setFuture_FeePerContract(
-        StructLib.StTypesStruct storage std, uint256 tokenTypeId, uint256 feePerContract
+        StructLib.StTypesStruct storage std, uint256 tokenTypeId, uint128 feePerContract
     )
     public {
         require(tokenTypeId >= 1 && tokenTypeId <= std._tt_Count, "Bad tokenTypeId");

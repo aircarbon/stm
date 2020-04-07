@@ -47,7 +47,7 @@ contract("StMaster", accounts => {
             underlyerTypeId: spotTypes[0].id,
                    refCcyId: ccyTypes.find(p => p.name === 'ETH').id,
                contractSize: 1000,
-           });
+        });
         ethFT = (await stm.getSecTokenTypes()).tokenTypes.filter(p => p.name == ftTestName_ETH)[0];
         ethFT_underlyer = spotTypes.filter(p => p.id == ethFT.ft.underlyerTypeId)[0];
         ethFT_refCcy = ccyTypes.filter(p => p.id == ethFT.refCcyId)[0];
@@ -62,7 +62,6 @@ contract("StMaster", accounts => {
     it(`FT positions - should be able to open a futures position with USD ref currency`, async () => {
         const A = accounts[global.TaddrNdx], B = accounts[global.TaddrNdx + 1];
         const x = await futuresHelper.openFtPos({ stm, accounts, tokTypeId: usdFT.id, ledger_A: A, ledger_B: B, qty_A: +1000, qty_B: -1000, price: 100 });
-        await CONST.logGas(web3, x.tx, `Open futures position`);
         //truffleAssert.prettyPrintEmittedEvents(x.tx);
     });
 
