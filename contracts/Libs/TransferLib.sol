@@ -387,8 +387,6 @@ library TransferLib {
             // batch fee - capped share of exchange ccy fee
             uint256 BFEE = (((uint256(batch.origCcyFee_percBips_ExFee) * 1000000/*increase precision*/) / 10000/*basis points*/) * batch_exFee_ccy) / 1000000/*decrease precision*/;
 
-            //emit dbg1(batch.id, 0, 0, ts_preview.transferQty[i], tot_qty, batch_exFee_ccy, BFEE);
-
             // currency fee transfer: from exchange owner account to batch originator
             StructLib.transferCcy(ld, StructLib.TransferCcyArgs({ from: feeAddrOwner, to: batch.originator, ccyTypeId: ccyTypeId, amount: BFEE, transferType: StructLib.TransferType.OriginatorFee }));
         }

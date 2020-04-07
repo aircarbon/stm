@@ -50,12 +50,15 @@ FUTURES - notes 26/MAR/2020
   (0.2) done: needs reference ccy to be assigned also in FT type
 (1) OPEN
   (1.1) done: auto-mint both sides +ve / -ve, assign price P into both STs, assign LastMarkPrice (LMP) -1 into both STs - always new STs (NetPositions will collapse them later...)
-  (1.2) WIP/TODO: UpdateSetAside: sum MarginRequired for *all* open positions (not just this one!) - write TotalMarginRequired[ccyId] to ledger...
+  (1.2) done: UpdateSetAside: sum MarginRequired for *all* open positions (not just this one!) - write TotalMarginRequired[ccyId] to ledger...
 
-(2) MARK (param: ftTypeId, MarkPrice [MP]) -- SettleFutures()
-  (2.1) TakeOrPay [2 updates: LMP + Ccy] - use (MP - LMP) or (MP - P) when LMP == -1
-  (2.2) NetPositions (auto-burn/shrink) - should only ever be ONE net ST per FT-type after TakeOrPay
-  (2.3) LiquidatePositions
+(2) SETTLE_JOB (off-chain) - walk all ledger entries...
+  (2.0) call [sol] settleFuturePositions // fn. (param: ledgerAddr, MarkPrice [MP])
+  (2.1)   >> TakeOrPay [2 updates: LMP + CcyBalance] -- use (MP - LMP) or (MP - P) when LMP == -1
+           ... preview mode - should net to zero across all ledgers and positions...
+
+  (2.2)   >> NetPositions (auto-burn/shrink) - should only ever be ONE net ST per FT-type after TakeOrPay
+  (2.3)   >> LiquidatePositions
 
  >> JS test framework, with various price series and event series (position opens/closes)
 

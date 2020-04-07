@@ -6,9 +6,6 @@ import "../Interfaces/StructLib.sol";
 library FuturesLib {
     event FutureOpenInterest(address indexed long, address indexed short, uint256 tokTypeId, uint256 qty, uint256 price);
 
-    // enum TransferType { User, ExchangeFee, OriginatorFee }
-    // event TransferedLedgerCcy(address indexed from, address indexed to, uint256 ccyTypeId, uint256 amount, TransferType transferType);
-
     //
     // PUBLIC - open futures position
     //
@@ -34,7 +31,7 @@ library FuturesLib {
 
         require(a.price <= 0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF && a.price > 0, "Bad price"); // max signed int128, non-zero
 
-        // handle fees
+        // apply fees
         int256 posSize = (a.qty_A < 0 ? a.qty_B : a.qty_A);
         int256 fee = std._tt_ft[a.tokTypeId].feePerContract * posSize;
         require(fee >= 0, "Unexpected fee value");
@@ -43,34 +40,21 @@ library FuturesLib {
         StructLib.transferCcy(ld, StructLib.TransferCcyArgs({ from: a.ledger_A, to: owner, ccyTypeId: std._tt_ft[a.tokTypeId].refCcyId, amount: uint256(fee), transferType: StructLib.TransferType.ExchangeFee }));
         StructLib.transferCcy(ld, StructLib.TransferCcyArgs({ from: a.ledger_B, to: owner, ccyTypeId: std._tt_ft[a.tokTypeId].refCcyId, amount: uint256(fee), transferType: StructLib.TransferType.ExchangeFee }));
 
-        // ****
-        // WIP: compute margin requirement - for validation re. position opening
-        //          (done) FT property - contractSize, e.g. 1000 (so one FT = 1000 tons)
-        //
-        // uint16 totMarginBips = std._tt_ft[a.tokTypeId].initMarginBips +
-        //                        std._tt_ft[a.tokTypeId].varMarginBips;
-        // int256 notional = ... posQty * contractSize * posPrice ?
-        // int256 reserved_A = (((int256(totMarginBips) * 1000000/*increase precision*/) / 10000/*basis points*/) * notional) / 1000000/*decrease precision*/;
-        //...
+        // calculate margin requirement
+        //uint16 totMarginBips = std._tt_ft[a.tokTypeId].initMarginBips + std._tt_ft[a.tokTypeId].varMarginBips;
+        //int256 notional = std._tt_ft[a.tokTypeId].contractSize * posSize * a.price;
+        int256 marginRequired = (((int256((std._tt_ft[a.tokTypeId].initMarginBips + std._tt_ft[a.tokTypeId].varMarginBips)/*totMarginBips*/)
+                                    * 1000000/*increase precision*/)
+                                    / 10000/*basis points*/)
+                                    * (std._tt_ft[a.tokTypeId].contractSize * posSize * a.price)/*notional*/
+                                ) / 1000000/*decrease precision*/;
+        //emit dbg1(marginRequired);
 
-        // int256 newReserved_A = ld._ledger.ccyType_reserved[a.ledger_A] + reserved_A;
-        // int256 newReserved_B = ld._ledger.ccyType_reserved[a.ledger_B] + reserved_B;
-
-        // var tot_margin = CurrentReservedBalance(); //ComputeTotalMarginOpenPositions(ledger) // view?
-        // var new_margin = tot_margin + this_margin
-        // if (TotalBalance(ledger) < new_margin) {
-        //    SetReservedBalance(new_margin);
-        //    open position...
-        // }
-        // else {
-        //    reject()
-        //}
-        // so we only add to the reservedBalance on position open
-        //   ...and subtract from it, on position closing/netting; (--> i.e. no need for computeAllPositions margin fn.)
-
-        // DONE: (1) SetReserved(ccyId, ledger, amount) ==> structLib...
-        // DONE: (2) transferTrade -> change to check (balance-reserved)
-        // DONE: (3) withdraw      -> change to check (balance-reserved)
+        // apply margin
+        int256 newReserved_A = ld._ledger[a.ledger_A].ccyType_reserved[std._tt_ft[a.tokTypeId].refCcyId] + marginRequired;
+        int256 newReserved_B = ld._ledger[a.ledger_B].ccyType_reserved[std._tt_ft[a.tokTypeId].refCcyId] + marginRequired;
+        StructLib.setReservedCcy(ld, ctd, a.ledger_A, std._tt_ft[a.tokTypeId].refCcyId, newReserved_A); // ...will revert if insufficient
+        StructLib.setReservedCcy(ld, ctd, a.ledger_B, std._tt_ft[a.tokTypeId].refCcyId, newReserved_B); //    "
 
         // create ledger entries as required
         StructLib.initLedgerIfNew(ld, a.ledger_A);

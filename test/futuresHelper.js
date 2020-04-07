@@ -25,7 +25,7 @@ module.exports = {
         // open futures position
         const st = (await stm.getSecTokenTypes()).tokenTypes.find(p => p.id == tokTypeId);
         const openFtPosTx = await stm.openFtPos( {
-            tokTypeId, ledger_A, ledger_B, qty_A: qty_A.toString(), qty_B: qty_B.toString(), price
+            tokTypeId, ledger_A, ledger_B, qty_A: qty_A.toString(), qty_B: qty_B.toString(), price: price.toString()
         }, { from: accounts[0] });
 
         const ledgerO_after = await stm.getLedgerEntry(accounts[0]);
@@ -33,6 +33,9 @@ module.exports = {
         const ledgerB_after = await stm.getLedgerEntry(ledger_B);
         const ftsA_after = ledgerA_after.tokens.filter(p => p.tokenTypeId == tokTypeId);
         const ftsB_after = ledgerB_after.tokens.filter(p => p.tokenTypeId == tokTypeId);
+
+        //console.log('ledgerA_after', ledgerA_after);
+        //console.log('ledgerB_after', ledgerB_after);
 
         // check fees paid
         const expectedFee = new BN(st.ft.feePerContract).mul(new BN(qty_A).abs()).mul(new BN(2));
