@@ -12,7 +12,8 @@
         "solium:lint": "solium lint -d ./contracts",
         "migrate": "rimraf -rf ./build/contracts && truffle migrate --network development --reset",
         "console": "truffle console",
-        "dev": "truffle develop"
+        "dev": "truffle develop",
+        "ft": "cross-env WEB3_NETWORK_ID=888 node ./jobs/ft_job TEST_1"
     },
     "keywords": [],
     "license": "MIT",
@@ -32,6 +33,7 @@
         "@digix/doxity": "^0.5.2",
         "@truffle/hdwallet-provider": "1.0.18",
         "big-number": "2.0.0",
+        "cross-env": "^7.0.2",
         "directory-tree": "^2.2.4",
         "eth-gas-reporter": "0.2.14",
         "ethereumjs-abi": "^0.6.8",
