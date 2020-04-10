@@ -10,14 +10,13 @@ library FuturesLib {
     //
     // PUBLIC - get/set initial margin ledger override
     //
-    function setInitMargin(
+    function setInitMargin_TokType(
         StructLib.LedgerStruct storage ld,
         StructLib.StTypesStruct storage std,
         address ledgerOwner,
         uint256 tokTypeId,
         uint16  initMarginBips
     ) public {
-        require(ld._contractSealed, "Contract is not sealed");
         require(ld._ledger[ledgerOwner].exists == true, "Bad ledgerOwner");
         require(tokTypeId >= 0 && tokTypeId <= std._tt_Count, "Bad tokTypeId");
         require(std._tt_Settle[tokTypeId] == StructLib.SettlementType.FUTURE, "Bad token settlement type");
@@ -58,14 +57,11 @@ library FuturesLib {
         StructLib.transferCcy(ld, StructLib.TransferCcyArgs({ from: a.ledger_B, to: owner, ccyTypeId: std._tt_ft[a.tokTypeId].refCcyId, amount: uint256(fee), transferType: StructLib.TransferType.ExchangeFee }));
 
         // calculate margin requirement
-        //uint16 totMarginBips = std._tt_ft[a.tokTypeId].initMarginBips + std._tt_ft[a.tokTypeId].varMarginBips;
-        //int256 notional = std._tt_ft[a.tokTypeId].contractSize * posSize * a.price;
         int256 marginRequired = (((int256((std._tt_ft[a.tokTypeId].initMarginBips + std._tt_ft[a.tokTypeId].varMarginBips)/*totMarginBips*/)
                                     * 1000000/*increase precision*/)
                                     / 10000/*basis points*/)
                                     * (std._tt_ft[a.tokTypeId].contractSize * posSize * a.price)/*notional*/
                                 ) / 1000000/*decrease precision*/;
-        //emit dbg1(marginRequired);
 
         // apply margin
         int256 newReserved_A = ld._ledger[a.ledger_A].ccyType_reserved[std._tt_ft[a.tokTypeId].refCcyId] + marginRequired;

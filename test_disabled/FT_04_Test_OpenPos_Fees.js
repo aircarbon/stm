@@ -69,7 +69,7 @@ contract("StMaster", accounts => {
         
         const x = await futuresHelper.openFtPos({ stm, accounts, tokTypeId: usdFT.id, ledger_A: A, ledger_B: B, qty_A: POS_QTY, qty_B: POS_QTY.neg(), price: 100 });
         //await CONST.logGas(web3, x.tx, `Open futures position (USD)`);
-        truffleAssert.prettyPrintEmittedEvents(x.tx);
+        //truffleAssert.prettyPrintEmittedEvents(x.tx);
     });
     it(`FT positions fees - should be able apply large two-sided mirrored ETH fees on an new futures position`, async () => {
         const A = accounts[global.TaddrNdx], B = accounts[global.TaddrNdx + 1];

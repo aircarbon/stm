@@ -31,14 +31,19 @@ import "../Libs/LoadLib.sol";
         int128 ft_price, int128 ft_lastMarkPrice
     ) public onlyOwner() { revert("Not implemented"); }
 
+    // ST totals
     function setTokenTotals(
         uint80 packed_ExchangeFeesPaidQty, uint80 packed_OriginatorFeesPaidQty, uint80 packed_TransferedQty,
         uint256 currentMax_id, uint256 totalMintedQty, uint256 totalBurnedQty
     ) public onlyOwner() { revert("Not implemented"); }
 
-    function setTotalCcyFunded(uint256 ccyTypeId, uint256 amount)
-    public onlyOwner() { revert("Not implemented"); }
-
-    function setTotalCcyWithdrawn(uint256 ccyTypeId, uint256 amount)
+    // ccy totals
+    function setCcyTotals(
+        uint256 ccyTypeId,
+        uint256 totalFunded,
+        uint256 totalWithdrawn,
+        uint256 totalTransfered,
+        uint256 totalFeesPaid
+    )
     public onlyOwner() { revert("Not implemented"); }
 }

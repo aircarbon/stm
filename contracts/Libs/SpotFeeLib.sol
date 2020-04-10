@@ -3,7 +3,7 @@ pragma experimental ABIEncoderV2;
 
 import "../Interfaces/StructLib.sol";
 
-library FeeLib {
+library SpotFeeLib {
     event SetFeeTokFix(uint256 tokenTypeId, address indexed ledgerOwner, uint256 fee_tokenQty_Fixed);
     event SetFeeCcyFix(uint256 ccyTypeId, address indexed ledgerOwner, uint256 fee_ccy_Fixed);
     event SetFeeTokBps(uint256 tokenTypeId, address indexed ledgerOwner, uint256 fee_token_PercBips);
@@ -23,12 +23,12 @@ library FeeLib {
         StructLib.SetFeeArgs memory a)
     public {
         require(tokenTypeId >= 1 && tokenTypeId <= std._tt_Count, "Bad tokenTypeId");
+        require(std._tt_Settle[tokenTypeId] == StructLib.SettlementType.SPOT, "Bad token settlement type");
         require(a.ccy_perMillion == 0, "ccy_perMillion unsupported for token-type fee");
         require(a.ccy_mirrorFee == false, "ccy_mirrorFee unsupported for token-type fee");
 
         StructLib.FeeStruct storage feeStruct = globalFees;
         if (ledgerOwner != address(0x0)) {
-            //require(ld._ledger[ledgerOwner].exists == true, "Bad ledgerOwner");
             StructLib.initLedgerIfNew(ld, ledgerOwner);
 
             feeStruct = ld._ledger[ledgerOwner].spot_customFees;
@@ -65,7 +65,6 @@ library FeeLib {
 
         StructLib.FeeStruct storage feeStruct = globalFees;
         if (ledgerOwner != address(0x0)) {
-            //require(ld._ledger[ledgerOwner].exists == true, "Bad ledgerOwner");
             StructLib.initLedgerIfNew(ld, ledgerOwner);
 
             feeStruct = ld._ledger[ledgerOwner].spot_customFees;

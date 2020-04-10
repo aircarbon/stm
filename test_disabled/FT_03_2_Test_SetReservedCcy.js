@@ -57,6 +57,38 @@ contract("StMaster", accounts => {
         assert(leCcy.balance == FUND && leCcy.reserved == RESERVE);
     });
 
+    it(`FT reserved ccy - should not allow non-owner to set reserved ammount for a ledger entry`, async () => {
+        const A = accounts[global.TaddrNdx];
+        try {
+            const x = await stm.setReservedCcy(usdCcy.id, 100, A, { from: accounts[1] });
+        }
+        catch (ex) { assert(ex.reason == 'Restricted', `unexpected: ${ex.reason}`); return; }
+        assert.fail('expected contract exception');
+    });
+    it(`FT reserved ccy - should not be able to set reserved ammount for a ledger entry when read only`, async () => {
+        const A = accounts[global.TaddrNdx];
+        try {
+            await stm.setReadOnly(true, { from: accounts[0] });
+            const x = await stm.setReservedCcy(usdCcy.id, 100, A, );
+            await stm.setReadOnly(false, { from: accounts[0] });
+        }
+        catch (ex) { 
+            await stm.setReadOnly(false, { from: accounts[0] });
+            assert(ex.reason == 'Read-only', `unexpected: ${ex.reason}`);
+            return;
+        }
+        assert.fail('expected contract exception');
+    });
+
+    it(`FT reserved ccy - should not be able to set an invalid (< 0) reserved amount for a ledger entry`, async () => {
+        const A = accounts[global.TaddrNdx];
+        try {
+            const x = await stm.setReservedCcy(usdCcy.id, -1, A);
+        }
+        catch (ex) { assert(ex.reason == 'Bad reservedAmount', `unexpected: ${ex.reason}`); return; }
+        assert.fail('expected contract exception');
+    });
+
     it(`FT reserved ccy - should not be able to perform a spot USD/token trade (no fees) if currency consideration exceeds unreserved balance (USD from A)`, async () => {
         const A = accounts[global.TaddrNdx + 0], B = accounts[global.TaddrNdx + 1];
         const FUNDED = new BN(10000), RESERVED = FUNDED.div(new BN(2)), AVAIL = FUNDED.sub(RESERVED);
@@ -190,27 +222,5 @@ contract("StMaster", accounts => {
         catch (ex) { assert(ex.reason == 'Reservation exceeds balance', `unexpected: ${ex.reason}`); return; }
         assert.fail('expected contract exception');
     });
-    
-    it(`FT reserved ccy - should not allow non-owner to set reserved ammount for a ledger entry`, async () => {
-        const A = accounts[global.TaddrNdx], B = accounts[global.TaddrNdx + 1];
-        try {
-            const x = await stm.setReservedCcy(usdCcy.id, 100, A, { from: accounts[1] });
-        }
-        catch (ex) { assert(ex.reason == 'Restricted', `unexpected: ${ex.reason}`); return; }
-        assert.fail('expected contract exception');
-    });
-    it(`FT reserved ccy - should not be able to set reserved ammount for a ledger entry when read only`, async () => {
-        const A = accounts[global.TaddrNdx], B = accounts[global.TaddrNdx + 1];
-        try {
-            await stm.setReadOnly(true, { from: accounts[0] });
-            const x = await stm.setReservedCcy(usdCcy.id, 100, A, );
-            await stm.setReadOnly(false, { from: accounts[0] });
-        }
-        catch (ex) { 
-            await stm.setReadOnly(false, { from: accounts[0] });
-            assert(ex.reason == 'Read-only', `unexpected: ${ex.reason}`);
-            return;
-        }
-        assert.fail('expected contract exception');
-    });
+
 });

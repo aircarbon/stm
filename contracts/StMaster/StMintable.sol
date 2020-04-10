@@ -8,7 +8,7 @@ import "./StLedger.sol";
 
 import "../Libs/LedgerLib.sol";
 import "../Interfaces/StructLib.sol";
-import "../Libs/FeeLib.sol";
+import "../Libs/SpotFeeLib.sol";
 
 contract StMintable is IStMintable,
     Owned, StLedger {

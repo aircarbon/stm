@@ -5,7 +5,7 @@ import "./IOwned.sol";
 //import "./StLedger.sol";
 
 import "../Interfaces/StructLib.sol";
-import "../Libs/FeeLib.sol";
+import "../Libs/SpotFeeLib.sol";
 
 /**
  * @notice Controls fees by currency and token type

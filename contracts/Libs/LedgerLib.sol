@@ -103,17 +103,20 @@ library LedgerLib {
             if (ledgerNdx != 0)
                 ledgerHash = keccak256(abi.encodePacked(ledgerHash, entryOwner));
 
-            // hash ledger tokens & custom fee, by token types
+            // hash ledger tokens, custom spot fees, by token types
             for (uint256 stTypeId = 1; stTypeId <= std._tt_Count; stTypeId++) {
                 uint256[] storage stIds = entry.tokenType_stIds[stTypeId];
 
                 // hash token type id list
                 ledgerHash = keccak256(abi.encodePacked(ledgerHash, stIds));
 
-                // hash token type ledger fees
+                // hash spot-type ledger fee override
                 if (entry.spot_customFees.tokType_Set[stTypeId]) {
                     ledgerHash = keccak256(abi.encodePacked(ledgerHash, hashSetFeeArgs(entry.spot_customFees.tok[stTypeId])));
                 }
+
+                // hash future-type ledger initial margin override
+                ledgerHash = keccak256(abi.encodePacked(ledgerHash, entry.ft_initMarginBips[stTypeId]));
             }
 
             // hash ledger currency balances & custom fees

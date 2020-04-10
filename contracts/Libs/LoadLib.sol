@@ -33,7 +33,7 @@ library LoadLib {
 
         ld._ledger[ledgerEntryOwner] = StructLib.Ledger({
                          exists: true,
-                     spot_customFees: StructLib.FeeStruct(),
+                spot_customFees: StructLib.FeeStruct(),
               spot_sumQtyMinted: spot_sumQtyMinted,
               spot_sumQtyBurned: spot_sumQtyBurned
         });
@@ -76,20 +76,19 @@ library LoadLib {
         ld._spot_totalBurnedQty = totalBurnedQty;
     }
 
-    function setTotalCcyFunded(
+    function setCcyTotals(
         StructLib.LedgerStruct storage ld,
-        uint256 ccyTypeId, uint256 amount)
+        uint256 ccyTypeId,
+        uint256 totalFunded,
+        uint256 totalWithdrawn,
+        uint256 totalTransfered,
+        uint256 totalFeesPaid
+    )
     public {
         require(!ld._contractSealed, "Contract is sealed");
-        ld._ccyType_totalFunded[ccyTypeId] = amount;
+        ld._ccyType_totalFunded[ccyTypeId] = totalFunded;
+        ld._ccyType_totalWithdrawn[ccyTypeId] = totalWithdrawn;
+        ld._ccyType_totalTransfered[ccyTypeId] = totalTransfered;
+        ld._ccyType_totalFeesPaid[ccyTypeId] = totalFeesPaid;
     }
-
-    function setTotalCcyWithdrawn(
-        StructLib.LedgerStruct storage ld,
-        uint256 ccyTypeId, uint256 amount)
-    public {
-        require(!ld._contractSealed, "Contract is sealed");
-        ld._ccyType_totalWithdrawn[ccyTypeId] = amount;
-    }
-
 }

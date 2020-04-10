@@ -48,13 +48,13 @@ contract DataLoadable is IDataLoadable,
         );
     }
 
-    function setTotalCcyFunded(uint256 ccyTypeId, uint256 amount)
-    public onlyOwner() {
-        LoadLib.setTotalCcyFunded(ld, ccyTypeId, amount);
-    }
-
-    function setTotalCcyWithdrawn(uint256 ccyTypeId, uint256 amount)
-    public onlyOwner() {
-        LoadLib.setTotalCcyWithdrawn(ld, ccyTypeId, amount);
+     function setCcyTotals(
+        uint256 ccyTypeId,
+        uint256 totalFunded,
+        uint256 totalWithdrawn,
+        uint256 totalTransfered,
+        uint256 totalFeesPaid
+    ) public onlyOwner() {
+        LoadLib.setCcyTotals(ld, ccyTypeId, totalFunded, totalWithdrawn, totalTransfered, totalFeesPaid);
     }
 }

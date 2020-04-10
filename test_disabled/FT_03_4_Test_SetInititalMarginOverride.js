@@ -46,14 +46,14 @@ contract("StMaster", accounts => {
     });
 
     it(`FT init margin override - should be able to override initial margin by ledger entry, for a futures token type`, async () => {
-        // TODO: margin calc needs to USE the override!
+        // TODO: margin calc needs to USE this override value...
         //...
     });
 
     it(`FT init margin override - should not allow non-owner to override initial margin`, async () => {
         const A = accounts[global.TaddrNdx];
         try {
-            const x = await stm.setInitMargin(A , usdFT.id, 1000, { from: accounts[1] });
+            const x = await stm.setInitMargin_TokType(A , usdFT.id, 1000, { from: accounts[1] });
         }
         catch (ex) { assert(ex.reason == 'Restricted', `unexpected: ${ex.reason}`); return; }
         assert.fail('expected contract exception');
@@ -62,7 +62,7 @@ contract("StMaster", accounts => {
         const A = accounts[global.TaddrNdx];
         try {
             await stm.setReadOnly(true, { from: accounts[0] });
-            const x = await stm.setInitMargin(A , usdFT.id, 1000);
+            const x = await stm.setInitMargin_TokType(A , usdFT.id, 1000);
             await stm.setReadOnly(false, { from: accounts[0] });
         }
         catch (ex) { 
@@ -76,7 +76,7 @@ contract("StMaster", accounts => {
     it(`FT init margin override - should not be able to override initial margin for an invalid (non-existent) ledger entry`, async () => {
         const X = accounts[global.TaddrNdx];
         try {
-            const x = await stm.setInitMargin(X, usdFT.id, 1000);
+            const x = await stm.setInitMargin_TokType(X, usdFT.id, 1000);
         }
         catch (ex) { assert(ex.reason == 'Bad ledgerOwner', `unexpected: ${ex.reason}`); return; }
         assert.fail('expected contract exception');
@@ -85,7 +85,7 @@ contract("StMaster", accounts => {
     it(`FT init margin override - should not be able to override initial margin for an invalid (non-existent) token type`, async () => {
         const A = accounts[global.TaddrNdx]; await stm.fund(CONST.ccyType.USD, 100, A);
         try {
-            const x = await stm.setInitMargin(A, 0xdeaddead, 1001);
+            const x = await stm.setInitMargin_TokType(A, 0xdeaddead, 1001);
         }
         catch (ex) { assert(ex.reason == 'Bad tokTypeId', `unexpected: ${ex.reason}`); return; }
         assert.fail('expected contract exception');
@@ -93,7 +93,7 @@ contract("StMaster", accounts => {
     it(`FT init margin override - should not be able to override initial margin for an invalid (non-future) token type`, async () => {
         const A = accounts[global.TaddrNdx]; await stm.fund(CONST.ccyType.USD, 100, A);
         try {
-            const x = await stm.setInitMargin(A, CONST.tokenType.CORSIA, 1002);
+            const x = await stm.setInitMargin_TokType(A, CONST.tokenType.CORSIA, 1002);
         }
         catch (ex) { assert(ex.reason == 'Bad token settlement type', `unexpected: ${ex.reason}`); return; }
         assert.fail('expected contract exception');
@@ -102,7 +102,7 @@ contract("StMaster", accounts => {
     it(`FT init margin override - should not be able to set an invalid (> 10000) initial margin override for a futures token type`, async () => {
         const A = accounts[global.TaddrNdx]; await stm.fund(CONST.ccyType.USD, 100, A);
         try {
-            const x = await stm.setInitMargin(A, usdFT.id, 10001);
+            const x = await stm.setInitMargin_TokType(A, usdFT.id, 10001);
         }
         catch (ex) { assert(ex.reason == 'Bad initMarginBips', `unexpected: ${ex.reason}`); return; }
         assert.fail('expected contract exception');
@@ -110,7 +110,7 @@ contract("StMaster", accounts => {
     it(`FT init margin override - should not be able to set an invalid (< 0) initial margin override on a futures token type`, async () => {
         const A = accounts[global.TaddrNdx]; await stm.fund(CONST.ccyType.USD, 100, A);
         try {
-            const x = await stm.setInitMargin(A, usdFT.id, -1);
+            const x = await stm.setInitMargin_TokType(A, usdFT.id, -1);
         }
         catch (ex) { assert(ex.reason == 'Bad initMarginBips', `unexpected: ${ex.reason}`); return; }
         assert.fail('expected contract exception');

@@ -47,20 +47,21 @@ contract("StMaster", accounts => {
 
         // ccy types
         await stm_cur.addCcyType('TEST_CCY_TYPE', 'TEST_UNIT', 42);
-        const ctd = await stm_cur.getCcyTypes();
-        console.log(`Ccy Types: ${ctd.ccyTypes.map(p => p.name).join(', ')}`);
+        const ccyTypes = await stm_cur.getCcyTypes();
+        console.log(`Ccy Types: ${ccyTypes.ccyTypes.map(p => p.name).join(', ')}`);
         curHash = await checkHashUpdate(curHash);
 
         // token types (spot & future)
-        const std = await stm_cur.getSecTokenTypes();
-        console.log(`St Types: ${std.tokenTypes.map(p => p.name).join(', ')}`);
+        const tokTypes = await stm_cur.getSecTokenTypes();
+        console.log(`St Types: ${tokTypes.tokenTypes.map(p => p.name).join(', ')}`);
+        var FT;
         if (await stm_cur.getContractType() == CONST.contractType.COMMODITY) {
             
             // add spot type
             await stm_cur.addSecTokenType('NEW_TOK_SPOT_TYPE', CONST.settlementType.SPOT, CONST.nullFutureArgs, { from: accounts[0] });
             
-            // add future type
-            const spotTypes = (await stm_cur.getSecTokenTypes()).tokenTypes.filter(p => p.settlementType == CONST.settlementType.SPOT);
+            // FT - add future type
+            const spotTypes = tokTypes.tokenTypes.filter(p => p.settlementType == CONST.settlementType.SPOT);
             const ccyTypes = (await stm_cur.getCcyTypes()).ccyTypes;
             await stm_cur.addSecTokenType('NEW_TOK_FT_TYPE', CONST.settlementType.FUTURE, {
                 expiryTimestamp: DateTime.local().toMillis(),
@@ -68,18 +69,18 @@ contract("StMaster", accounts => {
                        refCcyId: ccyTypes[0].id,
                  initMarginBips: 1000,
                   varMarginBips: 500,
-                   contractSize: 1000,
-                 feePerContract: 300,
+                   contractSize: 1,
+                 feePerContract: 0,
             });
             curHash = await checkHashUpdate(curHash);
-            const ft = (await stm_cur.getSecTokenTypes()).tokenTypes.filter(p => p.settlementType == CONST.settlementType.FUTURE)[0];
+            FT = (await stm_cur.getSecTokenTypes()).tokenTypes.filter(p => p.settlementType == CONST.settlementType.FUTURE)[0];
 
-            // update future variation margin
-            await stm_cur.setFuture_VariationMargin(ft.id, 600);
+            // FT - update future variation margin
+            await stm_cur.setFuture_VariationMargin(FT.id, 600);
             curHash = await checkHashUpdate(curHash);
 
-            //... update future fee per contract
-            await stm_cur.setFuture_FeePerContract(ft.id, 301);
+            // FT - update future fee per contract
+            await stm_cur.setFuture_FeePerContract(FT.id, 1);
             curHash = await checkHashUpdate(curHash);
         }
 
@@ -96,8 +97,8 @@ contract("StMaster", accounts => {
         await stm_cur.incWhitelistNext();
 
         // exchange fee - ccy's
-        for (let i=0 ; i < ctd.ccyTypes.length; i++) {
-            const ccyType = ctd.ccyTypes[i];
+        for (let i=0 ; i < ccyTypes.ccyTypes.length; i++) {
+            const ccyType = ccyTypes.ccyTypes[i];
             const setFee = await stm_cur.setFee_CcyType(ccyType.id, CONST.nullAddr, { ccy_mirrorFee: false, ccy_perMillion: 0, fee_fixed: i+1, fee_percBips: (i+1)*100, fee_min: (i+1), fee_max: (i+1+100) } );
             const x = await stm_cur.getFee(CONST.getFeeType.CCY, ccyType.id, CONST.nullAddr);
             console.log(`Exchange Fee: ccyTypeId=${ccyType.id} { x.fee_fixed=${x.fee_fixed} / x.fee_percBips=${x.fee_percBips} / x.fee_min=${x.fee_min} / x.fee_max=${x.fee_max} }`);
@@ -105,20 +106,22 @@ contract("StMaster", accounts => {
         }
 
         // exchange fee - tok's
-        for (let i=0 ; i < std.tokenTypes.length; i++) {
-            const tokType = std.tokenTypes[i];
+        for (let i=0 ; i < tokTypes.tokenTypes.length; i++) {
+            const tokType = tokTypes.tokenTypes[i];
             const setFee = await stm_cur.setFee_TokType(tokType.id, CONST.nullAddr, { ccy_mirrorFee: false, ccy_perMillion: 0, fee_fixed: i+1, fee_percBips: (i+1)*100, fee_min: (i+1), fee_max: (i+1+100) } );
             const x = await stm_cur.getFee(CONST.getFeeType.TOK, tokType.id, CONST.nullAddr);
             console.log(`Exchange Fee: tokType=${tokType.id} { x.fee_fixed=${x.fee_fixed} / x.fee_percBips=${x.fee_percBips} / x.fee_min=${x.fee_min} / x.fee_max=${x.fee_max} }`);
             curHash = await checkHashUpdate(curHash);
         }
 
-        // populate trades (batches, fees) & future positions
+        //
+        // populate test data: spot minting/burning, batch fees & transfers
+        //
         const MM = [];
-        for (let i=1 ; i <= /*WHITELIST_COUNT*/TEST_ADDR_COUNT ; i++) { // test data - mint for accounts after owner, move some to owner
+        for (let i=1 ; i <= TEST_ADDR_COUNT ; i++) {
 
             const M = accounts[i];
-            console.log('minting, setting fees, trading, burning & open future position for account... ', M);
+            console.log('minting, setting fees, trading & burning: for account... ', M);
 
             MM.push(M);
             const batchFee = { ccy_mirrorFee: false, ccy_perMillion: 0, fee_fixed: i+1, fee_percBips: (i+1)*100, fee_min: (i+1), fee_max: (i+1+100) };
@@ -186,17 +189,6 @@ contract("StMaster", accounts => {
             const burn_tx_B2 = await stm_cur.burnTokens(M, CONST.tokenType.NATURE, 100);
             curHash = await checkHashUpdate(curHash);
 
-            // open futures position
-            const ftTypes = (await stm_cur.getSecTokenTypes()).tokenTypes.filter(p => p.settlementType == CONST.settlementType.FUTURE);
-            const openFtPosTx = await stm_cur.openFtPos({ 
-                tokTypeId: ftTypes[0].id, 
-                 ledger_A: accounts[i], 
-                 ledger_B: accounts[i - 1],
-                    qty_A: +1 * ((i+1) * 100),
-                    qty_B: -1 * ((i+1) * 100),
-                    price: (i+1) * 100,
-            });
-            curHash = await checkHashUpdate(curHash);
         }
 
         const batchCount = await stm_cur.getSecTokenBatchCount.call();
@@ -205,30 +197,32 @@ contract("StMaster", accounts => {
             console.log(`Batch Data: id=${i} mintedQty=${x.mintedQty} burnedQty=${x.burnedQty} metaKeys=${x.metaKeys.join()} metaValues=${x.metaValues.join()} { x.fee_fixed=${x.origTokFee.fee_fixed} / x.fee_percBips=${x.origTokFee.fee_percBips} / x.fee_min=${x.origTokFee.fee_min} / x.fee_max=${x.origTokFee.fee_max} }`);
         }
 
-        // ledger entries: fund, set ledger fees
+        //
+        // populate test data 2: fund, withdraw, ccy & tok fees, futures
+        //
         const entryCount = await stm_cur.getLedgerOwnerCount(); // DATA_DUMP: individual fetches
         const allEntries = await stm_cur.getLedgerOwners(); // ## NON-PAGED - x-ref check
         assert(allEntries.length == entryCount, 'getLedgerOwnerCount / getLedgerOwners mismatch');
-        
-        for (let j=0 ; j < entryCount; j++) { // fund, withdraw & set ledger ccy & tok type fees
+        for (let j=0 ; j < entryCount; j++) {
             const entryOwner = await stm_cur.getLedgerOwner(j);
-            console.log('funding, withdrawing, setting ledger ccy & token fees for account... ', entryOwner);
+            console.log('funding, withdrawing, setting ledger ccy & token fees, & opening futures positions: for account... ', entryOwner);
 
             // for all ccy types
-            for (let i=0 ; i < ctd.ccyTypes.length; i++) { // test ccy data 
-                const ccyType = ctd.ccyTypes[i];
+            for (let i=0 ; i < ccyTypes.ccyTypes.length; i++) { // test ccy data 
+                const ccyType = ccyTypes.ccyTypes[i];
             
-                // fund to ledger
-                const fundAmount = (j+1)*100+(i+1), reserveAmount = (j+1)*50+(i+1), withdrawAmount = (j+1)*25+(i+1);
-                await stm_cur.fund(ccyType.id, fundAmount, entryOwner);
+                const FUND = (j+1)*100000+(i+1), RESERVE = Math.ceil(FUND / 2), WITHDRAW = Math.ceil(FUND / 4);
+
+                // fund 
+                await stm_cur.fund(ccyType.id, FUND, entryOwner);
                 if (entryOwner != accounts[0]) curHash = await checkHashUpdate(curHash);
 
-                // reserve on ledger
-                await stm_cur.setReservedCcy(ccyType.id, reserveAmount, entryOwner);
+                // reserve 
+                await stm_cur.setReservedCcy(ccyType.id, RESERVE, entryOwner);
                 if (entryOwner != accounts[0]) curHash = await checkHashUpdate(curHash);
 
-                // withdraw from ledger
-                await stm_cur.withdraw(ccyType.id, withdrawAmount, entryOwner);
+                // withdraw 
+                await stm_cur.withdraw(ccyType.id, WITHDRAW, entryOwner);
                 if (entryOwner != accounts[0]) curHash = await checkHashUpdate(curHash);
 
                 // set ledger ccy fee
@@ -237,11 +231,32 @@ contract("StMaster", accounts => {
             }
 
             // for all token types
-            for (let k=0 ; k < std.tokenTypes.length; k++) {
+            for (let k=0 ; k < tokTypes.tokenTypes.length; k++) {
                 // set ledger token fee
-                const tokType = std.tokenTypes[k];
-                await stm_cur.setFee_TokType(tokType.id, entryOwner, { ccy_mirrorFee: false, ccy_perMillion: 0, fee_fixed: k+4+j+4, fee_percBips: (k+4+j+4)*100, fee_min: (k+4+j+4), fee_max: (k+4+j+4+100) } );
-                if (entryOwner != accounts[0]) curHash = await checkHashUpdate(curHash);
+                const tokType = tokTypes.tokenTypes[k];
+                
+                if (tokType.settlementType == CONST.settlementType.SPOT) {
+                    await stm_cur.setFee_TokType(tokType.id, entryOwner, { ccy_mirrorFee: false, ccy_perMillion: 0, fee_fixed: k+4+j+4, fee_percBips: (k+4+j+4)*100, fee_min: (k+4+j+4), fee_max: (k+4+j+4+100) } );
+                    if (entryOwner != accounts[0]) curHash = await checkHashUpdate(curHash);
+                }
+            }
+
+            if (entryOwner != accounts[0]) {
+                // FT - override initial margin
+                await stm_cur.setInitMargin_TokType(FT.id, entryOwner, j+1);
+                curHash = await checkHashUpdate(curHash);
+
+                // FT - open futures position
+                const openFtPosTx = await stm_cur.openFtPos({ 
+                    tokTypeId: FT.id,
+                     ledger_A: entryOwner,
+                     ledger_B: accounts[0],
+                        qty_A: +1, // * ((j+1) * 10),
+                        qty_B: -1, // * ((j+1) * 10),
+                        price: j+1,
+                });
+                truffleAssert.prettyPrintEmittedEvents(openFtPosTx); 
+                curHash = await checkHashUpdate(curHash);
             }
         }
     });
@@ -271,13 +286,17 @@ contract("StMaster", accounts => {
         // currencies - load exchange fees, set total funded & withdrawn
         _.forEach(curCcys.ccyTypes, async (p) => { 
             await stm_new.setFee_CcyType(p.id, CONST.nullAddr, (await stm_cur.getFee(CONST.getFeeType.CCY, p.id, CONST.nullAddr)));
-            await stm_new.setTotalCcyFunded(p.id, (await stm_cur.getTotalCcyFunded(p.id)));
-            await stm_new.setTotalCcyWithdrawn(p.id, (await stm_cur.getTotalCcyWithdrawn(p.id)));
+            
+            await stm_new.setCcyTotals(p.id, 
+                (await stm_cur.getTotalCcyFunded(p.id)),
+                (await stm_cur.getTotalCcyWithdrawn(p.id)),
+                (await stm_cur.getCcy_totalTransfered(p.id)),
+                (await stm_cur.getCcy_totalExchangeFeesPaid(p.id)));
         });
 
-        // tokens - load exchange fees
-        _.forEach(curToks.tokenTypes, async (p) => { 
-            await stm_new.setFee_TokType(p.id, CONST.nullAddr, (await stm_cur.getFee(CONST.getFeeType.TOK, p.id, CONST.nullAddr)))
+        // spot tokens - load exchange fees
+        _.forEach(curToks.tokenTypes.filter(p => p.settlementType == CONST.settlementType.SPOT), async (p) => { 
+            await stm_new.setFee_TokType(p.id, CONST.nullAddr, (await stm_cur.getFee(CONST.getFeeType.TOK, p.id, CONST.nullAddr)));
         });
 
         // load batches
@@ -300,10 +319,13 @@ contract("StMaster", accounts => {
             // set ledger ccy fees
             for (p of curCcys.ccyTypes) await stm_new.setFee_CcyType(p.id, curEntryOwner, (await stm_cur.getFee(CONST.getFeeType.CCY, p.id, curEntryOwner)));
 
-            // set ledger token fees
-            for (p of curToks.tokenTypes) await stm_new.setFee_TokType(p.id, curEntryOwner, (await stm_cur.getFee(CONST.getFeeType.TOK, p.id, curEntryOwner)));
+            // set ledger spot token fees
+            for (p of curToks.tokenTypes.filter(p => p.settlementType == CONST.settlementType.SPOT)) await stm_new.setFee_TokType(p.id, curEntryOwner, (await stm_cur.getFee(CONST.getFeeType.TOK, p.id, curEntryOwner)));
 
-            // add tokens
+            // set ledger future token margin overrides
+            for (p of curToks.tokenTypes.filter(p => p.settlementType == CONST.settlementType.FUTURE)) await stm_new.setInitMargin_TokType(p.id, curEntryOwner, (await stm_cur.getInitMargin(p.id, curEntryOwner)));
+
+            // add tokens to ledger
             for (let p of curEntry.tokens) {
                 await stm_new.addSecToken(curEntryOwner, 
                     p.batchId,

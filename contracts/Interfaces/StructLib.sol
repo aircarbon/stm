@@ -6,29 +6,55 @@ library StructLib {
     // EVENTS - SHARED (FuturesLib & TransferLib)
     enum TransferType { User, ExchangeFee, OriginatorFee }
     event TransferedLedgerCcy(address indexed from, address indexed to, uint256 ccyTypeId, uint256 amount, TransferType transferType);
+    event ReervedLedgerCcy(address indexed ledgerOwner, uint256 ccyTypeId, uint256 amount);
 
-    //
-    // INTERNAL - transfer ccy
-    //
-    struct TransferCcyArgs { // todo move - structlib...
-        address      from;
-        address      to;
-        uint256      ccyTypeId;
-        uint256      amount;
+    /**
+     * @notice Transfers currency across ledger entries
+     * @param a Transfer arguments
+     */
+    struct TransferCcyArgs {
+        address                from;
+        address                to;
+        uint256                ccyTypeId;
+        uint256                amount;
         StructLib.TransferType transferType;
     }
     function transferCcy(
         StructLib.LedgerStruct storage ld,
         TransferCcyArgs memory a)
     public {
+        // todo: validate against available...
+
         ld._ledger[a.from].ccyType_balance[a.ccyTypeId] -= int256(a.amount);
         ld._ledger[a.to].ccyType_balance[a.ccyTypeId] += int256(a.amount);
+
         ld._ccyType_totalTransfered[a.ccyTypeId] += a.amount;
+
         emit StructLib.TransferedLedgerCcy(a.from, a.to, a.ccyTypeId, a.amount, a.transferType);
 
         if (a.transferType == StructLib.TransferType.ExchangeFee) {
-            ld._ccyType_totalFeesPaid[a.ccyTypeId] += a.amount;
+           ld._ccyType_totalFeesPaid[a.ccyTypeId] += a.amount;
         }
+    }
+
+    /**
+     * @notice Sets the reserved (unavailable/margined) currency amount for the specified ledger owner
+     * @param ledger Ledger owner
+     * @param ccyTypeId currency type
+     * @param reservedAmount Reserved amount to set
+     */
+    function setReservedCcy(
+        StructLib.LedgerStruct storage ld,
+        StructLib.CcyTypesStruct storage ctd,
+        address ledger, uint256 ccyTypeId, int256 reservedAmount
+    ) public {
+        require(ccyTypeId >= 1 && ccyTypeId <= ctd._ct_Count, "Bad ccyTypeId");
+        initLedgerIfNew(ld, ledger);
+        require(ld._ledger[ledger].ccyType_balance[ccyTypeId] >= reservedAmount, "Reservation exceeds balance");
+        require(reservedAmount >= 0, "Bad reservedAmount");
+
+        ld._ledger[ledger].ccyType_reserved[ccyTypeId] = reservedAmount;
+        emit ReervedLedgerCcy(ledger, ccyTypeId, uint256(reservedAmount));
     }
 
     // CONTRACT TYPE
@@ -286,7 +312,7 @@ library StructLib {
         if (!ld._ledger[addr].exists) {
             ld._ledger[addr] = StructLib.Ledger({
                  exists: true,
-             spot_customFees: StructLib.FeeStruct(),
+        spot_customFees: StructLib.FeeStruct(),
       spot_sumQtyMinted: 0,
       spot_sumQtyBurned: 0
             });
@@ -327,22 +353,5 @@ library StructLib {
         return (ld._ledger[ledger].ccyType_balance[ccyTypeId]
                 + receiving - ld._ledger[ledger].ccyType_reserved[ccyTypeId]
                ) >= sending + fee;
-    }
-
-    /**
-     * @notice Sets the reserved (unavailable, margined) currency amount for the specified ledger owner
-     * @param ledger Ledger owner
-     * @param ccyTypeId currency type
-     * @param reservedAmount Reserved amount to set
-     */
-    function setReservedCcy(
-        StructLib.LedgerStruct storage ld,
-        StructLib.CcyTypesStruct storage ctd,
-        address ledger, uint256 ccyTypeId, int256 reservedAmount
-    ) public {
-        require(ccyTypeId >= 1 && ccyTypeId <= ctd._ct_Count, "Bad ccyTypeId");
-        initLedgerIfNew(ld, ledger);
-        require(ld._ledger[ledger].ccyType_balance[ccyTypeId] >= reservedAmount, "Reservation exceeds balance");
-        ld._ledger[ledger].ccyType_reserved[ccyTypeId] = reservedAmount;
     }
 }

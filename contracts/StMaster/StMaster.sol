@@ -59,12 +59,14 @@ contract StMaster is IStMaster, IPublicViews,
     event SetBatchOriginatorFee_Token(uint256 indexed batchId, StructLib.SetFeeArgs originatorFee);
     event SetBatchOriginatorFee_Currency(uint256 indexed batchId, uint16 origCcyFee_percBips_ExFee);
     // TransferLib events
-    //enum TransferType { User, ExchangeFee, OriginatorFee }
-    event TransferedLedgerCcy(address indexed from, address indexed to, uint256 ccyTypeId, uint256 amount, TransferType transferType);
     event TransferedFullSecToken(address indexed from, address indexed to, uint256 indexed stId, uint256 mergedToSecTokenId, uint256 qty, TransferType transferType);
     event TransferedPartialSecToken(address indexed from, address indexed to, uint256 indexed splitFromSecTokenId, uint256 newSecTokenId, uint256 mergedToSecTokenId, uint256 qty, TransferType transferType);
     event TradedCcyTok(uint256 ccyTypeId, uint256 ccyAmount, uint256 tokTypeId, address indexed tokensFrom, address indexed ccyFrom, uint256 tokQty);
-    // FeeLib events
+    // StructLib events
+    //enum TransferType { User, ExchangeFee, OriginatorFee }
+    event TransferedLedgerCcy(address indexed from, address indexed to, uint256 ccyTypeId, uint256 amount, TransferType transferType);
+    event ReervedLedgerCcy(address indexed ledgerOwner, uint256 ccyTypeId, uint256 amount);
+    // SpotFeeLib events
     event SetFeeTokFix(uint256 tokenTypeId, address indexed ledgerOwner, uint256 fee_tokenQty_Fixed);
     event SetFeeCcyFix(uint256 ccyTypeId, address indexed ledgerOwner, uint256 fee_ccy_Fixed);
     event SetFeeTokBps(uint256 tokenTypeId, address indexed ledgerOwner, uint256 fee_token_PercBips);
@@ -131,7 +133,7 @@ contract StMaster is IStMaster, IPublicViews,
               ccy_perMillion: 300,      // $3.00 per Million tokens received
                ccy_mirrorFee: true      // mirrored - token sender pays, too
             });
-            FeeLib.setFee_CcyType(ld, ctd, globalFees,
+            SpotFeeLib.setFee_CcyType(ld, ctd, globalFees,
                 1,            // USD
                 address(0x0), // global fee
                 feeArgsGlobalUsd

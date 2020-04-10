@@ -7,7 +7,7 @@ import "./Owned.sol";
 import "./StLedger.sol";
 
 import "../Interfaces/StructLib.sol";
-import "../Libs/FeeLib.sol";
+import "../Libs/SpotFeeLib.sol";
 
 //
 // NOTE: fees are applied ON TOP OF the supplied transfer amounts to the transfer() fn.
@@ -15,8 +15,6 @@ import "../Libs/FeeLib.sol";
 //
 contract StFees is IStFees,
     Owned, StLedger {
-
-    // TODO: (*) orig-ccy fee - as % of exchange fee - [keep orig-tok fee?] -- disallow ccy-mirroring on originator fee set
 
     // GLOBAL FEES
     StructLib.FeeStruct globalFees;
@@ -40,12 +38,12 @@ contract StFees is IStFees,
 
     function setFee_TokType(uint256 tokenTypeId, address ledgerOwner, StructLib.SetFeeArgs memory feeArgs)
     public onlyOwner() onlyWhenReadWrite() {
-        FeeLib.setFee_TokType(ld, std, globalFees, tokenTypeId, ledgerOwner, feeArgs);
+        SpotFeeLib.setFee_TokType(ld, std, globalFees, tokenTypeId, ledgerOwner, feeArgs);
     }
 
     function setFee_CcyType(uint256 ccyTypeId, address ledgerOwner, StructLib.SetFeeArgs memory feeArgs)
     public onlyOwner() onlyWhenReadWrite() {
-        FeeLib.setFee_CcyType(ld, ctd, globalFees, ccyTypeId, ledgerOwner, feeArgs);
+        SpotFeeLib.setFee_CcyType(ld, ctd, globalFees, ccyTypeId, ledgerOwner, feeArgs);
     }
 
     function getSecToken_totalExchangeFeesPaidQty()

@@ -2,7 +2,7 @@ pragma solidity ^0.5.13;
 pragma experimental ABIEncoderV2;
 
 import "../Interfaces/StructLib.sol";
-import "./FeeLib.sol";
+import "./SpotFeeLib.sol";
 
 library TokenLib {
     event AddedSecTokenType(uint256 id, string name, StructLib.SettlementType settlementType, uint64 expiryTimestamp, uint256 underlyerTypeId, uint256 refCcyId, uint16 initMarginBips, uint16 varMarginBips);

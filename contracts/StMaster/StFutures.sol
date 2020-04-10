@@ -91,15 +91,15 @@ contract StFutures is Owned,
         FuturesLib.openFtPos(ld, std, ctd, globalFees, a, owner);
     }
 
-    function setInitMargin(
-        address ledgerOwner,
+    function setInitMargin_TokType(
         uint256 tokTypeId,
+        address ledgerOwner,
         uint16  initMarginBips
     ) public onlyOwner() onlyWhenReadWrite() {
-        FuturesLib.setInitMargin(ld, std, ledgerOwner, tokTypeId, initMarginBips);
+        FuturesLib.setInitMargin_TokType(ld, std, ledgerOwner, tokTypeId, initMarginBips);
     }
 
-    function getInitMargin(address ledgerOwner, uint256 tokTypeId)
+    function getInitMargin(uint256 tokTypeId, address ledgerOwner)
     external view returns (uint16) {
         return ld._ledger[ledgerOwner].ft_initMarginBips[tokTypeId];
     }
