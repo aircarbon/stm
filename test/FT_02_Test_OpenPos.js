@@ -165,8 +165,20 @@ contract("StMaster", accounts => {
         assert.fail('expected contract exception');
     });
 
-    // TODO...
-    //require(a.tokTypeId >= 0 && a.tokTypeId <= std._tt_Count, "Bad tokTypeId");
-    //require(std._tt_Settle[a.tokTypeId] == StructLib.SettlementType.FUTURE, "Bad token settlement type");
-
+    it(`FT positions - should not be able to open a futures position for an invalid (non-existent) token type`, async () => {
+        const A = accounts[global.TaddrNdx], B = accounts[global.TaddrNdx + 1];
+        try {
+            const x = await futuresHelper.openFtPos({ stm, accounts, tokTypeId: 0xdead, ledger_A: A, ledger_B: B, qty_A: +1, qty_B: -1, price: +1 });
+        }
+        catch (ex) { assert(ex.reason == 'Bad tokTypeId', `unexpected: ${ex.reason}`); return; }
+        assert.fail('expected contract exception');
+    });
+    it(`FT positions - should not be able to open a futures position for an invalid (non-future) token type`, async () => {
+        const A = accounts[global.TaddrNdx], B = accounts[global.TaddrNdx + 1];
+        try {
+            const x = await futuresHelper.openFtPos({ stm, accounts, tokTypeId: CONST.tokenType.CORSIA, ledger_A: A, ledger_B: B, qty_A: +1, qty_B: -1, price: +1 });
+        }
+        catch (ex) { assert(ex.reason == 'Bad token settlement type', `unexpected: ${ex.reason}`); return; }
+        assert.fail('expected contract exception');
+    });
 });

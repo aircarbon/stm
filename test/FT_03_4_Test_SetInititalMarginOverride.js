@@ -45,15 +45,9 @@ contract("StMaster", accounts => {
             console.log(`addrNdx: ${global.TaddrNdx} - contract @ ${stm.address} (owner: ${accounts[0]})`);
     });
 
-    // TODO: margin calc needs to USE the override!
-    // (todo - 05... >0 init margin on one type...)
-    // (todo - 02... +2 -ve tests...)
     it(`FT init margin override - should be able to override initial margin by ledger entry, for a futures token type`, async () => {
+        // TODO: margin calc needs to USE the override!
         //...
-        // const tx = await stm.setFuture_FeePerContract(usd.id, 300);
-        // const tt = (await stm.getSecTokenTypes()).tokenTypes.filter(p => p.id == usd.id)[0];
-        // assert(tt.ft.feePerContract = 300);
-        // truffleAssert.eventEmitted(tx, 'SetFutureFeePerContract', ev => ev.tokenTypeId == usd.id && ev.feePerContract == 300);
     });
 
     it(`FT init margin override - should not allow non-owner to override initial margin`, async () => {
@@ -79,7 +73,7 @@ contract("StMaster", accounts => {
         assert.fail('expected contract exception');
     });
 
-    it(`FT init margin override - should not be able to override initial margin for an invalid (non-existent) token type`, async () => {
+    it(`FT init margin override - should not be able to override initial margin for an invalid (non-existent) ledger entry`, async () => {
         const X = accounts[global.TaddrNdx];
         try {
             const x = await stm.setInitMargin(X, usdFT.id, 1000);
