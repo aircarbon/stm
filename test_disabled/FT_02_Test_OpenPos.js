@@ -164,4 +164,9 @@ contract("StMaster", accounts => {
         catch (ex) { assert(ex.reason == 'Bad price', `unexpected: ${ex.reason}`); return; }
         assert.fail('expected contract exception');
     });
+
+    // TODO...
+    //require(a.tokTypeId >= 0 && a.tokTypeId <= std._tt_Count, "Bad tokTypeId");
+    //require(std._tt_Settle[a.tokTypeId] == StructLib.SettlementType.FUTURE, "Bad token settlement type");
+
 });

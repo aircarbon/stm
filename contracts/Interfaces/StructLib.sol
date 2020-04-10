@@ -96,13 +96,14 @@ library StructLib {
         bool                          exists;                   // for existance check by address
         mapping(uint256 => uint256[]) tokenType_stIds;          // SecTokenTypeId -> stId[] of all owned STs
 
-        mapping(uint256 => int256)    ccyType_balance;          // CcyTypeId -> spot/total cash balance -- signed, for potentil -ve balances
-        mapping(uint256 => int256)    ccyType_reserved;         // CcyTypeId -> total margin requirement [FUTURES]
-                                                                // implied: available = balance - reserved
+        mapping(uint256 => int256)    ccyType_balance;          // CcyTypeId -> spot/total cash balance -- signed, for potential -ve balances
+        mapping(uint256 => int256)    ccyType_reserved;         // CcyTypeId -> total margin requirement [FUTURES] (available = balance - reserved)
 
-        StructLib.FeeStruct           customFees;               // global fee override - per ledger entry
+        StructLib.FeeStruct           spot_customFees;          // global fee override - per ledger entry
         uint256                       spot_sumQtyMinted;
         uint256                       spot_sumQtyBurned;
+
+        mapping(uint256 => uint16)    ft_initMarginBips;        // SecTokenTypeId -> custom initial margin -- TODO: get/set in FuturesLib...
     }
 
     struct LedgerReturn {                                       // ledger return structure
@@ -182,7 +183,7 @@ library StructLib {
         bool _contractSealed;
     }
 
-    // FEE STRUCTURE -- (ledger or global) fees for all ccy's and token types
+    // SPOT FEE STRUCTURE -- (ledger or global) fees for all ccy's and token types
     struct FeeStruct {
         mapping(uint256 => bool) tokType_Set;    // bool - values are set for the token type
         mapping(uint256 => bool) ccyType_Set;    // bool - values are set for the currency type
@@ -285,7 +286,7 @@ library StructLib {
         if (!ld._ledger[addr].exists) {
             ld._ledger[addr] = StructLib.Ledger({
                  exists: true,
-             customFees: StructLib.FeeStruct(),
+             spot_customFees: StructLib.FeeStruct(),
       spot_sumQtyMinted: 0,
       spot_sumQtyBurned: 0
             });

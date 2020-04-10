@@ -16,8 +16,7 @@ import "../Libs/FeeLib.sol";
 contract StFees is IStFees,
     Owned, StLedger {
 
-    // TODO: (*) ccy-fee mirror - tests
-    //       (*) orig-ccy fee - as % of exchange fee - [keep orig-tok fee?] -- disallow ccy-mirroring on originator fee set
+    // TODO: (*) orig-ccy fee - as % of exchange fee - [keep orig-tok fee?] -- disallow ccy-mirroring on originator fee set
 
     // GLOBAL FEES
     StructLib.FeeStruct globalFees;
@@ -27,14 +26,14 @@ contract StFees is IStFees,
 
     function getFee(GetFeeType feeType, uint256 typeId, address ledgerOwner)
     external view onlyOwner() returns(StructLib.SetFeeArgs memory) {
-        StructLib.FeeStruct storage fs = ledgerOwner == address(0x0) ? globalFees : ld._ledger[ledgerOwner].customFees;
+        StructLib.FeeStruct storage fs = ledgerOwner == address(0x0) ? globalFees : ld._ledger[ledgerOwner].spot_customFees;
         mapping(uint256 => StructLib.SetFeeArgs) storage fa = feeType == GetFeeType.CCY ? fs.ccy : fs.tok;
         return StructLib.SetFeeArgs( {
                fee_fixed: fa[typeId].fee_fixed,
             fee_percBips: fa[typeId].fee_percBips,
                  fee_min: fa[typeId].fee_min,
                  fee_max: fa[typeId].fee_max,
-         ccy_perMillion: fa[typeId].ccy_perMillion,
+          ccy_perMillion: fa[typeId].ccy_perMillion,
            ccy_mirrorFee: fa[typeId].ccy_mirrorFee
         });
     }
@@ -50,17 +49,17 @@ contract StFees is IStFees,
     }
 
     function getSecToken_totalExchangeFeesPaidQty()
-    external view /*onlyOwner()*/ returns (uint256) {
+    external view returns (uint256) {
         return ld._spot_total.exchangeFeesPaidQty;
     }
 
     function getSecToken_totalOriginatorFeesPaidQty()
-    external view /*onlyOwner()*/ returns (uint256) {
+    external view returns (uint256) {
         return ld._spot_total.originatorFeesPaidQty;
     }
 
     function getCcy_totalExchangeFeesPaid(uint256 ccyTypeId)
-    external view /*onlyOwner()*/ returns (uint256) {
+    external view returns (uint256) {
         return ld._ccyType_totalFeesPaid[ccyTypeId];
     }
 

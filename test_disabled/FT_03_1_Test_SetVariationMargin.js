@@ -80,7 +80,7 @@ contract("StMaster", accounts => {
         catch (ex) { assert(ex.reason == 'Bad tokenTypeId', `unexpected: ${ex.reason}`); return; }
         assert.fail('expected contract exception');
     });
-    it(`FT var margin - should not be able to set variation margin on a spot token type`, async () => {
+    it(`FT var margin - should not be able to set variation margin on an invalid (non-future) token type`, async () => {
         try {
             const x = await stm.setFuture_VariationMargin(spotTypes[0].id, 46);
         }

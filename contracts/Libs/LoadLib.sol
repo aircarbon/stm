@@ -33,7 +33,7 @@ library LoadLib {
 
         ld._ledger[ledgerEntryOwner] = StructLib.Ledger({
                          exists: true,
-                     customFees: StructLib.FeeStruct(),
+                     spot_customFees: StructLib.FeeStruct(),
               spot_sumQtyMinted: spot_sumQtyMinted,
               spot_sumQtyBurned: spot_sumQtyBurned
         });

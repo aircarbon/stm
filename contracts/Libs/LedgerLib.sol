@@ -111,8 +111,8 @@ library LedgerLib {
                 ledgerHash = keccak256(abi.encodePacked(ledgerHash, stIds));
 
                 // hash token type ledger fees
-                if (entry.customFees.tokType_Set[stTypeId]) {
-                    ledgerHash = keccak256(abi.encodePacked(ledgerHash, hashSetFeeArgs(entry.customFees.tok[stTypeId])));
+                if (entry.spot_customFees.tokType_Set[stTypeId]) {
+                    ledgerHash = keccak256(abi.encodePacked(ledgerHash, hashSetFeeArgs(entry.spot_customFees.tok[stTypeId])));
                 }
             }
 
@@ -123,8 +123,8 @@ library LedgerLib {
                 ledgerHash = keccak256(abi.encodePacked(ledgerHash, entry.ccyType_reserved[ccyTypeId]));
 
                 // hash currency type ledger fee
-                if (entry.customFees.ccyType_Set[ccyTypeId]) {
-                    ledgerHash = keccak256(abi.encodePacked(ledgerHash, hashSetFeeArgs(entry.customFees.ccy[ccyTypeId])));
+                if (entry.spot_customFees.ccyType_Set[ccyTypeId]) {
+                    ledgerHash = keccak256(abi.encodePacked(ledgerHash, hashSetFeeArgs(entry.spot_customFees.ccy[ccyTypeId])));
                 }
             }
 

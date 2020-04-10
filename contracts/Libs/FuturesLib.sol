@@ -5,6 +5,27 @@ import "../Interfaces/StructLib.sol";
 
 library FuturesLib {
     event FutureOpenInterest(address indexed long, address indexed short, uint256 tokTypeId, uint256 qty, uint256 price);
+    event SetInitialMargin(uint256 tokenTypeId, address indexed ledgerOwner, uint16 initMarginBips);
+
+    //
+    // PUBLIC - get/set initial margin ledger override
+    //
+    function setInitMargin(
+        StructLib.LedgerStruct storage ld,
+        StructLib.StTypesStruct storage std,
+        address ledgerOwner,
+        uint256 tokTypeId,
+        uint16  initMarginBips
+    ) public {
+        require(ld._contractSealed, "Contract is not sealed");
+        require(ld._ledger[ledgerOwner].exists == true, "Bad ledgerOwner");
+        require(tokTypeId >= 0 && tokTypeId <= std._tt_Count, "Bad tokTypeId");
+        require(std._tt_Settle[tokTypeId] == StructLib.SettlementType.FUTURE, "Bad token settlement type");
+        require(initMarginBips < 10000, "Bad initMarginBips");
+
+        ld._ledger[ledgerOwner].ft_initMarginBips[tokTypeId] = initMarginBips;
+        emit SetInitialMargin(tokTypeId, ledgerOwner, initMarginBips);
+    }
 
     //
     // PUBLIC - open futures position
@@ -18,17 +39,13 @@ library FuturesLib {
         address owner
     ) public {
         require(ld._contractSealed, "Contract is not sealed");
-
         require(a.ledger_A != a.ledger_B, "Bad transfer");
-
         require(a.qty_A <= 0x7FFFFFFFFFFFFFFF && a.qty_B <= 0x7FFFFFFFFFFFFFFF &&
                 a.qty_A >= -0x7FFFFFFFFFFFFFFF && a.qty_B >= -0x7FFFFFFFFFFFFFFF &&
                 a.qty_A != 0 && a.qty_B != 0, "Bad quantity"); // min/max signed int64, non-zero
         require(a.qty_A + a.qty_B == 0, "Quantity mismatch");
-
         require(a.tokTypeId >= 0 && a.tokTypeId <= std._tt_Count, "Bad tokTypeId");
-        require(std._tt_Settle[a.tokTypeId] == StructLib.SettlementType.FUTURE, "Invalid (non-future) tokTypeId");
-
+        require(std._tt_Settle[a.tokTypeId] == StructLib.SettlementType.FUTURE, "Bad token settlement type");
         require(a.price <= 0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF && a.price > 0, "Bad price"); // max signed int128, non-zero
 
         // apply fees
@@ -53,8 +70,8 @@ library FuturesLib {
         // apply margin
         int256 newReserved_A = ld._ledger[a.ledger_A].ccyType_reserved[std._tt_ft[a.tokTypeId].refCcyId] + marginRequired;
         int256 newReserved_B = ld._ledger[a.ledger_B].ccyType_reserved[std._tt_ft[a.tokTypeId].refCcyId] + marginRequired;
-        StructLib.setReservedCcy(ld, ctd, a.ledger_A, std._tt_ft[a.tokTypeId].refCcyId, newReserved_A); // ...will revert if insufficient
-        StructLib.setReservedCcy(ld, ctd, a.ledger_B, std._tt_ft[a.tokTypeId].refCcyId, newReserved_B); //    "
+        StructLib.setReservedCcy(ld, ctd, a.ledger_A, std._tt_ft[a.tokTypeId].refCcyId, newReserved_A); // will revert if insufficient
+        StructLib.setReservedCcy(ld, ctd, a.ledger_B, std._tt_ft[a.tokTypeId].refCcyId, newReserved_B);
 
         // create ledger entries as required
         StructLib.initLedgerIfNew(ld, a.ledger_A);

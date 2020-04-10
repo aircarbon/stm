@@ -31,7 +31,7 @@ library FeeLib {
             //require(ld._ledger[ledgerOwner].exists == true, "Bad ledgerOwner");
             StructLib.initLedgerIfNew(ld, ledgerOwner);
 
-            feeStruct = ld._ledger[ledgerOwner].customFees;
+            feeStruct = ld._ledger[ledgerOwner].spot_customFees;
         }
 
         feeStruct.tokType_Set[tokenTypeId] = a.fee_fixed != 0 || a.fee_percBips != 0 || a.fee_min != 0 || a.fee_max != 0;
@@ -68,7 +68,7 @@ library FeeLib {
             //require(ld._ledger[ledgerOwner].exists == true, "Bad ledgerOwner");
             StructLib.initLedgerIfNew(ld, ledgerOwner);
 
-            feeStruct = ld._ledger[ledgerOwner].customFees;
+            feeStruct = ld._ledger[ledgerOwner].spot_customFees;
         }
 
         feeStruct.ccyType_Set[ccyTypeId] = a.fee_fixed != 0 || a.fee_percBips != 0 || a.fee_min != 0 || a.fee_max != 0 || a.ccy_perMillion != 0;
