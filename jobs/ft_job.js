@@ -54,11 +54,12 @@ var ledgerOwners, accounts;
     // execute context
     const MAX_T = ctx[0].data.refs.length;
     for (let T=0 ; T < MAX_T; T++) {
-        for (let ft of ctx) {
-            const MP = ft.data.refs[T];
+        for (let ft of ctx) { // for each future token in context
+            
+            const MP = ft.data.refs[T]; // mark price
             console.log(chalk.inverse(`>> T=${T}, ftId=${ft.ftId}: MP=${MP}...`));
             
-            await processTestContext(ft.data.TEST_PARTICIPANTS, T);
+            await processTestContext(ft, T);
             
             // main - process
             await ftm(ft.ftId, MP);
@@ -68,16 +69,17 @@ var ledgerOwners, accounts;
     process.exit();
 })();
 
-async function processTestContext(TEST_PARTICIPANTS, T) {
+async function processTestContext(ft, T) {
+    const O = await CONST.getAccountAndKey(0);
+    const TEST_PARTICIPANTS = ft.data.TEST_PARTICIPANTS;
     console.group();
-    console.log(`(setup test actions for T=${T}...)`);
 
     // process ctx deposits
     for (let p of TEST_PARTICIPANTS) {
         const ccy_deposit = p.ccy_deposits[T];
         if (ccy_deposit.a) {
             console.log(chalk.yellow.dim(`TEST_PARTICIPANT: ID=${p.id}, account=${p.account}`) + chalk.yellow(` ** DEPOSIT ** `), ccy_deposit);
-            //...
+            await CONST.web3_tx('fund', [ CONST.ccyType.USD, ccy_deposit.a, p.account ], O.addr, O.privKey);
         }
     }
 
@@ -86,14 +88,16 @@ async function processTestContext(TEST_PARTICIPANTS, T) {
         const ft_long = p.ft_longs[T];
         if (ft_long.q) {
             console.log(chalk.yellow.dim(`TEST_PARTICIPANT: ID=${p.id}, account=${p.account}`) + chalk.yellow(` ** OPEN FUTURE POSITION ** `), ft_long);
-            // find/lookup counterparty...s
-            //...
+            const shortAccount = TEST_PARTICIPANTS.find(p => p.id == ft_long.cid).account;
+            await CONST.web3_tx('openFtPos', [{
+                tokTypeId: ft.ftId, ledger_A: p.account, ledger_B: shortAccount, qty_A: ft_long.q, qty_B: ft_long.q * -1, price: ft_long.p
+            }], O.addr, O.privKey);
         }
     }
 
     // TODO: extend to withdraws
     // TODO: extend to spot buys/sells (concurrent positions)
-    
+
     console.groupEnd();
 }
 
@@ -155,13 +159,12 @@ TEST_PARTICIPANTS: [ // test participants
           id: 1, account: freshAccounts[i++],
 ccy_deposits: [ {a:+1000},         {},                {},                {},                {},                {},                {},                 {},                 {} ], 
     ft_longs: [ {q:1,cid:2,p:1.0}, {},                {},                {},                {},                {},                {},                 {},                 {} ],
-   ft_shorts: [ {},                {},                {},                {},                {},                {},                {},                 {},                 {} ],
+ //ft_shorts: [ {},                {},                {},                {},                {},                {},                {},                 {},                 {} ],
 },
 { 
           id: 2, account: freshAccounts[i++],
 ccy_deposits: [ {a:+1000},         {},                {},                {},                {},                {},                {},                 {},                 {} ],
     ft_longs: [ {},                {},                {},                {},                {},                {},                {},                 {},                 {} ],
-   ft_shorts: [ {q:1,cid:1,p:1.0}, {},                {},                {},                {},                {},                {},                 {},                 {} ],
 }
 ]
     

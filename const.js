@@ -246,7 +246,7 @@ async function web3_call(methodName, methodArgs) {
     const { web3, ethereumTxChain } = getTestContextWeb3();
     const contractDb = (await db.GetDeployment(process.env.WEB3_NETWORK_ID, contractProps[process.env.CONTRACT_TYPE].contractName, contractProps[process.env.CONTRACT_TYPE].contractVer)).recordset[0];
     if (!contractDb) throw(Error(`Failed to lookup contract deployment for networkId=${process.env.WEB3_NETWORK_ID}, contractName=${contractProps[process.env.CONTRACT_TYPE].contractName}, contractVer=${contractProps[process.env.CONTRACT_TYPE].contractVer}`));
-    console.log(chalk.dim(` > CALL: [${contractDb.contract_enum} ${contractDb.contract_ver} @${contractDb.addr}] ${chalk.reset.bold.blue.bgWhite(methodName)}(${methodArgs.join()})` + chalk.dim(` [networkId: ${process.env.WEB3_NETWORK_ID} - ${web3.currentProvider.host}]`)));
+    console.log(chalk.dim(` > CALL: [${contractDb.contract_enum} ${contractDb.contract_ver} @${contractDb.addr}] ${chalk.reset.bold.blue.bgWhite(methodName + '(' + methodArgs.map(p => JSON.stringify(p)).join() + ')')}` + chalk.dim(` [networkId: ${process.env.WEB3_NETWORK_ID} - ${web3.currentProvider.host}]`)));
     var contract = new web3.eth.Contract(JSON.parse(contractDb.abi), contractDb.addr);
     const callRet = await contract.methods[methodName](...methodArgs).call();
     return callRet;
@@ -259,7 +259,7 @@ async function web3_tx(methodName, methodArgs, fromAddr, fromPrivKey) {
     var contract = new web3.eth.Contract(JSON.parse(contractDb.abi), contractDb.addr);
 
     // tx data
-    console.log(chalk.dim(` >   TX: [${contractDb.contract_enum} ${contractDb.contract_ver} @${contractDb.addr}] ${chalk.reset.bold.red.bgWhite(methodName)}(${methodArgs.join()})` + chalk.dim(` [networkId: ${process.env.WEB3_NETWORK_ID} - ${web3.currentProvider.host}]`)));
+    console.log(chalk.dim(` >   TX: [${contractDb.contract_enum} ${contractDb.contract_ver} @${contractDb.addr}] ${chalk.reset.bold.red.bgWhite(methodName + '(' + methodArgs.map(p => JSON.stringify(p)).join() + ')')}` + chalk.dim(` [networkId: ${process.env.WEB3_NETWORK_ID} - ${web3.currentProvider.host}]`)));
     const nonce = await web3.eth.getTransactionCount(fromAddr, "pending");
     var paramsData = contract.methods
         [methodName](...methodArgs)
