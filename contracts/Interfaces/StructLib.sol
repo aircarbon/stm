@@ -129,7 +129,7 @@ library StructLib {
         uint256                       spot_sumQtyMinted;
         uint256                       spot_sumQtyBurned;
 
-        mapping(uint256 => uint16)    ft_initMarginBips;        // SecTokenTypeId -> custom initial margin -- TODO: get/set in FuturesLib...
+        mapping(uint256 => uint16)    ft_initMarginBips;        // SecTokenTypeId -> custom initial margin ("hedge exemption"); overrides FT-type value if set
     }
 
     struct LedgerReturn {                                       // ledger return structure

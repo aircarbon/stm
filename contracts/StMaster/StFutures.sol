@@ -24,6 +24,13 @@ TODO: no open of positions on FT types after expiry timestamp - ** must be enfor
 
 FUTURES - notes 26/MAR/2020
 
+   >> WIP: initMargin ledger override...
+
+   >> TODO: settlement job by pos-pair (cap ITM at OTM, guarantee net 0) > event for any shortfall off-chain processing
+
+   >> ?? LIQUIDATION ?? -- reserved is currently the *total* across all positions; so liquidation would be *all positions* ???
+      i.e. margin call is at account level, or position level? account level easier?!
+
    >> pos combines - optimization: if both positions are processed (taken/paid) then they can be netted solely on the basis of qty
      i.e. entry_price is ONLY relevant on the FIRST take/pay cycle...
    >> margin: v1 can apply a simple flat % (e.g. 20%) - reserved margin_required = 20% * notional_size
@@ -39,11 +46,8 @@ FUTURES - notes 26/MAR/2020
   (1.1) done: auto-mint both sides +ve / -ve, assign price P into both STs, assign LastMarkPrice (LMP) -1 into both STs - always new STs (NetPositions will collapse them later...)
   (1.2) done: UpdateSetAside: sum MarginRequired for *all* open positions (not just this one!) - write TotalMarginRequired[ccyId] to ledger...
 
-  >> TODO: varMargin ledger override ...
-  >> TODO: settlement job by pos-pair (cap ITM at OTM, guarantee net 0) > event for any shortfall
-
-(2) SETTLE_JOB (off-chain) - walk all ledger entries...
-  (2.0) call [sol] settleFuturePositions // fn. (param: ledgerAddr, MarkPrice [MP])
+(2) SETTLE_JOB (off-chain) - POS-PAIR SETTLER... (caps ITM-pay at OTM-take: delta/default is handled off-chain...)
+  (2.0) call [sol] settleFuturePositions // fn. (param: ledgerAddr? || posPair?, MarkPrice [MP])
   (2.1)   >> TakeOrPay [2 updates: LMP + CcyBalance] -- use (MP - LMP) or (MP - P) when LMP == -1
            ... preview mode - should net to zero across all ledgers and positions...
 

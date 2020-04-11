@@ -17,11 +17,12 @@ library FuturesLib {
         uint256 tokTypeId,
         uint16  initMarginBips
     ) public {
-        require(ld._ledger[ledgerOwner].exists == true, "Bad ledgerOwner");
+        //require(ld._ledger[ledgerOwner].exists == true, "Bad ledgerOwner");
         require(tokTypeId >= 0 && tokTypeId <= std._tt_Count, "Bad tokTypeId");
         require(std._tt_Settle[tokTypeId] == StructLib.SettlementType.FUTURE, "Bad token settlement type");
-        require(initMarginBips < 10000, "Bad initMarginBips");
+        require(initMarginBips <= 10000, "Bad initMarginBips");
 
+        StructLib.initLedgerIfNew(ld, ledgerOwner);
         ld._ledger[ledgerOwner].ft_initMarginBips[tokTypeId] = initMarginBips;
         emit SetInitialMargin(tokTypeId, ledgerOwner, initMarginBips);
     }
@@ -56,16 +57,30 @@ library FuturesLib {
         StructLib.transferCcy(ld, StructLib.TransferCcyArgs({ from: a.ledger_A, to: owner, ccyTypeId: std._tt_ft[a.tokTypeId].refCcyId, amount: uint256(fee), transferType: StructLib.TransferType.ExchangeFee }));
         StructLib.transferCcy(ld, StructLib.TransferCcyArgs({ from: a.ledger_B, to: owner, ccyTypeId: std._tt_ft[a.tokTypeId].refCcyId, amount: uint256(fee), transferType: StructLib.TransferType.ExchangeFee }));
 
-        // calculate margin requirement
-        int256 marginRequired = (((int256((std._tt_ft[a.tokTypeId].initMarginBips + std._tt_ft[a.tokTypeId].varMarginBips)/*totMarginBips*/)
+        // calculate margin requirements
+        int256 marginRequired_A = (((int256((
+                                        (ld._ledger[a.ledger_A].ft_initMarginBips[a.tokTypeId] != 0
+                                            ? ld._ledger[a.ledger_A].ft_initMarginBips[a.tokTypeId]/*initial margin override*/
+                                            : std._tt_ft[a.tokTypeId].initMarginBips)/*product's initial margin*/
+                                         + std._tt_ft[a.tokTypeId].varMarginBips)/*totMarginBips*/)
+                                    * 1000000/*increase precision*/)
+                                    / 10000/*basis points*/)
+                                    * (std._tt_ft[a.tokTypeId].contractSize * posSize * a.price)/*notional*/
+                                ) / 1000000/*decrease precision*/;
+
+        int256 marginRequired_B = (((int256((
+                                        (ld._ledger[a.ledger_B].ft_initMarginBips[a.tokTypeId] != 0
+                                            ? ld._ledger[a.ledger_B].ft_initMarginBips[a.tokTypeId]/*initial margin override*/
+                                            : std._tt_ft[a.tokTypeId].initMarginBips)/*product's initial margin*/
+                                         + std._tt_ft[a.tokTypeId].varMarginBips)/*totMarginBips*/)
                                     * 1000000/*increase precision*/)
                                     / 10000/*basis points*/)
                                     * (std._tt_ft[a.tokTypeId].contractSize * posSize * a.price)/*notional*/
                                 ) / 1000000/*decrease precision*/;
 
         // apply margin
-        int256 newReserved_A = ld._ledger[a.ledger_A].ccyType_reserved[std._tt_ft[a.tokTypeId].refCcyId] + marginRequired;
-        int256 newReserved_B = ld._ledger[a.ledger_B].ccyType_reserved[std._tt_ft[a.tokTypeId].refCcyId] + marginRequired;
+        int256 newReserved_A = ld._ledger[a.ledger_A].ccyType_reserved[std._tt_ft[a.tokTypeId].refCcyId] + marginRequired_A;
+        int256 newReserved_B = ld._ledger[a.ledger_B].ccyType_reserved[std._tt_ft[a.tokTypeId].refCcyId] + marginRequired_B;
         StructLib.setReservedCcy(ld, ctd, a.ledger_A, std._tt_ft[a.tokTypeId].refCcyId, newReserved_A); // will revert if insufficient
         StructLib.setReservedCcy(ld, ctd, a.ledger_B, std._tt_ft[a.tokTypeId].refCcyId, newReserved_B);
 

@@ -35,8 +35,8 @@ library TokenLib {
             require(ft.underlyerTypeId > 0 && ft.underlyerTypeId <= std._tt_Count, "Bad underlyerTypeId");
             require(std._tt_Settle[ft.underlyerTypeId] == StructLib.SettlementType.SPOT, "Bad underyler settlement type");
             require(ft.refCcyId > 0 && ft.refCcyId <= ctd._ct_Count, "Bad refCcyId");
-            require(ft.initMarginBips < 10000, "Bad initMarginBips");
-            require(ft.varMarginBips < 10000, "Bad varMarginBips");
+            require(ft.initMarginBips <= 10000, "Bad initMarginBips");
+            require(ft.varMarginBips <= 10000, "Bad varMarginBips");
             require(ft.contractSize > 0, "Bad contractSize");
         }
         else if (settlementType == StructLib.SettlementType.SPOT) {
@@ -75,7 +75,7 @@ library TokenLib {
     public {
         require(tokenTypeId >= 1 && tokenTypeId <= std._tt_Count, "Bad tokenTypeId");
         require(std._tt_Settle[tokenTypeId] == StructLib.SettlementType.FUTURE, "Bad token settlement type");
-        require(varMarginBips < 10000, "Bad varMarginBips");
+        require(varMarginBips <= 10000, "Bad varMarginBips");
         std._tt_ft[tokenTypeId].varMarginBips = varMarginBips;
         emit SetFutureVariationMargin(tokenTypeId, varMarginBips);
     }
