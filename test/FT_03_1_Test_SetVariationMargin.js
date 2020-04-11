@@ -92,14 +92,14 @@ contract("StMaster", accounts => {
         try {
             const x = await stm.setFuture_VariationMargin(usdFT.id, 10001);
         }
-        catch (ex) { assert(ex.reason == 'Bad varMarginBips', `unexpected: ${ex.reason}`); return; }
+        catch (ex) { assert(ex.reason == 'Bad total margin', `unexpected: ${ex.reason}`); return; }
         assert.fail('expected contract exception');
     });
     it(`FT var margin - should not be able to set an invalid (< 0) variation margin on a futures token type`, async () => {
         try {
             const x = await stm.setFuture_VariationMargin(usdFT.id, -1);
         }
-        catch (ex) { assert(ex.reason == 'Bad varMarginBips', `unexpected: ${ex.reason}`); return; }
+        catch (ex) { assert(ex.reason == 'Bad total margin', `unexpected: ${ex.reason}`); return; }
         assert.fail('expected contract exception');
     });
 });

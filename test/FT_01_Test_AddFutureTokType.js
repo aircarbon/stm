@@ -28,6 +28,9 @@ contract("StMaster", accounts => {
             console.log(`addrNdx: ${global.TaddrNdx} - contract @ ${stm.address} (owner: ${accounts[0]})`);
     });
 
+    // ## TODO - init + var > 10000 on addSecTokenType ... throw surely? (init+var=100% == no leverage, should support that)
+    // ## todo - loadtest: spot *trade* op...
+
     it(`FT types - should be able to add a future on a spot underlyer`, async () => {
         //var expiryUTC = DateTime.fromISO("2020-12-28T17:00:00", { zone: "utc" });
         var expirySG = DateTime.fromISO("2020-12-28T17:00:00", { zone: "Asia/Singapore" });
@@ -59,8 +62,6 @@ contract("StMaster", accounts => {
     it(`FT types - should not be able to add a future with an invalid (unset) expiry time`, async () => {
         const allTypes = (await stm.getSecTokenTypes()).tokenTypes;
         const spotTypes = allTypes.filter(p => p.settlementType == CONST.settlementType.SPOT);
-        // console.log('spotTypes', spotTypes);
-        // console.log('allTypes', allTypes);
         const ccyTypes = (await stm.getCcyTypes()).ccyTypes;
         try {
             const addFtTx = await stm.addSecTokenType(`FT_TEST2_${new Date().getTime()}`, CONST.settlementType.FUTURE, { ...CONST.nullFutureArgs,
@@ -120,7 +121,7 @@ contract("StMaster", accounts => {
                 expiryTimestamp: DateTime.local().toMillis(), underlyerTypeId: spotTypes[0].id, refCcyId: ccyTypes[0].id, initMarginBips: 10001, contractSize: 1000,
             });
         }
-        catch (ex) { assert(ex.reason == 'Bad initMarginBips', `unexpected: ${ex.reason}`); return; }
+        catch (ex) { assert(ex.reason == 'Bad total margin', `unexpected: ${ex.reason}`); return; }
         assert.fail('expected contract exception');
     });
     it(`FT types - should not be able to add a future with an invalid (< 0) initial margin`, async () => {
@@ -131,7 +132,7 @@ contract("StMaster", accounts => {
                 expiryTimestamp: DateTime.local().toMillis(), underlyerTypeId: spotTypes[0].id, refCcyId: ccyTypes[0].id, initMarginBips: -1, contractSize: 1000,
             });
         }
-        catch (ex) { assert(ex.reason == 'Bad initMarginBips', `unexpected: ${ex.reason}`); return; }
+        catch (ex) { assert(ex.reason == 'Bad total margin', `unexpected: ${ex.reason}`); return; }
         assert.fail('expected contract exception');
     });
 
@@ -143,7 +144,7 @@ contract("StMaster", accounts => {
                 expiryTimestamp: DateTime.local().toMillis(), underlyerTypeId: spotTypes[0].id, refCcyId: ccyTypes[0].id, varMarginBips: 10001, contractSize: 1000,
             });
         }
-        catch (ex) { assert(ex.reason == 'Bad varMarginBips', `unexpected: ${ex.reason}`); return; }
+        catch (ex) { assert(ex.reason == 'Bad total margin', `unexpected: ${ex.reason}`); return; }
         assert.fail('expected contract exception');
     });
     it(`FT types - should not be able to add a future with an invalid (< 0) variation margin`, async () => {
@@ -154,7 +155,7 @@ contract("StMaster", accounts => {
                 expiryTimestamp: DateTime.local().toMillis(), underlyerTypeId: spotTypes[0].id, refCcyId: ccyTypes[0].id, varMarginBips: -1, contractSize: 1000,
             });
         }
-        catch (ex) { assert(ex.reason == 'Bad varMarginBips', `unexpected: ${ex.reason}`); return; }
+        catch (ex) { assert(ex.reason == 'Bad total margin', `unexpected: ${ex.reason}`); return; }
         assert.fail('expected contract exception');
     });
 

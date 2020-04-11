@@ -20,7 +20,7 @@ library FuturesLib {
         //require(ld._ledger[ledgerOwner].exists == true, "Bad ledgerOwner");
         require(tokTypeId >= 0 && tokTypeId <= std._tt_Count, "Bad tokTypeId");
         require(std._tt_Settle[tokTypeId] == StructLib.SettlementType.FUTURE, "Bad token settlement type");
-        require(initMarginBips <= 10000, "Bad initMarginBips");
+        require(/*std._tt_ft[tokTypeId].varMarginBips +*/initMarginBips <= 10000, "Bad total margin");
 
         StructLib.initLedgerIfNew(ld, ledgerOwner);
         ld._ledger[ledgerOwner].ft_initMarginBips[tokTypeId] = initMarginBips;
@@ -58,6 +58,7 @@ library FuturesLib {
         StructLib.transferCcy(ld, StructLib.TransferCcyArgs({ from: a.ledger_B, to: owner, ccyTypeId: std._tt_ft[a.tokTypeId].refCcyId, amount: uint256(fee), transferType: StructLib.TransferType.ExchangeFee }));
 
         // calculate margin requirements
+        // TODO: refactor/extract - cap at 10000 total bips
         int256 marginRequired_A = (((int256((
                                         (ld._ledger[a.ledger_A].ft_initMarginBips[a.tokTypeId] != 0
                                             ? ld._ledger[a.ledger_A].ft_initMarginBips[a.tokTypeId]/*initial margin override*/
