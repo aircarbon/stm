@@ -205,7 +205,7 @@ contract("StMaster", accounts => {
         assert(allEntries.length == entryCount, 'getLedgerOwnerCount / getLedgerOwners mismatch');
         for (let j=0 ; j < entryCount; j++) {
             const entryOwner = await stm_cur.getLedgerOwner(j);
-            console.log('funding, withdrawing, setting ledger ccy & token fees, & opening futures positions: for account... ', entryOwner);
+            console.log('funding, withdrawing, setting ledger ccy, token fees & future init margin override, spot trading & opening futures positions: for account... ', entryOwner);
 
             // for all ccy types
             for (let i=0 ; i < ccyTypes.ccyTypes.length; i++) { // test ccy data 
@@ -228,6 +228,21 @@ contract("StMaster", accounts => {
                 // set ledger ccy fee
                 await stm_cur.setFee_CcyType(ccyType.id, entryOwner, { ccy_mirrorFee: false, ccy_perMillion: 0, fee_fixed: i+2+j+2, fee_percBips: (i+2+j+2)*100, fee_min: (i+2+j+2), fee_max: (i+2+j+2+100) } );
                 if (entryOwner != accounts[0]) curHash = await checkHashUpdate(curHash);
+            }
+
+            // spot trade
+            if (entryOwner != accounts[0]) {
+                 const tradeTx = await stm_cur.transferOrTrade({ 
+                        ledger_A: entryOwner,                   ledger_B: accounts[0], 
+                           qty_A: 1,                       tokenTypeId_A: CONST.tokenType.CORSIA, 
+                           qty_B: 0,                       tokenTypeId_B: 0, 
+                    ccy_amount_A: 0,                         ccyTypeId_A: 0, 
+                    ccy_amount_B: CONST.ccyType.USD,         ccyTypeId_B: 1,
+                       applyFees: true,
+                    feeAddrOwner: CONST.nullAddr,
+                });
+                //truffleAssert.prettyPrintEmittedEvents(tradeTx);
+                curHash = await checkHashUpdate(curHash);
             }
 
             // for all token types
@@ -255,7 +270,7 @@ contract("StMaster", accounts => {
                         qty_B: -1, // * ((j+1) * 10),
                         price: j+1,
                 });
-                truffleAssert.prettyPrintEmittedEvents(openFtPosTx); 
+                //truffleAssert.prettyPrintEmittedEvents(openFtPosTx);
                 curHash = await checkHashUpdate(curHash);
             }
         }

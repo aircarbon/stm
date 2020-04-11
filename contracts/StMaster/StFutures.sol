@@ -27,7 +27,6 @@ FUTURES - notes 26/MAR/2020
    >> WIP: initMargin ledger override...
 
    >> TODO: settlement job by pos-pair (cap ITM at OTM, guarantee net 0) > event for any shortfall off-chain processing
-
    >> ?? LIQUIDATION ?? -- reserved is currently the *total* across all positions; so liquidation would be *all positions* ???
       i.e. margin call is at account level, or position level? account level easier?!
 

@@ -58,26 +58,8 @@ library FuturesLib {
         StructLib.transferCcy(ld, StructLib.TransferCcyArgs({ from: a.ledger_B, to: owner, ccyTypeId: std._tt_ft[a.tokTypeId].refCcyId, amount: uint256(fee), transferType: StructLib.TransferType.ExchangeFee }));
 
         // calculate margin requirements
-        // TODO: refactor/extract - cap at 10000 total bips
-        int256 marginRequired_A = (((int256((
-                                        (ld._ledger[a.ledger_A].ft_initMarginBips[a.tokTypeId] != 0
-                                            ? ld._ledger[a.ledger_A].ft_initMarginBips[a.tokTypeId]/*initial margin override*/
-                                            : std._tt_ft[a.tokTypeId].initMarginBips)/*product's initial margin*/
-                                         + std._tt_ft[a.tokTypeId].varMarginBips)/*totMarginBips*/)
-                                    * 1000000/*increase precision*/)
-                                    / 10000/*basis points*/)
-                                    * (std._tt_ft[a.tokTypeId].contractSize * posSize * a.price)/*notional*/
-                                ) / 1000000/*decrease precision*/;
-
-        int256 marginRequired_B = (((int256((
-                                        (ld._ledger[a.ledger_B].ft_initMarginBips[a.tokTypeId] != 0
-                                            ? ld._ledger[a.ledger_B].ft_initMarginBips[a.tokTypeId]/*initial margin override*/
-                                            : std._tt_ft[a.tokTypeId].initMarginBips)/*product's initial margin*/
-                                         + std._tt_ft[a.tokTypeId].varMarginBips)/*totMarginBips*/)
-                                    * 1000000/*increase precision*/)
-                                    / 10000/*basis points*/)
-                                    * (std._tt_ft[a.tokTypeId].contractSize * posSize * a.price)/*notional*/
-                                ) / 1000000/*decrease precision*/;
+        int256 marginRequired_A = calcPosMargin(ld, std, a.ledger_A, a.tokTypeId, a.qty_A, int128(a.price));
+        int256 marginRequired_B = calcPosMargin(ld, std, a.ledger_B, a.tokTypeId, a.qty_B, int128(a.price));
 
         // apply margin
         int256 newReserved_A = ld._ledger[a.ledger_A].ccyType_reserved[std._tt_ft[a.tokTypeId].refCcyId] + marginRequired_A;
@@ -116,5 +98,29 @@ library FuturesLib {
             emit FutureOpenInterest(a.ledger_A, a.ledger_B, a.tokTypeId, uint256(a.qty_A), uint256(a.price));
         else
             emit FutureOpenInterest(a.ledger_B, a.ledger_A, a.tokTypeId, uint256(a.qty_B), uint256(a.price));
+    }
+
+    function calcPosMargin(
+        StructLib.LedgerStruct storage ld,
+        StructLib.StTypesStruct storage std,
+        address ledgerOwner,
+        uint256 tokTypeId,
+        int256 posSize,
+        int128 price
+    ) private returns(int256)  {
+
+        uint16 totMargin = (ld._ledger[ledgerOwner].ft_initMarginBips[tokTypeId] != 0
+                                ? ld._ledger[ledgerOwner].ft_initMarginBips[tokTypeId]
+                                : std._tt_ft[tokTypeId].initMarginBips)
+                            + std._tt_ft[tokTypeId].varMarginBips;
+        if (totMargin > 10000) {
+            totMargin = 10000;
+        }
+
+        return (((int256(totMargin)
+            * 1000000/*increase precision*/)
+                / 10000/*basis points*/)
+                * (std._tt_ft[tokTypeId].contractSize * (posSize < 0 ? posSize * -1 : posSize) * price)/*notional*/
+            ) / 1000000/*decrease precision*/;
     }
 }

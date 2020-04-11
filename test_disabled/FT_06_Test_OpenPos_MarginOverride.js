@@ -33,7 +33,7 @@ contract("StMaster", accounts => {
               underlyerTypeId: spotTypes[0].id,
                      refCcyId: ccyTypes.find(p => p.name === 'USD').id,
                  contractSize: 1000,
-               initMarginBips: 999,   // 99.9%
+               initMarginBips: 999,   // 9.9%
                 varMarginBips: 50,    // 0.5%
          });
         usdFT = (await stm.getSecTokenTypes()).tokenTypes.filter(p => p.name == ftTestName_USD)[0];
