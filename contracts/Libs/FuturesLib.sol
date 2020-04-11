@@ -71,10 +71,11 @@ library FuturesLib {
         StructLib.initLedgerIfNew(ld, a.ledger_A);
         StructLib.initLedgerIfNew(ld, a.ledger_B);
 
-        // auto-mint ("batchless") balanced STs on each side of the position
+        // auto-mint ("batchless") a balanced ST-pair; one for each side of the position
         // (note: no global counter updates [_spot_totalMintedQty, spot_sumQtyMinted] for FT auto-mints)
-        uint256 newId_A = ld._tokens_currentMax_id + 1;
-        uint256 newId_B = ld._tokens_currentMax_id + 2;
+        // (note: the short position is always the first/lower ST ID, the long position is the second/higher ST ID - for pair lookup later)
+        uint256 newId_A = ld._tokens_currentMax_id + (a.qty_A < 0 ? 1 : 2);
+        uint256 newId_B = ld._tokens_currentMax_id + (a.qty_B < 0 ? 1 : 2);
 
         //ld._sts[newId_A].batchId = 0; // batchless
         ld._sts[newId_A].mintedQty = int64(a.qty_A);

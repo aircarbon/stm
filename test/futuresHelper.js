@@ -66,7 +66,9 @@ module.exports = {
         assert(ftA.currentQty == ftB.currentQty * -1, 'unexpected FT minted qty');
         
         return { 
-            tx: openFtPosTx
+                  tx: openFtPosTx,
+            ledger_A: ledgerA_after,
+            ledger_B: ledgerB_after,
         };
     },
 

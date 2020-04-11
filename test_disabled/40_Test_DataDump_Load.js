@@ -280,7 +280,7 @@ contract("StMaster", accounts => {
 
         //
         // cashflow data: args are set in new contract ctor()
-        // TODO: remaining cashflow data (need StDataLoadable support...)
+        // todo: remaining cashflow data (need StDataLoadable support...)
         //...
 
         // load ccy & token types
