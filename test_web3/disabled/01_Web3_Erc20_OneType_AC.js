@@ -51,7 +51,7 @@ describe(`Contract Web3 Interface`, async () => {
 
         //setup - whitelist A, mint for A, transferOrTrade A -> GRAY_1
         try {
-            const whitelistTx = await CONST.web3_tx('whitelist', [ WHITE ], OWNER, OWNER_privKey);
+            await CONST.web3_tx('whitelist', [ WHITE ], OWNER, OWNER_privKey);
         } catch(ex) {
             // swallow - ropsten doesn't include the revert msg
             //if (ex.toString().includes("Already whitelisted")) console.log('(already whitelisted - nop)');
@@ -59,17 +59,17 @@ describe(`Contract Web3 Interface`, async () => {
         }
         const sealedStatus = await CONST.web3_call('getContractSeal', []);
         if (!sealedStatus) {
-            const sealTx = await CONST.web3_tx('sealContract', [], OWNER, OWNER_privKey);
+            await CONST.web3_tx('sealContract', [], OWNER, OWNER_privKey);
         }
 
         // setup - mint for A
         //for (var i=0 ; i < 10 ; i++) {
-            const mintTx = await CONST.web3_tx('mintSecTokenBatch', [
+            await CONST.web3_tx('mintSecTokenBatch', [
                 CONST.tokenType.NATURE,    100000, 1,      WHITE, CONST.nullFees, 0, [], [],
             ], OWNER, OWNER_privKey);
 
             // setup - transferOrTrade A -> GRAY_1 (withdraw)
-            const withdrawTx = await CONST.web3_tx('transferOrTrade', [ {
+            await CONST.web3_tx('transferOrTrade', [ {
                     ledger_A: WHITE,                               ledger_B: GRAY_1,
                        qty_A: 100000,                         tokenTypeId_A: CONST.tokenType.NATURE,
                        qty_B: 0,                              tokenTypeId_B: 0,
@@ -86,18 +86,15 @@ describe(`Contract Web3 Interface`, async () => {
     });
 
     it(`web3 direct - erc20 - should be able to send single token type from graylist addr to external wallet (erc20 => erc20)`, async () => {
-        const erc20_1 = await CONST.web3_tx('transfer', [ AIRCARBON_DOM10_1, "25000" ], GRAY_1, GRAY_1_privKey);
-        const erc20_2 = await CONST.web3_tx('transfer', [ AIRCARBON_DOM10_2, "25000" ], GRAY_1, GRAY_1_privKey);
-        //await CONST.logGas(CONST.getTestContextWeb3().web3, { receipt: erc20_1 }, 'erc20 => erc20 (transfer 1): 1 type, 1 batch');
-        //await CONST.logGas(CONST.getTestContextWeb3().web3, { receipt: erc20_2 }, 'erc20 => erc20 (transfer 2): 1 type, 1 batch');
+        await CONST.web3_tx('transfer', [ AIRCARBON_DOM10_1, "25000" ], GRAY_1, GRAY_1_privKey);
+        await CONST.web3_tx('transfer', [ AIRCARBON_DOM10_2, "25000" ], GRAY_1, GRAY_1_privKey);
 
         await CONST.web3_sendEthTestAddr(0, AIRCARBON_DOM10_1, "0.01");
         await CONST.web3_sendEthTestAddr(0, AIRCARBON_DOM10_2, "0.01");
     });
    
     it(`web3 direct - erc20 - should be able to send from graylist addr to whitelist addr (DEPOSIT: erc20 => exchange)`, async () => {
-        const erc20_deposit = await CONST.web3_tx('transfer', [ WHITE, "50000" ], GRAY_1, GRAY_1_privKey);
-        //await CONST.logGas(CONST.getTestContextWeb3().web3, { receipt: erc20_deposit }, 'erc20 => exchange (deposit): 1 type, 1 batch');
+        await CONST.web3_tx('transfer', [ WHITE, "50000" ], GRAY_1, GRAY_1_privKey);
     });
 });
 

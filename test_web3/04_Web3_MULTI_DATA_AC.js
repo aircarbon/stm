@@ -65,7 +65,7 @@ describe(`Contract Web3 Interface`, async () => {
         // setup whitelist: reserved/internal
         var whiteNdx = 0;
         const submittedToWhitelist = []
-        var wlMany = [], whitelistTx
+        var wlMany = []
         for (whiteNdx = 0; whiteNdx < WHITELIST_RESERVED_COUNT; whiteNdx++) {
             x = await CONST.getAccountAndKey(whiteNdx);
             wlMany.push(x.addr);
@@ -73,7 +73,7 @@ describe(`Contract Web3 Interface`, async () => {
         }
         console.log(chalk.inverse(`SETUP RESERVED WL (count=${wlMany.length}) last whiteNdx=${whiteNdx}...`));
         try {
-            whitelistTx = await CONST.web3_tx('whitelistMany', [ wlMany ], OWNER, OWNER_privKey);
+            await CONST.web3_tx('whitelistMany', [ wlMany ], OWNER, OWNER_privKey);
         } catch(ex) { console.warn(ex); }
         for (whiteNdx = 0; whiteNdx < WHITELIST_RESERVED_COUNT; whiteNdx++) {
             x = await CONST.getAccountAndKey(whiteNdx);
@@ -90,7 +90,7 @@ describe(`Contract Web3 Interface`, async () => {
         }
         console.log(chalk.inverse(`SETUP MINTERS WL (count=${wlMany.length}) last whiteNdx=${whiteNdx}...`));
         try {
-            whitelistTx = await CONST.web3_tx('whitelistMany', [ wlMany ], OWNER, OWNER_privKey);
+            await CONST.web3_tx('whitelistMany', [ wlMany ], OWNER, OWNER_privKey);
         } catch(ex) { console.warn(ex); }
         for (whiteNdx = WHITELIST_RESERVED_COUNT; whiteNdx < WHITE_MINTER_START_NDX + WHITE_MINTER_COUNT; whiteNdx++) {
             x = await CONST.getAccountAndKey(whiteNdx);
@@ -107,7 +107,7 @@ describe(`Contract Web3 Interface`, async () => {
         }
         console.log(chalk.inverse(`SETUP BUYERS WL (count=${wlMany.length}) last whiteNdx=${whiteNdx}...`));
         try {
-            whitelistTx = await CONST.web3_tx('whitelistMany', [ wlMany ], OWNER, OWNER_privKey);
+            await CONST.web3_tx('whitelistMany', [ wlMany ], OWNER, OWNER_privKey);
         } catch(ex) { console.warn(ex); }
         for (whiteNdx = WHITE_MINTER_START_NDX + WHITE_MINTER_COUNT; whiteNdx < WHITE_BUYER_START_NDX + WHITE_BUYER_COUNT; whiteNdx++) {
             x = await CONST.getAccountAndKey(whiteNdx);
@@ -124,7 +124,7 @@ describe(`Contract Web3 Interface`, async () => {
         }
         console.log(chalk.inverse(`SETUP TEST ACCOUNTS WL (count=${wlMany.length}) last whiteNdx=${whiteNdx}...`));
         try {
-            whitelistTx = await CONST.web3_tx('whitelistMany', [ wlMany ], OWNER, OWNER_privKey);
+            await CONST.web3_tx('whitelistMany', [ wlMany ], OWNER, OWNER_privKey);
         } catch(ex) { console.warn(ex); }
         for (whiteNdx = WHITE_BUYER_START_NDX + WHITE_BUYER_COUNT; whiteNdx < TEST_ACCOUNT_START_NDX + TEST_ACCOUNT_COUNT; whiteNdx++) {
             x = await CONST.getAccountAndKey(whiteNdx);
@@ -147,7 +147,7 @@ describe(`Contract Web3 Interface`, async () => {
 
         // seal
         if (!sealedStatus) {
-            const sealTx = await CONST.web3_tx('sealContract', [], OWNER, OWNER_privKey);
+            await CONST.web3_tx('sealContract', [], OWNER, OWNER_privKey);
         }
 
         if (EXEC_TEST_ACTIONS) {
@@ -181,7 +181,7 @@ describe(`Contract Web3 Interface`, async () => {
                     fee_max: batchNdx * 50,
                 };
                 const origCcyFee_percBips_ExFee = batchFees.fee_percBips;
-                const mintTx = await CONST.web3_tx('mintSecTokenBatch', [
+                await CONST.web3_tx('mintSecTokenBatch', [
                     (batchNdx % curTokTypes.length) + 1, ((batchNdx+1) * 1000000), 1, WM.addr, batchFees, origCcyFee_percBips_ExFee, [], [],
                 ], OWNER, OWNER_privKey);
             }
@@ -200,7 +200,7 @@ describe(`Contract Web3 Interface`, async () => {
 
             // fund white buyer (deposit ccy)
             const ccyTypeIdFunded = (whiteNdx % ccyTypes.length) + 1;
-            const fundTx = await CONST.web3_tx('fund', [ccyTypeIdFunded, 1000000 * (whiteNdx+1), BUYER.addr], OWNER, OWNER_privKey);
+            await CONST.web3_tx('fund', [ccyTypeIdFunded, 1000000 * (whiteNdx+1), BUYER.addr], OWNER, OWNER_privKey);
 
             // trade with minters
             console.group(chalk.inverse(`BUYING FOR ${BUYER.addr}...`));
@@ -211,15 +211,15 @@ describe(`Contract Web3 Interface`, async () => {
 
                 const exchangeCcyFee = { ccy_mirrorFee: false, ccy_perMillion: 0, fee_fixed: buyNdx * 11, fee_percBips: buyNdx * 6, fee_min: buyNdx * 11, fee_max: buyNdx * 51, };
                 const ledgerCcyFee =   { ccy_mirrorFee: false, ccy_perMillion: 0, fee_fixed: buyNdx * 12, fee_percBips: buyNdx * 7, fee_min: buyNdx * 12, fee_max: buyNdx * 52, };
-                const setExchangeCcyFeeTx = await CONST.web3_tx('setFee_CcyType', [ ccyTypeIdFunded, CONST.nullAddr, exchangeCcyFee ], OWNER, OWNER_privKey);
-                const setLedgerCcyFeeTx   = await CONST.web3_tx('setFee_CcyType', [ ccyTypeIdFunded, BUYER.addr,     ledgerCcyFee   ], OWNER, OWNER_privKey);
+                await CONST.web3_tx('setFee_CcyType', [ ccyTypeIdFunded, CONST.nullAddr, exchangeCcyFee ], OWNER, OWNER_privKey);
+                await CONST.web3_tx('setFee_CcyType', [ ccyTypeIdFunded, BUYER.addr,     ledgerCcyFee   ], OWNER, OWNER_privKey);
 
                 const exchangeTokFee = { ccy_mirrorFee: false, ccy_perMillion: 0, fee_fixed: buyNdx * 11, fee_percBips: buyNdx * 6, fee_min: buyNdx * 11, fee_max: buyNdx * 51, };
                 const ledgerTokFee =   { ccy_mirrorFee: false, ccy_perMillion: 0, fee_fixed: buyNdx * 12, fee_percBips: buyNdx * 7, fee_min: buyNdx * 12, fee_max: buyNdx * 52, };
-                const setExchangeTokFeeTx = await CONST.web3_tx('setFee_TokType', [ minterTokTypeId, CONST.nullAddr, exchangeTokFee ], OWNER, OWNER_privKey);
-                const setLedgerTokFeeTx   = await CONST.web3_tx('setFee_TokType', [ minterTokTypeId, SELLER.addr,    ledgerTokFee   ], OWNER, OWNER_privKey);
+                await CONST.web3_tx('setFee_TokType', [ minterTokTypeId, CONST.nullAddr, exchangeTokFee ], OWNER, OWNER_privKey);
+                await CONST.web3_tx('setFee_TokType', [ minterTokTypeId, SELLER.addr,    ledgerTokFee   ], OWNER, OWNER_privKey);
 
-                const tradeTx = await CONST.web3_tx('transferOrTrade', [ {
+                await CONST.web3_tx('transferOrTrade', [ {
                     ledger_A: SELLER.addr,                                    ledger_B: BUYER.addr,
                        qty_A: minterLedger.tokens[0].currentQty.div(2),  tokenTypeId_A: minterTokTypeId,
                        qty_B: 0,                                         tokenTypeId_B: 0,
@@ -232,13 +232,13 @@ describe(`Contract Web3 Interface`, async () => {
             console.groupEnd();
 
             // withdraw some ccy
-            const withdrawTx = await CONST.web3_tx('withdraw', [ccyTypeIdFunded, 100 * (whiteNdx+1), BUYER.addr], OWNER, OWNER_privKey);
+            await CONST.web3_tx('withdraw', [ccyTypeIdFunded, 100 * (whiteNdx+1), BUYER.addr], OWNER, OWNER_privKey);
 
             // withdraw all tokens to graylist addr
             const buyerLedger = (await CONST.web3_call('getLedgerEntry', [BUYER.addr]));
             console.group(chalk.inverse(`WITHDRAWING (SELF-CUSTODY) ALL FOR ${BUYER.addr}...`));
             for (var x = 0; x < buyerLedger.tokens.length ; x++) {
-                const withdrawTokensTx = await CONST.web3_tx('transferOrTrade', [ {
+                await CONST.web3_tx('transferOrTrade', [ {
                     ledger_A: BUYER.addr,                            ledger_B: GRAY,
                        qty_A: buyerLedger.tokens[x].currentQty, tokenTypeId_A: buyerLedger.tokens[x].tokenTypeId.toString(),
                        qty_B: 0,                                tokenTypeId_B: 0,
@@ -258,7 +258,7 @@ describe(`Contract Web3 Interface`, async () => {
 
             // leave USD fee per million at $3 mirrored
             const gfUsd = { ccy_mirrorFee: true, ccy_perMillion: 300, fee_fixed: 0, fee_percBips: 0, fee_min: 300, fee_max: 0, };
-            const gfUsdTx = await CONST.web3_tx('setFee_CcyType', [ CONST.ccyType.USD, CONST.nullAddr, gfUsd ], OWNER, OWNER_privKey);
+            await CONST.web3_tx('setFee_CcyType', [ CONST.ccyType.USD, CONST.nullAddr, gfUsd ], OWNER, OWNER_privKey);
         }
     });
 });

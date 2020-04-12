@@ -1,5 +1,4 @@
 require('dotenv').config();
-
 const _ = require('lodash');
 const chalk = require('chalk');
 const { DateTime } = require('luxon');
@@ -28,7 +27,7 @@ var ledgerOwners, accounts;
     //   (todo: when not set, it runs exactly one ftm() pass per FT [todo later - will need a reference data source])
     //
 
-    const ftm = require('./ft_settler').FT_Maintain;
+    const TakePay = require('./ft_settler').TakePay;
     var ctx;
 
     // startup
@@ -53,17 +52,31 @@ var ledgerOwners, accounts;
 
     // execute context
     const MAX_T = ctx[0].data.refs.length;
-    for (let T=0 ; T < MAX_T; T++) {
-        for (let ft of ctx) { // for each future token in context
-            
+    for (let T=0 ; T < MAX_T; T++) { // for time T
+
+        // PHASE (1) - process TAKE/PAY (all futures, all positions)
+        for (let ft of ctx) {
             const MP = ft.data.refs[T]; // mark price
             console.log(chalk.inverse(`>> T=${T}, ftId=${ft.ftId}: MP=${MP}...`));
             
+            // test - process actions
             await processTestContext(ft, T);
             
-            // main - process
-            await ftm(ft.ftId, MP);
+            // main - process take/pay for all positions on this future
+            // TODO: --> "TakePay_ForAllPostions" -- n TX's: 1 per FT pos-pair
+            await TakePay(ft.ftId, MP); //...
         }
+
+        // PHASE (2) - process POS_COMBINE (all futures, all positions)
+        //  (TX's contingent: we decide if we need combine)
+        //...
+
+        // TODO: --> want a second FT to test account-level liquidation...
+
+        // PHASE (3) - PROCESS LIQUIDATE (all futures, all positions)
+        //  by account-level liquidation trigger (i.e. net/total physical bal < reserved bal)
+        //  (TX's contingent: we decide if we need to liquidate)
+        //...
     }
     
     process.exit();
@@ -82,21 +95,37 @@ async function processTestContext(ft, T) {
             await CONST.web3_tx('fund', [ CONST.ccyType.USD, ccy_deposit.a, p.account ], O.addr, O.privKey);
         }
     }
-
-    // process ctx futures
+    
+    // process ctx withdraws
     for (let p of TEST_PARTICIPANTS) {
-        const ft_long = p.ft_longs[T];
-        if (ft_long.q) {
-            console.log(chalk.yellow.dim(`TEST_PARTICIPANT: ID=${p.id}, account=${p.account}`) + chalk.yellow(` ** OPEN FUTURE POSITION ** `), ft_long);
-            const shortAccount = TEST_PARTICIPANTS.find(p => p.id == ft_long.cid).account;
-            await CONST.web3_tx('openFtPos', [{
-                tokTypeId: ft.ftId, ledger_A: p.account, ledger_B: shortAccount, qty_A: ft_long.q, qty_B: ft_long.q * -1, price: ft_long.p
-            }], O.addr, O.privKey);
+        const ccy_withdraw = p.ccy_withdraws[T];
+        if (ccy_withdraw.a) {
+            console.log(chalk.yellow.dim(`TEST_PARTICIPANT: ID=${p.id}, account=${p.account}`) + chalk.yellow(` ** WITHDRAW ** `), ccy_withdraw);
+            await CONST.web3_tx('withdraw', [ CONST.ccyType.USD, ccy_withdraw.a, p.account ], O.addr, O.privKey);
         }
     }
 
-    // TODO: extend to withdraws
-    // TODO: extend to spot buys/sells (concurrent positions)
+    // todo: ...extend for minting, burning & spot trades
+
+    // process ctx new futures positions
+    for (let p of TEST_PARTICIPANTS) {
+        const ft_long = p.ft_longs[T];
+        if (ft_long.q) {
+            console.log(chalk.yellow.dim(`TEST_PARTICIPANT: ID=${p.id}, account=${p.account}`) + chalk.yellow(` ** OPEN FUTURES POSITION ** `), ft_long);
+            const shortAccount = TEST_PARTICIPANTS.find(p => p.id == ft_long.cid).account;
+            //const a_before = await CONST.web3_call('getLedgerEntry', [ p.account ]);
+            //const b_before = await CONST.web3_call('getLedgerEntry', [ shortAccount ]);
+            //console.log('a_before.ccys', a_before.ccys[0]);
+            //console.log('b_before.ccys', b_before.ccys[0]);
+            await CONST.web3_tx('openFtPos', [{
+                tokTypeId: ft.ftId, ledger_A: p.account, ledger_B: shortAccount, qty_A: ft_long.q, qty_B: ft_long.q * -1, price: ft_long.p
+            }], O.addr, O.privKey);
+            //const a_after = await CONST.web3_call('getLedgerEntry', [ p.account ]);
+            //const b_after = await CONST.web3_call('getLedgerEntry', [ shortAccount ]);
+            //console.log('a_after.ccys', a_after.ccys[0]);
+            //console.log('a_after.ccys', a_after.ccys[0]);
+        }
+    }
 
     console.groupEnd();
 }
@@ -133,6 +162,9 @@ async function initTestMode(testMode) {
             underlyerTypeId: CONST.tokenType.CORSIA,
                    refCcyId: CONST.ccyType.USD,
                contractSize: 1000,
+             feePerContract: 300, // $3.00
+             initMarginBips: 1000, // 10%
+              varMarginBips: 1000, // 10%
         }], O.addr, O.privKey);
     } else console.log(`${TEST_FT_1} future already present; nop.`);
     fts = (await CONST.web3_call('getSecTokenTypes', [])).tokenTypes.filter(p => p.settlementType == CONST.settlementType.FUTURE);
@@ -152,19 +184,21 @@ async function initTestMode(testMode) {
         ftId: fts.find(p => p.name == TEST_FT_1).id.toString(), data: {
             
 refs: // FT - underlyer settlement prices
-              [ 1.0,               1.1,               1.2,               1.3,               1.4,               1.5,               1.6,               1.7,                 1.8 ], 
+               [ 100,               101,               102,               103,               104,               105,               106,                107,                108 ], 
 
 TEST_PARTICIPANTS: [ // test participants
 { 
-          id: 1, account: freshAccounts[i++],
-ccy_deposits: [ {a:+1000},         {},                {},                {},                {},                {},                {},                 {},                 {} ], 
-    ft_longs: [ {q:1,cid:2,p:1.0}, {},                {},                {},                {},                {},                {},                 {},                 {} ],
- //ft_shorts: [ {},                {},                {},                {},                {},                {},                {},                 {},                 {} ],
+           id: 1, account: freshAccounts[i++],
+ ccy_deposits: [ {a:+20300},        {},                {},                {},                {},                {},                {},                 {},                 {} ], 
+ccy_withdraws: [ {a:+0000},         {},                {},                {},                {},                {},                {},                 {},                 {} ], 
+     ft_longs: [ {q:1,cid:2,p:100}, {},                {},                {},                {},                {},                {},                 {},                 {} ],
+  //ft_shorts: [ {},                {},                {},                {},                {},                {},                {},                 {},                 {} ],
 },
 { 
-          id: 2, account: freshAccounts[i++],
-ccy_deposits: [ {a:+1000},         {},                {},                {},                {},                {},                {},                 {},                 {} ],
-    ft_longs: [ {},                {},                {},                {},                {},                {},                {},                 {},                 {} ],
+           id: 2, account: freshAccounts[i++],
+ ccy_deposits: [ {a:+20300},        {},                {},                {},                {},                {},                {},                 {},                 {} ],
+ccy_withdraws: [ {a:+0000},         {},                {},                {},                {},                {},                {},                 {},                 {} ], 
+     ft_longs: [ {},                {},                {},                {},                {},                {},                {},                 {},                 {} ],
 }
 ]
     
