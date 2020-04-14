@@ -6,18 +6,7 @@ import "../Interfaces/StructLib.sol";
 library FuturesLib {
     event FutureOpenInterest(address indexed long, address indexed short, uint256 tokTypeId, uint256 qty, uint256 price);
     event SetInitialMargin(uint256 tokenTypeId, address indexed ledgerOwner, uint16 initMarginBips);
-
-    //
-    // PUBLIC - take & pay a position pair (settlement)
-    //
-    function takePay(
-        StructLib.LedgerStruct storage ld,
-        StructLib.StTypesStruct storage std,
-        uint256 short_stId,
-        int128  markPrice
-    ) public {
-        // todo? - recalculate margin requirement (calcPosMargin()) - i.e. allow changes of FT var-margin on open positions...
-    }
+    event dbg(int256 deltaShort, int256 deltaLong);
 
     //
     // PUBLIC - get/set initial margin ledger override
@@ -94,12 +83,14 @@ library FuturesLib {
         ld._sts[newId_A].currentQty = int64(a.qty_A);
         ld._sts[newId_A].ft_price = int128(a.price);
         ld._sts[newId_A].ft_lastMarkPrice = -1;
+        ld._sts[newId_A].ledgerOwner = a.ledger_A;
 
         //ld._sts[newId_B].batchId = 0;
         ld._sts[newId_B].mintedQty = int64(a.qty_B);
         ld._sts[newId_B].currentQty = int64(a.qty_B);
         ld._sts[newId_B].ft_price = int128(a.price);
         ld._sts[newId_B].ft_lastMarkPrice = -1;
+        ld._sts[newId_B].ledgerOwner = a.ledger_B;
 
         ld._tokens_currentMax_id += 2;
 
@@ -113,6 +104,78 @@ library FuturesLib {
             emit FutureOpenInterest(a.ledger_B, a.ledger_A, a.tokTypeId, uint256(a.qty_B), uint256(a.price));
     }
 
+    //
+    // PUBLIC - take & pay a position pair (settlement)
+    //
+    function takePay(
+        StructLib.LedgerStruct storage ld,
+        StructLib.StTypesStruct storage std,
+        uint256 tokTypeId,
+        uint256 short_stId,
+        int128  markPrice
+    ) public {
+        // ...todo? - recalculate margin requirement (calcPosMargin()) - i.e. allow changes of FT var-margin on open positions...
+
+        require(tokTypeId >= 0 && tokTypeId <= std._tt_Count, "Bad tokTypeId");
+        require(std._tt_Settle[tokTypeId] == StructLib.SettlementType.FUTURE, "Bad token settlement type");
+        StructLib.FutureTokenTypeArgs fta = std._tt_ft[tokTypeId];
+        require(fta.contractSize > 0, "Unexpected token type FutureTokenTypeArgs");
+
+        StructLib.PackedSt storage shortSt = ld._sts[short_stId];
+        require(shortSt.batchId == 0 && shortSt.ft_price != 0, "Bad (unexpected data) on explicit short token");
+        require(shortSt.currentQty < 0, "Bad (non-short quantity) on explicit short token");
+        require(shortSt.ledgerOwner != address(0x0), "Bad token ledger owner on explicit short token");
+
+        StructLib.PackedSt storage longSt = ld._sts[short_stId + 1];
+        require(longSt.batchId == 0 && longSt.ft_price != 0, "Bad (unexpected data) on implied long token");
+        require(longSt.currentQty > 0, "Bad (non-short quantity) on implied long token");
+        require(longSt.ledgerOwner != address(0x0), "Bad token ledger owner on implied long token");
+
+        require(markPrice >= 0, "Bad markPrice"); // allow zero for marking
+
+        require(tokenExistsOnLedger(ld, tokTypeId, shortSt, short_stId), "Bad or missing ledger token type on explicit short token");
+        require(tokenExistsOnLedger(ld, tokTypeId, longSt, short_stId + 1), "Bad or missing ledger token type on implied long token");
+
+        int256 deltaShort = calcTakePay(ld, fta, tokTypeId, shortSt, markPrice);
+        int256 deltaLong = calcTakePay(ld, fta, tokTypeId, longSt, markPrice);
+        emit dbg(deltaShort, deltaLong);
+        require(deltaShort + deltaLong == 0, "Unexpected net delta short/long");
+
+        // todo: determine which is ITM/OTM... apply cap on OTM-take value... apply take/pay on physical cash (balance)
+        // (note - agnostic on the liquidation effect, if any)
+    }
+
+    // returns uncapped take/pay settlment amount for the given position
+    function calcTakePay(
+        StructLib.LedgerStruct storage ld,
+        StructLib.FutureTokenTypeArgs storage fta,
+        uint256 tokTypeId,
+        StructLib.PackedSt storage st,
+        int128  markPrice
+    ) private returns(int256) {
+        int256 delta = (markPrice - (st.ft_lastMarkPrice == -1
+                            ? st.ft_price
+                            : st.ft_lastMarkPrice)) * fta.contractSize * st.currentQty;
+        return delta;
+    }
+
+    // checks if the supplied token of supplied type is present on the supplied ledger entry
+    function tokenExistsOnLedger(
+        StructLib.LedgerStruct storage ld,
+        uint256 tokTypeId,
+        StructLib.PackedSt storage st,
+        uint256 stId
+    ) private returns(bool) {
+        for (uint256 x = 0; x < ld._ledger[st.ledgerOwner].tokenType_stIds[tokTypeId].length ; x++) {
+            if (ld._ledger[st.ledgerOwner].tokenType_stIds[tokTypeId][x] == stId) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    // return margin required for the given position
     function calcPosMargin(
         StructLib.LedgerStruct storage ld,
         StructLib.StTypesStruct storage std,
@@ -120,7 +183,7 @@ library FuturesLib {
         uint256 tokTypeId,
         int256 posSize,
         int128 price
-    ) private returns(int256)  {
+    ) private returns(int256) {
 
         uint16 totMargin = (ld._ledger[ledgerOwner].ft_initMarginBips[tokTypeId] != 0
                                 ? ld._ledger[ledgerOwner].ft_initMarginBips[tokTypeId]
