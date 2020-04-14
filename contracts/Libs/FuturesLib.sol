@@ -8,6 +8,18 @@ library FuturesLib {
     event SetInitialMargin(uint256 tokenTypeId, address indexed ledgerOwner, uint16 initMarginBips);
 
     //
+    // PUBLIC - take & pay a position pair (settlement)
+    //
+    function takePay(
+        StructLib.LedgerStruct storage ld,
+        StructLib.StTypesStruct storage std,
+        uint256 short_stId,
+        int128  markPrice
+    ) public {
+        // todo? - recalculate margin requirement (calcPosMargin()) - i.e. allow changes of FT var-margin on open positions...
+    }
+
+    //
     // PUBLIC - get/set initial margin ledger override
     //
     function setInitMargin_TokType(

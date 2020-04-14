@@ -103,6 +103,13 @@ contract StFutures is Owned,
         FuturesLib.setInitMargin_TokType(ld, std, ledgerOwner, tokTypeId, initMarginBips);
     }
 
+    function takePay(
+        uint256 short_stId,
+        int128  markPrice
+    ) public onlyOwner() {
+        FuturesLib.takePay(ld, std, short_stId, markPrice);
+    }
+
     function getInitMargin(uint256 tokTypeId, address ledgerOwner)
     external view returns (uint16) {
         return ld._ledger[ledgerOwner].ft_initMarginBips[tokTypeId];
