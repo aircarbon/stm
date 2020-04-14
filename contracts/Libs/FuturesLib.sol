@@ -118,7 +118,7 @@ library FuturesLib {
 
         require(tokTypeId >= 0 && tokTypeId <= std._tt_Count, "Bad tokTypeId");
         require(std._tt_Settle[tokTypeId] == StructLib.SettlementType.FUTURE, "Bad token settlement type");
-        StructLib.FutureTokenTypeArgs fta = std._tt_ft[tokTypeId];
+        StructLib.FutureTokenTypeArgs storage fta = std._tt_ft[tokTypeId];
         require(fta.contractSize > 0, "Unexpected token type FutureTokenTypeArgs");
 
         StructLib.PackedSt storage shortSt = ld._sts[short_stId];
@@ -136,12 +136,17 @@ library FuturesLib {
         require(tokenExistsOnLedger(ld, tokTypeId, shortSt, short_stId), "Bad or missing ledger token type on explicit short token");
         require(tokenExistsOnLedger(ld, tokTypeId, longSt, short_stId + 1), "Bad or missing ledger token type on implied long token");
 
+        // get delta each side
         int256 deltaShort = calcTakePay(ld, fta, tokTypeId, shortSt, markPrice);
         int256 deltaLong = calcTakePay(ld, fta, tokTypeId, longSt, markPrice);
-        emit dbg(deltaShort, deltaLong);
         require(deltaShort + deltaLong == 0, "Unexpected net delta short/long");
+        emit dbg(deltaShort, deltaLong);
 
-        // todo: determine which is ITM/OTM... apply cap on OTM-take value... apply take/pay on physical cash (balance)
+        // get OTM/ITM sides
+        uint256 itm_stId = deltaShort == deltaLong ? short_stId + 0 : deltaShort > 0 ? short_stId + 0 : short_stId + 1;
+        uint256 otm_stId = deltaShort == deltaLong ? short_stId + 1 :  deltaLong > 0 ? short_stId + 1 : short_stId + 0;
+
+        // todo: detapply cap on OTM-take value... apply take/pay on physical cash (balance)
         // (note - agnostic on the liquidation effect, if any)
     }
 
