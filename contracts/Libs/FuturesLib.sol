@@ -6,7 +6,8 @@ import "../Interfaces/StructLib.sol";
 library FuturesLib {
     event FutureOpenInterest(address indexed long, address indexed short, uint256 tokTypeId, uint256 qty, uint256 price);
     event SetInitialMargin(uint256 tokenTypeId, address indexed ledgerOwner, uint16 initMarginBips);
-    event dbg(int256 deltaShort, int256 deltaLong);
+    event TakePay(address indexed otm, address indexed itm, uint256 delta, uint256 done);
+    //event dbg(int256 short_Delta, int256 long_Delta, int256 itm_Delta, int256 otm_Delta, address itm, address otm);
 
     //
     // PUBLIC - get/set initial margin ledger override
@@ -107,6 +108,10 @@ library FuturesLib {
     //
     // PUBLIC - take & pay a position pair (settlement)
     //
+    struct TakePayVars {
+        StructLib.PackedSt st;
+        int256 delta;
+    }
     function takePay(
         StructLib.LedgerStruct storage ld,
         StructLib.StTypesStruct storage std,
@@ -121,12 +126,14 @@ library FuturesLib {
         StructLib.FutureTokenTypeArgs storage fta = std._tt_ft[tokTypeId];
         require(fta.contractSize > 0, "Unexpected token type FutureTokenTypeArgs");
 
-        StructLib.PackedSt storage shortSt = ld._sts[short_stId];
+        uint256 long_stId = short_stId + 1;
+
+        StructLib.PackedSt memory shortSt = ld._sts[short_stId];
         require(shortSt.batchId == 0 && shortSt.ft_price != 0, "Bad (unexpected data) on explicit short token");
         require(shortSt.currentQty < 0, "Bad (non-short quantity) on explicit short token");
         require(shortSt.ledgerOwner != address(0x0), "Bad token ledger owner on explicit short token");
 
-        StructLib.PackedSt storage longSt = ld._sts[short_stId + 1];
+        StructLib.PackedSt memory longSt = ld._sts[long_stId];
         require(longSt.batchId == 0 && longSt.ft_price != 0, "Bad (unexpected data) on implied long token");
         require(longSt.currentQty > 0, "Bad (non-short quantity) on implied long token");
         require(longSt.ledgerOwner != address(0x0), "Bad token ledger owner on implied long token");
@@ -134,20 +141,50 @@ library FuturesLib {
         require(markPrice >= 0, "Bad markPrice"); // allow zero for marking
 
         require(tokenExistsOnLedger(ld, tokTypeId, shortSt, short_stId), "Bad or missing ledger token type on explicit short token");
-        require(tokenExistsOnLedger(ld, tokTypeId, longSt, short_stId + 1), "Bad or missing ledger token type on implied long token");
+        require(tokenExistsOnLedger(ld, tokTypeId, longSt, long_stId), "Bad or missing ledger token type on implied long token");
 
         // get delta each side
-        int256 deltaShort = calcTakePay(ld, fta, tokTypeId, shortSt, markPrice);
-        int256 deltaLong = calcTakePay(ld, fta, tokTypeId, longSt, markPrice);
-        require(deltaShort + deltaLong == 0, "Unexpected net delta short/long");
-        emit dbg(deltaShort, deltaLong);
+        int256 short_Delta = calcTakePay(ld, fta, tokTypeId, shortSt, markPrice);
+        int256 long_Delta = calcTakePay(ld, fta, tokTypeId, longSt, markPrice);
+        require(short_Delta + long_Delta == 0, "Unexpected net delta short/long");
 
         // get OTM/ITM sides
-        uint256 itm_stId = deltaShort == deltaLong ? short_stId + 0 : deltaShort > 0 ? short_stId + 0 : short_stId + 1;
-        uint256 otm_stId = deltaShort == deltaLong ? short_stId + 1 :  deltaLong > 0 ? short_stId + 1 : short_stId + 0;
+        TakePayVars memory itm;
+        TakePayVars memory otm;
+        // StructLib.PackedSt memory itm_St;
+        // StructLib.PackedSt memory otm_St;
+        // int256 itm_Delta;
+        // int256 otm_Delta;
+        if (short_Delta == long_Delta) {
+            return;
+        }
+        else if (short_Delta > 0) {
+            itm = TakePayVars({ st: shortSt, delta: short_Delta });
+            otm = TakePayVars({ st: longSt,  delta: long_Delta  });
+        }
+        else {
+            itm = TakePayVars({ st: longSt,  delta: long_Delta  });
+            otm = TakePayVars({ st: shortSt, delta: short_Delta });
+        }
+        require(otm.delta < 0, "Unexpected otm_Delta");
+        require(itm.delta > 0, "Unexpected itm_Delta");
 
-        // todo: detapply cap on OTM-take value... apply take/pay on physical cash (balance)
-        // (note - agnostic on the liquidation effect, if any)
+        // cap OTM side at physical balance
+        int256 otm_Take = otm.delta * -1;
+        if (otm_Take > ld._ledger[otm.st.ledgerOwner].ccyType_balance[fta.refCcyId]) {
+            otm_Take = ld._ledger[otm.st.ledgerOwner].ccyType_balance[fta.refCcyId] * -1;
+        }
+        require(otm_Take >= 0, "Unexpected otm_Take");
+
+        // updated balances
+        StructLib.transferCcy(ld, StructLib.TransferCcyArgs({
+            from: otm.st.ledgerOwner, to: itm.st.ledgerOwner, ccyTypeId: fta.refCcyId, amount: uint256(otm_Take), transferType: StructLib.TransferType.TakePay }));
+        //ld._ledger[otm.st.ledgerOwner].ccyType_balance[fta.refCcyId] -= otm_Take;
+        //ld._ledger[itm.st.ledgerOwner].ccyType_balance[fta.refCcyId] += otm_Take;
+
+        emit TakePay(otm.st.ledgerOwner, itm.st.ledgerOwner, uint256(itm.delta), uint256(otm_Take));
+
+        //emit dbg(short_Delta, long_Delta, itm.delta, otm.delta, itm.st.ledgerOwner, otm.st.ledgerOwner);
     }
 
     // returns uncapped take/pay settlment amount for the given position
@@ -155,7 +192,7 @@ library FuturesLib {
         StructLib.LedgerStruct storage ld,
         StructLib.FutureTokenTypeArgs storage fta,
         uint256 tokTypeId,
-        StructLib.PackedSt storage st,
+        StructLib.PackedSt memory st,
         int128  markPrice
     ) private returns(int256) {
         int256 delta = (markPrice - (st.ft_lastMarkPrice == -1
@@ -168,7 +205,7 @@ library FuturesLib {
     function tokenExistsOnLedger(
         StructLib.LedgerStruct storage ld,
         uint256 tokTypeId,
-        StructLib.PackedSt storage st,
+        StructLib.PackedSt memory st,
         uint256 stId
     ) private returns(bool) {
         for (uint256 x = 0; x < ld._ledger[st.ledgerOwner].tokenType_stIds[tokTypeId].length ; x++) {
@@ -178,7 +215,6 @@ library FuturesLib {
         }
         return false;
     }
-
 
     // return margin required for the given position
     function calcPosMargin(

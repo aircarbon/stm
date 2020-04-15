@@ -63,7 +63,7 @@ contract StMaster is IStMaster, IPublicViews,
     event TransferedPartialSecToken(address indexed from, address indexed to, uint256 indexed splitFromSecTokenId, uint256 newSecTokenId, uint256 mergedToSecTokenId, uint256 qty, TransferType transferType);
     event TradedCcyTok(uint256 ccyTypeId, uint256 ccyAmount, uint256 tokTypeId, address indexed tokensFrom, address indexed ccyFrom, uint256 tokQty);
     // StructLib events
-    //enum TransferType { User, ExchangeFee, OriginatorFee }
+    //enum TransferType { User, ExchangeFee, OriginatorFee, TakePay }
     event TransferedLedgerCcy(address indexed from, address indexed to, uint256 ccyTypeId, uint256 amount, TransferType transferType);
     event ReervedLedgerCcy(address indexed ledgerOwner, uint256 ccyTypeId, uint256 amount);
     // SpotFeeLib events
@@ -84,7 +84,8 @@ contract StMaster is IStMaster, IPublicViews,
     // FuturesLib events
     event FutureOpenInterest(address indexed long, address indexed short, uint256 tokTypeId, uint256 qty, uint256 price);
     event SetInitialMargin(uint256 tokenTypeId, address indexed ledgerOwner, uint16 initMarginBips);
-    event dbg(int256 deltaShort, int256 deltaLong);
+    event TakePay(address indexed otm, address indexed itm, uint256 delta, uint256 done);
+    //event dbg(int256 short_Delta, int256 long_Delta, int256 itm_Delta, int256 otm_Delta, address itm, address otm);
 
     constructor(
         StructLib.ContractType        _contractType,

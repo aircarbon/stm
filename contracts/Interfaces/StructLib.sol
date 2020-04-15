@@ -4,7 +4,7 @@ pragma experimental ABIEncoderV2;
 library StructLib {
 
     // EVENTS - SHARED (FuturesLib & TransferLib)
-    enum TransferType { User, ExchangeFee, OriginatorFee }
+    enum TransferType { User, ExchangeFee, OriginatorFee, TakePay }
     event TransferedLedgerCcy(address indexed from, address indexed to, uint256 ccyTypeId, uint256 amount, TransferType transferType);
     event ReervedLedgerCcy(address indexed ledgerOwner, uint256 ccyTypeId, uint256 amount);
 
@@ -23,17 +23,17 @@ library StructLib {
         StructLib.LedgerStruct storage ld,
         TransferCcyArgs memory a)
     public {
-        // todo: validate against available...
+        if (a.amount > 0) {
+            ld._ledger[a.from].ccyType_balance[a.ccyTypeId] -= int256(a.amount);
+            ld._ledger[a.to].ccyType_balance[a.ccyTypeId] += int256(a.amount);
 
-        ld._ledger[a.from].ccyType_balance[a.ccyTypeId] -= int256(a.amount);
-        ld._ledger[a.to].ccyType_balance[a.ccyTypeId] += int256(a.amount);
+            ld._ccyType_totalTransfered[a.ccyTypeId] += a.amount;
 
-        ld._ccyType_totalTransfered[a.ccyTypeId] += a.amount;
+            emit StructLib.TransferedLedgerCcy(a.from, a.to, a.ccyTypeId, a.amount, a.transferType);
 
-        emit StructLib.TransferedLedgerCcy(a.from, a.to, a.ccyTypeId, a.amount, a.transferType);
-
-        if (a.transferType == StructLib.TransferType.ExchangeFee) {
-           ld._ccyType_totalFeesPaid[a.ccyTypeId] += a.amount;
+            if (a.transferType == StructLib.TransferType.ExchangeFee) {
+                ld._ccyType_totalFeesPaid[a.ccyTypeId] += a.amount;
+            }
         }
     }
 

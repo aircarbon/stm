@@ -27,6 +27,8 @@ module.exports = {
         console.log(`Fetched ${ledgerOwners.length} ledger entries`);
         console.log(`shortPosIds`, shortPosIds.join(','));
 
+        // *** TODO: FIFO -- order by posId ASC ***
+
         // take/pay each pos-pair
         for (posId of shortPosIds) {
             //
