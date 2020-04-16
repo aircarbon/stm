@@ -146,12 +146,13 @@ library FuturesLib {
         // get delta each side
         int256 short_Delta = calcTakePay(ld, fta, tokTypeId, shortSt, markPrice);
         int256 long_Delta = calcTakePay(ld, fta, tokTypeId, longSt, markPrice);
-        require(short_Delta + long_Delta == 0, "Unexpected net delta short/long");
+        //require(short_Delta + long_Delta == 0, "Unexpected net delta short/long");
 
         // get OTM/ITM sides
         TakePayVars memory itm;
         TakePayVars memory otm;
         if (short_Delta == long_Delta) {
+            emit TakePay(shortSt.ft_ledgerOwner, longSt.ft_ledgerOwner, 0, 0);
             return;
         }
         else if (short_Delta > 0) {
@@ -162,15 +163,15 @@ library FuturesLib {
             itm = TakePayVars({  st: longSt, delta: long_Delta  });
             otm = TakePayVars({ st: shortSt, delta: short_Delta });
         }
-        require(otm.delta < 0, "Unexpected otm_Delta");
-        require(itm.delta > 0, "Unexpected itm_Delta");
+        //require(otm.delta < 0, "Unexpected otm_Delta");
+        //require(itm.delta > 0, "Unexpected itm_Delta");
 
         // cap OTM side at physical balance
         int256 otm_Take = otm.delta * -1;
         if (otm_Take > ld._ledger[otm.st.ft_ledgerOwner].ccyType_balance[fta.refCcyId]) {
-            otm_Take = ld._ledger[otm.st.ft_ledgerOwner].ccyType_balance[fta.refCcyId] * -1;
+            otm_Take = ld._ledger[otm.st.ft_ledgerOwner].ccyType_balance[fta.refCcyId];
         }
-        require(otm_Take >= 0, "Unexpected otm_Take");
+        //require(otm_Take >= 0, "Unexpected otm_Take");
 
         // updated balances
         StructLib.transferCcy(ld, StructLib.TransferCcyArgs({
@@ -181,8 +182,6 @@ library FuturesLib {
         transferType: StructLib.TransferType.TakePay
         }));
         emit TakePay(otm.st.ft_ledgerOwner, itm.st.ft_ledgerOwner, uint256(itm.delta), uint256(otm_Take));
-
-        //emit dbg(short_Delta, long_Delta, itm.delta, otm.delta, itm.st.ledgerOwner, otm.st.ledgerOwner);
     }
 
     // returns uncapped take/pay settlment amount for the given position

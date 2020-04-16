@@ -25,7 +25,7 @@ const HDWalletProvider = require("@truffle/hdwallet-provider");
 const DEV_MNEMONIC = require('./dev_mnemonic.js').MNEMONIC;
 const PROD_MNEMONIC = '...'; // **PROD TODO
 
-const gweiDeployment = "20";
+const gweiDeployment = "5";
 
 module.exports = {
   /**

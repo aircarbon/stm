@@ -10,21 +10,62 @@ module.exports = {
 
     takePay: async (a) => {
         const { stm, accounts,
+            tokTypeId,
             ftId,
             shortStId,
             markPrice,
         } = a;
 
+        const ft = (await stm.getSecTokenTypes()).tokenTypes.find(p => p.id == tokTypeId);
+        const longStId = Number(shortStId) + 1;
+        
         const stShort = await stm.getSecToken(shortStId);
-        const stLong = await stm.getSecToken(shortStId + 1);
+        const stLong = await stm.getSecToken(longStId);
 
+        //console.log('stShort', stShort);
+        //console.log('stLong', stLong);
         const ledgerShort_before = await stm.getLedgerEntry(stShort.ft_ledgerOwner);
         const ledgerLong_before = await stm.getLedgerEntry(stLong.ft_ledgerOwner);
         
         const tx = await stm.takePay(ftId, shortStId, markPrice, { from: accounts[0] });
-
+        
+        var itm, otm, delta, done;
+        truffleAssert.eventEmitted(tx, 'TakePay', ev => {
+            itm = ev.itm;
+            otm = ev.otm;
+            delta = ev.delta;
+            done = ev.done;
+            return true;
+        });
         const ledgerShort_after = await stm.getLedgerEntry(stShort.ft_ledgerOwner);
         const ledgerLong_after = await stm.getLedgerEntry(stLong.ft_ledgerOwner);
+
+        //console.log('delta', delta.toString());
+        //console.log('done', done.toString());
+        //console.log('itm (ev)', itm);
+        //console.log('otm (ev)', otm);
+        //console.log('stShort.ft_ledgerOwner', stShort.ft_ledgerOwner);
+        //console.log('stLong.ft_ledgerOwner', stLong.ft_ledgerOwner);
+
+        // check balance updates
+        var itm_ccyDelta, otm_ccyDelta;
+        if (itm.toLowerCase() == stShort.ft_ledgerOwner.toLowerCase()) {
+            itm_ccyDelta = new BN(ledgerShort_after.ccys.find(p => p.id == ft.refCcyId).balance)
+                            .sub(new BN(ledgerShort_before.ccys.find(p => p.id == ft.refCcyId).balance));
+
+            otm_ccyDelta = new BN(ledgerLong_after.ccys.find(p => p.id == ft.refCcyId).balance)
+                            .sub(new BN(ledgerLong_before.ccys.find(p => p.id == ft.refCcyId).balance));
+        }
+        else if (itm.toLowerCase() == stLong.ft_ledgerOwner.toLowerCase()) {
+            otm_ccyDelta = new BN(ledgerShort_after.ccys.find(p => p.id == ft.refCcyId).balance)
+                            .sub(new BN(ledgerShort_before.ccys.find(p => p.id == ft.refCcyId).balance));
+
+            itm_ccyDelta = new BN(ledgerLong_after.ccys.find(p => p.id == ft.refCcyId).balance)
+                            .sub(new BN(ledgerLong_before.ccys.find(p => p.id == ft.refCcyId).balance));
+        }
+        else throw('Unexpected ledger itm/otm values');
+        assert(itm_ccyDelta.eq(done), 'unexpected ITM ccy delta');
+        assert(otm_ccyDelta.eq(done.neg()), 'unexpected OTM ccy delta');
 
         return { 
             tx, stShort, stLong,
