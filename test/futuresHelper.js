@@ -8,6 +8,31 @@ const { DateTime } = require('luxon');
 
 module.exports = {
 
+    takePay: async (a) => {
+        const { stm, accounts,
+            ftId,
+            shortStId,
+            markPrice,
+        } = a;
+
+        const stShort = await stm.getSecToken(shortStId);
+        const stLong = await stm.getSecToken(shortStId + 1);
+
+        const ledgerShort_before = await stm.getLedgerEntry(stShort.ft_ledgerOwner);
+        const ledgerLong_before = await stm.getLedgerEntry(stLong.ft_ledgerOwner);
+        
+        const tx = await stm.takePay(ftId, shortStId, markPrice, { from: accounts[0] });
+
+        const ledgerShort_after = await stm.getLedgerEntry(stShort.ft_ledgerOwner);
+        const ledgerLong_after = await stm.getLedgerEntry(stLong.ft_ledgerOwner);
+
+        return { 
+            tx, stShort, stLong,
+            ledgerShort_before, ledgerLong_before,
+            ledgerShort_after, ledgerLong_after,
+        };
+    },
+
     openFtPos: async (a) => {
         const { stm, accounts,
                 tokTypeId,

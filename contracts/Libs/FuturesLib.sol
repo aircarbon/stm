@@ -84,14 +84,14 @@ library FuturesLib {
         ld._sts[newId_A].currentQty = int64(a.qty_A);
         ld._sts[newId_A].ft_price = int128(a.price);
         ld._sts[newId_A].ft_lastMarkPrice = -1;
-        ld._sts[newId_A].ledgerOwner = a.ledger_A;
+        ld._sts[newId_A].ft_ledgerOwner = a.ledger_A;
 
         //ld._sts[newId_B].batchId = 0;
         ld._sts[newId_B].mintedQty = int64(a.qty_B);
         ld._sts[newId_B].currentQty = int64(a.qty_B);
         ld._sts[newId_B].ft_price = int128(a.price);
         ld._sts[newId_B].ft_lastMarkPrice = -1;
-        ld._sts[newId_B].ledgerOwner = a.ledger_B;
+        ld._sts[newId_B].ft_ledgerOwner = a.ledger_B;
 
         ld._tokens_currentMax_id += 2;
 
@@ -131,12 +131,12 @@ library FuturesLib {
         StructLib.PackedSt memory shortSt = ld._sts[short_stId];
         require(shortSt.batchId == 0 && shortSt.ft_price != 0, "Bad (unexpected data) on explicit short token");
         require(shortSt.currentQty < 0, "Bad (non-short quantity) on explicit short token");
-        require(shortSt.ledgerOwner != address(0x0), "Bad token ledger owner on explicit short token");
+        require(shortSt.ft_ledgerOwner != address(0x0), "Bad token ledger owner on explicit short token");
 
         StructLib.PackedSt memory longSt = ld._sts[long_stId];
         require(longSt.batchId == 0 && longSt.ft_price != 0, "Bad (unexpected data) on implied long token");
         require(longSt.currentQty > 0, "Bad (non-short quantity) on implied long token");
-        require(longSt.ledgerOwner != address(0x0), "Bad token ledger owner on implied long token");
+        require(longSt.ft_ledgerOwner != address(0x0), "Bad token ledger owner on implied long token");
 
         require(markPrice >= 0, "Bad markPrice"); // allow zero for marking
 
@@ -151,19 +151,15 @@ library FuturesLib {
         // get OTM/ITM sides
         TakePayVars memory itm;
         TakePayVars memory otm;
-        // StructLib.PackedSt memory itm_St;
-        // StructLib.PackedSt memory otm_St;
-        // int256 itm_Delta;
-        // int256 otm_Delta;
         if (short_Delta == long_Delta) {
             return;
         }
         else if (short_Delta > 0) {
             itm = TakePayVars({ st: shortSt, delta: short_Delta });
-            otm = TakePayVars({ st: longSt,  delta: long_Delta  });
+            otm = TakePayVars({  st: longSt, delta: long_Delta  });
         }
         else {
-            itm = TakePayVars({ st: longSt,  delta: long_Delta  });
+            itm = TakePayVars({  st: longSt, delta: long_Delta  });
             otm = TakePayVars({ st: shortSt, delta: short_Delta });
         }
         require(otm.delta < 0, "Unexpected otm_Delta");
@@ -171,18 +167,20 @@ library FuturesLib {
 
         // cap OTM side at physical balance
         int256 otm_Take = otm.delta * -1;
-        if (otm_Take > ld._ledger[otm.st.ledgerOwner].ccyType_balance[fta.refCcyId]) {
-            otm_Take = ld._ledger[otm.st.ledgerOwner].ccyType_balance[fta.refCcyId] * -1;
+        if (otm_Take > ld._ledger[otm.st.ft_ledgerOwner].ccyType_balance[fta.refCcyId]) {
+            otm_Take = ld._ledger[otm.st.ft_ledgerOwner].ccyType_balance[fta.refCcyId] * -1;
         }
         require(otm_Take >= 0, "Unexpected otm_Take");
 
         // updated balances
         StructLib.transferCcy(ld, StructLib.TransferCcyArgs({
-            from: otm.st.ledgerOwner, to: itm.st.ledgerOwner, ccyTypeId: fta.refCcyId, amount: uint256(otm_Take), transferType: StructLib.TransferType.TakePay }));
-        //ld._ledger[otm.st.ledgerOwner].ccyType_balance[fta.refCcyId] -= otm_Take;
-        //ld._ledger[itm.st.ledgerOwner].ccyType_balance[fta.refCcyId] += otm_Take;
-
-        emit TakePay(otm.st.ledgerOwner, itm.st.ledgerOwner, uint256(itm.delta), uint256(otm_Take));
+                from: otm.st.ft_ledgerOwner,
+                  to: itm.st.ft_ledgerOwner,
+           ccyTypeId: fta.refCcyId,
+              amount: uint256(otm_Take),
+        transferType: StructLib.TransferType.TakePay
+        }));
+        emit TakePay(otm.st.ft_ledgerOwner, itm.st.ft_ledgerOwner, uint256(itm.delta), uint256(otm_Take));
 
         //emit dbg(short_Delta, long_Delta, itm.delta, otm.delta, itm.st.ledgerOwner, otm.st.ledgerOwner);
     }
@@ -208,8 +206,8 @@ library FuturesLib {
         StructLib.PackedSt memory st,
         uint256 stId
     ) private returns(bool) {
-        for (uint256 x = 0; x < ld._ledger[st.ledgerOwner].tokenType_stIds[tokTypeId].length ; x++) {
-            if (ld._ledger[st.ledgerOwner].tokenType_stIds[tokTypeId][x] == stId) {
+        for (uint256 x = 0; x < ld._ledger[st.ft_ledgerOwner].tokenType_stIds[tokTypeId].length ; x++) {
+            if (ld._ledger[st.ft_ledgerOwner].tokenType_stIds[tokTypeId][x] == stId) {
                 return true;
             }
         }

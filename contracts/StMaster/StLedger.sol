@@ -58,7 +58,8 @@ contract StLedger is IStLedger,
             currentQty: ld._sts[id].currentQty,
                batchId: ld._sts[id].batchId,
               ft_price: ld._sts[id].ft_price,
-      ft_lastMarkPrice: ld._sts[id].ft_lastMarkPrice
+      ft_lastMarkPrice: ld._sts[id].ft_lastMarkPrice,
+        ft_ledgerOwner: ld._sts[id].ft_ledgerOwner
         });
     }
 

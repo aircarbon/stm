@@ -149,6 +149,7 @@ library StructLib {
             int64   currentQty;
             int128  ft_price;
             int128  ft_lastMarkPrice;
+            address ft_ledgerOwner;
         }
         struct LedgerCcyReturn {
             uint256 ccyTypeId;
@@ -165,16 +166,18 @@ library StructLib {
         int64  currentQty;                                      // current (variable) unit qty in the ST (i.e. burned = currentQty - mintedQty)
         int128 ft_price;                                        // [FUTURE types only]
         int128 ft_lastMarkPrice;                                // [FUTURE types only]
-        address ledgerOwner;                                    // [FUTURE types only] -- for takePay() lookup of ledger owner by ST
+        address ft_ledgerOwner;                                 // [FUTURE types only] -- for takePay() lookup of ledger owner by ST
     }
         struct SecTokenReturn { // todo: drop this - use LedgerSecTokenReturn (would need tokTypeId to be packed in PackedSt struct...)
             bool    exists;                                     // for existence check by id
             uint256 id;                                         // global sequential id: 1-based
-            int256  mintedQty;                                  // initial unit qty minted in the ST
-            int256  currentQty;                                 // current (variable) unit qty in the ST (i.e. burned = currentQty - mintedQty)
-            uint64  batchId;                                    // parent batch of the ST
-            int128  ft_price;                                   // entry price of the future position   
-            int128  ft_lastMarkPrice;                           // last marked reference price for the future position, or -1 if never marked
+            int256  mintedQty;
+            int256  currentQty;
+            uint64  batchId;
+            int128  ft_price;
+            int128  ft_lastMarkPrice;
+            address ft_ledgerOwner;
+
         }
     struct PackedStTotals {
         uint80 transferedQty;

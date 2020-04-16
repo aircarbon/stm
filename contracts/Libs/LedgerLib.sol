@@ -145,7 +145,8 @@ library LedgerLib {
                 st.mintedQty,
                 st.currentQty,
                 st.ft_price,
-                st.ft_lastMarkPrice
+                st.ft_lastMarkPrice,
+                st.ft_ledgerOwner
             ));
 
             // consistency check
@@ -230,7 +231,8 @@ library LedgerLib {
                       mintedQty: ld._sts[stId].mintedQty,
                      currentQty: ld._sts[stId].currentQty,
                        ft_price: ld._sts[stId].ft_price,
-               ft_lastMarkPrice: ld._sts[stId].ft_lastMarkPrice
+               ft_lastMarkPrice: ld._sts[stId].ft_lastMarkPrice,
+                 ft_ledgerOwner: ld._sts[stId].ft_ledgerOwner
                 });
                 flatSecTokenNdx++;
             }

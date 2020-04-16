@@ -349,7 +349,8 @@ contract("StMaster", accounts => {
                     p.mintedQty,
                     p.currentQty,
                     p.ft_price,
-                    p.ft_lastMarkPrice
+                    p.ft_lastMarkPrice,
+                    p.ft_ledgerOwner
                 );
             }
         }
