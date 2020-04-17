@@ -7,7 +7,7 @@ library FuturesLib {
     event FutureOpenInterest(address indexed long, address indexed short, uint256 tokTypeId, uint256 qty, uint256 price);
     event SetInitialMargin(uint256 tokenTypeId, address indexed ledgerOwner, uint16 initMarginBips);
     event TakePay(address indexed otm, address indexed itm, uint256 delta, uint256 done);
-    //event dbg(int256 short_Delta, int256 long_Delta, int256 itm_Delta, int256 otm_Delta, address itm, address otm);
+    event dbg(int256 feePerSide);
 
     //
     // PUBLIC - get/set initial margin ledger override
@@ -146,16 +146,19 @@ library FuturesLib {
         // get delta each side
         int256 short_Delta = calcTakePay(ld, fta, a.tokTypeId, shortSt, a.markPrice);
         int256 long_Delta = calcTakePay(ld, fta, a.tokTypeId, longSt, a.markPrice);
-        //require(short_Delta + long_Delta == 0, "Unexpected net delta short/long");
+        require(short_Delta + long_Delta == 0, "Unexpected net delta short/long");
 
         // get OTM/ITM sides
         TakePayVars memory itm;
         TakePayVars memory otm;
-        if (short_Delta == long_Delta) {
-            emit TakePay(shortSt.ft_ledgerOwner, longSt.ft_ledgerOwner, 0, 0);
-            return;
-        }
-        else if (short_Delta > 0) {
+        // if (short_Delta == long_Delta) {
+        //     itm = TakePayVars({ st: shortSt, delta: short_Delta });
+        //     otm = TakePayVars({  st: longSt, delta: long_Delta  });
+
+        //     //emit TakePay(shortSt.ft_ledgerOwner, longSt.ft_ledgerOwner, 0, 0);
+        //     //return;
+        // }
+        if (short_Delta == long_Delta || short_Delta > 0) {
             itm = TakePayVars({ st: shortSt, delta: short_Delta });
             otm = TakePayVars({  st: longSt, delta: long_Delta  });
         }
@@ -163,10 +166,11 @@ library FuturesLib {
             itm = TakePayVars({  st: longSt, delta: long_Delta  });
             otm = TakePayVars({ st: shortSt, delta: short_Delta });
         }
-        //require(otm.delta < 0, "Unexpected otm_Delta");
-        //require(itm.delta > 0, "Unexpected itm_Delta");
+        require(otm.delta < 0 || (otm.delta == 0 && itm.delta == 0), "Unexpected otm_Delta");
+        require(itm.delta > 0 || (otm.delta == 0 && itm.delta == 0), "Unexpected itm_Delta");
 
         // apply settlement fees
+        emit dbg(a.feePerSide);
         require(ld._ledger[otm.st.ft_ledgerOwner].ccyType_balance[fta.refCcyId] >= a.feePerSide, "Insufficient currency (OTM) for fee");
         //if (ld._ledger[otm.st.ft_ledgerOwner].ccyType_balance[fta.refCcyId] >= a.feePerSide) {
             StructLib.transferCcy(ld, StructLib.TransferCcyArgs({
@@ -177,6 +181,12 @@ library FuturesLib {
             StructLib.transferCcy(ld, StructLib.TransferCcyArgs({
                 from: itm.st.ft_ledgerOwner, to: a.feeAddrOwner, ccyTypeId: fta.refCcyId, amount: uint256(a.feePerSide), transferType: StructLib.TransferType.TakePayFee }));
         //}
+
+        // nop for net zero take/pay
+        if (short_Delta == long_Delta) { // == 0
+            emit TakePay(shortSt.ft_ledgerOwner, longSt.ft_ledgerOwner, 0, 0);
+            return;
+        }
 
         // cap OTM side at physical balance
         int256 otm_Take = otm.delta * -1;

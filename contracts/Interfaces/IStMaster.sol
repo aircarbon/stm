@@ -53,7 +53,7 @@ import "../Interfaces/StructLib.sol";
     event FutureOpenInterest(address indexed long, address indexed short, uint256 tokTypeId, uint256 qty, uint256 price);
     event SetInitialMargin(uint256 tokenTypeId, address indexed ledgerOwner, uint16 initMarginBips);
     event TakePay(address indexed otm, address indexed itm, uint256 delta, uint256 done);
-    //event dbg(int256 short_Delta, int256 long_Delta, int256 itm_Delta, int256 otm_Delta, address itm, address otm);
+    event dbg(int256 feePerSide);
 
     // /**
     //  * @notice Contract version
