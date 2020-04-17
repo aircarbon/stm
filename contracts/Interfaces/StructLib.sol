@@ -4,7 +4,7 @@ pragma experimental ABIEncoderV2;
 library StructLib {
 
     // EVENTS - SHARED (FuturesLib & TransferLib)
-    enum TransferType { User, ExchangeFee, OriginatorFee, TakePay }
+    enum TransferType { User, ExchangeFee, OriginatorFee, TakePay, TakePayFee }
     event TransferedLedgerCcy(address indexed from, address indexed to, uint256 ccyTypeId, uint256 amount, TransferType transferType);
     event ReervedLedgerCcy(address indexed ledgerOwner, uint256 ccyTypeId, uint256 amount);
 
@@ -301,6 +301,15 @@ library StructLib {
         int256   qty_A;
         int256   qty_B;
         int256   price; // signed, so we can explicitly test for <0 (otherwise -ve values are silently wrapped by web3 to unsigned values)
+    }
+
+    // FUTURES TAKE/PAY SETTLEMENT ARGS
+    struct TakePayArgs {
+        uint256 tokTypeId;
+        uint256 short_stId;
+        int128  markPrice;
+        int256  feePerSide;
+        address feeAddrOwner;
     }
 
     /**

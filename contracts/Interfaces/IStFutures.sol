@@ -38,7 +38,7 @@ import "../Libs/LedgerLib.sol";
      * @param short_stId The security token ID of the short side of the position pair
      * @param markPrice The mark price to use for the settlement process
      */
-    function takePay(uint256 tokTypeId, uint256 short_stId, int128 markPrice)
+    function takePay(uint256 tokTypeId, uint256 short_stId, int128 markPrice, int256 feePerSide)
     public onlyOwner() { revert("Not implemented"); }
 
     /**

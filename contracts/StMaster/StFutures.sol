@@ -106,9 +106,17 @@ contract StFutures is Owned,
     function takePay(
         uint256 tokTypeId,
         uint256 short_stId,
-        int128  markPrice
+        int128  markPrice,
+        int256  feePerSide
     ) public onlyOwner() {
-        FuturesLib.takePay(ld, std, tokTypeId, short_stId, markPrice);
+        FuturesLib.takePay(ld, std,
+          StructLib.TakePayArgs({
+             tokTypeId: tokTypeId,
+            short_stId: short_stId,
+             markPrice: markPrice,
+            feePerSide: feePerSide,
+          feeAddrOwner: owner
+          }));
     }
 
     function getInitMargin(uint256 tokTypeId, address ledgerOwner)

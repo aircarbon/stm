@@ -31,7 +31,7 @@ import "../Interfaces/StructLib.sol";
     event TransferedPartialSecToken(address indexed from, address indexed to, uint256 indexed splitFromSecTokenId, uint256 newSecTokenId, uint256 mergedToSecTokenId, uint256 qty, TransferType transferType);
     event TradedCcyTok(uint256 ccyTypeId, uint256 ccyAmount, uint256 tokTypeId, address indexed tokensFrom, address indexed ccyFrom, uint256 tokQty);
     // StructLib events
-    enum TransferType { User, ExchangeFee, OriginatorFee, TakePay }
+    enum TransferType { User, ExchangeFee, OriginatorFee, TakePay, TakePayFee }
     event TransferedLedgerCcy(address indexed from, address indexed to, uint256 ccyTypeId, uint256 amount, TransferType transferType);
     event ReervedLedgerCcy(address indexed ledgerOwner, uint256 ccyTypeId, uint256 amount);
     // SpotFeeLib events

@@ -140,6 +140,8 @@ module.exports = {
         USER: 0,
 EXCHANGE_FEE: 1,
     ORIG_FEE: 2,
+     TAKEPAY: 3,
+ TAKEPAY_FEE: 4
     }),
 
     // token types (contract data)
