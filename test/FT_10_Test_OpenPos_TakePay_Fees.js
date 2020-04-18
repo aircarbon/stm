@@ -78,57 +78,50 @@ contract("StMaster", accounts => {
         );
         await CONST.logGas(web3, data.tx, `pos-pair null take/pay`);
     });
-    // it(`FT pos-pair take/pay - should cap take at 0 when no balance available (short ITM, long OTM)`, async () => {
-    //     const DELTA_P = new BN(-10);
-    //     const data = await futuresHelper.takePay({ stm, accounts, tokTypeId: usdFT.id, ftId: usdFT.id, shortStId: SHORT_STID, markPrice: POS_PRICE.add(DELTA_P), feePerSide: FEE_PER_SIDE });
-    //     truffleAssert.eventEmitted(data.tx, 'TakePay', ev =>
-    //         ev.otm == LONG && ev.itm == SHORT && ev.delta == DELTA_P.abs().mul(POS_QTY).mul(FT_SIZE).toString() && ev.done.isZero()
-    //     );
-    // });
-    // it(`FT pos-pair take/pay - should cap take at 0 when no balance available (short OTM, long ITM)`, async () => {
-    //     const DELTA_P = new BN(+10);
-    //     const data = await futuresHelper.takePay({ stm, accounts, tokTypeId: usdFT.id, ftId: usdFT.id, shortStId: SHORT_STID, markPrice: POS_PRICE.add(DELTA_P), feePerSide: FEE_PER_SIDE });
-    //     truffleAssert.eventEmitted(data.tx, 'TakePay', ev =>
-    //         ev.otm == SHORT && ev.itm == LONG && ev.delta == DELTA_P.abs().mul(POS_QTY).mul(FT_SIZE).toString() && ev.done.isZero()
-    //     );
-    // });
 
     // ORDERED: partial-cap on take
-    // it(`FT pos-pair take/pay - should partially cap when insufficient available (short ITM, long OTM)`, async () => {
-    //     const DELTA_P = new BN(-10);
-    //     const DELTA = DELTA_P.abs().mul(POS_QTY).mul(FT_SIZE);
-    //     await stm.fund(usdFT.ft.refCcyId, DELTA.div(new BN(2)), LONG);
-    //     const data = await futuresHelper.takePay({ stm, accounts, tokTypeId: usdFT.id, ftId: usdFT.id, shortStId: SHORT_STID, markPrice: POS_PRICE.add(DELTA_P), feePerSide: FEE_PER_SIDE });
-    //     truffleAssert.eventEmitted(data.tx, 'TakePay', ev =>
-    //         ev.otm == LONG && ev.itm == SHORT && ev.delta == DELTA.toString() && ev.done.eq(ev.delta.div(new BN(2)))
-    //     );
-    // });
-    // it(`FT pos-pair take/pay - should partially cap when insufficient available (short OTM, long ITM)`, async () => {
-    //     const DELTA_P = new BN(+10);
-    //     const DELTA = DELTA_P.abs().mul(POS_QTY).mul(FT_SIZE);
-    //     const data = await futuresHelper.takePay({ stm, accounts, tokTypeId: usdFT.id, ftId: usdFT.id, shortStId: SHORT_STID, markPrice: POS_PRICE.add(DELTA_P), feePerSide: FEE_PER_SIDE });
-    //     truffleAssert.eventEmitted(data.tx, 'TakePay', ev =>
-    //         ev.otm == SHORT && ev.itm == LONG && ev.delta == DELTA.toString() && ev.done.eq(ev.delta.div(new BN(2)))
-    //     );
-    // });
+    it(`FT pos-pair take/pay fees - should apply fees and partially cap when insufficient available (short ITM, long OTM)`, async () => {
+        const DELTA_P = new BN(-10);
+        const DELTA = DELTA_P.abs().mul(POS_QTY).mul(FT_SIZE);
+        const PARTIAL = DELTA.div(new BN(2));
+        await stm.fund(usdFT.ft.refCcyId, FEE_PER_SIDE, LONG);
+        await stm.fund(usdFT.ft.refCcyId, FEE_PER_SIDE, SHORT);
+        await stm.fund(usdFT.ft.refCcyId, PARTIAL, LONG);
+        const data = await futuresHelper.takePay({ stm, accounts, tokTypeId: usdFT.id, ftId: usdFT.id, shortStId: SHORT_STID, markPrice: POS_PRICE.add(DELTA_P), feePerSide: FEE_PER_SIDE });
+        //truffleAssert.prettyPrintEmittedEvents(data.tx);
+        truffleAssert.eventEmitted(data.tx, 'TakePay', ev => ev.otm == LONG && ev.itm == SHORT && ev.delta == DELTA.toString() && ev.done.eq(PARTIAL));
+        truffleAssert.eventEmitted(data.tx, 'TransferedLedgerCcy', ev => ev.transferType == CONST.transferType.TAKEPAY_FEE && (ev.from == LONG || ev.from == SHORT) && ev.to == accounts[0] && ev.amount.eq(FEE_PER_SIDE));
+    });
+    it(`FT pos-pair take/pay fees - should apply fees and partially cap when insufficient available (short OTM, long ITM)`, async () => {
+        const DELTA_P = new BN(+10);
+        const DELTA = DELTA_P.abs().mul(POS_QTY).mul(FT_SIZE);
+        await stm.fund(usdFT.ft.refCcyId, FEE_PER_SIDE, LONG);
+        await stm.fund(usdFT.ft.refCcyId, FEE_PER_SIDE, SHORT);
+        const data = await futuresHelper.takePay({ stm, accounts, tokTypeId: usdFT.id, ftId: usdFT.id, shortStId: SHORT_STID, markPrice: POS_PRICE.add(DELTA_P), feePerSide: FEE_PER_SIDE });
+        //truffleAssert.prettyPrintEmittedEvents(data.tx);
+        truffleAssert.eventEmitted(data.tx, 'TakePay', ev => ev.otm == SHORT && ev.itm == LONG && ev.delta == DELTA.toString() && ev.done.eq(ev.delta.div(new BN(2))));
+        truffleAssert.eventEmitted(data.tx, 'TransferedLedgerCcy', ev => ev.transferType == CONST.transferType.TAKEPAY_FEE && (ev.from == LONG || ev.from == SHORT) && ev.to == accounts[0] && ev.amount.eq(FEE_PER_SIDE));
+    });
 
     // ORDERED: no cap on take
-    // it(`FT pos-pair take/pay - should have no cap when sufficient available (short ITM, long OTM)`, async () => {
-    //     const DELTA_P = new BN(-5); // assumes: = previous test's capped paid amount - can be fully covered
-    //     const DELTA = DELTA_P.abs().mul(POS_QTY).mul(FT_SIZE);
-    //     const data = await futuresHelper.takePay({ stm, accounts, tokTypeId: usdFT.id, ftId: usdFT.id, shortStId: SHORT_STID, markPrice: POS_PRICE.add(DELTA_P), feePerSide: FEE_PER_SIDE });
-    //     truffleAssert.eventEmitted(data.tx, 'TakePay', ev =>
-    //         ev.otm == LONG && ev.itm == SHORT && ev.delta == DELTA.toString() && ev.done.eq(ev.delta)
-    //     );
-    //     await CONST.logGas(web3, data.tx, `pos-pair take/pay no cap (short ITM)`);
-    // });
-    // it(`FT pos-pair take/pay - should have no cap when sufficient available (short OTM, long ITM)`, async () => {
-    //     const DELTA_P = new BN(+5); // assumes: = previous test's uncapped paid amount - can be fully covered
-    //     const DELTA = DELTA_P.abs().mul(POS_QTY).mul(FT_SIZE);
-    //     const data = await futuresHelper.takePay({ stm, accounts, tokTypeId: usdFT.id, ftId: usdFT.id, shortStId: SHORT_STID, markPrice: POS_PRICE.add(DELTA_P), feePerSide: FEE_PER_SIDE });
-    //     truffleAssert.eventEmitted(data.tx, 'TakePay', ev =>
-    //         ev.otm == SHORT && ev.itm == LONG && ev.delta == DELTA.toString() && ev.done.eq(ev.delta)
-    //     );
-    //     await CONST.logGas(web3, data.tx, `pos-pair take/pay no cap (long ITM)`);
-    // });
+    it(`FT pos-pair take/pay fees - should apply fees and have no cap when sufficient available (short ITM, long OTM)`, async () => {
+        const DELTA_P = new BN(-5); // assumes: = previous test's capped paid amount - can be fully covered
+        const DELTA = DELTA_P.abs().mul(POS_QTY).mul(FT_SIZE);
+        await stm.fund(usdFT.ft.refCcyId, FEE_PER_SIDE, LONG);
+        await stm.fund(usdFT.ft.refCcyId, FEE_PER_SIDE, SHORT);
+        const data = await futuresHelper.takePay({ stm, accounts, tokTypeId: usdFT.id, ftId: usdFT.id, shortStId: SHORT_STID, markPrice: POS_PRICE.add(DELTA_P), feePerSide: FEE_PER_SIDE });
+        //truffleAssert.prettyPrintEmittedEvents(data.tx);
+        truffleAssert.eventEmitted(data.tx, 'TakePay', ev => ev.otm == LONG && ev.itm == SHORT && ev.delta == DELTA.toString() && ev.done.eq(ev.delta));
+        await CONST.logGas(web3, data.tx, `pos-pair take/pay no cap (short ITM)`);
+    });
+    it(`FT pos-pair take/pay fees - should apply fees and have no cap when sufficient available (short OTM, long ITM)`, async () => {
+        const DELTA_P = new BN(+5); // assumes: = previous test's uncapped paid amount - can be fully covered
+        const DELTA = DELTA_P.abs().mul(POS_QTY).mul(FT_SIZE);
+        await stm.fund(usdFT.ft.refCcyId, FEE_PER_SIDE, LONG);
+        await stm.fund(usdFT.ft.refCcyId, FEE_PER_SIDE, SHORT);
+        const data = await futuresHelper.takePay({ stm, accounts, tokTypeId: usdFT.id, ftId: usdFT.id, shortStId: SHORT_STID, markPrice: POS_PRICE.add(DELTA_P), feePerSide: FEE_PER_SIDE });
+        //truffleAssert.prettyPrintEmittedEvents(data.tx);
+        truffleAssert.eventEmitted(data.tx, 'TakePay', ev => ev.otm == SHORT && ev.itm == LONG && ev.delta == DELTA.toString() && ev.done.eq(ev.delta));
+        await CONST.logGas(web3, data.tx, `pos-pair take/pay no cap (long ITM)`);
+    });
 });
