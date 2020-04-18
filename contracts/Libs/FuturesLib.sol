@@ -168,11 +168,16 @@ library FuturesLib {
                 from: itm.st.ft_ledgerOwner, to: a.feeAddrOwner, ccyTypeId: fta.refCcyId, amount: uint256(a.feePerSide), transferType: StructLib.TransferType.TakePayFee }));
         }
 
-        // gas - combine fee update w/ takepay update (would save 1 of 4 writes)
+        //
+        //## gas - combine fee update w/ takepay updates (currently 6 updates (owner x2, itm x2, out x2): could be net 3 updates)
+        // i.e. optimize out StructLib.transferCcy...
+        //  baseline: 132177 "FT pos-pair take/pay fees"
+        //...
 
         // update last mark price
         shortSt.ft_lastMarkPrice = a.markPrice;
-        longSt.ft_lastMarkPrice = a.markPrice; //** -- could be dropped? and use only the short side's last price - saves very little...
+        longSt.ft_lastMarkPrice = a.markPrice; //## gas - could be dropped: use only the short side's last price
+        //...
 
         // nop for net zero take/pay
         if (short_Delta == long_Delta) { // == 0
