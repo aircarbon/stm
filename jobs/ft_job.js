@@ -56,17 +56,22 @@ var ledgerOwners, accounts;
     const MAX_T = ctx[0].data.refs.length;
     const test_shortPosIds = [];
     for (let T=0 ; T < MAX_T; T++) { // for time T
+        console.log('-');
         console.log(chalk.inverse(` >> T=${T} << `));
         // PHASE (1) - process TAKE/PAY (all futures, all positions)
         for (let ft of ctx) {
+            console.group();
+
             const MP = ft.data.refs[T]; // mark price
-            console.log(chalk.dim(`\tftId=${ft.ftId}, MP=${MP}...`));
+            console.log(chalk.dim(`ftId=${ft.ftId}, MP=${MP}...`));
             
             // test - process actions
             await processTestContext(ft, T, test_shortPosIds);
             
             // main - process take/pay for all positions on this future
             await TakePay(ft.ftId, MP, test_shortPosIds);
+
+            console.groupEnd();
         }
 
         // PHASE (2) - process POS_COMBINE (all futures, all positions)
@@ -87,7 +92,6 @@ var ledgerOwners, accounts;
 async function processTestContext(ft, T, test_shortPosIds) {
     const O = await CONST.getAccountAndKey(0);
     const TEST_PARTICIPANTS = ft.data.TEST_PARTICIPANTS;
-    console.group();
 
     // process ctx deposits
     for (let p of TEST_PARTICIPANTS) {
@@ -135,8 +139,6 @@ async function processTestContext(ft, T, test_shortPosIds) {
             //console.log('a_after.ccys', a_after.ccys[0]);
         }
     }
-
-    console.groupEnd();
 }
 
 // inits & returns a test sequence

@@ -123,12 +123,12 @@ library FuturesLib {
 
         uint256 long_stId = a.short_stId + 1;
 
-        StructLib.PackedSt memory shortSt = ld._sts[a.short_stId];
+        StructLib.PackedSt storage shortSt = ld._sts[a.short_stId];
         require(shortSt.batchId == 0 && shortSt.ft_price != 0, "Bad (unexpected data) on explicit short token");
         require(shortSt.currentQty < 0, "Bad (non-short quantity) on explicit short token");
         require(shortSt.ft_ledgerOwner != address(0x0), "Bad token ledger owner on explicit short token");
 
-        StructLib.PackedSt memory longSt = ld._sts[long_stId];
+        StructLib.PackedSt storage longSt = ld._sts[long_stId];
         require(longSt.batchId == 0 && longSt.ft_price != 0, "Bad (unexpected data) on implied long token");
         require(longSt.currentQty > 0, "Bad (non-short quantity) on implied long token");
         require(longSt.ft_ledgerOwner != address(0x0), "Bad token ledger owner on implied long token");
@@ -141,8 +141,8 @@ library FuturesLib {
         require(a.feePerSide >= 0, "Bad feePerSide");
 
         // get delta each side
-        int256 short_Delta = calcTakePay(ld, fta, a.tokTypeId, shortSt, a.markPrice);
-        int256 long_Delta = calcTakePay(ld, fta, a.tokTypeId, longSt, a.markPrice);
+        int256 short_Delta = calcTakePay(ld, fta, a.tokTypeId, shortSt, a.markPrice, shortSt.ft_lastMarkPrice); //**
+        int256 long_Delta = calcTakePay(ld, fta, a.tokTypeId, longSt, a.markPrice, longSt.ft_lastMarkPrice); //**
         require(short_Delta + long_Delta == 0, "Unexpected net delta short/long");
 
         // get OTM/ITM sides
@@ -158,16 +158,21 @@ library FuturesLib {
         }
 
         // apply settlement fees
-        // (note: we donn't fail if insufficient balance for fees: position should be liquidated well before that point anyway)
-        //emit dbg(a.feePerSide);
-        if (ld._ledger[otm.st.ft_ledgerOwner].ccyType_balance[fta.refCcyId] >= a.feePerSide) {
+        // (note: we don't fail if insufficient balance for fees: position should be liquidated well before that point anyway)
+        if (a.feePerSide > 0 && ld._ledger[otm.st.ft_ledgerOwner].ccyType_balance[fta.refCcyId] >= a.feePerSide) {
             StructLib.transferCcy(ld, StructLib.TransferCcyArgs({
                 from: otm.st.ft_ledgerOwner, to: a.feeAddrOwner, ccyTypeId: fta.refCcyId, amount: uint256(a.feePerSide), transferType: StructLib.TransferType.TakePayFee }));
         }
-        if (ld._ledger[itm.st.ft_ledgerOwner].ccyType_balance[fta.refCcyId] >= a.feePerSide) {
+        if (a.feePerSide > 0 && ld._ledger[itm.st.ft_ledgerOwner].ccyType_balance[fta.refCcyId] >= a.feePerSide) {
             StructLib.transferCcy(ld, StructLib.TransferCcyArgs({
                 from: itm.st.ft_ledgerOwner, to: a.feeAddrOwner, ccyTypeId: fta.refCcyId, amount: uint256(a.feePerSide), transferType: StructLib.TransferType.TakePayFee }));
         }
+
+        // gas - combine fee update w/ takepay update (would save 1 of 4 writes)
+
+        // update last mark price
+        shortSt.ft_lastMarkPrice = a.markPrice;
+        longSt.ft_lastMarkPrice = a.markPrice; //** -- could be dropped? and use only the short side's last price - saves very little...
 
         // nop for net zero take/pay
         if (short_Delta == long_Delta) { // == 0
@@ -198,11 +203,12 @@ library FuturesLib {
         StructLib.FutureTokenTypeArgs storage fta,
         uint256 tokTypeId,
         StructLib.PackedSt memory st,
-        int128  markPrice
+        int128  markPrice,
+        int128  ft_lastMarkPrice
     ) private returns(int256) {
-        int256 delta = (markPrice - (st.ft_lastMarkPrice == -1
+        int256 delta = (markPrice - (ft_lastMarkPrice == -1
                             ? st.ft_price
-                            : st.ft_lastMarkPrice)) * fta.contractSize * st.currentQty;
+                            : ft_lastMarkPrice)) * fta.contractSize * st.currentQty;
         return delta;
     }
 

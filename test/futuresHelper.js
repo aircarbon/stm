@@ -20,8 +20,8 @@ module.exports = {
         const ft = (await stm.getSecTokenTypes()).tokenTypes.find(p => p.id == tokTypeId);
         const longStId = Number(shortStId) + 1;
         
-        const stShort = await stm.getSecToken(shortStId);
-        const stLong = await stm.getSecToken(longStId);
+        var stShort = await stm.getSecToken(shortStId);
+        var stLong = await stm.getSecToken(longStId);
 
         //console.log('stShort', stShort);
         //console.log('stLong', stLong);
@@ -47,6 +47,14 @@ module.exports = {
         //console.log('otm (ev)', otm);
         //console.log('stShort.ft_ledgerOwner', stShort.ft_ledgerOwner);
         //console.log('stLong.ft_ledgerOwner', stLong.ft_ledgerOwner);
+
+        // refresh tokens, check last mark prices
+        stShort = await stm.getSecToken(shortStId);
+        stLong = await stm.getSecToken(longStId);
+        //console.log('stShort.ft_lastMarkPrice', stShort.ft_lastMarkPrice);
+        //console.log('stLong.ft_lastMarkPrice', stLong.ft_lastMarkPrice);
+        assert(stShort.ft_lastMarkPrice == markPrice, "unexpected short LMP");
+        //assert(stLong.ft_lastMarkPrice == markPrice, "unexpected long LMP");
 
         // check balance updates
         var itm_ccyDelta, otm_ccyDelta;
