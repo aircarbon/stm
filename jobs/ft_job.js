@@ -27,6 +27,8 @@ var ledgerOwners, accounts;
     //   (todo: when not set, it runs exactly one ftm() pass per FT [todo later - will need a reference data source])
     //
 
+    CONST.consoleOutput(false);
+
     const TakePay = require('./ft_settler').TakePay;
     var ctx;
 
@@ -52,19 +54,19 @@ var ledgerOwners, accounts;
 
     // execute context
     const MAX_T = ctx[0].data.refs.length;
+    const test_shortPosIds = [];
     for (let T=0 ; T < MAX_T; T++) { // for time T
-
+        console.log(chalk.inverse(` >> T=${T} << `));
         // PHASE (1) - process TAKE/PAY (all futures, all positions)
         for (let ft of ctx) {
             const MP = ft.data.refs[T]; // mark price
-            console.log(chalk.inverse(`>> T=${T}, ftId=${ft.ftId}: MP=${MP}...`));
+            console.log(chalk.dim(`\tftId=${ft.ftId}, MP=${MP}...`));
             
             // test - process actions
-            await processTestContext(ft, T);
+            await processTestContext(ft, T, test_shortPosIds);
             
             // main - process take/pay for all positions on this future
-            // TODO: --> "TakePay_ForAllPostions" -- n TX's: 1 per FT pos-pair
-            await TakePay(ft.ftId, MP); //...
+            await TakePay(ft.ftId, MP, test_shortPosIds);
         }
 
         // PHASE (2) - process POS_COMBINE (all futures, all positions)
@@ -78,11 +80,11 @@ var ledgerOwners, accounts;
         //  (TX's contingent: we decide if we need to liquidate)
         //...
     }
-    
+
     process.exit();
 })();
 
-async function processTestContext(ft, T) {
+async function processTestContext(ft, T, test_shortPosIds) {
     const O = await CONST.getAccountAndKey(0);
     const TEST_PARTICIPANTS = ft.data.TEST_PARTICIPANTS;
     console.group();
@@ -91,7 +93,7 @@ async function processTestContext(ft, T) {
     for (let p of TEST_PARTICIPANTS) {
         const ccy_deposit = p.ccy_deposits[T];
         if (ccy_deposit.a) {
-            console.log(chalk.yellow.dim(`TEST_PARTICIPANT: ID=${p.id}, account=${p.account}`) + chalk.yellow(` ** DEPOSIT ** `), ccy_deposit);
+            console.log(chalk.blue.dim(`TEST_PARTICIPANT: ID=${p.id}, account=${p.account}`) + chalk.blue(` ** DEPOSIT ** `), ccy_deposit);
             await CONST.web3_tx('fund', [ CONST.ccyType.USD, ccy_deposit.a, p.account ], O.addr, O.privKey);
         }
     }
@@ -100,7 +102,7 @@ async function processTestContext(ft, T) {
     for (let p of TEST_PARTICIPANTS) {
         const ccy_withdraw = p.ccy_withdraws[T];
         if (ccy_withdraw.a) {
-            console.log(chalk.yellow.dim(`TEST_PARTICIPANT: ID=${p.id}, account=${p.account}`) + chalk.yellow(` ** WITHDRAW ** `), ccy_withdraw);
+            console.log(chalk.blue.dim(`TEST_PARTICIPANT: ID=${p.id}, account=${p.account}`) + chalk.blue(` ** WITHDRAW ** `), ccy_withdraw);
             await CONST.web3_tx('withdraw', [ CONST.ccyType.USD, ccy_withdraw.a, p.account ], O.addr, O.privKey);
         }
     }
@@ -111,15 +113,22 @@ async function processTestContext(ft, T) {
     for (let p of TEST_PARTICIPANTS) {
         const ft_long = p.ft_longs[T];
         if (ft_long.q) {
-            console.log(chalk.yellow.dim(`TEST_PARTICIPANT: ID=${p.id}, account=${p.account}`) + chalk.yellow(` ** OPEN FUTURES POSITION ** `), ft_long);
+            console.log(chalk.blue.dim(`TEST_PARTICIPANT: ID=${p.id}, account=${p.account}`) + chalk.blue(` ** OPEN FUTURES POSITION ** `), ft_long);
             const shortAccount = TEST_PARTICIPANTS.find(p => p.id == ft_long.cid).account;
             //const a_before = await CONST.web3_call('getLedgerEntry', [ p.account ]);
             //const b_before = await CONST.web3_call('getLedgerEntry', [ shortAccount ]);
             //console.log('a_before.ccys', a_before.ccys[0]);
             //console.log('b_before.ccys', b_before.ccys[0]);
-            await CONST.web3_tx('openFtPos', [{
+
+            // todo - grab shortFtId (restrict to that for test mode...)
+            const { txHash, receipt, evs } = await CONST.web3_tx('openFtPos', [{
                 tokTypeId: ft.ftId, ledger_A: p.account, ledger_B: shortAccount, qty_A: ft_long.q, qty_B: ft_long.q * -1, price: ft_long.p
             }], O.addr, O.privKey);
+            //console.log('ev... shortStId:', evs.find(p => p.event == 'FutureOpenInterest').returnValues.shortStId); // ## stack too deep for shortStId
+            const shortStId = Number(await CONST.web3_call('getSecToken_countMinted', [])) - 1;
+            test_shortPosIds.push(shortStId);
+            //console.log(chalk.blue.dim(`TEST_PARTICIPANT: ID=${p.id}, account=${p.account}`) + chalk.blue(` (TEST POSID [SHORT] = ${shortStId}) `), shortStId);
+
             //const a_after = await CONST.web3_call('getLedgerEntry', [ p.account ]);
             //const b_after = await CONST.web3_call('getLedgerEntry', [ shortAccount ]);
             //console.log('a_after.ccys', a_after.ccys[0]);

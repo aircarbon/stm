@@ -31,7 +31,7 @@ library TransferLib {
         uint256 maxStId = ld._tokens_currentMax_id;
 
         require(ld._contractSealed, "Contract is not sealed");
-        //require(a.ledger_A != a.ledger_B, "Bad transfer"); // erc20 compat: allow send-to-self 
+        //require(a.ledger_A != a.ledger_B, "Bad transfer"); // erc20 compat: allow send-to-self
         require(a.qty_A > 0 || a.qty_B > 0 || a.ccy_amount_A > 0 || a.ccy_amount_B > 0, "Bad null transfer");
         require(a.qty_A <= 0x7FFFFFFFFFFFFFFF, "Bad qty_A"); //* (2^64 /2: max signed int64) [was: 0xffffffffffffffff]
         require(a.qty_B <= 0x7FFFFFFFFFFFFFFF, "Bad qty_B"); //*

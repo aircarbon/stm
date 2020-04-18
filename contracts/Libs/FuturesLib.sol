@@ -4,10 +4,10 @@ pragma experimental ABIEncoderV2;
 import "../Interfaces/StructLib.sol";
 
 library FuturesLib {
-    event FutureOpenInterest(address indexed long, address indexed short, uint256 tokTypeId, uint256 qty, uint256 price);
+    event FutureOpenInterest(address indexed long, address indexed short, /*uint256 shortStId,*/ uint256 tokTypeId, uint256 qty, uint256 price);
     event SetInitialMargin(uint256 tokenTypeId, address indexed ledgerOwner, uint16 initMarginBips);
     event TakePay(address indexed otm, address indexed itm, uint256 delta, uint256 done);
-    event dbg(int256 feePerSide);
+    //event dbg(int256 feePerSide);
 
     //
     // PUBLIC - get/set initial margin ledger override
@@ -100,9 +100,9 @@ library FuturesLib {
         ld._ledger[a.ledger_B].tokenType_stIds[a.tokTypeId].push(newId_B);
 
         if (a.qty_A > 0)
-            emit FutureOpenInterest(a.ledger_A, a.ledger_B, a.tokTypeId, uint256(a.qty_A), uint256(a.price));
+            emit FutureOpenInterest(a.ledger_A, a.ledger_B, /*ld._tokens_currentMax_id - 1,*/ a.tokTypeId, uint256(a.qty_A), uint256(a.price));
         else
-            emit FutureOpenInterest(a.ledger_B, a.ledger_A, a.tokTypeId, uint256(a.qty_B), uint256(a.price));
+            emit FutureOpenInterest(a.ledger_B, a.ledger_A, /*ld._tokens_currentMax_id - 1,*/ a.tokTypeId, uint256(a.qty_B), uint256(a.price));
     }
 
     //
@@ -151,13 +151,6 @@ library FuturesLib {
         // get OTM/ITM sides
         TakePayVars memory itm;
         TakePayVars memory otm;
-        // if (short_Delta == long_Delta) {
-        //     itm = TakePayVars({ st: shortSt, delta: short_Delta });
-        //     otm = TakePayVars({  st: longSt, delta: long_Delta  });
-
-        //     //emit TakePay(shortSt.ft_ledgerOwner, longSt.ft_ledgerOwner, 0, 0);
-        //     //return;
-        // }
         if (short_Delta == long_Delta || short_Delta > 0) {
             itm = TakePayVars({ st: shortSt, delta: short_Delta });
             otm = TakePayVars({  st: longSt, delta: long_Delta  });
@@ -166,21 +159,22 @@ library FuturesLib {
             itm = TakePayVars({  st: longSt, delta: long_Delta  });
             otm = TakePayVars({ st: shortSt, delta: short_Delta });
         }
-        require(otm.delta < 0 || (otm.delta == 0 && itm.delta == 0), "Unexpected otm_Delta");
-        require(itm.delta > 0 || (otm.delta == 0 && itm.delta == 0), "Unexpected itm_Delta");
+        //require(otm.delta < 0 || (otm.delta == 0 && itm.delta == 0), "Unexpected otm_Delta");
+        //require(itm.delta > 0 || (otm.delta == 0 && itm.delta == 0), "Unexpected itm_Delta");
 
         // apply settlement fees
-        emit dbg(a.feePerSide);
-        require(ld._ledger[otm.st.ft_ledgerOwner].ccyType_balance[fta.refCcyId] >= a.feePerSide, "Insufficient currency (OTM) for fee");
-        //if (ld._ledger[otm.st.ft_ledgerOwner].ccyType_balance[fta.refCcyId] >= a.feePerSide) {
+        // (note: we donn't fail if insufficient balance for fees: position should be liquidated well before that point anyway)
+        //emit dbg(a.feePerSide);
+        //require(ld._ledger[otm.st.ft_ledgerOwner].ccyType_balance[fta.refCcyId] >= a.feePerSide, "Insufficient currency (OTM) for fee");
+        if (ld._ledger[otm.st.ft_ledgerOwner].ccyType_balance[fta.refCcyId] >= a.feePerSide) {
             StructLib.transferCcy(ld, StructLib.TransferCcyArgs({
                 from: otm.st.ft_ledgerOwner, to: a.feeAddrOwner, ccyTypeId: fta.refCcyId, amount: uint256(a.feePerSide), transferType: StructLib.TransferType.TakePayFee }));
-        //}
-        require(ld._ledger[itm.st.ft_ledgerOwner].ccyType_balance[fta.refCcyId] >= a.feePerSide, "Insufficient currency (ITM) for fee");
-        //if (ld._ledger[itm.st.ft_ledgerOwner].ccyType_balance[fta.refCcyId] >= a.feePerSide) {
+        }
+        //require(ld._ledger[itm.st.ft_ledgerOwner].ccyType_balance[fta.refCcyId] >= a.feePerSide, "Insufficient currency (ITM) for fee");
+        if (ld._ledger[itm.st.ft_ledgerOwner].ccyType_balance[fta.refCcyId] >= a.feePerSide) {
             StructLib.transferCcy(ld, StructLib.TransferCcyArgs({
                 from: itm.st.ft_ledgerOwner, to: a.feeAddrOwner, ccyTypeId: fta.refCcyId, amount: uint256(a.feePerSide), transferType: StructLib.TransferType.TakePayFee }));
-        //}
+        }
 
         // nop for net zero take/pay
         if (short_Delta == long_Delta) { // == 0

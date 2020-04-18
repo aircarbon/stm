@@ -72,10 +72,8 @@ contract("StMaster", accounts => {
         await stm.fund(usdFT.ft.refCcyId, FEE_PER_SIDE, LONG);
         await stm.fund(usdFT.ft.refCcyId, FEE_PER_SIDE, SHORT);
         const data = await futuresHelper.takePay({ stm, accounts, tokTypeId: usdFT.id, ftId: usdFT.id, shortStId: SHORT_STID, markPrice: POS_PRICE.add(DELTA_P), feePerSide: FEE_PER_SIDE });
-        truffleAssert.prettyPrintEmittedEvents(data.tx);
-        truffleAssert.eventEmitted(data.tx, 'TakePay', ev =>
-            ev.otm == SHORT && ev.itm == LONG && ev.delta.isZero() && ev.done.isZero()
-        );
+        //truffleAssert.prettyPrintEmittedEvents(data.tx);
+        truffleAssert.eventEmitted(data.tx, 'TakePay', ev => ev.otm == SHORT && ev.itm == LONG && ev.delta.isZero() && ev.done.isZero());
         await CONST.logGas(web3, data.tx, `pos-pair null take/pay`);
     });
 

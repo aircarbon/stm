@@ -35,7 +35,6 @@ FUTURES - notes 26/MAR/2020
 
 
 (2) SETTLE_JOB (off-chain) - POS-PAIR SETTLER... (caps ITM-pay at OTM-take: delta/default is handled off-chain...)
-  (2.0) call [sol] settleFuturePositions // fn. (param: ledgerAddr? || posPair?, MarkPrice [MP])
   (2.1)   >> TakeOrPay [2 updates: LMP + CcyBalance] -- use (MP - LMP) or (MP - P) when LMP == -1
            ... preview mode - should net to zero across all ledgers and positions...
 

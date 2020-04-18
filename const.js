@@ -59,6 +59,7 @@ const contractProps = {
     },
 };
 
+var consoleOutput = true;
 
 module.exports = {
     contractProps: contractProps,
@@ -97,6 +98,8 @@ module.exports = {
     web3_sendEthTestAddr: (sendFromNdx, sendToAddr, ethValue) => web3_sendEthTestAddr(sendFromNdx, sendToAddr, ethValue),
     web3_call: (methodName, methodArgs) => web3_call(methodName, methodArgs),
     web3_tx: (methodName, methodArgs, fromAddr, fromPrivKey) => web3_tx(methodName, methodArgs, fromAddr, fromPrivKey),
+
+    consoleOutput: (enabled) => { consoleOutput = enabled; },
 
     nullFees: {
          ccy_mirrorFee: false,
@@ -249,7 +252,7 @@ async function web3_call(methodName, methodArgs) {
     const { web3, ethereumTxChain } = getTestContextWeb3();
     const contractDb = (await db.GetDeployment(process.env.WEB3_NETWORK_ID, contractProps[process.env.CONTRACT_TYPE].contractName, contractProps[process.env.CONTRACT_TYPE].contractVer)).recordset[0];
     if (!contractDb) throw(Error(`Failed to lookup contract deployment for networkId=${process.env.WEB3_NETWORK_ID}, contractName=${contractProps[process.env.CONTRACT_TYPE].contractName}, contractVer=${contractProps[process.env.CONTRACT_TYPE].contractVer}`));
-    console.log(chalk.dim(` > CALL: [${contractDb.contract_enum} ${contractDb.contract_ver} @${contractDb.addr}] ${chalk.reset.blue.bgWhite(methodName + '(' + methodArgs.map(p => JSON.stringify(p)).join() + ')')}` + chalk.dim(` [networkId: ${process.env.WEB3_NETWORK_ID} - ${web3.currentProvider.host}]`)));
+    if (consoleOutput) console.log(chalk.dim(` > CALL: [${contractDb.contract_enum} ${contractDb.contract_ver} @${contractDb.addr}] ${chalk.reset.blue.bgWhite(methodName + '(' + methodArgs.map(p => JSON.stringify(p)).join() + ')')}` + chalk.dim(` [networkId: ${process.env.WEB3_NETWORK_ID} - ${web3.currentProvider.host}]`)));
     var contract = new web3.eth.Contract(JSON.parse(contractDb.abi), contractDb.addr);
     const callRet = await contract.methods[methodName](...methodArgs).call();
     return callRet;
@@ -285,7 +288,7 @@ async function web3_tx(methodName, methodArgs, fromAddr, fromPrivKey) {
 
     // tx data
     const nonce = await web3.eth.getTransactionCount(fromAddr, "pending");
-    console.log(chalk.dim(` >   TX: nonce=${nonce} [${contractDb.contract_enum} ${contractDb.contract_ver} @${contractDb.addr}] ${chalk.reset.red.bgWhiteBright(methodName + '(' + methodArgs.map(p => JSON.stringify(p)).join() + ')')}` + chalk.dim(` [networkId: ${process.env.WEB3_NETWORK_ID} - ${web3.currentProvider.host}]`)));
+    if (consoleOutput) console.log(chalk.dim(` >   TX: nonce=${nonce} [${contractDb.contract_enum} ${contractDb.contract_ver} @${contractDb.addr}] ${chalk.reset.red.bgWhiteBright(methodName + '(' + methodArgs.map(p => JSON.stringify(p)).join() + ')')}` + chalk.dim(` [networkId: ${process.env.WEB3_NETWORK_ID} - ${web3.currentProvider.host}]`)));
     var paramsData = contract.methods
         [methodName](...methodArgs)
         .encodeABI();
@@ -301,7 +304,7 @@ async function web3_tx(methodName, methodArgs, fromAddr, fromPrivKey) {
 
     // estimate gas
     const gasEstimate = await web3.eth.estimateGas(txData);
-    console.log(chalk.dim.yellow('   -> gasEstimate=', gasEstimate));
+    if (consoleOutput) console.log(chalk.dim.yellow('   -> gasEstimate=', gasEstimate));
 
     // send signed tx
     const EthereumTx = EthereumJsTx.Transaction
@@ -312,16 +315,16 @@ async function web3_tx(methodName, methodArgs, fromAddr, fromPrivKey) {
         var txHash;
         web3.eth.sendSignedTransaction(raw)
         .on("receipt", receipt => {
-            console.log(`   => receipt`, receipt);
+            if (consoleOutput) console.log(`   => receipt`, receipt);
         })
         .once("transactionHash", hash => {
             txHash = hash;
-            console.log(chalk.dim.yellow(`   => ${txHash} ...`));
+            if (consoleOutput) console.log(chalk.dim.yellow(`   => ${txHash} ...`));
         })
         .once("confirmation", async (confirms, receipt) => {
             //const receipt = await web3.eth.getTransactionReceipt(txHash);
             const evs = await contract.getPastEvents("allEvents", { fromBlock: receipt.blockNumber, toBlock: receipt.blockNumber });
-            console.log(chalk.dim.yellow(`   => ${txHash} - ${confirms} confirm(s), receipt.gasUsed=${receipt.gasUsed} receipt.blockNumber=${receipt.blockNumber} evs=${evs.map(p => `B# ${p.blockNumber}: ${p.event}`).join(',')}`));//, JSON.stringify(receipt)));
+            if (consoleOutput) console.log(chalk.dim.yellow(`   => ${txHash} - ${confirms} confirm(s), receipt.gasUsed=${receipt.gasUsed} receipt.blockNumber=${receipt.blockNumber} evs=${evs.map(p => `B# ${p.blockNumber}: ${p.event}`).join(',')}`));//, JSON.stringify(receipt)));
             // receipt.logs
             // receipt.blockNumber
             // receipt.blockHash
@@ -345,7 +348,7 @@ async function web3_sendEthTestAddr(sendFromNdx, sendToAddr, ethValue) {
 
     // send signed tx
     const { web3, ethereumTxChain } = getTestContextWeb3();
-    console.log(` > TX web3_sendEthTestAddr: Ξ${chalk.red.bgWhite(ethValue.toString())} @ ${chalk.red.bgWhite(fromAddr)} => ${chalk.red.bgWhite(sendToAddr)} [networkId: ${process.env.WEB3_NETWORK_ID} - ${web3.currentProvider.host}]`);
+    if (consoleOutput) console.log(` > TX web3_sendEthTestAddr: Ξ${chalk.red.bgWhite(ethValue.toString())} @ ${chalk.red.bgWhite(fromAddr)} => ${chalk.red.bgWhite(sendToAddr)} [networkId: ${process.env.WEB3_NETWORK_ID} - ${web3.currentProvider.host}]`);
     const nonce = await web3.eth.getTransactionCount(fromAddr, "pending");
     const EthereumTx = EthereumJsTx.Transaction
     var tx = new EthereumTx({
@@ -373,7 +376,7 @@ async function web3_sendEthTestAddr(sendFromNdx, sendToAddr, ethValue) {
         })
         .once("confirmation", async confirms => {
             const receipt = await web3.eth.getTransactionReceipt(txHash);
-            console.log(chalk.yellow(`   => ${txHash} - ${confirms} confirm(s), receipt.gasUsed=`, receipt.gasUsed));
+            if (consoleOutput) console.log(chalk.yellow(`   => ${txHash} - ${confirms} confirm(s), receipt.gasUsed=`, receipt.gasUsed));
             resolve(txHash);
         })
         .once("error", error => {
