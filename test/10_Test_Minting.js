@@ -195,7 +195,7 @@ contract("StMaster", accounts => {
             batchId = Number(ev.batchId);
             return ev.batchId == maxBatchIdAfter
                 && ev.tokenTypeId == tokenType
-                && ev.batchOwner == receiver
+                && ev.to == receiver
                 && ev.mintQty == qtyUnit
                 && ev.mintSecTokenCount == qtySecTokens
                 ;
@@ -212,7 +212,7 @@ contract("StMaster", accounts => {
                 return ev.stId > curMaxSecTokenId - qtySecTokens && ev.stId <= curMaxSecTokenId
                     && ev.batchId == batchId
                     && ev.tokenTypeId == tokenType
-                    && ev.ledgerOwner == receiver
+                    && ev.to == receiver
                     && ev.mintedQty == qtyUnit / qtySecTokens
                     ;
             });
