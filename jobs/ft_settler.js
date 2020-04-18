@@ -12,7 +12,8 @@ module.exports = {
         const O = await CONST.getAccountAndKey(0);
         
         console.group();
-        //console.log(`>> TAKE/PAY: ftId=${ftId} MP=${MP}...`);
+        const ft = (await CONST.web3_call('getSecTokenTypes', [])).tokenTypes.find(p => p.id == ftId);
+        console.log(`>> TAKE/PAY: ftId=${ftId} MP=${MP} ft=`, ft);
 
         // get all short positions on this FT
         const ledgerOwners = await CONST.web3_call('getLedgerOwners', []);
@@ -40,9 +41,17 @@ module.exports = {
         const FEE_PER_SIDE = 25; // TODO: ### $0.25 - assumes FT ref ccy is $ ###
         for (posId of shortPosIds) {
             
-            // TX: takePay(shortFtId, MP) (long is shortFtId+1 by definition, cap pay and take amount, emit events...)
             const { txHash, receipt, evs } = await CONST.web3_tx('takePay', [ftId, posId, MP, FEE_PER_SIDE], O.addr, O.privKey);
-            console.log('ev... TakePay:', evs.find(p => p.event == 'TakePay').returnValues); //... map from accounts to TEST_PARTICIPANT IDs?
+            //console.log('ev... TakePay:', ev);
+            const ev = evs.find(p => p.event == 'TakePay').returnValues;
+            const itm_le = await CONST.web3_call('getLedgerEntry', [ev.itm]);
+            const otm_le = await CONST.web3_call('getLedgerEntry', [ev.otm]);
+            console.log('itm_le', itm_le);
+            console.log('ft.ft.refCcyId', ft.ft.refCcyId.toString());
+            console.log(`done=${ev.done.toString()} (delta=${ev.delta.toString()}) :: \
+                        itm: ${ev.itm} ($${itm_le.ccys.find(p => p.ccyTypeId == ft.ft.refCcyId).balance}) / \
+                        otm: ${ev.otm} ($${otm_le.ccys.find(p => p.ccyTypeId == ft.ft.refCcyId).balance})\
+            `);
         }
 
         console.groupEnd();

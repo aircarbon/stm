@@ -31,7 +31,6 @@ library TransferLib {
         uint256 maxStId = ld._tokens_currentMax_id;
 
         require(ld._contractSealed, "Contract is not sealed");
-        //require(a.ledger_A != a.ledger_B, "Bad transfer"); // erc20 compat: allow send-to-self
         require(a.qty_A > 0 || a.qty_B > 0 || a.ccy_amount_A > 0 || a.ccy_amount_B > 0, "Bad null transfer");
         require(a.qty_A <= 0x7FFFFFFFFFFFFFFF, "Bad qty_A"); //* (2^64 /2: max signed int64) [was: 0xffffffffffffffff]
         require(a.qty_B <= 0x7FFFFFFFFFFFFFFF, "Bad qty_B"); //*
@@ -123,21 +122,12 @@ library TransferLib {
         }
 
         // validate currency balances - transfer amount & fees
-        require(StructLib.sufficientCcy(ld, a.ledger_A, a.ccyTypeId_A,
-                    a.ccy_amount_A, // amount sending
-                    a.ccy_amount_B, // amount receiving
-                    int256(exFees.fee_ccy_A) * (a.applyFees /*&& a.ccy_amount_A > 0 */? 1 : 0)), "Insufficient currency A");
-
-        require(StructLib.sufficientCcy(ld, a.ledger_B, a.ccyTypeId_B,
-                    a.ccy_amount_B, // amount sending
-                    a.ccy_amount_A, // amount receiving
-                    int256(exFees.fee_ccy_B) * (a.applyFees /*&& a.ccy_amount_B > 0 */? 1 : 0)), "Insufficient currency B");
+        require(StructLib.sufficientCcy(ld, a.ledger_A, a.ccyTypeId_A, a.ccy_amount_A/*amount sending*/, a.ccy_amount_B/*amount receiving*/, int256(exFees.fee_ccy_A) * (a.applyFees /*&& a.ccy_amount_A > 0 */? 1 : 0)), "Insufficient currency A");
+        require(StructLib.sufficientCcy(ld, a.ledger_B, a.ccyTypeId_B, a.ccy_amount_B /*amount sending*/, a.ccy_amount_A /*amount receiving*/, int256(exFees.fee_ccy_B) * (a.applyFees /*&& a.ccy_amount_B > 0 */? 1 : 0)), "Insufficient currency B");
 
         // validate token balances - sum exchange token fee + originator token fee(s)
-        require(StructLib.sufficientTokens(ld, a.ledger_A, a.tokenTypeId_A, int256(a.qty_A),
-                    int256((exFees.fee_tok_A + v.totalOrigFee[0]) * (a.applyFees && a.qty_A > 0 ? 1 : 0))), "Insufficient tokens A");
-        require(StructLib.sufficientTokens(ld, a.ledger_B, a.tokenTypeId_B, int256(a.qty_B),
-                    int256((exFees.fee_tok_B + v.totalOrigFee[1]) * (a.applyFees && a.qty_B > 0 ? 1 : 0))), "Insufficient tokens B");
+        require(StructLib.sufficientTokens(ld, a.ledger_A, a.tokenTypeId_A, int256(a.qty_A), int256((exFees.fee_tok_A + v.totalOrigFee[0]) * (a.applyFees && a.qty_A > 0 ? 1 : 0))), "Insufficient tokens A");
+        require(StructLib.sufficientTokens(ld, a.ledger_B, a.tokenTypeId_B, int256(a.qty_B), int256((exFees.fee_tok_B + v.totalOrigFee[1]) * (a.applyFees && a.qty_B > 0 ? 1 : 0))), "Insufficient tokens B");
 
         //
         // transfer currencies
@@ -168,7 +158,9 @@ library TransferLib {
 
             if (tot_exFee_ccy > 0) {
                 require(a.ccyTypeId_A != 0 || a.ccyTypeId_B != 0, "Unexpected: undefined currency types");
-                if (a.ccyTypeId_A != 0 && a.ccyTypeId_B != 0) require(a.ccyTypeId_A == a.ccyTypeId_B, "Unexpected: mirrored currency type mismatch");
+                if (a.ccyTypeId_A != 0 && a.ccyTypeId_B != 0) {
+                    require(a.ccyTypeId_A == a.ccyTypeId_B, "Unexpected: mirrored currency type mismatch");
+                }
                 uint256 ccyTypeId = a.ccyTypeId_A != 0 ? a.ccyTypeId_A : a.ccyTypeId_B;
 
                 // apply for A->B token batches
@@ -463,8 +455,9 @@ library TransferLib {
                 //ld._ledger[to].tokenType_sumQty[tokenTypeId] += stQty;                //* gas - DROP DONE - only used internally, validation params
 
                 v.remainingToTransfer -= stQty;
-                if (v.remainingToTransfer > 0)
+                if (v.remainingToTransfer > 0) {
                     require(from_stIds.length > 0, "Insufficient tokens");
+                }
             }
             else {
                 // split the ST across the ledger entries, soft-minting a new ST in the destination
@@ -594,8 +587,9 @@ library TransferLib {
                 from_stIds_length--;    // so instead
 
                 remainingToTransfer -= stQty;
-                if (remainingToTransfer > 0)
+                if (remainingToTransfer > 0) {
                     require(from_stIds_length > 0, "Insufficient tokens");
+                }
             }
             else { // partial ST transfer, and no more needed
                 remainingToTransfer = 0;

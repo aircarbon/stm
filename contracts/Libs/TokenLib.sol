@@ -38,8 +38,6 @@ library TokenLib {
             require(ft.underlyerTypeId > 0 && ft.underlyerTypeId <= std._tt_Count, "Bad underlyerTypeId");
             require(std._tt_Settle[ft.underlyerTypeId] == StructLib.SettlementType.SPOT, "Bad underyler settlement type");
             require(ft.refCcyId > 0 && ft.refCcyId <= ctd._ct_Count, "Bad refCcyId");
-            //require(ft.initMarginBips <= 10000, "Bad initMarginBips");
-            //require(ft.varMarginBips <= 10000, "Bad varMarginBips");
             require(ft.initMarginBips + ft.varMarginBips <= 10000, "Bad total margin");
             require(ft.contractSize > 0, "Bad contractSize");
         }
@@ -124,10 +122,7 @@ library TokenLib {
 
         require(ld._contractSealed, "Contract is not sealed");
         require(a.tokenTypeId >= 1 && a.tokenTypeId <= std._tt_Count, "Bad tokenTypeId");
-        //require(a.mintSecTokenCount >= 1, "Minimum one ST required");
-        //require(a.mintQty % a.mintSecTokenCount == 0, "mintQty must divide evenly into mintSecTokenCount");
         require(a.mintSecTokenCount == 1, "Set mintSecTokenCount 1");
-        //require(a.mintQty >= 0x1 && a.mintQty <= 0xffffffffffffffff, "Bad mintQty"); // max uint64
         require(a.mintQty >= 0x1 && a.mintQty <= 0x7fffffffffffffff, "Bad mintQty"); // max int64
         require(uint256(ld._batches_currentMax_id) + 1 <= 0xffffffffffffffff, "Too many batches");
         require(a.origTokFee.fee_max >= a.origTokFee.fee_min || a.origTokFee.fee_max == 0, "Bad fee args");
@@ -196,9 +191,7 @@ library TokenLib {
         require(batchId >= 1 && batchId <= ld._batches_currentMax_id, "Bad batchId");
 
         for (uint256 kvpNdx = 0; kvpNdx < ld._batches[batchId].metaKeys.length; kvpNdx++) {
-            require(keccak256(abi.encodePacked(ld._batches[batchId].metaKeys[kvpNdx])) !=
-                    keccak256(abi.encodePacked(metaKeyNew)),
-                    "Duplicate key");
+            require(keccak256(abi.encodePacked(ld._batches[batchId].metaKeys[kvpNdx])) != keccak256(abi.encodePacked(metaKeyNew)), "Duplicate key");
         }
 
         ld._batches[batchId].metaKeys.push(metaKeyNew);
@@ -257,18 +250,11 @@ library TokenLib {
     public {
         require(ld._contractSealed, "Contract is not sealed");
         require(ld._ledger[ledgerOwner].exists == true, "Bad ledgerOwner");
-        //require(burnQty >= 0x1 && burnQty <= 0xffffffffffffffff, "Bad burnQty"); // max uint64
         require(burnQty >= 0x1 && burnQty <= 0x7fffffffffffffff, "Bad burnQty"); // max int64
         require(tokenTypeId >= 1 && tokenTypeId <= std._tt_Count, "Bad tokenTypeId");
 
         // check ledger owner has sufficient tokens of supplied type
         require(StructLib.sufficientTokens(ld, ledgerOwner, tokenTypeId, int256(burnQty), 0) == true, "Insufficient tokens");
-        // uint256 kgAvailable = 0;
-        // for (uint i = 0; i < ld._ledger[ledgerOwner].tokenType_stIds[tokenTypeId].length; i++) {
-        //     kgAvailable += ld._sts_currentQty[ld._ledger[ledgerOwner].tokenType_stIds[tokenTypeId][i]];
-        // }
-        // require(kgAvailable >= uint256(burnQty), "Insufficient tokens");
-        //require(ld._ledger[ledgerOwner].tokenType_sumQty[tokenTypeId] >= uint256(burnQty), "Insufficient tokens");
 
         // burn (i.e. delete or resize) sufficient ST(s)
         uint256 ndx = 0;

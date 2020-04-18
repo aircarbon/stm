@@ -19,7 +19,6 @@ library FuturesLib {
         uint256 tokTypeId,
         uint16  initMarginBips
     ) public {
-        //require(ld._ledger[ledgerOwner].exists == true, "Bad ledgerOwner");
         require(tokTypeId >= 0 && tokTypeId <= std._tt_Count, "Bad tokTypeId");
         require(std._tt_Settle[tokTypeId] == StructLib.SettlementType.FUTURE, "Bad token settlement type");
         require(/*std._tt_ft[tokTypeId].varMarginBips +*/initMarginBips <= 10000, "Bad total margin");
@@ -42,9 +41,7 @@ library FuturesLib {
     ) public {
         require(ld._contractSealed, "Contract is not sealed");
         require(a.ledger_A != a.ledger_B, "Bad transfer");
-        require(a.qty_A <= 0x7FFFFFFFFFFFFFFF && a.qty_B <= 0x7FFFFFFFFFFFFFFF &&
-                a.qty_A >= -0x7FFFFFFFFFFFFFFF && a.qty_B >= -0x7FFFFFFFFFFFFFFF &&
-                a.qty_A != 0 && a.qty_B != 0, "Bad quantity"); // min/max signed int64, non-zero
+        require(a.qty_A <= 0x7FFFFFFFFFFFFFFF && a.qty_B <= 0x7FFFFFFFFFFFFFFF && a.qty_A >= -0x7FFFFFFFFFFFFFFF && a.qty_B >= -0x7FFFFFFFFFFFFFFF && a.qty_A != 0 && a.qty_B != 0, "Bad quantity"); // min/max signed int64, non-zero
         require(a.qty_A + a.qty_B == 0, "Quantity mismatch");
         require(a.tokTypeId >= 0 && a.tokTypeId <= std._tt_Count, "Bad tokTypeId");
         require(std._tt_Settle[a.tokTypeId] == StructLib.SettlementType.FUTURE, "Bad token settlement type");
@@ -159,18 +156,14 @@ library FuturesLib {
             itm = TakePayVars({  st: longSt, delta: long_Delta  });
             otm = TakePayVars({ st: shortSt, delta: short_Delta });
         }
-        //require(otm.delta < 0 || (otm.delta == 0 && itm.delta == 0), "Unexpected otm_Delta");
-        //require(itm.delta > 0 || (otm.delta == 0 && itm.delta == 0), "Unexpected itm_Delta");
 
         // apply settlement fees
         // (note: we donn't fail if insufficient balance for fees: position should be liquidated well before that point anyway)
         //emit dbg(a.feePerSide);
-        //require(ld._ledger[otm.st.ft_ledgerOwner].ccyType_balance[fta.refCcyId] >= a.feePerSide, "Insufficient currency (OTM) for fee");
         if (ld._ledger[otm.st.ft_ledgerOwner].ccyType_balance[fta.refCcyId] >= a.feePerSide) {
             StructLib.transferCcy(ld, StructLib.TransferCcyArgs({
                 from: otm.st.ft_ledgerOwner, to: a.feeAddrOwner, ccyTypeId: fta.refCcyId, amount: uint256(a.feePerSide), transferType: StructLib.TransferType.TakePayFee }));
         }
-        //require(ld._ledger[itm.st.ft_ledgerOwner].ccyType_balance[fta.refCcyId] >= a.feePerSide, "Insufficient currency (ITM) for fee");
         if (ld._ledger[itm.st.ft_ledgerOwner].ccyType_balance[fta.refCcyId] >= a.feePerSide) {
             StructLib.transferCcy(ld, StructLib.TransferCcyArgs({
                 from: itm.st.ft_ledgerOwner, to: a.feeAddrOwner, ccyTypeId: fta.refCcyId, amount: uint256(a.feePerSide), transferType: StructLib.TransferType.TakePayFee }));
@@ -187,7 +180,6 @@ library FuturesLib {
         if (otm_Take > ld._ledger[otm.st.ft_ledgerOwner].ccyType_balance[fta.refCcyId]) {
             otm_Take = ld._ledger[otm.st.ft_ledgerOwner].ccyType_balance[fta.refCcyId];
         }
-        //require(otm_Take >= 0, "Unexpected otm_Take");
 
         // apply take/pay currency movement
         StructLib.transferCcy(ld, StructLib.TransferCcyArgs({

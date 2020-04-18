@@ -36,8 +36,7 @@ library PayableLib {
         require(qty_saleAllocation >= current.qty_issuanceSold, "Bad cashflow request: qty_saleAllocation too small");
 
         // price is either in eth or in usd
-        require(cents_currentPrice == 0 && wei_currentPrice > 0 ||
-                cents_currentPrice > 0 && wei_currentPrice == 0, "Bad cashflow request: price either in USD or ETH");
+        require(cents_currentPrice == 0 && wei_currentPrice > 0 || cents_currentPrice > 0 && wei_currentPrice == 0, "Bad cashflow request: price either in USD or ETH");
 
         // we require a fixed price for bonds, because price paid is used to determine the interest due;
         // (we could have variable pricing, but only at the cost of copying the price paid into the token structure)
@@ -73,7 +72,9 @@ library PayableLib {
         require(ld._batches_currentMax_id == 1, "Bad cashflow request: no minted batch");
         require(cashflowData.wei_currentPrice > 0 || cashflowData.cents_currentPrice > 0, "Bad cashflow request: no price set");
         require(cashflowData.wei_currentPrice == 0 || cashflowData.cents_currentPrice == 0, "Bad cashflow request: ambiguous price set");
-        if (cashflowData.cents_currentPrice > 0) require(ethSat_UsdCents > 0, "Bad cashflow request: the end is nigh");
+        if (cashflowData.cents_currentPrice > 0) {
+            require(ethSat_UsdCents > 0, "Bad cashflow request: the end is nigh");
+        }
 
         // get issuer
         StructLib.SecTokenBatch storage issueBatch = ld._batches[1];

@@ -25,7 +25,7 @@ const HDWalletProvider = require("@truffle/hdwallet-provider");
 const DEV_MNEMONIC = require('./dev_mnemonic.js').MNEMONIC;
 const PROD_MNEMONIC = '...'; // **PROD TODO
 
-const gweiDeployment = "5";
+const gweiDeployment = "20";
 
 module.exports = {
   /**
@@ -77,17 +77,16 @@ module.exports = {
       provider: () => new HDWalletProvider(DEV_MNEMONIC, "https://ac-dev0.net:9545",
                       0, 1000), // # test accounts
       network_id: "*", // 3
-      gas: 7800000, // node reported limit: 7,984,363
+      gas: 8000029,
       gasPrice: web3.utils.toWei(gweiDeployment, "gwei"),
       networkCheckTimeout: 30000,
       
       confirmations: 2,    // # of confs to wait between deployments. (default: 0)
-
       skipDryRun: true,
       timeoutBlocks: 200, // but web3 always times out at 50 blocks?!
     },
 
-    // aircarbon private testnet geth node
+    // aircarbon private testnet g eth node
     testnet_ace: {
       provider: () => new HDWalletProvider(DEV_MNEMONIC, "https://ac-dev1.net:9545",
                       0, 1000), // # test accounts
@@ -100,9 +99,13 @@ module.exports = {
     ropsten_infura: {
       provider: () => new HDWalletProvider(DEV_MNEMONIC, "https://ropsten.infura.io/v3/93db2c7fd899496d8400e86100058297",
                       0, 1000), // # test accounts
-      network_id: "*", // 3 ?
-      gas: 7800000,
+      network_id: "*", // 3
+      gas: 8000000,
       gasPrice: web3.utils.toWei(gweiDeployment, "gwei"),
+
+      confirmations: 1,
+      skipDryRun: true,
+      timeoutBlocks: 200,
     },
 
     rinkeby_infura: {

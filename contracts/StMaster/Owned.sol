@@ -22,10 +22,6 @@ contract Owned is IOwned
         require(readOnlyState == false, "Read-only");
         _;
     }
-    // modifier onlyWhenReadOnly() {
-    //     require(readOnly == true, "Set to read-only first");
-    //     _;
-    // }
 
     function setReadOnly(bool readOnlyNewState)
     external onlyOwner() {

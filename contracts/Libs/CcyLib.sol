@@ -19,8 +19,7 @@ library CcyLib {
         require(ld.contractType == StructLib.ContractType.COMMODITY, "Bad cashflow request");
 
         for (uint256 ccyTypeId = 1; ccyTypeId <= ctd._ct_Count; ccyTypeId++) {
-            require(keccak256(abi.encodePacked(ctd._ct_Ccy[ccyTypeId].name)) != keccak256(abi.encodePacked(name)),
-                    "Currency type name already exists");
+            require(keccak256(abi.encodePacked(ctd._ct_Ccy[ccyTypeId].name)) != keccak256(abi.encodePacked(name)), "Currency type name already exists");
         }
 
         ctd._ct_Count++;
@@ -95,8 +94,7 @@ library CcyLib {
         require(amount > 0, "Bad amount");
         require(ld._ledger[ledgerOwner].exists == true, "Bad ledgerOwner");
 
-        require((ld._ledger[ledgerOwner].ccyType_balance[ccyTypeId] -
-                 ld._ledger[ledgerOwner].ccyType_reserved[ccyTypeId]) >= amount, "Insufficient balance");
+        require((ld._ledger[ledgerOwner].ccyType_balance[ccyTypeId] - ld._ledger[ledgerOwner].ccyType_reserved[ccyTypeId]) >= amount, "Insufficient balance");
 
         // update ledger balance
         ld._ledger[ledgerOwner].ccyType_balance[ccyTypeId] -= amount;
