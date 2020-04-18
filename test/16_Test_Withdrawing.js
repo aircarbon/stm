@@ -70,7 +70,7 @@ contract("StMaster", accounts => {
         ledgerEntryAfter = await stm.getLedgerEntry(withdrawer);
         truffleAssert.eventEmitted(withdrawTx, 'CcyWithdrewLedger', ev => {
             return ev.ccyTypeId == ccyTypeId
-                && ev.ledgerOwner == withdrawer
+                && ev.from == withdrawer
                 && ev.amount.toString() == amount.toString()
                 ;
         });

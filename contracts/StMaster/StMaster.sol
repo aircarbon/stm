@@ -45,8 +45,8 @@ contract StMaster is IStMaster, IPublicViews,
     // events -- (hack: see: https://ethereum.stackexchange.com/questions/11137/watching-events-defined-in-libraries)
     // CcyLib events
     event AddedCcyType(uint256 id, string name, string unit);
-    event CcyFundedLedger(uint256 ccyTypeId, address indexed ledgerOwner, int256 amount);
-    event CcyWithdrewLedger(uint256 ccyTypeId, address indexed ledgerOwner, int256 amount);
+    event CcyFundedLedger(uint256 ccyTypeId, address indexed to, int256 amount);
+    event CcyWithdrewLedger(uint256 ccyTypeId, address indexed from, int256 amount);
     // TokenLib events
     event AddedSecTokenType(uint256 id, string name, StructLib.SettlementType settlementType, uint64 expiryTimestamp, uint256 underlyerTypeId, uint256 refCcyId, uint16 initMarginBips, uint16 varMarginBips);
     event SetFutureVariationMargin(uint256 tokenTypeId, uint16 varMarginBips);
