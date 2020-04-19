@@ -29,11 +29,20 @@ library StructLib {
 
             ld._ccyType_totalTransfered[a.ccyTypeId] += a.amount;
 
-            emit StructLib.TransferedLedgerCcy(a.from, a.to, a.ccyTypeId, a.amount, a.transferType);
+            //emit StructLib.TransferedLedgerCcy(a.from, a.to, a.ccyTypeId, a.amount, a.transferType);
+            emitTransferedLedgerCcy(ld, a);
 
             if (a.transferType == StructLib.TransferType.ExchangeFee) {
                 ld._ccyType_totalFeesPaid[a.ccyTypeId] += a.amount;
             }
+        }
+    }
+    function emitTransferedLedgerCcy(
+        StructLib.LedgerStruct storage ld,
+        TransferCcyArgs memory a)
+    public {
+        if (a.amount > 0) {
+            emit StructLib.TransferedLedgerCcy(a.from, a.to, a.ccyTypeId, a.amount, a.transferType);
         }
     }
 

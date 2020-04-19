@@ -43,16 +43,20 @@ module.exports = {
         for (posId of shortPosIds) {
             
             const { txHash, receipt, evs } = await CONST.web3_tx('takePay', [ftId, posId, MP, FEE_PER_SIDE], O.addr, O.privKey);
-            //console.log('ev... TakePay:', ev);
+            // console.log('receipt... TakePay:', receipt);
+            // console.log('evs... TakePay:', evs);
+            // console.dir(evs[0].raw.topics);
+            // console.dir(evs[1].raw.topics);
+            // console.dir(evs[2].raw.topics);
             const ev = evs.find(p => p.event == 'TakePay').returnValues;
-            const itm_le = await CONST.web3_call('getLedgerEntry', [ev.itm]);
-            const otm_le = await CONST.web3_call('getLedgerEntry', [ev.otm]);
+            const itm_le = await CONST.web3_call('getLedgerEntry', [ev.to]);
+            const otm_le = await CONST.web3_call('getLedgerEntry', [ev.from]);
             //console.log('itm_le', itm_le);
             //console.log('ft.ft.refCcyId', ft.ft.refCcyId);
             console.log(chalk.greenBright(`\
 DONE=$${Number(ev.done.toString()).toFixed(0).padEnd(7)} (delta=$${Number(ev.delta.toString()).toFixed(0).padEnd(7)}) ==> \
-itm: ${ev.itm} ($${Number(itm_le.ccys.find(p => p.ccyTypeId.eq(ft.ft.refCcyId)).balance.toString()).toFixed(0).padEnd(8)}) / \
-otm: ${ev.otm} ($${Number(otm_le.ccys.find(p => p.ccyTypeId.eq(ft.ft.refCcyId)).balance.toString()).toFixed(0).padEnd(8)})\
+itm: ${ev.to} ($${Number(itm_le.ccys.find(p => p.ccyTypeId.eq(ft.ft.refCcyId)).balance.toString()).toFixed(0).padEnd(8)}) / \
+otm: ${ev.from} ($${Number(otm_le.ccys.find(p => p.ccyTypeId.eq(ft.ft.refCcyId)).balance.toString()).toFixed(0).padEnd(8)})\
 `));
 
             // ### delta should be linear (same each cycle) -- not using lastMarkPrice ???

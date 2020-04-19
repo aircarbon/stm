@@ -6,8 +6,7 @@ import "../Interfaces/StructLib.sol";
 library FuturesLib {
     event FutureOpenInterest(address indexed long, address indexed short, /*uint256 shortStId,*/ uint256 tokTypeId, uint256 qty, uint256 price);
     event SetInitialMargin(uint256 tokenTypeId, address indexed ledgerOwner, uint16 initMarginBips);
-    event TakePay(address indexed otm, address indexed itm, uint256 delta, uint256 done);
-    //event dbg(int256 feePerSide);
+    event TakePay(address indexed from, address indexed to, uint256 delta, uint256 done, address indexed feeTo, uint256 otmFee, uint256 itmFee, uint256 feeCcyId);
 
     //
     // PUBLIC - get/set initial margin ledger override
@@ -108,6 +107,9 @@ library FuturesLib {
     struct TakePayVars {
         StructLib.PackedSt st;
         int256 delta;
+        int256 bal;
+        int256 fee;
+        int256 take;
     }
     function takePay(
         StructLib.LedgerStruct storage ld,
@@ -116,90 +118,80 @@ library FuturesLib {
     ) public {
         // ...todo? - recalculate margin requirement (calcPosMargin()) - i.e. allow changes of FT var-margin on open positions...
 
-        require(a.tokTypeId >= 0 && a.tokTypeId <= std._tt_Count, "Bad tokTypeId");
+        //require(a.tokTypeId >= 0 && a.tokTypeId <= std._tt_Count, "Bad tokTypeId");
         require(std._tt_Settle[a.tokTypeId] == StructLib.SettlementType.FUTURE, "Bad token settlement type");
         StructLib.FutureTokenTypeArgs storage fta = std._tt_ft[a.tokTypeId];
-        require(fta.contractSize > 0, "Unexpected token type FutureTokenTypeArgs");
+        //require(fta.contractSize > 0, "Unexpected token type FutureTokenTypeArgs");
 
-        uint256 long_stId = a.short_stId + 1;
+        //uint256 long_stId = a.short_stId + 1;
 
         StructLib.PackedSt storage shortSt = ld._sts[a.short_stId];
-        require(shortSt.batchId == 0 && shortSt.ft_price != 0, "Bad (unexpected data) on explicit short token");
+        //require(shortSt.batchId == 0 && shortSt.ft_price != 0, "Bad (unexpected data) on explicit short token");
         require(shortSt.currentQty < 0, "Bad (non-short quantity) on explicit short token");
-        require(shortSt.ft_ledgerOwner != address(0x0), "Bad token ledger owner on explicit short token");
+        //require(shortSt.ft_ledgerOwner != address(0x0), "Bad token ledger owner on explicit short token");
 
-        StructLib.PackedSt storage longSt = ld._sts[long_stId];
+        StructLib.PackedSt storage longSt = ld._sts[a.short_stId + 1];
         require(longSt.batchId == 0 && longSt.ft_price != 0, "Bad (unexpected data) on implied long token");
-        require(longSt.currentQty > 0, "Bad (non-short quantity) on implied long token");
-        require(longSt.ft_ledgerOwner != address(0x0), "Bad token ledger owner on implied long token");
+        //require(longSt.currentQty > 0, "Bad (non-short quantity) on implied long token");
+        //require(longSt.ft_ledgerOwner != address(0x0), "Bad token ledger owner on implied long token");
 
         require(a.markPrice >= 0, "Bad markPrice"); // allow zero for marking
 
-        require(tokenExistsOnLedger(ld, a.tokTypeId, shortSt, a.short_stId), "Bad or missing ledger token type on explicit short token");
-        require(tokenExistsOnLedger(ld, a.tokTypeId, longSt, long_stId), "Bad or missing ledger token type on implied long token");
+        //require(tokenExistsOnLedger(ld, a.tokTypeId, shortSt, a.short_stId), "Bad or missing ledger token type on explicit short token");
+        //require(tokenExistsOnLedger(ld, a.tokTypeId, longSt, a.short_stId + 1), "Bad or missing ledger token type on implied long token");
 
         require(a.feePerSide >= 0, "Bad feePerSide");
 
         // get delta each side
-        int256 short_Delta = calcTakePay(ld, fta, a.tokTypeId, shortSt, a.markPrice, shortSt.ft_lastMarkPrice); //**
-        int256 long_Delta = calcTakePay(ld, fta, a.tokTypeId, longSt, a.markPrice, longSt.ft_lastMarkPrice); //**
-        require(short_Delta + long_Delta == 0, "Unexpected net delta short/long");
+        int256 short_Delta = calcTakePay(ld, fta, a.tokTypeId, shortSt, a.markPrice, shortSt.ft_lastMarkPrice);
+        int256 long_Delta = calcTakePay(ld, fta, a.tokTypeId, longSt, a.markPrice, shortSt.ft_lastMarkPrice);
+        //require(short_Delta + long_Delta == 0, "Unexpected net delta short/long");
 
         // get OTM/ITM sides
         TakePayVars memory itm;
         TakePayVars memory otm;
         if (short_Delta == long_Delta || short_Delta > 0) {
-            itm = TakePayVars({ st: shortSt, delta: short_Delta });
-            otm = TakePayVars({  st: longSt, delta: long_Delta  });
+            itm = TakePayVars({ st: shortSt, delta: short_Delta, bal: ld._ledger[shortSt.ft_ledgerOwner].ccyType_balance[fta.refCcyId], fee: 0, take: 0 });
+            otm = TakePayVars({  st: longSt, delta: long_Delta,  bal: ld._ledger[longSt.ft_ledgerOwner].ccyType_balance[fta.refCcyId],  fee: 0, take: 0 });
         }
         else {
-            itm = TakePayVars({  st: longSt, delta: long_Delta  });
-            otm = TakePayVars({ st: shortSt, delta: short_Delta });
+            itm = TakePayVars({  st: longSt, delta: long_Delta,  bal: ld._ledger[longSt.ft_ledgerOwner].ccyType_balance[fta.refCcyId],  fee: 0, take: 0 });
+            otm = TakePayVars({ st: shortSt, delta: short_Delta, bal: ld._ledger[shortSt.ft_ledgerOwner].ccyType_balance[fta.refCcyId], fee: 0, take: 0 });
         }
 
         // apply settlement fees
-        // (note: we don't fail if insufficient balance for fees: position should be liquidated well before that point anyway)
-        if (a.feePerSide > 0 && ld._ledger[otm.st.ft_ledgerOwner].ccyType_balance[fta.refCcyId] >= a.feePerSide) {
-            StructLib.transferCcy(ld, StructLib.TransferCcyArgs({
-                from: otm.st.ft_ledgerOwner, to: a.feeAddrOwner, ccyTypeId: fta.refCcyId, amount: uint256(a.feePerSide), transferType: StructLib.TransferType.TakePayFee }));
-        }
-        if (a.feePerSide > 0 && ld._ledger[itm.st.ft_ledgerOwner].ccyType_balance[fta.refCcyId] >= a.feePerSide) {
-            StructLib.transferCcy(ld, StructLib.TransferCcyArgs({
-                from: itm.st.ft_ledgerOwner, to: a.feeAddrOwner, ccyTypeId: fta.refCcyId, amount: uint256(a.feePerSide), transferType: StructLib.TransferType.TakePayFee }));
-        }
+        otm.fee = otm.bal >= a.feePerSide ? a.feePerSide : 0;
+        itm.fee = itm.bal >= a.feePerSide ? a.feePerSide : 0;
+        if (otm.fee + itm.fee > 0) {
+            ld._ledger[a.feeAddrOwner].ccyType_balance[fta.refCcyId] += otm.fee + itm.fee;//(a.feePerSide) * 2;
 
-        //
-        //## gas - combine fee update w/ takepay updates (currently 6 updates (owner x2, itm x2, out x2): could be net 3 updates)
-        // i.e. optimize out StructLib.transferCcy...
-        //  baseline: 132177 "FT pos-pair take/pay fees"
-        //...
+            StructLib.emitTransferedLedgerCcy(ld, StructLib.TransferCcyArgs({
+                from: otm.st.ft_ledgerOwner, to: a.feeAddrOwner, ccyTypeId: fta.refCcyId, amount: uint256(otm.fee), transferType: StructLib.TransferType.TakePayFee }));
+
+            StructLib.emitTransferedLedgerCcy(ld, StructLib.TransferCcyArgs({
+                from: itm.st.ft_ledgerOwner, to: a.feeAddrOwner, ccyTypeId: fta.refCcyId, amount: uint256(itm.fee), transferType: StructLib.TransferType.TakePayFee }));
+        }
+        otm.bal -= otm.fee;
+        itm.bal -= itm.fee;
 
         // update last mark price
         shortSt.ft_lastMarkPrice = a.markPrice;
-        longSt.ft_lastMarkPrice = a.markPrice; //## gas - could be dropped: use only the short side's last price
-        //...
-
-        // nop for net zero take/pay
-        if (short_Delta == long_Delta) { // == 0
-            emit TakePay(shortSt.ft_ledgerOwner, longSt.ft_ledgerOwner, 0, 0);
-            return;
-        }
+        //longSt.ft_lastMarkPrice = a.markPrice; //## gas - we use only the short side's last price
 
         // cap OTM side at physical balance
-        int256 otm_Take = otm.delta * -1;
-        if (otm_Take > ld._ledger[otm.st.ft_ledgerOwner].ccyType_balance[fta.refCcyId]) {
-            otm_Take = ld._ledger[otm.st.ft_ledgerOwner].ccyType_balance[fta.refCcyId];
+        otm.take = otm.delta * -1;
+        if (otm.take > otm.bal) {
+            otm.take = otm.bal;
         }
 
         // apply take/pay currency movement
-        StructLib.transferCcy(ld, StructLib.TransferCcyArgs({
-                from: otm.st.ft_ledgerOwner,
-                  to: itm.st.ft_ledgerOwner,
-           ccyTypeId: fta.refCcyId,
-              amount: uint256(otm_Take),
-        transferType: StructLib.TransferType.TakePay
-        }));
-        emit TakePay(otm.st.ft_ledgerOwner, itm.st.ft_ledgerOwner, uint256(itm.delta), uint256(otm_Take));
+        ld._ledger[otm.st.ft_ledgerOwner].ccyType_balance[fta.refCcyId] = otm.bal - (otm.take);
+        ld._ledger[itm.st.ft_ledgerOwner].ccyType_balance[fta.refCcyId] = itm.bal + (otm.take);
+
+        StructLib.emitTransferedLedgerCcy(ld, StructLib.TransferCcyArgs({
+           from: otm.st.ft_ledgerOwner, to: itm.st.ft_ledgerOwner, ccyTypeId: fta.refCcyId, amount: uint256(otm.take), transferType: StructLib.TransferType.TakePay }));
+
+        emit TakePay(otm.st.ft_ledgerOwner, itm.st.ft_ledgerOwner, uint256(itm.delta), uint256(otm.take), a.feeAddrOwner, uint256(otm.fee), uint256(itm.fee), fta.refCcyId);
     }
 
     // returns uncapped take/pay settlment amount for the given position

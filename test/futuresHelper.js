@@ -32,8 +32,8 @@ module.exports = {
         
         var itm, otm, delta, done;
         truffleAssert.eventEmitted(tx, 'TakePay', ev => {
-            itm = ev.itm;
-            otm = ev.otm;
+            itm = ev.to;
+            otm = ev.from;
             delta = ev.delta;
             done = ev.done;
             return true;
@@ -41,8 +41,8 @@ module.exports = {
         const ledgerShort_after = await stm.getLedgerEntry(stShort.ft_ledgerOwner);
         const ledgerLong_after = await stm.getLedgerEntry(stLong.ft_ledgerOwner);
 
-        //console.log('delta', delta.toString());
-        //console.log('done', done.toString());
+        // console.log('delta', delta.toString());
+        // console.log('done', done.toString());
         //console.log('itm (ev)', itm);
         //console.log('otm (ev)', otm);
         //console.log('stShort.ft_ledgerOwner', stShort.ft_ledgerOwner);
@@ -73,8 +73,10 @@ module.exports = {
                             .sub(new BN(ledgerLong_before.ccys.find(p => p.id == ft.refCcyId).balance));
         }
         else throw('Unexpected ledger itm/otm values');
-        assert(itm_ccyDelta.eq(done.sub(new BN(feePerSide))), 'unexpected ITM ccy delta');
+        //console.log('itm_ccyDelta', itm_ccyDelta.toString());
+        //console.log('otm_ccyDelta', otm_ccyDelta.toString());
         assert(otm_ccyDelta.eq(done.neg().sub(new BN(feePerSide))), 'unexpected OTM ccy delta');
+        assert(itm_ccyDelta.eq(done.sub(new BN(feePerSide))), 'unexpected ITM ccy delta');
 
         return { 
             tx, stShort, stLong,
