@@ -1,4 +1,4 @@
-pragma solidity ^0.5.13;
+pragma solidity >=0.4.21 <=0.6.6;
 pragma experimental ABIEncoderV2;
 
 import "../Interfaces/StructLib.sol";
@@ -15,25 +15,22 @@ library LedgerLib {
         StructLib.StTypesStruct storage std,
         StructLib.CcyTypesStruct storage ctd,
         StructLib.Erc20Struct storage erc20d,
-        StructLib.CashflowStruct storage cashflowData,
+        //StructLib.CashflowStruct storage cashflowData,
         StructLib.FeeStruct storage globalFees
     )
     public view returns (bytes32) {
         bytes32 ledgerHash;
 
         // hash cashflow data
-        ledgerHash = keccak256(abi.encodePacked(ledgerHash,
-            cashflowData.args.cashflowType,
-            //cashflowData.args.wei_maxIssuance,
-            //cashflowData.args.wei_currentPrice,
-            cashflowData.args.term_Blks,
-            cashflowData.args.bond_bps,
-            cashflowData.args.bond_int_EveryBlks,
-            //cashflowData.issued_Blk
-            cashflowData.qty_issuanceMax,
-            cashflowData.qty_issuanceRemaining,
-            cashflowData.wei_currentPrice
-        ));
+        // ledgerHash = keccak256(abi.encodePacked(ledgerHash,
+        //     cashflowData.args.cashflowType,
+        //     cashflowData.args.term_Blks,
+        //     cashflowData.args.bond_bps,
+        //     cashflowData.args.bond_int_EveryBlks,
+        //     cashflowData.qty_issuanceMax,
+        //     cashflowData.qty_issuanceRemaining,
+        //     cashflowData.wei_currentPrice
+        // ));
 
         // hash currency types & exchange currency fees
         for (uint256 ccyTypeId = 1; ccyTypeId <= ctd._ct_Count; ccyTypeId++) {

@@ -1,4 +1,4 @@
-pragma solidity ^0.5.13;
+pragma solidity >=0.4.21 <=0.6.6;
 pragma experimental ABIEncoderV2;
 
 import "../Interfaces/StructLib.sol";
@@ -274,7 +274,9 @@ library TokenLib {
 
                 // remove from ledger
                 tokenType_stIds[ndx] = tokenType_stIds[tokenType_stIds.length - 1];
-                tokenType_stIds.length--;
+                //tokenType_stIds.length--;
+                tokenType_stIds.pop(); // solc 0.6
+
                 //ld._ledger[ledgerOwner].tokenType_sumQty[tokenTypeId] -= stQty;
 
                 // burn from batch

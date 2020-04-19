@@ -1,8 +1,8 @@
 
-pragma solidity ^0.5.13;
+pragma solidity >=0.4.21 <=0.6.6;
 pragma experimental ABIEncoderV2;
 
-import "../Interfaces/IStPayable.sol";
+//import "../Interfaces/IStPayable.sol";
 
 import "./StFees.sol";
 
@@ -10,13 +10,14 @@ import "../Libs/LedgerLib.sol";
 import "../Interfaces/StructLib.sol";
 import "../Libs/PayableLib.sol";
 
-import "../Interfaces/IChainlinkAggregator.sol";
+//import "../Interfaces/IChainlinkAggregator.sol";
 
 //
 // WIP - out of scope
 //
+
 contract StPayable is
-    IStPayable,
+    //IStPayable,
     StFees {
 
     // === CFT ===
@@ -27,25 +28,27 @@ contract StPayable is
     //      TODO: pri3 - wallet auto-converts
     //      TODO: pri4 - (eq-type) changing issuancePrice mid-issuance
 
-    StructLib.CashflowStruct cashflowData;
-
-    // Chainlink
+/*
     address public chainlinkAggregator_btcUsd;
     address public chainlinkAggregator_ethUsd;
 
-    function get_btcUsd() public view returns(int256) {
-        if (chainlinkAggregator_btcUsd == address(0x0)) return 100000000; // $1 - cents*satoshis
-        IChainlinkAggregator ref = IChainlinkAggregator(chainlinkAggregator_btcUsd);
-        return ref.latestAnswer();
-    }
-    function get_ethUsd() public view returns(int256) {
-        if (chainlinkAggregator_ethUsd == address(0x0)) return 100000000; // $1 - cents*satoshis
-        IChainlinkAggregator ref = IChainlinkAggregator(chainlinkAggregator_ethUsd);
-        return ref.latestAnswer();
-    }
+    StructLib.CashflowStruct cashflowData;
 
-    function() external payable onlyWhenReadWrite() {
-        PayableLib.pay(ld, cashflowData, ctd, globalFees, owner, get_ethUsd());
+    // function get_btcUsd() public view returns(int256) {
+    //     if (chainlinkAggregator_btcUsd == address(0x0)) return 100000000; // $1 - cents*satoshis
+    //     IChainlinkAggregator ref = IChainlinkAggregator(chainlinkAggregator_btcUsd);
+    //     return ref.latestAnswer();
+    // }
+    // function get_ethUsd() public view returns(int256) {
+    //     if (chainlinkAggregator_ethUsd == address(0x0)) return 100000000; // $1 - cents*satoshis
+    //     IChainlinkAggregator ref = IChainlinkAggregator(chainlinkAggregator_ethUsd);
+    //     return ref.latestAnswer();
+    // }
+
+    //function() external  payable  onlyWhenReadWrite() {
+    receive() external payable {
+        PayableLib.pay(ld, cashflowData, ctd, globalFees, owner, 1 //get_ethUsd() // TODO: move chainlinkAggregator_ethUsd to PayableLib...
+        );
     }
 
     function setIssuerValues(
@@ -67,4 +70,6 @@ contract StPayable is
     function getCashflowData() public view returns(StructLib.CashflowStruct memory) {
         return PayableLib.getCashflowData(ld, cashflowData);
     }
+
+*/
 }

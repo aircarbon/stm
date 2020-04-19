@@ -71,8 +71,8 @@ module.exports = async function (deployer) {
     return deployer.deploy(PayableLib).then(async payableLib => { 
         deployer.link(PayableLib, StMaster);
 
-    return deployer.deploy(FuturesLib).then(async futuresLib => { 
-        deployer.link(FuturesLib, StMaster);
+    //return deployer.deploy(FuturesLib).then(async futuresLib => { 
+    //    deployer.link(FuturesLib, StMaster);
         
         //console.log('cashflowArgs', CONST.contractProps[type].cashflowArgs);
         
@@ -125,7 +125,7 @@ module.exports = async function (deployer) {
             }
         }).catch(err => { console.error('failed deployment: StMaster', err); });
     
-    }).catch(err => { console.error('failed deployment: FuturesLib', err); });
+    //}).catch(err => { console.error('failed deployment: FuturesLib', err); });
     }).catch(err => { console.error('failed deployment: PayableLib', err); });
     }).catch(err => { console.error('failed deployment: DataLib', err); });
     }).catch(err => { console.error('failed deployment: Erc20Lib', err); });

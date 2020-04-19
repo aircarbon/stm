@@ -1,4 +1,4 @@
-pragma solidity ^0.5.13;
+pragma solidity >=0.4.21 <=0.6.6;
 pragma experimental ABIEncoderV2;
 
 import "../Interfaces/StructLib.sol";
@@ -82,6 +82,7 @@ library PayableLib {
         // process payment
         if (msg.sender == issueBatch.originator) {
             //processIssuerPayment(ld, cashflowData, issueBatch, globalFees, owner); // sender is issuer
+            // TODO...
         }
         else {
             processSubscriberPayment(ld, cashflowData, ctd, issueBatch, globalFees, owner, ethSat_UsdCents); // all other senders
@@ -93,7 +94,8 @@ library PayableLib {
         StructLib.CashflowStruct storage cashflowData,
         StructLib.CcyTypesStruct storage ctd,
         StructLib.SecTokenBatch storage issueBatch,
-        StructLib.FeeStruct storage globalFees, address owner,
+        StructLib.FeeStruct storage globalFees,
+        address owner,
         int256 ethSat_UsdCents
     )
     private {
@@ -178,60 +180,61 @@ library PayableLib {
     //
     // TODO: ### caller needs to be able to specify a batch / offset (~5m gas / ~23k transfer per holder ~= 250 max holders!!)
     //
-    function processIssuerPayment(
-        StructLib.LedgerStruct storage ld,
-        StructLib.CashflowStruct storage cashflowData,
-        StructLib.SecTokenBatch storage issueBatch,
-        StructLib.FeeStruct storage globalFees, address owner
-    )
-    private {
-        // TODO: restrict msg.value upper bound so no overflow -- esp. wrt. precision hack below!!
+    // function processIssuerPayment(
+    //     StructLib.LedgerStruct storage ld,
+    //     StructLib.CashflowStruct storage cashflowData,
+    //     StructLib.SecTokenBatch storage issueBatch,
+    //     StructLib.FeeStruct storage globalFees,
+    //     address owner
+    // )
+    // private {
+    //     // TODO: restrict msg.value upper bound so no overflow -- esp. wrt. precision hack below!!
 
-        uint256[] storage issuer_stIds = ld._ledger[issueBatch.originator].tokenType_stIds[1];
-        StructLib.PackedSt storage issuerSt = ld._sts[issuer_stIds[0]];
+    //     uint256[] storage issuer_stIds = ld._ledger[issueBatch.originator].tokenType_stIds[1];
+    //     StructLib.PackedSt storage issuerSt = ld._sts[issuer_stIds[0]];
 
-        //address payable I = issueBatch.originator;
-        uint256 B = issueBatch.mintedQty;
-        uint256 I = uint256(issuerSt.currentQty);
-        uint256 S = B - I;
-        //uint256 r = cashflowData.args.bond_bps;
-        //uint256 p = cashflowData.wei_currentPrice;
+    //     //address payable I = issueBatch.originator;
+    //     uint256 B = issueBatch.mintedQty;
+    //     uint256 I = uint256(issuerSt.currentQty);
+    //     uint256 S = B - I;
+    //     //uint256 r = cashflowData.args.bond_bps;
+    //     //uint256 p = cashflowData.wei_currentPrice;
 
-        // TODO: fees
-        // uint256 fee = ...
-        // owner.transfer(msg.fee);
-        // uint256 msgValueExFees = msg.value - fee
-        //...
+    //     // TODO: fees
+    //     // uint256 fee = ...
+    //     // owner.transfer(msg.fee);
+    //     // uint256 msgValueExFees = msg.value - fee
+    //     //...
 
-        // TODO: events...
+    //     // TODO: events...
 
-        if (cashflowData.args.cashflowType == StructLib.CashflowType.BOND) {
-            // TODO: calc/switch interest vs. principal repayment...?
-            // TODO: calc requiredQty; require qty >= required: need a concept of last paid block, and interest due per block? i.e. per ~15s interest interval!
+    //     if (cashflowData.args.cashflowType == StructLib.CashflowType.BOND) {
+    //         // TODO: calc/switch interest vs. principal repayment...?
+    //         // TODO: calc requiredQty; require qty >= required: need a concept of last paid block, and interest due per block? i.e. per ~15s interest interval!
 
-            // walk all ST IDs except issuerSt...
-            // pay (ST qty / S) * (msg.value - fee)...
-            for (uint256 addrNdx = 0; addrNdx < ld._ledgerOwners.length; addrNdx++) {
-                address payable addr = address(uint160(ld._ledgerOwners[addrNdx]));
-                if (addr != issueBatch.originator) {
-                    StructLib.Ledger storage ledger = ld._ledger[addr];
-                    uint256[] storage stIds = ledger.tokenType_stIds[1];
-                    for (uint256 stNdx = 0; stNdx < stIds.length; stNdx++) {
-                        StructLib.PackedSt storage st = ld._sts[stIds[stNdx]];
+    //         // walk all ST IDs except issuerSt...
+    //         // pay (ST qty / S) * (msg.value - fee)...
+    //         for (uint256 addrNdx = 0; addrNdx < ld._ledgerOwners.length; addrNdx++) {
+    //             address payable addr = address(uint160(ld._ledgerOwners[addrNdx]));
+    //             if (addr != issueBatch.originator) {
+    //                 StructLib.Ledger storage ledger = ld._ledger[addr];
+    //                 uint256[] storage stIds = ledger.tokenType_stIds[1];
+    //                 for (uint256 stNdx = 0; stNdx < stIds.length; stNdx++) {
+    //                     StructLib.PackedSt storage st = ld._sts[stIds[stNdx]];
 
-                        uint256 sharePerc = S * 1000000/*precision*/ / uint256(st.currentQty);
-                        uint256 shareWei = msg.value * 1000000/*precision*/ / sharePerc;
+    //                     uint256 sharePerc = S * 1000000/*precision*/ / uint256(st.currentQty);
+    //                     uint256 shareWei = msg.value * 1000000/*precision*/ / sharePerc;
 
-                        addr.transfer(shareWei);
-                    }
-                }
-            }
-        }
-        else if (cashflowData.args.cashflowType == StructLib.CashflowType.EQUITY) {
-            // TODO: ...
-        }
-        else revert("Unexpected cashflow type");
-    }
+    //                     addr.transfer(shareWei);
+    //                 }
+    //             }
+    //         }
+    //     }
+    //     else if (cashflowData.args.cashflowType == StructLib.CashflowType.EQUITY) {
+    //         // TODO: ...
+    //     }
+    //     else revert("Unexpected cashflow type");
+    // }
 
     //
     // TODO: edit SQ, edit P

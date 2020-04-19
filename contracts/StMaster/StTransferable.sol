@@ -1,7 +1,7 @@
-pragma solidity ^0.5.13;
+pragma solidity >=0.4.21 <=0.6.6;
 pragma experimental ABIEncoderV2;
 
-import "../Interfaces/IStTransferable.sol";
+//import "../Interfaces/IStTransferable.sol";
 
 import "./Owned.sol";
 import "./StLedger.sol";
@@ -14,12 +14,13 @@ import "../Libs/TransferLib.sol";
 import "../Libs/Erc20Lib.sol";
 import "../Libs/LedgerLib.sol";
 
+abstract // solc 0.6
 contract StTransferable is Owned,
-    IStTransferable,
+    //IStTransferable,
     StLedger, StFees, StErc20, StPayable {
 
     function getLedgerHashcode() external view returns (bytes32) {
-        return LedgerLib.getLedgerHashcode(ld, std, ctd, erc20d, cashflowData, globalFees);
+        return LedgerLib.getLedgerHashcode(ld, std, ctd, erc20d, /*cashflowData,*/ globalFees);
     }
 
     function transferOrTrade(StructLib.TransferArgs memory a)

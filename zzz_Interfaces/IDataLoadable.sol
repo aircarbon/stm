@@ -1,4 +1,4 @@
-pragma solidity ^0.5.13;
+pragma solidity >=0.4.21 <=0.6.6;
 pragma experimental ABIEncoderV2;
 
 import "./IOwned.sol";
@@ -12,11 +12,10 @@ import "../Libs/LoadLib.sol";
  * @dev Data integrity between upgrades is verifiable through getLedgerHashcode()
  */
  contract IDataLoadable is IOwned {
-
     function loadSecTokenBatch(
         StructLib.SecTokenBatch[] memory batches,
-        uint64 _batches_currentMax_id)
-    public onlyOwner() { revert("Not implemented"); }
+        uint64 _batches_currentMax_id
+    ) public onlyOwner() { revert("Not implemented"); }
 
     function createLedgerEntry(
         address ledgerEntryOwner,
@@ -39,11 +38,11 @@ import "../Libs/LoadLib.sol";
 
     // ccy totals
     function setCcyTotals(
+        //LoadLib.SetCcyTotalArgs memory a
         uint256 ccyTypeId,
         uint256 totalFunded,
         uint256 totalWithdrawn,
         uint256 totalTransfered,
         uint256 totalFeesPaid
-    )
-    public onlyOwner() { revert("Not implemented"); }
+    ) public onlyOwner() { revert("Not implemented"); }
 }

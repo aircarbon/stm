@@ -1,7 +1,7 @@
-pragma solidity ^0.5.13;
+pragma solidity >=0.4.21 <=0.6.6;
 pragma experimental ABIEncoderV2;
 
-import "../Interfaces/IStFutures.sol";
+//import "../Interfaces/IStFutures.sol";
 
 import "./Owned.sol";
 import "./StLedger.sol";
@@ -85,13 +85,14 @@ FUTURES - notes 26/MAR/2020
 >> COULD KEEP BOTH IN CONTRACT DATA, IF WE PURGE AFTER POSITION CLOSE? (events would give the historic values?)
 */
 
+abstract // solc 0.6
 contract StFutures is Owned,
-    IStFutures,
+    //IStFutures,
     StLedger, StFees, StErc20, StPayable {
 
     function openFtPos(StructLib.FuturesPositionArgs memory a)
     public onlyOwner() onlyWhenReadWrite() {
-        FuturesLib.openFtPos(ld, std, ctd, globalFees, a, owner);
+        FuturesLib.openFtPos(ld, std, ctd, a, owner);
     }
 
     function setInitMargin_TokType(

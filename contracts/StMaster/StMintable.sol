@@ -1,7 +1,7 @@
-pragma solidity ^0.5.13;
+pragma solidity >=0.4.21 <=0.6.6;
 pragma experimental ABIEncoderV2;
 
-import "../Interfaces/IStMintable.sol";
+//import "../Interfaces/IStMintable.sol";
 
 import "./Owned.sol";
 import "./StLedger.sol";
@@ -10,7 +10,7 @@ import "../Libs/LedgerLib.sol";
 import "../Interfaces/StructLib.sol";
 import "../Libs/SpotFeeLib.sol";
 
-contract StMintable is IStMintable,
+contract StMintable is //IStMintable,
     Owned, StLedger {
 
     function mintSecTokenBatch(

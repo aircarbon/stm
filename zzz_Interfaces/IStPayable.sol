@@ -1,5 +1,5 @@
 
-pragma solidity ^0.5.13;
+pragma solidity >=0.4.21 <=0.6.6;
 pragma experimental ABIEncoderV2;
 
 import "./IOwned.sol";

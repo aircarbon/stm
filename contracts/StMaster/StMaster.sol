@@ -1,8 +1,8 @@
-pragma solidity ^0.5.13;
+pragma solidity >=0.4.21 <=0.6.6;
 pragma experimental ABIEncoderV2;
 
-import "../Interfaces/IStMaster.sol";
-import "../Interfaces/IPublicViews.sol";
+//import "../Interfaces/IStMaster.sol";
+//import "../Interfaces/IPublicViews.sol";
 
 import "./CcyCollateralizable.sol";
 import "./StMintable.sol";
@@ -15,9 +15,22 @@ import "./StFutures.sol";
 
 import "../Interfaces/StructLib.sol";
 
-contract StMaster is IStMaster, IPublicViews,
-    StMintable, StBurnable, Collateralizable, StTransferable, DataLoadable {//, StFutures {
+//
+// truffle deploy using "infinite" gas?
+// bytecode limit (24576): https://github.com/trufflesuite/ganache/issues/960
+//
+//  truffle compile --reset --all && grep \"bytecode\" build/contracts/* | awk '{print $1 " " length($3)/2}'
+//
+// 27321: ganache: ok / ropsten: ok / rinkeby: ok [no dataloadable, no futures]
+// 30508: ganache: ## ... [no futures]
+// 27741: ganache: ## / ropsten ## [no ctor setup, no futures]
+// 22123: ... [upgrade sol 0.6.6: removed ctor setup, removed WL deprecated, removed payable unused]
 
+
+contract StMaster
+    is //IStMaster, IPublicViews,
+    StMintable, StBurnable, Collateralizable, StTransferable, DataLoadable, StFutures
+{
     // === STM (AC COMMODITY) ===
     // TODO: SafeMath
     // TODO: ERC20 authorize + re-entrancy guards, and .call instead of .transfer
@@ -33,7 +46,6 @@ contract StMaster is IStMaster, IPublicViews,
     string public name;
 
     function getContractType() external view returns(StructLib.ContractType) { return ld.contractType; }
-
     function getContractSeal() external view returns (bool) { return ld._contractSealed; }
     function sealContract() external { ld._contractSealed = true; }
 
@@ -100,8 +112,10 @@ contract StMaster is IStMaster, IPublicViews,
         address                       _chainlinkAggregator_ethUsd
     ) StErc20(_contractSymbol, _contractDecimals)
     public {
-        chainlinkAggregator_btcUsd = _chainlinkAggregator_btcUsd;
-        chainlinkAggregator_ethUsd = _chainlinkAggregator_ethUsd;
+        // 24k bytecode limit - cashflow params: disable on commodity branch
+        //chainlinkAggregator_btcUsd = _chainlinkAggregator_btcUsd;
+        //chainlinkAggregator_ethUsd = _chainlinkAggregator_ethUsd;
+        //cashflowData.args = _cashflowArgs;
 
         // set common properties
         name = _contractName;
@@ -110,54 +124,55 @@ contract StMaster is IStMaster, IPublicViews,
 
         // contract type
         ld.contractType = _contractType;
-        cashflowData.args = _cashflowArgs;
+
+        // 24k bytecode limit - can be setup manually post-deployment
 
         // set token & ccy types
-        if (_contractType == StructLib.ContractType.COMMODITY) {
-            std._tt_Name[1] = 'AirCarbon CORSIA Token';     std._tt_Settle[1] = StructLib.SettlementType.SPOT;
-            std._tt_Name[2] = 'AirCarbon Nature Token';     std._tt_Settle[2] = StructLib.SettlementType.SPOT;
-            std._tt_Name[3] = 'AirCarbon Premium Token';    std._tt_Settle[3] = StructLib.SettlementType.SPOT;
-            std._tt_Count = 3;
-            ctd._ct_Ccy[1] = StructLib.Ccy({ id: 1, name: 'USD', unit: 'cents',      decimals: 2 });
-            ctd._ct_Ccy[2] = StructLib.Ccy({ id: 2, name: 'ETH', unit: 'Wei',        decimals: 18 });
-            ctd._ct_Ccy[3] = StructLib.Ccy({ id: 3, name: 'BTC', unit: 'Satoshi',    decimals: 8 });
-          //ctd._ct_Ccy[4] = StructLib.Ccy({ id: 4, name: 'SGD', unit: 'cents',      decimals: 2 });
-          //ctd._ct_Ccy[5] = StructLib.Ccy({ id: 5, name: 'EUR', unit: 'euro cents', decimals: 2 });
-          //ctd._ct_Ccy[6] = StructLib.Ccy({ id: 6, name: 'HKD', unit: 'cents',      decimals: 2 });
-          //ctd._ct_Ccy[7] = StructLib.Ccy({ id: 7, name: 'GBP', unit: 'pence',      decimals: 2 });
-            ctd._ct_Count = 3;
+    //     if (_contractType == StructLib.ContractType.COMMODITY) {
+    //         std._tt_Name[1] = 'AirCarbon CORSIA Token';     std._tt_Settle[1] = StructLib.SettlementType.SPOT;
+    //         std._tt_Name[2] = 'AirCarbon Nature Token';     std._tt_Settle[2] = StructLib.SettlementType.SPOT;
+    //         std._tt_Name[3] = 'AirCarbon Premium Token';    std._tt_Settle[3] = StructLib.SettlementType.SPOT;
+    //         std._tt_Count = 3;
+    //         ctd._ct_Ccy[1] = StructLib.Ccy({ id: 1, name: 'USD', unit: 'cents',      decimals: 2 });
+    //         ctd._ct_Ccy[2] = StructLib.Ccy({ id: 2, name: 'ETH', unit: 'Wei',        decimals: 18 });
+    //         ctd._ct_Ccy[3] = StructLib.Ccy({ id: 3, name: 'BTC', unit: 'Satoshi',    decimals: 8 });
+    //       //ctd._ct_Ccy[4] = StructLib.Ccy({ id: 4, name: 'SGD', unit: 'cents',      decimals: 2 });
+    //       //ctd._ct_Ccy[5] = StructLib.Ccy({ id: 5, name: 'EUR', unit: 'euro cents', decimals: 2 });
+    //       //ctd._ct_Ccy[6] = StructLib.Ccy({ id: 6, name: 'HKD', unit: 'cents',      decimals: 2 });
+    //       //ctd._ct_Ccy[7] = StructLib.Ccy({ id: 7, name: 'GBP', unit: 'pence',      decimals: 2 });
+    //         ctd._ct_Count = 3;
 
-            // set default ccy fee USD: $3/1000 mirrored
-            StructLib.SetFeeArgs memory feeArgsGlobalUsd = StructLib.SetFeeArgs({
-                   fee_fixed: 0,
-                fee_percBips: 0,
-                     fee_min: 300,      // min $3.00
-                     fee_max: 0,
-              ccy_perMillion: 300,      // $3.00 per Million tokens received
-               ccy_mirrorFee: true      // mirrored - token sender pays, too
-            });
-            SpotFeeLib.setFee_CcyType(ld, ctd, globalFees,
-                1,            // USD
-                address(0x0), // global fee
-                feeArgsGlobalUsd
-            );
-        }
-        else if (_contractType == StructLib.ContractType.CASHFLOW) {
-            std._tt_Name[1] = 'UNI_TOKEN'; //contractName;
-            std._tt_Count = 1;
-            ctd._ct_Ccy[1] = StructLib.Ccy({ id: 1, name: 'ETH', unit: 'Wei',        decimals: 18 });
-            ctd._ct_Count = 1;
-        }
-        else revert('Bad contract type');
+    //         // set default ccy fee USD: $3/1000 mirrored
+    //         StructLib.SetFeeArgs memory feeArgsGlobalUsd = StructLib.SetFeeArgs({
+    //                fee_fixed: 0,
+    //             fee_percBips: 0,
+    //                  fee_min: 300,      // min $3.00
+    //                  fee_max: 0,
+    //           ccy_perMillion: 300,      // $3.00 per Million tokens received
+    //            ccy_mirrorFee: true      // mirrored - token sender pays, too
+    //         });
+    //         SpotFeeLib.setFee_CcyType(ld, ctd, globalFees,
+    //             1,            // USD
+    //             address(0x0), // global fee
+    //             feeArgsGlobalUsd
+    //         );
+    //     }
+    //     else if (_contractType == StructLib.ContractType.CASHFLOW) {
+    //         std._tt_Name[1] = 'UNI_TOKEN'; //contractName;
+    //         std._tt_Count = 1;
+    //         ctd._ct_Ccy[1] = StructLib.Ccy({ id: 1, name: 'ETH', unit: 'Wei',        decimals: 18 });
+    //         ctd._ct_Count = 1;
+    //     }
+    //     else revert('Bad contract type');
 
-        // create ledger entry for contract owner - transfer fees are paid to this ledger entry
-        ld._ledger[owner] = StructLib.Ledger({
-                 exists: true,
-        spot_customFees: StructLib.FeeStruct(),
-      spot_sumQtyMinted: 0,
-      spot_sumQtyBurned: 0
-        });
-        ld._ledgerOwners.push(owner);
+    //     // create ledger entry for contract owner - transfer fees are paid to this ledger entry
+    //     ld._ledger[owner] = StructLib.Ledger({
+    //              exists: true,
+    //     spot_customFees: StructLib.FeeStruct(),
+    //   spot_sumQtyMinted: 0,
+    //   spot_sumQtyBurned: 0
+    //     });
+    //     ld._ledgerOwners.push(owner);
     }
 
     // todo: for updateable libs - proxy dispatcher

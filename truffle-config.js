@@ -39,12 +39,12 @@ module.exports = {
    */
 
   networks: {
-    solc: {
-      optimizer: {
-        enabled: true,
-        runs: 200
-      }
-    },
+    // solc: {
+    //   optimizer: {
+    //     enabled: true,
+    //     runs: 10000
+    //   }
+    // },
 
     //
     // DEPLOYMENT TIMEOUTS/LIMITS
@@ -100,7 +100,7 @@ module.exports = {
       provider: () => new HDWalletProvider(DEV_MNEMONIC, "https://ropsten.infura.io/v3/93db2c7fd899496d8400e86100058297",
                       0, 1000), // # test accounts
       network_id: "*", // 3
-      gas: 8000000,
+      gas: 7800000,
       gasPrice: web3.utils.toWei(gweiDeployment, "gwei"),
 
       confirmations: 1,
@@ -112,8 +112,12 @@ module.exports = {
       provider: () => new HDWalletProvider(DEV_MNEMONIC, "https://rinkeby.infura.io/v3/93db2c7fd899496d8400e86100058297",
                       0, 1000), // # test accounts
       network_id: "*", // 4
-      gas: 7800000,
-      gasPrice: web3.utils.toWei(gweiDeployment, "gwei")
+      gas: 10000000,
+      gasPrice: web3.utils.toWei(gweiDeployment, "gwei"),
+      
+      confirmations: 1,
+      skipDryRun: true,
+      timeoutBlocks: 200,
     }
 
     // Another network with more advanced options...
@@ -166,13 +170,13 @@ module.exports = {
   // Configure your compilers
   compilers: {
     solc: {
-      version: "0.5.13", // Fetch exact version from solc-bin (default: truffle's version)
+      version: "0.6.6", // 0.5.13 // Fetch exact version from solc-bin (default: truffle's version)
       docker: false, // Use "0.5.8" you've installed locally with docker (default: false)
       settings: {
         // See the solidity docs for advice about optimization and evmVersion
         optimizer: {
           enabled: true,
-          runs: 100
+          runs: 200
         },
         evmVersion: "byzantium"
       }

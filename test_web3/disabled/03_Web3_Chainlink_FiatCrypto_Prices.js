@@ -31,12 +31,12 @@ describe(`Contract Web3 Interface`, async () => {
     // TODO: WalletDetailSend in SCP re. SCP upgrades for auto-convert on receipt (esp. server mode)
     //
 
-    it(`web3 direct - chainlink - should be able to get reference data contract values`, async () => {
-        console.log('addr_btcUsd', await CONST.web3_call('chainlinkAggregator_btcUsd', []));
-        console.log('addr_ethUsd', await CONST.web3_call('chainlinkAggregator_ethUsd', []));
-        console.log('get_btcUsd', (await CONST.web3_call('get_btcUsd', [])).toString());
-        console.log('get_ethUsd', (await CONST.web3_call('get_ethUsd', [])).toString());
-    });
+    // it(`web3 direct - chainlink - should be able to get reference data contract values`, async () => {
+    //     console.log('addr_btcUsd', await CONST.web3_call('chainlinkAggregator_btcUsd', []));
+    //     console.log('addr_ethUsd', await CONST.web3_call('chainlinkAggregator_ethUsd', []));
+    //     console.log('get_btcUsd', (await CONST.web3_call('get_btcUsd', [])).toString());
+    //     console.log('get_ethUsd', (await CONST.web3_call('get_ethUsd', [])).toString());
+    // });
 });
 
   

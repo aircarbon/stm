@@ -1,7 +1,7 @@
-pragma solidity ^0.5.13;
+pragma solidity >=0.4.21 <=0.6.6;
 pragma experimental ABIEncoderV2;
 
-import "../Interfaces/ICcyCollateralizable.sol";
+//import "../Interfaces/ICcyCollateralizable.sol";
 
 import "./Owned.sol";
 import "./StLedger.sol";
@@ -9,7 +9,7 @@ import "./StLedger.sol";
 import "../Interfaces/StructLib.sol";
 import "../Libs/CcyLib.sol";
 
-contract Collateralizable is ICcyCollateralizable,
+contract Collateralizable is //ICcyCollateralizable,
     Owned, StLedger {
 
     function addCcyType(string memory name, string memory unit, uint16 decimals)

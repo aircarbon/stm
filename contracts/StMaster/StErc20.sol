@@ -1,7 +1,7 @@
-pragma solidity ^0.5.13;
+pragma solidity >=0.4.21 <=0.6.6;
 pragma experimental ABIEncoderV2;
 
-import "../Interfaces/IErc20.sol";
+//import "../Interfaces/IErc20.sol";
 
 import "./Owned.sol";
 import "./StLedger.sol";
@@ -15,7 +15,8 @@ import "../Libs/Erc20Lib.sol";
 /**
   * Manages ERC20 operations & data
   */
-contract StErc20 is StFees, IErc20 {
+contract StErc20 is StFees//, IErc20
+{
 
     StructLib.Erc20Struct erc20d;
 
@@ -35,9 +36,9 @@ contract StErc20 is StFees, IErc20 {
 
     // todo: move WL stuff out of erc20
     // WHITELIST - add entry & retreive full whitelist
-    function whitelist(address addr) public onlyOwner() {
-        Erc20Lib.whitelist(ld, erc20d, addr);
-    }
+    // function whitelist(address addr) public onlyOwner() {
+    //     Erc20Lib.whitelist(ld, erc20d, addr);
+    // }
     function whitelistMany(address[] memory addr) public onlyOwner() {
         for (uint256 i = 0; i < addr.length; i++) {
             Erc20Lib.whitelist(ld, erc20d, addr[i]);
@@ -46,22 +47,22 @@ contract StErc20 is StFees, IErc20 {
     function getWhitelist() external view returns (address[] memory) {
         return erc20d._whitelist;
     }
-    function getWhitelistCount() external view returns (uint256) {
-        return erc20d._whitelist.length;
-    }
+    // function getWhitelistCount() external view returns (uint256) {
+    //     return erc20d._whitelist.length;
+    // }
     function isWhitelisted(address addr) external view returns (bool) {
         return erc20d._whitelisted[addr];
     }
 
     // WHITELIST - get next entry and advance ndx
-    function getWhitelistNext() external view returns (address) {
-        return Erc20Lib.getWhitelistNext(ld, erc20d);
-    }
-    function incWhitelistNext() public onlyOwner() onlyWhenReadWrite() {
-        Erc20Lib.incWhitelistNext(ld, erc20d);
-    }
-    function getWhitelistNextNdx() external view returns (uint256) { return erc20d._nextWhitelistNdx; }
-    function setWhitelistNextNdx(uint256 v) public onlyOwner() { erc20d._nextWhitelistNdx = v; }
+    // function getWhitelistNext() external view returns (address) {
+    //     return Erc20Lib.getWhitelistNext(ld, erc20d);
+    // }
+    // function incWhitelistNext() public onlyOwner() onlyWhenReadWrite() {
+    //     Erc20Lib.incWhitelistNext(ld, erc20d);
+    // }
+    // function getWhitelistNextNdx() external view returns (uint256) { return erc20d._nextWhitelistNdx; }
+    // function setWhitelistNextNdx(uint256 v) public onlyOwner() { erc20d._nextWhitelistNdx = v; }
 
     // ERC20 - CORE
     function totalSupply() public view returns (uint256) {

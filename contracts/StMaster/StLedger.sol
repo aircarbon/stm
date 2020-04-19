@@ -1,7 +1,7 @@
-pragma solidity ^0.5.13;
+pragma solidity >=0.4.21 <=0.6.6;
 pragma experimental ABIEncoderV2;
 
-import "../Interfaces/IStLedger.sol";
+//import "../Interfaces/IStLedger.sol";
 
 import "./Owned.sol";
 
@@ -9,7 +9,7 @@ import "../Libs/LedgerLib.sol";
 import "../Interfaces/StructLib.sol";
 import "../Libs/TokenLib.sol";
 
-contract StLedger is IStLedger,
+contract StLedger is //IStLedger,
     Owned {
 
     StructLib.LedgerStruct ld;

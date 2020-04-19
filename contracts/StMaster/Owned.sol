@@ -1,8 +1,8 @@
-pragma solidity ^0.5.13;
+pragma solidity >=0.4.21 <=0.6.6;
 
-import "../Interfaces/IOwned.sol";
+//import "../Interfaces/IOwned.sol";
 
-contract Owned is IOwned
+contract Owned //is IOwned
 {
     address payable owner;
 

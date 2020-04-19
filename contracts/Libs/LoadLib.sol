@@ -1,10 +1,12 @@
-pragma solidity ^0.5.13;
+pragma solidity >=0.4.21 <=0.6.6;
 pragma experimental ABIEncoderV2;
 
 import "../Interfaces/StructLib.sol";
 
 library LoadLib {
-     function loadSecTokenBatch(
+
+
+    function loadSecTokenBatch(
         StructLib.LedgerStruct storage ld,
         StructLib.SecTokenBatch[] memory batches,
         uint64 _batches_currentMax_id
@@ -77,6 +79,13 @@ library LoadLib {
         ld._spot_totalBurnedQty = totalBurnedQty;
     }
 
+    // struct SetCcyTotalArgs {
+    //     uint256 ccyTypeId;
+    //     uint256 totalFunded;
+    //     uint256 totalWithdrawn;
+    //     uint256 totalTransfered;
+    //     uint256 totalFeesPaid;
+    // }
     function setCcyTotals(
         StructLib.LedgerStruct storage ld,
         uint256 ccyTypeId,

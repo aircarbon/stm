@@ -1,7 +1,7 @@
-pragma solidity ^0.5.13;
+pragma solidity >=0.4.21 <=0.6.6;
 pragma experimental ABIEncoderV2;
 
-import "../Interfaces/IDataLoadable.sol";
+//import "../Interfaces/IDataLoadable.sol";
 
 import "./Owned.sol";
 import "./StLedger.sol";
@@ -9,13 +9,16 @@ import "./StFees.sol";
 import "./StErc20.sol";
 
 import "../Interfaces/StructLib.sol";
-import "../Libs/TokenLib.sol";
 import "../Libs/LoadLib.sol";
 
-contract DataLoadable is IDataLoadable,
+abstract // solc 0.6
+contract DataLoadable is //IDataLoadable,
     Owned, StLedger, StFees, StErc20 {
 
-    function loadSecTokenBatch(StructLib.SecTokenBatch[] memory batches, uint64 _batches_currentMax_id) public onlyOwner() {
+    function loadSecTokenBatch(
+        StructLib.SecTokenBatch[] memory batches,
+        uint64 _batches_currentMax_id
+    ) public onlyOwner() {
         LoadLib.loadSecTokenBatch(ld, batches, _batches_currentMax_id);
     }
 
@@ -48,7 +51,8 @@ contract DataLoadable is IDataLoadable,
         );
     }
 
-     function setCcyTotals(
+    function setCcyTotals(
+        //LoadLib.SetCcyTotalArgs memory a
         uint256 ccyTypeId,
         uint256 totalFunded,
         uint256 totalWithdrawn,

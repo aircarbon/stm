@@ -1,4 +1,4 @@
-pragma solidity ^0.5.13;
+pragma solidity >=0.4.21 <=0.6.6;
 pragma experimental ABIEncoderV2;
 
 library StructLib {
@@ -30,7 +30,7 @@ library StructLib {
             ld._ccyType_totalTransfered[a.ccyTypeId] += a.amount;
 
             //emit StructLib.TransferedLedgerCcy(a.from, a.to, a.ccyTypeId, a.amount, a.transferType);
-            emitTransferedLedgerCcy(ld, a);
+            emitTransferedLedgerCcy(a);
 
             if (a.transferType == StructLib.TransferType.ExchangeFee) {
                 ld._ccyType_totalFeesPaid[a.ccyTypeId] += a.amount;
@@ -38,7 +38,6 @@ library StructLib {
         }
     }
     function emitTransferedLedgerCcy(
-        StructLib.LedgerStruct storage ld,
         TransferCcyArgs memory a)
     public {
         if (a.amount > 0) {

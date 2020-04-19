@@ -1,4 +1,4 @@
-pragma solidity ^0.5.13;
+pragma solidity >=0.4.21 <=0.6.6;
 pragma experimental ABIEncoderV2;
 
 import "../Interfaces/StructLib.sol";
@@ -425,7 +425,9 @@ library TransferLib {
 
                 // remove from origin - replace hot index 0 with value at last (ndx++, in effect)
                 from_stIds[v.ndx] = from_stIds[from_stIds.length - 1];
-                from_stIds.length--;
+                //from_stIds.length--;
+                from_stIds.pop(); // solc 0.6
+
                 //ld._ledger[from].tokenType_sumQty[a.tokenTypeId] -= stQty;            //* gas - DROP DONE - only used internally, validation params
 
                 // assign to destination
@@ -607,7 +609,7 @@ library TransferLib {
      * @param feeStructure Token or currency type fee structure mapping
      * @param sendAmount Amount being sent (token quantity or currency value)
      * @param receiveAmount Consideration value (tokens or currency) being received in return (if any)
-     * @return Capped or collared fee
+     * @return totalFee Capped or collared fee
      */
     function calcFeeWithCapCollar(
         StructLib.SetFeeArgs storage feeStructure,

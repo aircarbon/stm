@@ -1,7 +1,7 @@
-pragma solidity ^0.5.13;
+pragma solidity >=0.4.21 <=0.6.6;
 pragma experimental ABIEncoderV2;
 
-import "../Interfaces/IStFees.sol";
+//import "../Interfaces/IStFees.sol";
 
 import "./Owned.sol";
 import "./StLedger.sol";
@@ -13,8 +13,10 @@ import "../Libs/SpotFeeLib.sol";
 // NOTE: fees are applied ON TOP OF the supplied transfer amounts to the transfer() fn.
 //       i.e. transfer amounts are not inclusive of fees, they are additional
 //
-contract StFees is IStFees,
+contract StFees is //IStFees,
     Owned, StLedger {
+
+    enum GetFeeType { CCY, TOK }
 
     // GLOBAL FEES
     StructLib.FeeStruct globalFees;

@@ -1,4 +1,4 @@
-pragma solidity ^0.5.13;
+pragma solidity >=0.4.21 <=0.6.6;
 pragma experimental ABIEncoderV2;
 
 import "../Interfaces/StructLib.sol";
@@ -34,7 +34,6 @@ library FuturesLib {
         StructLib.LedgerStruct storage ld,
         StructLib.StTypesStruct storage std,
         StructLib.CcyTypesStruct storage ctd,
-        StructLib.FeeStruct storage globalFees,
         StructLib.FuturesPositionArgs memory a,
         address owner
     ) public {
@@ -143,8 +142,8 @@ library FuturesLib {
         require(a.feePerSide >= 0, "Bad feePerSide");
 
         // get delta each side
-        int256 short_Delta = calcTakePay(ld, fta, a.tokTypeId, shortSt, a.markPrice, shortSt.ft_lastMarkPrice);
-        int256 long_Delta = calcTakePay(ld, fta, a.tokTypeId, longSt, a.markPrice, shortSt.ft_lastMarkPrice);
+        int256 short_Delta = calcTakePay(fta, shortSt, a.markPrice, shortSt.ft_lastMarkPrice);
+        int256 long_Delta = calcTakePay(fta, longSt, a.markPrice, shortSt.ft_lastMarkPrice);
         //require(short_Delta + long_Delta == 0, "Unexpected net delta short/long");
 
         // get OTM/ITM sides
@@ -165,10 +164,10 @@ library FuturesLib {
         if (otm.fee + itm.fee > 0) {
             ld._ledger[a.feeAddrOwner].ccyType_balance[fta.refCcyId] += otm.fee + itm.fee;//(a.feePerSide) * 2;
 
-            StructLib.emitTransferedLedgerCcy(ld, StructLib.TransferCcyArgs({
+            StructLib.emitTransferedLedgerCcy(StructLib.TransferCcyArgs({
                 from: otm.st.ft_ledgerOwner, to: a.feeAddrOwner, ccyTypeId: fta.refCcyId, amount: uint256(otm.fee), transferType: StructLib.TransferType.TakePayFee }));
 
-            StructLib.emitTransferedLedgerCcy(ld, StructLib.TransferCcyArgs({
+            StructLib.emitTransferedLedgerCcy(StructLib.TransferCcyArgs({
                 from: itm.st.ft_ledgerOwner, to: a.feeAddrOwner, ccyTypeId: fta.refCcyId, amount: uint256(itm.fee), transferType: StructLib.TransferType.TakePayFee }));
         }
         otm.bal -= otm.fee;
@@ -188,7 +187,7 @@ library FuturesLib {
         ld._ledger[otm.st.ft_ledgerOwner].ccyType_balance[fta.refCcyId] = otm.bal - (otm.take);
         ld._ledger[itm.st.ft_ledgerOwner].ccyType_balance[fta.refCcyId] = itm.bal + (otm.take);
 
-        StructLib.emitTransferedLedgerCcy(ld, StructLib.TransferCcyArgs({
+        StructLib.emitTransferedLedgerCcy(StructLib.TransferCcyArgs({
            from: otm.st.ft_ledgerOwner, to: itm.st.ft_ledgerOwner, ccyTypeId: fta.refCcyId, amount: uint256(otm.take), transferType: StructLib.TransferType.TakePay }));
 
         emit TakePay(otm.st.ft_ledgerOwner, itm.st.ft_ledgerOwner, uint256(itm.delta), uint256(otm.take), a.feeAddrOwner, uint256(otm.fee), uint256(itm.fee), fta.refCcyId);
@@ -196,13 +195,11 @@ library FuturesLib {
 
     // returns uncapped take/pay settlment amount for the given position
     function calcTakePay(
-        StructLib.LedgerStruct storage ld,
         StructLib.FutureTokenTypeArgs storage fta,
-        uint256 tokTypeId,
         StructLib.PackedSt memory st,
         int128  markPrice,
         int128  ft_lastMarkPrice
-    ) private returns(int256) {
+    ) private view returns(int256) {
         int256 delta = (markPrice - (ft_lastMarkPrice == -1
                             ? st.ft_price
                             : ft_lastMarkPrice)) * fta.contractSize * st.currentQty;
@@ -215,7 +212,7 @@ library FuturesLib {
         uint256 tokTypeId,
         StructLib.PackedSt memory st,
         uint256 stId
-    ) private returns(bool) {
+    ) private view returns(bool) {
         for (uint256 x = 0; x < ld._ledger[st.ft_ledgerOwner].tokenType_stIds[tokTypeId].length ; x++) {
             if (ld._ledger[st.ft_ledgerOwner].tokenType_stIds[tokTypeId][x] == stId) {
                 return true;
@@ -232,7 +229,7 @@ library FuturesLib {
         uint256 tokTypeId,
         int256 posSize,
         int128 price
-    ) private returns(int256) {
+    ) private view returns(int256) {
 
         uint16 totMargin = (ld._ledger[ledgerOwner].ft_initMarginBips[tokTypeId] != 0
                                 ? ld._ledger[ledgerOwner].ft_initMarginBips[tokTypeId]

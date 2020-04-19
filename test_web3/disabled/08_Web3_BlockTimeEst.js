@@ -8,11 +8,6 @@ require('dotenv').config();
 
 const CONST = require('../const.js');
 
-//
-// tests Chainlink reference data contract(s) [get_btcUsd || get_ethUsd]
-// returns live data on Ropsten & mainnet, returns 42 on ganache
-//
-
 describe(`Contract Web3 Interface`, async () => {
 
     //

@@ -1,7 +1,7 @@
-pragma solidity ^0.5.13;
+pragma solidity >=0.4.21 <=0.6.6;
 pragma experimental ABIEncoderV2;
 
-import "../Interfaces/IStBurnable.sol";
+//import "../Interfaces/IStBurnable.sol";
 
 import "./Owned.sol";
 import "./StLedger.sol";
@@ -20,7 +20,7 @@ contract StBurnable is Owned, StLedger {
     }
 
     function getSecToken_totalBurnedQty()
-    external view /*onlyOwner()*/ returns (uint256 count) {
+    external view returns (uint256 count) {
         return ld._spot_totalBurnedQty;
     }
 }
