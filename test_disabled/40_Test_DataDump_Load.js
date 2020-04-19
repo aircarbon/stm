@@ -10,20 +10,22 @@ contract("StMaster", accounts => {
 
     before(async function () {  
         stm_cur = await st.deployed();
+        await require('../test/setup.js').setDefaults({ stm: stm_cur, accounts });
+
         //if (await stm_cur.getContractType() == CONST.contractType.CASHFLOW) this.skip();
         console.log(`stm_cur: @${stm_cur.address} ledgerHash=${await stm_cur.getLedgerHashcode()} / ${await stm_cur.name()} ${await stm_cur.version()}`);
 
         // explorers need unique contract names?!
         stm_new = await st.new(
             await stm_cur.getContractType(),
-            (await stm_cur.getCashflowData()).args,
+            //(await stm_cur.getCashflowData()).args,
             `${await stm_cur.name()}_V++`,
             `${await stm_cur.version()}_V++`,
             await stm_cur.unit(),
             await stm_cur.symbol(),
             await stm_cur.decimals(),
-            await stm_cur.chainlinkAggregator_btcUsd(),
-            await stm_cur.chainlinkAggregator_ethUsd()
+            //await stm_cur.chainlinkAggregator_btcUsd(),
+            //await stm_cur.chainlinkAggregator_ethUsd()
         );
         console.log(`stm_new: @${stm_new.address} ledgerHash=${await stm_new.getLedgerHashcode()} / ${await stm_new.name()} ${await stm_new.version()}`);
     });
@@ -35,7 +37,7 @@ contract("StMaster", accounts => {
         const whitelist = await stm_cur.getWhitelist();
         const allLedgerOwners = await stm_cur.getLedgerOwners();
         const ledgerEntry = await stm_cur.getLedgerEntry(accounts[0]);
-        const cashflowData = await stm_cur.getCashflowData();
+        //const cashflowData = await stm_cur.getCashflowData();
     });
 
     it(`data dump - should be able to set (and then read) all contract data`, async function () {
@@ -85,16 +87,17 @@ contract("StMaster", accounts => {
         }
 
         // whitelist
-        for (let i=0 ; i < WHITELIST_COUNT + 1; i++)
-            await stm_cur.whitelist(accounts[i]);
+        //for (let i=0 ; i < WHITELIST_COUNT + 1; i++)
+        //    await stm_cur.whitelist(accounts[i]);
+        await stm_cur.whitelistMany(accounts.slice(0,WHITELIST_COUNT));
         const whitelist = await stm_cur.getWhitelist();
         console.log(`Whitelist: ${whitelist.join(', ')}`);
         curHash = await checkHashUpdate(curHash);
         stm_cur.sealContract();
 
         // allocate next whitelist entry
-        const wl = await stm_cur.getWhitelistNext();
-        await stm_cur.incWhitelistNext();
+        //const wl = await stm_cur.getWhitelistNext();
+        //await stm_cur.incWhitelistNext();
 
         // exchange fee - ccy's
         for (let i=0 ; i < ccyTypes.ccyTypes.length; i++) {
@@ -291,12 +294,13 @@ contract("StMaster", accounts => {
         _.forEach(loadToks, async (p) => await stm_new.addSecTokenType(p.name, p.settlementType, p.ft));
 
         // load whitelist
-        stm_new.whitelist(accounts[555]); // simulate a new contract owner (first whitelist entry, by convention) -- i.e. we can upgrade contract with a new privkey
+        stm_new.whitelistMany([accounts[555]]); // simulate a new contract owner (first whitelist entry, by convention) -- i.e. we can upgrade contract with a new privkey
         const curWL = (await stm_cur.getWhitelist()), newWL = (await stm_new.getWhitelist()), loadWL = _.differenceWith(curWL.slice(1), newWL.slice(1), _.isEqual);
-        _.forEach(loadWL, async (p) => await stm_new.whitelist(p));
+        //_.forEach(loadWL, async (p) => await stm_new.whitelist(p));
+        await stm_new.whitelistMany(curWL);
 
         // set whitelist index
-        stm_new.setWhitelistNextNdx(await stm_cur.getWhitelistNextNdx());
+        //stm_new.setWhitelistNextNdx(await stm_cur.getWhitelistNextNdx());
 
         // currencies - load exchange fees, set total funded & withdrawn
         _.forEach(curCcys.ccyTypes, async (p) => { 

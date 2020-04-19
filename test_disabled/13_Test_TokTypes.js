@@ -11,6 +11,7 @@ contract("StMaster", accounts => {
         stm = await st.deployed();
         if (await stm.getContractType() == CONST.contractType.CASHFLOW) this.skip();
         await stm.sealContract();
+        await require('../test/setup.js').setDefaults({ stm, accounts });
         if (!global.TaddrNdx) global.TaddrNdx = 0;
     });
 
@@ -104,7 +105,7 @@ contract("StMaster", accounts => {
 
     it(`token types - should not allow adding a spot ST type with an expiry time`, async () => {
         try {
-            await stm.addSecTokenType(`NEW_TYPE_NAME_${new Date().getTime()}`, CONST.settlementType.SPOT, { 
+            await stm.addSecTokenType(`NEW_TYPE_NAME_${new Date().getTime()}`, CONST.settlementType.SPOT, { ...CONST.nullFutureArgs, 
                 expiryTimestamp: new Date().getTime(),
                 underlyerTypeId: 0,
                        refCcyId: 0
@@ -118,7 +119,7 @@ contract("StMaster", accounts => {
 
     it(`token types - should not allow adding a spot ST type with an underlyer`, async () => {
         try {
-            await stm.addSecTokenType(`NEW_TYPE_NAME_${new Date().getTime()}`, CONST.settlementType.SPOT, { 
+            await stm.addSecTokenType(`NEW_TYPE_NAME_${new Date().getTime()}`, CONST.settlementType.SPOT, { ...CONST.nullFutureArgs, 
                 expiryTimestamp: 0,
                 underlyerTypeId: CONST.tokenType.CORSIA,
                        refCcyId: 0
@@ -130,10 +131,10 @@ contract("StMaster", accounts => {
         assert.fail('expected contract exception');
     });
 
-    it(`token types - should not allow adding a spot ST type with a referency currency`, async () => {
+    it(`token types - should not allow adding a spot ST type with a reference currency`, async () => {
         const spotTypes = (await stm.getSecTokenTypes()).tokenTypes.filter(p => p.settlementType == CONST.settlementType.SPOT);
         try {
-            await stm.addSecTokenType(`NEW_TYPE_NAME_${new Date().getTime()}`, CONST.settlementType.SPOT, { 
+            await stm.addSecTokenType(`NEW_TYPE_NAME_${new Date().getTime()}`, CONST.settlementType.SPOT, { ...CONST.nullFutureArgs, 
                 expiryTimestamp: 0,
                 underlyerTypeId: 0,
                        refCcyId: CONST.ccyType.USD, 

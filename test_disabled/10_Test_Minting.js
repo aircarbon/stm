@@ -9,8 +9,10 @@ contract("StMaster", accounts => {
 
     before(async function () {
         stm = await st.deployed();
+        
         if (await stm.getContractType() == CONST.contractType.CASHFLOW) this.skip();
         await stm.sealContract();
+        await require('../test/setup.js').setDefaults({ stm, accounts });
         if (!global.TaddrNdx) global.TaddrNdx = 0;
     });
 

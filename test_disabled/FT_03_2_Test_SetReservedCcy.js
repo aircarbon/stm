@@ -22,10 +22,9 @@ contract("StMaster", accounts => {
         if (await stm.getContractType() == CONST.contractType.CASHFLOW) this.skip();
         if (!global.TaddrNdx) global.TaddrNdx = 0;
 
-        for (let i=0 ; i < 60 ; i++) { // whitelist enough accounts for the tests
-            await stm.whitelist(accounts[global.TaddrNdx + i]);
-        }
+        await stm.whitelistMany(accounts.slice(0,64));
         await stm.sealContract();
+        await require('../test/setup.js').setDefaults({ stm, accounts });
 
         ccyTypes = (await stm.getCcyTypes()).ccyTypes;
         usdCcy = ccyTypes.find(p => p.name === 'USD');

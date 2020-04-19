@@ -13,7 +13,7 @@ import "../Libs/PayableLib.sol";
 //import "../Interfaces/IChainlinkAggregator.sol";
 
 //
-// WIP - out of scope
+// 24k gas limit -- disabled for commodity branch...
 //
 
 contract StPayable is
@@ -29,10 +29,15 @@ contract StPayable is
     //      TODO: pri4 - (eq-type) changing issuancePrice mid-issuance
 
 /*
-    address public chainlinkAggregator_btcUsd;
-    address public chainlinkAggregator_ethUsd;
 
     StructLib.CashflowStruct cashflowData;
+
+    function getCashflowData() public view returns(StructLib.CashflowStruct memory) {
+        return PayableLib.getCashflowData(ld, cashflowData);
+    }
+
+    address public chainlinkAggregator_btcUsd;
+    address public chainlinkAggregator_ethUsd;
 
     // function get_btcUsd() public view returns(int256) {
     //     if (chainlinkAggregator_btcUsd == address(0x0)) return 100000000; // $1 - cents*satoshis
@@ -66,10 +71,7 @@ contract StPayable is
             qty_saleAllocation
         );
     }
-
-    function getCashflowData() public view returns(StructLib.CashflowStruct memory) {
-        return PayableLib.getCashflowData(ld, cashflowData);
-    }
-
 */
+
+
 }

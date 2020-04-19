@@ -23,8 +23,9 @@ contract("StMaster", accounts => {
         NDX_GRAY_2 = global.XaddrNdx + 1;
         GRAY_2 = accounts[NDX_GRAY_2];
         
-        await stm.whitelist(WHITE);
+        await stm.whitelistMany([WHITE]);
         await stm.sealContract();
+        await require('../test/setup.js').setDefaults({ stm, accounts });
 
         // mint NATURE with originator fee - should be ignored by ERC20
         const testFee = { ccy_mirrorFee: false, ccy_perMillion: 0, fee_fixed: 1, fee_percBips: 10, fee_min: 0, fee_max: 0 };

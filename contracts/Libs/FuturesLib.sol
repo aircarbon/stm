@@ -95,9 +95,9 @@ library FuturesLib {
         ld._ledger[a.ledger_B].tokenType_stIds[a.tokTypeId].push(newId_B);
 
         if (a.qty_A > 0)
-            emit FutureOpenInterest(a.ledger_A, a.ledger_B, /*ld._tokens_currentMax_id - 1,*/ a.tokTypeId, uint256(a.qty_A), uint256(a.price));
+            emit FutureOpenInterest(a.ledger_A, a.ledger_B, a.tokTypeId, uint256(a.qty_A), uint256(a.price));
         else
-            emit FutureOpenInterest(a.ledger_B, a.ledger_A, /*ld._tokens_currentMax_id - 1,*/ a.tokTypeId, uint256(a.qty_B), uint256(a.price));
+            emit FutureOpenInterest(a.ledger_B, a.ledger_A, a.tokTypeId, uint256(a.qty_B), uint256(a.price));
     }
 
     //

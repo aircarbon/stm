@@ -79,11 +79,11 @@ contract("StMaster", accounts => {
     });
 
     // retrieve-next pointer at correct initial value
-    it(`whitelist - retrieve next - should reserve the first n whitelist address(es)`, async () => {
-        const wlNdx = await stm.getWhitelistNextNdx();
-        console.log(`wlNdx: ${wlNdx}`);
-        assert(wlNdx == 10, 'Unexpected whitelist next index');
-    });
+    // it(`whitelist - retrieve next - should reserve the first n whitelist address(es)`, async () => {
+    //     const wlNdx = await stm.getWhitelistNextNdx();
+    //     console.log(`wlNdx: ${wlNdx}`);
+    //     assert(wlNdx == 10, 'Unexpected whitelist next index');
+    // });
 
     // seal
     it(`whitelist - should be able to seal the whitelist`, async () => {

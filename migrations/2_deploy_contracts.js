@@ -71,21 +71,21 @@ module.exports = async function (deployer) {
     return deployer.deploy(PayableLib).then(async payableLib => { 
         deployer.link(PayableLib, StMaster);
 
-    //return deployer.deploy(FuturesLib).then(async futuresLib => { 
-    //    deployer.link(FuturesLib, StMaster);
+    return deployer.deploy(FuturesLib).then(async futuresLib => { 
+        deployer.link(FuturesLib, StMaster);
         
         //console.log('cashflowArgs', CONST.contractProps[type].cashflowArgs);
         
         return deployer.deploy(StMaster, 
             contractType == "CASHFLOW" ? CONST.contractType.CASHFLOW : CONST.contractType.COMMODITY,
-            CONST.contractProps[contractType].cashflowArgs,
+            //CONST.contractProps[contractType].cashflowArgs,               // 24k bytecode limit - disabling on commodity branch
             CONST.contractProps[contractType].contractName,
             CONST.contractProps[contractType].contractVer,
             CONST.contractProps[contractType].contractUnit,
             CONST.contractProps[contractType].contractSymbol,
             CONST.contractProps[contractType].contractDecimals,
-            CONST.chainlinkAggregators[process.env.NETWORK_ID].btcUsd,
-            CONST.chainlinkAggregators[process.env.NETWORK_ID].ethUsd
+            //CONST.chainlinkAggregators[process.env.NETWORK_ID].btcUsd,    // 24k bytecode limit - disabling on commodity branch
+            //CONST.chainlinkAggregators[process.env.NETWORK_ID].ethUsd     // 24k bytecode limit - disabling on commodity branch
         ).then(async stm => {
             //console.dir(stm);
             //console.dir(stm.abi);
@@ -125,7 +125,7 @@ module.exports = async function (deployer) {
             }
         }).catch(err => { console.error('failed deployment: StMaster', err); });
     
-    //}).catch(err => { console.error('failed deployment: FuturesLib', err); });
+    }).catch(err => { console.error('failed deployment: FuturesLib', err); });
     }).catch(err => { console.error('failed deployment: PayableLib', err); });
     }).catch(err => { console.error('failed deployment: DataLib', err); });
     }).catch(err => { console.error('failed deployment: Erc20Lib', err); });

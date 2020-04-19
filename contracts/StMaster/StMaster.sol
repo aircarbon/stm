@@ -102,20 +102,19 @@ contract StMaster
 
     constructor(
         StructLib.ContractType        _contractType,
-        StructLib.CashflowArgs memory _cashflowArgs,
+        //StructLib.CashflowArgs memory _cashflowArgs,
         string memory                 _contractName,
         string memory                 _contractVer,
         string memory                 _contractUnit,
         string memory                 _contractSymbol,
-        uint8                         _contractDecimals,
-        address                       _chainlinkAggregator_btcUsd,
-        address                       _chainlinkAggregator_ethUsd
+        uint8                         _contractDecimals
+        //address                       _chainlinkAggregator_btcUsd,
+        //address                       _chainlinkAggregator_ethUsd
     ) StErc20(_contractSymbol, _contractDecimals)
     public {
-        // 24k bytecode limit - cashflow params: disable on commodity branch
-        //chainlinkAggregator_btcUsd = _chainlinkAggregator_btcUsd;
-        //chainlinkAggregator_ethUsd = _chainlinkAggregator_ethUsd;
-        //cashflowData.args = _cashflowArgs;
+        // chainlinkAggregator_btcUsd = _chainlinkAggregator_btcUsd;
+        // chainlinkAggregator_ethUsd = _chainlinkAggregator_ethUsd;
+        // cashflowData.args = _cashflowArgs;
 
         // set common properties
         name = _contractName;

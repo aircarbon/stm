@@ -16,16 +16,16 @@ contract("StMaster", accounts => {
         if (await stm.getContractType() == CONST.contractType.CASHFLOW) this.skip();
         if (!global.TaddrNdx) global.TaddrNdx = 0;
         
-        for (let i=0 ; i < 60 ; i++) {
-            await stm.whitelist(accounts[global.TaddrNdx + i]);
-        }
+        await stm.whitelistMany(accounts.slice(0,60));
         await stm.sealContract();
+        await require('../test/setup.js').setDefaults({ stm, accounts });
 
         // add test FT type - USD
         ccyTypes = (await stm.getCcyTypes()).ccyTypes;
         spotTypes = (await stm.getSecTokenTypes()).tokenTypes.filter(p => p.settlementType == CONST.settlementType.SPOT);
         const ftTestName_USD = `FT_USD_${new Date().getTime()}`;
         const addFtTx_USD = await stm.addSecTokenType(ftTestName_USD, CONST.settlementType.FUTURE, {...CONST.nullFutureArgs,
+                  contractSize: 1000,
                expiryTimestamp: DateTime.local().plus({ days: 30 }).toMillis(),
                underlyerTypeId: spotTypes[0].id,
                       refCcyId: ccyTypes.find(p => p.name === 'USD').id,
@@ -41,7 +41,7 @@ contract("StMaster", accounts => {
             console.log(`TaddrNdx: ${global.TaddrNdx} - contract @ ${stm.address} (owner: ${accounts[0]})`);
     });
 
-    /*it(`minting - should have reasonable gas cost for minting of multi-vST batches`, async () => {
+    it(`minting - should have reasonable gas cost for minting of multi-vST batches`, async () => {
         mintTx = await stm.mintSecTokenBatch(CONST.tokenType.CORSIA, CONST.GT_CARBON, 1, accounts[global.TaddrNdx], CONST.nullFees, 0, [], [], { from: accounts[0], });
         await CONST.logGas(web3, mintTx, `Mint  1 vST`);
 
@@ -358,7 +358,7 @@ contract("StMaster", accounts => {
         assert(contractOwnerCarbonTokQtyAfter == Number(contractOwnerCarbonTokQtyBefore) + Number(expectedFeeCarbon), 'unexpected contract owner (fee receiver) CORSIA ST quantity after transfer');
 
         await CONST.logGas(web3, data.transferTx, `0.5 vST trade eeu/ccy (A <-> B) w/ fees on eeu`);
-    });*/
+    });
 
     it(`FT positions - should have reasonable gas cost to open a futures position`, async () => {
         const A = accounts[global.TaddrNdx], B = accounts[global.TaddrNdx + 1];
