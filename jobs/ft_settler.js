@@ -59,7 +59,7 @@ itm: ${ev.to} ($${Number(itm_le.ccys.find(p => p.ccyTypeId.eq(ft.ft.refCcyId)).b
 otm: ${ev.from} ($${Number(otm_le.ccys.find(p => p.ccyTypeId.eq(ft.ft.refCcyId)).balance.toString()).toFixed(0).padEnd(8)})\
 `));
 
-            // ### delta should be linear (same each cycle) -- not using lastMarkPrice ???
+            // TODO: open second pos, and have takePay combine after doing the settlement...
         }
 
         //console.groupEnd();

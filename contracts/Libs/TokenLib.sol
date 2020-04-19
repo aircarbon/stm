@@ -9,10 +9,11 @@ library TokenLib {
     event SetFutureVariationMargin(uint256 tokenTypeId, uint16 varMarginBips);
     event SetFutureFeePerContract(uint256 tokenTypeId, uint256 feePerContract);
 
+    event Burned(uint256 tokenTypeId, address indexed from, uint256 burnedQty);
     event BurnedFullSecToken(uint256 indexed stId, uint256 tokenTypeId, address indexed from, uint256 burnedQty);
     event BurnedPartialSecToken(uint256 indexed stId, uint256 tokenTypeId, address indexed from, uint256 burnedQty);
 
-    event MintedSecTokenBatch(uint256 indexed batchId, uint256 tokenTypeId, address indexed to, uint256 mintQty, uint256 mintSecTokenCount);
+    event Minted(uint256 indexed batchId, uint256 tokenTypeId, address indexed to, uint256 mintQty, uint256 mintSecTokenCount);
     event MintedSecToken(uint256 indexed stId, uint256 indexed batchId, uint256 tokenTypeId, address indexed to, uint256 mintedQty);
 
     event AddedBatchMetadata(uint256 indexed batchId, string key, string value);
@@ -153,7 +154,7 @@ library TokenLib {
         });
         ld._batches[newBatch.id] = newBatch;
         ld._batches_currentMax_id++;
-        emit MintedSecTokenBatch(newBatch.id, a.tokenTypeId, a.batchOwner, uint256(a.mintQty), uint256(a.mintSecTokenCount));
+        emit Minted(newBatch.id, a.tokenTypeId, a.batchOwner, uint256(a.mintQty), uint256(a.mintSecTokenCount));
 
         // create ledger entry as required
         StructLib.initLedgerIfNew(ld, a.batchOwner);
@@ -300,5 +301,6 @@ library TokenLib {
 
         ld._spot_totalBurnedQty += uint256(burnQty);
         ld._ledger[ledgerOwner].spot_sumQtyBurned += uint256(burnQty);
+        emit Burned(tokenTypeId, ledgerOwner, uint256(burnQty));
     }
 }

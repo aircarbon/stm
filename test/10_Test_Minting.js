@@ -191,7 +191,7 @@ contract("StMaster", accounts => {
         assert(maxBatchIdAfter == maxBatchIdBefore + 1, 'unexpected batch id after minting');
 
         // validate batch minted event
-        truffleAssert.eventEmitted(mintTx, 'MintedSecTokenBatch', ev => {
+        truffleAssert.eventEmitted(mintTx, 'Minted', ev => {
             batchId = Number(ev.batchId);
             return ev.batchId == maxBatchIdAfter
                 && ev.tokenTypeId == tokenType

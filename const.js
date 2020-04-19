@@ -78,6 +78,10 @@ module.exports = {
             btcUsd: '0x882906a758207FeA9F21e0bb7d2f24E561bd0981',
             ethUsd: '0x8468b2bDCE073A157E560AA4D9CcF6dB1DB98507'
         },
+        "4": { // rinkeby
+            btcUsd: '0x5498BB86BC934c8D34FDA08E81D444153d0D06aD',
+            ethUsd: '0x0bF4e7bf3e1f6D6Dc29AA516A33134985cC3A5aA'
+        },
         "888": { // dev
             btcUsd: '0x0000000000000000000000000000000000000000',
             ethUsd: '0x0000000000000000000000000000000000000000'
