@@ -4,19 +4,20 @@ const got = require('got');
 const { web3_call } = require('./const.js');
 const { db } = require('../common/dist');
 
+//
+// initializes test/local DB values
+//
 process.env.WEB3_NETWORK_ID = Number(process.env.NETWORK_ID || 888);
 
 (async function () {
   const contractSealed = await web3_call('getContractSeal', []);
   const DEFAULT_WHITELIST_INDEX = 10;
   if (contractSealed) {
-    // reset whitelist index, to default
+    // reset whitelist index to default
     console.warn('Reset default whitelist index');
     await db.AddConfigSetting('next_wl_index', DEFAULT_WHITELIST_INDEX);
 
-    // ... web3_tx()
-
-    // DB: insert mock prices
+    // insert gas prices
     const GAS_PRICES_URL = 'https://www.etherchain.org/api/gasPriceOracle';
     const response = await got(GAS_PRICES_URL);
     const { safeLow, standard, fast, fastest } = JSON.parse(response.body);
@@ -52,6 +53,6 @@ process.env.WEB3_NETWORK_ID = Number(process.env.NETWORK_ID || 888);
       },
     );
   } else {
-    console.warn('NOT SEAL YET!');
+    console.warn('NOT SEALED YET!');
   }
 })();

@@ -8,6 +8,10 @@ process.env.WEB3_NETWORK_ID = Number(process.env.NETWORK_ID || 888);
   OWNER = x.addr;
   OWNER_privKey = x.privKey;
 
+  // initialize contract default values
+  await require('./devSetupContract.js').setDefaults();
+
+  // whitelist & seal contract
   const contractSealed = await web3_call('getContractSeal', []);
   console.log('contractSealed: ', contractSealed);
   if (!contractSealed) {
