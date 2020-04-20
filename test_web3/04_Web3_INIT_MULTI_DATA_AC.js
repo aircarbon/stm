@@ -5,9 +5,18 @@ const { db } = require('../../common/dist');
 require('dotenv').config();
 const _ = require('lodash');
 const chalk = require('chalk');
-
 const CONST = require('../const.js');
 
+//
+// INITIALIZES a deployed contract, & optionally populates it with arbitrary volumes of random/representative test data
+//
+// EXEC_TEST_ACTIONS: if false, will produce an empty state: only whitelisted accounts + sealed
+// if true, will perform a number of test actions: setting fees, minting, trading, etc.
+//
+const EXEC_TEST_ACTIONS = false;
+
+
+// owner
 const OWNER_NDX = 0;
 var OWNER, OWNER_privKey;
 
@@ -32,26 +41,20 @@ const TEST_ACCOUNT_START_NDX = WHITE_BUYER_START_NDX + WHITE_BUYER_COUNT;
 const TEST_ACCOUNT_COUNT = 100;
 const TEST_ACCOUNTS = [];
 
+// off-exchange "graylist" external address
 const GRAY_NDX = 800;
 var GRAY, GRAY_privKey;
-
-// if false, will produce an empty state: only whitelisted accounts + sealed
-// if true, will perform a number of test actions: setting fees, minting, trading, etc.
-const EXEC_TEST_ACTIONS = false;
-
-//
-// populates larger volumes of random/representative test data
-//
 
 describe(`Contract Web3 Interface`, async () => {
 
     //
-    // can run these to test web3 more quickly, e.g.
     //         Dev: ("export WEB3_NETWORK_ID=888 && export CONTRACT_TYPE=COMMODITY && mocha test_web3 --timeout 10000000 --exit")
     //  Ropsten AC: ("export WEB3_NETWORK_ID=3 && export CONTRACT_TYPE=COMMODITY && mocha test_web3 --timeout 10000000 --exit")
     //
 
     before(async function () {
+        await require('../devSetupContract.js').setDefaults();
+
         var x;
         x = await CONST.getAccountAndKey(OWNER_NDX);
         OWNER = x.addr; OWNER_privKey = x.privKey;

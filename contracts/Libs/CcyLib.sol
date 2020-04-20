@@ -62,7 +62,7 @@ library CcyLib {
         int256  amount, // signed value: ledger supports -ve balances
         address ledgerOwner)
     public {
-        // allow funding while not sealed - for initialization of owner ledger (see testSetup.js)
+        // allow funding while not sealed - for initialization of owner ledger (see testSetupContract.js)
         //require(ld._contractSealed, "Contract is not sealed");
         require(ccyTypeId >= 1 && ccyTypeId <= ctd._ct_Count, "Bad ccyTypeId");
         require(amount >= 0, "Bad amount"); // allow funding zero (initializes empty ledger entry), disallow negative funding

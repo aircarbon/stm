@@ -12,7 +12,7 @@ contract("StMaster", accounts => {
         
         if (await stm.getContractType() == CONST.contractType.CASHFLOW) this.skip();
         await stm.sealContract();
-        await require('../test/testSetup.js').setDefaults({ stm, accounts });
+        await require('../test/testSetupContract.js').setDefaults({ stm, accounts });
         if (!global.TaddrNdx) global.TaddrNdx = 0;
     });
 

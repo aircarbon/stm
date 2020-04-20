@@ -18,7 +18,7 @@ contract("StMaster", accounts => {
         
         await stm.whitelistMany(accounts.slice(0,60));
         await stm.sealContract();
-        await require('../test/testSetup.js').setDefaults({ stm, accounts });
+        await require('../test/testSetupContract.js').setDefaults({ stm, accounts });
 
         // add test FT type - USD
         ccyTypes = (await stm.getCcyTypes()).ccyTypes;

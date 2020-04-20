@@ -98,7 +98,7 @@ module.exports = async function (deployer) {
             //console.log('encodedArgs', encodedArgs.toString('hex'));
             // TODO: try https://github.com/Zoltu/ethereum-abi-encoder ...
 
-            const MNEMONIC = require('../dev_mnemonic.js').MNEMONIC;
+            const MNEMONIC = require('../DEV_MNEMONIC.js').MNEMONIC;
             const accountAndKey = await CONST.getAccountAndKey(0, MNEMONIC);
             const OWNER = accountAndKey.addr;
             const OWNER_privKey = accountAndKey.privKey;

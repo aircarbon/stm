@@ -239,7 +239,7 @@ function getTestContextWeb3() {
 }
 
 async function getAccountAndKey(accountNdx, mnemonic) {
-    const MNEMONIC = mnemonic || require('./dev_mnemonic.js').MNEMONIC;
+    const MNEMONIC = mnemonic || require('./DEV_MNEMONIC.js').MNEMONIC;
     //console.log('MNEMONIC: ', MNEMONIC);
     const seed = await bip39.mnemonicToSeed(MNEMONIC);
     const hdk = hdkey.fromMasterSeed(seed);

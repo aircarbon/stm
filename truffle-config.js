@@ -22,7 +22,7 @@ const Web3 = require("web3");
 const web3 = new Web3();
 const HDWalletProvider = require("@truffle/hdwallet-provider");
 
-const DEV_MNEMONIC = require('./dev_mnemonic.js').MNEMONIC;
+const DEV_MNEMONIC = require('./DEV_MNEMONIC.js').MNEMONIC;
 const PROD_MNEMONIC = '...'; // **PROD TODO
 
 const gweiDeployment = "5";

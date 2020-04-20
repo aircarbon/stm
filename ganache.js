@@ -1,5 +1,5 @@
 require('dotenv').config();
-const MNEMONIC = require('./dev_mnemonic.js').MNEMONIC;
+const MNEMONIC = require('./DEV_MNEMONIC.js').MNEMONIC;
 
 const shell = require('shelljs');
 const PORT = 8545;
