@@ -16,16 +16,16 @@ library Erc20Lib {
         erc20d._whitelisted[addr] = true;
     }
     // WHITELIST - get next, and advance current index [single]
-    function getWhitelistNext(StructLib.LedgerStruct storage ld, StructLib.Erc20Struct storage erc20d) public view returns (address) {
-        require(ld._contractSealed, "Contract is not sealed");
-        require(erc20d._nextWhitelistNdx < erc20d._whitelist.length, "Insufficient whitelist entries");
-        return erc20d._whitelist[erc20d._nextWhitelistNdx];
-    }
-    function incWhitelistNext(StructLib.LedgerStruct storage ld, StructLib.Erc20Struct storage erc20d) public {
-        require(ld._contractSealed, "Contract is not sealed");
-        require(erc20d._nextWhitelistNdx < erc20d._whitelist.length, "Insufficient whitelist entries");
-        erc20d._nextWhitelistNdx++;
-    }
+    // function getWhitelistNext(StructLib.LedgerStruct storage ld, StructLib.Erc20Struct storage erc20d) public view returns (address) {
+    //     require(ld._contractSealed, "Contract is not sealed");
+    //     require(erc20d._nextWhitelistNdx < erc20d._whitelist.length, "Insufficient whitelist entries");
+    //     return erc20d._whitelist[erc20d._nextWhitelistNdx];
+    // }
+    // function incWhitelistNext(StructLib.LedgerStruct storage ld, StructLib.Erc20Struct storage erc20d) public {
+    //     require(ld._contractSealed, "Contract is not sealed");
+    //     require(erc20d._nextWhitelistNdx < erc20d._whitelist.length, "Insufficient whitelist entries");
+    //     erc20d._nextWhitelistNdx++;
+    // }
 
     // TRANSFER
     function transfer(

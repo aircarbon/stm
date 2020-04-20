@@ -6,7 +6,7 @@ const CONST = require('../const.js');
 
 module.exports = {
 
-    // TODO: need the same in whitelist.js, and in 04_Web3_MULTI_DATA...
+    // TODO: need the same in 04_Web3_MULTI_DATA... + whitelist.js
 
     setDefaults: async (a) => {
         const { stm, accounts,
@@ -28,8 +28,7 @@ module.exports = {
                 await stm.addCcyType('BTC', 'Satoshi', 8);
             }
 
-        stm.setFee_CcyType(CONST.ccyType.USD, CONST.nullAddr, {...CONST.nullFees, ccy_perMillion: 300, ccy_mirrorFee: true, fee_min: 300 } );
-
+            stm.setFee_CcyType(CONST.ccyType.USD, CONST.nullAddr, {...CONST.nullFees, ccy_perMillion: 300, ccy_mirrorFee: true, fee_min: 300 } );
         }
         else if (await stm.getContractType() == CONST.contractType.CASHFLOW) {
             const spotTypes = (await stm.getSecTokenTypes()).tokenTypes.filter(p => p.settlementType == CONST.settlementType.SPOT);

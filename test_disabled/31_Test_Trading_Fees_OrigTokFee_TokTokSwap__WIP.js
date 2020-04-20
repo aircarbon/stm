@@ -15,7 +15,7 @@ contract("StMaster", accounts => {
         if (!global.TaddrNdx) global.TaddrNdx = 0;
         await stm.whitelistMany(accounts.slice(0,60));
         await stm.sealContract();
-        await require('../test/setup.js').setDefaults({ stm, accounts });
+        await require('../test/testSetup.js').setDefaults({ stm, accounts });
     });
 
     beforeEach(async () => {

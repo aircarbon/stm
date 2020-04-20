@@ -10,7 +10,7 @@ contract("StMaster", accounts => {
 
     before(async function () {  
         stm_cur = await st.deployed();
-        await require('../test/setup.js').setDefaults({ stm: stm_cur, accounts });
+        await require('../test/testSetup.js').setDefaults({ stm: stm_cur, accounts });
 
         //if (await stm_cur.getContractType() == CONST.contractType.CASHFLOW) this.skip();
         console.log(`stm_cur: @${stm_cur.address} ledgerHash=${await stm_cur.getLedgerHashcode()} / ${await stm_cur.name()} ${await stm_cur.version()}`);

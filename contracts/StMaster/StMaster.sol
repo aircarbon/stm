@@ -43,7 +43,7 @@ contract StMaster
     // todo: SCP - use decimals fields for erc20 (send/exchange text fields, or at least round to .decimals before passing to API)
 
     // contract properties
-    string public name;
+    string public name; 
 
     function getContractType() external view returns(StructLib.ContractType) { return ld.contractType; }
     function getContractSeal() external view returns (bool) { return ld._contractSealed; }

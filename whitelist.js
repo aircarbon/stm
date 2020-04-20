@@ -14,18 +14,18 @@ process.env.WEB3_NETWORK_ID = Number(process.env.NETWORK_ID || 888);
     console.warn('Reset default whitelist index');
     await db.AddConfigSetting('next_wl_index', DEFAULT_WHITELIST_INDEX);
 
-    const GAS_PRICES_URL = 'https://www.etherchain.org/api/gasPriceOracle';
+    // ... web3_tx()
 
+    // DB: insert mock prices
+    const GAS_PRICES_URL = 'https://www.etherchain.org/api/gasPriceOracle';
     const response = await got(GAS_PRICES_URL);
     const { safeLow, standard, fast, fastest } = JSON.parse(response.body);
-
     console.warn('Oracles prices in GWei', {
       safeLow,
       standard,
       fast,
       fastest,
     });
-
     await Promise.all([
       db.AddGasPriceValue('safeLow', safeLow),
       db.AddGasPriceValue('standard', standard),

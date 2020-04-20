@@ -13,7 +13,7 @@ contract("StMaster", accounts => {
         
         await stm.whitelistMany(accounts.slice(0,30));
         await stm.sealContract();
-        await require('../test/setup.js').setDefaults({ stm, accounts });
+        await require('../test/testSetup.js').setDefaults({ stm, accounts });
     });
     
     beforeEach(async () => {
