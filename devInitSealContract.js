@@ -3,6 +3,9 @@ const { getAccountAndKey, web3_call, web3_tx } = require('./const.js');
 
 process.env.WEB3_NETWORK_ID = Number(process.env.NETWORK_ID || 888);
 
+//
+// Initializes the contract with default values, whitelists and seals
+//
 (async function () {
   let x = await getAccountAndKey(0);
   OWNER = x.addr;

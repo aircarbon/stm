@@ -5,7 +5,7 @@ const { web3_call } = require('./const.js');
 const { db } = require('../common/dist');
 
 //
-// initializes test/local DB values
+// Initializes test/local DB with default/test values
 //
 process.env.WEB3_NETWORK_ID = Number(process.env.NETWORK_ID || 888);
 
