@@ -221,17 +221,20 @@ EXCHANGE_FEE: 1,
 
 function getTestContextWeb3() {
     const context =
-            // DM
+        // DM
           process.env.WEB3_NETWORK_ID == 888 ? { web3: new Web3('http://127.0.0.1:8545'),    ethereumTxChain: {} }
 
-            // Vince
+        // Vince
         : process.env.WEB3_NETWORK_ID == 890 ? { web3: new Web3('http://127.0.0.1:8545'),    ethereumTxChain: {} }
 
-            // Dung
+        // Dung
         : process.env.WEB3_NETWORK_ID == 889 ? { web3: new Web3('http://127.0.0.1:8545'),    ethereumTxChain: {} }
 
-            // Ropsten
+        // Ropsten
         : process.env.WEB3_NETWORK_ID == 3 ?   { web3: new Web3('https://ac-dev0.net:9545'), ethereumTxChain: { chain: 'ropsten', hardfork: 'petersburg' } }
+
+        // Rinkeby
+        : process.env.WEB3_NETWORK_ID == 4 ?   { web3: new Web3('https://rinkeby.infura.io/v3/93db2c7fd899496d8400e86100058297'), ethereumTxChain: { chain: 'rinkeby', hardfork: 'petersburg' } }
 
         : undefined;
     if (!context) throw('WEB3_NETWORK_ID is not set!');
