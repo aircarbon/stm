@@ -239,7 +239,7 @@ library TransferLib {
     }
 
     //
-    // PUBLIC - fee preview
+    // PUBLIC - fee preview (FULL - includes originator token fees)
     //
     function transfer_feePreview(
         StructLib.LedgerStruct storage ld,
@@ -345,6 +345,69 @@ library TransferLib {
                 origTokFee_struct: batch.origTokFee
                     });
                 }
+            }
+        }
+    }
+
+    //
+    // PUBLIC - fee preview (FAST - returs only the exchange fee[s])
+    //
+    function transfer_feePreview_ExchangeOnly(
+        StructLib.LedgerStruct storage ld,
+        StructLib.FeeStruct storage globalFees,
+        address feeAddrOwner,
+        StructLib.TransferArgs memory a
+    )
+    public view
+    returns (
+        StructLib.FeesCalc[1] memory feesAll // 1 exchange fee only (single destination)
+    ) {
+        uint ndx = 0;
+
+        // TODO: refactor - this is common/identical to transfer_feePreview...
+
+        // exchange fee
+        StructLib.FeeStruct storage exFeeStruct_ccy_A = ld._ledger[a.ledger_A].spot_customFees.ccyType_Set[a.ccyTypeId_A]   ? ld._ledger[a.ledger_A].spot_customFees : globalFees;
+        StructLib.FeeStruct storage exFeeStruct_tok_A = ld._ledger[a.ledger_A].spot_customFees.tokType_Set[a.tokenTypeId_A] ? ld._ledger[a.ledger_A].spot_customFees : globalFees;
+        StructLib.FeeStruct storage exFeeStruct_ccy_B = ld._ledger[a.ledger_B].spot_customFees.ccyType_Set[a.ccyTypeId_B]   ? ld._ledger[a.ledger_B].spot_customFees : globalFees;
+        StructLib.FeeStruct storage exFeeStruct_tok_B = ld._ledger[a.ledger_B].spot_customFees.tokType_Set[a.tokenTypeId_B] ? ld._ledger[a.ledger_B].spot_customFees : globalFees;
+        feesAll[ndx++] = StructLib.FeesCalc({
+            fee_ccy_A: a.ledger_A != a.feeAddrOwner && a.ccy_amount_A > 0 ? calcFeeWithCapCollar(exFeeStruct_ccy_A.ccy[a.ccyTypeId_A], uint256(a.ccy_amount_A), a.qty_B) : 0,
+            fee_ccy_B: a.ledger_B != a.feeAddrOwner && a.ccy_amount_B > 0 ? calcFeeWithCapCollar(exFeeStruct_ccy_B.ccy[a.ccyTypeId_B], uint256(a.ccy_amount_B), a.qty_A) : 0,
+            fee_tok_A: a.ledger_A != a.feeAddrOwner && a.qty_A > 0        ? calcFeeWithCapCollar(exFeeStruct_tok_A.tok[a.tokenTypeId_A], a.qty_A,               0)       : 0,
+            fee_tok_B: a.ledger_B != a.feeAddrOwner && a.qty_B > 0        ? calcFeeWithCapCollar(exFeeStruct_tok_B.tok[a.tokenTypeId_B], a.qty_B,               0)       : 0,
+               fee_to: feeAddrOwner,
+       origTokFee_qty: 0,
+   origTokFee_batchId: 0,
+    origTokFee_struct: StructLib.SetFeeArgs({
+               fee_fixed: 0,
+            fee_percBips: 0,
+                 fee_min: 0,
+                 fee_max: 0,
+          ccy_perMillion: 0,
+           ccy_mirrorFee: false
+        })
+        });
+
+        // apply exchange ccy fee mirroring - only ever from one side to the other
+        if (feesAll[0].fee_ccy_A > 0 && feesAll[0].fee_ccy_B == 0) {
+            if (exFeeStruct_ccy_A.ccy[a.ccyTypeId_A].ccy_mirrorFee == true) {
+                a.ccyTypeId_B = a.ccyTypeId_A;
+                //feesAll[0].fee_ccy_B = feesAll[0].fee_ccy_A; // symmetrical mirror
+
+                // asymmetrical mirror
+                exFeeStruct_ccy_B = ld._ledger[a.ledger_B].spot_customFees.ccyType_Set[a.ccyTypeId_B] ? ld._ledger[a.ledger_B].spot_customFees : globalFees;
+                feesAll[0].fee_ccy_B = a.ledger_B != a.feeAddrOwner ? calcFeeWithCapCollar(exFeeStruct_ccy_B.ccy[a.ccyTypeId_B], uint256(a.ccy_amount_A), a.qty_B) : 0; // ??!
+            }
+        }
+        else if (feesAll[0].fee_ccy_B > 0 && feesAll[0].fee_ccy_A == 0) {
+            if (exFeeStruct_ccy_B.ccy[a.ccyTypeId_B].ccy_mirrorFee == true) {
+                a.ccyTypeId_A = a.ccyTypeId_B;
+                //feesAll[0].fee_ccy_A = feesAll[0].fee_ccy_B; // symmetrical mirror
+
+                // asymmetrical mirror
+                exFeeStruct_ccy_A = ld._ledger[a.ledger_A].spot_customFees.ccyType_Set[a.ccyTypeId_A] ? ld._ledger[a.ledger_A].spot_customFees : globalFees;
+                feesAll[0].fee_ccy_A = a.ledger_A != a.feeAddrOwner ? calcFeeWithCapCollar(exFeeStruct_ccy_A.ccy[a.ccyTypeId_A], uint256(a.ccy_amount_B), a.qty_A) : 0; // ??!
             }
         }
     }

@@ -33,6 +33,13 @@ contract StTransferable is Owned,
         TransferLib.transferOrTrade(ld, ctd, globalFees, a);
     }
 
+    // FAST - fee preview exchange fee only
+    function transfer_feePreview_ExchangeOnly(StructLib.TransferArgs calldata a)
+    external view returns (StructLib.FeesCalc[1] memory feesAll) {
+        return TransferLib.transfer_feePreview_ExchangeOnly(ld, globalFees, owner, a);
+    }
+
+    // SLOW - fee preview (full, slow) - old/deprecate?
     uint256 constant MAX_BATCHES_PREVIEW = 128; // library constants not accessible in contract; must duplicate TransferLib value
     function transfer_feePreview(StructLib.TransferArgs calldata a)
     external view returns (StructLib.FeesCalc[1 + MAX_BATCHES_PREVIEW * 2] memory feesAll) {

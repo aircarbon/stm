@@ -6,8 +6,6 @@ const CONST = require('../const.js');
 
 module.exports = {
 
-    // TODO: need the same in 04_Web3_MULTI_DATA... + whitelist.js
-
     //
     // Initializes deployed contract with default values (currencies, spot token-types, and global commodity exchange fee)
     // (truffle version)
