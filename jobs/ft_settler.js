@@ -53,13 +53,13 @@ module.exports = {
             const otm_le = await CONST.web3_call('getLedgerEntry', [ev.from]);
             //console.log('itm_le', itm_le);
             //console.log('ft.ft.refCcyId', ft.ft.refCcyId);
-            console.log(chalk.greenBright(`\
+            console.log(`${chalk.inverse(`posId ${posId}`)}` + ` > ` +
+chalk.greenBright(`\
 DONE=$${Number(ev.done.toString()).toFixed(0).padEnd(7)} (delta=$${Number(ev.delta.toString()).toFixed(0).padEnd(7)}) ==> \
-itm: ${ev.to} ($${Number(itm_le.ccys.find(p => p.ccyTypeId.eq(ft.ft.refCcyId)).balance.toString()).toFixed(0).padEnd(8)}) / \
-otm: ${ev.from} ($${Number(otm_le.ccys.find(p => p.ccyTypeId.eq(ft.ft.refCcyId)).balance.toString()).toFixed(0).padEnd(8)})\
+itm: ${chalk.dim(ev.to)} ($${Number(itm_le.ccys.find(p => p.ccyTypeId.eq(ft.ft.refCcyId)).balance.toString()).toFixed(0).padEnd(8)}) / \
+otm: ${chalk.dim(ev.from)} ($${Number(otm_le.ccys.find(p => p.ccyTypeId.eq(ft.ft.refCcyId)).balance.toString()).toFixed(0).padEnd(8)})\
 `));
 
-            // TODO: open second pos, and have takePay combine after doing the settlement...
         }
 
         //console.groupEnd();

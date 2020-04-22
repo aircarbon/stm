@@ -162,7 +162,7 @@ library FuturesLib {
         otm.fee = otm.bal >= a.feePerSide ? a.feePerSide : 0;
         itm.fee = itm.bal >= a.feePerSide ? a.feePerSide : 0;
         if (otm.fee + itm.fee > 0) {
-            ld._ledger[a.feeAddrOwner].ccyType_balance[fta.refCcyId] += otm.fee + itm.fee;//(a.feePerSide) * 2;
+            ld._ledger[a.feeAddrOwner].ccyType_balance[fta.refCcyId] += otm.fee + itm.fee;
 
             StructLib.emitTransferedLedgerCcy(StructLib.TransferCcyArgs({
                 from: otm.st.ft_ledgerOwner, to: a.feeAddrOwner, ccyTypeId: fta.refCcyId, amount: uint256(otm.fee), transferType: StructLib.TransferType.TakePayFee }));

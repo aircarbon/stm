@@ -81,20 +81,10 @@ module.exports = {
       gasPrice: web3.utils.toWei(gweiDeployment, "gwei"),
       networkCheckTimeout: 30000,
       
-      confirmations: 2,    // # of confs to wait between deployments. (default: 0)
+      confirmations: 10,    // # of confs to wait between deployments. (default: 0)
       skipDryRun: true,
       timeoutBlocks: 200, // but web3 always times out at 50 blocks?!
     },
-
-    // aircarbon private testnet g eth node
-    testnet_ace: {
-      provider: () => new HDWalletProvider(DEV_MNEMONIC, "https://ac-dev1.net:9545",
-                      0, 1000), // # test accounts
-      network_id: "*", // 4242 ?
-      gas: 7800000,
-      gasPrice: web3.utils.toWei(gweiDeployment, "gwei")
-    },
-
     // ropsten infura -- much slower than rinkeby infura
     ropsten_infura: {
       provider: () => new HDWalletProvider(DEV_MNEMONIC, "https://ropsten.infura.io/v3/93db2c7fd899496d8400e86100058297",
@@ -103,11 +93,12 @@ module.exports = {
       gas: 7800000,
       gasPrice: web3.utils.toWei(gweiDeployment, "gwei"),
 
-      confirmations: 1,
+      confirmations: 10,
       skipDryRun: true,
       timeoutBlocks: 200,
     },
-
+    
+    // rinkeby infura
     rinkeby_infura: {
       provider: () => new HDWalletProvider(DEV_MNEMONIC, "https://rinkeby.infura.io/v3/93db2c7fd899496d8400e86100058297",
                       0, 1000), // # test accounts
@@ -118,6 +109,15 @@ module.exports = {
       confirmations: 1,
       skipDryRun: true,
       timeoutBlocks: 200,
+    },
+
+    // aircarbon private testnet g eth node
+    testnet_ace: {
+      provider: () => new HDWalletProvider(DEV_MNEMONIC, "https://ac-dev1.net:9545",
+                      0, 1000), // # test accounts
+      network_id: "*", // 4242 ?
+      gas: 7800000,
+      gasPrice: web3.utils.toWei(gweiDeployment, "gwei")
     }
 
     // Another network with more advanced options...

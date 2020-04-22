@@ -28,6 +28,7 @@ var ledgerOwners, accounts;
     //
 
     CONST.consoleOutput(false);
+    const O = await CONST.getAccountAndKey(0);
 
     const TakePay = require('./ft_settler').TakePay;
     var ctx;
@@ -41,6 +42,7 @@ var ledgerOwners, accounts;
     if (process.argv.length != 3) throw('Bad parameters');
     const MODE = process.argv[2].toUpperCase();
     if (MODE.startsWith("TEST")) {
+        await require('../devSetupContract.js').setDefaults();
         ctx = await initTestMode(MODE);
     }
     else { throw('Live mode - TODO'); } // TODO: live mode: fetch single reference price here, for each future (no participant test data)
@@ -58,7 +60,8 @@ var ledgerOwners, accounts;
     for (let T=0 ; T < MAX_T; T++) { // for time T
         console.log('-');
         console.log(chalk.inverse(` >> T=${T} << `));
-        // PHASE (1) - process TAKE/PAY (all futures, all positions)
+
+        // PHASE (1) - process TAKE/PAY (all types, all positions)
         for (let ft of ctx) {
             console.group();
 
@@ -67,6 +70,15 @@ var ledgerOwners, accounts;
             
             // test - process actions
             await processTestContext(ft, T, test_shortPosIds);
+            //console.log('test_shortPosIds', test_shortPosIds.join(','));
+
+            // dbg - show participant FT balances
+            for (let p of ft.data.TEST_PARTICIPANTS) {
+                const le = await CONST.web3_call('getLedgerEntry', [ p.account ], O.addr, O.privKey);
+                console.log(chalk.blue.dim(`PID=${p.id}`) + 
+                    chalk.dim(` ${le.tokens.map(p2 => `{ TT: ${p2.tokenTypeId} stId: ${p2.stId} M_qty:${p2.mintedQty.toString().padStart(3)} }`).join(', ')}`
+                )); //, le.tokens);
+            }
             
             // main - process take/pay for all positions on this future
             await TakePay(ft.ftId, MP, test_shortPosIds);
@@ -74,15 +86,19 @@ var ledgerOwners, accounts;
             console.groupEnd();
         }
 
-        // PHASE (2) - process POS_COMBINE (all futures, all positions)
-        //  (TX's contingent: we decide if we need combine)
+        // PHASE (2) - COMBINE positions (all types, all positions)
         //...
-
-        // TODO: --> want a second FT to test account-level liquidation...
+// TEST_2 --> no combines, end state:
+// >> T=8 << 
+// ftId=4, MP=108...
+// test_shortPosIds 19,21
+// posId 19 > DONE=$1000    (delta=$1000   ) ==> itm: 0xE6b292e9A4d691C17150C8F70046681a3F2B6060 ($55184   ) / otm: 0x996c72C8774f4086aDD8536e4888310483dDe5cD ($27184   )
+// posId 21 > DONE=$1000    (delta=$1000   ) ==> itm: 0xE6b292e9A4d691C17150C8F70046681a3F2B6060 ($56183   ) / otm: 0x996c72C8774f4086aDD8536e4888310483dDe5cD ($26183   )
 
         // PHASE (3) - PROCESS LIQUIDATE (all futures, all positions)
         //  by account-level liquidation trigger (i.e. net/total physical bal < reserved bal)
         //  (TX's contingent: we decide if we need to liquidate)
+        // TODO: --> want a second FT to test account-level liquidation...
         //...
     }
 
@@ -97,7 +113,7 @@ async function processTestContext(ft, T, test_shortPosIds) {
     for (let p of TEST_PARTICIPANTS) {
         const ccy_deposit = p.ccy_deposits[T];
         if (ccy_deposit.a) {
-            console.log(chalk.blue.dim(`TEST_PARTICIPANT: ID=${p.id}, account=${p.account}`) + chalk.blue(` ** DEPOSIT ** `), ccy_deposit);
+            console.log(chalk.blue.dim(`TEST_PARTICIPANT: PID=${p.id}, account=${p.account}`) + chalk.blue(` ** DEPOSIT ** `), ccy_deposit);
             await CONST.web3_tx('fund', [ CONST.ccyType.USD, ccy_deposit.a, p.account ], O.addr, O.privKey);
         }
     }
@@ -106,7 +122,7 @@ async function processTestContext(ft, T, test_shortPosIds) {
     for (let p of TEST_PARTICIPANTS) {
         const ccy_withdraw = p.ccy_withdraws[T];
         if (ccy_withdraw.a) {
-            console.log(chalk.blue.dim(`TEST_PARTICIPANT: ID=${p.id}, account=${p.account}`) + chalk.blue(` ** WITHDRAW ** `), ccy_withdraw);
+            console.log(chalk.blue.dim(`TEST_PARTICIPANT: PID=${p.id}, account=${p.account}`) + chalk.blue(` ** WITHDRAW ** `), ccy_withdraw);
             await CONST.web3_tx('withdraw', [ CONST.ccyType.USD, ccy_withdraw.a, p.account ], O.addr, O.privKey);
         }
     }
@@ -117,7 +133,7 @@ async function processTestContext(ft, T, test_shortPosIds) {
     for (let p of TEST_PARTICIPANTS) {
         const ft_long = p.ft_longs[T];
         if (ft_long.q) {
-            console.log(chalk.blue.dim(`TEST_PARTICIPANT: ID=${p.id}, account=${p.account}`) + chalk.blue(` ** OPEN FUTURES POSITION ** `), ft_long);
+            console.log(chalk.blue.dim(`TEST_PARTICIPANT: PID=${p.id}, account=${p.account}`) + chalk.blue(` ** OPEN FUTURES POSITION ** `), ft_long);
             const shortAccount = TEST_PARTICIPANTS.find(p => p.id == ft_long.cid).account;
             //const a_before = await CONST.web3_call('getLedgerEntry', [ p.account ]);
             //const b_before = await CONST.web3_call('getLedgerEntry', [ shortAccount ]);
@@ -130,8 +146,9 @@ async function processTestContext(ft, T, test_shortPosIds) {
             }], O.addr, O.privKey);
             //console.log('ev... shortStId:', evs.find(p => p.event == 'FutureOpenInterest').returnValues.shortStId); // ## stack too deep for shortStId
             const shortStId = Number(await CONST.web3_call('getSecToken_countMinted', [])) - 1;
+            //console.log('new test pos: ', shortStId);
             test_shortPosIds.push(shortStId);
-            //console.log(chalk.blue.dim(`TEST_PARTICIPANT: ID=${p.id}, account=${p.account}`) + chalk.blue(` (TEST POSID [SHORT] = ${shortStId}) `), shortStId);
+            //console.log(chalk.blue.dim(`TEST_PARTICIPANT: PID=${p.id}, account=${p.account}`) + chalk.blue(` (TEST POSID [SHORT] = ${shortStId}) `), shortStId);
 
             //const a_after = await CONST.web3_call('getLedgerEntry', [ p.account ]);
             //const b_after = await CONST.web3_call('getLedgerEntry', [ shortAccount ]);
@@ -191,14 +208,10 @@ async function initTestMode(testMode) {
     // init - define test data series, and test FTs
     var i=0;
     if (testMode == "TEST_1") { // single FT, single pos-pair
-        return [ {
-        ftId: fts.find(p => p.name == TEST_FT_1).id.toString(), data: {
-            
+        return [ { ftId: fts.find(p => p.name == TEST_FT_1).id.toString(), data: {
 refs: // FT - underlyer settlement prices
                [ 100,               101,               102,               103,               104,               105,               106,                107,                108 ], 
-
-TEST_PARTICIPANTS: [ // test participants
-{ 
+TEST_PARTICIPANTS: [ { // test participants
            id: 1, account: freshAccounts[i++],
  ccy_deposits: [ {a:+20300},        {},                {},                {},                {},                {},                {},                 {},                 {} ], 
 ccy_withdraws: [ {a:+0000},         {},                {},                {},                {},                {},                {},                 {},                 {} ], 
@@ -212,9 +225,29 @@ ccy_withdraws: [ {a:+0000},         {},                {},                {},   
      ft_longs: [ {},                {},                {},                {},                {},                {},                {},                 {},                 {} ],
 }
 ]
-    
         }
     }];
     }
+    else if (testMode == "TEST_2") { // single FT, two pos-pairs
+        return [ { ftId: fts.find(p => p.name == TEST_FT_1).id.toString(), data: {
+refs: 
+               [ 100,               101,               102,               103,               104,               105,               106,                107,                108 ], 
+TEST_PARTICIPANTS: [ {
+           id: 1, account: freshAccounts[i++],
+ ccy_deposits: [ {a:+20300},        {a:+21500},        {},                {},                {},                {},                {},                 {},                 {} ], 
+ccy_withdraws: [ {a:+0000},         {},                {},                {},                {},                {},                {},                 {},                 {} ], 
+     ft_longs: [ {q:1,cid:2,p:100}, {q:1,cid:2,p:101}, {},                {},                {},                {},                {},                 {},                 {} ],
+},
+{ 
+           id: 2, account: freshAccounts[i++],
+ ccy_deposits: [ {a:+20300},        {a:+21500},        {},                {},                {},                {},                {},                 {},                 {} ],
+ccy_withdraws: [ {a:+0000},         {},                {},                {},                {},                {},                {},                 {},                 {} ], 
+     ft_longs: [ {},                {},                {},                {},                {},                {},                {},                 {},                 {} ],
+}
+]
+        }
+    }];
+    }
+
     else throw('Unknown testmode');
 }

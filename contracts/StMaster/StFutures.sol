@@ -35,23 +35,19 @@ FUTURES - notes 26/MAR/2020
 
 
 (2) SETTLE_JOB (off-chain) - POS-PAIR SETTLER... (caps ITM-pay at OTM-take: delta/default is handled off-chain...)
-  (2.1)   >> TakeOrPay [2 updates: LMP + CcyBalance] -- use (MP - LMP) or (MP - P) when LMP == -1
-           ... preview mode - should net to zero across all ledgers and positions...
+  (2.1) done: TakeOrPay [2 updates: LMP + CcyBalance] -- use (MP - LMP) or (MP - P) when LMP == -1
 
-      >> TODO: settlement job by pos-pair (cap ITM at OTM, guarantee net 0) > event for any shortfall off-chain processing
+  (2.2) >>> NetPositions (auto-burn/shrink) - should only ever be ONE net ST per FT-type after TakeOrPay...
+
+  (2.3) LiquidatePositions
+
       >> ?? LIQUIDATION ?? -- reserved is currently the *total* across all positions; so liquidation would be *all positions* ???
           i.e. margin call is at account level, or position level? account level easier?!
 
-      >> pos combines - optimization: if both positions are processed (taken/paid) then they can be netted solely on the basis of qty
-        i.e. entry_price is ONLY relevant on the FIRST take/pay cycle...
       >> margin: v1 can apply a simple flat % (e.g. 20%) - reserved margin_required = 20% * notional_size
         e.g. 1000 contracts at $1 price = $1000 notional * 20% = $200 margin_required [reserved amount] -- IT NEVER CHANGES (assuming 20% is same value on each take/pay cycle)
       >> then, after take/pay job has run (and updated cash balance) - if ledger's cash balance < margin_requried either
         (a) margin-call or (b) liquidate
-
-
-  (2.2)   >> NetPositions (auto-burn/shrink) - should only ever be ONE net ST per FT-type after TakeOrPay
-  (2.3)   >> LiquidatePositions
 
  >> JS test framework, with various price series and event series (position opens/closes)
 
