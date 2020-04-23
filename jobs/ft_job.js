@@ -91,17 +91,17 @@ var ledgerOwners, accounts;
         // PHASE (2) - COMBINE positions (all types, all positions)
         for (let ft of ctx) {
             console.group();
-            await Combine(ft.ftId, test_shortPosIds);
+            await Combine(ft.ftId, ft.data.TEST_PARTICIPANTS.map(p => p.account));
             console.groupEnd();
         }
-
-        //...
 // TEST_2 --> no combines, end state:
 // >> T=8 << 
 // ftId=4, MP=108...
-// test_shortPosIds 19,21
-// posId 19 > DONE=$1000    (delta=$1000   ) ==> itm: 0xE6b292e9A4d691C17150C8F70046681a3F2B6060 ($55184   ) / otm: 0x996c72C8774f4086aDD8536e4888310483dDe5cD ($27184   )
-// posId 21 > DONE=$1000    (delta=$1000   ) ==> itm: 0xE6b292e9A4d691C17150C8F70046681a3F2B6060 ($56183   ) / otm: 0x996c72C8774f4086aDD8536e4888310483dDe5cD ($26183   )
+// PID=1 { TT: 4 stId: 94 M_qty:  1 }, { TT: 4 stId: 96 M_qty:  1 }, { TT: 4 stId: 98 M_qty:  1 }
+// PID=2 { TT: 4 stId: 93 M_qty: -1 }, { TT: 4 stId: 95 M_qty: -1 }, { TT: 4 stId: 97 M_qty: -1 }
+// shortId 93 > DONE=$1000    (delta=$1000   ) ==> itm: 0xC9EB2292aD2F1989e650eb2e05B436dbff6B2A7B ($81978   ) / otm: 0x5E5422e30491329C842a06Ca543cA32E16C00b6f ($43978   )
+// shortId 95 > DONE=$1000    (delta=$1000   ) ==> itm: 0xC9EB2292aD2F1989e650eb2e05B436dbff6B2A7B ($82977   ) / otm: 0x5E5422e30491329C842a06Ca543cA32E16C00b6f ($42977   )
+// shortId 97 > DONE=$1000    (delta=$1000   ) ==> itm: 0xC9EB2292aD2F1989e650eb2e05B436dbff6B2A7B ($83976   ) / otm: 0x5E5422e30491329C842a06Ca543cA32E16C00b6f ($41976   )
 
         // PHASE (3) - PROCESS LIQUIDATE (all futures, all positions)
         //  by account-level liquidation trigger (i.e. net/total physical bal < reserved bal)
@@ -236,19 +236,19 @@ ccy_withdraws: [ {a:+0000},         {},                {},                {},   
         }
     }];
     }
-    else if (testMode == "TEST_2") { // single FT, two pos-pairs
+    else if (testMode == "TEST_2") { // single FT, three pos-pairs
         return [ { ftId: fts.find(p => p.name == TEST_FT_1).id.toString(), data: {
 refs: 
                [ 100,               101,               102,               103,               104,               105,               106,                107,                108 ], 
 TEST_PARTICIPANTS: [ {
            id: 1, account: freshAccounts[i++],
- ccy_deposits: [ {a:+20300},        {a:+21500},        {},                {},                {},                {},                {},                 {},                 {} ], 
+ ccy_deposits: [ {a:+20300},        {a:+21300},        {a:+22300},        {},                {},                {},                {},                 {},                 {} ], 
 ccy_withdraws: [ {a:+0000},         {},                {},                {},                {},                {},                {},                 {},                 {} ], 
-     ft_longs: [ {q:1,cid:2,p:100}, {q:1,cid:2,p:101}, {},                {},                {},                {},                {},                 {},                 {} ],
+     ft_longs: [ {q:1,cid:2,p:100}, {q:1,cid:2,p:101}, {q:1,cid:2,p:102}, {},                {},                {},                {},                 {},                 {} ],
 },
 { 
            id: 2, account: freshAccounts[i++],
- ccy_deposits: [ {a:+20300},        {a:+21500},        {},                {},                {},                {},                {},                 {},                 {} ],
+ ccy_deposits: [ {a:+20300},        {a:+21300},        {a:+22300},        {},                {},                {},                {},                 {},                 {} ],
 ccy_withdraws: [ {a:+0000},         {},                {},                {},                {},                {},                {},                 {},                 {} ], 
      ft_longs: [ {},                {},                {},                {},                {},                {},                {},                 {},                 {} ],
 }

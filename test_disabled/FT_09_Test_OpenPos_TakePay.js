@@ -23,6 +23,8 @@ contract("StMaster", accounts => {
     const POS_QTY = new BN(1);
     const FT_SIZE = new BN(1000);
 
+    // TODO: negative tests...
+
     before(async function () {
         stm = await st.deployed();
         if (await stm.getContractType() == CONST.contractType.CASHFLOW) this.skip();

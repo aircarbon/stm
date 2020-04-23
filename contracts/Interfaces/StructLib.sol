@@ -320,6 +320,13 @@ library StructLib {
         address feeAddrOwner;
     }
 
+    // FUTURES POSITION COMBINE ARGS
+    struct CombinePositionArgs {
+        uint256   tokTypeId;
+        uint256   master_StId;
+        uint256[] child_StIds;
+    }
+
     /**
      * @notice Creates a new ledger entry, if not already existing
      * @param ld Ledger data

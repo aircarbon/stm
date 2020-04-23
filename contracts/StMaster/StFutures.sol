@@ -94,11 +94,12 @@ contract StFutures is Owned,
     function setInitMargin_TokType(
         uint256 tokTypeId,
         address ledgerOwner,
-        uint16  initMarginBips
-    ) public onlyOwner() onlyWhenReadWrite() {
+        uint16  initMarginBips)
+    public onlyOwner() onlyWhenReadWrite() {
         FuturesLib.setInitMargin_TokType(ld, std, ledgerOwner, tokTypeId, initMarginBips);
     }
-
+    
+    // SETTLEMENT CYCLE: TakePay + Combine
     function takePay(
         uint256 tokTypeId,
         uint256 short_stId,
@@ -113,6 +114,10 @@ contract StFutures is Owned,
             feePerSide: feePerSide,
           feeAddrOwner: owner
           }));
+    }
+    function combineFtPos(StructLib.CombinePositionArgs memory a)
+    public onlyOwner() {
+      FuturesLib.combineFtPos(ld, std, a);
     }
 
     function getInitMargin(uint256 tokTypeId, address ledgerOwner)

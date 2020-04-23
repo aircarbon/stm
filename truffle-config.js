@@ -25,7 +25,7 @@ const HDWalletProvider = require("@truffle/hdwallet-provider");
 const DEV_MNEMONIC = require('./DEV_MNEMONIC.js').MNEMONIC;
 const PROD_MNEMONIC = '...'; // **PROD TODO
 
-const gweiDeployment = "10";
+const gweiDeployment = "20";
 
 module.exports = {
   /**
@@ -97,7 +97,7 @@ module.exports = {
       skipDryRun: true,
       timeoutBlocks: 200,
     },
-    
+
     // rinkeby infura
     rinkeby_infura: {
       provider: () => new HDWalletProvider(DEV_MNEMONIC, "https://rinkeby.infura.io/v3/93db2c7fd899496d8400e86100058297",
