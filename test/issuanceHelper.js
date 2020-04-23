@@ -11,10 +11,6 @@ module.exports = {
         const issuer_balBefore = await web3.eth.getBalance(issuer);
         const issuer_ledgerBefore = await stm.getLedgerEntry(issuer);
 
-        // const whitelist = await stm.getWhitelist();
-        // console.log('whitelist', whitelist);
-        // console.log('readOnly', await stm.readOnly());
-
         // subscribe
         const sub_balBefore = await web3.eth.getBalance(subscriber);
         const sub_ledgerBefore = await stm.getLedgerEntry(subscriber);

@@ -55,7 +55,7 @@ describe(`Contract Web3 Interface`, async () => {
 
         // setup - whitelist A, mint two types for A, transferOrTrade all A -> GRAY_1
         try {
-            await CONST.web3_tx('whitelist', [ WHITE ], OWNER, OWNER_privKey);
+            await CONST.web3_tx('whitelistMany', [ [WHITE] ], OWNER, OWNER_privKey);
         } catch(ex) {
             // swallow - ropsten doesn't include the revert msg
             //if (ex.toString().includes("Already whitelisted")) console.log('(already whitelisted - nop)');

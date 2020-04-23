@@ -46,7 +46,6 @@ contract("StMaster", accounts => {
         const issuer_ledgerBefore = await stm.getLedgerEntry(issuer);
 
         // const whitelist = await stm.getWhitelist();
-        // console.log('whitelist', whitelist);
         // console.log('readOnly', await stm.readOnly());
 
         // subscribe
