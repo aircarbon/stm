@@ -31,6 +31,7 @@ var ledgerOwners, accounts;
     const O = await CONST.getAccountAndKey(0);
 
     const TakePay = require('./ft_settler').TakePay;
+    const Combine = require('./ft_settler').Combine;
     var ctx;
 
     // startup
@@ -61,16 +62,18 @@ var ledgerOwners, accounts;
         console.log('-');
         console.log(chalk.inverse(` >> T=${T} << `));
 
+        // test - process actions
+        for (let ft of ctx) {
+            console.group();
+            await processTestContext(ft, T, test_shortPosIds);
+            console.groupEnd();
+        }
+
         // PHASE (1) - process TAKE/PAY (all types, all positions)
         for (let ft of ctx) {
             console.group();
-
             const MP = ft.data.refs[T]; // mark price
             console.log(chalk.dim(`ftId=${ft.ftId}, MP=${MP}...`));
-            
-            // test - process actions
-            await processTestContext(ft, T, test_shortPosIds);
-            //console.log('test_shortPosIds', test_shortPosIds.join(','));
 
             // dbg - show participant FT balances
             for (let p of ft.data.TEST_PARTICIPANTS) {
@@ -82,11 +85,16 @@ var ledgerOwners, accounts;
             
             // main - process take/pay for all positions on this future
             await TakePay(ft.ftId, MP, test_shortPosIds);
-
             console.groupEnd();
         }
 
         // PHASE (2) - COMBINE positions (all types, all positions)
+        for (let ft of ctx) {
+            console.group();
+            await Combine(ft.ftId, test_shortPosIds);
+            console.groupEnd();
+        }
+
         //...
 // TEST_2 --> no combines, end state:
 // >> T=8 << 

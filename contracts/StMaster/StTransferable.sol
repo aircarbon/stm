@@ -31,7 +31,7 @@ contract StTransferable is Owned,
 
         a.feeAddrOwner = owner;
         TransferLib.transferOrTrade(ld, ctd, globalFees, a);
-    }
+    }   
 
     // FAST - fee preview exchange fee only
     function transfer_feePreview_ExchangeOnly(StructLib.TransferArgs calldata a)

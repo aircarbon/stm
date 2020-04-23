@@ -23,7 +23,7 @@ process.env.WEB3_NETWORK_ID = Number(process.env.NETWORK_ID || 888);
     for (let i = 0; i < WHITELIST_COUNT; i++) {
       // note - we include account[0] owner account in the whitelist
       x = await getAccountAndKey(i);
-      await web3_tx('whitelist', [x.addr], OWNER, OWNER_privKey);
+      await web3_tx('whitelistMany', [[x.addr]], OWNER, OWNER_privKey);
     }
     console.groupEnd();
 

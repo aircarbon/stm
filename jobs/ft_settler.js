@@ -9,6 +9,10 @@ module.exports = {
 
     // TODO - TX: setReadOnly(true)... ?
 
+    Combine: async (ftId, test_shortPosIds) => {
+        const O = await CONST.getAccountAndKey(0);
+    },
+
     TakePay: async (ftId, MP, test_shortPosIds) => {
         const O = await CONST.getAccountAndKey(0);
         
