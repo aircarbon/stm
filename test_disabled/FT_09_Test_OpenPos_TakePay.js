@@ -72,7 +72,7 @@ contract("StMaster", accounts => {
     it(`FT pos-pair take/pay - should handle null take/pay (markPrice == lastMarkPrice)`, async () => {
         const DELTA_P = new BN(0);
         LAST_PRICE = LAST_PRICE.add(DELTA_P);
-        const data = await futuresHelper.takePay({ stm, accounts, tokTypeId: usdFT.id, ftId: usdFT.id, shortStId: SHORT_STID, markPrice: LAST_PRICE, feePerSide: 0 });
+        const data = await futuresHelper.takePay({ stm, accounts, tokTypeId: usdFT.id, shortStId: SHORT_STID, markPrice: LAST_PRICE, feePerSide: 0 });
         //truffleAssert.prettyPrintEmittedEvents(data.tx);
         truffleAssert.eventEmitted(data.tx, 'TakePay', ev => ev.delta.isZero() && ev.done.isZero());
         await CONST.logGas(web3, data.tx, `pos-pair null take/pay`);
@@ -80,7 +80,7 @@ contract("StMaster", accounts => {
     it(`FT pos-pair take/pay - should cap take at 0 when no balance available (short ITM, long OTM)`, async () => {
         const DELTA_P = new BN(-10);
         LAST_PRICE = LAST_PRICE.add(DELTA_P);
-        const data = await futuresHelper.takePay({ stm, accounts, tokTypeId: usdFT.id, ftId: usdFT.id, shortStId: SHORT_STID, markPrice: LAST_PRICE, feePerSide: 0 });
+        const data = await futuresHelper.takePay({ stm, accounts, tokTypeId: usdFT.id, shortStId: SHORT_STID, markPrice: LAST_PRICE, feePerSide: 0 });
         truffleAssert.eventEmitted(data.tx, 'TakePay', ev =>
             ev.from == LONG && ev.to == SHORT && ev.delta == DELTA_P.abs().mul(POS_QTY).mul(FT_SIZE).toString() && ev.done.isZero()
         );
@@ -88,7 +88,7 @@ contract("StMaster", accounts => {
     it(`FT pos-pair take/pay - should cap take at 0 when no balance available (short OTM, long ITM)`, async () => {
         const DELTA_P = new BN(+10);
         LAST_PRICE = LAST_PRICE.add(DELTA_P);
-        const data = await futuresHelper.takePay({ stm, accounts, tokTypeId: usdFT.id, ftId: usdFT.id, shortStId: SHORT_STID, markPrice: LAST_PRICE, feePerSide: 0 });
+        const data = await futuresHelper.takePay({ stm, accounts, tokTypeId: usdFT.id, shortStId: SHORT_STID, markPrice: LAST_PRICE, feePerSide: 0 });
         truffleAssert.eventEmitted(data.tx, 'TakePay', ev =>
             ev.from == SHORT && ev.to == LONG && ev.delta == DELTA_P.abs().mul(POS_QTY).mul(FT_SIZE).toString() && ev.done.isZero()
         );
@@ -100,7 +100,7 @@ contract("StMaster", accounts => {
         LAST_PRICE = LAST_PRICE.add(DELTA_P);
         const DELTA = DELTA_P.abs().mul(POS_QTY).mul(FT_SIZE);
         await stm.fund(usdFT.ft.refCcyId, DELTA.div(new BN(2)), LONG);
-        const data = await futuresHelper.takePay({ stm, accounts, tokTypeId: usdFT.id, ftId: usdFT.id, shortStId: SHORT_STID, markPrice: LAST_PRICE, feePerSide: 0 });
+        const data = await futuresHelper.takePay({ stm, accounts, tokTypeId: usdFT.id, shortStId: SHORT_STID, markPrice: LAST_PRICE, feePerSide: 0 });
         truffleAssert.eventEmitted(data.tx, 'TakePay', ev =>
             ev.from == LONG && ev.to == SHORT && ev.delta == DELTA.toString() && ev.done.eq(ev.delta.div(new BN(2)))
         );
@@ -109,7 +109,7 @@ contract("StMaster", accounts => {
         const DELTA_P = new BN(+10);
         LAST_PRICE = LAST_PRICE.add(DELTA_P);
         const DELTA = DELTA_P.abs().mul(POS_QTY).mul(FT_SIZE);
-        const data = await futuresHelper.takePay({ stm, accounts, tokTypeId: usdFT.id, ftId: usdFT.id, shortStId: SHORT_STID, markPrice: LAST_PRICE, feePerSide: 0 });
+        const data = await futuresHelper.takePay({ stm, accounts, tokTypeId: usdFT.id, shortStId: SHORT_STID, markPrice: LAST_PRICE, feePerSide: 0 });
         truffleAssert.eventEmitted(data.tx, 'TakePay', ev =>
             ev.from == SHORT && ev.to == LONG && ev.delta == DELTA.toString() && ev.done.eq(ev.delta.div(new BN(2)))
         );
@@ -120,7 +120,7 @@ contract("StMaster", accounts => {
         const DELTA_P = new BN(-5); // assumes: = previous test's capped paid amount - can be fully covered
         LAST_PRICE = LAST_PRICE.add(DELTA_P);
         const DELTA = DELTA_P.abs().mul(POS_QTY).mul(FT_SIZE);
-        const data = await futuresHelper.takePay({ stm, accounts, tokTypeId: usdFT.id, ftId: usdFT.id, shortStId: SHORT_STID, markPrice: LAST_PRICE, feePerSide: 0 });
+        const data = await futuresHelper.takePay({ stm, accounts, tokTypeId: usdFT.id, shortStId: SHORT_STID, markPrice: LAST_PRICE, feePerSide: 0 });
         truffleAssert.eventEmitted(data.tx, 'TakePay', ev =>
             ev.from == LONG && ev.to == SHORT && ev.delta == DELTA.toString() && ev.done.eq(ev.delta)
         );
@@ -130,7 +130,7 @@ contract("StMaster", accounts => {
         const DELTA_P = new BN(+5); // assumes: = previous test's uncapped paid amount - can be fully covered
         LAST_PRICE = LAST_PRICE.add(DELTA_P);
         const DELTA = DELTA_P.abs().mul(POS_QTY).mul(FT_SIZE);
-        const data = await futuresHelper.takePay({ stm, accounts, tokTypeId: usdFT.id, ftId: usdFT.id, shortStId: SHORT_STID, markPrice: LAST_PRICE, feePerSide: 0 });
+        const data = await futuresHelper.takePay({ stm, accounts, tokTypeId: usdFT.id, shortStId: SHORT_STID, markPrice: LAST_PRICE, feePerSide: 0 });
         truffleAssert.eventEmitted(data.tx, 'TakePay', ev =>
             ev.from == SHORT && ev.to == LONG && ev.delta == DELTA.toString() && ev.done.eq(ev.delta)
         );

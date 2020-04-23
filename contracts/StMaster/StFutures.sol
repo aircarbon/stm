@@ -36,8 +36,9 @@ FUTURES - notes 26/MAR/2020
 
 (2) SETTLE_JOB (off-chain) - POS-PAIR SETTLER... (caps ITM-pay at OTM-take: delta/default is handled off-chain...)
   (2.1) done: TakeOrPay [2 updates: LMP + CcyBalance] -- use (MP - LMP) or (MP - P) when LMP == -1
+  (2.2) ... >>> NetPositions (auto-burn/shrink) - should only ever be ONE net ST per FT-type after TakeOrPay...
 
-  (2.2) >>> NetPositions (auto-burn/shrink) - should only ever be ONE net ST per FT-type after TakeOrPay...
+  >>>> TODO: negative tests (full suite) for takePay + combine <<<<
 
   (2.3) LiquidatePositions
 

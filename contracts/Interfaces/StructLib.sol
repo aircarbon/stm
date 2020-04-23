@@ -172,7 +172,7 @@ library StructLib {
         uint64 batchId;                                         // can be zero for "batchless" future "auto-minted" tokens; non-zero for spot tok-types
         int64  mintedQty;                                       // existence check field: should never be non-zero
         int64  currentQty;                                      // current (variable) unit qty in the ST (i.e. burned = currentQty - mintedQty)
-        int128 ft_price;                                        // [FUTURE types only]
+        int128 ft_price;                                        // [FUTURE types only] -- becomes average price after combining
         int128 ft_lastMarkPrice;                                // [FUTURE types only]
         address ft_ledgerOwner;                                 // [FUTURE types only] -- for takePay() lookup of ledger owner by ST
     }
@@ -185,7 +185,6 @@ library StructLib {
             int128  ft_price;
             int128  ft_lastMarkPrice;
             address ft_ledgerOwner;
-
         }
     struct PackedStTotals {
         uint80 transferedQty;

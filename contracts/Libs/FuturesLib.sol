@@ -7,6 +7,7 @@ library FuturesLib {
     event FutureOpenInterest(address indexed long, address indexed short, uint256 shortStId, uint256 tokTypeId, uint256 qty, uint256 price);
     event SetInitialMargin(uint256 tokenTypeId, address indexed ledgerOwner, uint16 initMarginBips);
     event TakePay(address indexed from, address indexed to, uint256 delta, uint256 done, address indexed feeTo, uint256 otmFee, uint256 itmFee, uint256 feeCcyId);
+    event Combine(address indexed to, uint256 masterStId, uint256 countTokensCombined);
 
     //
     // PUBLIC - get/set initial margin ledger override
@@ -234,8 +235,8 @@ library FuturesLib {
             require(childSt.batchId == 0 && childSt.ft_price != 0, "Bad (unexpected data) on child token");
             require(childSt.ft_ledgerOwner == masterSt.ft_ledgerOwner, "Token ledger owner mismatch");
             require(childSt.ft_lastMarkPrice != -1, "Bad last mark price on child token");
-            require(childSt.ft_lastMarkPrice != masterSt.ft_lastMarkPrice, "Last mark price mismatch");
-            require(tokenExistsOnLedger(ld, a.tokTypeId, masterSt.ft_ledgerOwner, a.master_StId), "Bad or missing ledger token type on child token");
+            require(tokenExistsOnLedger(ld, a.tokTypeId, masterSt.ft_ledgerOwner, a.child_StIds[x]), "Bad or missing ledger token type on child token");
+            require(childSt.ft_lastMarkPrice == masterSt.ft_lastMarkPrice, "Last mark price mismatch");
             require(childSt.mintedQty == childSt.currentQty, "Unexpected quantity on child token");
 
             childQty += childSt.currentQty;
@@ -252,6 +253,8 @@ library FuturesLib {
         // resize: recreate ledger entry tokenType list, with a single combined token
         delete ld._ledger[masterSt.ft_ledgerOwner].tokenType_stIds[a.tokTypeId];
         ld._ledger[masterSt.ft_ledgerOwner].tokenType_stIds[a.tokTypeId].push(a.master_StId);
+
+        emit Combine(masterSt.ft_ledgerOwner, a.master_StId, a.child_StIds.length);
     }
 
     // returns uncapped take/pay settlment amount for the given position

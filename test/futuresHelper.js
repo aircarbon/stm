@@ -11,7 +11,6 @@ module.exports = {
     takePay: async (a) => {
         const { stm, accounts,
             tokTypeId,
-            ftId,
             shortStId,
             markPrice,
             feePerSide
@@ -28,7 +27,7 @@ module.exports = {
         const ledgerShort_before = await stm.getLedgerEntry(stShort.ft_ledgerOwner);
         const ledgerLong_before = await stm.getLedgerEntry(stLong.ft_ledgerOwner);
         
-        const tx = await stm.takePay(ftId, shortStId, markPrice, feePerSide, { from: accounts[0] });
+        const tx = await stm.takePay(tokTypeId, shortStId, markPrice, feePerSide, { from: accounts[0] });
         
         var itm, otm, delta, done;
         truffleAssert.eventEmitted(tx, 'TakePay', ev => {

@@ -21,6 +21,7 @@ require('dotenv').config();
 const Web3 = require("web3");
 const web3 = new Web3();
 const HDWalletProvider = require("@truffle/hdwallet-provider");
+const NonceTrackerSubprovider = require("web3-provider-engine/subproviders/nonce-tracker");
 
 const DEV_MNEMONIC = require('./DEV_MNEMONIC.js').MNEMONIC;
 const PROD_MNEMONIC = '...'; // **PROD TODO
@@ -39,13 +40,6 @@ module.exports = {
    */
 
   networks: {
-    // solc: {
-    //   optimizer: {
-    //     enabled: true,
-    //     runs: 10000
-    //   }
-    // },
-
     //
     // DEPLOYMENT TIMEOUTS/LIMITS
     // web3 waits a maximum of 50 blocks for TX receipt (https://github.com/trufflesuite/truffle/issues/594)
@@ -87,8 +81,14 @@ module.exports = {
     },
     // ropsten infura -- much slower than rinkeby infura
     ropsten_infura: {
-      provider: () => new HDWalletProvider(DEV_MNEMONIC, "https://ropsten.infura.io/v3/93db2c7fd899496d8400e86100058297",
-                      0, 1000), // # test accounts
+      provider: //() => new HDWalletProvider(DEV_MNEMONIC, "https://ropsten.infura.io/v3/93db2c7fd899496d8400e86100058297", 0, 1000), // # test accounts
+        function() { // https://ethereum.stackexchange.com/questions/44349/truffle-infura-on-mainnet-nonce-too-low-error
+          var wallet = new HDWalletProvider(DEV_MNEMONIC, 'https://ropsten.infura.io/v3/93db2c7fd899496d8400e86100058297', 0, 1000);
+          var nonceTracker = new NonceTrackerSubprovider();
+          wallet.engine._providers.unshift(nonceTracker);
+          nonceTracker.setEngine(wallet.engine);
+          return wallet;
+        },
       network_id: "*", // 3
       gas: 7800000,
       gasPrice: web3.utils.toWei(gweiDeployment, "gwei"),

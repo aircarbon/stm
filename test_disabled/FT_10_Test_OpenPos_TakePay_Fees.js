@@ -72,7 +72,7 @@ contract("StMaster", accounts => {
         const DELTA_P = new BN(0);
         await stm.fund(usdFT.ft.refCcyId, FEE_PER_SIDE, LONG);
         await stm.fund(usdFT.ft.refCcyId, FEE_PER_SIDE, SHORT);
-        const data = await futuresHelper.takePay({ stm, accounts, tokTypeId: usdFT.id, ftId: usdFT.id, shortStId: SHORT_STID, markPrice: LAST_PRICE.add(DELTA_P), feePerSide: FEE_PER_SIDE });
+        const data = await futuresHelper.takePay({ stm, accounts, tokTypeId: usdFT.id, shortStId: SHORT_STID, markPrice: LAST_PRICE.add(DELTA_P), feePerSide: FEE_PER_SIDE });
         //truffleAssert.prettyPrintEmittedEvents(data.tx);
         truffleAssert.eventEmitted(data.tx, 'TakePay', ev => ev.delta.isZero() && ev.done.isZero());
         await CONST.logGas(web3, data.tx, `pos-pair null take/pay`);
@@ -87,7 +87,7 @@ contract("StMaster", accounts => {
         await stm.fund(usdFT.ft.refCcyId, FEE_PER_SIDE, LONG);
         await stm.fund(usdFT.ft.refCcyId, FEE_PER_SIDE, SHORT);
         await stm.fund(usdFT.ft.refCcyId, PARTIAL, LONG);
-        const data = await futuresHelper.takePay({ stm, accounts, tokTypeId: usdFT.id, ftId: usdFT.id, shortStId: SHORT_STID, markPrice: LAST_PRICE, feePerSide: FEE_PER_SIDE });
+        const data = await futuresHelper.takePay({ stm, accounts, tokTypeId: usdFT.id, shortStId: SHORT_STID, markPrice: LAST_PRICE, feePerSide: FEE_PER_SIDE });
         //truffleAssert.prettyPrintEmittedEvents(data.tx);
         truffleAssert.eventEmitted(data.tx, 'TakePay', ev => ev.from == LONG && ev.to == SHORT && ev.delta == DELTA.toString() && ev.done.eq(PARTIAL));
         truffleAssert.eventEmitted(data.tx, 'TransferedLedgerCcy', ev => ev.transferType == CONST.transferType.TAKEPAY_FEE && (ev.from == LONG || ev.from == SHORT) && ev.to == accounts[0] && ev.amount.eq(FEE_PER_SIDE));
@@ -98,7 +98,7 @@ contract("StMaster", accounts => {
         const DELTA = DELTA_P.abs().mul(POS_QTY).mul(FT_SIZE);
         await stm.fund(usdFT.ft.refCcyId, FEE_PER_SIDE, LONG);
         await stm.fund(usdFT.ft.refCcyId, FEE_PER_SIDE, SHORT);
-        const data = await futuresHelper.takePay({ stm, accounts, tokTypeId: usdFT.id, ftId: usdFT.id, shortStId: SHORT_STID, markPrice: LAST_PRICE, feePerSide: FEE_PER_SIDE });
+        const data = await futuresHelper.takePay({ stm, accounts, tokTypeId: usdFT.id, shortStId: SHORT_STID, markPrice: LAST_PRICE, feePerSide: FEE_PER_SIDE });
         //truffleAssert.prettyPrintEmittedEvents(data.tx);
         truffleAssert.eventEmitted(data.tx, 'TakePay', ev => ev.from == SHORT && ev.to == LONG && ev.delta == DELTA.toString() && ev.done.eq(ev.delta.div(new BN(2))));
         truffleAssert.eventEmitted(data.tx, 'TransferedLedgerCcy', ev => ev.transferType == CONST.transferType.TAKEPAY_FEE && (ev.from == LONG || ev.from == SHORT) && ev.to == accounts[0] && ev.amount.eq(FEE_PER_SIDE));
@@ -111,7 +111,7 @@ contract("StMaster", accounts => {
         const DELTA = DELTA_P.abs().mul(POS_QTY).mul(FT_SIZE);
         await stm.fund(usdFT.ft.refCcyId, FEE_PER_SIDE, LONG);
         await stm.fund(usdFT.ft.refCcyId, FEE_PER_SIDE, SHORT);
-        const data = await futuresHelper.takePay({ stm, accounts, tokTypeId: usdFT.id, ftId: usdFT.id, shortStId: SHORT_STID, markPrice: LAST_PRICE, feePerSide: FEE_PER_SIDE });
+        const data = await futuresHelper.takePay({ stm, accounts, tokTypeId: usdFT.id, shortStId: SHORT_STID, markPrice: LAST_PRICE, feePerSide: FEE_PER_SIDE });
         //truffleAssert.prettyPrintEmittedEvents(data.tx);
         truffleAssert.eventEmitted(data.tx, 'TakePay', ev => ev.from == LONG && ev.to == SHORT && ev.delta == DELTA.toString() && ev.done.eq(ev.delta));
         await CONST.logGas(web3, data.tx, `pos-pair take/pay no cap (short ITM)`);
@@ -122,7 +122,7 @@ contract("StMaster", accounts => {
         const DELTA = DELTA_P.abs().mul(POS_QTY).mul(FT_SIZE);
         await stm.fund(usdFT.ft.refCcyId, FEE_PER_SIDE, LONG);
         await stm.fund(usdFT.ft.refCcyId, FEE_PER_SIDE, SHORT);
-        const data = await futuresHelper.takePay({ stm, accounts, tokTypeId: usdFT.id, ftId: usdFT.id, shortStId: SHORT_STID, markPrice: LAST_PRICE, feePerSide: FEE_PER_SIDE });
+        const data = await futuresHelper.takePay({ stm, accounts, tokTypeId: usdFT.id, shortStId: SHORT_STID, markPrice: LAST_PRICE, feePerSide: FEE_PER_SIDE });
         //truffleAssert.prettyPrintEmittedEvents(data.tx);
         truffleAssert.eventEmitted(data.tx, 'TakePay', ev => ev.from == SHORT && ev.to == LONG && ev.delta == DELTA.toString() && ev.done.eq(ev.delta));
         await CONST.logGas(web3, data.tx, `pos-pair take/pay no cap (long ITM)`);
