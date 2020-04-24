@@ -26,7 +26,7 @@ const NonceTrackerSubprovider = require("web3-provider-engine/subproviders/nonce
 const DEV_MNEMONIC = require('./DEV_MNEMONIC.js').MNEMONIC;
 const PROD_MNEMONIC = '...'; // **PROD TODO
 
-const gweiDeployment = "20";
+const gweiDeployment = "5";
 
 module.exports = {
   /**
@@ -68,8 +68,14 @@ module.exports = {
 
     // aircarbon ropsten geth node -- a bit faster than infura, representative of mainnet
     ropsten_ac: {
-      provider: () => new HDWalletProvider(DEV_MNEMONIC, "https://ac-dev0.net:9545",
-                      0, 1000), // # test accounts
+      provider: //new HDWalletProvider(DEV_MNEMONIC, "https://ac-dev0.net:9545", 0, 1000), // # test accounts
+        function() { // https://ethereum.stackexchange.com/questions/44349/truffle-infura-on-mainnet-nonce-too-low-error
+          var wallet = new HDWalletProvider(DEV_MNEMONIC, 'https://ac-dev0.net:9545', 0, 1000);
+          var nonceTracker = new NonceTrackerSubprovider();
+          wallet.engine._providers.unshift(nonceTracker);
+          nonceTracker.setEngine(wallet.engine);
+          return wallet;
+        },
       network_id: "*", // 3
       gas: 8000029,
       gasPrice: web3.utils.toWei(gweiDeployment, "gwei"),
@@ -82,7 +88,7 @@ module.exports = {
     // ropsten infura -- much slower than rinkeby infura
     ropsten_infura: {
       provider: //() => new HDWalletProvider(DEV_MNEMONIC, "https://ropsten.infura.io/v3/93db2c7fd899496d8400e86100058297", 0, 1000), // # test accounts
-        function() { // https://ethereum.stackexchange.com/questions/44349/truffle-infura-on-mainnet-nonce-too-low-error
+        function() {
           var wallet = new HDWalletProvider(DEV_MNEMONIC, 'https://ropsten.infura.io/v3/93db2c7fd899496d8400e86100058297', 0, 1000);
           var nonceTracker = new NonceTrackerSubprovider();
           wallet.engine._providers.unshift(nonceTracker);

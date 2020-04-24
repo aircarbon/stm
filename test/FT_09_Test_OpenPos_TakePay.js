@@ -23,8 +23,6 @@ contract("StMaster", accounts => {
     const POS_QTY = new BN(1);
     const FT_SIZE = new BN(1000);
 
-    // TODO: negative tests...
-
     before(async function () {
         stm = await st.deployed();
         if (await stm.getContractType() == CONST.contractType.CASHFLOW) this.skip();
@@ -135,5 +133,35 @@ contract("StMaster", accounts => {
             ev.from == SHORT && ev.to == LONG && ev.delta == DELTA.toString() && ev.done.eq(ev.delta)
         );
         await CONST.logGas(web3, data.tx, `pos-pair take/pay no cap (long ITM)`);
+    });
+
+    it(`FT pos-pair take/pay - should not allow non-owner to run take/pay`, async () => {
+        try {  await stm.takePay(usdFT.id, SHORT_STID, LAST_PRICE.mul(new BN(2)), 0, { from: accounts[1] }); } 
+        catch (ex) { assert(ex.reason == 'Restricted', `unexpected: ${ex.reason}`); return; }
+        assert.fail('expected contract exception');
+    });
+
+    it(`FT pos-pair take/pay - should not allow take/pay for an invalid (non-future) token type`, async () => {
+        try { await stm.takePay(spotTypes[0].id, SHORT_STID, LAST_PRICE.mul(new BN(2)), 0); } 
+        catch (ex) { assert(ex.reason == 'Bad token settlement type', `unexpected: ${ex.reason}`); return; }
+        assert.fail('expected contract exception');
+    });
+
+    it(`FT pos-pair take/pay - should not allow take/pay for an invalid (long) pos-pair reference`, async () => {
+        try { await stm.takePay(usdFT.id, SHORT_STID + 1, LAST_PRICE.mul(new BN(2)), 0); } 
+        catch (ex) { assert(ex.reason == 'Bad (non-short quantity) on explicit short token', `unexpected: ${ex.reason}`); return; }
+        assert.fail('expected contract exception');
+    });
+
+    it(`FT pos-pair take/pay - should not allow take/pay for an invalid (< 0) mark price`, async () => {
+        try { await stm.takePay(usdFT.id, SHORT_STID, -1, 0); } 
+        catch (ex) { assert(ex.reason == 'Bad markPrice', `unexpected: ${ex.reason}`); return; }
+        assert.fail('expected contract exception');
+    });
+
+    it(`FT pos-pair take/pay - should not allow take/pay for an invalid (< 0) currency fee per side`, async () => {
+        try { await stm.takePay(usdFT.id, SHORT_STID, LAST_PRICE.mul(new BN(2)), -1); } 
+        catch (ex) { assert(ex.reason == 'Bad feePerSide', `unexpected: ${ex.reason}`); return; }
+        assert.fail('expected contract exception');
     });
 });

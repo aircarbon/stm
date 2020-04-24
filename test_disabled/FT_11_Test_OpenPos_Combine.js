@@ -19,7 +19,9 @@ contract("StMaster", accounts => {
     var ethFT, ethFT_underlyer, ethFT_refCcy; // eth FT
     var spotTypes, ccyTypes;
 
-    // TODO: negative tests...
+    //
+    // TODO: negative tests on takePay...
+    //
 
     before(async function () {
         stm = await st.deployed();
