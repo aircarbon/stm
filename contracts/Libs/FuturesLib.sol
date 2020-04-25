@@ -115,7 +115,7 @@ library FuturesLib {
     }
 
     //
-    // PUBLIC - SETTLEMENT: take & pay - v1 - position pair, bilateral
+    // PUBLIC - SETTLEMENT: take & pay - v1 - position pair, bilateral balanced
     //
     struct TakePayVars {
         StructLib.PackedSt st;
@@ -218,7 +218,7 @@ library FuturesLib {
     }
 
     //
-    // PUBLIC - SETTLEMENT: take & pay - v2 - central sweeping, unilateral
+    // PUBLIC - SETTLEMENT: take & pay - v2 - central sweeping, unilateral unbalanced
     //
     struct TakePayVars2 {
         StructLib.PackedSt st;
@@ -292,6 +292,14 @@ library FuturesLib {
                 from: a.feeAddrOwner, to: v.st.ft_ledgerOwner, ccyTypeId: fta.refCcyId, amount: uint256(v.fee), transferType: StructLib.TransferType.TakePayFee }));
 
             emit TakePay2(a.feeAddrOwner, v.st.ft_ledgerOwner, fta.refCcyId, uint256(abs256(delta)), uint256(v.take), uint256(v.fee));
+        }
+        else { // null settlement
+
+            // sweep fee only to central
+            ld._ledger[v.st.ft_ledgerOwner].ccyType_balance[fta.refCcyId] = v.bal;
+            ld._ledger[a.feeAddrOwner].ccyType_balance[fta.refCcyId] += v.fee;
+
+            emit TakePay2(a.feeAddrOwner, v.st.ft_ledgerOwner, fta.refCcyId, 0, 0, uint256(v.fee));
         }
     }
 

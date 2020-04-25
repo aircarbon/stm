@@ -8,6 +8,76 @@ const { DateTime } = require('luxon');
 
 module.exports = {
 
+    takePay2: async (a) => {
+        const { stm, accounts,
+            tokTypeId,
+            stId,
+            markPrice,
+            feePerSide
+        } = a;
+
+        const ft = (await stm.getSecTokenTypes()).tokenTypes.find(p => p.id == tokTypeId);
+        var st = await stm.getSecToken(stId);
+        console.log('st', st);
+        const le_before = await stm.getLedgerEntry(st.ft_ledgerOwner);
+        const owner_before = await stm.getLedgerEntry(accounts[0]);
+        const tx = await stm.takePay2(tokTypeId, stId, markPrice, feePerSide, { from: accounts[0] });
+        CONST.logGas(web3, tx, `takePay2`);
+        var from, to, delta, done, fee;
+        truffleAssert.eventEmitted(tx, 'TakePay2', ev => {
+            from = ev.to;
+            to = ev.from;
+            delta = ev.delta;
+            done = ev.done;
+            fee = ev.fee;
+            return true;
+        });
+        const le_after = await stm.getLedgerEntry(st.ft_ledgerOwner);
+        const owner_after = await stm.getLedgerEntry(accounts[0]);
+
+        console.log('le_before', le_before);
+        console.log('le_after', le_after);
+        console.log('delta', delta.toString());
+        console.log('done', done.toString());
+        console.log('from', from.toString());
+        console.log('to', to.toString());
+
+        // refresh token, check last mark prices
+        st = await stm.getSecToken(stId);
+        console.log('st.ft_lastMarkPrice', st.ft_lastMarkPrice);
+        assert(st.ft_lastMarkPrice == markPrice, "unexpected token LMP");
+
+        // check balance updates
+        const le_delta = new BN(le_after.ccys.find(p => p.id == ft.refCcyId).balance)
+                    .sub(new BN(le_before.ccys.find(p => p.id == ft.refCcyId).balance));
+        const owner_delta = new BN(owner_after.ccys.find(p => p.id == ft.refCcyId).balance)
+                       .sub(new BN(owner_before.ccys.find(p => p.id == ft.refCcyId).balance));
+        
+        console.log('le_delta', le_delta.toString());
+        console.log('owner_delta', owner_delta.toString());
+        assert(new BN(le_before.ccys.find(p => p.id == ft.refCcyId).balance).add(new BN(owner_before.ccys.find(p => p.id == ft.refCcyId).balance))
+           .eq(new BN(le_after.ccys.find(p => p.id == ft.refCcyId).balance).add(new BN(owner_after.ccys.find(p => p.id == ft.refCcyId).balance))), 'not net-zero post settlement');
+        
+        if (from.toLowerCase() == st.ft_ledgerOwner.toLowerCase()) { // pos was OTM
+            console.log('OTM');
+            assert(le_delta.abs().eq(done.add(fee)), 'unexpected token ledger balance after OTM');
+            assert(owner_delta.eq(done.add(fee)), 'unexpected owner ledger balance after OTM');
+        }
+        else if (to.toLowerCase() == st.ft_ledgerOwner.toLowerCase()) { // pos was ITM
+            console.log('ITM');
+            assert(le_delta.eq(done.sub(fee)), 'unexpected token ledger balance after ITM');
+            assert(owner_delta.abs().eq(done.add(fee)), 'unexpected owner ledger balance after ITM');
+        }
+        else throw('Unexpected event from/to values');
+
+        return { 
+            tx, st,
+            le_before, owner_before,
+            le_after, owner_after,
+            from, to, delta, done, fee
+        };
+    },
+
     takePay: async (a) => {
         const { stm, accounts,
             tokTypeId,
@@ -17,7 +87,7 @@ module.exports = {
         } = a;
 
         const ft = (await stm.getSecTokenTypes()).tokenTypes.find(p => p.id == tokTypeId);
-        const longStId = Number(shortStId) + 1;
+        const longStId = Number(shortStId) + 1; // only a valid assumption immediately post-trade (combineFtPos() breaks this assumption)
         
         var stShort = await stm.getSecToken(shortStId);
         var stLong = await stm.getSecToken(longStId);

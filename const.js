@@ -2,7 +2,7 @@ const Big = require('big.js');
 
 const Web3 = require('web3');
 const web3 = new Web3();
-const ETH_USD = 144;
+const ETH_USD = 190;
 
 const bip39 = require('bip39');
 const hdkey = require('ethereumjs-wallet/hdkey');
