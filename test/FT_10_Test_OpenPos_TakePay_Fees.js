@@ -58,7 +58,7 @@ contract("StMaster", accounts => {
         assert(x.ledger_A.tokens.filter(p => p.tokenTypeId == usdFT.id)[0].stId == 
                x.ledger_B.tokens.filter(p => p.tokenTypeId == usdFT.id)[0].stId - 1, 'unexpected StId sequence');
         SHORT_STID = x.ledger_A.tokens.filter(p => p.tokenTypeId == usdFT.id)[0].stId;
-        LONG_STID = SHORT_STID + 1;
+        LONG_STID = Number(SHORT_STID) + 1;
     });
 
     beforeEach(async () => {
@@ -68,7 +68,7 @@ contract("StMaster", accounts => {
     });
 
     // null/zero balance cap on take
-    it(`FT pos-pair take/pay fees - should apply fees on null take/pay (markPrice == lastMarkPrice)`, async () => {
+    it(`FT pos-pair take/pay w/ fees - should apply fees on null take/pay (markPrice == lastMarkPrice)`, async () => {
         const DELTA_P = new BN(0);
         await stm.fund(usdFT.ft.refCcyId, FEE_PER_SIDE, LONG);
         await stm.fund(usdFT.ft.refCcyId, FEE_PER_SIDE, SHORT);
@@ -79,7 +79,7 @@ contract("StMaster", accounts => {
     });
 
     // ORDERED: partial-cap on take
-    it(`FT pos-pair take/pay fees - should apply fees and partially cap when insufficient available (short ITM, long OTM)`, async () => {
+    it(`FT pos-pair take/pay w/ fees - should apply fees and partially cap when insufficient available (short ITM, long OTM)`, async () => {
         const DELTA_P = new BN(-10);
         LAST_PRICE = LAST_PRICE.add(DELTA_P);
         const DELTA = DELTA_P.abs().mul(POS_QTY).mul(FT_SIZE);
@@ -92,7 +92,7 @@ contract("StMaster", accounts => {
         truffleAssert.eventEmitted(data.tx, 'TakePay', ev => ev.from == LONG && ev.to == SHORT && ev.delta == DELTA.toString() && ev.done.eq(PARTIAL));
         truffleAssert.eventEmitted(data.tx, 'TransferedLedgerCcy', ev => ev.transferType == CONST.transferType.TAKEPAY_FEE && (ev.from == LONG || ev.from == SHORT) && ev.to == accounts[0] && ev.amount.eq(FEE_PER_SIDE));
     });
-    it(`FT pos-pair take/pay fees - should apply fees and partially cap when insufficient available (short OTM, long ITM)`, async () => {
+    it(`FT pos-pair take/pay w/ fees - should apply fees and partially cap when insufficient available (short OTM, long ITM)`, async () => {
         const DELTA_P = new BN(+10);
         LAST_PRICE = LAST_PRICE.add(DELTA_P);
         const DELTA = DELTA_P.abs().mul(POS_QTY).mul(FT_SIZE);
@@ -105,7 +105,7 @@ contract("StMaster", accounts => {
     });
 
     // // ORDERED: no cap on take
-    it(`FT pos-pair take/pay fees - should apply fees and have no cap when sufficient available (short ITM, long OTM)`, async () => {
+    it(`FT pos-pair take/pay w/ fees - should apply fees and have no cap when sufficient available (short ITM, long OTM)`, async () => {
         const DELTA_P = new BN(-5); // assumes: = previous test's capped paid amount - can be fully covered
         LAST_PRICE = LAST_PRICE.add(DELTA_P);
         const DELTA = DELTA_P.abs().mul(POS_QTY).mul(FT_SIZE);
@@ -116,7 +116,7 @@ contract("StMaster", accounts => {
         truffleAssert.eventEmitted(data.tx, 'TakePay', ev => ev.from == LONG && ev.to == SHORT && ev.delta == DELTA.toString() && ev.done.eq(ev.delta));
         await CONST.logGas(web3, data.tx, `pos-pair take/pay no cap (short ITM)`);
     });
-    it(`FT pos-pair take/pay fees - should apply fees and have no cap when sufficient available (short OTM, long ITM)`, async () => {
+    it(`FT pos-pair take/pay w/ fees - should apply fees and have no cap when sufficient available (short OTM, long ITM)`, async () => {
         const DELTA_P = new BN(+5); // assumes: = previous test's uncapped paid amount - can be fully covered
         LAST_PRICE = LAST_PRICE.add(DELTA_P);
         const DELTA = DELTA_P.abs().mul(POS_QTY).mul(FT_SIZE);

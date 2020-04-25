@@ -30,6 +30,7 @@
         "got": "^10.7.0",
         "lodash": "^4.17.15",
         "luxon": "^1.22.2",
+        "tcharts.js": "0.0.4",
         "web3-provider-engine": "^15.0.7"
     },
     "devDependencies": {

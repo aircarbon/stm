@@ -237,7 +237,7 @@ library FuturesLib {
         //require(fta.contractSize > 0, "Unexpected token type FutureTokenTypeArgs");
         StructLib.PackedSt storage st = ld._sts[a.stId];
         //require(shortSt.batchId == 0 && shortSt.ft_price != 0, "Bad (unexpected data) on explicit short token");
-        //require(shortSt.ft_ledgerOwner != address(0x0), "Bad token ledger owner on explicit short token");
+        require(st.ft_ledgerOwner != address(0x0), "Bad token ledger owner");
         require(a.markPrice >= 0, "Bad markPrice"); // allow zero for marking
         // require(tokenExistsOnLedger(ld, a.tokTypeId, st.ft_ledgerOwner, a.stId), "Bad or missing ledger token type on supplied token");
         require(a.feePerSide >= 0, "Bad feePerSide");
@@ -256,8 +256,8 @@ library FuturesLib {
         // update last mark price
         st.ft_lastMarkPrice = a.markPrice;
 
-        // if pos is OTM, sweep take to central + fee
-        // if pos is ITM, sweep from central - fee
+        // if pos is OTM, sweep take to central + fee: cap if insufficient
+        // if pos is ITM, sweep from central - fee: fail if insufficient
         // NOTE: *** unbalanced *** ! (capped for take, uncapped for pay)
         if (v.delta < 0) {
             v.take = v.delta * -1;
@@ -269,27 +269,36 @@ library FuturesLib {
             ld._ledger[v.st.ft_ledgerOwner].ccyType_balance[fta.refCcyId] = v.bal - (v.take);
             ld._ledger[a.feeAddrOwner].ccyType_balance[fta.refCcyId] += v.take + v.fee;
 
+            // event - settlement transfer: from OTM to central
             StructLib.emitTransferedLedgerCcy(StructLib.TransferCcyArgs({
                 from: v.st.ft_ledgerOwner, to: a.feeAddrOwner, ccyTypeId: fta.refCcyId, amount: uint256(v.take), transferType: StructLib.TransferType.SettleTake }));
 
+            // event - settlement transfer: from OTM to central
             StructLib.emitTransferedLedgerCcy(StructLib.TransferCcyArgs({
                 from: v.st.ft_ledgerOwner, to: a.feeAddrOwner, ccyTypeId: fta.refCcyId, amount: uint256(v.fee), transferType: StructLib.TransferType.TakePayFee }));
 
             emit TakePay2(v.st.ft_ledgerOwner, a.feeAddrOwner, fta.refCcyId, uint256(abs256(delta)), uint256(v.take), uint256(v.fee));
         }
         else if (v.delta > 0) { // *uncapped* ITM pay
+            v.take = v.delta;
 
-            // TODO: ### how to handle central not enough funds!!!? surely must revert/abort...
+            // NOTE:
+            // prevent central going negative -- settlement of ITM positions will *fail by design* until & unless
+            // central is topped up to allow the ITM positions to be paid without central's balance falling below zero.
+            // (alternatively: could remove this require to allow central account to fall below 0 -- if so, the cash integrity the system would be compromised)
+            require(ld._ledger[a.feeAddrOwner].ccyType_balance[fta.refCcyId] >= v.take, "Central insufficient for settlement");
 
-            // sweep from central, pay to OTM
+            // sweep from central, pay to ITM
             ld._ledger[v.st.ft_ledgerOwner].ccyType_balance[fta.refCcyId] = v.bal + (v.take);
             ld._ledger[a.feeAddrOwner].ccyType_balance[fta.refCcyId] -= v.take - v.fee;
 
+            // event - settlement transfer: from central to ITM
             StructLib.emitTransferedLedgerCcy(StructLib.TransferCcyArgs({
                 from: a.feeAddrOwner, to: v.st.ft_ledgerOwner, ccyTypeId: fta.refCcyId, amount: uint256(v.take), transferType: StructLib.TransferType.SettlePay }));
 
+            // event - settlement fee: from ITM to central
             StructLib.emitTransferedLedgerCcy(StructLib.TransferCcyArgs({
-                from: a.feeAddrOwner, to: v.st.ft_ledgerOwner, ccyTypeId: fta.refCcyId, amount: uint256(v.fee), transferType: StructLib.TransferType.TakePayFee }));
+                from: v.st.ft_ledgerOwner, to: a.feeAddrOwner, ccyTypeId: fta.refCcyId, amount: uint256(v.fee), transferType: StructLib.TransferType.TakePayFee }));
 
             emit TakePay2(a.feeAddrOwner, v.st.ft_ledgerOwner, fta.refCcyId, uint256(abs256(delta)), uint256(v.take), uint256(v.fee));
         }
@@ -298,6 +307,10 @@ library FuturesLib {
             // sweep fee only to central
             ld._ledger[v.st.ft_ledgerOwner].ccyType_balance[fta.refCcyId] = v.bal;
             ld._ledger[a.feeAddrOwner].ccyType_balance[fta.refCcyId] += v.fee;
+
+            // event - settlement fee: from ITM to central
+            StructLib.emitTransferedLedgerCcy(StructLib.TransferCcyArgs({
+                from: v.st.ft_ledgerOwner, to: a.feeAddrOwner, ccyTypeId: fta.refCcyId, amount: uint256(v.fee), transferType: StructLib.TransferType.TakePayFee }));
 
             emit TakePay2(a.feeAddrOwner, v.st.ft_ledgerOwner, fta.refCcyId, 0, 0, uint256(v.fee));
         }

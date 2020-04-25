@@ -57,7 +57,7 @@ contract("StMaster", accounts => {
         assert(x.ledger_A.tokens.filter(p => p.tokenTypeId == usdFT.id)[0].stId == 
                x.ledger_B.tokens.filter(p => p.tokenTypeId == usdFT.id)[0].stId - 1, 'unexpected StId sequence');
         SHORT_STID = x.ledger_A.tokens.filter(p => p.tokenTypeId == usdFT.id)[0].stId;
-        LONG_STID = SHORT_STID + 1;
+        LONG_STID = Number(SHORT_STID) + 1;
     });
 
     beforeEach(async () => {
