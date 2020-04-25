@@ -36,11 +36,23 @@ FUTURES - notes 26/MAR/2020
 
 (2) SETTLE_JOB (off-chain) - POS-PAIR SETTLER... (caps ITM-pay at OTM-take: delta/default is handled off-chain...)
   (2.1) done: TakeOrPay [2 updates: LMP + CcyBalance] -- use (MP - LMP) or (MP - P) when LMP == -1
-  (2.2) ... >>> NetPositions (auto-burn/shrink) - should only ever be ONE net ST per FT-type after TakeOrPay...
-
-  >>>> TODO: negative tests (full suite) for takePay + combine <<<<
+  (2.2) done: Combine (auto-burn/shrink) - should only ever be ONE net ST per FT-type after TakeOrPay
 
   (2.3) LiquidatePositions
+      done vs delta: this captures LIQUIDATED POSITION OBLIGATIONS (ITM side to be made whole somehow off-chain...)
+      >>> i.e. LIQUIDATION is a NOP...! POSITIONS STAY OPEN AND OUTPUT { DONE=0, DELTA=X }...
+      then, all that remains (?) is for (post-takePay, all positions) to look at which positions have balace < reserved: these are in margin-call territory...
+
+    PREFERRED... (SIMPLER, ELEGANT)
+      they would STAY OPEN, and deplete cash all the way to zero... (done/delta starts diverging) ... 
+        >> THEN MUST DEPLETE ACCOUNT CASH INTO **NEGATIVE VALUES** (keeps track of what they owe, in effect) <<
+        >> -VE CASH REPRESENTS ** ACCOUNT LEVEL LIQUIDATION ** <<
+        OTM POSITION/ACCOUNT CAN THEN "RECOVER", (from -ve balance into +ve) IF MARKET DIRECTION CHANGES
+
+      if not this, then a flag on PackedSt (liquidated, bool) ==>
+        (1) gets set on positions in some ordering, when (account_balance < account_reserved * 0.5)
+        (2) when set on a position, prevents the position every accumulating any ITM wins - it still produces OTM take values and outputs via delta/done
+
 
       >> ?? LIQUIDATION ?? -- reserved is currently the *total* across all positions; so liquidation would be *all positions* ???
           i.e. margin call is at account level, or position level? account level easier?!
@@ -49,8 +61,6 @@ FUTURES - notes 26/MAR/2020
         e.g. 1000 contracts at $1 price = $1000 notional * 20% = $200 margin_required [reserved amount] -- IT NEVER CHANGES (assuming 20% is same value on each take/pay cycle)
       >> then, after take/pay job has run (and updated cash balance) - if ledger's cash balance < margin_requried either
         (a) margin-call or (b) liquidate
-
- >> JS test framework, with various price series and event series (position opens/closes)
 
 ===
 
@@ -116,11 +126,29 @@ contract StFutures is Owned,
           feeAddrOwner: owner
           }));
     }
+
+    function takePay2(
+        uint256 tokTypeId,
+        uint256 stId,
+        int128  markPrice,
+        int256  feePerSide
+    ) public onlyOwner() {
+        FuturesLib.takePay2(ld, std,
+          StructLib.TakePayArgs2({
+             tokTypeId: tokTypeId,
+                  stId: stId,
+             markPrice: markPrice,
+            feePerSide: feePerSide,
+          feeAddrOwner: owner
+          }));
+    }
+
     function combineFtPos(StructLib.CombinePositionArgs memory a)
     public onlyOwner() {
       FuturesLib.combineFtPos(ld, std, a);
     }
 
+    // VIEWS
     function getInitMargin(uint256 tokTypeId, address ledgerOwner)
     external view returns (uint16) {
         return ld._ledger[ledgerOwner].ft_initMarginBips[tokTypeId];

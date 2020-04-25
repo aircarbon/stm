@@ -1,6 +1,7 @@
 require('dotenv').config();
 const _ = require('lodash');
 const chalk = require('chalk');
+const BN = require('bn.js');
 
 const { db } = require('../../common/dist');
 const CONST = require('../const.js');
@@ -35,48 +36,70 @@ module.exports = {
                 });
             }
         }
-        console.log('combines', combines);
+        //console.log('combines', combines);
+        for (let p of combines) {
+            //console.log('p.master', p.master);
+
+            //const master_ST = await CONST.web3_call('getSecToken', [p.master]);
+            //console.log('combine / master.ft_lastMarkPrice: ', master_ST.ft_lastMarkPrice);
+
+            //const le_before = await CONST.web3_call('getLedgerEntry', [p.addr]);
+            const { txHash, receipt, evs } = await CONST.web3_tx('combineFtPos', [{ 
+                tokTypeId: ftId,
+              master_StId: p.master,
+              child_StIds: p.combines,
+            }], O.addr, O.privKey);
+            //const le_after = await CONST.web3_call('getLedgerEntry', [p.addr]);
+            //console.log(`le_before: ${p.addr} ${le_before.tokens.map(p2 => `{ TT: ${p2.tokenTypeId} / stId: ${p2.stId} / P: ${p2.ft_price.toString()} / M_qty:${p2.mintedQty.toString().padStart(3)} }`).join(', ')}`);
+            //console.log(`le_after: ${p.addr} ${le_after.tokens.map(p2 => `{ TT: ${p2.tokenTypeId} / stId: ${p2.stId} / P: ${p2.ft_price.toString()} / M_qty:${p2.mintedQty.toString().padStart(3)} }`).join(', ')}`);
+
+            //console.log(evs);
+            const ev = evs.find(p => p.event == 'Combine').returnValues;
+            console.log(`${chalk.bgGray(`combine ${ev.to}`)}` + chalk.gray(` > #${ev.countTokensCombined} pos(s) [${p.combines.join(',')}] ==> stId: ${ev.masterStId}`));
+        }
     },
 
-    TakePay: async (ftId, MP, test_shortPosIds) => {
+    TakePay: async (ftId, MP, test_ledgerOwners) => {
         const O = await CONST.getAccountAndKey(0);
+        
+        //console.log('test_ledgerOwners', test_ledgerOwners);
         
         //console.group();
         const ft = (await CONST.web3_call('getSecTokenTypes', [])).tokenTypes.find(p => p.id == ftId);
-        //console.log(`>> TAKE/PAY: ftId=${ftId} MP=${MP}`);// ft=`, ft);
 
-        // get all short positions on this FT
+        // get all short positions on this FT ####
         const ledgerOwners = await CONST.web3_call('getLedgerOwners', []);
         var shortPosIds = [];
-        const ops = ledgerOwners.map(async addr => {
+        for (let addr of ledgerOwners) {
             const le = await CONST.web3_call('getLedgerEntry', [addr]);
-            const shortPositions = le.tokens.filter(p => p.tokenTypeId == ftId && p.currentQty.lt(0));
-            _.forEach(shortPositions, pos => {
-                shortPosIds.push(pos.stId.toString());
-            });
-        });
-        //console.log(`ops ${ops.length} ops`);
-        await Promise.all(ops);
-        //console.log(`Fetched ${ledgerOwners.length} ledger entries`);
-        shortPosIds.sort().reverse(); // ASC (for FIFO processing)
-        
-        // test mode - filter positions (only run for supplied positions created on this test run)
-        if (test_shortPosIds !== undefined && test_shortPosIds.length > 0) {
-            //console.log(`TEST - (filtering) test_shortPosIds: [${test_shortPosIds.join(',')}]`);
-            shortPosIds = test_shortPosIds; //_.differenceWith(test_shortPosIds, shortPosIds, _.isEqual);
+
+            // test mode - restrict accounts
+            var includeAccount = true;
+            if (test_ledgerOwners !== undefined) {
+                if (!test_ledgerOwners.map(p => p.toLowerCase()).includes(addr.toLowerCase())) {
+                    includeAccount = false;
+                }
+            }
+
+            if (includeAccount) {
+                //console.log(`le: ${addr} ${le.tokens.map(p2 => `{ TT: ${p2.tokenTypeId} / stId: ${p2.stId} / P: ${p2.ft_price.toString()} / M_qty:${p2.mintedQty.toString().padStart(3)} }`).join(', ')}`);
+                const shortPositions = le.tokens.filter(p => p.tokenTypeId == ftId && p.currentQty.lt(0));
+                _.forEach(shortPositions, pos => {
+                    shortPosIds.push(pos.stId.toString());
+                });
+            }
         }
+        shortPosIds.sort().reverse(); // ASC (for FIFO processing)
         //console.log(`Short posIds: [${shortPosIds.join(',')}]`);
 
-        // take/pay each pos-pair
-        const FEE_PER_SIDE = 1; // TODO: ### 1 ccy unit for testing
+        // take/pay each pos-pair ####
+        const FEE_PER_SIDE = 0; // TODO: ### fixed ccy unit for testing
         for (shortId of shortPosIds) {
             
+            //const short_ST = await CONST.web3_call('getSecToken', [shortId]);
+            //console.log(`pre TP / shortId: ${shortId}: `, short_ST);
+
             const { txHash, receipt, evs } = await CONST.web3_tx('takePay', [ftId, shortId, MP, FEE_PER_SIDE], O.addr, O.privKey);
-            // console.log('receipt... TakePay:', receipt);
-            // console.log('evs... TakePay:', evs);
-            // console.dir(evs[0].raw.topics);
-            // console.dir(evs[1].raw.topics);
-            // console.dir(evs[2].raw.topics);
             const ev = evs.find(p => p.event == 'TakePay').returnValues;
             const itm_le = await CONST.web3_call('getLedgerEntry', [ev.to]);
             const otm_le = await CONST.web3_call('getLedgerEntry', [ev.from]);
@@ -89,6 +112,11 @@ itm: ${chalk.dim(ev.to)} ($${Number(itm_le.ccys.find(p => p.ccyTypeId.eq(ft.ft.r
 otm: ${chalk.dim(ev.from)} ($${Number(otm_le.ccys.find(p => p.ccyTypeId.eq(ft.ft.refCcyId)).balance.toString()).toFixed(0).padEnd(8)})\
 `));
 
+            //const short_ST = await CONST.web3_call('getSecToken', [shortId]);
+            //console.log('post TP / short_ST.ft_lastMarkPrice: ', short_ST.ft_lastMarkPrice);
+
+            //const long_ST = await CONST.web3_call('getSecToken', [shortId+1]);
+            //console.log('post TP / long_ST.ft_lastMarkPrice: ', long_ST.ft_lastMarkPrice);
         }
 
         //console.groupEnd();

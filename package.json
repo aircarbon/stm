@@ -13,7 +13,7 @@
         "migrate": "rimraf -rf ./build/contracts && truffle migrate --network development --reset",
         "console": "truffle console",
         "dev": "truffle develop",
-        "ft": "cross-env WEB3_NETWORK_ID=888 node ./jobs/ft_job TEST_2"
+        "ft": "cross-env WEB3_NETWORK_ID=888 node ./jobs/ft_job TEST_3"
     },
     "keywords": [],
     "license": "MIT",
@@ -26,6 +26,7 @@
         "chainlink": "^0.7.10",
         "chalk": "^3.0.0",
         "dotenv": "^8.1.0",
+        "figlet": "^1.3.0",
         "got": "^10.7.0",
         "lodash": "^4.17.15",
         "luxon": "^1.22.2",

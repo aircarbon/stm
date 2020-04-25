@@ -7,6 +7,8 @@ library FuturesLib {
     event FutureOpenInterest(address indexed long, address indexed short, uint256 shortStId, uint256 tokTypeId, uint256 qty, uint256 price);
     event SetInitialMargin(uint256 tokenTypeId, address indexed ledgerOwner, uint16 initMarginBips);
     event TakePay(address indexed from, address indexed to, uint256 delta, uint256 done, address indexed feeTo, uint256 otmFee, uint256 itmFee, uint256 feeCcyId);
+    event TakePay2(address indexed from, address indexed to, uint256 ccyId, uint256 delta, uint256 done, uint256 fee);
+
     event Combine(address indexed to, uint256 masterStId, uint256 countTokensCombined);
 
     //
@@ -113,7 +115,7 @@ library FuturesLib {
     }
 
     //
-    // PUBLIC - SETTLEMENT: take & pay a position pair
+    // PUBLIC - SETTLEMENT: take & pay - v1 - position pair, bilateral
     //
     struct TakePayVars {
         StructLib.PackedSt st;
@@ -127,6 +129,14 @@ library FuturesLib {
         StructLib.StTypesStruct storage std,
         StructLib.TakePayArgs memory a
     ) public {
+
+        // #### need to change from bilateral model to unilateral????
+        // i.e. all OTM swept to central store, then all ITM swept from store (FIFO) ... more gas cost!
+
+        // #### id+1 assumption is broken by posCombine -- so for sure we remove from here, once we switch to unilateral model
+
+        // #### id+1 assumption usage in ft_job...?
+
         // ...todo? - recalculate margin requirement (calcPosMargin()) - i.e. allow changes of FT var-margin on open positions...
 
         //require(a.tokTypeId >= 0 && a.tokTypeId <= std._tt_Count, "Bad tokTypeId");
@@ -155,7 +165,7 @@ library FuturesLib {
 
         // get delta each side
         int256 short_Delta = calcTakePay(fta, shortSt, a.markPrice, shortSt.ft_lastMarkPrice);
-        int256 long_Delta = calcTakePay(fta, longSt, a.markPrice, shortSt.ft_lastMarkPrice);
+        int256 long_Delta = calcTakePay(fta, longSt, a.markPrice, longSt.ft_lastMarkPrice); // (gas - could only use short side's last mark price)
         //require(short_Delta + long_Delta == 0, "Unexpected net delta short/long");
 
         // get OTM/ITM sides
@@ -186,8 +196,9 @@ library FuturesLib {
         itm.bal -= itm.fee;
 
         // update last mark price
+        // (gas - we could only update & use the short side's last price; but at the cost of weakening the validation on combineFtPos)
         shortSt.ft_lastMarkPrice = a.markPrice;
-        //longSt.ft_lastMarkPrice = a.markPrice; //## gas - we use only the short side's last price
+        longSt.ft_lastMarkPrice = a.markPrice; // (gas - could remove [with changes in combineFtPos validation])
 
         // cap OTM side at physical balance
         otm.take = otm.delta * -1;
@@ -196,6 +207,7 @@ library FuturesLib {
         }
 
         // apply take/pay currency movement
+        // NOTE: balanced
         ld._ledger[otm.st.ft_ledgerOwner].ccyType_balance[fta.refCcyId] = otm.bal - (otm.take);
         ld._ledger[itm.st.ft_ledgerOwner].ccyType_balance[fta.refCcyId] = itm.bal + (otm.take);
 
@@ -206,7 +218,85 @@ library FuturesLib {
     }
 
     //
-    // PUBLIC - SETTLEMENT: (optimization) combine 1-n (master-child) positions; for execution post-settlement (take/pay)
+    // PUBLIC - SETTLEMENT: take & pay - v2 - central sweeping, unilateral
+    //
+    struct TakePayVars2 {
+        StructLib.PackedSt st;
+        int256 delta;
+        int256 bal;
+        int256 fee;
+        int256 take;
+    }
+    function takePay2(
+        StructLib.LedgerStruct storage ld,
+        StructLib.StTypesStruct storage std,
+        StructLib.TakePayArgs2 memory a
+    ) public {
+        require(std._tt_Settle[a.tokTypeId] == StructLib.SettlementType.FUTURE, "Bad token settlement type");
+        StructLib.FutureTokenTypeArgs storage fta = std._tt_ft[a.tokTypeId];
+        //require(fta.contractSize > 0, "Unexpected token type FutureTokenTypeArgs");
+        StructLib.PackedSt storage st = ld._sts[a.stId];
+        //require(shortSt.batchId == 0 && shortSt.ft_price != 0, "Bad (unexpected data) on explicit short token");
+        //require(shortSt.ft_ledgerOwner != address(0x0), "Bad token ledger owner on explicit short token");
+        require(a.markPrice >= 0, "Bad markPrice"); // allow zero for marking
+        // require(tokenExistsOnLedger(ld, a.tokTypeId, st.ft_ledgerOwner, a.stId), "Bad or missing ledger token type on supplied token");
+        require(a.feePerSide >= 0, "Bad feePerSide");
+
+        // get delta
+        int256 delta = calcTakePay(fta, st, a.markPrice, st.ft_lastMarkPrice);
+
+        // set vars
+        TakePayVars2 memory v;
+        v = TakePayVars2({ st: st, delta: delta, bal: ld._ledger[st.ft_ledgerOwner].ccyType_balance[fta.refCcyId], fee: 0, take: 0 });
+
+        // apply settlement fee
+        v.fee = v.bal >= a.feePerSide ? a.feePerSide : 0;
+        v.bal -= v.fee;
+
+        // update last mark price
+        st.ft_lastMarkPrice = a.markPrice;
+
+        // if pos is OTM, sweep take to central + fee
+        // if pos is ITM, sweep from central - fee
+        // NOTE: *** unbalanced *** ! (capped for take, uncapped for pay)
+        if (v.delta < 0) {
+            v.take = v.delta * -1;
+            if (v.take > v.bal) { // *capped* OTM take at physical balance
+                v.take = v.bal;
+            }
+
+            // take from OTM, sweep to central
+            ld._ledger[v.st.ft_ledgerOwner].ccyType_balance[fta.refCcyId] = v.bal - (v.take);
+            ld._ledger[a.feeAddrOwner].ccyType_balance[fta.refCcyId] += v.take + v.fee;
+
+            StructLib.emitTransferedLedgerCcy(StructLib.TransferCcyArgs({
+                from: v.st.ft_ledgerOwner, to: a.feeAddrOwner, ccyTypeId: fta.refCcyId, amount: uint256(v.take), transferType: StructLib.TransferType.SettleTake }));
+
+            StructLib.emitTransferedLedgerCcy(StructLib.TransferCcyArgs({
+                from: v.st.ft_ledgerOwner, to: a.feeAddrOwner, ccyTypeId: fta.refCcyId, amount: uint256(v.fee), transferType: StructLib.TransferType.TakePayFee }));
+
+            emit TakePay2(v.st.ft_ledgerOwner, a.feeAddrOwner, fta.refCcyId, uint256(abs256(delta)), uint256(v.take), uint256(v.fee));
+        }
+        else if (v.delta > 0) { // *uncapped* ITM pay
+
+            // TODO: ### how to handle central not enough funds!!!? surely must revert/abort...
+
+            // sweep from central, pay to OTM
+            ld._ledger[v.st.ft_ledgerOwner].ccyType_balance[fta.refCcyId] = v.bal + (v.take);
+            ld._ledger[a.feeAddrOwner].ccyType_balance[fta.refCcyId] -= v.take - v.fee;
+
+            StructLib.emitTransferedLedgerCcy(StructLib.TransferCcyArgs({
+                from: a.feeAddrOwner, to: v.st.ft_ledgerOwner, ccyTypeId: fta.refCcyId, amount: uint256(v.take), transferType: StructLib.TransferType.SettlePay }));
+
+            StructLib.emitTransferedLedgerCcy(StructLib.TransferCcyArgs({
+                from: a.feeAddrOwner, to: v.st.ft_ledgerOwner, ccyTypeId: fta.refCcyId, amount: uint256(v.fee), transferType: StructLib.TransferType.TakePayFee }));
+
+            emit TakePay2(a.feeAddrOwner, v.st.ft_ledgerOwner, fta.refCcyId, uint256(abs256(delta)), uint256(v.take), uint256(v.fee));
+        }
+    }
+
+    //
+    // PUBLIC - SETTLEMENT: (optimization) combine n down to 1 positions; for execution post-settlement (take/pay)
     //
     // struct CombineFuturePosVars {
     // }
@@ -218,15 +308,15 @@ library FuturesLib {
         require(std._tt_Settle[a.tokTypeId] == StructLib.SettlementType.FUTURE, "Bad token settlement type");
         //StructLib.FutureTokenTypeArgs storage fta = std._tt_ft[a.tokTypeId];
 
-        int64 totQty = 0;
-        int256 totPriceQty = 0;
+        int64 totQtyAbs = 0;
+        int256 totPriceQtyAbs = 0;
         StructLib.PackedSt storage masterSt = ld._sts[a.master_StId];
         require(masterSt.batchId == 0 && masterSt.ft_price != 0, "Bad (unexpected data) on master token");
         require(masterSt.ft_lastMarkPrice != -1, "Bad last mark price on master token");
         require(tokenExistsOnLedger(ld, a.tokTypeId, masterSt.ft_ledgerOwner, a.master_StId), "Bad or missing ledger token type on master token");
         require(masterSt.mintedQty == masterSt.currentQty, "Unexpected quantity on master token");
-        totQty += masterSt.currentQty;
-        totPriceQty += masterSt.currentQty * masterSt.ft_price;
+        totQtyAbs += abs64(masterSt.currentQty);
+        totPriceQtyAbs += abs64(masterSt.currentQty) * masterSt.ft_price;
 
         // delete child tokens from the master list
         int64 childQty = 0;
@@ -240,15 +330,17 @@ library FuturesLib {
             require(childSt.mintedQty == childSt.currentQty, "Unexpected quantity on child token");
 
             childQty += childSt.currentQty;
-            totQty += childSt.currentQty;
-            totPriceQty += childSt.currentQty * childSt.ft_price;
+
+            totQtyAbs += abs64(childSt.currentQty);
+            totPriceQtyAbs += abs64(childSt.currentQty) * childSt.ft_price;
             delete ld._sts[a.child_StIds[x]];
         }
 
-        // resize (grow) the master token
+        // resize (grow/shrink) the master token
+        // NOTE: we retain a closed position for record keeping (net zero currentQty)
         masterSt.mintedQty += childQty;
         masterSt.currentQty += childQty;
-        masterSt.ft_price = int128(totPriceQty / totQty); // weighted average price of combined tokens
+        masterSt.ft_price = int128(totPriceQtyAbs / totQtyAbs); // weighted average price of combined tokens
 
         // resize: recreate ledger entry tokenType list, with a single combined token
         delete ld._ledger[masterSt.ft_ledgerOwner].tokenType_stIds[a.tokTypeId];
@@ -307,7 +399,10 @@ library FuturesLib {
         return (((int256(totMargin)
             * 1000000/*increase precision*/)
                 / 10000/*basis points*/)
-                * (std._tt_ft[tokTypeId].contractSize * (posSize < 0 ? posSize * -1 : posSize) * price)/*notional*/
+                * (std._tt_ft[tokTypeId].contractSize * (abs256(posSize)) * price)/*notional*/
             ) / 1000000/*decrease precision*/;
     }
+
+    function abs256(int256 x) private pure returns(int256) { return x < 0 ? x * -1 : x; }
+    function abs64(int64 x) private pure returns(int64) { return x < 0 ? x * -1 : x; }
 }

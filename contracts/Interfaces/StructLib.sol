@@ -4,7 +4,7 @@ pragma experimental ABIEncoderV2;
 library StructLib {
 
     // EVENTS - SHARED (FuturesLib & TransferLib)
-    enum TransferType { User, ExchangeFee, OriginatorFee, TakePay, TakePayFee }
+    enum TransferType { User, ExchangeFee, OriginatorFee, TakePay, TakePayFee, SettleTake, SettlePay }
     event TransferedLedgerCcy(address indexed from, address indexed to, uint256 ccyTypeId, uint256 amount, TransferType transferType);
     event ReervedLedgerCcy(address indexed ledgerOwner, uint256 ccyTypeId, uint256 amount);
 
@@ -314,6 +314,13 @@ library StructLib {
     struct TakePayArgs {
         uint256 tokTypeId;
         uint256 short_stId;
+        int128  markPrice;
+        int256  feePerSide;
+        address feeAddrOwner;
+    }
+    struct TakePayArgs2 {
+        uint256 tokTypeId;
+        uint256 stId;
         int128  markPrice;
         int256  feePerSide;
         address feeAddrOwner;

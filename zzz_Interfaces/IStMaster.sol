@@ -31,7 +31,7 @@ import "../Interfaces/StructLib.sol";
     // event TransferedPartialSecToken(address indexed from, address indexed to, uint256 indexed splitFromSecTokenId, uint256 newSecTokenId, uint256 mergedToSecTokenId, uint256 qty, TransferType transferType);
     // event TradedCcyTok(uint256 ccyTypeId, uint256 ccyAmount, uint256 tokTypeId, address indexed /*tokens*/from, address indexed /*tokens*/to, uint256 tokQty);
     // // StructLib events
-    // enum TransferType { User, ExchangeFee, OriginatorFee, TakePay, TakePayFee }
+    // enum TransferType { User, ExchangeFee, OriginatorFee, TakePay, TakePayFee, SettleTake, SettlePay }
     // event TransferedLedgerCcy(address indexed from, address indexed to, uint256 ccyTypeId, uint256 amount, TransferType transferType);
     // event ReervedLedgerCcy(address indexed ledgerOwner, uint256 ccyTypeId, uint256 amount);
     // // SpotFeeLib events
@@ -53,6 +53,7 @@ import "../Interfaces/StructLib.sol";
     // event FutureOpenInterest(address indexed long, address indexed short, /*uint256 shortStId,*/ uint256 tokTypeId, uint256 qty, uint256 price);
     // event SetInitialMargin(uint256 tokenTypeId, address indexed ledgerOwner, uint16 initMarginBips);
     // event TakePay(address indexed otm, address indexed itm, uint256 delta, uint256 done);
+    // event TakePay2(address indexed from, address indexed to, uint256 ccyId, uint256 delta, uint256 done, uint256 fee);
     // event dbg(int256 feePerSide);
 
     // /**

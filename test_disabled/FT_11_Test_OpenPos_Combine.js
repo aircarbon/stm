@@ -19,10 +19,6 @@ contract("StMaster", accounts => {
     var ethFT, ethFT_underlyer, ethFT_refCcy; // eth FT
     var spotTypes, ccyTypes;
 
-    //
-    // TODO: negative tests on takePay...
-    //
-
     before(async function () {
         stm = await st.deployed();
         if (await stm.getContractType() == CONST.contractType.CASHFLOW) this.skip();
@@ -64,25 +60,111 @@ contract("StMaster", accounts => {
             console.log(`addrNdx: ${global.TaddrNdx} - contract @ ${stm.address} (owner: ${accounts[0]})`);
     });
 
-    it(`FT pos-combine - should combine 2 positions: same direction (short)`, async () => {
+    it(`FT pos-combine - should combine 2 positions, same direction`, async () => {
         const A = accounts[global.TaddrNdx], B = accounts[global.TaddrNdx + 1];
         
-        await futuresHelper.openFtPos({ stm, accounts, tokTypeId: usdFT.id, ledger_A: A, ledger_B: B, qty_A:  -1, qty_B:  +1, price: 100 });
-        const posId = Number(await stm.getSecToken_countMinted()) - 1;
-        await futuresHelper.takePay({ stm, accounts, tokTypeId: usdFT.id, shortStId: posId, markPrice: 100, feePerSide: 0 });
+        await futuresHelper.openFtPos({ stm, accounts, tokTypeId: usdFT.id, ledger_A: A, ledger_B: B, qty_A: +1, qty_B: -1, price: 100 });
+        const posId_A = Number(await stm.getSecToken_countMinted()) - 0; // long, A
+        const posId_B = Number(await stm.getSecToken_countMinted()) - 1; // short, B
+        await futuresHelper.takePay({ stm, accounts, tokTypeId: usdFT.id, shortStId: posId_B, markPrice: 100, feePerSide: 0 });
 
-        await futuresHelper.openFtPos({ stm, accounts, tokTypeId: usdFT.id, ledger_A: A, ledger_B: B, qty_A: -10, qty_B: +10, price: 102 });
-        const childId = Number(await stm.getSecToken_countMinted()) - 1;
-        await futuresHelper.takePay({ stm, accounts, tokTypeId: usdFT.id, shortStId: childId, markPrice: 100, feePerSide: 0 });
+        await futuresHelper.openFtPos({ stm, accounts, tokTypeId: usdFT.id, ledger_A: A, ledger_B: B, qty_A: +1, qty_B: -1, price: 102 });
+        const childId_A = Number(await stm.getSecToken_countMinted()) - 0; // long, A
+        const childId_B = Number(await stm.getSecToken_countMinted()) - 1; // short, B
+        await futuresHelper.takePay({ stm, accounts, tokTypeId: usdFT.id, shortStId: childId_B, markPrice: 100, feePerSide: 0 });
 
-        const le_before = await stm.getLedgerEntry(A);
-        const tx = await stm.combineFtPos({ tokTypeId: usdFT.id, master_StId: posId, child_StIds: [childId] });
-        const le_after = await stm.getLedgerEntry(A);
-        console.log(`before: ${le_before.tokens.map(p2 => `{ TT: ${p2.tokenTypeId} stId: ${p2.stId} P: ${p2.ft_price.toString()} M_qty:${p2.mintedQty.toString().padStart(3)} }`).join(', ')}`);
-        console.log(` after: ${le_after.tokens.map(p2 => `{ TT: ${p2.tokenTypeId} stId: ${p2.stId} P: ${p2.ft_price.toString()} M_qty:${p2.mintedQty.toString().padStart(3)} }`).join(', ')}`);
-        truffleAssert.prettyPrintEmittedEvents(tx);
-        //console.log(le_after);
-        //truffleAssert.eventEmitted(data.tx, 'xxx', ev => ev.delta.isZero() && ev.done.isZero());
+        // combine A side pos's
+        //const lA_before = await stm.getLedgerEntry(A);
+        const txA = await stm.combineFtPos({ tokTypeId: usdFT.id, master_StId: posId_A, child_StIds: [childId_A] });
+        const lA_after = await stm.getLedgerEntry(A);
+        //console.log(`lA_before: ${lA_before.tokens.map(p2 => `{ TT: ${p2.tokenTypeId} / stId: ${p2.stId} / P: ${p2.ft_price.toString()} / M_qty:${p2.mintedQty.toString().padStart(3)} }`).join(', ')}`);
+        //console.log(` lA_after: ${lA_after.tokens.map(p2 => `{ TT: ${p2.tokenTypeId} / stId: ${p2.stId} / P: ${p2.ft_price.toString()} / M_qty:${p2.mintedQty.toString().padStart(3)} }`).join(', ')}`);
+        //truffleAssert.prettyPrintEmittedEvents(txA);
+        assert(lA_after.tokens.length == 1 && lA_after.tokens[0].currentQty == +2, 'unexpected A side ledger after');
+        truffleAssert.eventEmitted(txA, 'Combine', ev => ev.masterStId == posId_A && ev.countTokensCombined == 1);
+
+        // combine B side pos's
+        //const lB_before = await stm.getLedgerEntry(B);
+        const txB = await stm.combineFtPos({ tokTypeId: usdFT.id, master_StId: posId_B, child_StIds: [childId_B] });
+        const lB_after = await stm.getLedgerEntry(B);
+        //console.log(`lB_before: ${lB_before.tokens.map(p2 => `{ TT: ${p2.tokenTypeId} / stId: ${p2.stId} / P: ${p2.ft_price.toString()} / M_qty:${p2.mintedQty.toString().padStart(3)} }`).join(', ')}`);
+        //console.log(` lB_after: ${lB_after.tokens.map(p2 => `{ TT: ${p2.tokenTypeId} / stId: ${p2.stId} / P: ${p2.ft_price.toString()} / M_qty:${p2.mintedQty.toString().padStart(3)} }`).join(', ')}`);
+        //truffleAssert.prettyPrintEmittedEvents(txB);
+        assert(lB_after.tokens.length == 1 && lB_after.tokens[0].currentQty == -2, 'unexpected B side ledger after');
+        truffleAssert.eventEmitted(txB, 'Combine', ev => ev.masterStId == posId_B && ev.countTokensCombined == 1);
+    });
+
+    it(`FT pos-combine - should combine 2 positions, opposite directions (closing)`, async () => {
+        const A = accounts[global.TaddrNdx], B = accounts[global.TaddrNdx + 1];
+        
+        await futuresHelper.openFtPos({ stm, accounts, tokTypeId: usdFT.id, ledger_A: A, ledger_B: B, qty_A: +1, qty_B: -1, price: 100 });
+        const posId_A = Number(await stm.getSecToken_countMinted()) - 0; // long, A
+        const posId_B = Number(await stm.getSecToken_countMinted()) - 1; // short, B
+        await futuresHelper.takePay({ stm, accounts, tokTypeId: usdFT.id, shortStId: posId_B, markPrice: 100, feePerSide: 0 });
+
+        await futuresHelper.openFtPos({ stm, accounts, tokTypeId: usdFT.id, ledger_A: A, ledger_B: B, qty_A: -1, qty_B: +1, price: 102 });
+        const childId_1B = Number(await stm.getSecToken_countMinted()) - 0; // long, B
+        const childId_1A = Number(await stm.getSecToken_countMinted()) - 1; // short, A
+        await futuresHelper.takePay({ stm, accounts, tokTypeId: usdFT.id, shortStId: childId_1A, markPrice: 100, feePerSide: 0 });
+
+        // combine A side pos's
+        //const lA_before = await stm.getLedgerEntry(A);
+        const txA = await stm.combineFtPos({ tokTypeId: usdFT.id, master_StId: posId_A, child_StIds: [childId_1A] });
+        const lA_after = await stm.getLedgerEntry(A);
+        //console.log(`lA_before: ${lA_before.tokens.map(p2 => `{ TT: ${p2.tokenTypeId} / stId: ${p2.stId} / P: ${p2.ft_price.toString()} / M_qty:${p2.mintedQty.toString().padStart(3)} }`).join(', ')}`);
+        //console.log(` lA_after: ${lA_after.tokens.map(p2 => `{ TT: ${p2.tokenTypeId} / stId: ${p2.stId} / P: ${p2.ft_price.toString()} / M_qty:${p2.mintedQty.toString().padStart(3)} }`).join(', ')}`);
+        //truffleAssert.prettyPrintEmittedEvents(txA);
+        assert(lA_after.tokens.length == 1 && lA_after.tokens[0].currentQty == 0, 'unexpected A side ledger after');
+        truffleAssert.eventEmitted(txA, 'Combine', ev => ev.masterStId == posId_A && ev.countTokensCombined == 1);
+
+        // combine B side pos's
+        //const lB_before = await stm.getLedgerEntry(B);
+        const txB = await stm.combineFtPos({ tokTypeId: usdFT.id, master_StId: posId_B, child_StIds: [childId_1B] });
+        const lB_after = await stm.getLedgerEntry(B);
+        //console.log(`lB_before: ${lB_before.tokens.map(p2 => `{ TT: ${p2.tokenTypeId} / stId: ${p2.stId} / P: ${p2.ft_price.toString()} / M_qty:${p2.mintedQty.toString().padStart(3)} }`).join(', ')}`);
+        //console.log(` lB_after: ${lB_after.tokens.map(p2 => `{ TT: ${p2.tokenTypeId} / stId: ${p2.stId} / P: ${p2.ft_price.toString()} / M_qty:${p2.mintedQty.toString().padStart(3)} }`).join(', ')}`);
+        //truffleAssert.prettyPrintEmittedEvents(txB);
+        assert(lB_after.tokens.length == 1 && lB_after.tokens[0].currentQty == 0, 'unexpected B side ledger after');
+        truffleAssert.eventEmitted(txB, 'Combine', ev => ev.masterStId == posId_B && ev.countTokensCombined == 1);
+    });
+
+    it(`FT pos-combine - should combine 3 positions, opposite directions (closing)`, async () => {
+        const A = accounts[global.TaddrNdx], B = accounts[global.TaddrNdx + 1];
+        
+        await futuresHelper.openFtPos({ stm, accounts, tokTypeId: usdFT.id, ledger_A: A, ledger_B: B, qty_A: +2, qty_B: -2, price: 100 });
+        const posId_A = Number(await stm.getSecToken_countMinted()) - 0; // long, A
+        const posId_B = Number(await stm.getSecToken_countMinted()) - 1; // short, B
+        await futuresHelper.takePay({ stm, accounts, tokTypeId: usdFT.id, shortStId: posId_B, markPrice: 100, feePerSide: 0 });
+
+        await futuresHelper.openFtPos({ stm, accounts, tokTypeId: usdFT.id, ledger_A: A, ledger_B: B, qty_A: -1, qty_B: +1, price: 102 });
+        const childId_1B = Number(await stm.getSecToken_countMinted()) - 0; // long, B
+        const childId_1A = Number(await stm.getSecToken_countMinted()) - 1; // short, A
+        await futuresHelper.takePay({ stm, accounts, tokTypeId: usdFT.id, shortStId: childId_1A, markPrice: 100, feePerSide: 0 });
+
+        await futuresHelper.openFtPos({ stm, accounts, tokTypeId: usdFT.id, ledger_A: A, ledger_B: B, qty_A: -1, qty_B: +1, price: 102 });
+        const childId_2B = Number(await stm.getSecToken_countMinted()) - 0; // long, B
+        const childId_2A = Number(await stm.getSecToken_countMinted()) - 1; // short, A
+        await futuresHelper.takePay({ stm, accounts, tokTypeId: usdFT.id, shortStId: childId_2A, markPrice: 100, feePerSide: 0 });
+
+        // combine A side pos's
+        //const lA_before = await stm.getLedgerEntry(A);
+        const txA = await stm.combineFtPos({ tokTypeId: usdFT.id, master_StId: posId_A, child_StIds: [childId_1A, childId_2A] });
+        const lA_after = await stm.getLedgerEntry(A);
+        // console.log(`lA_before: ${lA_before.tokens.map(p2 => `{ TT: ${p2.tokenTypeId} / stId: ${p2.stId} / P: ${p2.ft_price.toString()} / M_qty:${p2.mintedQty.toString().padStart(3)} }`).join(', ')}`);
+        // console.log(` lA_after: ${lA_after.tokens.map(p2 => `{ TT: ${p2.tokenTypeId} / stId: ${p2.stId} / P: ${p2.ft_price.toString()} / M_qty:${p2.mintedQty.toString().padStart(3)} }`).join(', ')}`);
+        // truffleAssert.prettyPrintEmittedEvents(txA);
+        assert(lA_after.tokens.length == 1 && lA_after.tokens[0].currentQty == 0, 'unexpected A side ledger after');
+        truffleAssert.eventEmitted(txA, 'Combine', ev => ev.masterStId == posId_A && ev.countTokensCombined == 2);
+
+        // combine B side pos's
+        //const lB_before = await stm.getLedgerEntry(B);
+        const txB = await stm.combineFtPos({ tokTypeId: usdFT.id, master_StId: posId_B, child_StIds: [childId_1B, childId_2B] });
+        const lB_after = await stm.getLedgerEntry(B);
+        // console.log(`lB_before: ${lB_before.tokens.map(p2 => `{ TT: ${p2.tokenTypeId} / stId: ${p2.stId} / P: ${p2.ft_price.toString()} / M_qty:${p2.mintedQty.toString().padStart(3)} }`).join(', ')}`);
+        // console.log(` lB_after: ${lB_after.tokens.map(p2 => `{ TT: ${p2.tokenTypeId} / stId: ${p2.stId} / P: ${p2.ft_price.toString()} / M_qty:${p2.mintedQty.toString().padStart(3)} }`).join(', ')}`);
+        // truffleAssert.prettyPrintEmittedEvents(txB);
+        assert(lB_after.tokens.length == 1 && lB_after.tokens[0].currentQty == 0, 'unexpected B side ledger after');
+        truffleAssert.eventEmitted(txB, 'Combine', ev => ev.masterStId == posId_B && ev.countTokensCombined == 2);
     });
 
     it(`FT pos-combine - should not allow non-owner to combine futures positions`, async () => {
@@ -93,9 +175,8 @@ contract("StMaster", accounts => {
     }); 
 
     it(`FT pos-combine - should not allow combine of futures positions for an invalid (non-future) token type`, async () => {
-        try { await stm.combineFtPos({ tokTypeId: spotTypes[0].id, master_StId: 1, child_StIds: [2] }); } catch (ex) {
-            assert(ex.reason == 'Bad token settlement type', `unexpected: ${ex.reason}`); return;
-        }
+        try { await stm.combineFtPos({ tokTypeId: spotTypes[0].id, master_StId: 1, child_StIds: [2] }); }
+        catch (ex) { assert(ex.reason == 'Bad token settlement type', `unexpected: ${ex.reason}`); return; }
         assert.fail('expected contract exception');
     }); 
 

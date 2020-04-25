@@ -2,6 +2,7 @@ require('dotenv').config();
 const _ = require('lodash');
 const chalk = require('chalk');
 const { DateTime } = require('luxon');
+const figlet = require('figlet')
 
 const { db } = require('../../common/dist');
 const CONST = require('../const.js');
@@ -26,6 +27,9 @@ var ledgerOwners, accounts;
     //   when set, it (1) creates FT types (throws if not virgin state) and (2) iterates over ftm() with TEST time series data for each FT
     //   (todo: when not set, it runs exactly one ftm() pass per FT [todo later - will need a reference data source])
     //
+
+    console.log(chalk.green.bold(figlet.textSync(`AirCarbon`, { horizontalLayout: 'fitted', kerning: 'default' })) + chalk.green.bold.inverse(' FUTURES SETTLEMENT ENGINE '));
+    console.log();
 
     CONST.consoleOutput(false);
     const O = await CONST.getAccountAndKey(0);
@@ -57,7 +61,7 @@ var ledgerOwners, accounts;
 
     // execute context
     const MAX_T = ctx[0].data.refs.length;
-    const test_shortPosIds = [];
+    //const test_shortPosIds = [];
     for (let T=0 ; T < MAX_T; T++) { // for time T
         console.log('-');
         console.log(chalk.inverse(` >> T=${T} << `));
@@ -65,7 +69,7 @@ var ledgerOwners, accounts;
         // test - process actions
         for (let ft of ctx) {
             console.group();
-            await processTestContext(ft, T, test_shortPosIds);
+            await processTestContext(ft, T);//, test_shortPosIds);
             console.groupEnd();
         }
 
@@ -78,30 +82,30 @@ var ledgerOwners, accounts;
             // dbg - show participant FT balances
             for (let p of ft.data.TEST_PARTICIPANTS) {
                 const le = await CONST.web3_call('getLedgerEntry', [ p.account ], O.addr, O.privKey);
-                console.log(chalk.blue.dim(`PID=${p.id}`) + 
-                    chalk.dim(` ${le.tokens.map(p2 => `{ TT: ${p2.tokenTypeId} stId: ${p2.stId} M_qty:${p2.mintedQty.toString().padStart(3)} }`).join(', ')}`
+                console.log(chalk.blue(`PID=${p.id}`) + 
+                    chalk.dim(` ${le.tokens.map(p2 => `{ TT: ${p2.tokenTypeId} / stId: ${p2.stId} / M_qty:${p2.mintedQty.toString().padStart(3)} }`).join(', ')}`
                 )); //, le.tokens);
             }
             
             // main - process take/pay for all positions on this future
-            await TakePay(ft.ftId, MP, test_shortPosIds);
+            await TakePay(ft.ftId, MP, ft.data.TEST_PARTICIPANTS.map(p => p.account));
             console.groupEnd();
         }
 
         // PHASE (2) - COMBINE positions (all types, all positions)
+// TEST_2 --> no combines, no fees, end state:
+// >> T=8 << 
+// ftId=6, MP=108...
+// PID=1 { TT: 6 stId: 58 M_qty:  1 }, { TT: 6 stId: 60 M_qty:  1 }, { TT: 6 stId: 62 M_qty:  1 }
+// PID=2 { TT: 6 stId: 57 M_qty: -1 }, { TT: 6 stId: 59 M_qty: -1 }, { TT: 6 stId: 61 M_qty: -1 }
+// shortId 61 > DONE=$1000    (delta=$1000   ) ==> itm: 0x1918222F80Bb95b0E19EBB4b5f097Cd3D606A741 ($82000   ) / otm: 0xe569441CA9C45aa4F6Bf1b17A7Dd10EE595440AB ($44000   )
+// shortId 59 > DONE=$1000    (delta=$1000   ) ==> itm: 0x1918222F80Bb95b0E19EBB4b5f097Cd3D606A741 ($83000   ) / otm: 0xe569441CA9C45aa4F6Bf1b17A7Dd10EE595440AB ($43000   )
+// shortId 57 > DONE=$1000    (delta=$1000   ) ==> itm: 0x1918222F80Bb95b0E19EBB4b5f097Cd3D606A741 ($84000   ) / otm: 0xe569441CA9C45aa4F6Bf1b17A7Dd10EE595440AB ($42000   )
         for (let ft of ctx) {
             console.group();
             await Combine(ft.ftId, ft.data.TEST_PARTICIPANTS.map(p => p.account));
             console.groupEnd();
         }
-// TEST_2 --> no combines, end state:
-// >> T=8 << 
-// ftId=4, MP=108...
-// PID=1 { TT: 4 stId: 94 M_qty:  1 }, { TT: 4 stId: 96 M_qty:  1 }, { TT: 4 stId: 98 M_qty:  1 }
-// PID=2 { TT: 4 stId: 93 M_qty: -1 }, { TT: 4 stId: 95 M_qty: -1 }, { TT: 4 stId: 97 M_qty: -1 }
-// shortId 93 > DONE=$1000    (delta=$1000   ) ==> itm: 0xC9EB2292aD2F1989e650eb2e05B436dbff6B2A7B ($81978   ) / otm: 0x5E5422e30491329C842a06Ca543cA32E16C00b6f ($43978   )
-// shortId 95 > DONE=$1000    (delta=$1000   ) ==> itm: 0xC9EB2292aD2F1989e650eb2e05B436dbff6B2A7B ($82977   ) / otm: 0x5E5422e30491329C842a06Ca543cA32E16C00b6f ($42977   )
-// shortId 97 > DONE=$1000    (delta=$1000   ) ==> itm: 0xC9EB2292aD2F1989e650eb2e05B436dbff6B2A7B ($83976   ) / otm: 0x5E5422e30491329C842a06Ca543cA32E16C00b6f ($41976   )
 
         // PHASE (3) - PROCESS LIQUIDATE (all futures, all positions)
         //  by account-level liquidation trigger (i.e. net/total physical bal < reserved bal)
@@ -113,7 +117,7 @@ var ledgerOwners, accounts;
     process.exit();
 })();
 
-async function processTestContext(ft, T, test_shortPosIds) {
+async function processTestContext(ft, T) { //, test_shortPosIds) {
     const O = await CONST.getAccountAndKey(0);
     const TEST_PARTICIPANTS = ft.data.TEST_PARTICIPANTS;
 
@@ -143,25 +147,14 @@ async function processTestContext(ft, T, test_shortPosIds) {
         if (ft_long.q) {
             console.log(chalk.blue.dim(`TEST_PARTICIPANT: PID=${p.id}, account=${p.account}`) + chalk.blue(` ** OPEN FUTURES POSITION ** `), ft_long);
             const shortAccount = TEST_PARTICIPANTS.find(p => p.id == ft_long.cid).account;
-            //const a_before = await CONST.web3_call('getLedgerEntry', [ p.account ]);
-            //const b_before = await CONST.web3_call('getLedgerEntry', [ shortAccount ]);
-            //console.log('a_before.ccys', a_before.ccys[0]);
-            //console.log('b_before.ccys', b_before.ccys[0]);
 
-            // todo - grab shortFtId (restrict to that for test mode...)
             const { txHash, receipt, evs } = await CONST.web3_tx('openFtPos', [{
                 tokTypeId: ft.ftId, ledger_A: p.account, ledger_B: shortAccount, qty_A: ft_long.q, qty_B: ft_long.q * -1, price: ft_long.p
             }], O.addr, O.privKey);
             //console.log('ev... shortStId:', evs.find(p => p.event == 'FutureOpenInterest').returnValues.shortStId); // ## stack too deep for shortStId
             const shortStId = Number(await CONST.web3_call('getSecToken_countMinted', [])) - 1;
             //console.log('new test pos: ', shortStId);
-            test_shortPosIds.push(shortStId);
-            //console.log(chalk.blue.dim(`TEST_PARTICIPANT: PID=${p.id}, account=${p.account}`) + chalk.blue(` (TEST POSID [SHORT] = ${shortStId}) `), shortStId);
-
-            //const a_after = await CONST.web3_call('getLedgerEntry', [ p.account ]);
-            //const b_after = await CONST.web3_call('getLedgerEntry', [ shortAccount ]);
-            //console.log('a_after.ccys', a_after.ccys[0]);
-            //console.log('a_after.ccys', a_after.ccys[0]);
+            //test_shortPosIds.push(shortStId);
         }
     }
 }
@@ -249,6 +242,26 @@ ccy_withdraws: [ {a:+0000},         {},                {},                {},   
 { 
            id: 2, account: freshAccounts[i++],
  ccy_deposits: [ {a:+20300},        {a:+21300},        {a:+22300},        {},                {},                {},                {},                 {},                 {} ],
+ccy_withdraws: [ {a:+0000},         {},                {},                {},                {},                {},                {},                 {},                 {} ], 
+     ft_longs: [ {},                {},                {},                {},                {},                {},                {},                 {},                 {} ],
+}
+]
+        }
+    }];
+    }
+    else if (testMode == "TEST_3") { // single FT, single pos-pair - done != delta (insufficient cash on OTM)
+        return [ { ftId: fts.find(p => p.name == TEST_FT_1).id.toString(), data: {
+refs: 
+               [ 100,               110,               120,               130,               140,               150,               160,                170,                180 ], 
+TEST_PARTICIPANTS: [ {
+           id: 1, account: freshAccounts[i++],
+ ccy_deposits: [ {a:+20300},        {},                {},                {},                {},                {},                {},                 {},                 {} ], 
+ccy_withdraws: [ {a:+0000},         {},                {},                {},                {},                {},                {},                 {},                 {} ], 
+     ft_longs: [ {q:1,cid:2,p:100}, {},                {},                {},                {},                {},                {},                 {},                 {} ],
+},
+{ 
+           id: 2, account: freshAccounts[i++],
+ ccy_deposits: [ {a:+20300},        {},                {},                {},                {},                {},                {},                 {},                 {} ],
 ccy_withdraws: [ {a:+0000},         {},                {},                {},                {},                {},                {},                 {},                 {} ], 
      ft_longs: [ {},                {},                {},                {},                {},                {},                {},                 {},                 {} ],
 }

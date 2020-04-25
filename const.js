@@ -34,7 +34,7 @@ const blocksFromMonths = (months) => Math.ceil(blocksFromDays(months * 30.42));
 //
 // MAIN: deployer definitions -- contract ctor() params
 //
-const contractVer = "0.97e";
+const contractVer = "0.97f";
 const contractProps = {
     COMMODITY: {
         contractVer: contractVer,
@@ -331,12 +331,12 @@ async function web3_tx(methodName, methodArgs, fromAddr, fromPrivKey) {
         .once("confirmation", async (confirms, receipt) => {
             //const receipt = await web3.eth.getTransactionReceipt(txHash);
             const evs = await contract.getPastEvents("allEvents", { fromBlock: receipt.blockNumber, toBlock: receipt.blockNumber });
+            //console.log('evs', evs);
             if (consoleOutput) console.log(chalk.dim.yellow(`   => ${txHash} - ${confirms} confirm(s), receipt.gasUsed=${receipt.gasUsed} receipt.blockNumber=${receipt.blockNumber} evs=${evs.map(p => `B# ${p.blockNumber}: ${p.event}`).join(',')}`));//, JSON.stringify(receipt)));
             // receipt.logs
             // receipt.blockNumber
             // receipt.blockHash
             // receipt.transactionHash
-            //console.log('evs', evs);
             //console.log('evs', evs.map(p => `B# ${p.blockNumber}: ${p.event}(${JSON.stringify(p.returnValues)})`).join('\n'));
             resolve({ txHash, receipt, evs });
         })
