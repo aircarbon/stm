@@ -2,6 +2,7 @@ require('dotenv').config();
 const _ = require('lodash');
 const chalk = require('chalk');
 const BN = require('bn.js');
+const chart = require('ascii-horizontal-barchart');
 
 const { db } = require('../../common/dist');
 const CONST = require('../const.js');
@@ -50,17 +51,39 @@ module.exports = {
 }
 
 async function runTakePay(O, ft, ftId, posId, MP, FEE_PER_SIDE, SIDE) {
+    // run TP
     const { txHash, receipt, evs } = await CONST.web3_tx('takePay2', [ftId, posId, MP, FEE_PER_SIDE], O.addr, O.privKey);
     const ev = evs.find(p => p.event == 'TakePay2').returnValues;
     const to_le = await CONST.web3_call('getLedgerEntry', [ev.to]);
     const from_le = await CONST.web3_call('getLedgerEntry', [ev.from]);
-    const to_desc = ev.to.toLowerCase() == O.addr.toLowerCase() ? "C" : SIDE;
-    const from_desc = ev.from.toLowerCase() == O.addr.toLowerCase() ? "C" : SIDE;
+    const to_desc = ev.to.toLowerCase() == O.addr.toLowerCase() ? "[C]" : `[${SIDE}]`
+    const from_desc = ev.from.toLowerCase() == O.addr.toLowerCase() ? "[C]" : `[${SIDE}]`
+
+    // graph reserved & balance
+    const le = ev.to.toLowerCase() == O.addr.toLowerCase() ? from_le : to_le;
+    const ccy = le.ccys.find(p => p.ccyTypeId.eq(ft.ft.refCcyId)), bal = Number(ccy.balance.toString()), res = Number(ccy.reserved.toString());
+    const RL = res > 0 ? bal / res : 1; // 1 = at margin/reserve 
+    const data = { 'Reserve %': (RL*100).toFixed(2) };
     
+    // log TP info
     console.log(`${chalk.dim(`${SIDE} stId:${posId.padEnd(3)}`)}` + ` > ` +
 chalk.greenBright(`\
-(${from_desc}) ${chalk.dim(ev.from)} ($${Number(from_le.ccys.find(p => p.ccyTypeId.eq(ft.ft.refCcyId)).balance.toString()).toFixed(0).padEnd(8)}) ==> \
-[DONE=$${Number(ev.done.toString()).toFixed(0).padStart(7)} /delta=$${Number(ev.delta.toString()).toFixed(0).padEnd(7)})] ==> \
-(${to_desc}) ${chalk.dim(ev.to)} ($${Number(to_le.ccys.find(p => p.ccyTypeId.eq(ft.ft.refCcyId)).balance.toString()).toFixed(0).padEnd(8)})\
-`));
+${chalk.inverse(from_desc)} ${chalk.dim(truncMiddle(ev.from, 8))} ($${Number(from_le.ccys.find(p => p.ccyTypeId.eq(ft.ft.refCcyId)).balance.toString()).toFixed(0).padEnd(8)}) ==> \
+[$${Number(ev.done.toString()).toFixed(0).padStart(7)} `) +
+chalk.dim(`/Δ=$${Number(ev.delta.toString()).toFixed(0).padEnd(7)}`) +
+chalk.greenBright(`)] ==> \
+${chalk.inverse(to_desc)} ${chalk.dim(truncMiddle(ev.to, 8))} ($${Number(to_le.ccys.find(p => p.ccyTypeId.eq(ft.ft.refCcyId)).balance.toString()).toFixed(0).padEnd(8)}) `)
+    // graph
+    + (
+    RL < 0.8 ? chalk.red(chart(data, true, Math.ceil((Math.min(RL, 1) / 1) * 40))) :
+    RL < 1.0 ? chalk.yellow(chart(data, true, Math.ceil((Math.min(RL, 1) / 1) * 40))) :
+               chalk.green(chart(data, true,  Math.ceil((Math.min(RL, 1) / 1) * 40)))
+    )
+);
 }
+
+function truncMiddle(s, n) {
+    return s.length > n
+      ? `${s.substr(0, s.length / 2 - (s.length - n) / 2)}…${s.substr(s.length / 2 + (s.length - n) / 2)}`
+      : s;
+  }
