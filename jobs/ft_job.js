@@ -29,14 +29,16 @@ var ledgerOwners, accounts;
     //   (todo: when not set, it runs exactly one ftm() pass per FT [todo later - will need a reference data source])
     //
 
-    console.log(chalk.green.bold(figlet.textSync(`AirCarbon`, { horizontalLayout: 'fitted', kerning: 'default' })) + chalk.green.bold.inverse(' FUTURES SETTLEMENT ENGINE '));
+    console.log(chalk.green.bold(figlet.textSync(`AirCarbon`, { horizontalLayout: 'fitted', kerning: 'default' })));
+    console.log(chalk.green.bold.inverse(`${''.padStart(16)}${' FUTURES SETTLEMENT ENGINE '}${''.padEnd(16)}`));
     console.log();
 
     CONST.consoleOutput(false);
     const O = await CONST.getAccountAndKey(0);
 
-    const TakePay = require('./ft_settler').TakePay;
-    const Combine = require('./ft_settler').Combine;
+    const TakePay_v1 = require('./ft_settler_TP1').TakePay_v1;
+    const TakePay_v2 = require('./ft_settler_TP2').TakePay_v2;
+    const Combine = require('./ft_settler_Combine').Combine;
     var ctx;
 
     // startup
@@ -52,13 +54,6 @@ var ledgerOwners, accounts;
         ctx = await initTestMode(MODE);
     }
     else { throw('Live mode - TODO'); } // TODO: live mode: fetch single reference price here, for each future (no participant test data)
-    
-    // get all FT types (??)
-    // const tts = await CONST.web3_call('getSecTokenTypes', []);
-    // if (!tts) throw('Failed to get token types');
-    // const fts = tts.tokenTypes.filter(p => p.settlementType == CONST.settlementType.FUTURE);
-    // if (!fts || fts.length == 0) { throw('No FUTURE token types'); }
-    // console.log(`Processing for ${fts.length} FT tok-types...`);
 
     // execute context
     const MAX_T = ctx[0].data.refs.length;
@@ -74,7 +69,26 @@ var ledgerOwners, accounts;
             console.groupEnd();
         }
 
-        // PHASE (1) - process TAKE/PAY (all types, all positions)
+        // TODO - TX: setReadOnly(true)... ?
+
+        // PHASE (1) - process TAKE/PAY (all types, all positions) [v1]
+        // for (let ft of ctx) {
+        //     console.group();
+        //     const MP = ft.data.refs[T]; // mark price
+        //     console.log(chalk.dim(`ftId=${ft.ftId}, MP=${MP}...`));
+
+        //     // dbg - show participant FT balances
+        //     for (let p of ft.data.TEST_PARTICIPANTS) {
+        //         const le = await CONST.web3_call('getLedgerEntry', [ p.account ], O.addr, O.privKey);
+        //         console.log(chalk.blue(`PID=${p.id}`) + 
+        //             chalk.dim(` ${le.tokens.map(p2 => `{ TT: ${p2.tokenTypeId} / stId: ${p2.stId} / M_qty:${p2.mintedQty.toString().padStart(3)} }`).join(', ')}`
+        //         )); //, le.tokens);
+        //     }
+            
+        //     // main - process take/pay for all positions on this future
+        //     await TakePay_v1(ft.ftId, MP, ft.data.TEST_PARTICIPANTS.map(p => p.account));
+        //     console.groupEnd();
+        // }
         for (let ft of ctx) {
             console.group();
             const MP = ft.data.refs[T]; // mark price
@@ -89,7 +103,7 @@ var ledgerOwners, accounts;
             }
             
             // main - process take/pay for all positions on this future
-            await TakePay(ft.ftId, MP, ft.data.TEST_PARTICIPANTS.map(p => p.account));
+            await TakePay_v2(ft.ftId, MP, ft.data.TEST_PARTICIPANTS.map(p => p.account));
             console.groupEnd();
         }
 
@@ -115,6 +129,35 @@ var ledgerOwners, accounts;
         //...
     }
 
+     // integrity check - compare context ledgers after vs. before & deltas
+     console.log();
+     for (let ft of ctx) {
+        const data = [], nets = [];
+        const ftData = (await CONST.web3_call('getSecTokenTypes', [])).tokenTypes.find(p => p.id == ft.ftId);
+        data.push(['Account', 'Before', 'After', 'Deposits', 'Withdraws', 'Net' ])
+        for (let p of ft.data.TEST_PARTICIPANTS) {
+            p.le_after = await CONST.web3_call('getLedgerEntry', [p.account]);
+            const ccyBefore = Number(p.le_before.ccys.find(p => p.ccyTypeId.eq(ftData.ft.refCcyId)).balance);
+            const ccyAfter = Number(p.le_after.ccys.find(p => p.ccyTypeId.eq(ftData.ft.refCcyId)).balance);
+            const ccyDeposits = Number(p.ccy_deposits ? p.ccy_deposits.map(p => p.a).reduce((a,b)=>(a||0)+(b||0),0).toString() : 0);
+            const ccyWithdraws = Number(p.ccy_withdraws ? p.ccy_withdraws.map(p => p.a).reduce((a,b)=>(a||0)+(b||0),0).toString() : 0);
+            const net = ccyAfter - ccyBefore - ccyDeposits + ccyWithdraws;
+            data.push([
+                p.account, 
+                `$${ccyBefore.toString()}`,
+                `$${ccyAfter.toString()}`,
+                `$${ccyDeposits.toString()}`,
+                `$${ccyWithdraws.toString()}`,
+                `$${net.toString()}`
+            ]);
+            nets.push(net);
+        }
+        data.push(['-', '-', '-', '-', '-', `$${nets.reduce((a,b)=>a+b,0).toString()}`]);
+        const table = new TCharts.Table(0.2);
+        table.setData(data);
+        console.log(table.string());
+    }
+
     process.exit();
 })();
 
@@ -123,7 +166,7 @@ async function processTestContext(ft, T) { //, test_shortPosIds) {
     const TEST_PARTICIPANTS = ft.data.TEST_PARTICIPANTS;
 
     // process ctx deposits
-    for (let p of TEST_PARTICIPANTS) {
+    for (let p of TEST_PARTICIPANTS.filter(p => p.id > 0)) {
         const ccy_deposit = p.ccy_deposits[T];
         if (ccy_deposit.a) {
             console.log(chalk.blue.dim(`TEST_PARTICIPANT: PID=${p.id}, account=${p.account}`) + chalk.blue(` ** DEPOSIT ** `), ccy_deposit);
@@ -132,7 +175,7 @@ async function processTestContext(ft, T) { //, test_shortPosIds) {
     }
     
     // process ctx withdraws
-    for (let p of TEST_PARTICIPANTS) {
+    for (let p of TEST_PARTICIPANTS.filter(p => p.id > 0)) {
         const ccy_withdraw = p.ccy_withdraws[T];
         if (ccy_withdraw.a) {
             console.log(chalk.blue.dim(`TEST_PARTICIPANT: PID=${p.id}, account=${p.account}`) + chalk.blue(` ** WITHDRAW ** `), ccy_withdraw);
@@ -143,7 +186,7 @@ async function processTestContext(ft, T) { //, test_shortPosIds) {
     // todo: ...extend for minting, burning & spot trades
 
     // process ctx new futures positions
-    for (let p of TEST_PARTICIPANTS) {
+    for (let p of TEST_PARTICIPANTS.filter(p => p.id > 0)) {
         const ft_long = p.ft_longs[T];
         if (ft_long.q) {
             console.log(chalk.blue.dim(`TEST_PARTICIPANT: PID=${p.id}, account=${p.account}`) + chalk.blue(` ** OPEN FUTURES POSITION ** `), ft_long);
@@ -202,15 +245,15 @@ async function initTestMode(testMode) {
     // init - get entire ledger (for allocation of clean/unused accounts to test participants)
     ledgerOwners = await CONST.web3_call('getLedgerOwners', []);
     const freshAccounts = _.differenceWith(accounts, ledgerOwners, (a,b) => a.toLowerCase() == b.toLowerCase());
-    if (freshAccounts.length == 0) throw ('Insufficient fresh test accounts: deploy the contract');
-    // console.log('accounts', accounts);
-    // console.log('ledgerOwners', ledgerOwners);
+    if (freshAccounts.length == 0) throw ('Insufficient fresh test accounts: redeploy the contract');
+    //console.log('accounts', accounts);
+    //console.log('ledgerOwners', ledgerOwners);
     //console.log(`${testMode} - freshAccounts`, freshAccounts);
 
     // init - define test data series, and test FTs
-    var i=0;
+    var i=0, ret;
     if (testMode == "TEST_1") { // single FT, single pos-pair
-        return [ { ftId: fts.find(p => p.name == TEST_FT_1).id.toString(), data: {
+        ret = [ { ftId: fts.find(p => p.name == TEST_FT_1).id.toString(), data: {
 refs: // FT - underlyer settlement prices
                [ 100,               101,               102,               103,               104,               105,               106,                107,                108 ], 
 TEST_PARTICIPANTS: [ { // test participants
@@ -230,8 +273,8 @@ ccy_withdraws: [ {a:+0000},         {},                {},                {},   
         }
     }];
     }
-    else if (testMode == "TEST_2") { // single FT, three pos-pairs
-        return [ { ftId: fts.find(p => p.name == TEST_FT_1).id.toString(), data: {
+    else if (testMode == "TEST_2") { // single FT, three pos-pairs same participants
+        ret =  [ { ftId: fts.find(p => p.name == TEST_FT_1).id.toString(), data: {
 refs: 
                [ 100,               101,               102,               103,               104,               105,               106,                107,                108 ], 
 TEST_PARTICIPANTS: [ {
@@ -250,8 +293,34 @@ ccy_withdraws: [ {a:+0000},         {},                {},                {},   
         }
     }];
     }
-    else if (testMode == "TEST_3") { // single FT, single pos-pair - done != delta (insufficient cash on OTM)
-        return [ { ftId: fts.find(p => p.name == TEST_FT_1).id.toString(), data: {
+    else if (testMode == "TEST_3") { // single FT, two positions, three participants
+        ret =  [ { ftId: fts.find(p => p.name == TEST_FT_1).id.toString(), data: {
+refs: 
+               [ 100,               101,               102,               103,               104,               105,               106,                107,                108 ], 
+TEST_PARTICIPANTS: [ {
+           id: 1, account: freshAccounts[i++],
+ ccy_deposits: [ {a:+20300},        {},                {},                {},                {},                {},                {},                 {},                 {} ], 
+ccy_withdraws: [ {},                {},                {},                {},                {},                {},                {},                 {},                 {} ], 
+     ft_longs: [ {q:1,cid:2,p:100}, {},                {},                {},                {},                {},                {},                 {},                 {} ],
+},
+{ 
+           id: 2, account: freshAccounts[i++],
+ ccy_deposits: [ {a:+20300},        {a:+21300},        {},                {},                {},                {},                {},                 {},                 {} ],
+ccy_withdraws: [ {},                {},                {},                {},                {},                {},                {},                 {},                 {} ], 
+     ft_longs: [ {},                {q:1,cid:3,p:101}, {},                {},                {},                {},                {},                 {},                 {} ],
+},
+{ 
+           id: 3, account: freshAccounts[i++],
+ ccy_deposits: [ {},                {a:+21300},        {},                {},                {},                {},                {},                 {},                 {} ],
+ccy_withdraws: [ {},                {},                {},                {},                {},                {},                {},                 {},                 {} ], 
+     ft_longs: [ {},                {},                {},                {},                {},                {},                {},                 {},                 {} ],
+}
+]
+        }
+    }];
+    }
+    else if (testMode == "TEST_4") { // single FT, single pos-pair - done != delta (insufficient cash on OTM)
+        ret =  [ { ftId: fts.find(p => p.name == TEST_FT_1).id.toString(), data: {
 refs: 
                [ 100,               110,               120,               130,               140,               150,               160,                170,                180 ], 
 TEST_PARTICIPANTS: [ {
@@ -270,6 +339,14 @@ ccy_withdraws: [ {a:+0000},         {},                {},                {},   
         }
     }];
     }
-
     else throw('Unknown testmode');
+
+    // set starting balances in context
+    for (ft of ret) {
+        ft.data.TEST_PARTICIPANTS.push({ id: 0, account: O.addr });
+        for (let p of ft.data.TEST_PARTICIPANTS) {
+            p.le_before = await CONST.web3_call('getLedgerEntry', [p.account]);
+        }
+    }
+    return ret;
 }
