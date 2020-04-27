@@ -56,7 +56,7 @@ var ledgerOwners, accounts;
     else { throw('Live mode - TODO'); } // TODO: live mode: fetch single reference price here, for each future (no participant test data)
 
     // execute context
-    const MAX_T = ctx[0].data.refs.length;
+    const MAX_T = ctx[0].data.price.length;
     //const test_shortPosIds = [];
     for (let T=0 ; T < MAX_T; T++) { // for time T
         console.log('-');
@@ -74,7 +74,7 @@ var ledgerOwners, accounts;
         // PHASE (1) - process TAKE/PAY (all types, all positions) [v1]
         // for (let ft of ctx) {
         //     console.group();
-        //     const MP = ft.data.refs[T]; // mark price
+        //     const MP = ft.data.price[T]; // mark price
         //     console.log(chalk.dim(`ftId=${ft.ftId}, MP=${MP}...`));
 
         //     // dbg - show participant FT balances
@@ -91,7 +91,7 @@ var ledgerOwners, accounts;
         // }
         for (let ft of ctx) {
             console.group();
-            const MP = ft.data.refs[T]; // mark price
+            const MP = ft.data.price[T]; // mark price
             console.log(chalk.dim(`ftId=${ft.ftId}, MP=${MP}...`));
 
             // dbg - show participant FT balances
@@ -103,6 +103,8 @@ var ledgerOwners, accounts;
             }
             
             // main - process take/pay for all positions on this future
+            //        
+            //
             await TakePay_v2(ft.ftId, MP, ft.data.TEST_PARTICIPANTS.map(p => p.account));
             console.groupEnd();
         }
@@ -252,11 +254,11 @@ async function initTestMode(testMode) {
 
     // init - define test data series, and test FTs
     var i=0, ret;
-    if (testMode == "TEST_1") { // single FT, single pos-pair
+    if (testMode == "TEST_1") { // single position
         ret = [ { ftId: fts.find(p => p.name == TEST_FT_1).id.toString(), data: {
-refs: // FT - underlyer settlement prices
+price:
                [ 100,               101,               102,               103,               104,               105,               106,                107,                108 ], 
-TEST_PARTICIPANTS: [ { // test participants
+TEST_PARTICIPANTS: [ {
            id: 1, account: freshAccounts[i++],
  ccy_deposits: [ {a:+20300},        {},                {},                {},                {},                {},                {},                 {},                 {} ], 
 ccy_withdraws: [ {a:+0000},         {},                {},                {},                {},                {},                {},                 {},                 {} ], 
@@ -273,9 +275,9 @@ ccy_withdraws: [ {a:+0000},         {},                {},                {},   
         }
     }];
     }
-    else if (testMode == "TEST_2") { // single FT, three pos-pairs same participants
+    else if (testMode == "TEST_2") { // adding to positions, 2 parties (pos-combine)
         ret =  [ { ftId: fts.find(p => p.name == TEST_FT_1).id.toString(), data: {
-refs: 
+price: 
                [ 100,               101,               102,               103,               104,               105,               106,                107,                108 ], 
 TEST_PARTICIPANTS: [ {
            id: 1, account: freshAccounts[i++],
@@ -293,9 +295,9 @@ ccy_withdraws: [ {a:+0000},         {},                {},                {},   
         }
     }];
     }
-    else if (testMode == "TEST_3") { // single FT, two positions, three participants
+    else if (testMode == "TEST_3") { // A - B - C (counterparty gets swapped)
         ret =  [ { ftId: fts.find(p => p.name == TEST_FT_1).id.toString(), data: {
-refs: 
+price: 
                [ 100,               101,               102,               103,               104,               105,               106,                107,                108 ], 
 TEST_PARTICIPANTS: [ {
            id: 1, account: freshAccounts[i++],
@@ -319,9 +321,9 @@ ccy_withdraws: [ {},                {},                {},                {},   
         }
     }];
     }
-    else if (testMode == "TEST_4") { // single FT, single pos-pair - done != delta (insufficient cash on OTM)
+    else if (testMode == "TEST_4") { // margin call -> zero (## settelment fails, by design ##)
         ret =  [ { ftId: fts.find(p => p.name == TEST_FT_1).id.toString(), data: {
-refs: 
+price: 
                [ 100,               110,               120,               130,               140,               150,               160,                170,                180 ], 
 TEST_PARTICIPANTS: [ {
            id: 1, account: freshAccounts[i++],

@@ -74,8 +74,9 @@ contract("StMaster", accounts => {
         //console.log('MIN_BALANCE $', Number(MIN_BALANCE.toString())/100);
         await stm.fund(usdFT.ft.refCcyId, MIN_BALANCE.toString(), A);
         await stm.fund(usdFT.ft.refCcyId, MIN_BALANCE.toString(), B);
-
         const x = await futuresHelper.openFtPos({ stm, accounts, tokTypeId: usdFT.id, ledger_A: A, ledger_B: B, qty_A: POS_QTY, qty_B: POS_QTY.neg(), price: CONTRACT_PRICE });
+        assert(new BN(x.ledger_A.ccys.find(p => p.ccyTypeId == usdFT.ft.refCcyId).reserved).eq(POS_MARGIN), 'unexpected reserve ledger A');
+        assert(new BN(x.ledger_B.ccys.find(p => p.ccyTypeId == usdFT.ft.refCcyId).reserved).eq(POS_MARGIN), 'unexpected reserve ledger B');
         await CONST.logGas(web3, x.tx, `Open futures position (USD)`);
     });
 

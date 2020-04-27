@@ -61,8 +61,10 @@ library StructLib {
         require(ld._ledger[ledger].ccyType_balance[ccyTypeId] >= reservedAmount, "Reservation exceeds balance");
         require(reservedAmount >= 0, "Bad reservedAmount");
 
-        ld._ledger[ledger].ccyType_reserved[ccyTypeId] = reservedAmount;
-        emit ReervedLedgerCcy(ledger, ccyTypeId, uint256(reservedAmount));
+        if (ld._ledger[ledger].ccyType_reserved[ccyTypeId] != reservedAmount) {
+            ld._ledger[ledger].ccyType_reserved[ccyTypeId] = reservedAmount;
+            emit ReervedLedgerCcy(ledger, ccyTypeId, uint256(reservedAmount));
+        }
     }
 
     // CONTRACT TYPE
@@ -311,13 +313,13 @@ library StructLib {
     }
 
     // FUTURES TAKE/PAY SETTLEMENT ARGS
-    struct TakePayArgs {
-        uint256 tokTypeId;
-        uint256 short_stId;
-        int128  markPrice;
-        int256  feePerSide;
-        address feeAddrOwner;
-    }
+    // struct TakePayArgs {
+    //     uint256 tokTypeId;
+    //     uint256 short_stId;
+    //     int128  markPrice;
+    //     int256  feePerSide;
+    //     address feeAddrOwner;
+    // }
     struct TakePayArgs2 {
         uint256 tokTypeId;
         uint256 stId;
@@ -383,7 +385,6 @@ library StructLib {
         StructLib.LedgerStruct storage ld,
         address ledger, uint256 ccyTypeId, int256 sending, int256 receiving, int256 fee
     ) public view returns (bool) {
-
         return (ld._ledger[ledger].ccyType_balance[ccyTypeId]
                 + receiving - ld._ledger[ledger].ccyType_reserved[ccyTypeId]
                ) >= sending + fee;

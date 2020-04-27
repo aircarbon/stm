@@ -38,7 +38,15 @@ FUTURES - notes 26/MAR/2020
   (2.1) done: TakeOrPay [2 updates: LMP + CcyBalance] -- use (MP - LMP) or (MP - P) when LMP == -1
   (2.2) done: Combine (auto-burn/shrink) - should only ever be ONE net ST per FT-type after TakeOrPay
 
-  (2.3) LiquidatePositions
+  ******
+  (2.2.1) >>> RECALC MARGIN -- WIP (new test for closing/reducing/adding position affecting reserved...)
+  ******
+
+  ***** BIFURFACTION POINT: ARE WE CCP, I.E. GUARANTEEING ITM PAYOUTS? if *NOT* then probably don't need to liquidate positions at all ?! *****
+    if going with "capped futures" then for sure we want a single simple view of "TOTAL LONG RESERVE LIQUIDITY" vs "TOTAL SHORT RESERVE LIQUIDITY"
+    AND a view of how much is ahead of us in the queue for payout...
+
+  (2.3) LiquidatePositions...??
       done vs delta: this captures LIQUIDATED POSITION OBLIGATIONS (ITM side to be made whole somehow off-chain...)
       >>> i.e. LIQUIDATION is a NOP...! POSITIONS STAY OPEN AND OUTPUT { DONE=0, DELTA=X }...
       then, all that remains (?) is for (post-takePay, all positions) to look at which positions have balace < reserved: these are in margin-call territory...
@@ -111,21 +119,21 @@ contract StFutures is Owned,
     }
     
     // SETTLEMENT CYCLE: TakePay + Combine
-    function takePay(
-        uint256 tokTypeId,
-        uint256 short_stId,
-        int128  markPrice,
-        int256  feePerSide
-    ) public onlyOwner() {
-        FuturesLib.takePay(ld, std,
-          StructLib.TakePayArgs({
-             tokTypeId: tokTypeId,
-            short_stId: short_stId,
-             markPrice: markPrice,
-            feePerSide: feePerSide,
-          feeAddrOwner: owner
-          }));
-    }
+    // function takePay(
+    //     uint256 tokTypeId,
+    //     uint256 short_stId,
+    //     int128  markPrice,
+    //     int256  feePerSide
+    // ) public onlyOwner() {
+    //     FuturesLib.takePay(ld, std,
+    //       StructLib.TakePayArgs({
+    //          tokTypeId: tokTypeId,
+    //         short_stId: short_stId,
+    //          markPrice: markPrice,
+    //         feePerSide: feePerSide,
+    //       feeAddrOwner: owner
+    //       }));
+    // }
 
     function takePay2(
         uint256 tokTypeId,

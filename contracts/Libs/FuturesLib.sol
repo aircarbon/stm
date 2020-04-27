@@ -6,7 +6,7 @@ import "../Interfaces/StructLib.sol";
 library FuturesLib {
     event FutureOpenInterest(address indexed long, address indexed short, uint256 shortStId, uint256 tokTypeId, uint256 qty, uint256 price);
     event SetInitialMargin(uint256 tokenTypeId, address indexed ledgerOwner, uint16 initMarginBips);
-    event TakePay(address indexed from, address indexed to, uint256 delta, uint256 done, address indexed feeTo, uint256 otmFee, uint256 itmFee, uint256 feeCcyId);
+    //event TakePay(address indexed from, address indexed to, uint256 delta, uint256 done, address indexed feeTo, uint256 otmFee, uint256 itmFee, uint256 feeCcyId);
     event TakePay2(address indexed from, address indexed to, uint256 ccyId, uint256 delta, uint256 done, uint256 fee);
 
     event Combine(address indexed to, uint256 masterStId, uint256 countTokensCombined);
@@ -68,15 +68,20 @@ library FuturesLib {
         StructLib.transferCcy(ld, StructLib.TransferCcyArgs({ from: a.ledger_A, to: owner, ccyTypeId: std._tt_ft[a.tokTypeId].refCcyId, amount: uint256(v.fee), transferType: StructLib.TransferType.ExchangeFee }));
         StructLib.transferCcy(ld, StructLib.TransferCcyArgs({ from: a.ledger_B, to: owner, ccyTypeId: std._tt_ft[a.tokTypeId].refCcyId, amount: uint256(v.fee), transferType: StructLib.TransferType.ExchangeFee }));
 
-        // calculate margin requirements
-        v.marginRequired_A = calcPosMargin(ld, std, a.ledger_A, a.tokTypeId, a.qty_A, int128(a.price));
-        v.marginRequired_B = calcPosMargin(ld, std, a.ledger_B, a.tokTypeId, a.qty_B, int128(a.price));
+        // get current position(s) size -- ## might be a better/faster way of doing this, maybe something like:
+        // int64 currentQty_A = tokenTypeQtyOnledger(ld, a.tokTypeId, a.ledger_A);
+        // int64 currentQty_B = tokenTypeQtyOnledger(ld, a.tokTypeId, a.ledger_B);
+        // // ...and then inc/dec the reserve amount
 
-        // apply margin
-        v.newReserved_A = ld._ledger[a.ledger_A].ccyType_reserved[std._tt_ft[a.tokTypeId].refCcyId] + v.marginRequired_A;
-        v.newReserved_B = ld._ledger[a.ledger_B].ccyType_reserved[std._tt_ft[a.tokTypeId].refCcyId] + v.marginRequired_B;
-        StructLib.setReservedCcy(ld, ctd, a.ledger_A, std._tt_ft[a.tokTypeId].refCcyId, v.newReserved_A); // will revert if insufficient
-        StructLib.setReservedCcy(ld, ctd, a.ledger_B, std._tt_ft[a.tokTypeId].refCcyId, v.newReserved_B);
+        // calculate margin requirements for this position
+        // v.marginRequired_A = calcPosMargin(ld, std, a.ledger_A, a.tokTypeId, a.qty_A, int128(a.price));
+        // v.marginRequired_B = calcPosMargin(ld, std, a.ledger_B, a.tokTypeId, a.qty_B, int128(a.price));
+
+        // // apply margin: assign reserved value
+        // v.newReserved_A = ld._ledger[a.ledger_A].ccyType_reserved[std._tt_ft[a.tokTypeId].refCcyId] + v.marginRequired_A;
+        // v.newReserved_B = ld._ledger[a.ledger_B].ccyType_reserved[std._tt_ft[a.tokTypeId].refCcyId] + v.marginRequired_B;
+        // StructLib.setReservedCcy(ld, ctd, a.ledger_A, std._tt_ft[a.tokTypeId].refCcyId, v.newReserved_A); // will revert if insufficient
+        // StructLib.setReservedCcy(ld, ctd, a.ledger_B, std._tt_ft[a.tokTypeId].refCcyId, v.newReserved_B);
 
         // create ledger entries as required
         StructLib.initLedgerIfNew(ld, a.ledger_A);
@@ -108,6 +113,10 @@ library FuturesLib {
         ld._ledger[a.ledger_A].tokenType_stIds[a.tokTypeId].push(v.newId_A);
         ld._ledger[a.ledger_B].tokenType_stIds[a.tokTypeId].push(v.newId_B);
 
+        // update/set margin reserved amount - will revert if insufficient
+        setReservedAllFtPos(ld, std, ctd, a.ledger_A);
+        setReservedAllFtPos(ld, std, ctd, a.ledger_B);
+
         if (a.qty_A > 0)
             emit FutureOpenInterest(a.ledger_A, a.ledger_B, ld._tokens_currentMax_id - 1, a.tokTypeId, uint256(a.qty_A), uint256(a.price));
         else
@@ -115,107 +124,108 @@ library FuturesLib {
     }
 
     //
+    // pair-wise marking: deprecated/broken by pos-combine
     // PUBLIC - SETTLEMENT: take & pay - v1 - position pair, bilateral balanced
     //
-    struct TakePayVars {
-        StructLib.PackedSt st;
-        int256 delta;
-        int256 bal;
-        int256 fee;
-        int256 take;
-    }
-    function takePay(
-        StructLib.LedgerStruct storage ld,
-        StructLib.StTypesStruct storage std,
-        StructLib.TakePayArgs memory a
-    ) public {
+    // struct TakePayVars {
+    //     StructLib.PackedSt st;
+    //     int256 delta;
+    //     int256 bal;
+    //     int256 fee;
+    //     int256 take;
+    // }
+    // function takePay(
+    //     StructLib.LedgerStruct storage ld,
+    //     StructLib.StTypesStruct storage std,
+    //     StructLib.TakePayArgs memory a
+    // ) public {
 
-        // #### need to change from bilateral model to unilateral????
-        // i.e. all OTM swept to central store, then all ITM swept from store (FIFO) ... more gas cost!
+    //     // #### need to change from bilateral model to unilateral????
+    //     // i.e. all OTM swept to central store, then all ITM swept from store (FIFO) ... more gas cost!
 
-        // #### id+1 assumption is broken by posCombine -- so for sure we remove from here, once we switch to unilateral model
+    //     // #### id+1 assumption is broken by posCombine -- so for sure we remove from here, once we switch to unilateral model
 
-        // #### id+1 assumption usage in ft_job...?
+    //     // #### id+1 assumption usage in ft_job...?
 
-        // ...todo? - recalculate margin requirement (calcPosMargin()) - i.e. allow changes of FT var-margin on open positions...
+    //     // ...todo? - recalculate margin requirement (calcPosMargin()) - i.e. allow changes of FT var-margin on open positions...
 
-        //require(a.tokTypeId >= 0 && a.tokTypeId <= std._tt_Count, "Bad tokTypeId");
-        require(std._tt_Settle[a.tokTypeId] == StructLib.SettlementType.FUTURE, "Bad token settlement type");
-        StructLib.FutureTokenTypeArgs storage fta = std._tt_ft[a.tokTypeId];
-        //require(fta.contractSize > 0, "Unexpected token type FutureTokenTypeArgs");
+    //     //require(a.tokTypeId >= 0 && a.tokTypeId <= std._tt_Count, "Bad tokTypeId");
+    //     require(std._tt_Settle[a.tokTypeId] == StructLib.SettlementType.FUTURE, "Bad token settlement type");
+    //     StructLib.FutureTokenTypeArgs storage fta = std._tt_ft[a.tokTypeId];
+    //     //require(fta.contractSize > 0, "Unexpected token type FutureTokenTypeArgs");
 
-        //uint256 long_stId = a.short_stId + 1;
+    //     //uint256 long_stId = a.short_stId + 1;
 
-        StructLib.PackedSt storage shortSt = ld._sts[a.short_stId];
-        //require(shortSt.batchId == 0 && shortSt.ft_price != 0, "Bad (unexpected data) on explicit short token");
-        require(shortSt.currentQty < 0, "Bad (non-short quantity) on explicit short token");
-        //require(shortSt.ft_ledgerOwner != address(0x0), "Bad token ledger owner on explicit short token");
+    //     StructLib.PackedSt storage shortSt = ld._sts[a.short_stId];
+    //     //require(shortSt.batchId == 0 && shortSt.ft_price != 0, "Bad (unexpected data) on explicit short token");
+    //     require(shortSt.currentQty < 0, "Bad (non-short quantity) on explicit short token");
+    //     //require(shortSt.ft_ledgerOwner != address(0x0), "Bad token ledger owner on explicit short token");
 
-        StructLib.PackedSt storage longSt = ld._sts[a.short_stId + 1];
-        require(longSt.batchId == 0 && longSt.ft_price != 0, "Bad (unexpected data) on implied long token");
-        //require(longSt.currentQty > 0, "Bad (non-short quantity) on implied long token");
-        //require(longSt.ft_ledgerOwner != address(0x0), "Bad token ledger owner on implied long token");
+    //     StructLib.PackedSt storage longSt = ld._sts[a.short_stId + 1];
+    //     require(longSt.batchId == 0 && longSt.ft_price != 0, "Bad (unexpected data) on implied long token");
+    //     //require(longSt.currentQty > 0, "Bad (non-short quantity) on implied long token");
+    //     //require(longSt.ft_ledgerOwner != address(0x0), "Bad token ledger owner on implied long token");
 
-        require(a.markPrice >= 0, "Bad markPrice"); // allow zero for marking
+    //     require(a.markPrice >= 0, "Bad markPrice"); // allow zero for marking
 
-        // require(tokenExistsOnLedger(ld, a.tokTypeId, shortSt.ft_ledgerOwner, a.short_stId), "Bad or missing ledger token type on explicit short token");
-        // require(tokenExistsOnLedger(ld, a.tokTypeId, longSt.ft_ledgerOwner, a.short_stId + 1), "Bad or missing ledger token type on implied long token");
+    //     // require(tokenExistsOnLedger(ld, a.tokTypeId, shortSt.ft_ledgerOwner, a.short_stId), "Bad or missing ledger token type on explicit short token");
+    //     // require(tokenExistsOnLedger(ld, a.tokTypeId, longSt.ft_ledgerOwner, a.short_stId + 1), "Bad or missing ledger token type on implied long token");
 
-        require(a.feePerSide >= 0, "Bad feePerSide");
+    //     require(a.feePerSide >= 0, "Bad feePerSide");
 
-        // get delta each side
-        int256 short_Delta = calcTakePay(fta, shortSt, a.markPrice, shortSt.ft_lastMarkPrice);
-        int256 long_Delta = calcTakePay(fta, longSt, a.markPrice, longSt.ft_lastMarkPrice); // (gas - could only use short side's last mark price)
-        //require(short_Delta + long_Delta == 0, "Unexpected net delta short/long");
+    //     // get delta each side
+    //     int256 short_Delta = calcTakePay(fta, shortSt, a.markPrice, shortSt.ft_lastMarkPrice);
+    //     int256 long_Delta = calcTakePay(fta, longSt, a.markPrice, longSt.ft_lastMarkPrice); // (gas - could only use short side's last mark price)
+    //     //require(short_Delta + long_Delta == 0, "Unexpected net delta short/long");
 
-        // get OTM/ITM sides
-        TakePayVars memory itm;
-        TakePayVars memory otm;
-        if (short_Delta == long_Delta || short_Delta > 0) {
-            itm = TakePayVars({ st: shortSt, delta: short_Delta, bal: ld._ledger[shortSt.ft_ledgerOwner].ccyType_balance[fta.refCcyId], fee: 0, take: 0 });
-            otm = TakePayVars({  st: longSt, delta: long_Delta,  bal: ld._ledger[longSt.ft_ledgerOwner].ccyType_balance[fta.refCcyId],  fee: 0, take: 0 });
-        }
-        else {
-            itm = TakePayVars({  st: longSt, delta: long_Delta,  bal: ld._ledger[longSt.ft_ledgerOwner].ccyType_balance[fta.refCcyId],  fee: 0, take: 0 });
-            otm = TakePayVars({ st: shortSt, delta: short_Delta, bal: ld._ledger[shortSt.ft_ledgerOwner].ccyType_balance[fta.refCcyId], fee: 0, take: 0 });
-        }
+    //     // get OTM/ITM sides
+    //     TakePayVars memory itm;
+    //     TakePayVars memory otm;
+    //     if (short_Delta == long_Delta || short_Delta > 0) {
+    //         itm = TakePayVars({ st: shortSt, delta: short_Delta, bal: ld._ledger[shortSt.ft_ledgerOwner].ccyType_balance[fta.refCcyId], fee: 0, take: 0 });
+    //         otm = TakePayVars({  st: longSt, delta: long_Delta,  bal: ld._ledger[longSt.ft_ledgerOwner].ccyType_balance[fta.refCcyId],  fee: 0, take: 0 });
+    //     }
+    //     else {
+    //         itm = TakePayVars({  st: longSt, delta: long_Delta,  bal: ld._ledger[longSt.ft_ledgerOwner].ccyType_balance[fta.refCcyId],  fee: 0, take: 0 });
+    //         otm = TakePayVars({ st: shortSt, delta: short_Delta, bal: ld._ledger[shortSt.ft_ledgerOwner].ccyType_balance[fta.refCcyId], fee: 0, take: 0 });
+    //     }
 
-        // apply settlement fees
-        otm.fee = otm.bal >= a.feePerSide ? a.feePerSide : 0;
-        itm.fee = itm.bal >= a.feePerSide ? a.feePerSide : 0;
-        if (otm.fee + itm.fee > 0) {
-            ld._ledger[a.feeAddrOwner].ccyType_balance[fta.refCcyId] += otm.fee + itm.fee;
+    //     // apply settlement fees
+    //     otm.fee = otm.bal >= a.feePerSide ? a.feePerSide : 0;
+    //     itm.fee = itm.bal >= a.feePerSide ? a.feePerSide : 0;
+    //     if (otm.fee + itm.fee > 0) {
+    //         ld._ledger[a.feeAddrOwner].ccyType_balance[fta.refCcyId] += otm.fee + itm.fee;
 
-            StructLib.emitTransferedLedgerCcy(StructLib.TransferCcyArgs({
-                from: otm.st.ft_ledgerOwner, to: a.feeAddrOwner, ccyTypeId: fta.refCcyId, amount: uint256(otm.fee), transferType: StructLib.TransferType.TakePayFee }));
+    //         StructLib.emitTransferedLedgerCcy(StructLib.TransferCcyArgs({
+    //             from: otm.st.ft_ledgerOwner, to: a.feeAddrOwner, ccyTypeId: fta.refCcyId, amount: uint256(otm.fee), transferType: StructLib.TransferType.TakePayFee }));
 
-            StructLib.emitTransferedLedgerCcy(StructLib.TransferCcyArgs({
-                from: itm.st.ft_ledgerOwner, to: a.feeAddrOwner, ccyTypeId: fta.refCcyId, amount: uint256(itm.fee), transferType: StructLib.TransferType.TakePayFee }));
-        }
-        otm.bal -= otm.fee;
-        itm.bal -= itm.fee;
+    //         StructLib.emitTransferedLedgerCcy(StructLib.TransferCcyArgs({
+    //             from: itm.st.ft_ledgerOwner, to: a.feeAddrOwner, ccyTypeId: fta.refCcyId, amount: uint256(itm.fee), transferType: StructLib.TransferType.TakePayFee }));
+    //     }
+    //     otm.bal -= otm.fee;
+    //     itm.bal -= itm.fee;
 
-        // update last mark price
-        // (gas - we could only update & use the short side's last price; but at the cost of weakening the validation on combineFtPos)
-        shortSt.ft_lastMarkPrice = a.markPrice;
-        longSt.ft_lastMarkPrice = a.markPrice; // (gas - could remove [with changes in combineFtPos validation])
+    //     // update last mark price
+    //     // (gas - we could only update & use the short side's last price; but at the cost of weakening the validation on combineFtPos)
+    //     shortSt.ft_lastMarkPrice = a.markPrice;
+    //     longSt.ft_lastMarkPrice = a.markPrice; // (gas - could remove [with changes in combineFtPos validation])
 
-        // cap OTM side at physical balance
-        otm.take = otm.delta * -1;
-        if (otm.take > otm.bal) {
-            otm.take = otm.bal;
-        }
+    //     // cap OTM side at physical balance
+    //     otm.take = otm.delta * -1;
+    //     if (otm.take > otm.bal) {
+    //         otm.take = otm.bal;
+    //     }
 
-        // apply take/pay currency movement
-        // NOTE: balanced
-        ld._ledger[otm.st.ft_ledgerOwner].ccyType_balance[fta.refCcyId] = otm.bal - (otm.take);
-        ld._ledger[itm.st.ft_ledgerOwner].ccyType_balance[fta.refCcyId] = itm.bal + (otm.take);
+    //     // apply take/pay currency movement
+    //     // NOTE: balanced
+    //     ld._ledger[otm.st.ft_ledgerOwner].ccyType_balance[fta.refCcyId] = otm.bal - (otm.take);
+    //     ld._ledger[itm.st.ft_ledgerOwner].ccyType_balance[fta.refCcyId] = itm.bal + (otm.take);
 
-        StructLib.emitTransferedLedgerCcy(StructLib.TransferCcyArgs({
-           from: otm.st.ft_ledgerOwner, to: itm.st.ft_ledgerOwner, ccyTypeId: fta.refCcyId, amount: uint256(otm.take), transferType: StructLib.TransferType.TakePay }));
+    //     StructLib.emitTransferedLedgerCcy(StructLib.TransferCcyArgs({
+    //        from: otm.st.ft_ledgerOwner, to: itm.st.ft_ledgerOwner, ccyTypeId: fta.refCcyId, amount: uint256(otm.take), transferType: StructLib.TransferType.TakePay }));
 
-        emit TakePay(otm.st.ft_ledgerOwner, itm.st.ft_ledgerOwner, uint256(itm.delta), uint256(otm.take), a.feeAddrOwner, uint256(otm.fee), uint256(itm.fee), fta.refCcyId);
-    }
+    //     emit TakePay(otm.st.ft_ledgerOwner, itm.st.ft_ledgerOwner, uint256(itm.delta), uint256(otm.take), a.feeAddrOwner, uint256(otm.fee), uint256(itm.fee), fta.refCcyId);
+    // }
 
     //
     // PUBLIC - SETTLEMENT: take & pay - v2 - central sweeping, unilateral unbalanced
@@ -399,6 +409,63 @@ library FuturesLib {
         return false;
     }
 
+    // checks if the supplied token of supplied type is present on the supplied ledger entry
+    function tokenTypeQtyOnledger(
+        StructLib.LedgerStruct storage ld,
+        uint256 tokTypeId,
+        address ledgerOwner
+    ) private view returns(int64) {
+        int64 totQty;
+        for (uint256 x = 0; x < ld._ledger[ledgerOwner].tokenType_stIds[tokTypeId].length ; x++) {
+            uint256 ftId = ld._ledger[ledgerOwner].tokenType_stIds[tokTypeId][x];
+            StructLib.PackedSt storage st = ld._sts[ftId];
+            totQty += st.currentQty;
+        }
+        return totQty;
+    }
+
+    // sets the total reserved margin amount for all open positions
+    event dbg1(uint256 tokTypeId, address addr, int256 totMargin, int64 qty, int128 price);
+    function setReservedAllFtPos(
+        StructLib.LedgerStruct storage ld,
+        StructLib.StTypesStruct storage std,
+        StructLib.CcyTypesStruct storage ctd,
+        address ledgerOwner
+    ) private {
+        int256[32/*MAX_CCYS*/ + 1] memory ccyId_newRes; // 1-based
+
+        // walk future positions
+        for (uint256 tokTypeId = 1; tokTypeId <= std._tt_Count; tokTypeId++) {
+            if (std._tt_Settle[tokTypeId] == StructLib.SettlementType.FUTURE) {
+
+                // get aggregate position for this future type
+                int64 totQtyNet;
+                int64 totQtyAbs;
+                int128 totPriceQtyAbs;
+                for (uint256 x = 0; x < ld._ledger[ledgerOwner].tokenType_stIds[tokTypeId].length ; x++) {
+                    uint256 ftId = ld._ledger[ledgerOwner].tokenType_stIds[tokTypeId][x];
+                    StructLib.PackedSt storage st = ld._sts[ftId];
+                    totQtyNet += st.currentQty;
+                    totQtyAbs += abs64(st.currentQty);
+                    totPriceQtyAbs += abs64(st.currentQty) * st.ft_price;
+                }
+
+                // get margin requirement for the aggregate position
+                int128 avgPrice = totQtyAbs != 0 ? totPriceQtyAbs / totQtyAbs : 0;
+                int256 totMargin = calcPosMargin(ld, std, ledgerOwner, tokTypeId, int256(totQtyNet), avgPrice);
+                //emit dbg1(tokTypeId, ledgerOwner, totMargin, totQtyNet, avgPrice);
+
+                // increment reserve amount for this FT's ref ccy
+                ccyId_newRes[std._tt_ft[tokTypeId].refCcyId] += abs256(totMargin);
+            }
+        }
+
+        // set reserved margin amount per ccy type
+        for (uint256 ccyTypeId = 1; ccyTypeId <= ctd._ct_Count; ccyTypeId++) {
+            StructLib.setReservedCcy(ld, ctd, ledgerOwner, ccyTypeId, ccyId_newRes[ccyTypeId]); // will revert if insufficient
+        }
+    }
+
     // return margin required for the given position
     function calcPosMargin(
         StructLib.LedgerStruct storage ld,
@@ -420,7 +487,10 @@ library FuturesLib {
         return (((int256(totMargin)
             * 1000000/*increase precision*/)
                 / 10000/*basis points*/)
-                * (std._tt_ft[tokTypeId].contractSize * (abs256(posSize)) * price)/*notional*/
+                * (std._tt_ft[tokTypeId].contractSize * (
+                    //abs256(posSize)
+                    posSize // **** NO ABS -- WE NEED TO NET OFF MARGINS ACROSS LONG AND SHORT POSITIONS (in setReservedAllFtPos)
+                ) * price)/*notional*/
             ) / 1000000/*decrease precision*/;
     }
 

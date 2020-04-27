@@ -17,6 +17,7 @@ library CcyLib {
         uint16 decimals)
     public {
         require(ld.contractType == StructLib.ContractType.COMMODITY, "Bad cashflow request");
+        require(ctd._ct_Count < 32/*MAX_CCYS*/, "Too many currencies");
 
         for (uint256 ccyTypeId = 1; ccyTypeId <= ctd._ct_Count; ccyTypeId++) {
             require(keccak256(abi.encodePacked(ctd._ct_Ccy[ccyTypeId].name)) != keccak256(abi.encodePacked(name)), "Currency type name already exists");

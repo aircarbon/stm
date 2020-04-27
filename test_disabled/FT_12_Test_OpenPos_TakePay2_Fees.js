@@ -76,12 +76,12 @@ contract("StMaster", accounts => {
         const short = await futuresHelper.takePay2({ stm, accounts, tokTypeId: usdFT.id, stId: SHORT_STID, markPrice: LAST_PRICE.add(DELTA_P), feePerSide: FEE_PER_SIDE });
         //truffleAssert.prettyPrintEmittedEvents(short.tx);
         truffleAssert.eventEmitted(short.tx, 'TakePay2', ev => ev.delta.isZero() && ev.done.isZero());
-        //await CONST.logGas(web3, short.tx, `unilateral null take/pay (short)`);
+        await CONST.logGas(web3, short.tx, `unilateral NULL SHORT take/pay`);
 
         const long = await futuresHelper.takePay2({ stm, accounts, tokTypeId: usdFT.id, stId: LONG_STID, markPrice: LAST_PRICE.add(DELTA_P), feePerSide: FEE_PER_SIDE });
         //truffleAssert.prettyPrintEmittedEvents(long.tx);
         truffleAssert.eventEmitted(long.tx, 'TakePay2', ev => ev.delta.isZero() && ev.done.isZero());
-        //await CONST.logGas(web3, long.tx, `unilateral null take/pay (long)`);
+        await CONST.logGas(web3, long.tx, `unilateral NULL LONG take/pay`);
     });
 
     // ORDERED: partial-cap on take
@@ -98,14 +98,14 @@ contract("StMaster", accounts => {
         const long = await futuresHelper.takePay2({ stm, accounts, tokTypeId: usdFT.id, stId: LONG_STID, markPrice: LAST_PRICE, feePerSide: FEE_PER_SIDE });
         //truffleAssert.prettyPrintEmittedEvents(long.tx);
         truffleAssert.eventEmitted(long.tx, 'TakePay2', ev => ev.delta == DELTA.toString() && ev.done.eq(PARTIAL));
-        //await CONST.logGas(web3, long.tx, `unilateral capped OTM take`);
+        await CONST.logGas(web3, long.tx, `unilateral capped OTM LONG take`);
 
         // SHORT - ITM, uncapped
         await stm.fund(usdFT.ft.refCcyId, DELTA.sub(PARTIAL).sub(FEE_PER_SIDE), accounts[0]); // fund central owner minimum requred to supply ITM
         const short = await futuresHelper.takePay2({ stm, accounts, tokTypeId: usdFT.id, stId: SHORT_STID, markPrice: LAST_PRICE, feePerSide: FEE_PER_SIDE });
         //truffleAssert.prettyPrintEmittedEvents(short.tx);
         truffleAssert.eventEmitted(short.tx, 'TakePay2', ev => ev.delta == DELTA.toString() && ev.done == DELTA.toString());
-        //await CONST.logGas(web3, short.tx, `unilateral uncapped ITM pay`);
+        await CONST.logGas(web3, short.tx, `unilateral uncapped ITM SHORT pay`);
     });
     it(`FT unilateral take/pay w/ fees - should apply fees and cap OTM when insufficient available (short OTM, long ITM)`, async () => {
         const DELTA_P = new BN(+20);
@@ -120,14 +120,14 @@ contract("StMaster", accounts => {
         const otm = await futuresHelper.takePay2({ stm, accounts, tokTypeId: usdFT.id, stId: SHORT_STID, markPrice: LAST_PRICE, feePerSide: FEE_PER_SIDE });
         //truffleAssert.prettyPrintEmittedEvents(otm.tx);
         truffleAssert.eventEmitted(otm.tx, 'TakePay2', ev => ev.delta == DELTA.toString() && ev.done.eq(PARTIAL));
-        //await CONST.logGas(web3, otm.tx, `unilateral capped OTM take`);
+        await CONST.logGas(web3, otm.tx, `unilateral capped OTM SHORT take`);
 
         // LONG - ITM, uncapped
         await stm.fund(usdFT.ft.refCcyId, DELTA.sub(PARTIAL).sub(FEE_PER_SIDE), accounts[0]); // fund central owner minimum requred to supply ITM
         const itm = await futuresHelper.takePay2({ stm, accounts, tokTypeId: usdFT.id, stId: LONG_STID, markPrice: LAST_PRICE, feePerSide: FEE_PER_SIDE });
         //truffleAssert.prettyPrintEmittedEvents(itm.tx);
         truffleAssert.eventEmitted(itm.tx, 'TakePay2', ev => ev.delta == DELTA.toString() && ev.done == DELTA.toString());
-        //await CONST.logGas(web3, itm.tx, `unilateral uncapped ITM pay`);
+        await CONST.logGas(web3, itm.tx, `unilateral uncapped ITM LONG pay`);
     });    
 
     // ORDERED: no cap on take
@@ -143,13 +143,13 @@ contract("StMaster", accounts => {
         const long = await futuresHelper.takePay2({ stm, accounts, tokTypeId: usdFT.id, stId: LONG_STID, markPrice: LAST_PRICE, feePerSide: FEE_PER_SIDE });
         //truffleAssert.prettyPrintEmittedEvents(long.tx);
         truffleAssert.eventEmitted(long.tx, 'TakePay2', ev => ev.delta == DELTA.toString() && ev.done == DELTA.toString());
-        //await CONST.logGas(web3, long.tx, `unilateral capped OTM take`);
+        await CONST.logGas(web3, long.tx, `unilateral no cap on OTM LONG take`);
 
         // SHORT - ITM, uncapped
         const short = await futuresHelper.takePay2({ stm, accounts, tokTypeId: usdFT.id, stId: SHORT_STID, markPrice: LAST_PRICE, feePerSide: FEE_PER_SIDE });
         //truffleAssert.prettyPrintEmittedEvents(short.tx);
         truffleAssert.eventEmitted(short.tx, 'TakePay2', ev => ev.delta == DELTA.toString() && ev.done == DELTA.toString());
-        //await CONST.logGas(web3, short.tx, `unilateral uncapped ITM pay`);
+        await CONST.logGas(web3, short.tx, `unilateral uncapped ITM SHORT pay`);
     });
     it(`FT unilateral take/pay w/ fees - should apply fees with no cap on OTM when sufficient available (short OTM, long ITM)`, async () => {
         const DELTA_P = new BN(+20);
@@ -159,16 +159,16 @@ contract("StMaster", accounts => {
         await stm.fund(usdFT.ft.refCcyId, FEE_PER_SIDE, LONG);
         await stm.fund(usdFT.ft.refCcyId, FEE_PER_SIDE, SHORT);
 
-        // SHORT - OTM, capped
+        // SHORT - OTM, no cap on take
         const otm = await futuresHelper.takePay2({ stm, accounts, tokTypeId: usdFT.id, stId: SHORT_STID, markPrice: LAST_PRICE, feePerSide: FEE_PER_SIDE });
         //truffleAssert.prettyPrintEmittedEvents(otm.tx);
         truffleAssert.eventEmitted(otm.tx, 'TakePay2', ev => ev.delta == DELTA.toString() && ev.done == DELTA.toString());
-        //await CONST.logGas(web3, otm.tx, `unilateral capped OTM take`);
+        await CONST.logGas(web3, otm.tx, `unilateral no cap on OTM SHORT take`);
 
         // LONG - ITM, uncapped
         const itm = await futuresHelper.takePay2({ stm, accounts, tokTypeId: usdFT.id, stId: LONG_STID, markPrice: LAST_PRICE, feePerSide: FEE_PER_SIDE });
         //truffleAssert.prettyPrintEmittedEvents(itm.tx);
         truffleAssert.eventEmitted(itm.tx, 'TakePay2', ev => ev.delta == DELTA.toString() && ev.done == DELTA.toString());
-        //await CONST.logGas(web3, itm.tx, `unilateral uncapped ITM pay`);
+        await CONST.logGas(web3, itm.tx, `unilateral uncapped ITM LONG pay`);
     });
 });

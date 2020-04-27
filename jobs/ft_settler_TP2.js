@@ -17,7 +17,7 @@ module.exports = {
 
         // get all positions on this FT, group by short/long
         const ledgerOwners = await CONST.web3_call('getLedgerOwners', []);
-        var shortIds = [], longIds = [];
+        var shortIds = [], longIds = [], closedIds = [];
         for (let addr of ledgerOwners) {
             const le = await CONST.web3_call('getLedgerEntry', [addr]);
             var includeAccount = true;
@@ -30,13 +30,16 @@ module.exports = {
                 //console.log(`le: ${addr} ${le.tokens.map(p2 => `{ TT: ${p2.tokenTypeId} / stId: ${p2.stId} / P: ${p2.ft_price.toString()} / M_qty:${p2.mintedQty.toString().padStart(3)} }`).join(', ')}`);
                 const shorts = le.tokens.filter(p => p.tokenTypeId == ftId && p.currentQty.lt(0));
                 const longs = le.tokens.filter(p => p.tokenTypeId == ftId && p.currentQty.gt(0));
+                const closed = le.tokens.filter(p => p.tokenTypeId == ftId && p.currentQty.eq(0));
                 shortIds = shortIds.concat(shorts.map(p => p.stId.toString()));
                 longIds = longIds.concat(longs.map(p => p.stId.toString()));
+                closedIds = closedIds.concat(closed.map(p => p.stId.toString()));
             }
         }
         // FIFO: sort id ASC
         shortIds.sort().reverse();
         longIds.sort().reverse();
+        closedIds.sort().reverse();
 
         // settle shorts
         for (shortId of shortIds) {
@@ -47,6 +50,17 @@ module.exports = {
         for (longId of longIds) {
             await runTakePay(O, ft, ftId, longId, MP, FEE_PER_SIDE, "+");
         }
+
+        // dbg - settle closed
+        for (closedId of closedIds) {
+            await runTakePay(O, ft, ftId, closedId, MP, FEE_PER_SIDE, "0");
+        }
+
+        // #####
+        // TODO: need to recalc the balance reserve amount after each new trade
+        //       (at the moment it only gets added to, once on position open -- a simple sum across all positions and assign should work fine)
+        //      then, new test case can show going from red back up to orange, when reducing a position size say from 2 to 1
+        // #####
     },
 }
 
@@ -64,6 +78,8 @@ async function runTakePay(O, ft, ftId, posId, MP, FEE_PER_SIDE, SIDE) {
     const ccy = le.ccys.find(p => p.ccyTypeId.eq(ft.ft.refCcyId)), bal = Number(ccy.balance.toString()), res = Number(ccy.reserved.toString());
     const RL = res > 0 ? bal / res : 1; // 1 = at margin/reserve 
     const data = { 'Reserve %': (RL*100).toFixed(2) };
+    const chartStr = chart(data, true, Math.ceil((Math.min(RL, 1) / 1) * 40));
+    const resStr = `[ B:$${bal.toFixed(0).padStart(5)} / R:$${res.toFixed(0).padStart(5)} ${chartStr} ]` // 👎 // ✋ // 👌
     
     // log TP info
     console.log(`${chalk.dim(`${SIDE} stId:${posId.padEnd(3)}`)}` + ` > ` +
@@ -75,9 +91,9 @@ chalk.greenBright(`)] ==> \
 ${chalk.inverse(to_desc)} ${chalk.dim(truncMiddle(ev.to, 8))} ($${Number(to_le.ccys.find(p => p.ccyTypeId.eq(ft.ft.refCcyId)).balance.toString()).toFixed(0).padEnd(8)}) `)
     // graph
     + (
-    RL < 0.8 ? chalk.red(chart(data, true, Math.ceil((Math.min(RL, 1) / 1) * 40))) :
-    RL < 1.0 ? chalk.yellow(chart(data, true, Math.ceil((Math.min(RL, 1) / 1) * 40))) :
-               chalk.green(chart(data, true,  Math.ceil((Math.min(RL, 1) / 1) * 40)))
+    RL < 0.8 ? chalk.red(resStr) : 
+    RL < 1.0 ? chalk.yellow(resStr) : 
+               chalk.green(resStr) 
     )
 );
 }
