@@ -66,12 +66,17 @@ contract("StMaster", accounts => {
         await futuresHelper.openFtPos({ stm, accounts, tokTypeId: usdFT.id, ledger_A: A, ledger_B: B, qty_A: +1, qty_B: -1, price: 100 });
         const posId_A = Number(await stm.getSecToken_countMinted()) - 0; // long, A
         const posId_B = Number(await stm.getSecToken_countMinted()) - 1; // short, B
-        await futuresHelper.takePay({ stm, accounts, tokTypeId: usdFT.id, shortStId: posId_B, markPrice: 100, feePerSide: 0 });
+        //await futuresHelper.takePay({ stm, accounts, tokTypeId: usdFT.id, shortStId: posId_B, markPrice: 100, feePerSide: 0 });
 
-        await futuresHelper.openFtPos({ stm, accounts, tokTypeId: usdFT.id, ledger_A: A, ledger_B: B, qty_A: +1, qty_B: -1, price: 102 });
+        await futuresHelper.openFtPos({ stm, accounts, tokTypeId: usdFT.id, ledger_A: A, ledger_B: B, qty_A: +1, qty_B: -1, price: 100 });
         const childId_A = Number(await stm.getSecToken_countMinted()) - 0; // long, A
         const childId_B = Number(await stm.getSecToken_countMinted()) - 1; // short, B
-        await futuresHelper.takePay({ stm, accounts, tokTypeId: usdFT.id, shortStId: childId_B, markPrice: 100, feePerSide: 0 });
+        //await futuresHelper.takePay({ stm, accounts, tokTypeId: usdFT.id, shortStId: childId_B, markPrice: 100, feePerSide: 0 });
+        
+        await  futuresHelper.takePay2({ stm, accounts, tokTypeId: usdFT.id, stId: posId_B, markPrice: 100, feePerSide: 0 });
+        await  futuresHelper.takePay2({ stm, accounts, tokTypeId: usdFT.id, stId: posId_A, markPrice: 100, feePerSide: 0 });
+        await  futuresHelper.takePay2({ stm, accounts, tokTypeId: usdFT.id, stId: childId_B, markPrice: 100, feePerSide: 0 });
+        await  futuresHelper.takePay2({ stm, accounts, tokTypeId: usdFT.id, stId: childId_A, markPrice: 100, feePerSide: 0 });
 
         // combine A side pos's
         //const lA_before = await stm.getLedgerEntry(A);
@@ -100,12 +105,16 @@ contract("StMaster", accounts => {
         await futuresHelper.openFtPos({ stm, accounts, tokTypeId: usdFT.id, ledger_A: A, ledger_B: B, qty_A: +1, qty_B: -1, price: 100 });
         const posId_A = Number(await stm.getSecToken_countMinted()) - 0; // long, A
         const posId_B = Number(await stm.getSecToken_countMinted()) - 1; // short, B
-        await futuresHelper.takePay({ stm, accounts, tokTypeId: usdFT.id, shortStId: posId_B, markPrice: 100, feePerSide: 0 });
+        //await futuresHelper.takePay({ stm, accounts, tokTypeId: usdFT.id, shortStId: posId_B, markPrice: 100, feePerSide: 0 });
+        await  futuresHelper.takePay2({ stm, accounts, tokTypeId: usdFT.id, stId: posId_B, markPrice: 100, feePerSide: 0 });
+        await  futuresHelper.takePay2({ stm, accounts, tokTypeId: usdFT.id, stId: posId_A, markPrice: 100, feePerSide: 0 });
 
-        await futuresHelper.openFtPos({ stm, accounts, tokTypeId: usdFT.id, ledger_A: A, ledger_B: B, qty_A: -1, qty_B: +1, price: 102 });
+        await futuresHelper.openFtPos({ stm, accounts, tokTypeId: usdFT.id, ledger_A: A, ledger_B: B, qty_A: -1, qty_B: +1, price: 100 });
         const childId_1B = Number(await stm.getSecToken_countMinted()) - 0; // long, B
         const childId_1A = Number(await stm.getSecToken_countMinted()) - 1; // short, A
-        await futuresHelper.takePay({ stm, accounts, tokTypeId: usdFT.id, shortStId: childId_1A, markPrice: 100, feePerSide: 0 });
+        //await futuresHelper.takePay({ stm, accounts, tokTypeId: usdFT.id, shortStId: childId_1A, markPrice: 100, feePerSide: 0 });
+        await  futuresHelper.takePay2({ stm, accounts, tokTypeId: usdFT.id, stId: childId_1A, markPrice: 100, feePerSide: 0 });
+        await  futuresHelper.takePay2({ stm, accounts, tokTypeId: usdFT.id, stId: childId_1B, markPrice: 100, feePerSide: 0 });
 
         // combine A side pos's
         //const lA_before = await stm.getLedgerEntry(A);
@@ -134,17 +143,23 @@ contract("StMaster", accounts => {
         await futuresHelper.openFtPos({ stm, accounts, tokTypeId: usdFT.id, ledger_A: A, ledger_B: B, qty_A: +2, qty_B: -2, price: 100 });
         const posId_A = Number(await stm.getSecToken_countMinted()) - 0; // long, A
         const posId_B = Number(await stm.getSecToken_countMinted()) - 1; // short, B
-        await futuresHelper.takePay({ stm, accounts, tokTypeId: usdFT.id, shortStId: posId_B, markPrice: 100, feePerSide: 0 });
+        //await futuresHelper.takePay({ stm, accounts, tokTypeId: usdFT.id, shortStId: posId_B, markPrice: 100, feePerSide: 0 });
+        await futuresHelper.takePay2({ stm, accounts, tokTypeId: usdFT.id, stId: posId_B, markPrice: 100, feePerSide: 0 });
+        await futuresHelper.takePay2({ stm, accounts, tokTypeId: usdFT.id, stId: posId_A, markPrice: 100, feePerSide: 0 });
 
-        await futuresHelper.openFtPos({ stm, accounts, tokTypeId: usdFT.id, ledger_A: A, ledger_B: B, qty_A: -1, qty_B: +1, price: 102 });
+        await futuresHelper.openFtPos({ stm, accounts, tokTypeId: usdFT.id, ledger_A: A, ledger_B: B, qty_A: -1, qty_B: +1, price: 100 });
         const childId_1B = Number(await stm.getSecToken_countMinted()) - 0; // long, B
         const childId_1A = Number(await stm.getSecToken_countMinted()) - 1; // short, A
-        await futuresHelper.takePay({ stm, accounts, tokTypeId: usdFT.id, shortStId: childId_1A, markPrice: 100, feePerSide: 0 });
+        //await futuresHelper.takePay({ stm, accounts, tokTypeId: usdFT.id, shortStId: childId_1A, markPrice: 100, feePerSide: 0 });
+        await futuresHelper.takePay2({ stm, accounts, tokTypeId: usdFT.id, stId: childId_1A, markPrice: 100, feePerSide: 0 });
+        await futuresHelper.takePay2({ stm, accounts, tokTypeId: usdFT.id, stId: childId_1B, markPrice: 100, feePerSide: 0 });
 
-        await futuresHelper.openFtPos({ stm, accounts, tokTypeId: usdFT.id, ledger_A: A, ledger_B: B, qty_A: -1, qty_B: +1, price: 102 });
+        await futuresHelper.openFtPos({ stm, accounts, tokTypeId: usdFT.id, ledger_A: A, ledger_B: B, qty_A: -1, qty_B: +1, price: 100 });
         const childId_2B = Number(await stm.getSecToken_countMinted()) - 0; // long, B
         const childId_2A = Number(await stm.getSecToken_countMinted()) - 1; // short, A
-        await futuresHelper.takePay({ stm, accounts, tokTypeId: usdFT.id, shortStId: childId_2A, markPrice: 100, feePerSide: 0 });
+        //await futuresHelper.takePay({ stm, accounts, tokTypeId: usdFT.id, shortStId: childId_2A, markPrice: 100, feePerSide: 0 });
+        await futuresHelper.takePay2({ stm, accounts, tokTypeId: usdFT.id, stId: childId_2A, markPrice: 100, feePerSide: 0 });
+        await futuresHelper.takePay2({ stm, accounts, tokTypeId: usdFT.id, stId: childId_2B, markPrice: 100, feePerSide: 0 });
 
         // combine A side pos's
         //const lA_before = await stm.getLedgerEntry(A);
@@ -196,27 +211,35 @@ contract("StMaster", accounts => {
             const A = accounts[global.TaddrNdx], B = accounts[global.TaddrNdx + 1];
             
             await futuresHelper.openFtPos({ stm, accounts, tokTypeId: usdFT.id, ledger_A: A, ledger_B: B, qty_A:  -1, qty_B:  +1, price: 100 });
-            const posId = Number(await stm.getSecToken_countMinted()) - 1;
-            await futuresHelper.takePay({ stm, accounts, tokTypeId: usdFT.id, shortStId: posId, markPrice: 100, feePerSide: 0 });
+            const shortId = Number(await stm.getSecToken_countMinted()) - 1;
+            //await futuresHelper.takePay({ stm, accounts, tokTypeId: usdFT.id, shortStId: posId, markPrice: 100, feePerSide: 0 });
+            await futuresHelper.takePay2({ stm, accounts, tokTypeId: usdFT.id, stId: shortId,   markPrice: 100, feePerSide: 0 });
+            await futuresHelper.takePay2({ stm, accounts, tokTypeId: usdFT.id, stId: shortId+1, markPrice: 100, feePerSide: 0 });
 
-            await futuresHelper.openFtPos({ stm, accounts, tokTypeId: usdFT.id, ledger_A: A, ledger_B: B, qty_A: -10, qty_B: +10, price: 102 });
-            const childId = Number(await stm.getSecToken_countMinted()) - 1;
+            await futuresHelper.openFtPos({ stm, accounts, tokTypeId: usdFT.id, ledger_A: A, ledger_B: B, qty_A: -10, qty_B: +10, price: 100 });
+            const childShortId = Number(await stm.getSecToken_countMinted()) - 1;
 
-            await stm.combineFtPos({ tokTypeId: usdFT.id, master_StId: posId, child_StIds: [childId] });
+            await stm.combineFtPos({ tokTypeId: usdFT.id, master_StId: shortId, child_StIds: [childShortId] });
         } catch (ex) { assert(ex.reason == 'Bad last mark price on child token', `unexpected: ${ex.reason}`); return; }
         assert.fail('expected contract exception');
     });
     it(`FT pos-combine - should not allow combine of futures positions for a mark mismatch position (child vs. master)`, async () => {
         try { 
             const A = accounts[global.TaddrNdx], B = accounts[global.TaddrNdx + 1];
-            
+            await stm.fund(usdFT.ft.refCcyId, CONST.millionCcy_cents, A);
+            await stm.fund(usdFT.ft.refCcyId, CONST.millionCcy_cents, B);
+
             await futuresHelper.openFtPos({ stm, accounts, tokTypeId: usdFT.id, ledger_A: A, ledger_B: B, qty_A:  -1, qty_B:  +1, price: 100 });
             const posId = Number(await stm.getSecToken_countMinted()) - 1;
-            await futuresHelper.takePay({ stm, accounts, tokTypeId: usdFT.id, shortStId: posId, markPrice: 100, feePerSide: 0 });
+            //await futuresHelper.takePay({ stm, accounts, tokTypeId: usdFT.id, shortStId: posId, markPrice: 100, feePerSide: 0 });
+            await futuresHelper.takePay2({ stm, accounts, tokTypeId: usdFT.id, stId: posId,   markPrice: 100, feePerSide: 0 });
+            await futuresHelper.takePay2({ stm, accounts, tokTypeId: usdFT.id, stId: posId+1, markPrice: 100, feePerSide: 0 });
 
             await futuresHelper.openFtPos({ stm, accounts, tokTypeId: usdFT.id, ledger_A: A, ledger_B: B, qty_A: -10, qty_B: +10, price: 102 });
             const childId = Number(await stm.getSecToken_countMinted()) - 1;
-            await futuresHelper.takePay({ stm, accounts, tokTypeId: usdFT.id, shortStId: childId, markPrice: 999, feePerSide: 0 });
+            //await futuresHelper.takePay({ stm, accounts, tokTypeId: usdFT.id, shortStId: childId, markPrice: 999, feePerSide: 0 });
+            await futuresHelper.takePay2({ stm, accounts, tokTypeId: usdFT.id, stId: childId,   markPrice: 999, feePerSide: 0 });
+            await futuresHelper.takePay2({ stm, accounts, tokTypeId: usdFT.id, stId: childId+1, markPrice: 999, feePerSide: 0 });
 
             await stm.combineFtPos({ tokTypeId: usdFT.id, master_StId: posId, child_StIds: [childId] });
         } catch (ex) { assert(ex.reason == 'Last mark price mismatch', `unexpected: ${ex.reason}`); return; }
@@ -229,9 +252,11 @@ contract("StMaster", accounts => {
             
             await futuresHelper.openFtPos({ stm, accounts, tokTypeId: usdFT.id, ledger_A: A, ledger_B: B, qty_A:  -1, qty_B:  +1, price: 100 });
             const posId = Number(await stm.getSecToken_countMinted()) - 1;
-            await futuresHelper.takePay({ stm, accounts, tokTypeId: usdFT.id, shortStId: posId, markPrice: 100, feePerSide: 0 });
+            //await futuresHelper.takePay({ stm, accounts, tokTypeId: usdFT.id, shortStId: posId, markPrice: 100, feePerSide: 0 });
+            await futuresHelper.takePay2({ stm, accounts, tokTypeId: usdFT.id, stId: posId,   markPrice: 100, feePerSide: 0 });
+            await futuresHelper.takePay2({ stm, accounts, tokTypeId: usdFT.id, stId: posId+1, markPrice: 100, feePerSide: 0 });
 
-            await futuresHelper.openFtPos({ stm, accounts, tokTypeId: usdFT.id, ledger_A: A, ledger_B: B, qty_A: -10, qty_B: +10, price: 102 });
+            await futuresHelper.openFtPos({ stm, accounts, tokTypeId: usdFT.id, ledger_A: A, ledger_B: B, qty_A: -10, qty_B: +10, price: 100 });
             const childId = Number(await stm.getSecToken_countMinted()) - 1;
 
             await stm.combineFtPos({ tokTypeId: ethFT.id, master_StId: posId, child_StIds: [childId] });
@@ -244,11 +269,15 @@ contract("StMaster", accounts => {
             
             await futuresHelper.openFtPos({ stm, accounts, tokTypeId: usdFT.id, ledger_A: A, ledger_B: B, qty_A:  -1, qty_B:  +1, price: 100 });
             const posId = Number(await stm.getSecToken_countMinted()) - 1;
-            await futuresHelper.takePay({ stm, accounts, tokTypeId: usdFT.id, shortStId: posId, markPrice: 100, feePerSide: 0 });
+            //await futuresHelper.takePay({ stm, accounts, tokTypeId: usdFT.id, shortStId: posId, markPrice: 100, feePerSide: 0 });
+            await futuresHelper.takePay2({ stm, accounts, tokTypeId: usdFT.id, stId: posId,   markPrice: 100, feePerSide: 0 });
+            await futuresHelper.takePay2({ stm, accounts, tokTypeId: usdFT.id, stId: posId+1, markPrice: 100, feePerSide: 0 });
 
-            await futuresHelper.openFtPos({ stm, accounts, tokTypeId: ethFT.id, ledger_A: A, ledger_B: B, qty_A: -10, qty_B: +10, price: 102 });
+            await futuresHelper.openFtPos({ stm, accounts, tokTypeId: ethFT.id, ledger_A: A, ledger_B: B, qty_A: -10, qty_B: +10, price: 100 });
             const childId = Number(await stm.getSecToken_countMinted()) - 1;
-            await futuresHelper.takePay({ stm, accounts, tokTypeId: ethFT.id, shortStId: childId, markPrice: 100, feePerSide: 0 });
+            //await futuresHelper.takePay({ stm, accounts, tokTypeId: ethFT.id, shortStId: childId, markPrice: 100, feePerSide: 0 });
+            await futuresHelper.takePay2({ stm, accounts, tokTypeId: usdFT.id, stId: childId,   markPrice: 100, feePerSide: 0 });
+            await futuresHelper.takePay2({ stm, accounts, tokTypeId: usdFT.id, stId: childId+1, markPrice: 100, feePerSide: 0 });
 
             await stm.combineFtPos({ tokTypeId: usdFT.id, master_StId: posId, child_StIds: [childId] });
         } catch (ex) { assert(ex.reason == 'Bad or missing ledger token type on child token', `unexpected: ${ex.reason}`); return; }
@@ -261,9 +290,11 @@ contract("StMaster", accounts => {
             
             await futuresHelper.openFtPos({ stm, accounts, tokTypeId: usdFT.id, ledger_A: A, ledger_B: B, qty_A:  -1, qty_B:  +1, price: 100 });
             const posId = Number(await stm.getSecToken_countMinted()) - 1;
-            await futuresHelper.takePay({ stm, accounts, tokTypeId: usdFT.id, shortStId: posId, markPrice: 100, feePerSide: 0 });
+            //await futuresHelper.takePay({ stm, accounts, tokTypeId: usdFT.id, shortStId: posId, markPrice: 100, feePerSide: 0 });
+            await futuresHelper.takePay2({ stm, accounts, tokTypeId: usdFT.id, stId: posId,   markPrice: 100, feePerSide: 0 });
+            await futuresHelper.takePay2({ stm, accounts, tokTypeId: usdFT.id, stId: posId+1, markPrice: 100, feePerSide: 0 });
 
-            await futuresHelper.openFtPos({ stm, accounts, tokTypeId: usdFT.id, ledger_A: accounts[0], ledger_B: B, qty_A: -10, qty_B: +10, price: 102 });
+            await futuresHelper.openFtPos({ stm, accounts, tokTypeId: usdFT.id, ledger_A: accounts[0], ledger_B: B, qty_A: -10, qty_B: +10, price: 100 });
             const childId = Number(await stm.getSecToken_countMinted()) - 1;
 
             await stm.combineFtPos({ tokTypeId: usdFT.id, master_StId: posId, child_StIds: [childId] });

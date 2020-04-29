@@ -13,7 +13,7 @@
         "migrate": "rimraf -rf ./build/contracts && truffle migrate --network development --reset",
         "console": "truffle console",
         "dev": "truffle develop",
-        "ft": "cross-env WEB3_NETWORK_ID=888 node ./jobs/ft_job TEST_3"
+        "ft": "cross-env WEB3_NETWORK_ID=888 node ./jobs/ft_job TEST_2"
     },
     "keywords": [],
     "license": "MIT",

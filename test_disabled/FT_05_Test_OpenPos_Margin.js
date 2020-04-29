@@ -150,9 +150,9 @@ contract("StMaster", accounts => {
         // A: -1 / B: +1
         const y = await futuresHelper.openFtPos({ stm, accounts, tokTypeId: usdFT.id, ledger_A: A, ledger_B: B, qty_A: POS_QTY.neg(), qty_B: POS_QTY,
             price: CONTRACT_PRICE.mul(new BN(3)) });
-        console.log(y.ledger_A.ccys.find(p => p.ccyTypeId == usdFT.ft.refCcyId));
-        console.log(y.ledger_B.ccys.find(p => p.ccyTypeId == usdFT.ft.refCcyId));
-        truffleAssert.prettyPrintEmittedEvents(y.tx);
+        //console.log(y.ledger_A.ccys.find(p => p.ccyTypeId == usdFT.ft.refCcyId));
+        //console.log(y.ledger_B.ccys.find(p => p.ccyTypeId == usdFT.ft.refCcyId));
+        //truffleAssert.prettyPrintEmittedEvents(y.tx);
         assert(new BN(y.ledger_A.ccys.find(p => p.ccyTypeId == usdFT.ft.refCcyId).reserved).isZero(), 'unexpected reserve ledger A (closed position)');
         assert(new BN(y.ledger_B.ccys.find(p => p.ccyTypeId == usdFT.ft.refCcyId).reserved).isZero(), 'unexpected reserve ledger B (new position)');
     }),
@@ -182,7 +182,7 @@ contract("StMaster", accounts => {
             price: CONTRACT_PRICE.mul(new BN(3)) });
         //console.log(y.ledger_A.ccys.find(p => p.ccyTypeId == usdFT.ft.refCcyId));
         //console.log(y.ledger_B.ccys.find(p => p.ccyTypeId == usdFT.ft.refCcyId));
-        truffleAssert.prettyPrintEmittedEvents(y.tx);
+        //truffleAssert.prettyPrintEmittedEvents(y.tx);
         assert(new BN(y.ledger_A.ccys.find(p => p.ccyTypeId == usdFT.ft.refCcyId).reserved).isZero(), 'unexpected reserve ledger A (closed position)');
         assert(new BN(y.ledger_B.ccys.find(p => p.ccyTypeId == usdFT.ft.refCcyId).reserved).eq(POS_MARGIN.mul(new BN(3))), 'unexpected reserve ledger B (new position)');
     }),

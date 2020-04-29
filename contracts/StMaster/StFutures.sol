@@ -37,19 +37,47 @@ FUTURES - notes 26/MAR/2020
 (2) SETTLE_JOB (off-chain) - POS-PAIR SETTLER... (caps ITM-pay at OTM-take: delta/default is handled off-chain...)
   (2.1) done: TakeOrPay [2 updates: LMP + CcyBalance] -- use (MP - LMP) or (MP - P) when LMP == -1
   (2.2) done: Combine (auto-burn/shrink) - should only ever be ONE net ST per FT-type after TakeOrPay
+  (2.3) done: ReCalc margin - on openFtPos
 
-  ******
-  (2.2.1) >>> RECALC MARGIN -- WIP (new test for closing/reducing/adding position affecting reserved...)
-  ******
+  Thom, Bill & Tom review 29th Apr ...
+  ================================
+  >>> TODO: FT fees per contract --> want at account level... <<<
+
+  >>> TODO: intra-day risk management --> need to be able to alter var-margin intraday, and recalc margins on all open positions <-- [i.e. triggering margin calls in response to market vol]
+       >> results in recalc of margin for all positions on the product: ++ new method() in SC...
+
+  >>> TODO: unrealizedPL ---> new field in PackedSt: just inc/dec on each settlement cycle... (probably *needed* for position-level liquiation)
+
+  >>> TODO: liquidaton v1 --> *account level* --> need a sane algo to walk position and determine which ones to liquidate...
+       >> LiquidatePos(posId) { 
+         // move the position to central (!) ...
+              (1) here, it "awaits replacement" from the order book (liquidation v2) -- probably gets deleted central when it's successfully replaced
+              (2) here, the pos does *not* participate in takePay any more: ITMs are short their dues, until/unless the is REPLACED
+
+         // move the reserve cash amount *for that position* to central ... >> MOVE HOW MUCH?? impossible to know how much is remaining "due to that position"
+              ?? could move init_margin ... it's a known amount?
+              >> it's the "liquidation loss" amount, in effect??
+
+        bottom line: we would profit *substantially* (to the tune of init_margin ?== liquidation_loss) from the liquidation (assuming we cover/replace the position)...
+
+       }
+     
+     .... OR CAN LIQUIDATE ALL ?! --> much simpler!
+
+  ================================
+
+ old: 
 
   ***** BIFURFACTION POINT: ARE WE CCP, I.E. GUARANTEEING ITM PAYOUTS? if *NOT* then probably don't need to liquidate positions at all ?! *****
     if going with "capped futures" then for sure we want a single simple view of "TOTAL LONG RESERVE LIQUIDITY" vs "TOTAL SHORT RESERVE LIQUIDITY"
     AND a view of how much is ahead of us in the queue for payout...
 
-  (2.3) LiquidatePositions...??
+  (2.4) LiquidatePositions...??
       done vs delta: this captures LIQUIDATED POSITION OBLIGATIONS (ITM side to be made whole somehow off-chain...)
       >>> i.e. LIQUIDATION is a NOP...! POSITIONS STAY OPEN AND OUTPUT { DONE=0, DELTA=X }...
       then, all that remains (?) is for (post-takePay, all positions) to look at which positions have balace < reserved: these are in margin-call territory...
+
+      ExPit == moving liquidated position to us, for temporary/replacement purposes
 
     PREFERRED... (SIMPLER, ELEGANT)
       they would STAY OPEN, and deplete cash all the way to zero... (done/delta starts diverging) ... 
@@ -61,7 +89,6 @@ FUTURES - notes 26/MAR/2020
         (1) gets set on positions in some ordering, when (account_balance < account_reserved * 0.5)
         (2) when set on a position, prevents the position every accumulating any ITM wins - it still produces OTM take values and outputs via delta/done
 
-
       >> ?? LIQUIDATION ?? -- reserved is currently the *total* across all positions; so liquidation would be *all positions* ???
           i.e. margin call is at account level, or position level? account level easier?!
 
@@ -71,6 +98,8 @@ FUTURES - notes 26/MAR/2020
         (a) margin-call or (b) liquidate
 
 ===
+
+older:
 
 (4) "open interest" = when first trade done on FUTURE token-type
 (5) trade mechancics are same as CASH token-type, except that:

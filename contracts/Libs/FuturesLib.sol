@@ -275,6 +275,8 @@ library FuturesLib {
                 v.take = v.bal;
             }
 
+            emit TakePay2(v.st.ft_ledgerOwner, a.feeAddrOwner, fta.refCcyId, uint256(abs256(delta)), uint256(v.take), uint256(v.fee));
+
             // take from OTM, sweep to central
             ld._ledger[v.st.ft_ledgerOwner].ccyType_balance[fta.refCcyId] = v.bal - (v.take);
             ld._ledger[a.feeAddrOwner].ccyType_balance[fta.refCcyId] += v.take + v.fee;
@@ -286,11 +288,11 @@ library FuturesLib {
             // event - settlement transfer: from OTM to central
             StructLib.emitTransferedLedgerCcy(StructLib.TransferCcyArgs({
                 from: v.st.ft_ledgerOwner, to: a.feeAddrOwner, ccyTypeId: fta.refCcyId, amount: uint256(v.fee), transferType: StructLib.TransferType.TakePayFee }));
-
-            emit TakePay2(v.st.ft_ledgerOwner, a.feeAddrOwner, fta.refCcyId, uint256(abs256(delta)), uint256(v.take), uint256(v.fee));
         }
         else if (v.delta > 0) { // *uncapped* ITM pay
             v.take = v.delta;
+
+            emit TakePay2(a.feeAddrOwner, v.st.ft_ledgerOwner, fta.refCcyId, uint256(abs256(delta)), uint256(v.take), uint256(v.fee));
 
             // NOTE:
             // prevent central going negative -- settlement of ITM positions will *fail by design* until & unless
@@ -309,10 +311,9 @@ library FuturesLib {
             // event - settlement fee: from ITM to central
             StructLib.emitTransferedLedgerCcy(StructLib.TransferCcyArgs({
                 from: v.st.ft_ledgerOwner, to: a.feeAddrOwner, ccyTypeId: fta.refCcyId, amount: uint256(v.fee), transferType: StructLib.TransferType.TakePayFee }));
-
-            emit TakePay2(a.feeAddrOwner, v.st.ft_ledgerOwner, fta.refCcyId, uint256(abs256(delta)), uint256(v.take), uint256(v.fee));
         }
         else { // null settlement
+            emit TakePay2(a.feeAddrOwner, v.st.ft_ledgerOwner, fta.refCcyId, 0, 0, uint256(v.fee));
 
             // sweep fee only to central
             ld._ledger[v.st.ft_ledgerOwner].ccyType_balance[fta.refCcyId] = v.bal;
@@ -321,8 +322,6 @@ library FuturesLib {
             // event - settlement fee: from ITM to central
             StructLib.emitTransferedLedgerCcy(StructLib.TransferCcyArgs({
                 from: v.st.ft_ledgerOwner, to: a.feeAddrOwner, ccyTypeId: fta.refCcyId, amount: uint256(v.fee), transferType: StructLib.TransferType.TakePayFee }));
-
-            emit TakePay2(a.feeAddrOwner, v.st.ft_ledgerOwner, fta.refCcyId, 0, 0, uint256(v.fee));
         }
     }
 
