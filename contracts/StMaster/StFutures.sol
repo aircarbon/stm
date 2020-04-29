@@ -17,14 +17,38 @@ import "../Libs/LedgerLib.sol";
 /*
 
 BREAKING-ISH: getLedgerEntry / LedgerCcyReturn: balance ==> { balance, reserved, } // HX+admin should limit spot BUYs to (balance-reserved)
-
 TODO: no open of positions on FT types after expiry timestamp - ** must be enforced off-chain ** (a chainlink for block->timestamp mapping could let it be done on-chain)
-
 =========
+
+=== IMPLEMENTATION:
+
+  PAUSED: Thom, Bill & Tom review 29th Apr ...
+  ================================
+  >>> TODO: FT fees per contract --> want at account level... <<<
+  >>> TODO: unrealizedPL ---> new field in PackedSt: just inc/dec on each settlement cycle... (probably *needed* for position-level liquiation)
+
+  >>> TODO: intra-day risk management --> need to be able to alter var-margin intraday, and recalc margins on all open positions <-- [i.e. triggering margin calls in response to market vol]
+       >> results in recalc of margin for all positions on the product: ++ new method() in SC...
+
+  >>> TODO: liquidation v1 -- *account level* -->
+      >> LiquidateAccount(addr)
+         // move ALL THE POSITIONS to central (!) ...
+              (1) here, it "awaits replacement" from the order book (liquidation v2) -- probably gets deleted central when it's successfully replaced
+              (2) here, the pos does *not* participate in takePay any more: ITMs are short their dues, until/unless the is REPLACED
+         // move ALL THE CASH to central (!!) ...
+
+  >>> (better/later?) liquidaton v2 ??? --> *per position* --> need a sane algo to walk position and determine which ones to liquidate...?
+       >> LiquidatePos(posId) { 
+         // move the single position to central... (as above, awaits replacement, no longer pays out or receives)
+         // move JUST THE RESERVE CASH AMOUNT *for that position* to central ... >> BUT MOVE HOW MUCH?? impossible to know how much is remaining "due to that position"
+              ?? could move init_margin ... it's a known amount ???
+              ?? or use the position PL value to calc how much is remaining of its init+var ???
+
+==================================
 
 FUTURES - notes 26/MAR/2020
 
-=== IMPLEMENTATION:
+done: 
 
 (0) ADD FT
   (0.2) done: needs reference ccy to be assigned also in FT type
@@ -38,33 +62,6 @@ FUTURES - notes 26/MAR/2020
   (2.1) done: TakeOrPay [2 updates: LMP + CcyBalance] -- use (MP - LMP) or (MP - P) when LMP == -1
   (2.2) done: Combine (auto-burn/shrink) - should only ever be ONE net ST per FT-type after TakeOrPay
   (2.3) done: ReCalc margin - on openFtPos
-
-  Thom, Bill & Tom review 29th Apr ...
-  ================================
-  >>> TODO: FT fees per contract --> want at account level... <<<
-
-  >>> TODO: intra-day risk management --> need to be able to alter var-margin intraday, and recalc margins on all open positions <-- [i.e. triggering margin calls in response to market vol]
-       >> results in recalc of margin for all positions on the product: ++ new method() in SC...
-
-  >>> TODO: unrealizedPL ---> new field in PackedSt: just inc/dec on each settlement cycle... (probably *needed* for position-level liquiation)
-
-  >>> TODO: liquidaton v1 --> *account level* --> need a sane algo to walk position and determine which ones to liquidate...
-       >> LiquidatePos(posId) { 
-         // move the position to central (!) ...
-              (1) here, it "awaits replacement" from the order book (liquidation v2) -- probably gets deleted central when it's successfully replaced
-              (2) here, the pos does *not* participate in takePay any more: ITMs are short their dues, until/unless the is REPLACED
-
-         // move the reserve cash amount *for that position* to central ... >> MOVE HOW MUCH?? impossible to know how much is remaining "due to that position"
-              ?? could move init_margin ... it's a known amount?
-              >> it's the "liquidation loss" amount, in effect??
-
-        bottom line: we would profit *substantially* (to the tune of init_margin ?== liquidation_loss) from the liquidation (assuming we cover/replace the position)...
-
-       }
-     
-     .... OR CAN LIQUIDATE ALL ?! --> much simpler!
-
-  ================================
 
  old: 
 
