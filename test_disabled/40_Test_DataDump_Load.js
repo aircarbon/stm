@@ -261,7 +261,11 @@ contract("StMaster", accounts => {
 
             if (entryOwner != accounts[0]) {
                 // FT - override initial margin
-                await stm_cur.setInitMargin_TokType(FT.id, entryOwner, j+1);
+                await stm_cur.initMarginOverride(FT.id, entryOwner, j+1);
+                curHash = await checkHashUpdate(curHash);
+
+                // FT - override fee per contract
+                await stm_cur.feePerContractOverride(FT.id, entryOwner, j+42);
                 curHash = await checkHashUpdate(curHash);
 
                 // FT - open futures position
@@ -341,8 +345,9 @@ contract("StMaster", accounts => {
             // set ledger spot token fees
             for (p of curToks.tokenTypes.filter(p => p.settlementType == CONST.settlementType.SPOT)) await stm_new.setFee_TokType(p.id, curEntryOwner, (await stm_cur.getFee(CONST.getFeeType.TOK, p.id, curEntryOwner)));
 
-            // set ledger future token margin overrides
-            for (p of curToks.tokenTypes.filter(p => p.settlementType == CONST.settlementType.FUTURE)) await stm_new.setInitMargin_TokType(p.id, curEntryOwner, (await stm_cur.getInitMargin(p.id, curEntryOwner)));
+            // set ledger futures overrides (init-margin & fee-per-contract)
+            for (p of curToks.tokenTypes.filter(p => p.settlementType == CONST.settlementType.FUTURE)) await stm_new.initMarginOverride(p.id, curEntryOwner, (await stm_cur.getInitMarginOverride(p.id, curEntryOwner)));
+            for (p of curToks.tokenTypes.filter(p => p.settlementType == CONST.settlementType.FUTURE)) await stm_new.feePerContractOverride(p.id, curEntryOwner, (await stm_cur.getFeePerContractOverride(p.id, curEntryOwner)));
 
             // add tokens to ledger
             for (let p of curEntry.tokens) {

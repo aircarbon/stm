@@ -112,8 +112,9 @@ library LedgerLib {
                     ledgerHash = keccak256(abi.encodePacked(ledgerHash, hashSetFeeArgs(entry.spot_customFees.tok[stTypeId])));
                 }
 
-                // hash future-type ledger initial margin override
+                // hash future-type ledger overrides (init-margin, and fee-per-contract)
                 ledgerHash = keccak256(abi.encodePacked(ledgerHash, entry.ft_initMarginBips[stTypeId]));
+                ledgerHash = keccak256(abi.encodePacked(ledgerHash, entry.ft_feePerContract[stTypeId]));
             }
 
             // hash ledger currency balances & custom fees

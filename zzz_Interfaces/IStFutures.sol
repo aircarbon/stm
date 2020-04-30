@@ -29,7 +29,7 @@ import "../Libs/LedgerLib.sol";
      * @param tokTypeId The token type ID of the future on which to set the override - must have settlement type of FUTURE
      * @param initMarginBips The initial margin to set, in basis points - must be <= than 10000
      */
-    function setInitMargin_TokType(uint256 tokTypeId, address ledgerOwner, uint16 initMarginBips)
+    function initMarginOverride(uint256 tokTypeId, address ledgerOwner, uint16 initMarginBips)
     public onlyOwner() onlyWhenReadWrite() { revert("Not implemented"); }
 
     /**
@@ -46,6 +46,6 @@ import "../Libs/LedgerLib.sol";
      * @param ledgerOwner The ledger address for which to get the initial margin override
      * @param tokTypeId The token type ID of the future on which to get the override - must have settlement type of FUTURE
      */
-    function getInitMargin(uint256 tokTypeId, address ledgerOwner)
+    function getInitMarginOverride(uint256 tokTypeId, address ledgerOwner)
     external view returns (uint16) { revert("Not implemented"); }
 }

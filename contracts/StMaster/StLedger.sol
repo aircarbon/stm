@@ -5,8 +5,8 @@ pragma experimental ABIEncoderV2;
 
 import "./Owned.sol";
 
-import "../Libs/LedgerLib.sol";
 import "../Interfaces/StructLib.sol";
+import "../Libs/LedgerLib.sol";
 import "../Libs/TokenLib.sol";
 
 contract StLedger is //IStLedger,
@@ -24,11 +24,11 @@ contract StLedger is //IStLedger,
         TokenLib.addSecTokenType(ld, std, ctd, name, settlementType, ft);
     }
 
+    // #### TODO - move to StFutures...
     function setFuture_VariationMargin(uint256 tokenTypeId, uint16 varMarginBips)
     public onlyOwner() onlyWhenReadWrite() {
-        TokenLib.setFuture_VariationMargin(std, tokenTypeId, varMarginBips);
+        TokenLib.setFuture_VariationMargin(std, tokenTypeId, varMarginBips); // ### recalc all open pos margin/reserve; needs to be batched (job) - re. gas limits
     }
-
     function setFuture_FeePerContract(uint256 tokenTypeId, uint128 feePerContract)
     public onlyOwner() onlyWhenReadWrite() {
         TokenLib.setFuture_FeePerContract(std, tokenTypeId, feePerContract);

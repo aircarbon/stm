@@ -24,8 +24,10 @@ TODO: no open of positions on FT types after expiry timestamp - ** must be enfor
 
   PAUSED: Thom, Bill & Tom review 29th Apr ...
   ================================
-  >>> TODO: FT fees per contract --> want at account level... <<<
+
   >>> TODO: unrealizedPL ---> new field in PackedSt: just inc/dec on each settlement cycle... (probably *needed* for position-level liquiation)
+
+  >>> TODO: FT fees per contract --> want at account level... <<<
 
   >>> TODO: intra-day risk management --> need to be able to alter var-margin intraday, and recalc margins on all open positions <-- [i.e. triggering margin calls in response to market vol]
        >> results in recalc of margin for all positions on the product: ++ new method() in SC...
@@ -131,34 +133,36 @@ contract StFutures is Owned,
     //IStFutures,
     StLedger, StFees, StErc20, StPayable {
 
+    // set initial margin - ledger override
+    function initMarginOverride(
+        uint256 tokTypeId,
+        address ledgerOwner,
+        uint16  initMarginBips)
+    public onlyOwner() onlyWhenReadWrite() {
+        FuturesLib.initMarginOverride(ld, std, tokTypeId, ledgerOwner, initMarginBips);
+    }
+
+    // set fee per contract - ledger override
+    function feePerContractOverride(
+        uint256 tokTypeId,
+        address ledgerOwner,
+        uint128 feePerContract)
+    public onlyOwner() onlyWhenReadWrite() {
+        FuturesLib.feePerContractOverride(ld, std, tokTypeId, ledgerOwner, feePerContract);
+    }
+
     function openFtPos(StructLib.FuturesPositionArgs memory a)
     public onlyOwner() onlyWhenReadWrite() {
         FuturesLib.openFtPos(ld, std, ctd, a, owner);
     }
 
-    function setInitMargin_TokType(
-        uint256 tokTypeId,
-        address ledgerOwner,
-        uint16  initMarginBips)
-    public onlyOwner() onlyWhenReadWrite() {
-        FuturesLib.setInitMargin_TokType(ld, std, ledgerOwner, tokTypeId, initMarginBips);
-    }
-    
-    // SETTLEMENT CYCLE: TakePay + Combine
-    // function takePay(
+    // ##### set var margin - per product   // ALREADY EXISTS! setFuture_VariationMargin()....
+    // function updateVarMargin(  
     //     uint256 tokTypeId,
-    //     uint256 short_stId,
-    //     int128  markPrice,
-    //     int256  feePerSide
-    // ) public onlyOwner() {
-    //     FuturesLib.takePay(ld, std,
-    //       StructLib.TakePayArgs({
-    //          tokTypeId: tokTypeId,
-    //         short_stId: short_stId,
-    //          markPrice: markPrice,
-    //         feePerSide: feePerSide,
-    //       feeAddrOwner: owner
-    //       }));
+    //     uint16  varMarginBips)
+    // public onlyOwner() {
+    //     // TODO: needs to *re-calc* any open position reserves...
+    //     //...
     // }
 
     function takePay2(
@@ -179,12 +183,16 @@ contract StFutures is Owned,
 
     function combineFtPos(StructLib.CombinePositionArgs memory a)
     public onlyOwner() {
-      FuturesLib.combineFtPos(ld, std, a);
+        FuturesLib.combineFtPos(ld, std, a);
     }
 
     // VIEWS
-    function getInitMargin(uint256 tokTypeId, address ledgerOwner)
+    function getInitMarginOverride(uint256 tokTypeId, address ledgerOwner)
     external view returns (uint16) {
         return ld._ledger[ledgerOwner].ft_initMarginBips[tokTypeId];
+    }
+    function getFeePerContractOverride(uint256 tokTypeId, address ledgerOwner)
+    external view returns (uint128) {
+        return ld._ledger[ledgerOwner].ft_feePerContract[tokTypeId];
     }
 }

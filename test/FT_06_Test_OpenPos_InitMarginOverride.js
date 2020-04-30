@@ -43,7 +43,7 @@ contract("StMaster", accounts => {
     });
 
     beforeEach(async () => {
-        global.TaddrNdx++;
+        global.TaddrNdx += 2;
         if (CONST.logTestAccountUsage)
             console.log(`addrNdx: ${global.TaddrNdx} - contract @ ${stm.address} (owner: ${accounts[0]})`);
     });
@@ -55,8 +55,8 @@ contract("StMaster", accounts => {
         await stm.setFuture_FeePerContract(usdFT.id, FEE_PER_CONTRACT);
         await stm.setFuture_VariationMargin(usdFT.id, 50); // 0.5%
 
-        const setInitMarginTx_A = stm.setInitMargin_TokType(usdFT.id, A, 25); // 0.25%
-        const setInitMarginTx_B = stm.setInitMargin_TokType(usdFT.id, B, 25); // 0.25%
+        const setInitMarginTx_A = stm.initMarginOverride(usdFT.id, A, 25); // 0.25%
+        const setInitMarginTx_B = stm.initMarginOverride(usdFT.id, B, 25); // 0.25%
 
         const NOTIONAL = new BN(usdFT.ft.contractSize).mul(POS_QTY).mul(CONTRACT_PRICE);
 
@@ -80,10 +80,71 @@ contract("StMaster", accounts => {
         await CONST.logGas(web3, x.tx, `Open futures position (USD)`);
     });
 
+    it(`FT init margin override - should be able to override initial margin for a ledger entry (A)`, async () => {
+        const A = accounts[global.TaddrNdx], B = accounts[global.TaddrNdx + 1];
+        
+        const FEE_PER_CONTRACT = new BN(1), POS_QTY = new BN(1), CONTRACT_PRICE = new BN(1);
+        await stm.setFuture_FeePerContract(usdFT.id, FEE_PER_CONTRACT);
+        await stm.setFuture_VariationMargin(usdFT.id, 50); // 0.5%
+
+        const setInitMarginTx_A = stm.initMarginOverride(usdFT.id, A, 25); // 0.25%
+
+        const NOTIONAL = new BN(usdFT.ft.contractSize).mul(POS_QTY).mul(CONTRACT_PRICE);
+
+        const POS_MARGIN_A = (((new BN(75) // total margin, bips - 0.75%
+                             .mul(new BN(1000000))).div(new BN(10000))).mul(NOTIONAL)).div(new BN(1000000));
+        const CHECK_A = Math.floor(Number(NOTIONAL) * 0.0075);
+        assert(CHECK_A == POS_MARGIN_A);
+
+        const POS_MARGIN_B = (((new BN(1049) // total margin, bips - 10.49%
+                             .mul(new BN(1000000))).div(new BN(10000))).mul(NOTIONAL)).div(new BN(1000000));
+        const CHECK_B = Math.floor(Number(NOTIONAL) * 0.1049);
+        assert(CHECK_B == POS_MARGIN_B);
+
+        const MIN_BALANCE_A = FEE_PER_CONTRACT.mul(POS_QTY).add(new BN(POS_MARGIN_A));
+        const MIN_BALANCE_B = FEE_PER_CONTRACT.mul(POS_QTY).add(new BN(POS_MARGIN_B));
+        await stm.fund(usdFT.ft.refCcyId, MIN_BALANCE_A.toString(), A);
+        await stm.fund(usdFT.ft.refCcyId, MIN_BALANCE_B.toString(), B);
+        const x = await futuresHelper.openFtPos({ stm, accounts, tokTypeId: usdFT.id, ledger_A: A, ledger_B: B, qty_A: POS_QTY, qty_B: POS_QTY.neg(), price: CONTRACT_PRICE });
+        assert(new BN(x.ledger_A.ccys.find(p => p.ccyTypeId == usdFT.ft.refCcyId).reserved).eq(POS_MARGIN_A), 'unexpected reserve ledger A');
+        assert(new BN(x.ledger_B.ccys.find(p => p.ccyTypeId == usdFT.ft.refCcyId).reserved).eq(POS_MARGIN_B), 'unexpected reserve ledger B');
+        //await CONST.logGas(web3, x.tx, `Open futures position (USD)`);   
+    });
+    it(`FT init margin override - should be able to override initial margin for a ledger entry (B)`, async () => {
+        const A = accounts[global.TaddrNdx], B = accounts[global.TaddrNdx + 1];
+        
+        const FEE_PER_CONTRACT = new BN(1), POS_QTY = new BN(1), CONTRACT_PRICE = new BN(1);
+        await stm.setFuture_FeePerContract(usdFT.id, FEE_PER_CONTRACT);
+        await stm.setFuture_VariationMargin(usdFT.id, 50); // 0.5%
+
+        const setInitMarginTx_B = stm.initMarginOverride(usdFT.id, B, 25); // 0.25%
+
+        const NOTIONAL = new BN(usdFT.ft.contractSize).mul(POS_QTY).mul(CONTRACT_PRICE);
+
+        const POS_MARGIN_A = (((new BN(1049) // total margin, bips - 10.49%
+                             .mul(new BN(1000000))).div(new BN(10000))).mul(NOTIONAL)).div(new BN(1000000));
+        const POS_MARGIN_B = (((new BN(75) // total margin, bips - 0.75%
+                             .mul(new BN(1000000))).div(new BN(10000))).mul(NOTIONAL)).div(new BN(1000000));
+
+        const CHECK_A = Math.floor(Number(NOTIONAL) * 0.1049);
+        const CHECK_B = Math.floor(Number(NOTIONAL) * 0.0075);
+        assert(CHECK_A == POS_MARGIN_A);
+        assert(CHECK_B == POS_MARGIN_B);
+
+        const MIN_BALANCE_A = FEE_PER_CONTRACT.mul(POS_QTY).add(new BN(POS_MARGIN_A));
+        const MIN_BALANCE_B = FEE_PER_CONTRACT.mul(POS_QTY).add(new BN(POS_MARGIN_B));
+        await stm.fund(usdFT.ft.refCcyId, MIN_BALANCE_A.toString(), A);
+        await stm.fund(usdFT.ft.refCcyId, MIN_BALANCE_B.toString(), B);
+        const x = await futuresHelper.openFtPos({ stm, accounts, tokTypeId: usdFT.id, ledger_A: A, ledger_B: B, qty_A: POS_QTY, qty_B: POS_QTY.neg(), price: CONTRACT_PRICE });
+        assert(new BN(x.ledger_A.ccys.find(p => p.ccyTypeId == usdFT.ft.refCcyId).reserved).eq(POS_MARGIN_A), 'unexpected reserve ledger A');
+        assert(new BN(x.ledger_B.ccys.find(p => p.ccyTypeId == usdFT.ft.refCcyId).reserved).eq(POS_MARGIN_B), 'unexpected reserve ledger B');
+        //await CONST.logGas(web3, x.tx, `Open futures position (USD)`);   
+    });
+
     it(`FT init margin override - should not allow non-owner to override initial margin`, async () => {
         const A = accounts[global.TaddrNdx];
         try {
-            const x = await stm.setInitMargin_TokType(usdFT.id, A, 1000, { from: accounts[1] });
+            const x = await stm.initMarginOverride(usdFT.id, A, 1000, { from: accounts[1] });
         }
         catch (ex) { assert(ex.reason == 'Restricted', `unexpected: ${ex.reason}`); return; }
         assert.fail('expected contract exception');
@@ -92,7 +153,7 @@ contract("StMaster", accounts => {
         const A = accounts[global.TaddrNdx];
         try {
             await stm.setReadOnly(true, { from: accounts[0] });
-            const x = await stm.setInitMargin_TokType(usdFT.id, A, 1000);
+            const x = await stm.initMarginOverride(usdFT.id, A, 1000);
             await stm.setReadOnly(false, { from: accounts[0] });
         }
         catch (ex) { 
@@ -103,19 +164,10 @@ contract("StMaster", accounts => {
         assert.fail('expected contract exception');
     });
 
-    // //it(`FT init margin override - should not be able to override initial margin for an invalid (non-existent) ledger entry`, async () => {
-    // //    const X = accounts[global.TaddrNdx];
-    // //    try {
-    // //        const x = await stm.setInitMargin_TokType(usdFT.id, X, 1000);
-    // //    }
-    // //    catch (ex) { assert(ex.reason == 'Bad ledgerOwner', `unexpected: ${ex.reason}`); return; }
-    // //    assert.fail('expected contract exception');
-    // //});
-
     it(`FT init margin override - should not be able to override initial margin for an invalid (non-existent) token type`, async () => {
         const A = accounts[global.TaddrNdx]; await stm.fund(CONST.ccyType.USD, 100, A);
         try {
-            const x = await stm.setInitMargin_TokType(0xdeaddead, A, 1001);
+            const x = await stm.initMarginOverride(0xdeaddead, A, 1001);
         }
         catch (ex) { assert(ex.reason == 'Bad tokTypeId', `unexpected: ${ex.reason}`); return; }
         assert.fail('expected contract exception');
@@ -123,7 +175,7 @@ contract("StMaster", accounts => {
     it(`FT init margin override - should not be able to override initial margin for an invalid (non-future) token type`, async () => {
         const A = accounts[global.TaddrNdx]; await stm.fund(CONST.ccyType.USD, 100, A);
         try {
-            const x = await stm.setInitMargin_TokType(CONST.tokenType.CORSIA, A, 1002);
+            const x = await stm.initMarginOverride(CONST.tokenType.CORSIA, A, 1002);
         }
         catch (ex) { assert(ex.reason == 'Bad token settlement type', `unexpected: ${ex.reason}`); return; }
         assert.fail('expected contract exception');
@@ -132,7 +184,7 @@ contract("StMaster", accounts => {
     it(`FT init margin override - should not be able to set an invalid (> 10000) initial margin override for a futures token type`, async () => {
         const A = accounts[global.TaddrNdx]; await stm.fund(CONST.ccyType.USD, 100, A);
         try {
-            const x = await stm.setInitMargin_TokType(usdFT.id, A, 10001);
+            const x = await stm.initMarginOverride(usdFT.id, A, 10001);
         }
         catch (ex) { assert(ex.reason == 'Bad total margin', `unexpected: ${ex.reason}`); return; }
         assert.fail('expected contract exception');
@@ -140,8 +192,8 @@ contract("StMaster", accounts => {
     it(`FT init margin override - should not be able to set an invalid (< 0) initial margin override on a futures token type`, async () => {
         const A = accounts[global.TaddrNdx]; await stm.fund(CONST.ccyType.USD, 100, A);
         try {
-            const x = await stm.setInitMargin_TokType(usdFT.id, A, -1);
-            //console.log('test:', (await stm.getInitMargin(usdFT.id, A)).toString());
+            const x = await stm.initMarginOverride(usdFT.id, A, -1);
+            //console.log('test:', (await stm.getInitMarginOverride(usdFT.id, A)).toString());
         }
         catch (ex) { assert(ex.reason == 'Bad total margin', `unexpected: ${ex.reason}`); return; }
         assert.fail('expected contract exception');

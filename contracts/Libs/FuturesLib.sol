@@ -5,20 +5,21 @@ import "../Interfaces/StructLib.sol";
 
 library FuturesLib {
     event FutureOpenInterest(address indexed long, address indexed short, uint256 shortStId, uint256 tokTypeId, uint256 qty, uint256 price);
-    event SetInitialMargin(uint256 tokenTypeId, address indexed ledgerOwner, uint16 initMarginBips);
+    event SetInitialMarginOverride(uint256 tokenTypeId, address indexed ledgerOwner, uint16 initMarginBips);
+    event SetFeePerContractOverride(uint256 tokenTypeId, address indexed ledgerOwner, uint128 feePerContract);
     //event TakePay(address indexed from, address indexed to, uint256 delta, uint256 done, address indexed feeTo, uint256 otmFee, uint256 itmFee, uint256 feeCcyId);
     event TakePay2(address indexed from, address indexed to, uint256 ccyId, uint256 delta, uint256 done, uint256 fee);
 
     event Combine(address indexed to, uint256 masterStId, uint256 countTokensCombined);
 
     //
-    // PUBLIC - get/set initial margin ledger override
+    // PUBLIC - initial margin ledger override
     //
-    function setInitMargin_TokType(
+    function initMarginOverride(
         StructLib.LedgerStruct storage ld,
         StructLib.StTypesStruct storage std,
-        address ledgerOwner,
         uint256 tokTypeId,
+        address ledgerOwner,
         uint16  initMarginBips
     ) public {
         require(tokTypeId >= 0 && tokTypeId <= std._tt_Count, "Bad tokTypeId");
@@ -27,7 +28,22 @@ library FuturesLib {
 
         StructLib.initLedgerIfNew(ld, ledgerOwner);
         ld._ledger[ledgerOwner].ft_initMarginBips[tokTypeId] = initMarginBips;
-        emit SetInitialMargin(tokTypeId, ledgerOwner, initMarginBips);
+        emit SetInitialMarginOverride(tokTypeId, ledgerOwner, initMarginBips);
+    }
+
+    function feePerContractOverride(
+        StructLib.LedgerStruct storage ld,
+        StructLib.StTypesStruct storage std,
+        uint256 tokTypeId,
+        address ledgerOwner,
+        uint128 feePerContract
+    ) public {
+        require(tokTypeId >= 0 && tokTypeId <= std._tt_Count, "Bad tokTypeId");
+        require(std._tt_Settle[tokTypeId] == StructLib.SettlementType.FUTURE, "Bad token settlement type");
+
+        StructLib.initLedgerIfNew(ld, ledgerOwner);
+        ld._ledger[ledgerOwner].ft_feePerContract[tokTypeId] = feePerContract;
+        emit SetFeePerContractOverride(tokTypeId, ledgerOwner, feePerContract);
     }
 
     //

@@ -54,10 +54,6 @@ contract("StMaster", accounts => {
         const FEE_PER_CONTRACT = new BN(0), POS_QTY = new BN(1), CONTRACT_PRICE = new BN(1);
         await stm.setFuture_FeePerContract(usdFT.id, FEE_PER_CONTRACT);
         
-        //await stm.setFuture_VariationMargin(usdFT.id, 50); 
-        //const setInitMarginTx_A = stm.setInitMargin_TokType(usdFT.id, A, 25);
-        //const setInitMarginTx_B = stm.setInitMargin_TokType(usdFT.id, B, 25);
-
         const NOTIONAL = new BN(usdFT.ft.contractSize).mul(POS_QTY).mul(CONTRACT_PRICE);
 
         const POS_MARGIN = (((new BN(10000)           // total margin, bips - 100%
