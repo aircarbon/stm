@@ -55,8 +55,8 @@ contract("StMaster", accounts => {
         await stm.setFuture_FeePerContract(usdFT.id, FEE_PER_CONTRACT);
         await stm.setFuture_VariationMargin(usdFT.id, 50); // 0.5%
 
-        const setInitMarginTx_A = stm.initMarginOverride(usdFT.id, A, 25); // 0.25%
-        const setInitMarginTx_B = stm.initMarginOverride(usdFT.id, B, 25); // 0.25%
+        const setInitMarginTx_A = await stm.initMarginOverride(usdFT.id, A, 25); // 0.25%
+        const setInitMarginTx_B = await stm.initMarginOverride(usdFT.id, B, 25); // 0.25%
 
         const NOTIONAL = new BN(usdFT.ft.contractSize).mul(POS_QTY).mul(CONTRACT_PRICE);
 
@@ -87,7 +87,7 @@ contract("StMaster", accounts => {
         await stm.setFuture_FeePerContract(usdFT.id, FEE_PER_CONTRACT);
         await stm.setFuture_VariationMargin(usdFT.id, 50); // 0.5%
 
-        const setInitMarginTx_A = stm.initMarginOverride(usdFT.id, A, 25); // 0.25%
+        const setInitMarginTx_A = await stm.initMarginOverride(usdFT.id, A, 25); // 0.25%
 
         const NOTIONAL = new BN(usdFT.ft.contractSize).mul(POS_QTY).mul(CONTRACT_PRICE);
 
@@ -117,7 +117,7 @@ contract("StMaster", accounts => {
         await stm.setFuture_FeePerContract(usdFT.id, FEE_PER_CONTRACT);
         await stm.setFuture_VariationMargin(usdFT.id, 50); // 0.5%
 
-        const setInitMarginTx_B = stm.initMarginOverride(usdFT.id, B, 25); // 0.25%
+        const setInitMarginTx_B = await stm.initMarginOverride(usdFT.id, B, 25); // 0.25%
 
         const NOTIONAL = new BN(usdFT.ft.contractSize).mul(POS_QTY).mul(CONTRACT_PRICE);
 

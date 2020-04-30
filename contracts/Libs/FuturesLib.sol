@@ -4,7 +4,7 @@ pragma experimental ABIEncoderV2;
 import "../Interfaces/StructLib.sol";
 
 library FuturesLib {
-    event FutureOpenInterest(address indexed long, address indexed short, uint256 shortStId, uint256 tokTypeId, uint256 qty, uint256 price);
+    event FutureOpenInterest(address indexed long, address indexed short, uint256 shortStId, uint256 tokTypeId, uint256 qty, uint256 price, uint256 feeLong, uint256 feeShort);
     event SetInitialMarginOverride(uint256 tokenTypeId, address indexed ledgerOwner, uint16 initMarginBips);
     event SetFeePerContractOverride(uint256 tokenTypeId, address indexed ledgerOwner, uint128 feePerContract);
     //event TakePay(address indexed from, address indexed to, uint256 delta, uint256 done, address indexed feeTo, uint256 otmFee, uint256 itmFee, uint256 feeCcyId);
@@ -51,7 +51,8 @@ library FuturesLib {
     //
     struct OpenPosVars {
         int256 posSize;
-        int256 fee;
+        int256 fee_A;
+        int256 fee_B;
         int256 marginRequired_A;
         int256 marginRequired_B;
         int256 newReserved_A;
@@ -77,12 +78,14 @@ library FuturesLib {
 
         // apply fees
         v.posSize = (a.qty_A < 0 ? a.qty_B : a.qty_A);
-        v.fee = std._tt_ft[a.tokTypeId].feePerContract * v.posSize;
-        require(v.fee >= 0, "Unexpected fee value");
-        require(StructLib.sufficientCcy(ld, a.ledger_A, std._tt_ft[a.tokTypeId].refCcyId, 0, 0, v.fee), "Insufficient currency A");
-        require(StructLib.sufficientCcy(ld, a.ledger_B, std._tt_ft[a.tokTypeId].refCcyId, 0, 0, v.fee), "Insufficient currency B");
-        StructLib.transferCcy(ld, StructLib.TransferCcyArgs({ from: a.ledger_A, to: owner, ccyTypeId: std._tt_ft[a.tokTypeId].refCcyId, amount: uint256(v.fee), transferType: StructLib.TransferType.ExchangeFee }));
-        StructLib.transferCcy(ld, StructLib.TransferCcyArgs({ from: a.ledger_B, to: owner, ccyTypeId: std._tt_ft[a.tokTypeId].refCcyId, amount: uint256(v.fee), transferType: StructLib.TransferType.ExchangeFee }));
+        v.fee_A = (ld._ledger[a.ledger_A].ft_feePerContract[a.tokTypeId] != 0 ? ld._ledger[a.ledger_A].ft_feePerContract[a.tokTypeId] : std._tt_ft[a.tokTypeId].feePerContract) * v.posSize;
+        v.fee_B = (ld._ledger[a.ledger_B].ft_feePerContract[a.tokTypeId] != 0 ? ld._ledger[a.ledger_B].ft_feePerContract[a.tokTypeId] : std._tt_ft[a.tokTypeId].feePerContract) * v.posSize;
+        require(v.fee_A >= 0, "Unexpected fee value A");
+        require(v.fee_B >= 0, "Unexpected fee value B");
+        require(StructLib.sufficientCcy(ld, a.ledger_A, std._tt_ft[a.tokTypeId].refCcyId, 0, 0, v.fee_A), "Insufficient currency A");
+        require(StructLib.sufficientCcy(ld, a.ledger_B, std._tt_ft[a.tokTypeId].refCcyId, 0, 0, v.fee_B), "Insufficient currency B");
+        StructLib.transferCcy(ld, StructLib.TransferCcyArgs({ from: a.ledger_A, to: owner, ccyTypeId: std._tt_ft[a.tokTypeId].refCcyId, amount: uint256(v.fee_A), transferType: StructLib.TransferType.ExchangeFee }));
+        StructLib.transferCcy(ld, StructLib.TransferCcyArgs({ from: a.ledger_B, to: owner, ccyTypeId: std._tt_ft[a.tokTypeId].refCcyId, amount: uint256(v.fee_B), transferType: StructLib.TransferType.ExchangeFee }));
 
         // get current position(s) size -- ## might be a better/faster way of doing this, maybe something like:
         // int64 currentQty_A = tokenTypeQtyOnledger(ld, a.tokTypeId, a.ledger_A);
@@ -134,9 +137,9 @@ library FuturesLib {
         setReservedAllFtPos(ld, std, ctd, a.ledger_B);
 
         if (a.qty_A > 0)
-            emit FutureOpenInterest(a.ledger_A, a.ledger_B, ld._tokens_currentMax_id - 1, a.tokTypeId, uint256(a.qty_A), uint256(a.price));
+            emit FutureOpenInterest(a.ledger_A, a.ledger_B, ld._tokens_currentMax_id - 1, a.tokTypeId, uint256(a.qty_A), uint256(a.price), uint256(v.fee_A), uint256(v.fee_B));
         else
-            emit FutureOpenInterest(a.ledger_B, a.ledger_A, ld._tokens_currentMax_id - 1, a.tokTypeId, uint256(a.qty_B), uint256(a.price));
+            emit FutureOpenInterest(a.ledger_B, a.ledger_A, ld._tokens_currentMax_id - 1, a.tokTypeId, uint256(a.qty_B), uint256(a.price), uint256(v.fee_B), uint256(v.fee_A));
     }
 
     //

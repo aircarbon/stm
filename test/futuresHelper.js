@@ -189,10 +189,23 @@ module.exports = {
         //console.log('ledgerB_after', ledgerB_after);
 
         // check fees paid
-        const expectedFee = new BN(st.ft.feePerContract).mul(new BN(qty_A).abs()).mul(new BN(2));
+        const fpcOverride_A = await stm.getFeePerContractOverride(tokTypeId, ledger_A);
+        const expectedFee_A = new BN((fpcOverride_A.eq(new BN(0)) ? st.ft.feePerContract : fpcOverride_A)).mul(new BN(qty_A).abs());
+        const fpcOverride_B = await stm.getFeePerContractOverride(tokTypeId, ledger_B);
+        const expectedFee_B = new BN((fpcOverride_B.eq(new BN(0)) ? st.ft.feePerContract : fpcOverride_B)).mul(new BN(qty_B).abs());
+        //console.log('expectedFee_A', expectedFee_A.toString());
+        //console.log('expectedFee_B', expectedFee_B.toString());
+        //const expectedFee = new BN(st.ft.feePerContract).mul(new BN(qty_A).abs()).mul(new BN(2));
+        const expectedFee_All = expectedFee_B.add(expectedFee_A);
         assert(new BN(ledgerO_after.ccys.find(p => p.ccyTypeId == st.ft.refCcyId).balance).sub(
-               new BN(ledgerO_before.ccys.find(p => p.ccyTypeId == st.ft.refCcyId).balance)).eq(expectedFee), "unexpected owner balance after");
+               new BN(ledgerO_before.ccys.find(p => p.ccyTypeId == st.ft.refCcyId).balance)).eq(expectedFee_All), "unexpected owner balance after");
 
+        assert(new BN(ledgerA_before.ccys.find(p => p.ccyTypeId == st.ft.refCcyId).balance).sub(
+               new BN(ledgerA_after.ccys.find(p => p.ccyTypeId == st.ft.refCcyId).balance)).eq(expectedFee_A), "unexpected A balance after");
+ 
+        assert(new BN(ledgerB_before.ccys.find(p => p.ccyTypeId == st.ft.refCcyId).balance).sub(
+               new BN(ledgerB_after.ccys.find(p => p.ccyTypeId == st.ft.refCcyId).balance)).eq(expectedFee_B), "unexpected B balance after");
+ 
         // check events
         if (qty_A > 0 && qty_B < 0) {
             truffleAssert.eventEmitted(openFtPosTx, 'FutureOpenInterest', ev =>

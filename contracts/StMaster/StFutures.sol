@@ -24,13 +24,12 @@ TODO: no open of positions on FT types after expiry timestamp - ** must be enfor
 
   PAUSED: Thom, Bill & Tom review 29th Apr ...
   ================================
+     (done: FT fees per contract --> want at account level)
 
   >>> TODO: unrealizedPL ---> new field in PackedSt: just inc/dec on each settlement cycle... (probably *needed* for position-level liquiation)
 
-  >>> TODO: FT fees per contract --> want at account level... <<<
-
   >>> TODO: intra-day risk management --> need to be able to alter var-margin intraday, and recalc margins on all open positions <-- [i.e. triggering margin calls in response to market vol]
-       >> results in recalc of margin for all positions on the product: ++ new method() in SC...
+       >>> must be a job: setFuture_VariationMargin() on product, then must recalc margin/reserve on all open positions: NEW METHOD <<<
 
   >>> TODO: liquidation v1 -- *account level* -->
       >> LiquidateAccount(addr)

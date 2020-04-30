@@ -96,7 +96,7 @@ contract StMaster
     // PayableLib events
     event IssuanceSubscribed(address indexed subscriber, address indexed issuer, uint256 weiSent, uint256 weiChange, uint256 tokensSubscribed, uint256 weiPrice);
     // FuturesLib events
-    event FutureOpenInterest(address indexed long, address indexed short, /*uint256 shortStId,*/ uint256 tokTypeId, uint256 qty, uint256 price);
+    event FutureOpenInterest(address indexed long, address indexed short, uint256 shortStId, uint256 tokTypeId, uint256 qty, uint256 price, uint256 feeLong, uint256 feeShort);
     event SetInitialMarginOverride(uint256 tokenTypeId, address indexed ledgerOwner, uint16 initMarginBips);
     //event TakePay(address indexed from, address indexed to, uint256 delta, uint256 done, address indexed feeTo, uint256 otmFee, uint256 itmFee, uint256 feeCcyId);
     event TakePay2(address indexed from, address indexed to, uint256 ccyId, uint256 delta, uint256 done, uint256 fee);
