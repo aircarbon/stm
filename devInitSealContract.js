@@ -26,7 +26,6 @@ process.env.WEB3_NETWORK_ID = Number(process.env.NETWORK_ID || 888);
       await web3_tx('whitelistMany', [[x.addr]], OWNER, OWNER_privKey);
     }
     console.groupEnd();
-'whi'
     console.group('SEALING...');
     await web3_tx('sealContract', [], OWNER, OWNER_privKey);
     console.groupEnd();
