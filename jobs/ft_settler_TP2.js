@@ -27,7 +27,6 @@ module.exports = {
                 }
             }
             if (includeAccount) {
-                //console.log(`le: ${addr} ${le.tokens.map(p2 => `{ TT: ${p2.tokenTypeId} / stId: ${p2.stId} / P: ${p2.ft_price.toString()} / M_qty:${p2.mintedQty.toString().padStart(3)} }`).join(', ')}`);
                 const shorts = le.tokens.filter(p => p.tokenTypeId == ftId && p.currentQty.lt(0));
                 const longs = le.tokens.filter(p => p.tokenTypeId == ftId && p.currentQty.gt(0));
                 const closed = le.tokens.filter(p => p.tokenTypeId == ftId && p.currentQty.eq(0));
@@ -75,14 +74,21 @@ async function runTakePay(O, ft, ftId, posId, MP, FEE_PER_SIDE, SIDE) {
 
     // graph reserved & balance
     const le = ev.to.toLowerCase() == O.addr.toLowerCase() ? from_le : to_le;
+    const le_pos = le.tokens.find(p => p.stId == posId);
     const ccy = le.ccys.find(p => p.ccyTypeId.eq(ft.ft.refCcyId)), bal = Number(ccy.balance.toString()), res = Number(ccy.reserved.toString());
     const RL = res > 0 ? bal / res : 1; // 1 = at margin/reserve 
     const data = { 'Reserve %': (RL*100).toFixed(2) };
     const chartStr = chart(data, true, Math.ceil((Math.min(RL, 1) / 1) * 40));
     const resStr = `[ B:$${bal.toFixed(0).padStart(5)} / R:$${res.toFixed(0).padStart(5)} ${chartStr} ]` // 👎 // ✋ // 👌
+    const plStr = ` PL:$${le_pos.ft_PL.toString().padEnd(8)}`
     
     // log TP info
-    console.log(`${chalk.dim(`${SIDE} stId:${posId.padEnd(3)}`)}` + ` > ` +
+    console.log(`${chalk.dim(`${SIDE} stId:${posId.padEnd(3)}`)}` + 
+    ( le_pos.ft_PL.gt(0) ? chalk.greenBright(plStr)
+    : le_pos.ft_PL.lt(0) ? chalk.redBright(plStr)
+    : chalk.gray(plStr)
+    )
++    ` > ` +
 chalk.greenBright(`\
 ${chalk.inverse(from_desc)} ${chalk.dim(truncMiddle(ev.from, 8))} ($${Number(from_le.ccys.find(p => p.ccyTypeId.eq(ft.ft.refCcyId)).balance.toString()).toFixed(0).padEnd(8)}) ==> \
 [$${Number(ev.done.toString()).toFixed(0).padStart(7)} `) +

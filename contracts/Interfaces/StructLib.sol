@@ -159,8 +159,9 @@ library StructLib {
             int64   mintedQty;
             int64   currentQty;
             int128  ft_price;
-            int128  ft_lastMarkPrice;
             address ft_ledgerOwner;
+            int128  ft_lastMarkPrice;
+            int128  ft_PL;
         }
         struct LedgerCcyReturn {
             uint256 ccyTypeId;
@@ -172,12 +173,13 @@ library StructLib {
 
     // *** PACKED SECURITY TOKEN ***
     struct PackedSt { // ** DATA_DUMP: OK
-        uint64 batchId;                                         // can be zero for "batchless" future "auto-minted" tokens; non-zero for spot tok-types
-        int64  mintedQty;                                       // existence check field: should never be non-zero
-        int64  currentQty;                                      // current (variable) unit qty in the ST (i.e. burned = currentQty - mintedQty)
-        int128 ft_price;                                        // [FUTURE types only] -- becomes average price after combining
-        int128 ft_lastMarkPrice;                                // [FUTURE types only]
+        uint64  batchId;                                        // can be zero for "batchless" future "auto-minted" tokens; non-zero for spot tok-types
+        int64   mintedQty;                                      // existence check field: should never be non-zero
+        int64   currentQty;                                     // current (variable) unit qty in the ST (i.e. burned = currentQty - mintedQty)
+        int128  ft_price;                                       // [FUTURE types only] -- becomes average price after combining
         address ft_ledgerOwner;                                 // [FUTURE types only] -- for takePay() lookup of ledger owner by ST
+        int128  ft_lastMarkPrice;                               // [FUTURE types only]
+        int128  ft_PL;                                          // [FUTURE types only] -- running total P&L
     }
         struct SecTokenReturn { // todo: drop this - use LedgerSecTokenReturn (would need tokTypeId to be packed in PackedSt struct...)
             bool    exists;                                     // for existence check by id
@@ -186,8 +188,9 @@ library StructLib {
             int256  currentQty;
             uint64  batchId;
             int128  ft_price;
-            int128  ft_lastMarkPrice;
             address ft_ledgerOwner;
+            int128  ft_lastMarkPrice;
+            int128  ft_PL;
         }
     struct PackedStTotals {
         uint80 transferedQty;

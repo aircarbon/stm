@@ -48,8 +48,6 @@ module.exports = {
               child_StIds: p.combines,
             }], O.addr, O.privKey);
             //const le_after = await CONST.web3_call('getLedgerEntry', [p.addr]);
-            //console.log(`le_before: ${p.addr} ${le_before.tokens.map(p2 => `{ TT: ${p2.tokenTypeId} / stId: ${p2.stId} / P: ${p2.ft_price.toString()} / M_qty:${p2.mintedQty.toString().padStart(3)} }`).join(', ')}`);
-            //console.log(`le_after: ${p.addr} ${le_after.tokens.map(p2 => `{ TT: ${p2.tokenTypeId} / stId: ${p2.stId} / P: ${p2.ft_price.toString()} / M_qty:${p2.mintedQty.toString().padStart(3)} }`).join(', ')}`);
 
             //console.log(evs);
             const ev = evs.find(p => p.event == 'Combine').returnValues;

@@ -4,6 +4,7 @@ const _ = require('lodash');
 const { DateTime } = require('luxon');
 
 const CONST = require('../const.js');
+const futuresHelper = require('../test/futuresHelper.js');
 
 contract("StMaster", accounts => {
     var stm_cur, stm_new;
@@ -278,7 +279,21 @@ contract("StMaster", accounts => {
                         price: j+1,
                 });
                 //truffleAssert.prettyPrintEmittedEvents(openFtPosTx);
+                // const x = await futuresHelper.openFtPos({ stm: stm_cur, accounts,
+                //     tokTypeId: FT.id,
+                //      ledger_A: entryOwner,
+                //      ledger_B: accounts[0],
+                //         qty_A: +1,
+                //         qty_B: -1,
+                //         price: j+1
+                // });
                 curHash = await checkHashUpdate(curHash);
+                const longStId = Number(await stm_cur.getSecToken_countMinted()) - 0;
+                const shortStId = Number(await stm_cur.getSecToken_countMinted()) - 1;
+
+                // FT - run one settlement cycle
+                await stm_cur.takePay2(FT.id, shortStId, j+2/*markPrice*/, 1/*feePerSide*/);
+                await stm_cur.takePay2(FT.id, longStId,  j+2/*markPrice*/, 1/*feePerSide*/);
             }
         }
     });
@@ -359,7 +374,8 @@ contract("StMaster", accounts => {
                     p.currentQty,
                     p.ft_price,
                     p.ft_lastMarkPrice,
-                    p.ft_ledgerOwner
+                    p.ft_ledgerOwner,
+                    p.ft_PL
                 );
             }
         }

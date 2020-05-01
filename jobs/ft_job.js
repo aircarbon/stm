@@ -81,7 +81,7 @@ var ledgerOwners, accounts;
         //     for (let p of ft.data.TEST_PARTICIPANTS) {
         //         const le = await CONST.web3_call('getLedgerEntry', [ p.account ], O.addr, O.privKey);
         //         console.log(chalk.blue(`PID=${p.id}`) + 
-        //             chalk.dim(` ${le.tokens.map(p2 => `{ TT: ${p2.tokenTypeId} / stId: ${p2.stId} / M_qty:${p2.mintedQty.toString().padStart(3)} }`).join(', ')}`
+        //             chalk.dim(` ${le.tokens.map(p2 => `{ #${p2.stId}/Q:${p2.mintedQty.toString().padStart(3)} }`).join(', ')}`
         //         )); //, le.tokens);
         //     }
             
@@ -98,7 +98,7 @@ var ledgerOwners, accounts;
             for (let p of ft.data.TEST_PARTICIPANTS) {
                 const le = await CONST.web3_call('getLedgerEntry', [ p.account ], O.addr, O.privKey);
                 console.log(chalk.blue(`PID=${p.id}`) + 
-                    chalk.dim(` ${le.tokens.map(p2 => `{ TT: ${p2.tokenTypeId} / stId: ${p2.stId} / M_qty:${p2.mintedQty.toString().padStart(3)} }`).join(', ')}`
+                    chalk.dim(` ${le.tokens.map(p2 => `{ #${p2.stId}/Q:${p2.mintedQty.toString().padStart(3)} }`).join(', ')}`
                 )); //, le.tokens);
             }
             
@@ -110,14 +110,6 @@ var ledgerOwners, accounts;
         }
 
         // PHASE (2) - COMBINE positions (all types, all positions)
-// TEST_2 --> no combines, no fees, end state:
-// >> T=8 << 
-// ftId=6, MP=108...
-// PID=1 { TT: 6 stId: 58 M_qty:  1 }, { TT: 6 stId: 60 M_qty:  1 }, { TT: 6 stId: 62 M_qty:  1 }
-// PID=2 { TT: 6 stId: 57 M_qty: -1 }, { TT: 6 stId: 59 M_qty: -1 }, { TT: 6 stId: 61 M_qty: -1 }
-// shortId 61 > DONE=$1000    (delta=$1000   ) ==> itm: 0x1918222F80Bb95b0E19EBB4b5f097Cd3D606A741 ($82000   ) / otm: 0xe569441CA9C45aa4F6Bf1b17A7Dd10EE595440AB ($44000   )
-// shortId 59 > DONE=$1000    (delta=$1000   ) ==> itm: 0x1918222F80Bb95b0E19EBB4b5f097Cd3D606A741 ($83000   ) / otm: 0xe569441CA9C45aa4F6Bf1b17A7Dd10EE595440AB ($43000   )
-// shortId 57 > DONE=$1000    (delta=$1000   ) ==> itm: 0x1918222F80Bb95b0E19EBB4b5f097Cd3D606A741 ($84000   ) / otm: 0xe569441CA9C45aa4F6Bf1b17A7Dd10EE595440AB ($42000   )
         for (let ft of ctx) {
             console.group();
             await Combine(ft.ftId, ft.data.TEST_PARTICIPANTS.map(p => p.account));

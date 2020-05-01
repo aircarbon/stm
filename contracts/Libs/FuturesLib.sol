@@ -273,6 +273,7 @@ library FuturesLib {
 
         // get delta
         int256 delta = calcTakePay(fta, st, a.markPrice, st.ft_lastMarkPrice);
+        require(delta <= 0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF && delta >= -0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF, "Delta overflow"); // max/min signed int128
 
         // set vars
         TakePayVars2 memory v;
@@ -284,6 +285,9 @@ library FuturesLib {
 
         // update last mark price
         st.ft_lastMarkPrice = a.markPrice;
+
+        // update running P&L total
+        st.ft_PL += (int128(v.delta) + int128(v.fee * -1));
 
         // if pos is OTM, sweep take to central + fee: cap if insufficient
         // if pos is ITM, sweep from central - fee: fail if insufficient

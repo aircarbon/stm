@@ -50,7 +50,7 @@ library LoadLib {
         StructLib.LedgerStruct storage ld,
         address ledgerEntryOwner,
         uint64 batchId, uint256 stId, uint256 tokenTypeId, int64 mintedQty, int64 currentQty,
-        int128 ft_price, int128 ft_lastMarkPrice, address ft_ledgerOwner
+        int128 ft_price, int128 ft_lastMarkPrice, address ft_ledgerOwner, int128 ft_PL
     )
     public {
         require(!ld._contractSealed, "Contract is sealed");
@@ -58,8 +58,9 @@ library LoadLib {
         ld._sts[stId].mintedQty = mintedQty;
         ld._sts[stId].currentQty = currentQty;
         ld._sts[stId].ft_price = ft_price;
-        ld._sts[stId].ft_lastMarkPrice = ft_lastMarkPrice;
         ld._sts[stId].ft_ledgerOwner = ft_ledgerOwner;
+        ld._sts[stId].ft_lastMarkPrice = ft_lastMarkPrice;
+        ld._sts[stId].ft_PL = ft_PL;
         ld._ledger[ledgerEntryOwner].tokenType_stIds[tokenTypeId].push(stId);
     }
 

@@ -34,10 +34,10 @@ contract DataLoadable is //IDataLoadable,
     function addSecToken(
         address ledgerEntryOwner,
         uint64 batchId, uint256 stId, uint256 tokenTypeId, int64 mintedQty, int64 currentQty,
-        int128 ft_price, int128 ft_lastMarkPrice, address ft_ledgerOwner
+        int128 ft_price, int128 ft_lastMarkPrice, address ft_ledgerOwner, int128 ft_PL
     ) public onlyOwner() {
         LoadLib.addSecToken(ld,
-            ledgerEntryOwner, batchId, stId, tokenTypeId, mintedQty, currentQty, ft_price, ft_lastMarkPrice, ft_ledgerOwner
+            ledgerEntryOwner, batchId, stId, tokenTypeId, mintedQty, currentQty, ft_price, ft_lastMarkPrice, ft_ledgerOwner, ft_PL
         );
     }
 

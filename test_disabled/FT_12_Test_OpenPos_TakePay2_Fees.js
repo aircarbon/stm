@@ -171,4 +171,6 @@ contract("StMaster", accounts => {
         truffleAssert.eventEmitted(itm.tx, 'TakePay2', ev => ev.delta == DELTA.toString() && ev.done == DELTA.toString());
         await CONST.logGas(web3, itm.tx, `unilateral uncapped ITM LONG pay`);
     });
+    //>>> gasUsed - unilateral no cap on OTM SHORT take: 59057 @0.000000005 ETH/gas = Ξ0.0003 ~= $0.0561
+    //>>> gasUsed - unilateral uncapped ITM LONG pay: 75938 @0.000000005 ETH/gas = Ξ0.0004 ~= $0.0721
 });
