@@ -1,12 +1,17 @@
-pragma solidity 0.5.13;
+pragma solidity >=0.4.21 <=0.6.6;
 
-contract Owned {
+//import "../Interfaces/IOwned.sol";
+
+contract Owned //is IOwned
+{
     address payable owner;
-    bool public readOnly;
+
+    bool readOnlyState;
+    function readOnly() external view returns (bool) { return readOnlyState; }
 
     constructor() public {
         owner = msg.sender;
-        readOnly = false;
+        readOnlyState = false;
     }
 
     modifier onlyOwner() {
@@ -14,20 +19,12 @@ contract Owned {
         _; // required magic
     }
     modifier onlyWhenReadWrite() {
-        require(readOnly == false, "Read-only");
+        require(readOnlyState == false, "Read-only");
         _;
     }
-    // modifier onlyWhenReadOnly() {
-    //     require(readOnly == true, "Set to read-only first");
-    //     _;
-    // }
 
-    /**
-     * @dev Sets the contract-wide read only state
-     * @param _readOnly State to set
-     */
-    function setReadOnly(bool _readOnly)
-    public onlyOwner() {
-        readOnly = _readOnly;
+    function setReadOnly(bool readOnlyNewState)
+    external onlyOwner() {
+        readOnlyState = readOnlyNewState;
     }
 }

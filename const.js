@@ -2,12 +2,13 @@ const Big = require('big.js');
 
 const Web3 = require('web3');
 const web3 = new Web3();
-//const _gasPriceEth = web3.utils.fromWei(web3.utils.toWei("20", "gwei"), 'ether');
-const _ethUsd = 150;
+const ETH_USD = 190;
 
 const bip39 = require('bip39');
 const hdkey = require('ethereumjs-wallet/hdkey');
 const EthereumJsTx = require('ethereumjs-tx');
+const chalk = require('chalk');
+const truffleAssert = require('truffle-assertions');
 
 const { db } = require('../common/dist');
 
@@ -16,11 +17,11 @@ const WEB3_GWEI_GAS_BID = '10';
 const WEB3_GAS_LIMIT = 5000000;
 
 // CFD helpers
-const nullCashflowArgs = { cashflowType: 0, 
-    //wei_maxIssuance: 0, 
+const nullCashflowArgs = { cashflowType: 0,
+    //wei_maxIssuance: 0,
     //wei_currentPrice: 0,
     term_Blks: 0, bond_bps: 0, bond_int_EveryBlks: 0 };
-const cashflowType = Object.freeze({ 
+const cashflowType = Object.freeze({
     BOND: 0,
     EQUITY: 1,
 });
@@ -33,31 +34,32 @@ const blocksFromMonths = (months) => Math.ceil(blocksFromDays(months * 30.42));
 //
 // MAIN: deployer definitions -- contract ctor() params
 //
-const contractVer = "0.95c";
+const contractVer = "0.97g";
 const contractProps = {
     COMMODITY: {
         contractVer: contractVer,
-        contractName: `AirCarbon_CORSIA_v${contractVer}`, //"SecTok_Master",
-        contractUnit: "KG",
-        contractSymbol: "CCC",
+        contractName: `AirCarbon__v${contractVer}`,
+        contractUnit: "KG", //"Ton(s)",
+        contractSymbol: "ACC",
         contractDecimals: 0,
         cashflowArgs: nullCashflowArgs,
     },
     CASHFLOW: {
         contractVer: contractVer,
-        contractName: `SingDax_CFT_v${contractVer}_1A`,
+        contractName: `SingDax_CFT__v${contractVer}_1A`,
         contractUnit: "Token(s)",
         contractSymbol: "SD1A",
         contractDecimals: 0,
         cashflowArgs: {
               cashflowType: cashflowType.BOND,
-        //wei_currentPrice: web3.utils.toWei("0.02", "ether"),
                  term_Blks: blocksFromDays(1),
                   bond_bps: 1000, // 10%
         bond_int_EveryBlks: blocksFromHours(1)
         }
     },
 };
+
+var consoleOutput = true;
 
 module.exports = {
     contractProps: contractProps,
@@ -66,18 +68,60 @@ module.exports = {
 
     nullAddr: "0x0000000000000000000000000000000000000000",
 
+    // https://docs.chain.link/docs/using-chainlink-reference-contracts
+    chainlinkAggregators: {
+        "1": { // mainnet
+            btcUsd: '0xF5fff180082d6017036B771bA883025c654BC935',
+            ethUsd: '0x79fEbF6B9F76853EDBcBc913e6aAE8232cFB9De9'
+        },
+        "3": { // ropsten
+            btcUsd: '0x882906a758207FeA9F21e0bb7d2f24E561bd0981',
+            ethUsd: '0x8468b2bDCE073A157E560AA4D9CcF6dB1DB98507'
+        },
+        "4": { // rinkeby
+            btcUsd: '0x5498BB86BC934c8D34FDA08E81D444153d0D06aD',
+            ethUsd: '0x0bF4e7bf3e1f6D6Dc29AA516A33134985cC3A5aA'
+        },
+        "888": { // dev
+            btcUsd: '0x0000000000000000000000000000000000000000',
+            ethUsd: '0x0000000000000000000000000000000000000000'
+        },
+        "889": { // dev
+            btcUsd: '0x0000000000000000000000000000000000000000',
+            ethUsd: '0x0000000000000000000000000000000000000000'
+        },
+        "890": { // dev
+            btcUsd: '0x0000000000000000000000000000000000000000',
+            ethUsd: '0x0000000000000000000000000000000000000000'
+        },
+    },
+
     getTestContextWeb3: () => getTestContextWeb3(),
-    getAccountAndKey: async (accountNdx) => getAccountAndKey(accountNdx),
-    
+    getAccountAndKey: async (accountNdx, mnemonic) => getAccountAndKey(accountNdx, mnemonic),
+
     web3_sendEthTestAddr: (sendFromNdx, sendToAddr, ethValue) => web3_sendEthTestAddr(sendFromNdx, sendToAddr, ethValue),
     web3_call: (methodName, methodArgs) => web3_call(methodName, methodArgs),
     web3_tx: (methodName, methodArgs, fromAddr, fromPrivKey, returnBeforeConfirmed) => web3_tx(methodName, methodArgs, fromAddr, fromPrivKey, returnBeforeConfirmed),
 
+    consoleOutput: (enabled) => { consoleOutput = enabled; },
+
     nullFees: {
-        fee_fixed: 0,
-        fee_percBips: 0,
-        fee_min: 0,
-        fee_max: 0,
+         ccy_mirrorFee: false,
+        ccy_perMillion: 0,
+             fee_fixed: 0,
+          fee_percBips: 0,
+               fee_min: 0,
+               fee_max: 0,
+    },
+
+    nullFutureArgs: {
+        expiryTimestamp: 0,
+        underlyerTypeId: 0,
+               refCcyId: 0,
+         initMarginBips: 0,
+          varMarginBips: 0,
+           contractSize: 0,
+         feePerContract: 0,
     },
 
     contractType: Object.freeze({
@@ -86,6 +130,12 @@ module.exports = {
     }),
 
     cashflowType: cashflowType,
+
+    settlementType: Object.freeze({
+        UNDEFINED: 0,
+        SPOT: 1,
+        FUTURE: 2,
+    }),
 
     getFeeType: Object.freeze({
         CCY: 0,
@@ -97,30 +147,38 @@ module.exports = {
         USER: 0,
 EXCHANGE_FEE: 1,
     ORIG_FEE: 2,
+     TAKEPAY: 3,
+ TAKEPAY_FEE: 4
     }),
 
     // token types (contract data)
     tokenType: Object.freeze({
-        UNFCCC: 1,
-           VCS: 2,
+          CORSIA: 1,
+          NATURE: 2,
+         PREMIUM: 3,
     }),
 
     // ccy types (contract data)
     ccyType: Object.freeze({
-        SGD: 1,
+        USD: 1,
         ETH: 2,
         BTC: 3,
-        USD: 4,
-        EUR: 5,
-        HKD: 6,
-        GBP: 7
-    }), 
+        // SGD: 4,
+        // EUR: 5,
+        // HKD: 6,
+        // GBP: 7
+    }),
 
-    // eeu kg constants
-    tonCarbon: 1000,                      // one ton carbon in kg
-     ktCarbon: 1000 * 1000,               // kiloton carbon in kg
-     mtCarbon: 1000 * 1000 * 1000,        // megaton carbon in kg
-     gtCarbon: 1000 * 1000 * 1000 * 1000, // gigaton carbon in kg
+    // eeu qty constants - tons
+    // KT_CARBON: 1000,                      // 1000 qty (tons) = 1 kiloton
+    // MT_CARBON: 1000 * 1000,               // 1^6 qty (tons) = 1 megaton
+    // GT_CARBON: 1000 * 1000 * 1000,        // 1^9 qty (tons) = 1 gigaton
+
+    // eeu qty constants - kg
+    T1_CARBON: 1000,                         //  1^3 kg =            1 ton
+    KT_CARBON: 1000 * 1000,                  //  1^6 kg = 1^3 tons = 1 kiloton
+    MT_CARBON: 1000 * 1000 * 1000,           //  1^9 kg = 1^6 tons = 1 megaton
+    GT_CARBON: 1000 * 1000 * 1000 * 1000,    // 1^12 kg = 1^9 tons = 1 gigaton
 
     // ccy constants
          oneCcy_cents: Big(1 * 100).toFixed(),
@@ -128,18 +186,17 @@ EXCHANGE_FEE: 1,
     thousandCcy_cents: Big(1000 * 100).toFixed(),
      millionCcy_cents: Big(1000 * 1000 * 100).toFixed(),
      billionCcy_cents: Big(1000).times(1000).times(1000).times(100).toFixed(),
-    thousandthEth_wei: Big(web3.utils.toWei("1", "ether") / 1000).toFixed(),                  // "1000000000000000", 
-     hundredthEth_wei: Big(web3.utils.toWei("1", "ether") / 100).toFixed(),                   // "10000000000000000", 
-         tenthEth_wei: Big(web3.utils.toWei("1", "ether") / 10).toFixed(),                    // "100000000000000000", 
-           oneEth_wei: Big(web3.utils.toWei("1", "ether")).toFixed(),                         // "1000000000000000000", 
-      thousandEth_wei: Big(web3.utils.toWei("1", "ether") * 1000).toFixed(),                  // "1000000000000000000000", 
-       millionEth_wei: Big(web3.utils.toWei("1", "ether")).times(1000).times(1000).toFixed(), // "1000000000000000000000000", 
+    thousandthEth_wei: Big(web3.utils.toWei("1", "ether") / 1000).toFixed(),                  // "1000000000000000",
+     hundredthEth_wei: Big(web3.utils.toWei("1", "ether") / 100).toFixed(),                   // "10000000000000000",
+         tenthEth_wei: Big(web3.utils.toWei("1", "ether") / 10).toFixed(),                    // "100000000000000000",
+           oneEth_wei: Big(web3.utils.toWei("1", "ether")).toFixed(),                         // "1000000000000000000",
+      thousandEth_wei: Big(web3.utils.toWei("1", "ether") * 1000).toFixed(),                  // "1000000000000000000000",
+       millionEth_wei: Big(web3.utils.toWei("1", "ether")).times(1000).times(1000).toFixed(), // "1000000000000000000000000",
      hundredthBtc_sat: Big(1000000).toFixed(),
          tenthBtc_sat: Big(10000000).toFixed(),
            oneBtc_sat: Big(100000000).toFixed(),
       thousandBtc_sat: Big(100000000).times(1000).toFixed(),
        millionBtc_sat: Big(100000000).times(1000000).toFixed(),
-
 
     // gas approx values - for cost estimations
     //gasPriceEth: _gasPriceEth,
@@ -155,7 +212,7 @@ EXCHANGE_FEE: 1,
         //console.log('actualGasPriceEth', actualGasPriceEth);
 
         const weiCost = web3Tx.gasPrice * truffleTx.receipt.gasUsed;
-        const usdCost = actualGasPriceEth * truffleTx.receipt.gasUsed * _ethUsd;
+        const usdCost = actualGasPriceEth * truffleTx.receipt.gasUsed * ETH_USD;
 
         console.log(`>>> gasUsed - ${desc}: ${truffleTx.receipt.gasUsed} @${actualGasPriceEth} ETH/gas = Ξ${(actualGasPriceEth * truffleTx.receipt.gasUsed).toFixed(4)} ~= $${(usdCost).toFixed(4)}`);
         return { usdCost, weiCost };
@@ -163,32 +220,35 @@ EXCHANGE_FEE: 1,
 };
 
 function getTestContextWeb3() {
-    const context = 
-              // DM
-              process.env.WEB3_NETWORK_ID == 888 ? { web3: new Web3('http://127.0.0.1:8545'),    ethereumTxChain: {} }
+    const context =
+        // DM
+          process.env.WEB3_NETWORK_ID == 888 ? { web3: new Web3('http://127.0.0.1:8545'),    ethereumTxChain: {} }
 
-              // Vince
-            : process.env.WEB3_NETWORK_ID == 890 ? { web3: new Web3('http://127.0.0.1:8545'),    ethereumTxChain: {} }
+        // Vince
+        : process.env.WEB3_NETWORK_ID == 890 ? { web3: new Web3('http://127.0.0.1:8545'),    ethereumTxChain: {} }
 
-              // Dung
-            : process.env.WEB3_NETWORK_ID == 889 ? { web3: new Web3('http://127.0.0.1:8545'),    ethereumTxChain: {} }
+        // Dung
+        : process.env.WEB3_NETWORK_ID == 889 ? { web3: new Web3('http://127.0.0.1:8545'),    ethereumTxChain: {} }
 
-              // Ropsten
-            : process.env.WEB3_NETWORK_ID == 3 ?  { web3: new Web3('https://ac-dev0.net:9545'),  ethereumTxChain: { chain: 'ropsten', hardfork: 'petersburg' } }
+        // Ropsten
+        : process.env.WEB3_NETWORK_ID == 3 ?   { web3: new Web3('https://ac-dev0.net:9545'), ethereumTxChain: { chain: 'ropsten', hardfork: 'petersburg' } }
 
-            : undefined;
+        // Rinkeby
+        : process.env.WEB3_NETWORK_ID == 4 ?   { web3: new Web3('https://rinkeby.infura.io/v3/93db2c7fd899496d8400e86100058297'), ethereumTxChain: { chain: 'rinkeby', hardfork: 'petersburg' } }
+
+        : undefined;
     if (!context) throw('WEB3_NETWORK_ID is not set!');
     return context;
 }
 
-async function getAccountAndKey(accountNdx) {
-    const MNEMONIC = require('./dev_mnemonic.js').MNEMONIC;
+async function getAccountAndKey(accountNdx, mnemonic) {
+    const MNEMONIC = mnemonic || require('./DEV_MNEMONIC.js').MNEMONIC;
     //console.log('MNEMONIC: ', MNEMONIC);
     const seed = await bip39.mnemonicToSeed(MNEMONIC);
     const hdk = hdkey.fromMasterSeed(seed);
     const addr_node = hdk.derivePath(`m/44'/60'/0'/0/${accountNdx}`);
     const addr = addr_node.getWallet().getAddressString();
-    const privKeyBytes = addr_node.getWallet().getPrivateKey();        
+    const privKeyBytes = addr_node.getWallet().getPrivateKey();
     //console.dir(privKeyBytes);
     const privKeyHex = privKeyBytes.toString('hex');
     //console.log('privKeyHex', privKeyHex);
@@ -199,7 +259,7 @@ async function web3_call(methodName, methodArgs) {
     const { web3, ethereumTxChain } = getTestContextWeb3();
     const contractDb = (await db.GetDeployment(process.env.WEB3_NETWORK_ID, contractProps[process.env.CONTRACT_TYPE].contractName, contractProps[process.env.CONTRACT_TYPE].contractVer)).recordset[0];
     if (!contractDb) throw(Error(`Failed to lookup contract deployment for networkId=${process.env.WEB3_NETWORK_ID}, contractName=${contractProps[process.env.CONTRACT_TYPE].contractName}, contractVer=${contractProps[process.env.CONTRACT_TYPE].contractVer}`));
-    console.log(` > CALL: [${contractDb.contract_enum} ${contractDb.contract_ver} @${contractDb.addr}] ${methodName}(${methodArgs.join()}) [networkId: ${process.env.WEB3_NETWORK_ID} - ${web3.currentProvider.host}]`);
+    if (consoleOutput) console.log(chalk.dim(` > CALL: [${contractDb.contract_enum} ${contractDb.contract_ver} @${contractDb.addr}] ${chalk.reset.blue.bgWhite(methodName + '(' + methodArgs.map(p => JSON.stringify(p)).join() + ')')}` + chalk.dim(` [networkId: ${process.env.WEB3_NETWORK_ID} - ${web3.currentProvider.host}]`)));
     var contract = new web3.eth.Contract(JSON.parse(contractDb.abi), contractDb.addr);
     const callRet = await contract.methods[methodName](...methodArgs).call();
     return callRet;
@@ -211,9 +271,31 @@ async function web3_tx(methodName, methodArgs, fromAddr, fromPrivKey, returnBefo
     if (!contractDb) throw(Error(`Failed to lookup contract deployment for networkId=${process.env.WEB3_NETWORK_ID}, contractName=${contractProps[process.env.CONTRACT_TYPE].contractName}, contractVer=${contractProps[process.env.CONTRACT_TYPE].contractVer}`));
     var contract = new web3.eth.Contract(JSON.parse(contractDb.abi), contractDb.addr);
 
+    // Error: Subscriptions are not supported with the HttpProvider.
+    // WS: https://github.com/ethereum/web3.js/issues/2661
+    // contract.events.allEvents({ 
+    //     // filter
+    // }, function (err, ev) {
+    //     console.log('callback', ev);
+    // },
+    // ).on('data', (ev) => {
+    //     console.log('data', ev);
+    // })
+    // .on('changed', (ev) => {
+    //     console.log('changed', ev);
+    // })
+    // .on('error', (ev) => {
+    //     console.log('error', ev);
+    //}
+    //);
+
+    //web3.eth.transactionConfirmationBlocks = 1;
+    //web3.transactionConfirmationBlocks = 1;
+    //console.dir(web3);
+
     // tx data
-    console.log(` > TX: [${contractDb.contract_enum} ${contractDb.contract_ver} @${contractDb.addr}] ${methodName}(${methodArgs.join()}) [networkId: ${process.env.WEB3_NETWORK_ID} - ${web3.currentProvider.host}]`);
     const nonce = await web3.eth.getTransactionCount(fromAddr, "pending");
+    if (consoleOutput) console.log(chalk.dim(` >   TX: nonce=${nonce} [${contractDb.contract_enum} ${contractDb.contract_ver} @${contractDb.addr}] ${chalk.reset.red.bgWhiteBright(methodName + '(' + methodArgs.map(p => JSON.stringify(p)).join() + ')')}` + chalk.dim(` [networkId: ${process.env.WEB3_NETWORK_ID} - ${web3.currentProvider.host}]`)));
     var paramsData = contract.methods
         [methodName](...methodArgs)
         .encodeABI();
@@ -229,7 +311,7 @@ async function web3_tx(methodName, methodArgs, fromAddr, fromPrivKey, returnBefo
 
     // estimate gas
     const gasEstimate = await web3.eth.estimateGas(txData);
-    console.log('   -> gasEstimate=', gasEstimate);
+    if (consoleOutput) console.log(chalk.dim.yellow('   -> gasEstimate=', gasEstimate));
 
     // send signed tx
     const EthereumTx = EthereumJsTx.Transaction
@@ -240,21 +322,27 @@ async function web3_tx(methodName, methodArgs, fromAddr, fromPrivKey, returnBefo
         var txHash;
         web3.eth.sendSignedTransaction(raw)
         .on("receipt", receipt => {
-            //console.log(`   => receipt`, receipt);
+            if (consoleOutput) console.log(`   => receipt`, receipt);
         })
         .once("transactionHash", hash => {
             txHash = hash;
-            console.log(`   => ${txHash} ...`);
+            if (consoleOutput) console.log(chalk.dim.yellow(`   => ${txHash} ...`));
         })
-        .once("confirmation", async (confirms) => {
-            const receipt = await web3.eth.getTransactionReceipt(txHash);
-            if (!returnBeforeConfirmed) {
-                console.log(`   => ${txHash} - ${confirms} confirm(s), receipt.gasUsed=`, receipt.gasUsed);
-                resolve(txHash);
-            }
+        .once("confirmation", async (confirms, receipt) => {
+            //const receipt = await web3.eth.getTransactionReceipt(txHash);
+            const evs = await contract.getPastEvents("allEvents", { fromBlock: receipt.blockNumber, toBlock: receipt.blockNumber });
+            //console.log('evs', evs);
+            if (consoleOutput) console.log(chalk.dim.yellow(`   => ${txHash} - ${confirms} confirm(s), receipt.gasUsed=${receipt.gasUsed} receipt.blockNumber=${receipt.blockNumber} evs=${evs.map(p => `B# ${p.blockNumber}: ${p.event}`).join(',')}`));//, JSON.stringify(receipt)));
+            // receipt.logs
+            // receipt.blockNumber
+            // receipt.blockHash
+            // receipt.transactionHash
+            //console.log('evs', evs.map(p => `B# ${p.blockNumber}: ${p.event}(${JSON.stringify(p.returnValues)})`).join('\n'));
+            resolve({ txHash, receipt, evs });
         })
         .once("error", error => {
-            console.log(`   => ## error`, error);
+            console.log(chalk.bold.red(`   => ## error`, error));
+            console.dir(error);
             reject(error);
         });
     });
@@ -267,7 +355,7 @@ async function web3_sendEthTestAddr(sendFromNdx, sendToAddr, ethValue) {
 
     // send signed tx
     const { web3, ethereumTxChain } = getTestContextWeb3();
-    console.log(` > TX web3_sendEthTestAddr: Ξ${ethValue.toString()} @ ${fromAddr} => ${sendToAddr} [networkId: ${process.env.WEB3_NETWORK_ID} - ${web3.currentProvider.host}]`);
+    if (consoleOutput) console.log(` > TX web3_sendEthTestAddr: Ξ${chalk.red.bgWhite(ethValue.toString())} @ ${chalk.red.bgWhite(fromAddr)} => ${chalk.red.bgWhite(sendToAddr)} [networkId: ${process.env.WEB3_NETWORK_ID} - ${web3.currentProvider.host}]`);
     const nonce = await web3.eth.getTransactionCount(fromAddr, "pending");
     const EthereumTx = EthereumJsTx.Transaction
     var tx = new EthereumTx({
@@ -295,11 +383,12 @@ async function web3_sendEthTestAddr(sendFromNdx, sendToAddr, ethValue) {
         })
         .once("confirmation", async confirms => {
             const receipt = await web3.eth.getTransactionReceipt(txHash);
-            console.log(`   => ${txHash} - ${confirms} confirm(s), receipt.gasUsed=`, receipt.gasUsed);
+            if (consoleOutput) console.log(chalk.yellow(`   => ${txHash} - ${confirms} confirm(s), receipt.gasUsed=`, receipt.gasUsed));
             resolve(txHash);
         })
         .once("error", error => {
-            console.log(`   => ## error`, error);
+            console.log(chalk.yellow(`   => ## error`, error));
+            console.dir(error);
             reject(error);
         });
     });

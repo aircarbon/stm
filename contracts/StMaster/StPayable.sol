@@ -1,50 +1,77 @@
 
-pragma solidity 0.5.13;
+pragma solidity >=0.4.21 <=0.6.6;
 pragma experimental ABIEncoderV2;
+
+//import "../Interfaces/IStPayable.sol";
 
 import "./StFees.sol";
 
 import "../Libs/LedgerLib.sol";
-import "../Libs/StructLib.sol";
+import "../Interfaces/StructLib.sol";
 import "../Libs/PayableLib.sol";
 
-contract StPayable is StFees {
+//import "../Interfaces/IChainlinkAggregator.sol";
+
+//
+// 24k gas limit -- disabled for commodity branch...
+//
+
+contract StPayable is
+    //IStPayable,
+    StFees {
+
+    // === CFT ===
+    // PRI 1 ** CASHFLOWS (J 1+3) ==>>> MVP -- CFT CORE (aiming for *no whitelisting*, i.e. all external control ERC20 accounts)
+    //      TODO: pri1 - test - exchange fees on subscriptions
+    //      TODO: pri1 - new  - eth fees on subscriptions (new fee-type)
+    //      TODO: pri2 - issuerPayments (BOND) v0 basic (no validations, i.e. eq-path only?)
+    //      TODO: pri3 - wallet auto-converts
+    //      TODO: pri4 - (eq-type) changing issuancePrice mid-issuance
+
+/*
 
     StructLib.CashflowStruct cashflowData;
 
-    /**
-     * @dev Handles
-     *   (1) issuer payments (bond interest payments & principal repayments, and equity dividend payments)
-     *   (2) subscriber payments
-     */
-    function setIssuerValues(
-        // address issuer,
-        // StructLib.SetFeeArgs memory originatorFee,
-        //uint256 qty_issuanceMax,
-        uint256 wei_currentPrice,
-        uint256 qty_saleAllocation
-    ) external onlyWhenReadWrite() {
-        PayableLib.setIssuerValues(
-            ledgerData,
-            cashflowData,
-            //qty_issuanceMax,
-            wei_currentPrice, qty_saleAllocation
+    function getCashflowData() public view returns(StructLib.CashflowStruct memory) {
+        return PayableLib.getCashflowData(ld, cashflowData);
+    }
+
+    address public chainlinkAggregator_btcUsd;
+    address public chainlinkAggregator_ethUsd;
+
+    // function get_btcUsd() public view returns(int256) {
+    //     if (chainlinkAggregator_btcUsd == address(0x0)) return 100000000; // $1 - cents*satoshis
+    //     IChainlinkAggregator ref = IChainlinkAggregator(chainlinkAggregator_btcUsd);
+    //     return ref.latestAnswer();
+    // }
+    // function get_ethUsd() public view returns(int256) {
+    //     if (chainlinkAggregator_ethUsd == address(0x0)) return 100000000; // $1 - cents*satoshis
+    //     IChainlinkAggregator ref = IChainlinkAggregator(chainlinkAggregator_ethUsd);
+    //     return ref.latestAnswer();
+    // }
+
+    //function() external  payable  onlyWhenReadWrite() {
+    receive() external payable {
+        PayableLib.pay(ld, cashflowData, ctd, globalFees, owner, 1 //get_ethUsd() // TODO: move chainlinkAggregator_ethUsd to PayableLib...
         );
     }
 
-    /**
-     * @dev Handles
-     *   (1) issuer payments (bond interest payments & principal repayments, and equity dividend payments)
-     *   (2) subscriber payments
-     */
-    function() external payable onlyWhenReadWrite() {
-        PayableLib.pay(ledgerData, cashflowData, globalFees, owner);
+    function setIssuerValues(
+        // address issuer,
+        // StructLib.SetFeeArgs memory originatorFee,
+        uint256 wei_currentPrice,
+        uint256 cents_currentPrice,
+        uint256 qty_saleAllocation
+    ) external onlyWhenReadWrite() {
+        PayableLib.setIssuerValues(
+            ld,
+            cashflowData,
+            wei_currentPrice,
+            cents_currentPrice,
+            qty_saleAllocation
+        );
     }
+*/
 
-    /**
-     * @dev Returns cashflow data
-     */
-    function getCashflowData() public view returns(StructLib.CashflowStruct memory) {
-        return PayableLib.getCashflowData(ledgerData, cashflowData);
-    }
+
 }

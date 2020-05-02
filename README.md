@@ -1,5 +1,7 @@
 # SecTokMaster - Security Token Master (ERC20 [partial] Compatible Commodity or Cashflow Token)
 
+[Overview](./contracts/Interfaces/docs/OVERVIEW__STM.md)
+
 ## Setup
 - `npm install`
 - `npm i truffle -g`
@@ -29,6 +31,10 @@ Migration script will pickup this env var and deploy a test contract accordingly
 - `truffle compile` or (undocumented) `truffle compile --reset` if it keeps recompiling when there aren't any changes in the Solidity
 - `truffle test --network development`
 
+## Docs
+- `npx soldoc --output html ./contracts/interfaces/docs/soldoc ./contracts/Interfaces`
+- `npx solidity-docgen -i ./contracts/interfaces -o ./contracts/interfaces/docs/solidity-docgen --contract-pages`
+
 ## Dbg - misc
 If you see `Error: invalid reporter "eth-gas-reporter"` -- try running `npm i` in ./packages/erc20
 
@@ -39,6 +45,6 @@ If you see `Error: invalid reporter "eth-gas-reporter"` -- try running `npm i` i
 - `AcMaster.deployed().then((i) => { ac=i })`
 - `` AcMaster.MintedSecTokenBatch({}).watch((err,res) => { console.log(`MintedSecTokenBatch... id = ${res.args.id}`) }) ``
 - `ac.methods`
-- `ac.mintSecTokenBatch(1, 1000, 1, '0xc3241d546dDE0Bf0A42BE0b3fEe70Da17ad724c9', { fee_fixed: 1, fee_percBips: 10, fee_min: 0, fee_max: 0 }, [], [])`
+- `ac.mintSecTokenBatch(1, 1000, 1, '0xc3241d546dDE0Bf0A42BE0b3fEe70Da17ad724c9', { ccy_mirrorFee: false, ccy_perThousand: 0, fee_fixed: 1, fee_percBips: 10, fee_min: 0, fee_max: 0 }, 0, [], [])`
 - `ac.getLedgerEntry('0xc3241d546dDE0Bf0A42BE0b3fEe70Da17ad724c9')`
 - `ac.getSecToken(1)`

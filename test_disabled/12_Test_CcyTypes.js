@@ -5,12 +5,13 @@ const CONST = require('../const.js');
 contract("StMaster", accounts => {
     var stm;
 
-    const countDefaultCcyTypes = 7;
+    const countDefaultCcyTypes = 3;
 
     before(async function () {
         stm = await st.deployed();
         if (await stm.getContractType() == CONST.contractType.CASHFLOW) this.skip();
         await stm.sealContract();
+        await require('../test/testSetupContract.js').setDefaults({ stm, accounts });
         if (!global.TaddrNdx) global.TaddrNdx = 0;
     });
 
@@ -24,13 +25,13 @@ contract("StMaster", accounts => {
         const types = (await stm.getCcyTypes()).ccyTypes;
         assert(types.length == countDefaultCcyTypes, 'unexpected default ccy type count');
 
-        assert(types[0].name == 'SGD', 'unexpected default ccy type name 1');
+        assert(types[0].name == 'USD', 'unexpected default ccy type name 1');
         assert(types[0].unit == 'cents', 'unexpected default ccy type unit 1');
         assert(types[0].id == 1, 'unexpected default ccy type id 1');
 
-        assert(types[1].name == 'ETH', 'unexpected default ccy type name 2');
-        assert(types[1].unit == 'Wei', 'unexpected default ccy type unit 2');
-        assert(types[1].id == 2, 'unexpected default ccy type id 2');
+        //assert(types[1].name == 'ETH', 'unexpected default ccy type name 2');
+        //assert(types[1].unit == 'Wei', 'unexpected default ccy type unit 2');
+        //assert(types[1].id == 2, 'unexpected default ccy type id 2');
     });
 
     it(`ccy types - should make visible newly added currency types in the ledger`, async () => {
@@ -75,7 +76,7 @@ contract("StMaster", accounts => {
 
     it(`ccy types - should not allow adding an existing currency type name`, async () => {
         try {
-            await stm.addCcyType('ETH', 'test_unit', 2, { from: accounts[0] });
+            await stm.addCcyType('USD', 'test_unit', 2, { from: accounts[0] });
         } catch (ex) { 
             assert(ex.reason == 'Currency type name already exists', `unexpected: ${ex.reason}`);
             return; 

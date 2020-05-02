@@ -20,13 +20,13 @@
 require('dotenv').config();
 const Web3 = require("web3");
 const web3 = new Web3();
-
 const HDWalletProvider = require("@truffle/hdwallet-provider");
+const NonceTrackerSubprovider = require("web3-provider-engine/subproviders/nonce-tracker");
 
-// wallet seed (only needed for public testnets: ropsten & rinkeby - manage wallet with MetaMask)
-const MNEMONIC = 'educate school blast ability display bleak club soon curve car oil ostrich';
+const DEV_MNEMONIC = require('./DEV_MNEMONIC.js').MNEMONIC;
+const PROD_MNEMONIC = '...'; // **PROD TODO
 
-const gweiDeployment = "10";
+const gweiDeployment = "5";
 
 module.exports = {
   /**
@@ -40,12 +40,11 @@ module.exports = {
    */
 
   networks: {
-    solc: {
-      optimizer: {
-        enabled: true,
-        runs: 100
-      }
-    },
+    //
+    // DEPLOYMENT TIMEOUTS/LIMITS
+    // web3 waits a maximum of 50 blocks for TX receipt (https://github.com/trufflesuite/truffle/issues/594)
+    // gweiDeployment MUST BE HIGH ENOUGH TO RELIABLY CONFIRM WITHIN 50 BLOCKS, otherwise deployments will fail
+    //
 
     // Useful for testing. The `development` name is special - truffle uses it by default
     // if it's defined here and no other network is specified at the command line.
@@ -59,46 +58,70 @@ module.exports = {
     //     network_id: "*",
     // },
     development: {
-      // for "truffle test" -- with manually launched "ganache-cli -a 1000" (1000 test accounts)
+      // for "truffle test" -- use with "ganache-cli -a 1000" (1000 test accounts)
       host: process.env.GANACHE_HOST || "127.0.0.1",
       port: 8545,
-      network_id: "*", // 777, 888, 999
-      gas: 7800000,
+      network_id: "*", // see: getTestContextWeb3() for dev network_id convention
+      gas: 7900000,
       gasPrice: web3.utils.toWei(gweiDeployment, "gwei")
     },
 
-    // aircarbon ropsten geth node -- a bit faster than infura, but representative of mainnet
+    // aircarbon ropsten geth node -- a bit faster than infura, representative of mainnet
     ropsten_ac: {
-      provider: () => new HDWalletProvider(MNEMONIC, "https://ac-dev0.net:9545",
-                      0, 888), // # test accounts
+      provider: //new HDWalletProvider(DEV_MNEMONIC, "https://ac-dev0.net:9545", 0, 1000), // # test accounts
+        function() { // https://ethereum.stackexchange.com/questions/44349/truffle-infura-on-mainnet-nonce-too-low-error
+          var wallet = new HDWalletProvider(DEV_MNEMONIC, 'https://ac-dev0.net:9545', 0, 1000);
+          var nonceTracker = new NonceTrackerSubprovider();
+          wallet.engine._providers.unshift(nonceTracker);
+          nonceTracker.setEngine(wallet.engine);
+          return wallet;
+        },
       network_id: "*", // 3
-      gas: 7800000, // node reported limit: 7,984,363
+      gas: 8000029,
       gasPrice: web3.utils.toWei(gweiDeployment, "gwei"),
       networkCheckTimeout: 30000,
+      
+      confirmations: 10,    // # of confs to wait between deployments. (default: 0)
+      skipDryRun: true,
+      timeoutBlocks: 200, // but web3 always times out at 50 blocks?!
     },
-
-    // aircarbon private testnet geth node
-    testnet_ace: {
-      provider: () => new HDWalletProvider(MNEMONIC, "https://ac-dev1.net:9545",
-                      0, 888), // # test accounts
-      network_id: "*", // 4242 ?
-      gas: 7800000,
-      gasPrice: web3.utils.toWei(gweiDeployment, "gwei")
-    },
-
     // ropsten infura -- much slower than rinkeby infura
     ropsten_infura: {
-      provider: () => new HDWalletProvider(MNEMONIC, "https://ropsten.infura.io/v3/93db2c7fd899496d8400e86100058297",
-                      0, 888), // # test accounts
-      network_id: "*", // 3 ?
+      provider: //() => new HDWalletProvider(DEV_MNEMONIC, "https://ropsten.infura.io/v3/93db2c7fd899496d8400e86100058297", 0, 1000), // # test accounts
+        function() {
+          var wallet = new HDWalletProvider(DEV_MNEMONIC, 'https://ropsten.infura.io/v3/93db2c7fd899496d8400e86100058297', 0, 1000);
+          var nonceTracker = new NonceTrackerSubprovider();
+          wallet.engine._providers.unshift(nonceTracker);
+          nonceTracker.setEngine(wallet.engine);
+          return wallet;
+        },
+      network_id: "*", // 3
       gas: 7800000,
-      gasPrice: web3.utils.toWei(gweiDeployment, "gwei")
+      gasPrice: web3.utils.toWei(gweiDeployment, "gwei"),
+
+      confirmations: 10,
+      skipDryRun: true,
+      timeoutBlocks: 200,
     },
 
+    // rinkeby infura
     rinkeby_infura: {
-      provider: () => new HDWalletProvider(MNEMONIC, "https://rinkeby.infura.io/v3/93db2c7fd899496d8400e86100058297",
-                      0, 888), // # test accounts
-      network_id: "*", // 4 ?
+      provider: () => new HDWalletProvider(DEV_MNEMONIC, "https://rinkeby.infura.io/v3/93db2c7fd899496d8400e86100058297",
+                      0, 1000), // # test accounts
+      network_id: "*", // 4
+      gas: 10000000,
+      gasPrice: web3.utils.toWei(gweiDeployment, "gwei"),
+      
+      confirmations: 1,
+      skipDryRun: true,
+      timeoutBlocks: 200,
+    },
+
+    // aircarbon private testnet g eth node
+    testnet_ace: {
+      provider: () => new HDWalletProvider(DEV_MNEMONIC, "https://ac-dev1.net:9545",
+                      0, 1000), // # test accounts
+      network_id: "*", // 4242 ?
       gas: 7800000,
       gasPrice: web3.utils.toWei(gweiDeployment, "gwei")
     }
@@ -138,26 +161,27 @@ module.exports = {
     enableTimeouts: false,
 
     // on ropsten:
-    // "ERROR: eth-gas-reporter was unable to resolve a client url from the provider available in your test context. Try setting the url as a mocha reporter option (ex: url='http://localhost:8545')"
-    reporter: 'eth-gas-reporter',
-
+    // *** "ERROR: eth-gas-reporter was unable to resolve a client url from the provider available in your test context.
+    // Try setting the url as a mocha reporter option (ex: url='http://localhost:8545')"
+    /*reporter: 'eth-gas-reporter',
     reporterOptions: {
       currency: 'usd',
       gasPrice: 10
-     //, url: 'https://ac-dev0.net:9545'
-    }
+      // ***
+      //, url: 'https://ac-dev0.net:9545'
+    }*/
   },
 
   // Configure your compilers
   compilers: {
     solc: {
-      version: "0.5.13", // Fetch exact version from solc-bin (default: truffle's version)
+      version: "0.6.6", // 0.5.13 // Fetch exact version from solc-bin (default: truffle's version)
       docker: false, // Use "0.5.8" you've installed locally with docker (default: false)
       settings: {
         // See the solidity docs for advice about optimization and evmVersion
         optimizer: {
           enabled: true,
-          runs: 100
+          runs: 200
         },
         evmVersion: "byzantium"
       }

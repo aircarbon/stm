@@ -9,8 +9,10 @@ contract("StMaster", accounts => {
 
     before(async function () {
         stm = await st.deployed();
+        
         if (await stm.getContractType() == CONST.contractType.CASHFLOW) this.skip();
         await stm.sealContract();
+        await require('../test/testSetupContract.js').setDefaults({ stm, accounts });
         if (!global.TaddrNdx) global.TaddrNdx = 0;
     });
 
@@ -21,25 +23,25 @@ contract("StMaster", accounts => {
     });
 
     it(`minting - should allow owner to mint a single-vST batch`, async () => {
-        await mintBatch({ tokenType: CONST.tokenType.UNFCCC, qtyUnit: CONST.ktCarbon * 100, qtySecTokens: 1, receiver: accounts[global.TaddrNdx], }, { from: accounts[0] });
+        await mintBatch({ tokenType: CONST.tokenType.CORSIA, qtyUnit: CONST.GT_CARBON * 100, qtySecTokens: 1, receiver: accounts[global.TaddrNdx], }, { from: accounts[0] });
     });
 
     // DEPRECATD: no multi ST batch minting
     //it(`minting - should allow owner to mint a multi-vST (2) batch`, async () => {
-    //    await mintBatch({ tokenType: CONST.tokenType.UNFCCC, qtyUnit: CONST.ktCarbon * 100, qtySecTokens: 2, receiver: accounts[global.TaddrNdx], },{ from: accounts[0] });
+    //    await mintBatch({ tokenType: CONST.tokenType.CORSIA, qtyUnit: CONST.GT_CARBON * 100, qtySecTokens: 2, receiver: accounts[global.TaddrNdx], },{ from: accounts[0] });
     //});
 
     it(`minting - should allow owner to mint a minimum-sized token (one ton)`, async () => {
-        await mintBatch({ tokenType: CONST.tokenType.UNFCCC, qtyUnit: CONST.tonCarbon * 1, qtySecTokens: 1, receiver: accounts[global.TaddrNdx], }, { from: accounts[0] });
+        await mintBatch({ tokenType: CONST.tokenType.CORSIA, qtyUnit: CONST.KT_CARBON * 1, qtySecTokens: 1, receiver: accounts[global.TaddrNdx], }, { from: accounts[0] });
     });
 
     it(`minting - should allow owner to mint a megatoken (10 gigatons)`, async () => {
-        await mintBatch({ tokenType: CONST.tokenType.UNFCCC, qtyUnit: CONST.gtCarbon * 10, qtySecTokens: 1, receiver: accounts[global.TaddrNdx], }, { from: accounts[0] });
+        await mintBatch({ tokenType: CONST.tokenType.CORSIA, qtyUnit: CONST.GT_CARBON * 10, qtySecTokens: 1, receiver: accounts[global.TaddrNdx], }, { from: accounts[0] });
     });
 
     it(`minting - should allow owner to mint different vST-types`, async () => {
-        await mintBatch({ tokenType: CONST.tokenType.UNFCCC, qtyUnit: CONST.ktCarbon * 100, qtySecTokens: 1, receiver: accounts[global.TaddrNdx], }, { from: accounts[0] });
-        await mintBatch({ tokenType: CONST.tokenType.VCS, qtyUnit: CONST.ktCarbon * 100, qtySecTokens: 1, receiver: accounts[global.TaddrNdx], }, { from: accounts[0] });
+        await mintBatch({ tokenType: CONST.tokenType.CORSIA, qtyUnit: CONST.GT_CARBON * 100, qtySecTokens: 1, receiver: accounts[global.TaddrNdx], }, { from: accounts[0] });
+        await mintBatch({ tokenType: CONST.tokenType.NATURE, qtyUnit: CONST.GT_CARBON * 100, qtySecTokens: 1, receiver: accounts[global.TaddrNdx], }, { from: accounts[0] });
     });
 
     it(`minting - should allow minting of multiple batches to the same receiver`, async () => {
@@ -47,40 +49,30 @@ contract("StMaster", accounts => {
         var totalMintedQty = 0;
         var totalMintedSecTokens = 0;
         for (var i = 0; i < 3; i++) {
-            const qtyUnit = (i + 1) * 2 * CONST.tonCarbon;
+            const qtyUnit = (i + 1) * 2 * CONST.KT_CARBON;
             const qtySecTokens = 1;
-            const batchId = await mintBatch({ tokenType: CONST.tokenType.UNFCCC, qtyUnit, qtySecTokens, receiver: accounts[global.TaddrNdx] }, { from: accounts[0] });
+            const batchId = await mintBatch({ tokenType: CONST.tokenType.CORSIA, qtyUnit, qtySecTokens, receiver: accounts[global.TaddrNdx] }, { from: accounts[0] });
             totalMintedQty += qtyUnit;
             totalMintedSecTokens += qtySecTokens;
             batchIds.push(batchId);
         }
 
-        var totalBatchQtyKG = 0;
+        var totalBatchQtyTok = 0;
         for (i = 0; i < batchIds.length; i++) {
             const batchId = batchIds[i];
             const batch = await stm.getSecTokenBatch(batchId);
-            totalBatchQtyKG += Number(batch.mintedQty);
+            totalBatchQtyTok += Number(batch.mintedQty);
         }
-        assert(totalBatchQtyKG == totalMintedQty, 'invalid total kg in minted batches');
+        assert(totalBatchQtyTok == totalMintedQty, 'invalid total kg in minted batches');
 
         const ledgerEntryAfter = await stm.getLedgerEntry(accounts[global.TaddrNdx]);
         assert(ledgerEntryAfter.tokens.length == totalMintedSecTokens, 'invalid eeu qty in ledger entry');
     });
 
-    it(`minting - should have reasonable gas cost for minting of multi-vST batches`, async () => {
-        mintTx = await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.ktCarbon, 1, accounts[global.TaddrNdx], CONST.nullFees, [], [], { from: accounts[0], });
-        await CONST.logGas(web3, mintTx, `Mint  1 vST`);
-
-        // mintTx = await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.ktCarbon, 5, accounts[global.TaddrNdx], { from: accounts[0], });
-        //await CONST.logGas(web3, mintTx, `Mint  5 vST`);
-
-        // var mintTx = await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.ktCarbon, 10, accounts[global.TaddrNdx], { from: accounts[0] });
-        //await CONST.logGas(web3, mintTx, `Mint 10 vST`);
-    });
 
     it(`minting - should not allow non-owner to mint vST batches`, async () => {
         try {
-            await stm.mintSecTokenBatch(CONST.tokenType.UNFCCC, CONST.tonCarbon, 1, accounts[global.TaddrNdx], CONST.nullFees, [], [], { from: accounts[1], });
+            await stm.mintSecTokenBatch(CONST.tokenType.CORSIA, CONST.KT_CARBON, 1, accounts[global.TaddrNdx], CONST.nullFees, 0, [], [], { from: accounts[1], });
         } catch (ex) { 
             assert(ex.reason == 'Restricted', `unexpected: ${ex.reason}`);
             return;
@@ -90,7 +82,7 @@ contract("StMaster", accounts => {
 
     it(`minting - should not allow non-existent vST-type to be minted`, async () => {
         try {
-            await stm.mintSecTokenBatch(999, CONST.tonCarbon, 1, accounts[global.TaddrNdx], CONST.nullFees, [], [], { from: accounts[0] });
+            await stm.mintSecTokenBatch(999, CONST.KT_CARBON, 1, accounts[global.TaddrNdx], CONST.nullFees, 0, [], [], { from: accounts[0] });
         } catch (ex) { 
             assert(ex.reason == 'Bad tokenTypeId', `unexpected: ${ex.reason}`);
             return;
@@ -100,7 +92,7 @@ contract("StMaster", accounts => {
 
     it(`minting - should not allow multi-vST minting`, async () => {
         try {
-            await mintBatch({ tokenType: CONST.tokenType.UNFCCC, qtyUnit: CONST.tonCarbon, qtySecTokens: 2, receiver: accounts[global.TaddrNdx], }, { from: accounts[0] } );
+            await mintBatch({ tokenType: CONST.tokenType.CORSIA, qtyUnit: CONST.KT_CARBON, qtySecTokens: 2, receiver: accounts[global.TaddrNdx], }, { from: accounts[0] } );
         } catch (ex) { 
             assert(ex.reason == 'Set mintSecTokenCount 1', `unexpected: ${ex.reason}`);
             return;
@@ -108,16 +100,16 @@ contract("StMaster", accounts => {
         assert.fail('expected contract exception');
     });    
 
-    // it(`minting - should not allow non-integer KG carbon in an vST`, async () => {
+    // it(`minting - should not allow non-integer TONS carbon in an vST`, async () => {
     //     try {
-    //         await mintBatch({ tokenType: CONST.tokenType.UNFCCC, qtyUnit: CONST.tonCarbon, qtySecTokens: 3, receiver: accounts[global.TaddrNdx], }, { from: accounts[0] } );
+    //         await mintBatch({ tokenType: CONST.tokenType.CORSIA, qtyUnit: CONST.KT_CARBON, qtySecTokens: 3, receiver: accounts[global.TaddrNdx], }, { from: accounts[0] } );
     //     } catch (ex) { return; }
     //     assert.fail('expected contract exception');
     // });
 
     it(`minting - should not allow minting invalid (0) token units (1)`, async () => {
         try {
-            await mintBatch( { tokenType: CONST.tokenType.UNFCCC, qtyUnit: 0, qtySecTokens: 1, receiver: accounts[global.TaddrNdx] }, { from: accounts[0] } );
+            await mintBatch( { tokenType: CONST.tokenType.CORSIA, qtyUnit: 0, qtySecTokens: 1, receiver: accounts[global.TaddrNdx] }, { from: accounts[0] } );
         } catch (ex) { 
             assert(ex.reason == 'Bad mintQty', `unexpected: ${ex.reason}`);
             return;
@@ -127,7 +119,7 @@ contract("StMaster", accounts => {
 
     it(`minting - should not allow minting invalid (-1) token units (2)`, async () => {
         try {
-            await mintBatch( { tokenType: CONST.tokenType.UNFCCC, qtyUnit: -1, qtySecTokens: 1, receiver: accounts[global.TaddrNdx] }, { from: accounts[0] } );
+            await mintBatch( { tokenType: CONST.tokenType.CORSIA, qtyUnit: -1, qtySecTokens: 1, receiver: accounts[global.TaddrNdx] }, { from: accounts[0] } );
         } catch (ex) { 
             assert(ex.reason == 'Bad mintQty', `unexpected: ${ex.reason}`);
             return;
@@ -139,7 +131,7 @@ contract("StMaster", accounts => {
         try {
             const qty = Big(2).pow(64);//.minus(1);
             const M = accounts[global.TaddrNdx];
-            await mintBatch({ tokenType: CONST.tokenType.UNFCCC, qtyUnit: qty.toString(), qtySecTokens: 1, receiver: accounts[global.TaddrNdx] }, { from: accounts[0] });
+            await mintBatch({ tokenType: CONST.tokenType.CORSIA, qtyUnit: qty.toString(), qtySecTokens: 1, receiver: accounts[global.TaddrNdx] }, { from: accounts[0] });
         } catch (ex) {
             assert(ex.reason == 'Bad mintQty', `unexpected: ${ex.reason}`);
             return;
@@ -149,7 +141,7 @@ contract("StMaster", accounts => {
 
     it(`minting - should not allow minting invalid vST quantities (1)`, async () => {
         try {
-            await mintBatch({ tokenType: CONST.tokenType.UNFCCC, qtyUnit: CONST.tonCarbon, qtySecTokens: 0, receiver: accounts[global.TaddrNdx], }, { from: accounts[0] });
+            await mintBatch({ tokenType: CONST.tokenType.CORSIA, qtyUnit: CONST.KT_CARBON, qtySecTokens: 0, receiver: accounts[global.TaddrNdx], }, { from: accounts[0] });
         } catch (ex) { 
             assert(ex.reason == 'Set mintSecTokenCount 1', `unexpected: ${ex.reason}`);
             return;
@@ -159,7 +151,7 @@ contract("StMaster", accounts => {
 
     it(`minting - should not allow invalid minting vST quantities (2)`, async () => {
         try {
-            await mintBatch({ tokenType: CONST.tokenType.UNFCCC, qtyUnit: CONST.tonCarbon, qtySecTokens: -1, receiver: accounts[global.TaddrNdx], }, { from: accounts[0] });
+            await mintBatch({ tokenType: CONST.tokenType.CORSIA, qtyUnit: CONST.KT_CARBON, qtySecTokens: -1, receiver: accounts[global.TaddrNdx], }, { from: accounts[0] });
         } catch (ex) {
             assert(ex.reason == 'Set mintSecTokenCount 1', `unexpected: ${ex.reason}`);
             return;
@@ -170,7 +162,7 @@ contract("StMaster", accounts => {
     it(`minting - should not allow minting when contract is read only`, async () => {
         try {
             await stm.setReadOnly(true, { from: accounts[0] });
-            await mintBatch({ tokenType: CONST.tokenType.UNFCCC, qtyUnit: CONST.tonCarbon, qtySecTokens: 1, receiver: accounts[global.TaddrNdx], }, { from: accounts[0] });
+            await mintBatch({ tokenType: CONST.tokenType.CORSIA, qtyUnit: CONST.KT_CARBON, qtySecTokens: 1, receiver: accounts[global.TaddrNdx], }, { from: accounts[0] });
         } catch (ex) {
             assert(ex.reason == 'Read-only', `unexpected: ${ex.reason}`);
             await stm.setReadOnly(false, { from: accounts[0] });
@@ -193,19 +185,19 @@ contract("StMaster", accounts => {
             qtyUnit, 
             qtySecTokens, 
             receiver, 
-            CONST.nullFees, [], [],
+            CONST.nullFees, 0, [], [],
         { from: accounts[0] });
 
-        // validat batch ID
+        // validate batch ID
         const maxBatchIdAfter = (await stm.getSecTokenBatchCount.call()).toNumber();
         assert(maxBatchIdAfter == maxBatchIdBefore + 1, 'unexpected batch id after minting');
 
         // validate batch minted event
-        truffleAssert.eventEmitted(mintTx, 'MintedSecTokenBatch', ev => {
+        truffleAssert.eventEmitted(mintTx, 'Minted', ev => {
             batchId = Number(ev.batchId);
             return ev.batchId == maxBatchIdAfter
                 && ev.tokenTypeId == tokenType
-                && ev.batchOwner == receiver
+                && ev.to == receiver
                 && ev.mintQty == qtyUnit
                 && ev.mintSecTokenCount == qtySecTokens
                 ;
@@ -222,7 +214,7 @@ contract("StMaster", accounts => {
                 return ev.stId > curMaxSecTokenId - qtySecTokens && ev.stId <= curMaxSecTokenId
                     && ev.batchId == batchId
                     && ev.tokenTypeId == tokenType
-                    && ev.ledgerOwner == receiver
+                    && ev.to == receiver
                     && ev.mintedQty == qtyUnit / qtySecTokens
                     ;
             });
@@ -239,7 +231,7 @@ contract("StMaster", accounts => {
         assert(ledgerEntryAfter.tokens.map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0) ==
                ledgerEntryBefore.tokens.map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0) + qtyUnit,
                'invalid kg in ledger entry eeus');
-        assert(Number(ledgerEntryAfter.tokens_sumQty) == Number(ledgerEntryBefore.tokens_sumQty) + qtyUnit, 'invalid kg sum ledger entry');
+        assert(Number(ledgerEntryAfter.spot_sumQty) == Number(ledgerEntryBefore.spot_sumQty) + qtyUnit, 'invalid kg sum ledger entry');
 
         // validate STs minted
         for (var ndx = ledgerEntryBefore.tokens.length; ndx < ledgerEntryAfter.tokens.length; ndx++) {
@@ -248,9 +240,12 @@ contract("StMaster", accounts => {
             assert(eeu.exists == true, 'missing vST after minting');
             assert(eeu.batchId == batchId, 'unexpected vST batch after minting');
             assert(eeu.mintedTimestamp != 0, 'missing mint timestamp on vST after minting');
-            assert(eeu.mintedQty == qtyUnit / qtySecTokens, 'unexpected vST minted KG value after minting');
-            assert(eeu.currentQty == qtyUnit / qtySecTokens, 'unexpected vST remaining (unburned) KG value after minting');
+            assert(eeu.mintedQty == qtyUnit / qtySecTokens, 'unexpected vST minted TONS value after minting');
+            assert(eeu.currentQty == qtyUnit / qtySecTokens, 'unexpected vST remaining (unburned) TONS value after minting');
         }
+
+        // validate total minted field
+        assert(ledgerEntryAfter.spot_sumQtyMinted - ledgerEntryBefore.spot_sumQtyMinted == qtyUnit, 'unexpected spot_sumQtyMinted before vs. after');
 
         return batchId;
     }

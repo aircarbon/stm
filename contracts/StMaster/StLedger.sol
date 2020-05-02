@@ -1,91 +1,71 @@
-pragma solidity 0.5.13;
+pragma solidity >=0.4.21 <=0.6.6;
 pragma experimental ABIEncoderV2;
+
+//import "../Interfaces/IStLedger.sol";
 
 import "./Owned.sol";
 
+import "../Interfaces/StructLib.sol";
 import "../Libs/LedgerLib.sol";
-import "../Libs/StructLib.sol";
 import "../Libs/TokenLib.sol";
 
-contract StLedger is Owned {
+contract StLedger is //IStLedger,
+    Owned {
 
-    StructLib.LedgerStruct ledgerData;
+    StructLib.LedgerStruct ld;
+    StructLib.StTypesStruct std;
+    StructLib.CcyTypesStruct ctd;
 
-    StructLib.StTypesStruct stTypesData;
-    StructLib.CcyTypesStruct ccyTypesData;
-
-    /**
-     * @dev Adds a new ST type
-     * @param name New ST type name
-     */
-    function addSecTokenType(string memory name)
+    //
+    // MUTATE LEDGER
+    //
+    function addSecTokenType(string memory name, StructLib.SettlementType settlementType, StructLib.FutureTokenTypeArgs memory ft)
     public onlyOwner() onlyWhenReadWrite() {
-        TokenLib.addSecTokenType(ledgerData, stTypesData, name);
+        TokenLib.addSecTokenType(ld, std, ctd, name, settlementType, ft);
     }
 
-    /**
-     * @dev Returns current ST types
-     */
-    function getSecTokenTypes()
-    external view returns (StructLib.GetSecTokenTypesReturn memory) {
-        return TokenLib.getSecTokenTypes(stTypesData);
+    // #### TODO - move to StFutures...
+    function setFuture_VariationMargin(uint256 tokenTypeId, uint16 varMarginBips)
+    public onlyOwner() onlyWhenReadWrite() {
+        TokenLib.setFuture_VariationMargin(std, tokenTypeId, varMarginBips); // ### recalc all open pos margin/reserve; needs to be batched (job) - re. gas limits
+    }
+    function setFuture_FeePerContract(uint256 tokenTypeId, uint128 feePerContract)
+    public onlyOwner() onlyWhenReadWrite() {
+        TokenLib.setFuture_FeePerContract(std, tokenTypeId, feePerContract);
+    }
+
+    function setReservedCcy(uint256 ccyTypeId, int256 reservedAmount, address ledger)
+    public onlyOwner() onlyWhenReadWrite() {
+        StructLib.setReservedCcy(ld, ctd, ledger, ccyTypeId, reservedAmount);
     }
 
     //
-    // ACCESSORS -- PUBLIC LEDGER
+    // VIEW LEDGER
     //
+    function getSecTokenTypes() external view returns (StructLib.GetSecTokenTypesReturn memory) { return TokenLib.getSecTokenTypes(std); }
 
-    /**
-     * @dev Returns all account addresses in the ledger
-     */
-    function getLedgerOwners() external view returns (address[] memory) {
-        return ledgerData._ledgerOwners;
-    }
+    function getLedgerOwners() external view returns (address[] memory) { return ld._ledgerOwners; }
+    function getLedgerOwnerCount() external view returns (uint256) { return ld._ledgerOwners.length; }
+    function getLedgerOwner(uint256 index) external view returns (address) { return ld._ledgerOwners[index]; }
+    function getLedgerEntry(address account) external view returns (StructLib.LedgerReturn memory) { return LedgerLib.getLedgerEntry(ld, std, ctd, account); }
+    function getSecTokenBatchCount() external view returns (uint256) { return ld._batches_currentMax_id; } // 1-based
 
-    /**
-     * @dev Returns a single account address in the ledger
-     * DATA_DUMP: individual fetches
-     */
-    function getLedgerOwnerCount() external view returns (uint256) { return ledgerData._ledgerOwners.length; }
-
-    /**
-     * @dev Returns a single account address in the ledger
-     * DATA_DUMP: individual fetches
-     */
-    function getLedgerOwner(uint256 index) external view returns (address) { return ledgerData._ledgerOwners[index]; }
-
-    /**
-     * @dev Returns the ledger entry for a single account
-     */
-    function getLedgerEntry(address account) external view returns (StructLib.LedgerReturn memory) {
-        return LedgerLib.getLedgerEntry(ledgerData, stTypesData, ccyTypesData, account);
-    }
-
-    /**
-     * @dev Returns a token by ID
-     */
     function getSecToken(uint256 id) external view returns (StructLib.SecTokenReturn memory) {
         return StructLib.SecTokenReturn({
-                exists: ledgerData._sts[id].batchId != 0,
+                exists: ld._sts[id].mintedQty != 0,
                     id: id,
-             mintedQty: ledgerData._sts[id].mintedQty,
-            currentQty: ledgerData._sts[id].currentQty,
-               batchId: ledgerData._sts[id].batchId
+             mintedQty: ld._sts[id].mintedQty,
+            currentQty: ld._sts[id].currentQty,
+               batchId: ld._sts[id].batchId,
+              ft_price: ld._sts[id].ft_price,
+        ft_ledgerOwner: ld._sts[id].ft_ledgerOwner,
+      ft_lastMarkPrice: ld._sts[id].ft_lastMarkPrice,
+                 ft_PL: ld._sts[id].ft_PL
         });
     }
 
-    /**
-     * @dev Returns the global token batch count
-     */
-    function getSecTokenBatchCount() external view returns (uint256) {
-        return ledgerData._batches_currentMax_id; // 1-based
-    }
-
-    /**
-     * @dev Returns a token batch by ID
-     */
     function getSecTokenBatch(uint256 batchId) external view returns (StructLib.SecTokenBatch memory) {
-        require(batchId >= 1 && batchId <= ledgerData._batches_currentMax_id, "Bad batchId");
-        return ledgerData._batches[batchId];
+        require(batchId >= 1 && batchId <= ld._batches_currentMax_id, "Bad batchId");
+        return ld._batches[batchId];
     }
 }

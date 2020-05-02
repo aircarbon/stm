@@ -1,87 +1,105 @@
-pragma solidity 0.5.13;
+pragma solidity >=0.4.21 <=0.6.6;
 pragma experimental ABIEncoderV2;
 
-import "./StructLib.sol";
+import "../Interfaces/StructLib.sol";
 
 library LoadLib {
-     function loadSecTokenBatch(
-        StructLib.LedgerStruct storage ledgerData,
+
+
+    function loadSecTokenBatch(
+        StructLib.LedgerStruct storage ld,
         StructLib.SecTokenBatch[] memory batches,
         uint64 _batches_currentMax_id
     )
     public {
-        require(!ledgerData._contractSealed, "Contract is sealed");
+        require(!ld._contractSealed, "Contract is sealed");
         for (uint256 i = 0; i < batches.length; i++) {
-            ledgerData._batches[batches[i].id] = batches[i];
+            ld._batches[batches[i].id] = batches[i];
         }
-        ledgerData._batches_currentMax_id = _batches_currentMax_id;
+        ld._batches_currentMax_id = _batches_currentMax_id;
     }
 
     function createLedgerEntry(
-        StructLib.LedgerStruct storage ledgerData,
+        StructLib.LedgerStruct storage ld,
         address ledgerEntryOwner,
-        StructLib.LedgerCcyReturn[] memory ccys
+        StructLib.LedgerCcyReturn[] memory ccys,
+        uint256 spot_sumQtyMinted,
+        uint256 spot_sumQtyBurned
     )
     public {
-        require(!ledgerData._contractSealed, "Contract is sealed");
+        require(!ld._contractSealed, "Contract is sealed");
 
-        if (!ledgerData._ledger[ledgerEntryOwner].exists) {
-            ledgerData._ledgerOwners.push(ledgerEntryOwner);
+        if (!ld._ledger[ledgerEntryOwner].exists) {
+            ld._ledgerOwners.push(ledgerEntryOwner);
         }
 
-        ledgerData._ledger[ledgerEntryOwner] = StructLib.Ledger({
-                exists: true,
-            customFees: StructLib.FeeStruct()
+        ld._ledger[ledgerEntryOwner] = StructLib.Ledger({
+                         exists: true,
+                spot_customFees: StructLib.FeeStruct(),
+              spot_sumQtyMinted: spot_sumQtyMinted,
+              spot_sumQtyBurned: spot_sumQtyBurned
         });
 
         for (uint256 i = 0 ; i < ccys.length ; i++) {
-            ledgerData._ledger[ledgerEntryOwner].ccyType_balance[ccys[i].ccyTypeId] = ccys[i].balance;
+            ld._ledger[ledgerEntryOwner].ccyType_balance[ccys[i].ccyTypeId] = ccys[i].balance;
+            ld._ledger[ledgerEntryOwner].ccyType_reserved[ccys[i].ccyTypeId] = ccys[i].reserved;
         }
     }
 
     function addSecToken(
-        StructLib.LedgerStruct storage ledgerData,
+        StructLib.LedgerStruct storage ld,
         address ledgerEntryOwner,
-        uint64 batchId, uint256 stId, uint256 tokenTypeId, uint64 mintedQty, uint64 currentQty
+        uint64 batchId, uint256 stId, uint256 tokenTypeId, int64 mintedQty, int64 currentQty,
+        int128 ft_price, int128 ft_lastMarkPrice, address ft_ledgerOwner, int128 ft_PL
     )
     public {
-        require(!ledgerData._contractSealed, "Contract is sealed");
-        ledgerData._sts[stId].batchId = batchId;
-        ledgerData._sts[stId].mintedQty = mintedQty;
-        ledgerData._sts[stId].currentQty = currentQty;
-        ledgerData._ledger[ledgerEntryOwner].tokenType_stIds[tokenTypeId].push(stId);
+        require(!ld._contractSealed, "Contract is sealed");
+        ld._sts[stId].batchId = batchId;
+        ld._sts[stId].mintedQty = mintedQty;
+        ld._sts[stId].currentQty = currentQty;
+        ld._sts[stId].ft_price = ft_price;
+        ld._sts[stId].ft_ledgerOwner = ft_ledgerOwner;
+        ld._sts[stId].ft_lastMarkPrice = ft_lastMarkPrice;
+        ld._sts[stId].ft_PL = ft_PL;
+        ld._ledger[ledgerEntryOwner].tokenType_stIds[tokenTypeId].push(stId);
     }
 
     function setTokenTotals(
-        StructLib.LedgerStruct storage ledgerData,
+        StructLib.LedgerStruct storage ld,
         uint80 packed_ExchangeFeesPaidQty, uint80 packed_OriginatorFeesPaidQty, uint80 packed_TransferedQty,
         uint256 currentMax_id, uint256 totalMintedQty, uint256 totalBurnedQty
     )
     public {
-        require(!ledgerData._contractSealed, "Contract is sealed");
-        ledgerData._tokens_total.exchangeFeesPaidQty = packed_ExchangeFeesPaidQty;
-        ledgerData._tokens_total.originatorFeesPaidQty = packed_OriginatorFeesPaidQty;
-        ledgerData._tokens_total.transferedQty = packed_TransferedQty;
+        require(!ld._contractSealed, "Contract is sealed");
+        ld._spot_total.exchangeFeesPaidQty = packed_ExchangeFeesPaidQty;
+        ld._spot_total.originatorFeesPaidQty = packed_OriginatorFeesPaidQty;
+        ld._spot_total.transferedQty = packed_TransferedQty;
 
-        ledgerData._tokens_currentMax_id = currentMax_id;
-        ledgerData._tokens_totalMintedQty = totalMintedQty;
-        ledgerData._tokens_totalBurnedQty = totalBurnedQty;
+        ld._tokens_currentMax_id = currentMax_id;
+        ld._spot_totalMintedQty = totalMintedQty;
+        ld._spot_totalBurnedQty = totalBurnedQty;
     }
 
-    function setTotalCcyFunded(
-        StructLib.LedgerStruct storage ledgerData,
-        uint256 ccyTypeId, uint256 amount)
+    // struct SetCcyTotalArgs {
+    //     uint256 ccyTypeId;
+    //     uint256 totalFunded;
+    //     uint256 totalWithdrawn;
+    //     uint256 totalTransfered;
+    //     uint256 totalFeesPaid;
+    // }
+    function setCcyTotals(
+        StructLib.LedgerStruct storage ld,
+        uint256 ccyTypeId,
+        uint256 totalFunded,
+        uint256 totalWithdrawn,
+        uint256 totalTransfered,
+        uint256 totalFeesPaid
+    )
     public {
-        require(!ledgerData._contractSealed, "Contract is sealed");
-        ledgerData._ccyType_totalFunded[ccyTypeId] = amount;
+        require(!ld._contractSealed, "Contract is sealed");
+        ld._ccyType_totalFunded[ccyTypeId] = totalFunded;
+        ld._ccyType_totalWithdrawn[ccyTypeId] = totalWithdrawn;
+        ld._ccyType_totalTransfered[ccyTypeId] = totalTransfered;
+        ld._ccyType_totalFeesPaid[ccyTypeId] = totalFeesPaid;
     }
-
-    function setTotalCcyWithdrawn(
-        StructLib.LedgerStruct storage ledgerData,
-        uint256 ccyTypeId, uint256 amount)
-    public {
-        require(!ledgerData._contractSealed, "Contract is sealed");
-        ledgerData._ccyType_totalWithdrawn[ccyTypeId] = amount;
-    }
-
 }
