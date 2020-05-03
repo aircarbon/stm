@@ -1,6 +1,7 @@
 const st = artifacts.require('StMaster');
 const truffleAssert = require('truffle-assertions');
 const CONST = require('../const.js');
+const setupHelper = require('../test/testSetupContract.js');
 
 contract("StMaster", accounts => {
     var stm;

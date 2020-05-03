@@ -1,6 +1,7 @@
 const st = artifacts.require('StMaster');
 const CONST = require('../const.js');
 const transferHelper = require('../test/transferHelper.js');
+const setupHelper = require('../test/testSetupContract.js');
 
 contract("StMaster", accounts => {
     var stm;
@@ -10,9 +11,9 @@ contract("StMaster", accounts => {
         if (await stm.getContractType() == CONST.contractType.CASHFLOW) this.skip();
         if (!global.TaddrNdx) global.TaddrNdx = 0;
         
-        await stm.whitelistMany(accounts.slice(0,60));
+        await stm.whitelistMany(accounts.slice(0,500));
         await stm.sealContract();
-        await require('../test/testSetupContract.js').setDefaults({ stm, accounts });
+        await setupHelper.setDefaults({ stm, accounts });
     });
 
     beforeEach(async () => {

@@ -6,6 +6,7 @@ const BN = require('bn.js');
 const Big = require('big.js');
 const Web3 = require('web3');
 const web3 = new Web3();
+const setupHelper = require('../test/testSetupContract.js');
 
 contract("StMaster", accounts => {
     var stm;
@@ -16,9 +17,8 @@ contract("StMaster", accounts => {
 
         if (!global.TaddrNdx) global.TaddrNdx = 0;
         
-        await stm.whitelistMany(accounts.slice(0,60));
-        await stm.sealContract();
-        await require('../test/testSetupContract.js').setDefaults({ stm, accounts });
+        await setupHelper.whitelistAndSeal({ stm, accounts });
+        await setupHelper.setDefaults({ stm, accounts });
     });
 
     beforeEach(async () => {

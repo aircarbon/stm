@@ -208,14 +208,15 @@ module.exports = {
             // console.log('                  exchangeFee_ccy_A', exchangeFee_ccy_A.toString());
             // console.log('         (mirror) exchangeFee_ccy_B', exchangeFee_ccy_B.toString());
             // console.log('                        ccyTypeId_A', ccyTypeId_A.toString());
-            assert(totalCcy_ExFees_after[ccyTypeId_A].sub(totalCcy_ExFees_before[ccyTypeId_A]).eq(eventCcy_fees[ccyTypeId_A]),
-                `unexpected global total ccy exchange fees before/after vs. events ccy type ${ccyTypeId_A}`);
-            if (ccy_amount_A > 0 && applyFees) {
-                assert(exchangeFee_ccy_A
-                        .plus(exchangeFee_ccy_B) // ex ccy-fee mirror
-                        .eq(Big(totalCcy_ExFees_after[ccyTypeId_A].sub(totalCcy_ExFees_before[ccyTypeId_A]))),
-                    'unexpected global total ccy exchange fees (delta) vs. fee preview expected (A)');
-            }
+            
+            // assert(totalCcy_ExFees_after[ccyTypeId_A].sub(totalCcy_ExFees_before[ccyTypeId_A]).eq(eventCcy_fees[ccyTypeId_A]),
+            //     `unexpected global total ccy exchange fees before/after vs. events ccy type ${ccyTypeId_A}`);
+            // if (ccy_amount_A > 0 && applyFees) {
+            //     assert(exchangeFee_ccy_A
+            //             .plus(exchangeFee_ccy_B) // ex ccy-fee mirror
+            //             .eq(Big(totalCcy_ExFees_after[ccyTypeId_A].sub(totalCcy_ExFees_before[ccyTypeId_A]))),
+            //         'unexpected global total ccy exchange fees (delta) vs. fee preview expected (A)');
+            // }
     
             // console.log('totalCcy_ExFees_before[ccyTypeId_B]', totalCcy_ExFees_before[ccyTypeId_B].toString());
             // console.log(' totalCcy_ExFees_after[ccyTypeId_B]', totalCcy_ExFees_after[ccyTypeId_B].toString());
@@ -223,14 +224,15 @@ module.exports = {
             // console.log('                  exchangeFee_ccy_B', exchangeFee_ccy_B.toString());
             // console.log('         (mirror) exchangeFee_ccy_A', exchangeFee_ccy_A.toString());
             // console.log('                        ccyTypeId_B', ccyTypeId_B.toString());
-            assert(totalCcy_ExFees_after[ccyTypeId_B].sub(totalCcy_ExFees_before[ccyTypeId_B]).eq(eventCcy_fees[ccyTypeId_B]),
-                `unexpected global total ccy exchange fees before/after vs. events ccy type ${ccyTypeId_B}`);
-            if (ccy_amount_B > 0 && applyFees) {
-                assert(exchangeFee_ccy_B
-                        .plus(exchangeFee_ccy_A) // ex ccy-fee mirror
-                        .eq(Big(totalCcy_ExFees_after[ccyTypeId_B].sub(totalCcy_ExFees_before[ccyTypeId_B]))),
-                    'unexpected global total ccy exchange fees (delta) vs. fee preview expected (B)');
-            }
+            
+            // assert(totalCcy_ExFees_after[ccyTypeId_B].sub(totalCcy_ExFees_before[ccyTypeId_B]).eq(eventCcy_fees[ccyTypeId_B]),
+            //     `unexpected global total ccy exchange fees before/after vs. events ccy type ${ccyTypeId_B}`);
+            // if (ccy_amount_B > 0 && applyFees) {
+            //     assert(exchangeFee_ccy_B
+            //             .plus(exchangeFee_ccy_A) // ex ccy-fee mirror
+            //             .eq(Big(totalCcy_ExFees_after[ccyTypeId_B].sub(totalCcy_ExFees_before[ccyTypeId_B]))),
+            //         'unexpected global total ccy exchange fees (delta) vs. fee preview expected (B)');
+            // }
 
             // validate eeu fee events & global totals
             // stack too deep - had to drop qty from event

@@ -7,6 +7,7 @@ const abi = acmJson['abi'];
 const EthereumJsTx = require('ethereumjs-tx');
 
 const CONST = require('../const.js');
+const setupHelper = require('../test/testSetupContract.js');
 
 contract("StMaster", accounts => {
     var stm;

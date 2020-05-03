@@ -5,13 +5,14 @@ const { DateTime } = require('luxon');
 
 const CONST = require('../const.js');
 const futuresHelper = require('../test/futuresHelper.js');
+const setupHelper = require('../test/testSetupContract.js');
 
 contract("StMaster", accounts => {
     var stm_cur, stm_new;
 
     before(async function () {  
         stm_cur = await st.deployed();
-        await require('../test/testSetupContract.js').setDefaults({ stm: stm_cur, accounts });
+        await setupHelper.setDefaults({ stm: stm_cur, accounts });
 
         //if (await stm_cur.getContractType() == CONST.contractType.CASHFLOW) this.skip();
         console.log(`stm_cur: @${stm_cur.address} ledgerHash=${await stm_cur.getLedgerHashcode()} / ${await stm_cur.name()} ${await stm_cur.version()}`);

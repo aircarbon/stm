@@ -12,6 +12,7 @@ const BN = require('bn.js');
 const CONST = require('../const.js');
 const transferHelper = require('../test/transferHelper.js');
 const issuanceHelper = require('../test/issuanceHelper.js');
+const setupHelper = require('../test/testSetupContract.js');
 
 contract("StMaster", accounts => {
     var stm;

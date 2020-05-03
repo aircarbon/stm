@@ -47,4 +47,18 @@ module.exports = {
         // setup default owner ledger entry
         await stm.fund(CONST.ccyType.USD, 0, accounts[0]);
     },
+
+    whitelistAndSeal: async (a) => {
+        const { stm, accounts, } = a;
+
+        const CHUNK_SIZE = 100;
+        const CHUNKS = 5;
+        //console.log(`accounts: #${accounts.length}`);
+        for (var i=0; i < CHUNKS; i++) {
+            await stm.whitelistMany(accounts.slice(i * CHUNK_SIZE, (i+1) * CHUNK_SIZE));
+        }
+        const wl = await stm.getWhitelist();
+        //console.log(`WL: #${wl.length}`);
+        await stm.sealContract();
+    }
 };

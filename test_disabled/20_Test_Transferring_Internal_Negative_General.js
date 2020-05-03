@@ -2,6 +2,7 @@ const st = artifacts.require('StMaster');
 const Big = require('big.js');
 const transferHelper = require('./transferHelper.js');
 const CONST = require('../const.js');
+const setupHelper = require('../test/testSetupContract.js');
 
 contract("StMaster", accounts => {
     var stm;
@@ -13,7 +14,7 @@ contract("StMaster", accounts => {
         
         await stm.whitelistMany(accounts.slice(0,30));
         await stm.sealContract();
-        await require('../test/testSetupContract.js').setDefaults({ stm, accounts });
+        await setupHelper.setDefaults({ stm, accounts });
     });
     
     beforeEach(async () => {

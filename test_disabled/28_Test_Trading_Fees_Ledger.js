@@ -6,6 +6,7 @@ const BN = require('bn.js');
 const Big = require('big.js');
 const Web3 = require('web3');
 const web3 = new Web3();
+const setupHelper = require('../test/testSetupContract.js');
 
 contract("StMaster", accounts => {
     var stm;
@@ -15,9 +16,8 @@ contract("StMaster", accounts => {
         if (await stm.getContractType() == CONST.contractType.CASHFLOW) this.skip();
         if (!global.TaddrNdx) global.TaddrNdx = 0;
         
-        await stm.whitelistMany(accounts.slice(0,60));
-        await stm.sealContract();
-        await require('../test/testSetupContract.js').setDefaults({ stm, accounts });
+        await setupHelper.whitelistAndSeal({ stm, accounts });
+        await setupHelper.setDefaults({ stm, accounts });
     });
 
     beforeEach(async () => {
@@ -185,7 +185,7 @@ contract("StMaster", accounts => {
         const A = accounts[global.TaddrNdx + 0];
         const B = accounts[global.TaddrNdx + 1];
 
-        await stm.fund(CONST.ccyType.ETH,                      CONST.oneEth_wei,        A,                            { from: accounts[0] });
+        await stm.fund(CONST.ccyType.ETH,                      CONST.oneEth_wei,         A,                            { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.GT_CARBON, 1,       B, CONST.nullFees, 0, [], [], { from: accounts[0] });
 
         // set global fee structure (non-zero)

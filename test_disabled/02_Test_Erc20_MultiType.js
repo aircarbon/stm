@@ -2,6 +2,7 @@ const st = artifacts.require('StMaster');
 const truffleAssert = require('truffle-assertions');
 const CONST = require('../const.js');
 const transferHelper = require('../test/transferHelper.js');
+const setupHelper = require('../test/testSetupContract.js');
 
 contract("StMaster", accounts => {
     var stm;
@@ -25,7 +26,7 @@ contract("StMaster", accounts => {
         
         await stm.whitelistMany([WHITE]);
         await stm.sealContract();
-        await require('../test/testSetupContract.js').setDefaults({ stm, accounts });
+        await setupHelper.setDefaults({ stm, accounts });
 
         // mint batches x 3 with originator fees - should be ignored by ERC20
         const testFee = { ccy_mirrorFee: false, ccy_perMillion: 0, fee_fixed: 1, fee_percBips: 10, fee_min: 0, fee_max: 0 };

@@ -11,6 +11,7 @@ const { DateTime } = require('luxon');
 
 const futuresHelper = require('../test/futuresHelper.js');
 const CONST = require('../const.js');
+const setupHelper = require('../test/testSetupContract.js');
 
 contract("StMaster", accounts => {
     var stm;
@@ -22,7 +23,7 @@ contract("StMaster", accounts => {
         stm = await st.deployed();
         if (await stm.getContractType() == CONST.contractType.CASHFLOW) this.skip();
         await stm.sealContract();
-        await require('../test/testSetupContract.js').setDefaults({ stm, accounts });
+        await setupHelper.setDefaults({ stm, accounts });
         if (!global.TaddrNdx) global.TaddrNdx = 0;
 
         ccyTypes = (await stm.getCcyTypes()).ccyTypes;

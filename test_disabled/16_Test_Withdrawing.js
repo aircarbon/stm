@@ -10,7 +10,7 @@ contract("StMaster", accounts => {
         stm = await st.deployed();
         if (await stm.getContractType() == CONST.contractType.CASHFLOW) this.skip();
         await stm.sealContract();
-        await require('../test/testSetupContract.js').setDefaults({ stm, accounts });
+        await setupHelper.setDefaults({ stm, accounts });
         if (!global.TaddrNdx) global.TaddrNdx = 0;
     });
 
@@ -64,7 +64,7 @@ contract("StMaster", accounts => {
         var ledgerEntryBefore, ledgerEntryAfter;
 
         ledgerEntryBefore = await stm.getLedgerEntry(withdrawer);
-        const totalWithdrawnBefore = await stm.getTotalCcyWithdrawn.call(ccyTypeId);
+        //const totalWithdrawnBefore = await stm.getTotalCcyWithdrawn.call(ccyTypeId);
         
         // withdraw
         const withdrawTx = await stm.withdraw(ccyTypeId, amount, withdrawer, { from: accounts[0] });
@@ -88,8 +88,8 @@ contract("StMaster", accounts => {
                'unexpected ledger balance after withdrawing for ccy non-test ccy');
 
         // validate global total funded is updated
-        const totalWithdrawnAfter = await stm.getTotalCcyWithdrawn.call(ccyTypeId);
-        assert(totalWithdrawnAfter - totalWithdrawnBefore == amount, 'unexpected total withdrawn after withdrawal');
+        //const totalWithdrawnAfter = await stm.getTotalCcyWithdrawn.call(ccyTypeId);
+        //assert(totalWithdrawnAfter - totalWithdrawnBefore == amount, 'unexpected total withdrawn after withdrawal');
     }
 
     it(`withdrawing - should not allow non-owner to withdrawing from a ledger entry`, async () => {

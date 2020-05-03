@@ -22,9 +22,15 @@ import "../Interfaces/StructLib.sol";
 //  truffle compile --reset --all && grep \"bytecode\" build/contracts/* | awk '{print $1 " " length($3)/2}'
 //
 // 22123: ... [upgrade sol 0.6.6: removed ctor setup, removed WL deprecated, removed payable unused]
-// 23576: ... adding CF: baseline
-// 22951: ... [removed all global counters] // 24k
-// 23903: ... restored cashflowArgs
+// 23576: ... FTs v0 (paused) - baseline
+// 22830: ... [removed all global counters, except total minted & burned] // 24k
+// 22745: ... [removed isWL and getWLCount] // 24k
+
+// TODO: retest all...
+// TODO: test WL extreme count (~10k) esp. fetch all... (ropsten) --> MAYBE NEED isWL????
+// TODO: FT (new pos, mark, all) ==> must be WL account!
+
+// .....: ... restored cashflowArgs
 
 contract StMaster
     is //IStMaster, IPublicViews,

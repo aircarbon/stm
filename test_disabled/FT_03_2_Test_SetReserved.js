@@ -11,6 +11,7 @@ const { DateTime } = require('luxon');
 
 const transferHelper = require('../test/transferHelper.js');
 const CONST = require('../const.js');
+const setupHelper = require('../test/testSetupContract.js');
 
 contract("StMaster", accounts => {
     var stm;
@@ -22,9 +23,8 @@ contract("StMaster", accounts => {
         if (await stm.getContractType() == CONST.contractType.CASHFLOW) this.skip();
         if (!global.TaddrNdx) global.TaddrNdx = 0;
 
-        await stm.whitelistMany(accounts.slice(0,64));
-        await stm.sealContract();
-        await require('../test/testSetupContract.js').setDefaults({ stm, accounts });
+        await setupHelper.whitelistAndSeal({ stm, accounts });
+        await setupHelper.setDefaults({ stm, accounts });
 
         ccyTypes = (await stm.getCcyTypes()).ccyTypes;
         usdCcy = ccyTypes.find(p => p.name === 'USD');
