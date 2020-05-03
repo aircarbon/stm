@@ -247,116 +247,116 @@ library TransferLib {
     //
     // PUBLIC - fee preview (FULL - includes originator token fees)
     //
-    function transfer_feePreview(
-        StructLib.LedgerStruct storage ld,
-        StructLib.FeeStruct storage globalFees,
-        address feeAddrOwner,
-        StructLib.TransferArgs memory a
-    )
-    public view
-    // 1 exchange fee (single destination) + maximum of MAX_BATCHES_PREVIEW of originator fees on each side (x2) of the transfer
-    returns (
-        StructLib.FeesCalc[1 + MAX_BATCHES_PREVIEW * 2] memory feesAll
-        //
-        // SPLITTING
-        // want to *also* return the # of full & partial ST transfers, involved in *ALL* the transfer actions (not just fees)
-        // each set of { partialCount, fullCount } should be grouped by transfer-type: USER, EX_FEE, ORIG_FEE
-        // transfer could then take params: { StructLib.TransferType: partialStart, partialEnd, fullStart, fullEnd } -- basically pagination of the sub-transfers
-        //
-        // TEST SETUP COULD BE: ~100 minted batches 1 ton each, and move 99 tons A-B (type USER, multi-batch)
-        //       try to make orchestrator that batches by (eg.) 10...
-        //       (exactly the same for type ORIG_FEE multi-batch)
-        //
-    ) {
-        uint ndx = 0;
+//     function transfer_feePreview(
+//         StructLib.LedgerStruct storage ld,
+//         StructLib.FeeStruct storage globalFees,
+//         address feeAddrOwner,
+//         StructLib.TransferArgs memory a
+//     )
+//     public view
+//     // 1 exchange fee (single destination) + maximum of MAX_BATCHES_PREVIEW of originator fees on each side (x2) of the transfer
+//     returns (
+//         StructLib.FeesCalc[1 + MAX_BATCHES_PREVIEW * 2] memory feesAll
+//         //
+//         // SPLITTING
+//         // want to *also* return the # of full & partial ST transfers, involved in *ALL* the transfer actions (not just fees)
+//         // each set of { partialCount, fullCount } should be grouped by transfer-type: USER, EX_FEE, ORIG_FEE
+//         // transfer could then take params: { StructLib.TransferType: partialStart, partialEnd, fullStart, fullEnd } -- basically pagination of the sub-transfers
+//         //
+//         // TEST SETUP COULD BE: ~100 minted batches 1 ton each, and move 99 tons A-B (type USER, multi-batch)
+//         //       try to make orchestrator that batches by (eg.) 10...
+//         //       (exactly the same for type ORIG_FEE multi-batch)
+//         //
+//     ) {
+//         uint ndx = 0;
 
-        // exchange fee
-        StructLib.FeeStruct storage exFeeStruct_ccy_A = ld._ledger[a.ledger_A].spot_customFees.ccyType_Set[a.ccyTypeId_A]   ? ld._ledger[a.ledger_A].spot_customFees : globalFees;
-        StructLib.FeeStruct storage exFeeStruct_tok_A = ld._ledger[a.ledger_A].spot_customFees.tokType_Set[a.tokenTypeId_A] ? ld._ledger[a.ledger_A].spot_customFees : globalFees;
-        StructLib.FeeStruct storage exFeeStruct_ccy_B = ld._ledger[a.ledger_B].spot_customFees.ccyType_Set[a.ccyTypeId_B]   ? ld._ledger[a.ledger_B].spot_customFees : globalFees;
-        StructLib.FeeStruct storage exFeeStruct_tok_B = ld._ledger[a.ledger_B].spot_customFees.tokType_Set[a.tokenTypeId_B] ? ld._ledger[a.ledger_B].spot_customFees : globalFees;
-        feesAll[ndx++] = StructLib.FeesCalc({
-            fee_ccy_A: a.ledger_A != a.feeAddrOwner && a.ccy_amount_A > 0 ? calcFeeWithCapCollar(exFeeStruct_ccy_A.ccy[a.ccyTypeId_A], uint256(a.ccy_amount_A), a.qty_B) : 0,
-            fee_ccy_B: a.ledger_B != a.feeAddrOwner && a.ccy_amount_B > 0 ? calcFeeWithCapCollar(exFeeStruct_ccy_B.ccy[a.ccyTypeId_B], uint256(a.ccy_amount_B), a.qty_A) : 0,
-            fee_tok_A: a.ledger_A != a.feeAddrOwner && a.qty_A > 0        ? calcFeeWithCapCollar(exFeeStruct_tok_A.tok[a.tokenTypeId_A], a.qty_A,               0)       : 0,
-            fee_tok_B: a.ledger_B != a.feeAddrOwner && a.qty_B > 0        ? calcFeeWithCapCollar(exFeeStruct_tok_B.tok[a.tokenTypeId_B], a.qty_B,               0)       : 0,
-               fee_to: feeAddrOwner,
-       origTokFee_qty: 0,
-   origTokFee_batchId: 0,
-    origTokFee_struct: StructLib.SetFeeArgs({
-               fee_fixed: 0,
-            fee_percBips: 0,
-                 fee_min: 0,
-                 fee_max: 0,
-          ccy_perMillion: 0,
-           ccy_mirrorFee: false
-        })
-        });
+//         // exchange fee
+//         StructLib.FeeStruct storage exFeeStruct_ccy_A = ld._ledger[a.ledger_A].spot_customFees.ccyType_Set[a.ccyTypeId_A]   ? ld._ledger[a.ledger_A].spot_customFees : globalFees;
+//         StructLib.FeeStruct storage exFeeStruct_tok_A = ld._ledger[a.ledger_A].spot_customFees.tokType_Set[a.tokenTypeId_A] ? ld._ledger[a.ledger_A].spot_customFees : globalFees;
+//         StructLib.FeeStruct storage exFeeStruct_ccy_B = ld._ledger[a.ledger_B].spot_customFees.ccyType_Set[a.ccyTypeId_B]   ? ld._ledger[a.ledger_B].spot_customFees : globalFees;
+//         StructLib.FeeStruct storage exFeeStruct_tok_B = ld._ledger[a.ledger_B].spot_customFees.tokType_Set[a.tokenTypeId_B] ? ld._ledger[a.ledger_B].spot_customFees : globalFees;
+//         feesAll[ndx++] = StructLib.FeesCalc({
+//             fee_ccy_A: a.ledger_A != a.feeAddrOwner && a.ccy_amount_A > 0 ? calcFeeWithCapCollar(exFeeStruct_ccy_A.ccy[a.ccyTypeId_A], uint256(a.ccy_amount_A), a.qty_B) : 0,
+//             fee_ccy_B: a.ledger_B != a.feeAddrOwner && a.ccy_amount_B > 0 ? calcFeeWithCapCollar(exFeeStruct_ccy_B.ccy[a.ccyTypeId_B], uint256(a.ccy_amount_B), a.qty_A) : 0,
+//             fee_tok_A: a.ledger_A != a.feeAddrOwner && a.qty_A > 0        ? calcFeeWithCapCollar(exFeeStruct_tok_A.tok[a.tokenTypeId_A], a.qty_A,               0)       : 0,
+//             fee_tok_B: a.ledger_B != a.feeAddrOwner && a.qty_B > 0        ? calcFeeWithCapCollar(exFeeStruct_tok_B.tok[a.tokenTypeId_B], a.qty_B,               0)       : 0,
+//                fee_to: feeAddrOwner,
+//        origTokFee_qty: 0,
+//    origTokFee_batchId: 0,
+//     origTokFee_struct: StructLib.SetFeeArgs({
+//                fee_fixed: 0,
+//             fee_percBips: 0,
+//                  fee_min: 0,
+//                  fee_max: 0,
+//           ccy_perMillion: 0,
+//            ccy_mirrorFee: false
+//         })
+//         });
 
-        // apply exchange ccy fee mirroring - only ever from one side to the other
-        if (feesAll[0].fee_ccy_A > 0 && feesAll[0].fee_ccy_B == 0) {
-            if (exFeeStruct_ccy_A.ccy[a.ccyTypeId_A].ccy_mirrorFee == true) {
-                a.ccyTypeId_B = a.ccyTypeId_A;
-                //feesAll[0].fee_ccy_B = feesAll[0].fee_ccy_A; // symmetrical mirror
+//         // apply exchange ccy fee mirroring - only ever from one side to the other
+//         if (feesAll[0].fee_ccy_A > 0 && feesAll[0].fee_ccy_B == 0) {
+//             if (exFeeStruct_ccy_A.ccy[a.ccyTypeId_A].ccy_mirrorFee == true) {
+//                 a.ccyTypeId_B = a.ccyTypeId_A;
+//                 //feesAll[0].fee_ccy_B = feesAll[0].fee_ccy_A; // symmetrical mirror
 
-                // asymmetrical mirror
-                exFeeStruct_ccy_B = ld._ledger[a.ledger_B].spot_customFees.ccyType_Set[a.ccyTypeId_B] ? ld._ledger[a.ledger_B].spot_customFees : globalFees;
-                feesAll[0].fee_ccy_B = a.ledger_B != a.feeAddrOwner ? calcFeeWithCapCollar(exFeeStruct_ccy_B.ccy[a.ccyTypeId_B], uint256(a.ccy_amount_A), a.qty_B) : 0; // ??!
-            }
-        }
-        else if (feesAll[0].fee_ccy_B > 0 && feesAll[0].fee_ccy_A == 0) {
-            if (exFeeStruct_ccy_B.ccy[a.ccyTypeId_B].ccy_mirrorFee == true) {
-                a.ccyTypeId_A = a.ccyTypeId_B;
-                //feesAll[0].fee_ccy_A = feesAll[0].fee_ccy_B; // symmetrical mirror
+//                 // asymmetrical mirror
+//                 exFeeStruct_ccy_B = ld._ledger[a.ledger_B].spot_customFees.ccyType_Set[a.ccyTypeId_B] ? ld._ledger[a.ledger_B].spot_customFees : globalFees;
+//                 feesAll[0].fee_ccy_B = a.ledger_B != a.feeAddrOwner ? calcFeeWithCapCollar(exFeeStruct_ccy_B.ccy[a.ccyTypeId_B], uint256(a.ccy_amount_A), a.qty_B) : 0; // ??!
+//             }
+//         }
+//         else if (feesAll[0].fee_ccy_B > 0 && feesAll[0].fee_ccy_A == 0) {
+//             if (exFeeStruct_ccy_B.ccy[a.ccyTypeId_B].ccy_mirrorFee == true) {
+//                 a.ccyTypeId_A = a.ccyTypeId_B;
+//                 //feesAll[0].fee_ccy_A = feesAll[0].fee_ccy_B; // symmetrical mirror
 
-                // asymmetrical mirror
-                exFeeStruct_ccy_A = ld._ledger[a.ledger_A].spot_customFees.ccyType_Set[a.ccyTypeId_A] ? ld._ledger[a.ledger_A].spot_customFees : globalFees;
-                feesAll[0].fee_ccy_A = a.ledger_A != a.feeAddrOwner ? calcFeeWithCapCollar(exFeeStruct_ccy_A.ccy[a.ccyTypeId_A], uint256(a.ccy_amount_B), a.qty_A) : 0; // ??!
-            }
-        }
+//                 // asymmetrical mirror
+//                 exFeeStruct_ccy_A = ld._ledger[a.ledger_A].spot_customFees.ccyType_Set[a.ccyTypeId_A] ? ld._ledger[a.ledger_A].spot_customFees : globalFees;
+//                 feesAll[0].fee_ccy_A = a.ledger_A != a.feeAddrOwner ? calcFeeWithCapCollar(exFeeStruct_ccy_A.ccy[a.ccyTypeId_A], uint256(a.ccy_amount_B), a.qty_A) : 0; // ??!
+//             }
+//         }
 
-        // originator token fee(s) - per batch
-        uint256 maxStId = ld._tokens_currentMax_id;
-        if (a.qty_A > 0) {
-            TransferSplitPreviewReturn memory preview = transferSplitSecTokens_Preview(ld, TransferSplitArgs({ from: a.ledger_A, to: a.ledger_B, tokenTypeId: a.tokenTypeId_A, qtyUnit: a.qty_A, transferType: StructLib.TransferType.User, maxStId: maxStId }));
-            for (uint i = 0; i < preview.batchCount ; i++) {
-                StructLib.SecTokenBatch storage batch = ld._batches[preview.batchIds[i]];
-                if (a.ledger_A != batch.originator) {
-                    feesAll[ndx++] = StructLib.FeesCalc({
-                        fee_ccy_A: 0,
-                        fee_ccy_B: 0,
-                        fee_tok_A: calcFeeWithCapCollar(batch.origTokFee, preview.transferQty[i], 0),
-                        fee_tok_B: 0,
-                           fee_to: batch.originator,
-                   origTokFee_qty: preview.transferQty[i],
-               origTokFee_batchId: preview.batchIds[i],
-                origTokFee_struct: batch.origTokFee
-                    });
-                }
-            }
-        }
-        if (a.qty_B > 0) {
-            TransferSplitPreviewReturn memory preview = transferSplitSecTokens_Preview(ld, TransferSplitArgs({ from: a.ledger_B, to: a.ledger_A, tokenTypeId: a.tokenTypeId_B, qtyUnit: a.qty_B, transferType: StructLib.TransferType.User, maxStId: maxStId }));
-            for (uint i = 0; i < preview.batchCount ; i++) {
-                StructLib.SecTokenBatch storage batch = ld._batches[preview.batchIds[i]];
-                if (a.ledger_B != batch.originator) {
-                    feesAll[ndx++] = StructLib.FeesCalc({
-                        fee_ccy_A: 0,
-                        fee_ccy_B: 0,
-                        fee_tok_A: 0,
-                        fee_tok_B: calcFeeWithCapCollar(batch.origTokFee, preview.transferQty[i], 0),
-                           fee_to: batch.originator,
-                   origTokFee_qty: preview.transferQty[i],
-               origTokFee_batchId: preview.batchIds[i],
-                origTokFee_struct: batch.origTokFee
-                    });
-                }
-            }
-        }
-    }
+//         // originator token fee(s) - per batch
+//         uint256 maxStId = ld._tokens_currentMax_id;
+//         if (a.qty_A > 0) {
+//             TransferSplitPreviewReturn memory preview = transferSplitSecTokens_Preview(ld, TransferSplitArgs({ from: a.ledger_A, to: a.ledger_B, tokenTypeId: a.tokenTypeId_A, qtyUnit: a.qty_A, transferType: StructLib.TransferType.User, maxStId: maxStId }));
+//             for (uint i = 0; i < preview.batchCount ; i++) {
+//                 StructLib.SecTokenBatch storage batch = ld._batches[preview.batchIds[i]];
+//                 if (a.ledger_A != batch.originator) {
+//                     feesAll[ndx++] = StructLib.FeesCalc({
+//                         fee_ccy_A: 0,
+//                         fee_ccy_B: 0,
+//                         fee_tok_A: calcFeeWithCapCollar(batch.origTokFee, preview.transferQty[i], 0),
+//                         fee_tok_B: 0,
+//                            fee_to: batch.originator,
+//                    origTokFee_qty: preview.transferQty[i],
+//                origTokFee_batchId: preview.batchIds[i],
+//                 origTokFee_struct: batch.origTokFee
+//                     });
+//                 }
+//             }
+//         }
+//         if (a.qty_B > 0) {
+//             TransferSplitPreviewReturn memory preview = transferSplitSecTokens_Preview(ld, TransferSplitArgs({ from: a.ledger_B, to: a.ledger_A, tokenTypeId: a.tokenTypeId_B, qtyUnit: a.qty_B, transferType: StructLib.TransferType.User, maxStId: maxStId }));
+//             for (uint i = 0; i < preview.batchCount ; i++) {
+//                 StructLib.SecTokenBatch storage batch = ld._batches[preview.batchIds[i]];
+//                 if (a.ledger_B != batch.originator) {
+//                     feesAll[ndx++] = StructLib.FeesCalc({
+//                         fee_ccy_A: 0,
+//                         fee_ccy_B: 0,
+//                         fee_tok_A: 0,
+//                         fee_tok_B: calcFeeWithCapCollar(batch.origTokFee, preview.transferQty[i], 0),
+//                            fee_to: batch.originator,
+//                    origTokFee_qty: preview.transferQty[i],
+//                origTokFee_batchId: preview.batchIds[i],
+//                 origTokFee_struct: batch.origTokFee
+//                     });
+//                 }
+//             }
+//         }
+//     }
 
     //
-    // PUBLIC - fee preview (FAST - returs only the exchange fee[s])
+    // PUBLIC - fee preview (FAST - returns only the exchange fee[s])
     //
     function transfer_feePreview_ExchangeOnly(
         StructLib.LedgerStruct storage ld,

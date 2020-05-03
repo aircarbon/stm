@@ -25,7 +25,8 @@ import "../Interfaces/StructLib.sol";
 // 23576: ... FTs v0 (paused) - baseline
 // 22830: ... [removed all global counters, except total minted & burned]
 // 22870: ... [removed isWL and getWLCount]
-// 22545: ... [moved WL checks (transferTrade & openFtPos) to libs]
+// 22545: ... [removed WL checks (transferTrade & openFtPos) to libs]
+// 22055: ... [removed old/full fee preview]
 
 // .....: ... restored cashflowArgs
 

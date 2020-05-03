@@ -17,7 +17,7 @@ import "../Libs/PayableLib.sol";
 // 24k gas limit -- disabled for commodity branch...
 //
 
-abstract
+abstract // solc 0.6
 contract StPayable is
     //IStPayable,
     StErc20 {
