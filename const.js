@@ -64,7 +64,7 @@ var consoleOutput = true;
 module.exports = {
     contractProps: contractProps,
 
-    //logTestAccountUsage: true,
+    logTestAccountUsage: false,
 
     nullAddr: "0x0000000000000000000000000000000000000000",
 

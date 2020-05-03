@@ -24,7 +24,7 @@ contract("StMaster", accounts => {
         stm = await st.deployed();
         if (await stm.getContractType() == CONST.contractType.CASHFLOW) this.skip();
         
-        await stm.sealContract();
+        await setupHelper.whitelistAndSeal({ stm, accounts });
         await setupHelper.setDefaults({ stm, accounts });
         if (!global.TaddrNdx) global.TaddrNdx = 0;
 

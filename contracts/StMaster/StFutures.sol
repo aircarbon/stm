@@ -151,6 +151,10 @@ contract StFutures is Owned,
 
     function openFtPos(StructLib.FuturesPositionArgs memory a)
     public onlyOwner() onlyWhenReadWrite() {
+        // abort if opening position on a non-whitelist account
+        require(erc20d._whitelisted[a.ledger_A], "Not whitelisted (A)");
+        require(erc20d._whitelisted[a.ledger_B], "Not whitelisted (B)");
+
         FuturesLib.openFtPos(ld, std, ctd, a, owner);
     }
 
