@@ -17,6 +17,23 @@ process.env.WEB3_NETWORK_ID = Number(process.env.NETWORK_ID || 888);
     console.warn('Reset default whitelist index');
     await db.AddConfigSetting('next_wl_index', DEFAULT_WHITELIST_INDEX);
 
+    const defaultGasPrices = [
+      'gasPrice_admin_mintSecTokenBatch_mwei',
+      'gasPrice_admin_fund_mwei',
+      'gasPrice_admin_transferOrTrade_mwei',
+      'gasPrice_admin_burnTokens_mwei',
+      'gasPrice_admin_withdraw_mwei',
+      'gasPrice_admin_setOriginatorFeeTokenBatch_mwei',
+      'gasPrice_admin_addMetaSecTokenBatch_mwei',
+      'gasPrice_admin_setFee_CcyType_mwei',
+      'gasPrice_admin_setFee_TokType_mwei',
+      'gasPrice_exchange_transferOrTrade_mwei'
+    ];
+
+    const gasPricesPromise = defaultGasPrices.map(action => db.AddConfigSetting(action, 'fast'))
+
+    await Promise.all(gasPricesPromise);
+
     // insert gas prices
     const GAS_PRICES_URL = 'https://www.etherchain.org/api/gasPriceOracle';
     const response = await got(GAS_PRICES_URL);
