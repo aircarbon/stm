@@ -26,7 +26,6 @@ import "../Interfaces/StructLib.sol";
 // 22830: ... [removed all global counters, except total minted & burned] // 24k
 // 22745: ... [removed isWL and getWLCount] // 24k
 
-// TODO: retest all...
 // TODO: test WL extreme count (~10k) esp. fetch all... (ropsten) --> MAYBE NEED isWL????
 // TODO: FT (new pos, mark, all) ==> must be WL account!
 

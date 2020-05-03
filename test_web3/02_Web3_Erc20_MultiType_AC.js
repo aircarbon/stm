@@ -53,6 +53,8 @@ describe(`Contract Web3 Interface`, async () => {
         x = await CONST.getAccountAndKey(GRAY_2_NDX);
         GRAY_2 = x.addr; GRAY_2_privKey = x.privKey;
 
+        await require('../devSetupContract.js').setDefaults();
+
         // setup - whitelist A, mint two types for A, transferOrTrade all A -> GRAY_1
         try {
             await CONST.web3_tx('whitelistMany', [ [WHITE] ], OWNER, OWNER_privKey);

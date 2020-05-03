@@ -23,11 +23,6 @@ describe(`Contract Web3 Interface`, async () => {
         const wl_all = await CONST.web3_call('getWhitelist', [])
         console.log('wl_all', wl_all);
     });
-
-    it(`web3 direct - getWhitelistNext()`, async () => {
-        const wl_next = await CONST.web3_call('getWhitelistNext', [])
-        console.log('wl_next', wl_next);
-    });
 });
 
   
