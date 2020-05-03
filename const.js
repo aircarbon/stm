@@ -13,7 +13,7 @@ const truffleAssert = require('truffle-assertions');
 const { db } = require('../common/dist/lib');
 
 // misc
-const WEB3_GWEI_GAS_BID = '10';
+const WEB3_GWEI_GAS_BID = '5';
 const WEB3_GAS_LIMIT = 5000000;
 
 // CFD helpers
@@ -321,9 +321,9 @@ async function web3_tx(methodName, methodArgs, fromAddr, fromPrivKey) {
     const txPromise = new Promise((resolve, reject) =>  {
         var txHash;
         web3.eth.sendSignedTransaction(raw)
-        .on("receipt", receipt => {
-            if (consoleOutput) console.log(`   => receipt`, receipt);
-        })
+        // .on("receipt", receipt => {
+        //     if (consoleOutput) console.log(`   => receipt`, receipt);
+        // })
         .once("transactionHash", hash => {
             txHash = hash;
             if (consoleOutput) console.log(chalk.dim.yellow(`   => ${txHash} ...`));
@@ -331,6 +331,7 @@ async function web3_tx(methodName, methodArgs, fromAddr, fromPrivKey) {
         .once("confirmation", async (confirms, receipt) => {
             //const receipt = await web3.eth.getTransactionReceipt(txHash);
             const evs = await contract.getPastEvents("allEvents", { fromBlock: receipt.blockNumber, toBlock: receipt.blockNumber });
+            //console.log('receipt', receipt);
             //console.log('evs', evs);
             if (consoleOutput) console.log(chalk.dim.yellow(`   => ${txHash} - ${confirms} confirm(s), receipt.gasUsed=${receipt.gasUsed} receipt.blockNumber=${receipt.blockNumber} evs=${evs.map(p => `B# ${p.blockNumber}: ${p.event}`).join(',')}`));//, JSON.stringify(receipt)));
             // receipt.logs
@@ -341,7 +342,7 @@ async function web3_tx(methodName, methodArgs, fromAddr, fromPrivKey) {
             resolve({ txHash, receipt, evs });
         })
         .once("error", error => {
-            console.log(chalk.bold.red(`   => ## error`, error));
+            console.log(chalk.bold.red(`   => ## error`, JSON.stringify(error)));
             console.dir(error);
             reject(error);
         });
@@ -374,10 +375,10 @@ async function web3_sendEthTestAddr(sendFromNdx, sendToAddr, ethValue) {
     const txPromise = new Promise((resolve, reject) =>  {
         var txHash;
         web3.eth.sendSignedTransaction(raw)
-        .on("receipt", receipt => {
-            //console.log(`   => receipt`, receipt);
-        })
-        .on("transactionHash", hash => {
+        // .on("receipt", receipt => {
+        //     //console.log(`   => receipt`, receipt);
+        // })
+        .once("transactionHash", hash => {
             txHash = hash;
             //console.log(`   => ${txHash} ...`);
         })
@@ -387,7 +388,7 @@ async function web3_sendEthTestAddr(sendFromNdx, sendToAddr, ethValue) {
             resolve(txHash);
         })
         .once("error", error => {
-            console.log(chalk.yellow(`   => ## error`, error));
+            console.log(chalk.yellow(`   => ## error`, JSON.stringify(error)));
             console.dir(error);
             reject(error);
         });

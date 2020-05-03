@@ -77,11 +77,11 @@ module.exports = {
           return wallet;
         },
       network_id: "*", // 3
-      gas: 8000029,
+      gas: 7800000,
       gasPrice: web3.utils.toWei(gweiDeployment, "gwei"),
       networkCheckTimeout: 30000,
       
-      confirmations: 10,    // # of confs to wait between deployments. (default: 0)
+      confirmations: 1,    // # of confs to wait between deployments. (default: 0)
       skipDryRun: true,
       timeoutBlocks: 200, // but web3 always times out at 50 blocks?!
     },
@@ -99,7 +99,7 @@ module.exports = {
       gas: 7800000,
       gasPrice: web3.utils.toWei(gweiDeployment, "gwei"),
 
-      confirmations: 10,
+      confirmations: 1,
       skipDryRun: true,
       timeoutBlocks: 200,
     },
