@@ -36,7 +36,7 @@ contract("StMaster", accounts => {
         await stm.setFee_TokType(CONST.tokenType.NATURE, CONST.nullAddr, testFee );
 
         // set ledger fees NATURE - should be ignored by ERC20
-        await stm.setFee_TokType(CONST.tokenType.NATURE, WHITE,  testFee );
+        await stm.setFee_TokType(CONST.tokenType.NATURE, WHITE, testFee );
         
         await stm.fund(CONST.ccyType.USD, 1, GRAY_1, { from: accounts[0] });
         await stm.setFee_TokType(CONST.tokenType.NATURE, GRAY_1, testFee );

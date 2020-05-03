@@ -81,7 +81,6 @@ contract StErc20 is StFees//, IErc20
             ld,
             std,
             ctd,
-            erc20d,
             globalFees,
             Erc20Lib.transferErc20Args({
                      owner: owner,

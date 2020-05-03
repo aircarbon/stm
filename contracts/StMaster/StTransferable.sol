@@ -25,8 +25,12 @@ contract StTransferable is Owned,
 
     function transferOrTrade(StructLib.TransferArgs memory a)
     public onlyOwner() onlyWhenReadWrite() {
+        // abort if sending tokens from a non-whitelist account
+        require(!(a.qty_A > 0 && !erc20d._whitelisted[a.ledger_A]), "Not whitelisted (A)"); 
+        require(!(a.qty_B > 0 && !erc20d._whitelisted[a.ledger_B]), "Not whitelisted (B)");
+
         a.feeAddrOwner = owner;
-        TransferLib.transferOrTrade(ld, ctd, erc20d, globalFees, a);
+        TransferLib.transferOrTrade(ld, ctd, globalFees, a);
     }
 
     // FAST - fee preview exchange fee only
@@ -36,12 +40,12 @@ contract StTransferable is Owned,
     }
 
     // SLOW - fee preview (full, slow) - old/deprecate?
-    // 24k
-    // uint256 constant MAX_BATCHES_PREVIEW = 128; // library constants not accessible in contract; must duplicate TransferLib value
-    // function transfer_feePreview(StructLib.TransferArgs calldata a)
-    // external view returns (StructLib.FeesCalc[1 + MAX_BATCHES_PREVIEW * 2] memory feesAll) {
-    //     return TransferLib.transfer_feePreview(ld, globalFees, owner, a);
-    // }
+    // 24k - remove
+    uint256 constant MAX_BATCHES_PREVIEW = 128; // library constants not accessible in contract; must duplicate TransferLib value
+    function transfer_feePreview(StructLib.TransferArgs calldata a)
+    external view returns (StructLib.FeesCalc[1 + MAX_BATCHES_PREVIEW * 2] memory feesAll) {
+        return TransferLib.transfer_feePreview(ld, globalFees, owner, a);
+    }
 
     // 24k
     // function getCcy_totalTransfered(uint256 ccyTypeId)

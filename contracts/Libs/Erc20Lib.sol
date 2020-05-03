@@ -37,7 +37,6 @@ library Erc20Lib {
         StructLib.LedgerStruct storage ld,
         StructLib.StTypesStruct storage std,
         StructLib.CcyTypesStruct storage ctd,
-        StructLib.Erc20Struct storage erc20d,
         StructLib.FeeStruct storage globalFees,
         transferErc20Args memory a
     ) public returns (bool) {
@@ -60,7 +59,7 @@ library Erc20Lib {
                 uint256 qtyTransfer = remainingToTransfer >= qtyType ? qtyType : remainingToTransfer;
 
                 if (qtyTransfer > 0) {
-                    StructLib.TransferArgs memory a2 = StructLib.TransferArgs({
+                    StructLib.TransferArgs memory transferOrTradeArgs = StructLib.TransferArgs({
                             ledger_A: msg.sender,
                             ledger_B: a.recipient,
                                qty_A: qtyTransfer,
@@ -74,7 +73,7 @@ library Erc20Lib {
                            applyFees: false,
                         feeAddrOwner: a.owner //address(0x0) // fees: disabled for erc20 - not used
                     });
-                    TransferLib.transferOrTrade(ld, ctd, erc20d, globalFees, a2);
+                    TransferLib.transferOrTrade(ld, ctd, globalFees, transferOrTradeArgs);
                     remainingToTransfer -= qtyTransfer;
                 }
             }

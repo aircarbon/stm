@@ -24,9 +24,7 @@ import "../Interfaces/StructLib.sol";
 // 22123: ... [upgrade sol 0.6.6: removed ctor setup, removed WL deprecated, removed payable unused]
 // 23576: ... FTs v0 (paused) - baseline
 // 22830: ... [removed all global counters, except total minted & burned]
-// 22870: ... [removed isWL and getWLCount]
-// 22545: ... [removed WL checks (transferTrade & openFtPos) to libs]
-// 22055: ... [removed old/full fee preview]
+// 22911: ... [removed isWL and getWLCount]
 
 // .....: ... restored cashflowArgs
 
