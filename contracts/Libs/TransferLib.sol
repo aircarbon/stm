@@ -24,11 +24,15 @@ library TransferLib {
     function transferOrTrade(
         StructLib.LedgerStruct storage ld,
         StructLib.CcyTypesStruct storage ctd,
+        StructLib.Erc20Struct storage erc20d,
         StructLib.FeeStruct storage globalFees,
         StructLib.TransferArgs memory a
     ) public {
         TransferVars memory v;
         uint256 maxStId = ld._tokens_currentMax_id;
+
+        require(!(a.qty_A > 0 && !erc20d._whitelisted[a.ledger_A]), "Not whitelisted (A)"); // abort if sending tokens from a non-whitelist account
+        require(!(a.qty_B > 0 && !erc20d._whitelisted[a.ledger_B]), "Not whitelisted (B)");
 
         require(ld._contractSealed, "Contract is not sealed");
         require(a.qty_A > 0 || a.qty_B > 0 || a.ccy_amount_A > 0 || a.ccy_amount_B > 0, "Bad null transfer");

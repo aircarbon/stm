@@ -63,6 +63,7 @@ library PayableLib {
         StructLib.LedgerStruct storage ld,
         StructLib.CashflowStruct storage cashflowData,
         StructLib.CcyTypesStruct storage ctd,
+        StructLib.Erc20Struct storage erc20d,
         StructLib.FeeStruct storage globalFees, address owner,
         int256 ethSat_UsdCents
     )
@@ -85,7 +86,7 @@ library PayableLib {
             // TODO...
         }
         else {
-            processSubscriberPayment(ld, cashflowData, ctd, issueBatch, globalFees, owner, ethSat_UsdCents); // all other senders
+            processSubscriberPayment(ld, cashflowData, ctd, erc20d, issueBatch, globalFees, owner, ethSat_UsdCents); // all other senders
         }
     }
 
@@ -93,6 +94,7 @@ library PayableLib {
         StructLib.LedgerStruct storage ld,
         StructLib.CashflowStruct storage cashflowData,
         StructLib.CcyTypesStruct storage ctd,
+        StructLib.Erc20Struct storage erc20d,
         StructLib.SecTokenBatch storage issueBatch,
         StructLib.FeeStruct storage globalFees,
         address owner,
@@ -141,7 +143,7 @@ library PayableLib {
                    applyFees: false,
                 feeAddrOwner: owner
             });
-            TransferLib.transferOrTrade(ld, ctd, globalFees, a);
+            TransferLib.transferOrTrade(ld, ctd, erc20d, globalFees, a);
         }
 
         // todo: issuance fees (set then clear ledgerFee?)

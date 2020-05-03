@@ -64,10 +64,14 @@ library FuturesLib {
         StructLib.LedgerStruct storage ld,
         StructLib.StTypesStruct storage std,
         StructLib.CcyTypesStruct storage ctd,
+        StructLib.Erc20Struct storage erc20d,
         StructLib.FuturesPositionArgs memory a,
         address owner
     ) public {
         OpenPosVars memory v;
+        require(erc20d._whitelisted[a.ledger_A], "Not whitelisted (A)"); // abort if opening position on a non-whitelist account
+        require(erc20d._whitelisted[a.ledger_B], "Not whitelisted (B)");
+
         require(ld._contractSealed, "Contract is not sealed");
         require(a.ledger_A != a.ledger_B, "Bad transfer");
         require(a.qty_A <= 0x7FFFFFFFFFFFFFFF && a.qty_B <= 0x7FFFFFFFFFFFFFFF && a.qty_A >= -0x7FFFFFFFFFFFFFFF && a.qty_B >= -0x7FFFFFFFFFFFFFFF && a.qty_A != 0 && a.qty_B != 0, "Bad quantity"); // min/max signed int64, non-zero

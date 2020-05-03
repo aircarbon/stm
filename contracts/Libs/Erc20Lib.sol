@@ -28,16 +28,22 @@ library Erc20Lib {
     // }
 
     // TRANSFER
+    struct transferErc20Args {
+        address owner;
+        address recipient;
+        uint256 amount;
+    }
     function transfer(
         StructLib.LedgerStruct storage ld,
         StructLib.StTypesStruct storage std,
         StructLib.CcyTypesStruct storage ctd,
-        StructLib.FeeStruct storage globalFees, address owner, // fees: disabled for erc20 - not used
-        address recipient, uint256 amount
+        StructLib.Erc20Struct storage erc20d,
+        StructLib.FeeStruct storage globalFees,
+        transferErc20Args memory a
     ) public returns (bool) {
         require(ld._contractSealed, "Contract is not sealed");
 
-        uint256 remainingToTransfer = amount;
+        uint256 remainingToTransfer = a.amount;
         while (remainingToTransfer > 0) {
             // iterate ST types
             for (uint256 tokenTypeId = 1; tokenTypeId <= std._tt_Count; tokenTypeId++) {
@@ -54,9 +60,9 @@ library Erc20Lib {
                 uint256 qtyTransfer = remainingToTransfer >= qtyType ? qtyType : remainingToTransfer;
 
                 if (qtyTransfer > 0) {
-                    StructLib.TransferArgs memory a = StructLib.TransferArgs({
+                    StructLib.TransferArgs memory a2 = StructLib.TransferArgs({
                             ledger_A: msg.sender,
-                            ledger_B: recipient,
+                            ledger_B: a.recipient,
                                qty_A: qtyTransfer,
                        tokenTypeId_A: tokenTypeId,
                                qty_B: 0,
@@ -66,14 +72,14 @@ library Erc20Lib {
                         ccy_amount_B: 0,
                          ccyTypeId_B: 0,
                            applyFees: false,
-                        feeAddrOwner: owner
+                        feeAddrOwner: a.owner //address(0x0) // fees: disabled for erc20 - not used
                     });
-                    TransferLib.transferOrTrade(ld, ctd, globalFees, a);
+                    TransferLib.transferOrTrade(ld, ctd, erc20d, globalFees, a2);
                     remainingToTransfer -= qtyTransfer;
                 }
             }
         }
-        emit Transfer(msg.sender, recipient, amount);
+        emit Transfer(msg.sender, a.recipient, a.amount);
         return true;
     }
 }

@@ -25,12 +25,8 @@ contract StTransferable is Owned,
 
     function transferOrTrade(StructLib.TransferArgs memory a)
     public onlyOwner() onlyWhenReadWrite() {
-        // abort if sending tokens from a non-whitelist account
-        require(!(a.qty_A > 0 && !erc20d._whitelisted[a.ledger_A]), "Not whitelisted (A)");
-        require(!(a.qty_B > 0 && !erc20d._whitelisted[a.ledger_B]), "Not whitelisted (B)");
-
         a.feeAddrOwner = owner;
-        TransferLib.transferOrTrade(ld, ctd, globalFees, a);
+        TransferLib.transferOrTrade(ld, ctd, erc20d, globalFees, a);
     }
 
     // FAST - fee preview exchange fee only

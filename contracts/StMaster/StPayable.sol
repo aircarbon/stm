@@ -5,6 +5,7 @@ pragma experimental ABIEncoderV2;
 //import "../Interfaces/IStPayable.sol";
 
 import "./StFees.sol";
+import "./StErc20.sol";
 
 import "../Libs/LedgerLib.sol";
 import "../Interfaces/StructLib.sol";
@@ -16,9 +17,10 @@ import "../Libs/PayableLib.sol";
 // 24k gas limit -- disabled for commodity branch...
 //
 
+abstract
 contract StPayable is
     //IStPayable,
-    StFees {
+    StErc20 {
 
     // === CFT ===
     // PRI 1 ** CASHFLOWS (J 1+3) ==>>> MVP -- CFT CORE (aiming for *no whitelisting*, i.e. all external control ERC20 accounts)

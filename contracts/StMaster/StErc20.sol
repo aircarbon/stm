@@ -81,9 +81,13 @@ contract StErc20 is StFees//, IErc20
             ld,
             std,
             ctd,
+            erc20d,
             globalFees,
-            owner,
-            recipient, amount // erc20 args
+            Erc20Lib.transferErc20Args({
+                     owner: owner,
+                 recipient: recipient,
+                    amount: amount
+            })
         );
     }
 
