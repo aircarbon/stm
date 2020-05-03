@@ -28,20 +28,20 @@ contract IStFees is IOwned {
     /**
      * @notice Returns the total quantity of token exchange fees paid, in the contract base unit
      */
-    function getSecToken_totalExchangeFeesPaidQty()
-    external view returns (uint256) { revert("Not implemented"); }
+    // function getSecToken_totalExchangeFeesPaidQty()
+    // external view returns (uint256) { revert("Not implemented"); }
 
     /**
      * @notice Returns the total quantity of token originator fees paid, in the contract base unit
      */
-    function getSecToken_totalOriginatorFeesPaidQty()
-    external view returns (uint256) { revert("Not implemented"); }
+    // function getSecToken_totalOriginatorFeesPaidQty()
+    // external view returns (uint256) { revert("Not implemented"); }
 
     /**
      * @notice Returns the total amount of currency exchange fees paid, for the supplied currency
      */
-    function getCcy_totalExchangeFeesPaid(uint256 ccyTypeId)
-    external view returns (uint256) { revert("Not implemented"); }
+    // function getCcy_totalExchangeFeesPaid(uint256 ccyTypeId)
+    // external view returns (uint256) { revert("Not implemented"); }
 
     /**
      * @notice Sets the current fee structure (global or ledger fee) for the supplied token type

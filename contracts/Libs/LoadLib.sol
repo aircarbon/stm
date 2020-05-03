@@ -66,40 +66,34 @@ library LoadLib {
 
     function setTokenTotals(
         StructLib.LedgerStruct storage ld,
-        uint80 packed_ExchangeFeesPaidQty, uint80 packed_OriginatorFeesPaidQty, uint80 packed_TransferedQty,
+        //uint80 packed_ExchangeFeesPaidQty, uint80 packed_OriginatorFeesPaidQty, uint80 packed_TransferedQty,
         uint256 currentMax_id, uint256 totalMintedQty, uint256 totalBurnedQty
     )
     public {
         require(!ld._contractSealed, "Contract is sealed");
-        ld._spot_total.exchangeFeesPaidQty = packed_ExchangeFeesPaidQty;
-        ld._spot_total.originatorFeesPaidQty = packed_OriginatorFeesPaidQty;
-        ld._spot_total.transferedQty = packed_TransferedQty;
+        //ld._spot_total.exchangeFeesPaidQty = packed_ExchangeFeesPaidQty;
+        //ld._spot_total.originatorFeesPaidQty = packed_OriginatorFeesPaidQty;
+        //ld._spot_total.transferedQty = packed_TransferedQty;
 
         ld._tokens_currentMax_id = currentMax_id;
         ld._spot_totalMintedQty = totalMintedQty;
         ld._spot_totalBurnedQty = totalBurnedQty;
     }
 
-    // struct SetCcyTotalArgs {
-    //     uint256 ccyTypeId;
-    //     uint256 totalFunded;
-    //     uint256 totalWithdrawn;
-    //     uint256 totalTransfered;
-    //     uint256 totalFeesPaid;
+    // 24k
+    // function setCcyTotals(
+    //     StructLib.LedgerStruct storage ld,
+    //     uint256 ccyTypeId,
+    //     uint256 totalFunded,
+    //     uint256 totalWithdrawn,
+    //     uint256 totalTransfered,
+    //     uint256 totalFeesPaid
+    // )
+    // public {
+    //     require(!ld._contractSealed, "Contract is sealed");
+    //     ld._ccyType_totalFunded[ccyTypeId] = totalFunded;
+    //     ld._ccyType_totalWithdrawn[ccyTypeId] = totalWithdrawn;
+    //     ld._ccyType_totalTransfered[ccyTypeId] = totalTransfered;
+    //     ld._ccyType_totalFeesPaid[ccyTypeId] = totalFeesPaid;
     // }
-    function setCcyTotals(
-        StructLib.LedgerStruct storage ld,
-        uint256 ccyTypeId,
-        uint256 totalFunded,
-        uint256 totalWithdrawn,
-        uint256 totalTransfered,
-        uint256 totalFeesPaid
-    )
-    public {
-        require(!ld._contractSealed, "Contract is sealed");
-        ld._ccyType_totalFunded[ccyTypeId] = totalFunded;
-        ld._ccyType_totalWithdrawn[ccyTypeId] = totalWithdrawn;
-        ld._ccyType_totalTransfered[ccyTypeId] = totalTransfered;
-        ld._ccyType_totalFeesPaid[ccyTypeId] = totalFeesPaid;
-    }
 }

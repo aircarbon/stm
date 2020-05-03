@@ -28,10 +28,7 @@ contract Collateralizable is //ICcyCollateralizable,
         CcyLib.fund(ld, ctd, ccyTypeId, amount, ledgerOwner);
     }
 
-    function getTotalCcyFunded(uint256 ccyTypeId)
-    external view returns (uint256) {
-        return ld._ccyType_totalFunded[ccyTypeId];
-    }
+
 
     function withdraw(uint256 ccyTypeId,
                       int256  amount,
@@ -40,8 +37,13 @@ contract Collateralizable is //ICcyCollateralizable,
         CcyLib.withdraw(ld, ctd, ccyTypeId, amount, ledgerOwner);
     }
 
-    function getTotalCcyWithdrawn(uint256 ccyTypeId)
-    external view returns (uint256) {
-        return ld._ccyType_totalWithdrawn[ccyTypeId];
-    }
+    // 24k
+    // function getTotalCcyFunded(uint256 ccyTypeId)
+    // external view returns (uint256) {
+    //     return ld._ccyType_totalFunded[ccyTypeId];
+    // }
+    // function getTotalCcyWithdrawn(uint256 ccyTypeId)
+    // external view returns (uint256) {
+    //     return ld._ccyType_totalWithdrawn[ccyTypeId];
+    // }
 }

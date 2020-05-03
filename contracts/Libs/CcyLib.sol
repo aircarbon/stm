@@ -78,7 +78,8 @@ library CcyLib {
         ld._ledger[ledgerOwner].ccyType_balance[ccyTypeId] += amount;
 
         // update global total funded
-        ld._ccyType_totalFunded[ccyTypeId] += uint256(amount);
+        // 24k
+        //ld._ccyType_totalFunded[ccyTypeId] += uint256(amount);
 
         emit CcyFundedLedger(ccyTypeId, ledgerOwner, amount);
     }
@@ -102,7 +103,8 @@ library CcyLib {
         ld._ledger[ledgerOwner].ccyType_balance[ccyTypeId] -= amount;
 
         // update global total withdrawn
-        ld._ccyType_totalWithdrawn[ccyTypeId] += uint256(amount);
+        // 24k
+        //ld._ccyType_totalWithdrawn[ccyTypeId] += uint256(amount);
 
         emit CcyWithdrewLedger(ccyTypeId, ledgerOwner, amount);
     }

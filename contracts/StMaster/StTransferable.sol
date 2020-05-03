@@ -31,7 +31,7 @@ contract StTransferable is Owned,
 
         a.feeAddrOwner = owner;
         TransferLib.transferOrTrade(ld, ctd, globalFees, a);
-    }   
+    }
 
     // FAST - fee preview exchange fee only
     function transfer_feePreview_ExchangeOnly(StructLib.TransferArgs calldata a)
@@ -40,19 +40,20 @@ contract StTransferable is Owned,
     }
 
     // SLOW - fee preview (full, slow) - old/deprecate?
+    // 24k - remove
     uint256 constant MAX_BATCHES_PREVIEW = 128; // library constants not accessible in contract; must duplicate TransferLib value
     function transfer_feePreview(StructLib.TransferArgs calldata a)
     external view returns (StructLib.FeesCalc[1 + MAX_BATCHES_PREVIEW * 2] memory feesAll) {
         return TransferLib.transfer_feePreview(ld, globalFees, owner, a);
     }
 
-    function getCcy_totalTransfered(uint256 ccyTypeId)
-    external view returns (uint256) {
-        return ld._ccyType_totalTransfered[ccyTypeId];
-    }
-
-    function getSecToken_totalTransferedQty()
-    external view returns (uint256) {
-        return ld._spot_total.transferedQty;
-    }
+    // 24k
+    // function getCcy_totalTransfered(uint256 ccyTypeId)
+    // external view returns (uint256) {
+    //     return ld._ccyType_totalTransfered[ccyTypeId];
+    // }
+    // function getSecToken_totalTransferedQty()
+    // external view returns (uint256) {
+    //     return ld._spot_total.transferedQty;
+    // }
 }

@@ -42,23 +42,23 @@ contract DataLoadable is //IDataLoadable,
     }
 
     function setTokenTotals(
-        uint80 packed_ExchangeFeesPaidQty, uint80 packed_OriginatorFeesPaidQty, uint80 packed_TransferedQty,
+        //uint80 packed_ExchangeFeesPaidQty, uint80 packed_OriginatorFeesPaidQty, uint80 packed_TransferedQty,
         uint256 currentMax_id, uint256 totalMintedQty, uint256 totalBurnedQty
     ) public onlyOwner() {
         LoadLib.setTokenTotals(ld,
-            packed_ExchangeFeesPaidQty, packed_OriginatorFeesPaidQty, packed_TransferedQty,
+            //packed_ExchangeFeesPaidQty, packed_OriginatorFeesPaidQty, packed_TransferedQty,
             currentMax_id, totalMintedQty, totalBurnedQty
         );
     }
 
-    function setCcyTotals(
-        //LoadLib.SetCcyTotalArgs memory a
-        uint256 ccyTypeId,
-        uint256 totalFunded,
-        uint256 totalWithdrawn,
-        uint256 totalTransfered,
-        uint256 totalFeesPaid
-    ) public onlyOwner() {
-        LoadLib.setCcyTotals(ld, ccyTypeId, totalFunded, totalWithdrawn, totalTransfered, totalFeesPaid);
-    }
+    // function setCcyTotals(
+    //     //LoadLib.SetCcyTotalArgs memory a
+    //     uint256 ccyTypeId,
+    //     uint256 totalFunded,
+    //     uint256 totalWithdrawn,
+    //     uint256 totalTransfered,
+    //     uint256 totalFeesPaid
+    // ) public onlyOwner() {
+    //     LoadLib.setCcyTotals(ld, ccyTypeId, totalFunded, totalWithdrawn, totalTransfered, totalFeesPaid);
+    // }
 }

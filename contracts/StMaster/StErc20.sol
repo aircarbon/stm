@@ -47,6 +47,8 @@ contract StErc20 is StFees//, IErc20
     function getWhitelist() external view returns (address[] memory) {
         return erc20d._whitelist;
     }
+
+    // 24k
     function getWhitelistCount() external view returns (uint256) {
         return erc20d._whitelist.length;
     }

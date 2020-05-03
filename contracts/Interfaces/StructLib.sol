@@ -27,14 +27,16 @@ library StructLib {
             ld._ledger[a.from].ccyType_balance[a.ccyTypeId] -= int256(a.amount);
             ld._ledger[a.to].ccyType_balance[a.ccyTypeId] += int256(a.amount);
 
-            ld._ccyType_totalTransfered[a.ccyTypeId] += a.amount;
+            // 24k
+            //ld._ccyType_totalTransfered[a.ccyTypeId] += a.amount;
 
             //emit StructLib.TransferedLedgerCcy(a.from, a.to, a.ccyTypeId, a.amount, a.transferType);
             emitTransferedLedgerCcy(a);
 
-            if (a.transferType == StructLib.TransferType.ExchangeFee) {
-                ld._ccyType_totalFeesPaid[a.ccyTypeId] += a.amount;
-            }
+            // 24k
+            // if (a.transferType == StructLib.TransferType.ExchangeFee) {
+            //     ld._ccyType_totalFeesPaid[a.ccyTypeId] += a.amount;
+            // }
         }
     }
     function emitTransferedLedgerCcy(
@@ -192,11 +194,11 @@ library StructLib {
             int128  ft_lastMarkPrice;
             int128  ft_PL;
         }
-    struct PackedStTotals {
-        uint80 transferedQty;
-        uint80 exchangeFeesPaidQty;
-        uint80 originatorFeesPaidQty;
-    }
+    // struct PackedStTotals {
+    //     uint80 transferedQty;
+    //     uint80 exchangeFeesPaidQty;
+    //     uint80 originatorFeesPaidQty;
+    // }
 
     struct LedgerStruct {
         StructLib.ContractType contractType;
@@ -216,12 +218,15 @@ library StructLib {
         // global totals
         uint256 _spot_totalMintedQty;                           // [SPOT types only] - todo: split by type?
         uint256 _spot_totalBurnedQty;                           // [SPOT types only] - todo: split by type?
-        PackedStTotals _spot_total;                             // [SPOT types only] - todo: split by type?
 
-        mapping(uint256 => uint256) _ccyType_totalFunded;
-        mapping(uint256 => uint256) _ccyType_totalWithdrawn;
-        mapping(uint256 => uint256) _ccyType_totalTransfered;
-        mapping(uint256 => uint256) _ccyType_totalFeesPaid;
+        // 24k
+        //PackedStTotals _spot_total;                             // [SPOT types only] - todo: split by type?
+
+        // 24k
+        //mapping(uint256 => uint256) _ccyType_totalFunded;
+        //mapping(uint256 => uint256) _ccyType_totalWithdrawn;
+        //mapping(uint256 => uint256) _ccyType_totalTransfered;
+        //mapping(uint256 => uint256) _ccyType_totalFeesPaid;
 
         bool _contractSealed;
     }

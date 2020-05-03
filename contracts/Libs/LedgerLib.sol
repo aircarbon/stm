@@ -161,15 +161,17 @@ library LedgerLib {
         ledgerHash = keccak256(abi.encodePacked(ledgerHash, ld._tokens_currentMax_id));
         ledgerHash = keccak256(abi.encodePacked(ledgerHash, ld._spot_totalMintedQty));
         ledgerHash = keccak256(abi.encodePacked(ledgerHash, ld._spot_totalBurnedQty));
-        ledgerHash = keccak256(abi.encodePacked(ledgerHash, uint256(ld._spot_total.transferedQty)));
-        ledgerHash = keccak256(abi.encodePacked(ledgerHash, uint256(ld._spot_total.exchangeFeesPaidQty)));
-        ledgerHash = keccak256(abi.encodePacked(ledgerHash, uint256(ld._spot_total.originatorFeesPaidQty)));
-        for (uint256 ccyTypeId = 1; ccyTypeId <= ctd._ct_Count; ccyTypeId++) {
-            ledgerHash = keccak256(abi.encodePacked(ledgerHash, uint256(ld._ccyType_totalFunded[ccyTypeId])));
-            ledgerHash = keccak256(abi.encodePacked(ledgerHash, uint256(ld._ccyType_totalWithdrawn[ccyTypeId])));
-            ledgerHash = keccak256(abi.encodePacked(ledgerHash, uint256(ld._ccyType_totalTransfered[ccyTypeId])));
-            ledgerHash = keccak256(abi.encodePacked(ledgerHash, uint256(ld._ccyType_totalFeesPaid[ccyTypeId])));
-        }
+
+        // 24k
+        //ledgerHash = keccak256(abi.encodePacked(ledgerHash, uint256(ld._spot_total.transferedQty)));
+        //ledgerHash = keccak256(abi.encodePacked(ledgerHash, uint256(ld._spot_total.exchangeFeesPaidQty)));
+        //ledgerHash = keccak256(abi.encodePacked(ledgerHash, uint256(ld._spot_total.originatorFeesPaidQty)));
+        // for (uint256 ccyTypeId = 1; ccyTypeId <= ctd._ct_Count; ccyTypeId++) {
+        //     ledgerHash = keccak256(abi.encodePacked(ledgerHash, uint256(ld._ccyType_totalFunded[ccyTypeId])));
+        //     ledgerHash = keccak256(abi.encodePacked(ledgerHash, uint256(ld._ccyType_totalWithdrawn[ccyTypeId])));
+        //     ledgerHash = keccak256(abi.encodePacked(ledgerHash, uint256(ld._ccyType_totalTransfered[ccyTypeId])));
+        //     ledgerHash = keccak256(abi.encodePacked(ledgerHash, uint256(ld._ccyType_totalFeesPaid[ccyTypeId])));
+        // }
 
         return ledgerHash;
     }

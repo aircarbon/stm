@@ -10,7 +10,7 @@ const EthereumJsTx = require('ethereumjs-tx');
 const chalk = require('chalk');
 const truffleAssert = require('truffle-assertions');
 
-const { db } = require('../common/dist');
+const { db } = require('../common/dist/lib');
 
 // misc
 const WEB3_GWEI_GAS_BID = '10';
@@ -34,7 +34,7 @@ const blocksFromMonths = (months) => Math.ceil(blocksFromDays(months * 30.42));
 //
 // MAIN: deployer definitions -- contract ctor() params
 //
-const contractVer = "0.97g";
+const contractVer = "0.97h";
 const contractProps = {
     COMMODITY: {
         contractVer: contractVer,

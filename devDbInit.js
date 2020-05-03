@@ -2,7 +2,7 @@ require('dotenv').config();
 const mapSeries = require('async/mapSeries');
 const got = require('got');
 const { web3_call } = require('./const.js');
-const { db } = require('../common/dist');
+const { db } = require('../common/dist/lib');
 
 //
 // Initializes test/local DB with default/test values

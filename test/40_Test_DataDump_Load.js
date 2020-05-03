@@ -325,11 +325,12 @@ contract("StMaster", accounts => {
         _.forEach(curCcys.ccyTypes, async (p) => { 
             await stm_new.setFee_CcyType(p.id, CONST.nullAddr, (await stm_cur.getFee(CONST.getFeeType.CCY, p.id, CONST.nullAddr)));
             
-            await stm_new.setCcyTotals(p.id, 
-                (await stm_cur.getTotalCcyFunded(p.id)),
-                (await stm_cur.getTotalCcyWithdrawn(p.id)),
-                (await stm_cur.getCcy_totalTransfered(p.id)),
-                (await stm_cur.getCcy_totalExchangeFeesPaid(p.id)));
+            // 24k
+            // await stm_new.setCcyTotals(p.id, 
+            //     (await stm_cur.getTotalCcyFunded(p.id)),
+            //     (await stm_cur.getTotalCcyWithdrawn(p.id)),
+            //     (await stm_cur.getCcy_totalTransfered(p.id)),
+            //     (await stm_cur.getCcy_totalExchangeFeesPaid(p.id)));
         });
 
         // spot tokens - load exchange fees
@@ -390,14 +391,14 @@ contract("StMaster", accounts => {
         // }
 
         // set token totals
-        const curTotalExchangeFeesPaidQty = await stm_cur.getSecToken_totalExchangeFeesPaidQty();
-        const curTotalOriginatorFeesPaidQty = await stm_cur.getSecToken_totalOriginatorFeesPaidQty();
-        const curTotalTransferedQty = await stm_cur.getSecToken_totalTransferedQty();
+        //const curTotalExchangeFeesPaidQty = await stm_cur.getSecToken_totalExchangeFeesPaidQty();
+        //const curTotalOriginatorFeesPaidQty = await stm_cur.getSecToken_totalOriginatorFeesPaidQty();
+        //const curTotalTransferedQty = await stm_cur.getSecToken_totalTransferedQty();
         const curSecTokenMintedCount = await stm_cur.getSecToken_countMinted();
         const curSecTokenBurnedQty = await stm_cur.getSecToken_totalBurnedQty();
         const curSecTokenMintedQty = await stm_cur.getSecToken_totalMintedQty();
         await stm_new.setTokenTotals(
-            curTotalExchangeFeesPaidQty, curTotalOriginatorFeesPaidQty, curTotalTransferedQty,
+            //curTotalExchangeFeesPaidQty, curTotalOriginatorFeesPaidQty, curTotalTransferedQty,
             curSecTokenMintedCount, curSecTokenMintedQty, curSecTokenBurnedQty
         );
 

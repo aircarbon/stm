@@ -21,8 +21,7 @@ contract StFees is //IStFees,
     // GLOBAL FEES
     StructLib.FeeStruct globalFees;
 
-    constructor() public {
-    }
+    constructor() public {}
 
     function getFee(GetFeeType feeType, uint256 typeId, address ledgerOwner)
     external view onlyOwner() returns(StructLib.SetFeeArgs memory) {
@@ -48,19 +47,18 @@ contract StFees is //IStFees,
         SpotFeeLib.setFee_CcyType(ld, ctd, globalFees, ccyTypeId, ledgerOwner, feeArgs);
     }
 
-    function getSecToken_totalExchangeFeesPaidQty()
-    external view returns (uint256) {
-        return ld._spot_total.exchangeFeesPaidQty;
-    }
-
-    function getSecToken_totalOriginatorFeesPaidQty()
-    external view returns (uint256) {
-        return ld._spot_total.originatorFeesPaidQty;
-    }
-
-    function getCcy_totalExchangeFeesPaid(uint256 ccyTypeId)
-    external view returns (uint256) {
-        return ld._ccyType_totalFeesPaid[ccyTypeId];
-    }
+    // 24k
+    // function getSecToken_totalExchangeFeesPaidQty()
+    // external view returns (uint256) {
+    //     return ld._spot_total.exchangeFeesPaidQty;
+    // }
+    // function getSecToken_totalOriginatorFeesPaidQty()
+    // external view returns (uint256) {
+    //     return ld._spot_total.originatorFeesPaidQty;
+    // }
+    // function getCcy_totalExchangeFeesPaid(uint256 ccyTypeId)
+    // external view returns (uint256) {
+    //     return ld._ccyType_totalFeesPaid[ccyTypeId];
+    // }
 
 }

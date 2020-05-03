@@ -225,9 +225,11 @@ library TransferLib {
 
         // set globals to final values
         ld._tokens_currentMax_id = maxStId; // packing this as a uint64 (and the fields below) into _spot_total struct *increases* gas cost! no idea why - reverted
-        if (v.exchangeFeesPaidQty > 0) ld._spot_total.exchangeFeesPaidQty += v.exchangeFeesPaidQty;
-        if (v.originatorFeesPaidQty > 0) ld._spot_total.originatorFeesPaidQty += v.originatorFeesPaidQty;
-        ld._spot_total.transferedQty += v.transferedQty + v.exchangeFeesPaidQty + v.originatorFeesPaidQty;
+
+        // 24k
+        //if (v.exchangeFeesPaidQty > 0) ld._spot_total.exchangeFeesPaidQty += v.exchangeFeesPaidQty;
+        //if (v.originatorFeesPaidQty > 0) ld._spot_total.originatorFeesPaidQty += v.originatorFeesPaidQty;
+        //ld._spot_total.transferedQty += v.transferedQty + v.exchangeFeesPaidQty + v.originatorFeesPaidQty;
 
         // emit trade events
         if (a.ccy_amount_A > 0 && a.qty_B > 0) {

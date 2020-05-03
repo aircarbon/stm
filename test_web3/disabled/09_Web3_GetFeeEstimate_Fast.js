@@ -3,7 +3,7 @@ const assert = require('assert');
 //const abi = acmJson['abi'];
 const EthereumJsTx = require('ethereumjs-tx');
 const BN = require('bn.js');
-const { db } = require('../../common/dist');
+const { db } = require('../../common/dist/lib');
 require('dotenv').config();
 
 const CONST = require('../const.js');

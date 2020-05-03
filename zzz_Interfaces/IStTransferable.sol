@@ -41,12 +41,12 @@ import "../Libs/LedgerLib.sol";
     /**
      * @notice Returns the total currency amount transfered, for the supplied currency type
      */
-    function getCcy_totalTransfered(uint256 ccyTypeId)
-    external view onlyOwner() returns (uint256) { revert("Not implemented"); }
+    // function getCcy_totalTransfered(uint256 ccyTypeId)
+    // external view onlyOwner() returns (uint256) { revert("Not implemented"); }
 
-    /**
-     * @dev Returns the global quantity of tokens transfered, across all token types
-     */
-    function getSecToken_totalTransferedQty()
-    external view onlyOwner() returns (uint256) { revert("Not implemented"); }
+    // /**
+    //  * @dev Returns the global quantity of tokens transfered, across all token types
+    //  */
+    // function getSecToken_totalTransferedQty()
+    // external view onlyOwner() returns (uint256) { revert("Not implemented"); }
 }

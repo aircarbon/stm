@@ -4,7 +4,7 @@ const chalk = require('chalk');
 const BN = require('bn.js');
 const chart = require('ascii-horizontal-barchart');
 
-const { db } = require('../../common/dist');
+const { db } = require('../../common/dist/lib');
 const CONST = require('../const.js');
 
 module.exports = {

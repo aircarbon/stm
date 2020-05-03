@@ -19,6 +19,7 @@ contract StBurnable is Owned, StLedger {
         TokenLib.burnTokens(ld, std, ledgerOwner, tokenTypeId, burnQty);
     }
 
+    // 24k - exception/retain - needed for erc20 total supply
     function getSecToken_totalBurnedQty()
     external view returns (uint256 count) {
         return ld._spot_totalBurnedQty;

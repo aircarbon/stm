@@ -21,11 +21,10 @@ import "../Interfaces/StructLib.sol";
 //
 //  truffle compile --reset --all && grep \"bytecode\" build/contracts/* | awk '{print $1 " " length($3)/2}'
 //
-// 27321: ganache: ok / ropsten: ok / rinkeby: ok [no dataloadable, no futures]
-// 30508: ganache: ## ... [no futures]
-// 27741: ganache: ## / ropsten ## [no ctor setup, no futures]
 // 22123: ... [upgrade sol 0.6.6: removed ctor setup, removed WL deprecated, removed payable unused]
-
+// 23576: ... adding CF: baseline
+// 22951: ... [removed all global counters] // 24k
+// 23903: ... restored cashflowArgs
 
 contract StMaster
     is //IStMaster, IPublicViews,
@@ -43,7 +42,7 @@ contract StMaster
     // todo: SCP - use decimals fields for erc20 (send/exchange text fields, or at least round to .decimals before passing to API)
 
     // contract properties
-    string public name; 
+    string public name;
 
     function getContractType() external view returns(StructLib.ContractType) { return ld.contractType; }
     function getContractSeal() external view returns (bool) { return ld._contractSealed; }
@@ -116,7 +115,7 @@ contract StMaster
     public {
         // chainlinkAggregator_btcUsd = _chainlinkAggregator_btcUsd;
         // chainlinkAggregator_ethUsd = _chainlinkAggregator_ethUsd;
-        // cashflowData.args = _cashflowArgs;
+        //cashflowData.args = _cashflowArgs;
 
         // set common properties
         name = _contractName;

@@ -32,7 +32,7 @@ import "../Libs/LoadLib.sol";
 
     // ST totals
     function setTokenTotals(
-        uint80 packed_ExchangeFeesPaidQty, uint80 packed_OriginatorFeesPaidQty, uint80 packed_TransferedQty,
+        //uint80 packed_ExchangeFeesPaidQty, uint80 packed_OriginatorFeesPaidQty, uint80 packed_TransferedQty,
         uint256 currentMax_id, uint256 totalMintedQty, uint256 totalBurnedQty
     ) public onlyOwner() { revert("Not implemented"); }
 

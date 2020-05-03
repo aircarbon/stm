@@ -117,7 +117,7 @@ contract("StMaster", accounts => {
         var ledgerEntryBefore, ledgerEntryAfter;
 
         ledgerEntryBefore = await stm.getLedgerEntry(receiver);
-        const totalFundedBefore = await stm.getTotalCcyFunded.call(ccyTypeId);
+        //const totalFundedBefore = await stm.getTotalCcyFunded.call(ccyTypeId);
         
         // fund
         const fundTx = await stm.fund(ccyTypeId, amount, receiver, { from: accounts[0] });
@@ -130,9 +130,6 @@ contract("StMaster", accounts => {
         });
         
         // validate ledger balance is updated for test ccy
-        //console.dir(ledgerEntryBefore);
-        //console.dir(ledgerEntryAfter);
-
         assert(ledgerEntryAfter.ccys.find(p => p.ccyTypeId == ccyTypeId).balance == 
                Number(ledgerEntryBefore.ccys.find(p => p.ccyTypeId == ccyTypeId).balance) + Number(amount),
                'unexpected ledger balance after funding for test ccy');
@@ -144,8 +141,8 @@ contract("StMaster", accounts => {
                'unexpected ledger balance after funding for ccy non-test ccy');
 
         // validate global total funded is updated
-        const totalFundedAfter = await stm.getTotalCcyFunded.call(ccyTypeId);
-        assert(totalFundedAfter - totalFundedBefore == amount, 'unexpected total funded after funding');
+        //const totalFundedAfter = await stm.getTotalCcyFunded.call(ccyTypeId);
+        //assert(totalFundedAfter - totalFundedBefore == amount, 'unexpected total funded after funding');
     }
 
 });

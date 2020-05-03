@@ -15,7 +15,7 @@ const FuturesLib = artifacts.require('./FuturesLib.sol');
 const StMaster = artifacts.require('./StMaster.sol');
 
 const CONST = require('../const.js');
-const { db } = require('../../common/dist');
+const { db } = require('../../common/dist/lib');
 const chalk = require('chalk');
 
 module.exports = async function (deployer) {

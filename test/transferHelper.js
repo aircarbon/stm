@@ -28,21 +28,21 @@ module.exports = {
         owner_before = await stm.getLedgerEntry(accounts[0]);
         
         // global totals: transferred before
-        var totalTokQty_tfd_before, totalTokQty_tfd_after;
-        const totalCcy_tfd_before = [];
-        const totalCcy_tfd_after = [];
-        totalTokQty_tfd_before = await stm.getSecToken_totalTransferedQty.call();
-        totalCcy_tfd_before[ccyTypeId_A] = await stm.getCcy_totalTransfered.call(ccyTypeId_A);
-        totalCcy_tfd_before[ccyTypeId_B] = await stm.getCcy_totalTransfered.call(ccyTypeId_B);
+        //var totalTokQty_tfd_before, totalTokQty_tfd_after;
+        //const totalCcy_tfd_before = [];
+        //const totalCcy_tfd_after = [];
+        //totalTokQty_tfd_before = await stm.getSecToken_totalTransferedQty.call();
+        //totalCcy_tfd_before[ccyTypeId_A] = await stm.getCcy_totalTransfered.call(ccyTypeId_A);
+        //totalCcy_tfd_before[ccyTypeId_B] = await stm.getCcy_totalTransfered.call(ccyTypeId_B);
 
         // global totals: fees before
-        var totalTokQty_fees_before, totalTokQty_fees_after;
-        const totalCcy_ExFees_before = [];
-        const totalCcy_ExFees_after = [];
-        totalTokQty_fees_before = (await stm.getSecToken_totalExchangeFeesPaidQty.call())
-                          .add(await stm.getSecToken_totalOriginatorFeesPaidQty.call());
-        totalCcy_ExFees_before[ccyTypeId_A] = await stm.getCcy_totalExchangeFeesPaid.call(ccyTypeId_A);
-        totalCcy_ExFees_before[ccyTypeId_B] = await stm.getCcy_totalExchangeFeesPaid.call(ccyTypeId_B);
+        //var totalTokQty_fees_before, totalTokQty_fees_after;
+        //const totalCcy_ExFees_before = [];
+        //const totalCcy_ExFees_after = [];
+        //totalTokQty_fees_before = (await stm.getSecToken_totalExchangeFeesPaidQty.call())
+        //                    .add(await stm.getSecToken_totalOriginatorFeesPaidQty.call());
+        //totalCcy_ExFees_before[ccyTypeId_A] = await stm.getCcy_totalExchangeFeesPaid.call(ccyTypeId_A);
+        //totalCcy_ExFees_before[ccyTypeId_B] = await stm.getCcy_totalExchangeFeesPaid.call(ccyTypeId_B);
         // console.log(`ccyTypeId_A=${ccyTypeId_A} totalCcy_ExFees_before[ccyTypeId_A]=${totalCcy_ExFees_before[ccyTypeId_A]}`);
         // console.log(`ccyTypeId_B=${ccyTypeId_B} totalCcy_ExFees_before[ccyTypeId_B]=${totalCcy_ExFees_before[ccyTypeId_B]}`);
 
@@ -162,15 +162,15 @@ module.exports = {
         //console.log('originatorFeeData', originatorFeeData);
 
         // global totals: transferred after
-        totalTokQty_tfd_after = await stm.getSecToken_totalTransferedQty.call();
-        totalCcy_tfd_after[ccyTypeId_A] = await stm.getCcy_totalTransfered.call(ccyTypeId_A);
-        totalCcy_tfd_after[ccyTypeId_B] = await stm.getCcy_totalTransfered.call(ccyTypeId_B);
+        //totalTokQty_tfd_after = await stm.getSecToken_totalTransferedQty.call();
+        //totalCcy_tfd_after[ccyTypeId_A] = await stm.getCcy_totalTransfered.call(ccyTypeId_A);
+        //totalCcy_tfd_after[ccyTypeId_B] = await stm.getCcy_totalTransfered.call(ccyTypeId_B);
 
         // global totals: fees after
-        totalTokQty_fees_after = (await stm.getSecToken_totalExchangeFeesPaidQty())
-                         .add(await stm.getSecToken_totalOriginatorFeesPaidQty());
-        totalCcy_ExFees_after[ccyTypeId_A] = await stm.getCcy_totalExchangeFeesPaid.call(ccyTypeId_A);
-        totalCcy_ExFees_after[ccyTypeId_B] = await stm.getCcy_totalExchangeFeesPaid.call(ccyTypeId_B);
+        // totalTokQty_fees_after = (await stm.getSecToken_totalExchangeFeesPaidQty())
+        //                  .add(await stm.getSecToken_totalOriginatorFeesPaidQty());
+        // totalCcy_ExFees_after[ccyTypeId_A] = await stm.getCcy_totalExchangeFeesPaid.call(ccyTypeId_A);
+        // totalCcy_ExFees_after[ccyTypeId_B] = await stm.getCcy_totalExchangeFeesPaid.call(ccyTypeId_B);
         // console.log(`ccyTypeId_A=${ccyTypeId_A} totalCcy_ExFees_after[ccyTypeId_A]=${totalCcy_ExFees_after[ccyTypeId_A]}`);
         // console.log(`ccyTypeId_B=${ccyTypeId_B} totalCcy_ExFees_after[ccyTypeId_B]=${totalCcy_ExFees_after[ccyTypeId_B]}`);
 
@@ -346,8 +346,8 @@ module.exports = {
         }
 
         // validate currency global totals
-        totalCcy_tfd_after[ccyTypeId_A] = await stm.getCcy_totalTransfered.call(ccyTypeId_A);
-        totalCcy_tfd_after[ccyTypeId_B] = await stm.getCcy_totalTransfered.call(ccyTypeId_B);
+        //totalCcy_tfd_after[ccyTypeId_A] = await stm.getCcy_totalTransfered.call(ccyTypeId_A);
+        //totalCcy_tfd_after[ccyTypeId_B] = await stm.getCcy_totalTransfered.call(ccyTypeId_B);
         const expectedCcy_tfd = []; 
         expectedCcy_tfd[ccyTypeId_A] = Big(0);
         expectedCcy_tfd[ccyTypeId_B] = Big(0);
@@ -373,11 +373,12 @@ module.exports = {
         // console.log(' totalCcy_tfd_after[ccyTypeId_A]', totalCcy_tfd_after[ccyTypeId_A].toString());
         // console.log('totalCcy_tfd_before[ccyTypeId_A]', totalCcy_tfd_before[ccyTypeId_A].toString());
         // console.log('    expectedCcy_tfd[ccyTypeId_A]', expectedCcy_tfd[ccyTypeId_A].toString());
-        assert(Big(totalCcy_tfd_after[ccyTypeId_A]).minus(totalCcy_tfd_before[ccyTypeId_A]).eq(expectedCcy_tfd[ccyTypeId_A]),
-            `unexpected total transfered delta after, ccy A`);
+
+        // assert(Big(totalCcy_tfd_after[ccyTypeId_A]).minus(totalCcy_tfd_before[ccyTypeId_A]).eq(expectedCcy_tfd[ccyTypeId_A]),
+        //     `unexpected total transfered delta after, ccy A`);
                
-        assert(Big(totalCcy_tfd_after[ccyTypeId_B]).minus(totalCcy_tfd_before[ccyTypeId_B]).eq(expectedCcy_tfd[ccyTypeId_B]),
-            `unexpected total transfered delta after, ccy B`);
+        // assert(Big(totalCcy_tfd_after[ccyTypeId_B]).minus(totalCcy_tfd_before[ccyTypeId_B]).eq(expectedCcy_tfd[ccyTypeId_B]),
+        //     `unexpected total transfered delta after, ccy B`);
 
         // validate token events
         const eeuFullEvents = [];
@@ -573,7 +574,7 @@ module.exports = {
         // console.log(' totalTokQty_tfd_before', totalTokQty_tfd_before.toString());
         // console.log('  totalTokQty_tfd_after', totalTokQty_tfd_after.toString());
         // console.log('totalTokQty_tfd_incFees', totalTokQty_tfd_incFees.toString());
-        assert(totalTokQty_tfd_after.sub(totalTokQty_tfd_before).eq(totalTokQty_tfd_incFees), 'unexpected total quantity carbon after transfer');
+        //assert(totalTokQty_tfd_after.sub(totalTokQty_tfd_before).eq(totalTokQty_tfd_incFees), 'unexpected total quantity carbon after transfer');
 
         return {
             transferTx, 

@@ -20,14 +20,14 @@ import "../Libs/TokenLib.sol";
     /**
      * @notice Returns the total amount of funded collateralized currency for the supplied currency type
      */
-    function getTotalCcyFunded(uint256 ccyTypeId)
-    external view onlyOwner() returns (uint256) { revert("Not implemented"); }
+    //function getTotalCcyFunded(uint256 ccyTypeId)
+    //external view onlyOwner() returns (uint256) { revert("Not implemented"); }
 
     /**
      * @dev Returns the total global amount withdrawn for the supplied currency
      */
-    function getTotalCcyWithdrawn(uint256 ccyTypeId)
-    external view onlyOwner() returns (uint256) { revert("Not implemented"); }
+    //function getTotalCcyWithdrawn(uint256 ccyTypeId)
+    //external view onlyOwner() returns (uint256) { revert("Not implemented"); }
 
     /**
      * @notice Adds a new currency type
