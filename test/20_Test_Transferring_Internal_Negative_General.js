@@ -23,6 +23,41 @@ contract("StMaster", accounts => {
             console.log(`addrNdx: ${global.TaddrNdx} - contract @ ${stm.address} (owner: ${accounts[0]})`);
     });
 
+    it(`transferring - should not allow transfer of tokens from non-whitelisted ledger entry (A)`, async () => {
+        try {
+            const A = accounts[888], B = accounts[global.TaddrNdx + 0];
+            await stm.mintSecTokenBatch(CONST.tokenType.NATURE, CONST.GT_CARBON, 1,      A, CONST.nullFees, 0, [], []);
+            await stm.fund(CONST.ccyType.USD,                   CONST.thousandCcy_cents, B,                          );
+            await transferHelper.transferWrapper(stm, accounts, A, B,
+                1, CONST.tokenType.NATURE, // qty_A, tokenTypeId_A, 
+                0, 0,                      // qty_B, tokenTypeId_B, 
+                0, 0,                      // ccy_amount_A, ccyTypeId_A, 
+                1, CONST.ccyType.USD,      // ccy_amount_B, ccyTypeId_B, 
+            false, { from: accounts[0] });
+        } catch (ex) { 
+            assert(ex.reason == 'Not whitelisted (A)', `unexpected: ${ex.reason}`);
+            return;
+        }
+        assert.fail('expected contract exception');
+    });
+    it(`transferring - should not allow transfer of tokens from non-whitelisted ledger entry (B)`, async () => {
+        try {
+            const A = accounts[global.TaddrNdx + 0], B = accounts[888];
+            await stm.fund(CONST.ccyType.USD,                   CONST.thousandCcy_cents, A,                          );
+            await stm.mintSecTokenBatch(CONST.tokenType.NATURE, CONST.GT_CARBON, 1,      B, CONST.nullFees, 0, [], []);
+            await transferHelper.transferWrapper(stm, accounts, A, B,
+                0, 0,                      // qty_A, tokenTypeId_A, 
+                1, CONST.tokenType.NATURE, // qty_B, tokenTypeId_B, 
+                1, CONST.ccyType.USD,      // ccy_amount_A, ccyTypeId_A, 
+                0, 0,                      // ccy_amount_B, ccyTypeId_B, 
+            false, { from: accounts[0] });
+        } catch (ex) { 
+            assert(ex.reason == 'Not whitelisted (B)', `unexpected: ${ex.reason}`);
+            return;
+        }
+        assert.fail('expected contract exception');
+    });
+
     it(`transferring - should not allow non-owner to transfer across ledger entries`, async () => {
         try {
             await transferHelper.transferWrapper(stm, accounts, accounts[global.TaddrNdx + 0], accounts[global.TaddrNdx + 1], 0, 0, 0, 0, 0, 0, 0, 0, false, { from: accounts[1] });
