@@ -101,7 +101,7 @@ module.exports = {
 
     web3_sendEthTestAddr: (sendFromNdx, sendToAddr, ethValue) => web3_sendEthTestAddr(sendFromNdx, sendToAddr, ethValue),
     web3_call: (methodName, methodArgs) => web3_call(methodName, methodArgs),
-    web3_tx: (methodName, methodArgs, fromAddr, fromPrivKey) => web3_tx(methodName, methodArgs, fromAddr, fromPrivKey),
+    web3_tx: (methodName, methodArgs, fromAddr, fromPrivKey, returnBeforeConfirmed) => web3_tx(methodName, methodArgs, fromAddr, fromPrivKey, returnBeforeConfirmed),
 
     consoleOutput: (enabled) => { consoleOutput = enabled; },
 
@@ -267,7 +267,7 @@ async function web3_call(methodName, methodArgs) {
     return callRet;
 }
 
-async function web3_tx(methodName, methodArgs, fromAddr, fromPrivKey) {
+async function web3_tx(methodName, methodArgs, fromAddr, fromPrivKey, returnBeforeConfirmed) {
     const { web3, ethereumTxChain } = getTestContextWeb3();
     const contractDb = (await db.GetDeployment(process.env.WEB3_NETWORK_ID, contractProps[process.env.CONTRACT_TYPE].contractName, contractProps[process.env.CONTRACT_TYPE].contractVer)).recordset[0];
     if (!contractDb) throw(Error(`Failed to lookup contract deployment for networkId=${process.env.WEB3_NETWORK_ID}, contractName=${contractProps[process.env.CONTRACT_TYPE].contractName}, contractVer=${contractProps[process.env.CONTRACT_TYPE].contractVer}`));
