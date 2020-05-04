@@ -20,10 +20,16 @@ process.env.WEB3_NETWORK_ID = Number(process.env.NETWORK_ID || 888);
   if (!contractSealed) {
     const WHITELIST_COUNT = Number(process.env.WHITELIST_COUNT || 30);
     console.group('WHITELISTING...');
+    const wl = await web3_call('getWhitelist', []);
     for (let i = 0; i < WHITELIST_COUNT; i++) {
       // note - we include account[0] owner account in the whitelist
       x = await getAccountAndKey(i);
-      await web3_tx('whitelistMany', [[x.addr]], OWNER, OWNER_privKey);
+      if (!wl.map(p => p.toLowerCase()).includes(x.addr.toLocaleLowerCase())) {
+        await web3_tx('whitelistMany', [[x.addr]], OWNER, OWNER_privKey);
+      }
+      else {
+        console.log(`skipping ${x.addr} (already in WL)...`);
+      }
     }
     console.groupEnd();
     console.group('SEALING...');
