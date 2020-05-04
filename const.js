@@ -13,7 +13,7 @@ const truffleAssert = require('truffle-assertions');
 const { db } = require('../common/dist/lib');
 
 // misc
-const WEB3_GWEI_GAS_BID = '5';
+const WEB3_GWEI_GAS_BID = '15';
 const WEB3_GAS_LIMIT = 5000000;
 
 // CFD helpers
@@ -261,6 +261,8 @@ async function web3_call(methodName, methodArgs) {
     if (!contractDb) throw(Error(`Failed to lookup contract deployment for networkId=${process.env.WEB3_NETWORK_ID}, contractName=${contractProps[process.env.CONTRACT_TYPE].contractName}, contractVer=${contractProps[process.env.CONTRACT_TYPE].contractVer}`));
     if (consoleOutput) console.log(chalk.dim(` > CALL: [${contractDb.contract_enum} ${contractDb.contract_ver} @${contractDb.addr}] ${chalk.reset.blue.bgWhite(methodName + '(' + methodArgs.map(p => JSON.stringify(p)).join() + ')')}` + chalk.dim(` [networkId: ${process.env.WEB3_NETWORK_ID} - ${web3.currentProvider.host}]`)));
     var contract = new web3.eth.Contract(JSON.parse(contractDb.abi), contractDb.addr);
+    if ((await contract.methods['version']().call()) != contractDb.contract_ver) throw('Deployed contract missing or version mismatch'); // test contract exists - will silently return null on calls if it's not deployed, wtf
+
     const callRet = await contract.methods[methodName](...methodArgs).call();
     return callRet;
 }
@@ -270,6 +272,7 @@ async function web3_tx(methodName, methodArgs, fromAddr, fromPrivKey) {
     const contractDb = (await db.GetDeployment(process.env.WEB3_NETWORK_ID, contractProps[process.env.CONTRACT_TYPE].contractName, contractProps[process.env.CONTRACT_TYPE].contractVer)).recordset[0];
     if (!contractDb) throw(Error(`Failed to lookup contract deployment for networkId=${process.env.WEB3_NETWORK_ID}, contractName=${contractProps[process.env.CONTRACT_TYPE].contractName}, contractVer=${contractProps[process.env.CONTRACT_TYPE].contractVer}`));
     var contract = new web3.eth.Contract(JSON.parse(contractDb.abi), contractDb.addr);
+    if ((await contract.methods['version']().call()) != contractDb.contract_ver) throw('Deployed contract missing or version mismatch'); // test contract exists - will silently return null on calls if it's not deployed, wtf
 
     // Error: Subscriptions are not supported with the HttpProvider.
     // WS: https://github.com/ethereum/web3.js/issues/2661

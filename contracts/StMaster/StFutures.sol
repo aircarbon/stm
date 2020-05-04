@@ -155,7 +155,7 @@ contract StFutures is Owned,
         require(erc20d._whitelisted[a.ledger_A], "Not whitelisted (A)"); 
         require(erc20d._whitelisted[a.ledger_B], "Not whitelisted (B)");
 
-        FuturesLib.openFtPos(ld, std, ctd, erc20d, a, owner);
+        FuturesLib.openFtPos(ld, std, ctd, a, owner);
     }
 
     // ##### set var margin - per product   // ALREADY EXISTS! setFuture_VariationMargin()....

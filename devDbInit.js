@@ -7,6 +7,7 @@ const { db } = require('../common/dist/lib');
 //
 // Initializes test/local DB with default/test values
 //
+
 process.env.WEB3_NETWORK_ID = Number(process.env.NETWORK_ID || 888);
 
 (async function () {

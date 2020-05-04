@@ -64,7 +64,6 @@ library FuturesLib {
         StructLib.LedgerStruct storage ld,
         StructLib.StTypesStruct storage std,
         StructLib.CcyTypesStruct storage ctd,
-        StructLib.Erc20Struct storage erc20d,
         StructLib.FuturesPositionArgs memory a,
         address owner
     ) public {
