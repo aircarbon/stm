@@ -94,6 +94,10 @@ module.exports = {
             btcUsd: '0x0000000000000000000000000000000000000000',
             ethUsd: '0x0000000000000000000000000000000000000000'
         },
+        "891": { // dev
+            btcUsd: '0x0000000000000000000000000000000000000000',
+            ethUsd: '0x0000000000000000000000000000000000000000'
+        },
     },
 
     getTestContextWeb3: () => getTestContextWeb3(),
@@ -221,14 +225,15 @@ EXCHANGE_FEE: 1,
 
 function getTestContextWeb3() {
     const context =
+
         // DM
           process.env.WEB3_NETWORK_ID == 888 ? { web3: new Web3('http://127.0.0.1:8545'),    ethereumTxChain: {} }
-
-        // Vince
-        : process.env.WEB3_NETWORK_ID == 890 ? { web3: new Web3('http://127.0.0.1:8545'),    ethereumTxChain: {} }
-
         // Dung
         : process.env.WEB3_NETWORK_ID == 889 ? { web3: new Web3('http://127.0.0.1:8545'),    ethereumTxChain: {} }
+        // Vince
+        : process.env.WEB3_NETWORK_ID == 890 ? { web3: new Web3('http://127.0.0.1:8545'),    ethereumTxChain: {} }
+        // Lakshmi
+        : process.env.WEB3_NETWORK_ID == 891 ? { web3: new Web3('http://127.0.0.1:8545'),    ethereumTxChain: {} }
 
         // Ropsten
         : process.env.WEB3_NETWORK_ID == 3 ?   { web3: new Web3('https://ac-dev0.net:9545'), ethereumTxChain: { chain: 'ropsten', hardfork: 'petersburg' } }
@@ -262,7 +267,6 @@ async function web3_call(methodName, methodArgs) {
     if (consoleOutput) console.log(chalk.dim(` > CALL: [${contractDb.contract_enum} ${contractDb.contract_ver} @${contractDb.addr}] ${chalk.reset.blue.bgWhite(methodName + '(' + methodArgs.map(p => JSON.stringify(p)).join() + ')')}` + chalk.dim(` [networkId: ${process.env.WEB3_NETWORK_ID} - ${web3.currentProvider.host}]`)));
     var contract = new web3.eth.Contract(JSON.parse(contractDb.abi), contractDb.addr);
     if ((await contract.methods['version']().call()) != contractDb.contract_ver) throw('Deployed contract missing or version mismatch'); // test contract exists - will silently return null on calls if it's not deployed, wtf
-
     const callRet = await contract.methods[methodName](...methodArgs).call();
     return callRet;
 }

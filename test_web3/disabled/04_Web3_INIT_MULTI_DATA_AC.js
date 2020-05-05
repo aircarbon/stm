@@ -1,7 +1,7 @@
 const assert = require('assert');
 const EthereumJsTx = require('ethereumjs-tx');
 const BN = require('bn.js');
-const { db } = require('../../common/dist/lib');
+const { db } = require('../../common/dist');
 require('dotenv').config();
 const _ = require('lodash');
 const chalk = require('chalk');

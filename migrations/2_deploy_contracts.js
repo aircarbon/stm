@@ -15,10 +15,11 @@ const FuturesLib = artifacts.require('./FuturesLib.sol');
 const StMaster = artifacts.require('./StMaster.sol');
 
 const CONST = require('../const.js');
-const { db } = require('../../common/dist/lib');
+const { db } = require('../../common/dist');
 const chalk = require('chalk');
 
 module.exports = async function (deployer) {
+
     process.env.NETWORK = deployer.network;
     process.env.NETWORK_ID = deployer.network_id;
     process.env.WEB3_NETWORK_ID = deployer.network_id;

@@ -5,7 +5,7 @@ const { DateTime } = require('luxon');
 const figlet = require('figlet')
 const TCharts = require('tcharts.js'); // for tables
 
-const { db } = require('../../common/dist/lib');
+const { db } = require('../../common/dist');
 const CONST = require('../const.js');
 
 //
