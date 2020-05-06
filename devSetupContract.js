@@ -32,7 +32,9 @@ module.exports = {
             await CONST.web3_tx('setFee_CcyType', [ CONST.ccyType.USD, CONST.nullAddr, {...CONST.nullFees, ccy_perMillion: 300, ccy_mirrorFee: true, fee_min: 300 } ], O.addr, O.privKey);
         }
         else if (await CONST.web3_call('getContractType', []) == CONST.contractType.CASHFLOW) {
-            const spotTypes = (await CONST.web3_call('getSecTokenTypes', [])).tokenTypes.filter(p => p.settlementType == CONST.settlementType.SPOT);
+            const allTypes = (await CONST.web3_call('getSecTokenTypes', [])).tokenTypes;
+            console.log('allTypes', allTypes);
+            const spotTypes = allTypes.filter(p => p.settlementType == CONST.settlementType.SPOT);
             if (spotTypes.length == 0) {
                 await CONST.web3_tx('addSecTokenType', [ 'UNI_TOKEN',  CONST.settlementType.SPOT, CONST.nullFutureArgs ], O.addr, O.privKey);
             }

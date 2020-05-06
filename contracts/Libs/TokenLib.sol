@@ -30,7 +30,8 @@ library TokenLib {
         StructLib.FutureTokenTypeArgs memory ft
     )
     public {
-        require(ld.contractType == StructLib.ContractType.COMMODITY, "Bad cashflow request");
+        require(ld.contractType == StructLib.ContractType.COMMODITY ||
+               (ld.contractType == StructLib.ContractType.CASHFLOW && std._tt_Count == 0), "Bad cashflow request"); // only allow single tok-type for cashflow contract
         for (uint256 tokenTypeId = 1; tokenTypeId <= std._tt_Count; tokenTypeId++) {
             require(keccak256(abi.encodePacked(std._tt_Name[tokenTypeId])) != keccak256(abi.encodePacked(name)), "Duplicate name");
         }

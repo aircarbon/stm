@@ -8,6 +8,7 @@
         "test": "test"
     },
     "scripts": {
+        "devInitSealContract": "node devInitSealContract",
         "test": "truffle test",
         "solium:lint": "solium lint -d ./contracts",
         "migrate": "rimraf -rf ./build/contracts && truffle migrate --network development --reset",
