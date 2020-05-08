@@ -16,7 +16,7 @@ const { db } = require('../common/dist/lib');
 const WEB3_GWEI_GAS_BID = '15';
 const WEB3_GAS_LIMIT = 5000000;
 
-// CFD helpers
+// CFT helpers
 const nullCashflowArgs = { cashflowType: 0,
     //wei_maxIssuance: 0,
     //wei_currentPrice: 0,

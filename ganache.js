@@ -15,9 +15,9 @@ const command =
 --networkId ${NETWORK_ID} \
 --mnemonic "${MNEMONIC}" \
 --gasLimit 7984363 \
---defaultBalanceEther 1000000000 \
---allowUnlimitedContractSize` // https://ethereum.stackexchange.com/questions/63426/running-out-of-gas-during-a-deploy-due-to-a-large-number-of-require-statements
+--defaultBalanceEther 1000000000`
 ;
+//--allowUnlimitedContractSize` // https://ethereum.stackexchange.com/questions/63426/running-out-of-gas-during-a-deploy-due-to-a-large-number-of-require-statements
 
 shell.echo(`Run: ${command}`);
 

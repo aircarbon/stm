@@ -131,7 +131,9 @@ library TokenLib {
         require(a.origTokFee.fee_percBips <= 10000, "Bad fee args");
         require(a.origTokFee.ccy_mirrorFee == false, "ccy_mirrorFee unsupported for token-type fee");
         require(a.origCcyFee_percBips_ExFee <= 10000, "Bad fee args");
-        require(ld.contractType == StructLib.ContractType.COMMODITY, "Bad cashflow request");
+
+        if (ld.contractType == StructLib.ContractType.CASHFLOW)
+            require(ld._batches_currentMax_id == 0, "Bad cashflow request");
 
         // ### string[] param lengths are reported as zero!
         /*require(metaKeys.length == 0, "At least one metadata key must be provided");

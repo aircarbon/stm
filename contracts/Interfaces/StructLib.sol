@@ -106,15 +106,15 @@ library StructLib {
         mapping(uint256 => FutureTokenTypeArgs) _tt_ft;         // futures args
         uint256 _tt_Count;
     }
-    struct FutureTokenTypeArgs {
-        uint64  expiryTimestamp;
-        uint256 underlyerTypeId;
-        uint256 refCcyId;
-        uint16  initMarginBips;                                 // initial margin - set only once at future token-type creation
-        uint16  varMarginBips;                                  // variation margin - can be updated after token-type creation
-        uint16  contractSize;                                   // contract size - set only once at future token-type creation
-        uint128 feePerContract;                                 // paid by both sides in refCcyId - can be updated after token-type creation
-    }
+        struct FutureTokenTypeArgs {
+            uint64  expiryTimestamp;
+            uint256 underlyerTypeId;
+            uint256 refCcyId;
+            uint16  initMarginBips;                             // initial margin - set only once at future token-type creation
+            uint16  varMarginBips;                              // variation margin - can be updated after token-type creation
+            uint16  contractSize;                               // contract size - set only once at future token-type creation
+            uint128 feePerContract;                             // paid by both sides in refCcyId - can be updated after token-type creation
+        }
 
     // TOKEN BATCH
     struct SecTokenBatch { // ** DATA_DUMP: OK
@@ -208,7 +208,7 @@ library StructLib {
         uint64 _batches_currentMax_id;                          // 1-based
 
         // *** SecTokens LIST
-        mapping(uint256 => PackedSt) _sts;
+        mapping(uint256 => PackedSt) _sts;                      // stId => PackedSt
         uint256 _tokens_currentMax_id;                          // 1-based - updated by Mint() and by transferSplitSecTokens()
 
         // *** LEDGER

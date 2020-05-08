@@ -1,4 +1,4 @@
-# SekTokMaster (STM) v0.96 - Overview
+# SecTokMaster (STM) v0.96 - Overview
 
 ## Contract Type - Commodity or Cashflow
 STM is an Ethereum contract comprising:
