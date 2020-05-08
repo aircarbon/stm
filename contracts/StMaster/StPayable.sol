@@ -50,9 +50,8 @@ contract StPayable is
     }
 
     //function() external  payable  onlyWhenReadWrite() {
-    receive() external payable {
-        PayableLib.pay(ld, cashflowData, ctd, globalFees, owner, /*1*/ get_ethUsd() // TODO: move chainlinkAggregator_ethUsd to PayableLib...
-        );
+    receive() external payable onlyWhenReadWrite() {
+        PayableLib.pay(ld, cashflowData, ctd, globalFees, owner, get_ethUsd());
     }
 
     function setIssuerValues(

@@ -40,6 +40,8 @@ contract("StMaster", accounts => {
         const x = await CONST.getAccountAndKey(0);
         OWNER = x.addr; OWNER_privKey = x.privKey;
 
+        await setupHelper.setDefaults({ stm, accounts });
+
         if (bondPricing == "ETH") {
             wei_currentPrice = new BN(web3.utils.toWei("0.02", "ether"));
             cents_currentPrice = 0;
