@@ -2,6 +2,8 @@ pragma solidity >=0.4.21 <=0.6.6;
 pragma experimental ABIEncoderV2;
 
 import "../Interfaces/StructLib.sol";
+import "../Interfaces/IChainlinkAggregator.sol";
+
 import "./TransferLib.sol";
 
 //
@@ -9,6 +11,12 @@ import "./TransferLib.sol";
 //
 library PayableLib {
     event IssuanceSubscribed(address indexed subscriber, address indexed issuer, uint256 weiSent, uint256 weiChange, uint256 tokensSubscribed, uint256 weiPrice);
+
+    function get_ethUsd(address chainlinkAggregator_ethUsd) public view returns(int256) {
+        if (chainlinkAggregator_ethUsd == address(0x0)) return 100000000; // $1 - cents*satoshis
+        IChainlinkAggregator ref = IChainlinkAggregator(chainlinkAggregator_ethUsd);
+        return ref.latestAnswer();
+    }
 
     //
     // TODO: re-entrancy guards, and .call instead of .transfer

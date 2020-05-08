@@ -79,14 +79,14 @@ module.exports = async function (deployer) {
         
         return deployer.deploy(StMaster, 
             contractType == "CASHFLOW" ? CONST.contractType.CASHFLOW : CONST.contractType.COMMODITY,
-            //CONST.contractProps[contractType].cashflowArgs,               // 24k bytecode limit - disabling on commodity branch
+            CONST.contractProps[contractType].cashflowArgs,
             CONST.contractProps[contractType].contractName,
             CONST.contractProps[contractType].contractVer,
             CONST.contractProps[contractType].contractUnit,
             CONST.contractProps[contractType].contractSymbol,
             CONST.contractProps[contractType].contractDecimals,
-            //CONST.chainlinkAggregators[process.env.NETWORK_ID].btcUsd,    // 24k bytecode limit - disabling on commodity branch
-            //CONST.chainlinkAggregators[process.env.NETWORK_ID].ethUsd     // 24k bytecode limit - disabling on commodity branch
+            //CONST.chainlinkAggregators[process.env.NETWORK_ID].btcUsd,    // 24k
+            CONST.chainlinkAggregators[process.env.NETWORK_ID].ethUsd
         ).then(async stm => {
             //console.dir(stm);
             //console.dir(stm.abi);
