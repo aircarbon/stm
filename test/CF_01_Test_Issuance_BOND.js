@@ -144,19 +144,18 @@ contract("StMaster", accounts => {
         assert(cashflowData.cents_currentPrice == cents_currentPrice, 'unexpected cents_currentPrice after setting issuer values');
     });
 
-    it(`cashflow - issuance (${bondPricing} bond) - should not be able to change issuer price value for bond once set`, async () => {
-        const qty_saleAllocation = ISSUANCE_QTY;
-        try {
-            if (wei_currentPrice > 0)
-                await stm.setIssuerValues(wei_currentPrice.add(new BN(1)), cents_currentPrice, qty_saleAllocation, { from: ISSUER });
-            else if (cents_currentPrice > 0)
-                await stm.setIssuerValues(wei_currentPrice, cents_currentPrice.add(new BN(1)), qty_saleAllocation, { from: ISSUER });
-        } catch (ex) {  
-           assert(ex.reason == 'Bad cashflow request: cannot change price for bond once set', `unexpected: ${ex.reason}`);
-           return;
-        }
-    });
-
+    // it(`cashflow - issuance (${bondPricing} bond) - should not be able to change issuer price value for bond once set`, async () => {
+    //     const qty_saleAllocation = ISSUANCE_QTY;
+    //     try {
+    //         if (wei_currentPrice > 0)
+    //             await stm.setIssuerValues(wei_currentPrice.add(new BN(1)), cents_currentPrice, qty_saleAllocation, { from: ISSUER });
+    //         else if (cents_currentPrice > 0)
+    //             await stm.setIssuerValues(wei_currentPrice, cents_currentPrice.add(new BN(1)), qty_saleAllocation, { from: ISSUER });
+    //     } catch (ex) {  
+    //        assert(ex.reason == 'Bad cashflow request: cannot change price for bond once set', `unexpected: ${ex.reason}`);
+    //        return;
+    //     }
+    // });
     it(`cashflow - issuance (${bondPricing} bond) - should not be able to change issuer price value for bond once set`, async () => {
         const qty_saleAllocation = ISSUANCE_QTY;
         try {
@@ -178,15 +177,15 @@ contract("StMaster", accounts => {
 
     it(`cashflow - issuance (${bondPricing} bond) - should not handle payable tx when contract is read only`, async () => {
         try {
-            await stm.setReadOnly(true, { from: accounts[0] });
+            await stm.setReadOnly(true);
             await issuanceHelper.subscribe(stm, wei_priceForOne, 
                 ISSUER,
                 accounts[++global.TaddrNdx], 
                 wei_priceForOne.toString() //web3.utils.fromWei(cashflowData.wei_currentPrice.toString(), 'ether')
                 );
-            await stm.setReadOnly(false, { from: accounts[0] });
+            await stm.setReadOnly(false);
         } catch (ex) {  
-            await stm.setReadOnly(false, { from: accounts[0] });
+            await stm.setReadOnly(false);
             assert(ex.reason == 'Read-only', `unexpected: ${ex.reason}`);
             return;
         }
@@ -196,13 +195,13 @@ contract("StMaster", accounts => {
     it(`cashflow - issuance (${bondPricing} bond) - should not be able to subscribe more than the monobatch size`, async () => {
         try {
             const wei_maxSubscriptionValue = Big(
-                wei_priceForOne.toString() //cashflowData.wei_currentPrice
+                wei_priceForOne.toString()
             ).times(Big(ISSUANCE_QTY))
             await issuanceHelper.subscribe(stm, wei_priceForOne, ISSUER, accounts[++global.TaddrNdx], 
                 web3.utils.fromWei(
                     wei_maxSubscriptionValue
                     .plus(Big( // round up one token qty
-                        wei_priceForOne.toString() //cashflowData.wei_currentPrice
+                        wei_priceForOne.toString()
                     )) 
                 .toFixed(), 'ether'));
         } catch (ex) {  
@@ -224,13 +223,13 @@ contract("StMaster", accounts => {
     it(`cashflow - issuance (${bondPricing} bond) - should not be able to subscribe more than the available sale qty`, async () => {
         try {
             const wei_maxSubscriptionValue = Big(
-                wei_priceForOne.toString() //cashflowData.wei_currentPrice
+                wei_priceForOne.toString()
             ).times(Big(cashflowData.qty_saleAllocation))
             await issuanceHelper.subscribe(stm, wei_priceForOne, ISSUER, accounts[++global.TaddrNdx], 
                 web3.utils.fromWei(
                     wei_maxSubscriptionValue
                     .plus(Big( // round up one token qty
-                        wei_priceForOne.toString() //cashflowData.wei_currentPrice
+                        wei_priceForOne.toString()
                     )) 
                 .toFixed(), 'ether'));
         } catch (ex) {  
@@ -243,7 +242,7 @@ contract("StMaster", accounts => {
     it(`cashflow - issuance (${bondPricing} bond) - should be able to subscribe up to the available sale qty`, async () => {
         const SUB_1 = ++global.TaddrNdx;
         const wei_maxSubscriptionValue = Big(
-            wei_priceForOne.toString() //cashflowData.wei_currentPrice
+            wei_priceForOne.toString()
         ).times(Big(cashflowData.qty_saleAllocation))
         //console.log('cashflowData.qty_saleAllocation', cashflowData.qty_saleAllocation.toString());
         const bought = await issuanceHelper.subscribe(stm, wei_priceForOne, ISSUER, accounts[SUB_1], web3.utils.fromWei(wei_maxSubscriptionValue.toFixed(), 'ether'));

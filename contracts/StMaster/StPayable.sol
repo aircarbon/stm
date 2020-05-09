@@ -22,13 +22,15 @@ contract StPayable is
     //IStPayable,
     StErc20 {
 
-    // === CFT ===
-    // PRI 1 ** CASHFLOWS (J 1+3) ==>>> MVP -- CFT CORE (aiming for *no whitelisting*, i.e. all external control ERC20 accounts)
-    //      TODO: pri1 - test - exchange fees on subscriptions
-    //      TODO: pri1 - new  - eth fees on subscriptions (new fee-type)
-    //      TODO: pri2 - issuerPayments (BOND) v0 basic (no validations, i.e. eq-path only?)
+    // === CFT === V0 ** =>>> MVP -- CFT CORE (*no whitelisting*, i.e. all external control ERC20 accounts, no collateral: aka private equity/ledger - no exchange)
+    //      TODO: pri0 - issuerPayments (BOND) v0.1 -- basic (no validations, i.e. eq-path only?)
+    //      TODO: pri0 - issuerPayments (EQ)   v0.1 -- test pack: changing issuancePrice mid-issuance
+
+    // === CFT === V1 ** =>>> MVP -- CFT SPLIT LEDGER (central WL, central collateral, central spot transferOrTrade...)
+    //      TODO: pri1 - ledger combine/abstract (centralised collateral)
+
+    //      TODO: pri2 - PE: issuance fee on subscriptions
     //      TODO: pri3 - wallet auto-converts
-    //      TODO: pri4 - (eq-type) changing issuancePrice mid-issuance
 
     StructLib.CashflowStruct cashflowData;
     //address public chainlinkAggregator_btcUsd;
