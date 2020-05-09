@@ -25,8 +25,7 @@ import "../Interfaces/StructLib.sol";
 // 23576: ... FTs v0 (paused) - baseline
 // 22830: ... [removed all global counters, except total minted & burned]
 // 22911: ... [removed isWL and getWLCount]
-
-// .....: ... restored cashflowArgs
+// 24003: ... [restored cashflowArgs, optimizer runs down to 10]
 
 contract StMaster
     is //IStMaster, IPublicViews,

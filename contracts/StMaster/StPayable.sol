@@ -22,11 +22,17 @@ contract StPayable is
     //IStPayable,
     StErc20 {
 
+    // get basic (eq) issuer payments working, then look at split ledger ...
+
     // === CFT === V0 ** =>>> MVP -- CFT CORE (*no whitelisting*, i.e. all external control ERC20 accounts, no collateral: aka private equity/ledger - no exchange)
-    //      TODO: pri0 - issuerPayments (BOND) v0.1 -- basic (no validations, i.e. eq-path only?)
-    //      TODO: pri0 - issuerPayments (EQ)   v0.1 -- test pack: changing issuancePrice mid-issuance
+    //      TODO: pri0 - issuerPayments (EQ)   v0.1 -- MVP (any amount ok, no validations) -- test pack: changing issuancePrice mid-issuance
+    //      TODO: pri0 - issuerPayments (BOND) v0.1 -- MVP basic (no validations, i.e. eq-path only -- revisit loan/interest etc. later)
 
     // === CFT === V1 ** =>>> MVP -- CFT SPLIT LEDGER (central WL, central collateral, central spot transferOrTrade...)
+    //  Cashflow type is fundamentally way less fungible than Commodity type, i.e. loan A != loan B
+    //  Therefore, the only way to preserve ERC20 semanitcs for CFTs, is for each CFT *to have its own contract address*
+    //    (i.e. we can't use token-types (or batch metadata) to separate different CFTs in a single contract ledger)
+    //
     //      TODO: pri1 - ledger combine/abstract (centralised collateral)
 
     //      TODO: pri2 - PE: issuance fee on subscriptions
