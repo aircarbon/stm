@@ -10,7 +10,7 @@ const EthereumJsTx = require('ethereumjs-tx');
 const chalk = require('chalk');
 const truffleAssert = require('truffle-assertions');
 
-const { db } = require('../common/dist/lib');
+const { db } = require('../common/dist');
 
 // misc
 const WEB3_GWEI_GAS_BID = '15';
@@ -280,7 +280,7 @@ async function web3_tx(methodName, methodArgs, fromAddr, fromPrivKey, returnBefo
 
     // Error: Subscriptions are not supported with the HttpProvider.
     // WS: https://github.com/ethereum/web3.js/issues/2661
-    // contract.events.allEvents({ 
+    // contract.events.allEvents({
     //     // filter
     // }, function (err, ev) {
     //     console.log('callback', ev);

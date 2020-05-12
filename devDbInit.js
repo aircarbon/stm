@@ -3,7 +3,7 @@ const mapSeries = require('async/mapSeries');
 const allSettled = require('promise.allsettled');
 const got = require('got');
 const { web3_call } = require('./const.js');
-const { db } = require('../common/dist/lib');
+const { db } = require('../common/dist');
 
 //
 // Initializes test/local DB with default/test values
