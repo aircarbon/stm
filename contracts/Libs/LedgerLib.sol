@@ -46,8 +46,8 @@ library LedgerLib {
 
         // hash token types & exchange token fees
         for (uint256 stTypeId = 1; stTypeId <= std._tt_Count; stTypeId++) {
-            ledgerHash = keccak256(abi.encodePacked(ledgerHash, std._tt_Name[stTypeId]));
-            ledgerHash = keccak256(abi.encodePacked(ledgerHash, std._tt_Settle[stTypeId]));
+            ledgerHash = keccak256(abi.encodePacked(ledgerHash, std._tt_name[stTypeId]));
+            ledgerHash = keccak256(abi.encodePacked(ledgerHash, std._tt_settle[stTypeId]));
 
             ledgerHash = keccak256(abi.encodePacked(ledgerHash, std._tt_ft[stTypeId].expiryTimestamp));
             ledgerHash = keccak256(abi.encodePacked(ledgerHash, std._tt_ft[stTypeId].underlyerTypeId));
@@ -56,6 +56,8 @@ library LedgerLib {
             ledgerHash = keccak256(abi.encodePacked(ledgerHash, std._tt_ft[stTypeId].varMarginBips));
             ledgerHash = keccak256(abi.encodePacked(ledgerHash, std._tt_ft[stTypeId].contractSize));
             ledgerHash = keccak256(abi.encodePacked(ledgerHash, std._tt_ft[stTypeId].feePerContract));
+
+            ledgerHash = keccak256(abi.encodePacked(ledgerHash, std._tt_addr[stTypeId]));
 
             if (globalFees.tokType_Set[stTypeId]) {
                 ledgerHash = keccak256(abi.encodePacked(ledgerHash, hashSetFeeArgs(globalFees.tok[stTypeId])));
@@ -219,7 +221,7 @@ library LedgerLib {
                 uint256 stId = tokenType_stIds[ndx];
 
                 // sum ST sizes - convenience for caller - only applicable for spot (+ve qty) token types
-                if (std._tt_Settle[tokenTypeId] == StructLib.SettlementType.SPOT) {
+                if (std._tt_settle[tokenTypeId] == StructLib.SettlementType.SPOT) {
                     spot_sumQty += uint256(ld._sts[stId].currentQty);
                 }
 
@@ -227,7 +229,7 @@ library LedgerLib {
                 tokens[flatSecTokenNdx] = StructLib.LedgerSecTokenReturn({
                            stId: stId,
                     tokenTypeId: tokenTypeId,
-                  tokenTypeName: std._tt_Name[tokenTypeId],
+                  tokenTypeName: std._tt_name[tokenTypeId],
                         batchId: ld._sts[stId].batchId,
                       mintedQty: ld._sts[stId].mintedQty,
                      currentQty: ld._sts[stId].currentQty,

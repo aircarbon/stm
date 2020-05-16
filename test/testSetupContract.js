@@ -18,9 +18,9 @@ module.exports = {
         if (await stm.getContractType() == CONST.contractType.COMMODITY) {
             const spotTypes = (await stm.getSecTokenTypes()).tokenTypes.filter(p => p.settlementType == CONST.settlementType.SPOT);
             if (spotTypes.length == 0) {
-                await stm.addSecTokenType(`AirCarbon CORSIA Token`, CONST.settlementType.SPOT, CONST.nullFutureArgs);
-                await stm.addSecTokenType(`AirCarbon Nature Token`, CONST.settlementType.SPOT, CONST.nullFutureArgs);
-                await stm.addSecTokenType(`AirCarbon Premium Token`, CONST.settlementType.SPOT, CONST.nullFutureArgs);
+                await stm.addSecTokenType(`AirCarbon CORSIA Token`, CONST.settlementType.SPOT, CONST.nullFutureArgs, CONST.nullAddr);
+                await stm.addSecTokenType(`AirCarbon Nature Token`, CONST.settlementType.SPOT, CONST.nullFutureArgs, CONST.nullAddr);
+                await stm.addSecTokenType(`AirCarbon Premium Token`, CONST.settlementType.SPOT, CONST.nullFutureArgs, CONST.nullAddr);
             }
 
             const ccyTypes = (await stm.getCcyTypes()).ccyTypes;
@@ -35,7 +35,7 @@ module.exports = {
         else if (await stm.getContractType() == CONST.contractType.CASHFLOW) {
             const spotTypes = (await stm.getSecTokenTypes()).tokenTypes.filter(p => p.settlementType == CONST.settlementType.SPOT);
             if (spotTypes.length == 0) {
-                await stm.addSecTokenType(`UNI_TOKEN`, CONST.settlementType.SPOT, CONST.nullFutureArgs);
+                await stm.addSecTokenType(`UNI_TOKEN`, CONST.settlementType.SPOT, CONST.nullFutureArgs, CONST.nullAddr);
             }
 
             const ccyTypes = (await stm.getCcyTypes()).ccyTypes;

@@ -62,7 +62,7 @@ contract("StMaster", accounts => {
         if (await stm_cur.getContractType() == CONST.contractType.COMMODITY) {
             
             // add spot type
-            await stm_cur.addSecTokenType('NEW_TOK_SPOT_TYPE', CONST.settlementType.SPOT, CONST.nullFutureArgs, { from: accounts[0] });
+            await stm_cur.addSecTokenType('NEW_TOK_SPOT_TYPE', CONST.settlementType.SPOT, CONST.nullFutureArgs, CONST.nullAddr, { from: accounts[0] });
             
             // FT - add future type
             const spotTypes = tokTypes.tokenTypes.filter(p => p.settlementType == CONST.settlementType.SPOT);
@@ -75,7 +75,7 @@ contract("StMaster", accounts => {
                   varMarginBips: 500,
                    contractSize: 1,
                  feePerContract: 0,
-            });
+            }, CONST.nullAddr );
             curHash = await checkHashUpdate(curHash);
             FT = (await stm_cur.getSecTokenTypes()).tokenTypes.filter(p => p.settlementType == CONST.settlementType.FUTURE)[0];
 
@@ -311,7 +311,7 @@ contract("StMaster", accounts => {
         _.forEach(loadCcys, async (p) => await stm_new.addCcyType(p.name, p.unit, p.decimals));
 
         const curToks = await stm_cur.getSecTokenTypes(), newToks = await stm_new.getSecTokenTypes(), loadToks = _.differenceWith(curToks.tokenTypes, newToks.tokenTypes, _.isEqual);
-        _.forEach(loadToks, async (p) => await stm_new.addSecTokenType(p.name, p.settlementType, p.ft));
+        _.forEach(loadToks, async (p) => await stm_new.addSecTokenType(p.name, p.settlementType, p.ft, pt.cashflowBaseAddr));
 
         // load whitelist
         stm_new.whitelistMany([accounts[555]]); // simulate a new contract owner (first whitelist entry, by convention) -- i.e. we can upgrade contract with a new privkey

@@ -157,7 +157,7 @@ describe(`Contract Web3 Interface`, async () => {
         if (EXEC_TEST_ACTIONS) {
             // add sec token type
             if (!(await CONST.web3_call('getSecTokenTypes',[])).tokenTypes.some(p => p.name == 'NEW_TOK_TYPE_A')) {
-                await CONST.web3_tx('addSecTokenType', [ 'NEW_TOK_TYPE_A', CONST.settlementType.SPOT, CONST.nullFutureArgs ], OWNER, OWNER_privKey);
+                await CONST.web3_tx('addSecTokenType', [ 'NEW_TOK_TYPE_A', CONST.settlementType.SPOT, CONST.nullFutureArgs, CONST.nullAddr ], OWNER, OWNER_privKey);
             }
 
             // add ccy type

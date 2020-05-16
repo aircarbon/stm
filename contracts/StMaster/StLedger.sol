@@ -1,8 +1,6 @@
 pragma solidity >=0.4.21 <=0.6.6;
 pragma experimental ABIEncoderV2;
 
-//import "../Interfaces/IStLedger.sol";
-
 import "./Owned.sol";
 
 import "../Interfaces/StructLib.sol";
@@ -19,10 +17,10 @@ contract StLedger is //IStLedger,
     //
     // MUTATE LEDGER
     //
-    function addSecTokenType(string memory name, StructLib.SettlementType settlementType, StructLib.FutureTokenTypeArgs memory ft)
-    public onlyOwner() onlyWhenReadWrite() {
-        TokenLib.addSecTokenType(ld, std, ctd, name, settlementType, ft);
-    }
+
+    // add token type: direct (by name) or cashflow base (by address)
+    function addSecTokenType(string memory name, StructLib.SettlementType settlementType, StructLib.FutureTokenTypeArgs memory ft, address cashflowBaseAddr)
+    public onlyOwner() onlyWhenReadWrite() { TokenLib.addSecTokenType(ld, std, ctd, name, settlementType, ft, cashflowBaseAddr); }
 
     // function initLedgerIfNew(address account)
     // public onlyOwner() onlyWhenReadWrite() {

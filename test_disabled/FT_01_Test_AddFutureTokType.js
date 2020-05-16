@@ -50,7 +50,7 @@ contract("StMaster", accounts => {
              initMarginBips: 1000,
               varMarginBips: 1500,
                contractSize: 1000,
-        });
+        }, CONST.nullAddr);
         const ftType = (await stm.getSecTokenTypes()).tokenTypes.find(p => p.name == ftName);
         assert(ftType !== undefined);
         assert(ftType.settlementType == CONST.settlementType.FUTURE);
@@ -70,7 +70,7 @@ contract("StMaster", accounts => {
                 underlyerTypeId: spotTypes[0].id, 
                        refCcyId: ccyTypes[0].id,
                    contractSize: 1000,
-            });
+            }, CONST.nullAddr);
         }
         catch (ex) { assert(ex.reason == 'Bad expiry', `unexpected: ${ex.reason}`); return; }
         assert.fail('expected contract exception');
@@ -83,7 +83,7 @@ contract("StMaster", accounts => {
                 expiryTimestamp: DateTime.local().toMillis(), 
                        refCcyId: ccyTypes[0].id,
                    contractSize: 1000,
-            });
+            }, CONST.nullAddr);
         }
         catch (ex) { assert(ex.reason == 'Bad underlyerTypeId', `unexpected: ${ex.reason}`); return; }
         assert.fail('expected contract exception');
@@ -93,12 +93,12 @@ contract("StMaster", accounts => {
         const ccyTypes = (await stm.getCcyTypes()).ccyTypes;
         const addFtTx_ok = await stm.addSecTokenType(`FT_TEST4_${new Date().getTime()}`, CONST.settlementType.FUTURE, { ...CONST.nullFutureArgs,
             expiryTimestamp: DateTime.local().toMillis(), underlyerTypeId: spotTypes[0].id, refCcyId: ccyTypes[0].id, contractSize: 1000,
-        });
+        }, CONST.nullAddr);
         const ftTypes = (await stm.getSecTokenTypes()).tokenTypes.filter(p => p.settlementType == CONST.settlementType.FUTURE);
         try {
             const addFtTx_err = await stm.addSecTokenType(`FT_TEST5_${new Date().getTime()}`, CONST.settlementType.FUTURE, {  ...CONST.nullFutureArgs,
                 expiryTimestamp: DateTime.local().toMillis(), underlyerTypeId: ftTypes[0].id, refCcyId: ccyTypes[0].id, contractSize: 1000,
-            });
+            }, CONST.nullAddr);
         }
         catch (ex) { assert(ex.reason == 'Bad underyler settlement type', `unexpected: ${ex.reason}`); return; }
         assert.fail('expected contract exception');
@@ -109,9 +109,9 @@ contract("StMaster", accounts => {
         try {
             const addFtTx = await stm.addSecTokenType(`FT_TEST6_${new Date().getTime()}`, CONST.settlementType.FUTURE, { ...CONST.nullFutureArgs,
                 expiryTimestamp: DateTime.local().toMillis(), underlyerTypeId: spotTypes[0].id, refCcyId: 0, contractSize: 1000,
-            });
+            }, CONST.nullAddr);
         }
-        catch (ex) { assert(ex.reason == 'Bad refCcyId', `unexpected: ${ex.reason}`); return; }
+    catch (ex) { assert(ex.reason == 'Bad refCcyId', `unexpected: ${ex.reason}`); return; }
         assert.fail('expected contract exception');
     });
 
@@ -121,7 +121,7 @@ contract("StMaster", accounts => {
         try {
             const addFtTx = await stm.addSecTokenType(`FT_TEST6_${new Date().getTime()}`, CONST.settlementType.FUTURE, { ...CONST.nullFutureArgs,
                 expiryTimestamp: DateTime.local().toMillis(), underlyerTypeId: spotTypes[0].id, refCcyId: ccyTypes[0].id, initMarginBips: 10001, contractSize: 1000,
-            });
+            }, CONST.nullAddr);
         }
         catch (ex) { assert(ex.reason == 'Bad total margin', `unexpected: ${ex.reason}`); return; }
         assert.fail('expected contract exception');
@@ -132,7 +132,7 @@ contract("StMaster", accounts => {
         try {
             const addFtTx = await stm.addSecTokenType(`FT_TEST6_${new Date().getTime()}`, CONST.settlementType.FUTURE, { ...CONST.nullFutureArgs,
                 expiryTimestamp: DateTime.local().toMillis(), underlyerTypeId: spotTypes[0].id, refCcyId: ccyTypes[0].id, initMarginBips: -1, contractSize: 1000,
-            });
+            }, CONST.nullAddr);
         }
         catch (ex) { assert(ex.reason == 'Bad total margin', `unexpected: ${ex.reason}`); return; }
         assert.fail('expected contract exception');
@@ -144,7 +144,7 @@ contract("StMaster", accounts => {
         try {
             const addFtTx = await stm.addSecTokenType(`FT_TEST6_${new Date().getTime()}`, CONST.settlementType.FUTURE, { ...CONST.nullFutureArgs,
                 expiryTimestamp: DateTime.local().toMillis(), underlyerTypeId: spotTypes[0].id, refCcyId: ccyTypes[0].id, varMarginBips: 10001, contractSize: 1000,
-            });
+            }, CONST.nullAddr);
         }
         catch (ex) { assert(ex.reason == 'Bad total margin', `unexpected: ${ex.reason}`); return; }
         assert.fail('expected contract exception');
@@ -155,7 +155,7 @@ contract("StMaster", accounts => {
         try {
             const addFtTx = await stm.addSecTokenType(`FT_TEST6_${new Date().getTime()}`, CONST.settlementType.FUTURE, { ...CONST.nullFutureArgs,
                 expiryTimestamp: DateTime.local().toMillis(), underlyerTypeId: spotTypes[0].id, refCcyId: ccyTypes[0].id, varMarginBips: -1, contractSize: 1000,
-            });
+            }, CONST.nullAddr);
         }
         catch (ex) { assert(ex.reason == 'Bad total margin', `unexpected: ${ex.reason}`); return; }
         assert.fail('expected contract exception');
@@ -167,7 +167,7 @@ contract("StMaster", accounts => {
         try {
             const addFtTx = await stm.addSecTokenType(`FT_TEST6_${new Date().getTime()}`, CONST.settlementType.FUTURE, { ...CONST.nullFutureArgs,
                 expiryTimestamp: DateTime.local().toMillis(), underlyerTypeId: spotTypes[0].id, refCcyId: ccyTypes[0].id, contractSize: 0,
-            });
+            }, CONST.nullAddr);
         }
         catch (ex) { assert(ex.reason == 'Bad contractSize', `unexpected: ${ex.reason}`); return; }
         assert.fail('expected contract exception');

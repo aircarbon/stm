@@ -23,7 +23,7 @@ library FuturesLib {
         uint16  initMarginBips
     ) public {
         require(tokTypeId >= 0 && tokTypeId <= std._tt_Count, "Bad tokTypeId");
-        require(std._tt_Settle[tokTypeId] == StructLib.SettlementType.FUTURE, "Bad token settlement type");
+        require(std._tt_settle[tokTypeId] == StructLib.SettlementType.FUTURE, "Bad token settlement type");
         require(/*std._tt_ft[tokTypeId].varMarginBips +*/initMarginBips <= 10000, "Bad total margin");
 
         StructLib.initLedgerIfNew(ld, ledgerOwner);
@@ -39,7 +39,7 @@ library FuturesLib {
         uint128 feePerContract
     ) public {
         require(tokTypeId >= 0 && tokTypeId <= std._tt_Count, "Bad tokTypeId");
-        require(std._tt_Settle[tokTypeId] == StructLib.SettlementType.FUTURE, "Bad token settlement type");
+        require(std._tt_settle[tokTypeId] == StructLib.SettlementType.FUTURE, "Bad token settlement type");
 
         StructLib.initLedgerIfNew(ld, ledgerOwner);
         ld._ledger[ledgerOwner].ft_feePerContract[tokTypeId] = feePerContract;
@@ -73,7 +73,7 @@ library FuturesLib {
         require(a.qty_A <= 0x7FFFFFFFFFFFFFFF && a.qty_B <= 0x7FFFFFFFFFFFFFFF && a.qty_A >= -0x7FFFFFFFFFFFFFFF && a.qty_B >= -0x7FFFFFFFFFFFFFFF && a.qty_A != 0 && a.qty_B != 0, "Bad quantity"); // min/max signed int64, non-zero
         require(a.qty_A + a.qty_B == 0, "Quantity mismatch");
         require(a.tokTypeId >= 0 && a.tokTypeId <= std._tt_Count, "Bad tokTypeId");
-        require(std._tt_Settle[a.tokTypeId] == StructLib.SettlementType.FUTURE, "Bad token settlement type");
+        require(std._tt_settle[a.tokTypeId] == StructLib.SettlementType.FUTURE, "Bad token settlement type");
         require(a.price <= 0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF && a.price > 0, "Bad price"); // max signed int128, non-zero
 
         // apply fees
@@ -169,7 +169,7 @@ library FuturesLib {
     //     // ...todo? - recalculate margin requirement (calcPosMargin()) - i.e. allow changes of FT var-margin on open positions...
 
     //     //require(a.tokTypeId >= 0 && a.tokTypeId <= std._tt_Count, "Bad tokTypeId");
-    //     require(std._tt_Settle[a.tokTypeId] == StructLib.SettlementType.FUTURE, "Bad token settlement type");
+    //     require(std._tt_settle[a.tokTypeId] == StructLib.SettlementType.FUTURE, "Bad token settlement type");
     //     StructLib.FutureTokenTypeArgs storage fta = std._tt_ft[a.tokTypeId];
     //     //require(fta.contractSize > 0, "Unexpected token type FutureTokenTypeArgs");
 
@@ -261,7 +261,7 @@ library FuturesLib {
         StructLib.StTypesStruct storage std,
         StructLib.TakePayArgs2 memory a
     ) public {
-        require(std._tt_Settle[a.tokTypeId] == StructLib.SettlementType.FUTURE, "Bad token settlement type");
+        require(std._tt_settle[a.tokTypeId] == StructLib.SettlementType.FUTURE, "Bad token settlement type");
         StructLib.FutureTokenTypeArgs storage fta = std._tt_ft[a.tokTypeId];
         //require(fta.contractSize > 0, "Unexpected token type FutureTokenTypeArgs");
         StructLib.PackedSt storage st = ld._sts[a.stId];
@@ -358,7 +358,7 @@ library FuturesLib {
         StructLib.StTypesStruct storage std,
         StructLib.CombinePositionArgs memory a
     ) public {
-        require(std._tt_Settle[a.tokTypeId] == StructLib.SettlementType.FUTURE, "Bad token settlement type");
+        require(std._tt_settle[a.tokTypeId] == StructLib.SettlementType.FUTURE, "Bad token settlement type");
         //StructLib.FutureTokenTypeArgs storage fta = std._tt_ft[a.tokTypeId];
 
         int64 totQtyAbs = 0;
@@ -458,7 +458,7 @@ library FuturesLib {
 
         // walk future positions
         for (uint256 tokTypeId = 1; tokTypeId <= std._tt_Count; tokTypeId++) {
-            if (std._tt_Settle[tokTypeId] == StructLib.SettlementType.FUTURE) {
+            if (std._tt_settle[tokTypeId] == StructLib.SettlementType.FUTURE) {
 
                 // get aggregate position for this future type
                 int64 totQtyNet;

@@ -232,7 +232,7 @@ async function initTestMode(testMode) {
              feePerContract: 300, // $3.00
              initMarginBips: 1000, // 10%
               varMarginBips: 1000, // 10%
-        }], O.addr, O.privKey);
+        }, CONST.nullAddr], O.addr, O.privKey);
     } else console.log(`${TEST_FT_1} future already present; nop.`);
     fts = (await CONST.web3_call('getSecTokenTypes', [])).tokenTypes.filter(p => p.settlementType == CONST.settlementType.FUTURE);
 

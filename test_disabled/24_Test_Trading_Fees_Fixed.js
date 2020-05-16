@@ -94,7 +94,7 @@ contract("StMaster", accounts => {
     });
 
     it(`fees (fixed) - apply large (>1 batch ST size) token fee on a trade on a newly added ST type`, async () => {
-        await stm.addSecTokenType('TEST_EEU_TYPE', CONST.settlementType.SPOT, CONST.nullFutureArgs);
+        await stm.addSecTokenType('TEST_EEU_TYPE', CONST.settlementType.SPOT, CONST.nullFutureArgs, CONST.nullAddr);
         const types = (await stm.getSecTokenTypes()).tokenTypes;
         const newSecTokenTypeId = types.filter(p => p.name == 'TEST_EEU_TYPE')[0].id;
 
@@ -297,7 +297,7 @@ contract("StMaster", accounts => {
         const ccyTypes = (await stm.getCcyTypes()).ccyTypes;
         const newCcyTypeId = ccyTypes.filter(p => p.name == 'TEST_CCY_TYPE_2')[0].id;
 
-        await stm.addSecTokenType('TEST_EEU_TYPE_2', CONST.settlementType.SPOT, CONST.nullFutureArgs);
+        await stm.addSecTokenType('TEST_EEU_TYPE_2', CONST.settlementType.SPOT, CONST.nullFutureArgs, CONST.nullAddr);
         const tokenTypes = (await stm.getSecTokenTypes()).tokenTypes;
         const newSecTokenTypeId = tokenTypes.filter(p => p.name == 'TEST_EEU_TYPE_2')[0].id;
 

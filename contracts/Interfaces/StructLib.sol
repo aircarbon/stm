@@ -94,6 +94,7 @@ library StructLib {
         string              name;
         SettlementType      settlementType;
         FutureTokenTypeArgs ft;
+        address             cashflowBaseAddr;
     }
     struct GetSecTokenTypesReturn {
         SecTokenTypeReturn[] tokenTypes;
@@ -101,9 +102,10 @@ library StructLib {
 
     enum SettlementType { UNDEFINED, SPOT, FUTURE }
     struct StTypesStruct { // ** DATA_DUMP: OK
-        mapping(uint256 => string)              _tt_Name;       // typeId (1-based) -> typeName
-        mapping(uint256 => SettlementType)      _tt_Settle;
-        mapping(uint256 => FutureTokenTypeArgs) _tt_ft;         // futures args
+        mapping(uint256 => string)              _tt_name;       // typeId (1-based) -> typeName
+        mapping(uint256 => SettlementType)      _tt_settle;
+        mapping(uint256 => FutureTokenTypeArgs) _tt_ft;
+        mapping(uint256 => address)             _tt_addr;       // cashflow base
         uint256 _tt_Count;
     }
         struct FutureTokenTypeArgs {

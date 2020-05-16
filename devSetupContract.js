@@ -5,7 +5,7 @@ const chalk = require('chalk');
 module.exports = {
 
     //
-    // Initializes deployed contract with default values (currencies, spot token-types, and global commodity exchange fee)
+    // Initializes the latest deployed contract with default values (currencies, spot token-types, and global commodity exchange fee)
     // (web3 version)
     //
     setDefaults: async () => {
@@ -18,9 +18,9 @@ module.exports = {
 
             const spotTypes = (await CONST.web3_call('getSecTokenTypes', [])).tokenTypes.filter(p => p.settlementType == CONST.settlementType.SPOT);
             if (spotTypes.length == 0) {
-                await CONST.web3_tx('addSecTokenType', [ 'AirCarbon CORSIA Token',  CONST.settlementType.SPOT, CONST.nullFutureArgs ], O.addr, O.privKey);
-                await CONST.web3_tx('addSecTokenType', [ 'AirCarbon Nature Token',  CONST.settlementType.SPOT, CONST.nullFutureArgs ], O.addr, O.privKey);
-                await CONST.web3_tx('addSecTokenType', [ 'AirCarbon Premium Token', CONST.settlementType.SPOT, CONST.nullFutureArgs ], O.addr, O.privKey);
+                await CONST.web3_tx('addSecTokenType', [ 'AirCarbon CORSIA Token',  CONST.settlementType.SPOT, CONST.nullFutureArgs, CONST.nullAddr ], O.addr, O.privKey);
+                await CONST.web3_tx('addSecTokenType', [ 'AirCarbon Nature Token',  CONST.settlementType.SPOT, CONST.nullFutureArgs, CONST.nullAddr ], O.addr, O.privKey);
+                await CONST.web3_tx('addSecTokenType', [ 'AirCarbon Premium Token', CONST.settlementType.SPOT, CONST.nullFutureArgs, CONST.nullAddr ], O.addr, O.privKey);
             }
 
             const ccyTypes = (await CONST.web3_call('getCcyTypes', [])).ccyTypes;
@@ -33,8 +33,8 @@ module.exports = {
             // default exchange fee
             await CONST.web3_tx('setFee_CcyType', [ CONST.ccyType.USD, CONST.nullAddr, {...CONST.nullFees, ccy_perMillion: 300, ccy_mirrorFee: true, fee_min: 300 } ], O.addr, O.privKey);
 
-            // setup default owner ledger entry
-            await CONST.web3_tx('fund', [CONST.ccyType.USD, 0, O.addr], O.addr, O.privKey);
+            // owner ledger entry
+            await CONST.web3_tx('fund', [CONST.ccyType.USD, 0, O.addr], O.addr, O.privKey); 
         }
         else if (await CONST.web3_call('getContractType', []) == CONST.contractType.CASHFLOW) {
             console.log(chalk.inverse('devSetupContract >> base cashflow contract...'));
@@ -42,14 +42,14 @@ module.exports = {
             // base cashflow - unitype
             const spotTypes = (await CONST.web3_call('getSecTokenTypes', [])).tokenTypes.filter(p => p.settlementType == CONST.settlementType.SPOT);
             if (spotTypes.length == 0) {
-                await CONST.web3_tx('addSecTokenType', [ 'UNI_TOKEN',  CONST.settlementType.SPOT, CONST.nullFutureArgs ], O.addr, O.privKey);
+                await CONST.web3_tx('addSecTokenType', [ 'UNI_TOKEN',  CONST.settlementType.SPOT, CONST.nullFutureArgs, CONST.nullAddr ], O.addr, O.privKey);
             }
 
             // base cashflow - does not track collateral, no ccy types at all
             ;
             
-            // setup default owner ledger entry
-            await CONST.web3_tx('setFee_TokType', [ 1, O.addr, CONST.nullFees ], O.addr, O.privKey); 
+            // owner ledger entry
+            await CONST.web3_tx('setFee_TokType', [ 1, O.addr, CONST.nullFees ], O.addr, O.privKey);
         }
         else if (await CONST.web3_call('getContractType', []) == CONST.contractType.CASHFLOW_CONTROLLER) {
             console.log(chalk.inverse('devSetupContract >> cashflow controller contract...'));
@@ -64,8 +64,8 @@ module.exports = {
                 await CONST.web3_tx('addCcyType', [ 'ETH', 'Wei',   18 ], O.addr, O.privKey);
             }
 
-            // setup default owner ledger entry
-            await CONST.web3_tx('setFee_CcyType', [ 1, O.addr, CONST.nullFees ], O.addr, O.privKey); 
+            // owner ledger entry
+            await CONST.web3_tx('setFee_CcyType', [ 1, O.addr, CONST.nullFees ], O.addr, O.privKey);
         }
         
         console.groupEnd();

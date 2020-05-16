@@ -27,20 +27,26 @@ library TokenLib {
         StructLib.CcyTypesStruct storage ctd,
         string memory name,
         StructLib.SettlementType settlementType,
-        StructLib.FutureTokenTypeArgs memory ft
+        StructLib.FutureTokenTypeArgs memory ft,
+        address cashflowBaseAddr
     )
     public {
-        // disallow tokens on cashflow controller contract, only allow single token type on cashflow contract
-        require(ld.contractType == StructLib.ContractType.COMMODITY ||
-               (ld.contractType == StructLib.ContractType.CASHFLOW && std._tt_Count == 0), "Bad cashflow request");
+        // allow any number of cashflow-base types on cashflow-controller contract
+        // (todo - probably should allow direct futures-settlement type on cashflow-controller; these are centralised i.e. can't be withdrawn, so don't need separate base contracts)
+        // allow only a single direct type on cashflow-base contract
+        // allow any number of of direct types on commodity contract
+        require((ld.contractType == StructLib.ContractType.COMMODITY           && bytes(name).length > 0 && cashflowBaseAddr == address(0x0)) ||
+                (ld.contractType == StructLib.ContractType.CASHFLOW            && bytes(name).length > 0 && cashflowBaseAddr == address(0x0) && std._tt_Count == 0) ||
+                (ld.contractType == StructLib.ContractType.CASHFLOW_CONTROLLER && bytes(name).length == 0 && cashflowBaseAddr != address(0x0))
+               , "Bad cashflow request");
 
         for (uint256 tokenTypeId = 1; tokenTypeId <= std._tt_Count; tokenTypeId++) {
-            require(keccak256(abi.encodePacked(std._tt_Name[tokenTypeId])) != keccak256(abi.encodePacked(name)), "Duplicate name");
+            require(keccak256(abi.encodePacked(std._tt_name[tokenTypeId])) != keccak256(abi.encodePacked(name)), "Duplicate name");
         }
         if (settlementType == StructLib.SettlementType.FUTURE) {
             require(ft.expiryTimestamp > 1585699708, "Bad expiry");
             require(ft.underlyerTypeId > 0 && ft.underlyerTypeId <= std._tt_Count, "Bad underlyerTypeId");
-            require(std._tt_Settle[ft.underlyerTypeId] == StructLib.SettlementType.SPOT, "Bad underyler settlement type");
+            require(std._tt_settle[ft.underlyerTypeId] == StructLib.SettlementType.SPOT, "Bad underyler settlement type");
             require(ft.refCcyId > 0 && ft.refCcyId <= ctd._ct_Count, "Bad refCcyId");
             require(ft.initMarginBips + ft.varMarginBips <= 10000, "Bad total margin");
             require(ft.contractSize > 0, "Bad contractSize");
@@ -54,8 +60,9 @@ library TokenLib {
         }
 
         std._tt_Count++;
-        std._tt_Name[std._tt_Count] = name;
-        std._tt_Settle[std._tt_Count] = settlementType;
+        std._tt_name[std._tt_Count] = name;
+        std._tt_settle[std._tt_Count] = settlementType;
+        std._tt_addr[std._tt_Count] = cashflowBaseAddr;
 
         // futures
         if (settlementType == StructLib.SettlementType.FUTURE) {
@@ -70,7 +77,7 @@ library TokenLib {
     )
     public {
         require(tokenTypeId >= 1 && tokenTypeId <= std._tt_Count, "Bad tokenTypeId");
-        require(std._tt_Settle[tokenTypeId] == StructLib.SettlementType.FUTURE, "Bad token settlement type");
+        require(std._tt_settle[tokenTypeId] == StructLib.SettlementType.FUTURE, "Bad token settlement type");
         std._tt_ft[tokenTypeId].feePerContract = feePerContract;
         emit SetFutureFeePerContract(tokenTypeId, feePerContract);
     }
@@ -80,7 +87,7 @@ library TokenLib {
     )
     public {
         require(tokenTypeId >= 1 && tokenTypeId <= std._tt_Count, "Bad tokenTypeId");
-        require(std._tt_Settle[tokenTypeId] == StructLib.SettlementType.FUTURE, "Bad token settlement type");
+        require(std._tt_settle[tokenTypeId] == StructLib.SettlementType.FUTURE, "Bad token settlement type");
         require(std._tt_ft[tokenTypeId].initMarginBips + varMarginBips <= 10000, "Bad total margin");
         std._tt_ft[tokenTypeId].varMarginBips = varMarginBips;
         emit SetFutureVariationMargin(tokenTypeId, varMarginBips);
@@ -95,9 +102,10 @@ library TokenLib {
         for (uint256 tokenTypeId = 1; tokenTypeId <= std._tt_Count; tokenTypeId++) {
             tokenTypes[tokenTypeId - 1] = StructLib.SecTokenTypeReturn({
                     id: tokenTypeId,
-                  name: std._tt_Name[tokenTypeId],
-        settlementType: std._tt_Settle[tokenTypeId],
-                    ft: std._tt_ft[tokenTypeId]
+                  name: std._tt_name[tokenTypeId],
+        settlementType: std._tt_settle[tokenTypeId],
+                    ft: std._tt_ft[tokenTypeId],
+      cashflowBaseAddr: std._tt_addr[tokenTypeId]
             });
         }
 
