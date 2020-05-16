@@ -311,7 +311,7 @@ contract("StMaster", accounts => {
         _.forEach(loadCcys, async (p) => await stm_new.addCcyType(p.name, p.unit, p.decimals));
 
         const curToks = await stm_cur.getSecTokenTypes(), newToks = await stm_new.getSecTokenTypes(), loadToks = _.differenceWith(curToks.tokenTypes, newToks.tokenTypes, _.isEqual);
-        _.forEach(loadToks, async (p) => await stm_new.addSecTokenType(p.name, p.settlementType, p.ft, pt.cashflowBaseAddr));
+        _.forEach(loadToks, async (p) => await stm_new.addSecTokenType(p.name, p.settlementType, p.ft, p.cashflowBaseAddr));
 
         // load whitelist
         stm_new.whitelistMany([accounts[555]]); // simulate a new contract owner (first whitelist entry, by convention) -- i.e. we can upgrade contract with a new privkey

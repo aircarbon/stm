@@ -12,7 +12,7 @@ contract("StMaster", accounts => {
         if (await stm.getContractType() == CONST.contractType.CASHFLOW) this.skip();
         if (!global.TaddrNdx) global.TaddrNdx = 0;
         
-        await stm.whitelistMany(accounts.slice(0,30));
+        await stm.whitelistMany(accounts.slice(global.TaddrNdx, global.TaddrNdx + 30));
         await stm.sealContract();
         await setupHelper.setDefaults({ stm, accounts });
     });

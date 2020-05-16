@@ -3,8 +3,13 @@ pragma experimental ABIEncoderV2;
 
 import "../Interfaces/StructLib.sol";
 import "./SpotFeeLib.sol";
+import "./Strings.sol";
+
+import "../StMaster/StMaster.sol";
 
 library TokenLib {
+    using strings for *;
+
     event AddedSecTokenType(uint256 id, string name, StructLib.SettlementType settlementType, uint64 expiryTimestamp, uint256 underlyerTypeId, uint256 refCcyId, uint16 initMarginBips, uint16 varMarginBips);
     event SetFutureVariationMargin(uint256 tokenTypeId, uint16 varMarginBips);
     event SetFutureFeePerContract(uint256 tokenTypeId, uint256 feePerContract);
@@ -28,10 +33,10 @@ library TokenLib {
         string memory name,
         StructLib.SettlementType settlementType,
         StructLib.FutureTokenTypeArgs memory ft,
-        address cashflowBaseAddr
+        address payable cashflowBaseAddr
     )
     public {
-        // allow any number of cashflow-base types on cashflow-controller contract
+        // allow any number of cashflow-base (indirect) types on cashflow-controller contract
         // (todo - probably should allow direct futures-settlement type on cashflow-controller; these are centralised i.e. can't be withdrawn, so don't need separate base contracts)
         // allow only a single direct type on cashflow-base contract
         // allow any number of of direct types on commodity contract
@@ -60,13 +65,28 @@ library TokenLib {
         }
 
         std._tt_Count++;
-        std._tt_name[std._tt_Count] = name;
-        std._tt_settle[std._tt_Count] = settlementType;
-        std._tt_addr[std._tt_Count] = cashflowBaseAddr;
 
-        // futures
-        if (settlementType == StructLib.SettlementType.FUTURE) {
-            std._tt_ft[std._tt_Count] = ft;
+        if (cashflowBaseAddr != address(0x0)) {
+            // add cashflow (base, indirect) contract type to cashflow-controller contract
+            //StMaster base = StMaster(cashflowBaseAddr);
+            //string memory s0 = base.name;
+            //strings.slice memory s = "asd".toSlice();
+            //string memory ss = s.toString();
+            //string storage baseName = base.name;
+            std._tt_name[std._tt_Count] = "TODO: no (var-len) strings can be read from base..."; // https://ethereum.stackexchange.com/questions/3727/contract-reading-a-string-returned-by-another-contract
+            std._tt_settle[std._tt_Count] = settlementType;
+            std._tt_addr[std._tt_Count] = cashflowBaseAddr;
+        }
+        else {
+            // add direct type to
+            std._tt_name[std._tt_Count] = name;
+            std._tt_settle[std._tt_Count] = settlementType;
+            std._tt_addr[std._tt_Count] = cashflowBaseAddr;
+
+            // futures
+            if (settlementType == StructLib.SettlementType.FUTURE) {
+                std._tt_ft[std._tt_Count] = ft;
+            }
         }
 
         emit AddedSecTokenType(std._tt_Count, name, settlementType, ft.expiryTimestamp, ft.underlyerTypeId, ft.refCcyId, ft.initMarginBips, ft.varMarginBips);

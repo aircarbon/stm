@@ -19,7 +19,7 @@ contract StLedger is //IStLedger,
     //
 
     // add token type: direct (by name) or cashflow base (by address)
-    function addSecTokenType(string memory name, StructLib.SettlementType settlementType, StructLib.FutureTokenTypeArgs memory ft, address cashflowBaseAddr)
+    function addSecTokenType(string memory name, StructLib.SettlementType settlementType, StructLib.FutureTokenTypeArgs memory ft, address payable cashflowBaseAddr)
     public onlyOwner() onlyWhenReadWrite() { TokenLib.addSecTokenType(ld, std, ctd, name, settlementType, ft, cashflowBaseAddr); }
 
     // function initLedgerIfNew(address account)

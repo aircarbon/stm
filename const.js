@@ -358,9 +358,11 @@ async function web3_tx(methodName, methodArgs, fromAddr, fromPrivKey, returnBefo
             resolve({ txHash, receipt, evs });
         })
         .once("error", error => {
-            console.log(chalk.bold.red(`   => ## error`, JSON.stringify(error)));
-            console.dir(error);
-            reject(error);
+            if (!_.isEmpty(error.error)) {
+                console.log(chalk.gray(`   => ## error`, JSON.stringify(error)));
+                //console.dir(error);
+                reject(error);
+            }
         });
     });
     return txPromise;
@@ -404,9 +406,11 @@ async function web3_sendEthTestAddr(sendFromNdx, sendToAddr, ethValue) {
             resolve(txHash);
         })
         .once("error", error => {
-            console.log(chalk.yellow(`   => ## error`, JSON.stringify(error)));
-            console.dir(error);
-            reject(error);
+            if (!_.isEmpty(error.error)) {
+                console.log(chalk.gray(`   => ## error`, JSON.stringify(error)));
+                //console.dir(error);
+                reject(error);
+            }
         });
     });
     return txPromise;
