@@ -24,6 +24,11 @@ contract StLedger is //IStLedger,
         TokenLib.addSecTokenType(ld, std, ctd, name, settlementType, ft);
     }
 
+    // function initLedgerIfNew(address account)
+    // public onlyOwner() onlyWhenReadWrite() {
+    //     StructLib.initLedgerIfNew(ld, account);
+    // }
+
     // #### TODO - move to StFutures...
     function setFuture_VariationMargin(uint256 tokenTypeId, uint16 varMarginBips)
     public onlyOwner() onlyWhenReadWrite() {

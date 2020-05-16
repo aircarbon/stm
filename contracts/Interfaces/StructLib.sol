@@ -70,7 +70,7 @@ library StructLib {
     }
 
     // CONTRACT TYPE
-    enum ContractType { COMMODITY, CASHFLOW }
+    enum ContractType { COMMODITY, CASHFLOW, CASHFLOW_CONTROLLER }
 
     // CCY TYPES
     struct Ccy {

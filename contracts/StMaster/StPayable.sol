@@ -30,11 +30,11 @@ contract StPayable is
     //    (i.e. we can't use token-types (or batch metadata) to separate different CFTs in a single contract ledger)
     //      TODO: pri0 - ledger combine/abstract (centralised collateral)
     //
-    //          (1) CFT-C: new contract type: CASHFLOW-CONTROLLER
+    //          (1) CASHFLOW_CONTROLLER: new contract type
     //                  (a) its n tokTypes wrap n CASHFLOW-type contracts
     //                  (b) so addSecTokType() for CFT-C needs to take the address of a deployed CFT contract...
     //
-    //          (2) CFT-C: is entry point for the split ledger - all clients talk only to it
+    //          (2) CASHFLOW: is entry point for the split ledger - all clients talk only to it
     //                  > getLedgerEntry: return (a) n ccy's from CFT-C ... UNION ... (b) n tok's from n CFT's
     //                  > transferOrTrade: update 1 ccy in CFT-C ... update 1 tok in CFT
     //

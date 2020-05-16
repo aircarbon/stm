@@ -38,7 +38,7 @@ const contractVer = "0.97h";
 const contractProps = {
     COMMODITY: {
         contractVer: contractVer,
-        contractName: `AirCarbon__v${contractVer}`,
+        contractName: `AirCarbon`,
         contractUnit: "KG", //"Ton(s)",
         contractSymbol: "ACC",
         contractDecimals: 0,
@@ -46,7 +46,7 @@ const contractProps = {
     },
     CASHFLOW: {
         contractVer: contractVer,
-        contractName: `SingDax_CFT__v${contractVer}_1A`,
+        contractName: `SingDax_CFT-1A`,
         contractUnit: "Token(s)",
         contractSymbol: "SD1A",
         contractDecimals: 0,
@@ -56,6 +56,14 @@ const contractProps = {
                   bond_bps: 1000, // 10%
         bond_int_EveryBlks: blocksFromHours(1)
         }
+    },
+    CASHFLOW_CONTROLLER: {
+        contractVer: contractVer,
+        contractName: `SingDax_CFT-C`,
+        contractUnit: "N/A",
+        contractSymbol: "SDCFTC",
+        contractDecimals: 0,
+        cashflowArgs: nullCashflowArgs
     },
 };
 
@@ -131,6 +139,7 @@ module.exports = {
     contractType: Object.freeze({
         COMMODITY: 0,
         CASHFLOW: 1,
+        CASHFLOW_CONTROLLER: 2,
     }),
 
     cashflowType: cashflowType,
