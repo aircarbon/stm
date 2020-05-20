@@ -138,10 +138,10 @@ describe(`Contract Web3 Interface`, async () => {
 
         // dbg - get counts & whitelist
         const allWhitelisted = await CONST.web3_call('getWhitelist', []);
-        const allWhitelistedCount = await CONST.web3_call('getWhitelistCount', []);
+        //const allWhitelistedCount = await CONST.web3_call('getWhitelistCount', []);
         console.log(chalk.inverse(`DONE WHITELISTING...`));
         console.log('allWhitelisted.length: ', allWhitelisted.length);
-        console.log('allWhitelistedCount: ', allWhitelistedCount.toString());
+        //console.log('allWhitelistedCount: ', allWhitelistedCount.toString());
         
         console.dir(allWhitelisted);
         console.dir(submittedToWhitelist);
