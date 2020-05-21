@@ -1,4 +1,3 @@
-require('dotenv').config();
 const _ = require('lodash');
 const chalk = require('chalk');
 const BN = require('bn.js');
@@ -11,7 +10,7 @@ const { db } = require('../../common/dist');
 module.exports = {
 
     Deploy: async (p) => {
-        const { deployer, artifacts, contractType, ok } = p; 
+        const { deployer, artifacts, contractType } = p; 
         var stmAddr;
         //const contractType = process.env.CONTRACT_TYPE;
         if (contractType != "CASHFLOW" && contractType != "CASHFLOW_CONTROLLER" && contractType != "COMMODITY") throw ('Unknown contractType');
@@ -72,12 +71,13 @@ module.exports = {
             //console.log('cashflowArgs', CONST.contractProps[type].cashflowArgs);
             
             //return 
+            const contractName = `${process.env.CONTRACT_PREFIX}${CONST.contractProps[contractType].contractName}`;
             stmAddr = await deployer.deploy(StMaster,
                 contractType == "CASHFLOW"            ? CONST.contractType.CASHFLOW :
                 contractType == "CASHFLOW_CONTROLLER" ? CONST.contractType.CASHFLOW_CONTROLLER :
                                                         CONST.contractType.COMMODITY,
                 CONST.contractProps[contractType].cashflowArgs,
-                CONST.contractProps[contractType].contractName,
+                contractName,
                 CONST.contractProps[contractType].contractVer,
                 CONST.contractProps[contractType].contractUnit,
                 CONST.contractProps[contractType].contractSymbol,
@@ -109,9 +109,9 @@ module.exports = {
                     var ip = "unknown";
                     publicIp.v4().then(p => ip = p).catch(e => { console.log("\tWARN: could not get IP - will write 'unknown'"); });
 
-                    console.log(`>>> SAVING DEPLOYMENT: ${CONST.contractProps[contractType].contractName} ${CONST.contractProps[contractType].contractVer}`);
+                    console.log(`>>> SAVING DEPLOYMENT: ${contractName} ${CONST.contractProps[contractType].contractVer} to ${process.env.sql_server}`);
                     await db.SaveDeployment({
-                        contractName: CONST.contractProps[contractType].contractName,
+                        contractName: contractName,
                          contractVer: CONST.contractProps[contractType].contractVer,
                            networkId: deployer.network_id,
                      deployedAddress: stm.address,
@@ -142,9 +142,9 @@ module.exports = {
 
 function logEnv(phase, owner, ownerPrivKey, contractType) {
     console.log(chalk.black.bgWhite(phase));
-    console.log(chalk.red('\t             contractType: '), contractType);
-    console.log(chalk.red('\t      process.env.NETWORK: '), process.env.NETWORK);
-    console.log(chalk.red('\t   process.env.NETWORK_ID: '), process.env.NETWORK_ID);
-    console.log(chalk.red('\t                    owner: '), owner);
-    console.log(chalk.red('\t             ownerPrivKey: '), ownerPrivKey);
+    console.log(chalk.red('\t                contractType: '), contractType);
+    console.log(chalk.red('\t process.env.CONTRACT_PREFIX: '), process.env.CONTRACT_PREFIX);
+    console.log(chalk.red('\t      process.env.NETWORK_ID: '), process.env.NETWORK_ID);
+    console.log(chalk.red('\t                       owner: '), owner);
+    console.log(chalk.red('\t                ownerPrivKey: '), ownerPrivKey);
 }

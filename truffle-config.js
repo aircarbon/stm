@@ -26,7 +26,7 @@ const NonceTrackerSubprovider = require("web3-provider-engine/subproviders/nonce
 const DEV_MNEMONIC = require('./DEV_MNEMONIC.js').MNEMONIC;
 const PROD_MNEMONIC = '...'; // **PROD TODO
 
-const gweiDeployment = "50";
+const gweiDeployment = "5";
 
 module.exports = {
   /**

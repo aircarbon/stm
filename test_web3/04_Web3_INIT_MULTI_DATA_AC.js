@@ -2,19 +2,19 @@ const assert = require('assert');
 const EthereumJsTx = require('ethereumjs-tx');
 const BN = require('bn.js');
 const { db } = require('../../common/dist');
-require('dotenv').config();
 const _ = require('lodash');
 const chalk = require('chalk');
+
 const CONST = require('../const.js');
+process.env.WEB3_NETWORK_ID = Number(process.env.NETWORK_ID || 888);
 
 //
 // INITIALIZES a deployed contract, & optionally populates it with arbitrary volumes of random/representative test data
 //
-// EXEC_TEST_ACTIONS: if false, will produce an empty state: only whitelisted accounts + sealed
-// if true, will perform a number of test actions: setting fees, minting, trading, etc.
-//
-const EXEC_TEST_ACTIONS = false;
 
+// if false, will produce an empty state: only whitelisted accounts + sealed
+// if true, will perform a number of test actions: setting fees, minting, trading, etc.
+const EXEC_TEST_ACTIONS = false;
 
 // owner
 const OWNER_NDX = 0;
@@ -48,9 +48,9 @@ var GRAY, GRAY_privKey;
 describe(`Contract Web3 Interface`, async () => {
 
     //
-    //             Dev: ("export WEB3_NETWORK_ID=888 && export CONTRACT_TYPE=COMMODITY && mocha test_web3 --timeout 10000000 --exit")
-    //      Ropsten AC: ("export WEB3_NETWORK_ID=3 && export CONTRACT_TYPE=COMMODITY && mocha test_web3 --timeout 10000000 --exit")
-    //  Rinkeby Infura: ("export WEB3_NETWORK_ID=4 && export CONTRACT_TYPE=COMMODITY && mocha test_web3 --timeout 10000000 --exit")
+    //           Local: ("export INSTANCE_ID=local && mocha test_web3 --timeout 10000000 --exit")
+    //         AWS Dev: ("export INSTANCE_ID=DEV && export CONTRACT_TYPE=COMMODITY && mocha test_web3 --timeout 10000000 --exit")
+    //         AWS UAT: ("export INSTANCE_ID=UAT && export CONTRACT_TYPE=COMMODITY && mocha test_web3 --timeout 10000000 --exit")
     //
 
     before(async function () {
