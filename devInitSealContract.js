@@ -1,4 +1,4 @@
-require('dotenv').config();
+require('dotenv').config( { path: require('path').resolve(__dirname, "./.env." + (process.env.INSTANCE_ID !== undefined ? process.env.INSTANCE_ID : 'local')) });
 const { getAccountAndKey, web3_call, web3_tx } = require('./const.js');
 
 process.env.WEB3_NETWORK_ID = Number(process.env.NETWORK_ID || 888);

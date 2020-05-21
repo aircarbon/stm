@@ -4,9 +4,9 @@ const assert = require('assert');
 const EthereumJsTx = require('ethereumjs-tx');
 const BN = require('bn.js');
 const { db } = require('../../common/dist');
-require('dotenv').config();
 
 const CONST = require('../const.js');
+process.env.WEB3_NETWORK_ID = Number(process.env.NETWORK_ID || 888);
 
 const OWNER_NDX = 0;
 const WHITE_NDX = 1;
@@ -17,13 +17,12 @@ var WHITE, WHITE_privKey;
 var GRAY_1, GRAY_1_privKey;
 var GRAY_2, GRAY_2_privKey;
 
-
 describe(`Contract Web3 Interface`, async () => {
 
     //
-    // can run these to test web3 more quickly, e.g.
-    //         Dev: ("export WEB3_NETWORK_ID=888 && export CONTRACT_TYPE=COMMODITY && mocha test_web3 --timeout 10000000 --exit")
-    //  Ropsten AC: ("export WEB3_NETWORK_ID=3 && export CONTRACT_TYPE=COMMODITY && mocha test_web3 --timeout 10000000 --exit")
+    //           Local: ("export INSTANCE_ID=local && mocha test_web3 --timeout 10000000 --exit")
+    //         AWS Dev: ("export INSTANCE_ID=DEV && export CONTRACT_TYPE=COMMODITY && mocha test_web3 --timeout 10000000 --exit")
+    //         AWS UAT: ("export INSTANCE_ID=UAT && export CONTRACT_TYPE=COMMODITY && mocha test_web3 --timeout 10000000 --exit")
     //
 
     const test_accounts = [];

@@ -1,4 +1,3 @@
-require('dotenv').config();
 const _ = require('lodash');
 const chalk = require('chalk');
 const { DateTime } = require('luxon');
@@ -7,12 +6,11 @@ const TCharts = require('tcharts.js'); // for tables
 
 const { db } = require('../../common/dist');
 const CONST = require('../const.js');
+process.env.WEB3_NETWORK_ID = Number(process.env.NETWORK_ID || 888);
 
 //
 // FUTURES POSITIONS SETTLEMENT/MAINTENANCE
 //
-
-//process.env.WEB3_NETWORK_ID = Number(process.env.NETWORK_ID || 888);
 
 //
 // >> RUN FROM ./ERC20 << (not from ./jobs - config will fail if so)

@@ -1,4 +1,4 @@
-require('dotenv').config();
+require('dotenv').config( { path: require('path').resolve(__dirname, "./.env." + (process.env.INSTANCE_ID !== undefined ? process.env.INSTANCE_ID : 'local')) });
 const mapSeries = require('async/mapSeries');
 const allSettled = require('promise.allsettled');
 const got = require('got');

@@ -117,7 +117,7 @@ contract("StMaster", accounts => {
     });
 
     // it("web3 - speed - should allow fast return of txid (rinkeby_infura)", async () => {
-    //     let networkID = process.env.NETWORK;
+    //     let networkID = process.env.NETWORK_ID;
     //     console.log('net_version: ', networkID);
 
     //     if (networkID !== "rinkeby_infura") {``
