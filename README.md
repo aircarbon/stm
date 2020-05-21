@@ -33,6 +33,9 @@ Migration script `2_deploy_contract.js` will pickup this env var and deploy a te
 - `export INSTANCE_ID=UAT && truffle migrate --network ropsten_inufra --reset` (Deploy AWS UAT instance using Infura Ropsten)
 - `export INSTANCE_ID=DEMO && truffle migrate --network rinkeby_infura --reset` (Deploy AWS DEMO instance using Infura Rinkeby)
 
+## Whitelist & seal Deployed Contract
+For setup of deployed contract ready for use, see `04_Web3_INIT_MULTI_DATA_AC.js` web3 test(s), to: add addresses to the contract's whitelist, seal the contract and optionally submit test transactions/data.
+
 ## Run Tests
 - `truffle compile` or (undocumented) `truffle compile --reset` if it keeps recompiling when there aren't any changes in the Solidity
 - `truffle test --network development`
