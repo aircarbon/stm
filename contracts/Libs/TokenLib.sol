@@ -3,8 +3,13 @@ pragma experimental ABIEncoderV2;
 
 import "../Interfaces/StructLib.sol";
 import "./SpotFeeLib.sol";
+import "./Strings.sol";
+
+import "../StMaster/StMaster.sol";
 
 library TokenLib {
+    using strings for *;
+
     event AddedSecTokenType(uint256 id, string name, StructLib.SettlementType settlementType, uint64 expiryTimestamp, uint256 underlyerTypeId, uint256 refCcyId, uint16 initMarginBips, uint16 varMarginBips);
     event SetFutureVariationMargin(uint256 tokenTypeId, uint16 varMarginBips);
     event SetFutureFeePerContract(uint256 tokenTypeId, uint256 feePerContract);
@@ -27,18 +32,26 @@ library TokenLib {
         StructLib.CcyTypesStruct storage ctd,
         string memory name,
         StructLib.SettlementType settlementType,
-        StructLib.FutureTokenTypeArgs memory ft
+        StructLib.FutureTokenTypeArgs memory ft,
+        address payable cashflowBaseAddr
     )
     public {
-        require(ld.contractType == StructLib.ContractType.COMMODITY ||
-               (ld.contractType == StructLib.ContractType.CASHFLOW && std._tt_Count == 0), "Bad cashflow request"); // only allow single tok-type for cashflow contract
+        // allow any number of cashflow-base (indirect) types on cashflow-controller contract
+        // (todo - probably should allow direct futures-settlement type on cashflow-controller; these are centralised i.e. can't be withdrawn, so don't need separate base contracts)
+        // allow only a single direct type on cashflow-base contract
+        // allow any number of of direct types on commodity contract
+        require((ld.contractType == StructLib.ContractType.COMMODITY           && bytes(name).length > 0 && cashflowBaseAddr == address(0x0)) ||
+                (ld.contractType == StructLib.ContractType.CASHFLOW            && bytes(name).length > 0 && cashflowBaseAddr == address(0x0) && std._tt_Count == 0) ||
+                (ld.contractType == StructLib.ContractType.CASHFLOW_CONTROLLER && bytes(name).length == 0 && cashflowBaseAddr != address(0x0))
+               , "Bad cashflow request");
+
         for (uint256 tokenTypeId = 1; tokenTypeId <= std._tt_Count; tokenTypeId++) {
-            require(keccak256(abi.encodePacked(std._tt_Name[tokenTypeId])) != keccak256(abi.encodePacked(name)), "Duplicate name");
+            require(keccak256(abi.encodePacked(std._tt_name[tokenTypeId])) != keccak256(abi.encodePacked(name)), "Duplicate name");
         }
         if (settlementType == StructLib.SettlementType.FUTURE) {
             require(ft.expiryTimestamp > 1585699708, "Bad expiry");
             require(ft.underlyerTypeId > 0 && ft.underlyerTypeId <= std._tt_Count, "Bad underlyerTypeId");
-            require(std._tt_Settle[ft.underlyerTypeId] == StructLib.SettlementType.SPOT, "Bad underyler settlement type");
+            require(std._tt_settle[ft.underlyerTypeId] == StructLib.SettlementType.SPOT, "Bad underyler settlement type");
             require(ft.refCcyId > 0 && ft.refCcyId <= ctd._ct_Count, "Bad refCcyId");
             require(ft.initMarginBips + ft.varMarginBips <= 10000, "Bad total margin");
             require(ft.contractSize > 0, "Bad contractSize");
@@ -52,12 +65,28 @@ library TokenLib {
         }
 
         std._tt_Count++;
-        std._tt_Name[std._tt_Count] = name;
-        std._tt_Settle[std._tt_Count] = settlementType;
 
-        // futures
-        if (settlementType == StructLib.SettlementType.FUTURE) {
-            std._tt_ft[std._tt_Count] = ft;
+        if (cashflowBaseAddr != address(0x0)) {
+            // add cashflow (base, indirect) contract type to cashflow-controller contract
+            //StMaster base = StMaster(cashflowBaseAddr);
+            //string memory s0 = base.name;
+            //strings.slice memory s = "asd".toSlice();
+            //string memory ss = s.toString();
+            //string storage baseName = base.name;
+            std._tt_name[std._tt_Count] = "TODO: no (var-len) strings can be read from base..."; // https://ethereum.stackexchange.com/questions/3727/contract-reading-a-string-returned-by-another-contract
+            std._tt_settle[std._tt_Count] = settlementType;
+            std._tt_addr[std._tt_Count] = cashflowBaseAddr;
+        }
+        else {
+            // add direct type to
+            std._tt_name[std._tt_Count] = name;
+            std._tt_settle[std._tt_Count] = settlementType;
+            std._tt_addr[std._tt_Count] = cashflowBaseAddr;
+
+            // futures
+            if (settlementType == StructLib.SettlementType.FUTURE) {
+                std._tt_ft[std._tt_Count] = ft;
+            }
         }
 
         emit AddedSecTokenType(std._tt_Count, name, settlementType, ft.expiryTimestamp, ft.underlyerTypeId, ft.refCcyId, ft.initMarginBips, ft.varMarginBips);
@@ -68,7 +97,7 @@ library TokenLib {
     )
     public {
         require(tokenTypeId >= 1 && tokenTypeId <= std._tt_Count, "Bad tokenTypeId");
-        require(std._tt_Settle[tokenTypeId] == StructLib.SettlementType.FUTURE, "Bad token settlement type");
+        require(std._tt_settle[tokenTypeId] == StructLib.SettlementType.FUTURE, "Bad token settlement type");
         std._tt_ft[tokenTypeId].feePerContract = feePerContract;
         emit SetFutureFeePerContract(tokenTypeId, feePerContract);
     }
@@ -78,7 +107,7 @@ library TokenLib {
     )
     public {
         require(tokenTypeId >= 1 && tokenTypeId <= std._tt_Count, "Bad tokenTypeId");
-        require(std._tt_Settle[tokenTypeId] == StructLib.SettlementType.FUTURE, "Bad token settlement type");
+        require(std._tt_settle[tokenTypeId] == StructLib.SettlementType.FUTURE, "Bad token settlement type");
         require(std._tt_ft[tokenTypeId].initMarginBips + varMarginBips <= 10000, "Bad total margin");
         std._tt_ft[tokenTypeId].varMarginBips = varMarginBips;
         emit SetFutureVariationMargin(tokenTypeId, varMarginBips);
@@ -93,9 +122,10 @@ library TokenLib {
         for (uint256 tokenTypeId = 1; tokenTypeId <= std._tt_Count; tokenTypeId++) {
             tokenTypes[tokenTypeId - 1] = StructLib.SecTokenTypeReturn({
                     id: tokenTypeId,
-                  name: std._tt_Name[tokenTypeId],
-        settlementType: std._tt_Settle[tokenTypeId],
-                    ft: std._tt_ft[tokenTypeId]
+                  name: std._tt_name[tokenTypeId],
+        settlementType: std._tt_settle[tokenTypeId],
+                    ft: std._tt_ft[tokenTypeId],
+      cashflowBaseAddr: std._tt_addr[tokenTypeId]
             });
         }
 

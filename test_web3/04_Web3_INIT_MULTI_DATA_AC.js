@@ -138,10 +138,10 @@ describe(`Contract Web3 Interface`, async () => {
 
         // dbg - get counts & whitelist
         const allWhitelisted = await CONST.web3_call('getWhitelist', []);
-        const allWhitelistedCount = await CONST.web3_call('getWhitelistCount', []);
+        //const allWhitelistedCount = await CONST.web3_call('getWhitelistCount', []);
         console.log(chalk.inverse(`DONE WHITELISTING...`));
         console.log('allWhitelisted.length: ', allWhitelisted.length);
-        console.log('allWhitelistedCount: ', allWhitelistedCount.toString());
+        //console.log('allWhitelistedCount: ', allWhitelistedCount.toString());
         
         console.dir(allWhitelisted);
         console.dir(submittedToWhitelist);
@@ -157,7 +157,7 @@ describe(`Contract Web3 Interface`, async () => {
         if (EXEC_TEST_ACTIONS) {
             // add sec token type
             if (!(await CONST.web3_call('getSecTokenTypes',[])).tokenTypes.some(p => p.name == 'NEW_TOK_TYPE_A')) {
-                await CONST.web3_tx('addSecTokenType', [ 'NEW_TOK_TYPE_A', CONST.settlementType.SPOT, CONST.nullFutureArgs ], OWNER, OWNER_privKey);
+                await CONST.web3_tx('addSecTokenType', [ 'NEW_TOK_TYPE_A', CONST.settlementType.SPOT, CONST.nullFutureArgs, CONST.nullAddr ], OWNER, OWNER_privKey);
             }
 
             // add ccy type

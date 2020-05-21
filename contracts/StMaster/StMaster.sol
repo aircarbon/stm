@@ -130,9 +130,9 @@ contract StMaster
 
         // set token & ccy types
     //     if (_contractType == StructLib.ContractType.COMMODITY) {
-    //         std._tt_Name[1] = 'AirCarbon CORSIA Token';     std._tt_Settle[1] = StructLib.SettlementType.SPOT;
-    //         std._tt_Name[2] = 'AirCarbon Nature Token';     std._tt_Settle[2] = StructLib.SettlementType.SPOT;
-    //         std._tt_Name[3] = 'AirCarbon Premium Token';    std._tt_Settle[3] = StructLib.SettlementType.SPOT;
+    //         std._tt_name[1] = 'AirCarbon CORSIA Token';     std._tt_settle[1] = StructLib.SettlementType.SPOT;
+    //         std._tt_name[2] = 'AirCarbon Nature Token';     std._tt_settle[2] = StructLib.SettlementType.SPOT;
+    //         std._tt_name[3] = 'AirCarbon Premium Token';    std._tt_settle[3] = StructLib.SettlementType.SPOT;
     //         std._tt_Count = 3;
     //         ctd._ct_Ccy[1] = StructLib.Ccy({ id: 1, name: 'USD', unit: 'cents',      decimals: 2 });
     //         ctd._ct_Ccy[2] = StructLib.Ccy({ id: 2, name: 'ETH', unit: 'Wei',        decimals: 18 });
@@ -159,7 +159,7 @@ contract StMaster
     //         );
     //     }
     //     else if (_contractType == StructLib.ContractType.CASHFLOW) {
-    //         std._tt_Name[1] = 'UNI_TOKEN'; //contractName;
+    //         std._tt_name[1] = 'UNI_TOKEN'; //contractName;
     //         std._tt_Count = 1;
     //         ctd._ct_Ccy[1] = StructLib.Ccy({ id: 1, name: 'ETH', unit: 'Wei',        decimals: 18 });
     //         ctd._ct_Count = 1;

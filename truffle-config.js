@@ -26,7 +26,7 @@ const NonceTrackerSubprovider = require("web3-provider-engine/subproviders/nonce
 const DEV_MNEMONIC = require('./DEV_MNEMONIC.js').MNEMONIC;
 const PROD_MNEMONIC = '...'; // **PROD TODO
 
-const gweiDeployment = "5";
+const gweiDeployment = "50";
 
 module.exports = {
   /**
@@ -81,7 +81,7 @@ module.exports = {
       gasPrice: web3.utils.toWei(gweiDeployment, "gwei"),
       networkCheckTimeout: 30000,
       
-      confirmations: 1,    // # of confs to wait between deployments. (default: 0)
+      confirmations: 3,    // # of confs to wait between deployments. (default: 0)
       skipDryRun: true,
       timeoutBlocks: 200, // but web3 always times out at 50 blocks?!
     },

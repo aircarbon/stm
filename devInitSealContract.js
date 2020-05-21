@@ -18,20 +18,21 @@ process.env.WEB3_NETWORK_ID = Number(process.env.NETWORK_ID || 888);
     const contractSealed = await web3_call('getContractSeal', []);
     console.log('contractSealed: ', contractSealed);
     if (!contractSealed) {
-        const WHITELIST_COUNT = Number(process.env.WHITELIST_COUNT || 30);
-        console.group('WHITELISTING...');
-        const wl = await web3_call('getWhitelist', []);
         
+        console.group('WHITELISTING...');
+        const WHITELIST_COUNT = Number(process.env.WHITELIST_COUNT || 30);
+        const wl = await web3_call('getWhitelist', []);
+        const wl_addrs = [];
         for (let i = 0; i < WHITELIST_COUNT; i++) {
             // note - we include account[0] owner account in the whitelist
             x = await getAccountAndKey(i);
             if (!wl.map(p => p.toLowerCase()).includes(x.addr.toLocaleLowerCase())) {
-                await web3_tx('whitelistMany', [[x.addr]], OWNER, OWNER_privKey);
+                wl_addrs.push(x.addr);
             }
-            else {
-                console.log(`skipping ${x.addr} (already in WL)...`);
-            }
+            else console.log(`skipping ${x.addr} (already in WL)...`);
         }
+        await web3_tx('whitelistMany', [wl_addrs], OWNER, OWNER_privKey);
+
         console.groupEnd();
         console.group('SEALING...');
         await web3_tx('sealContract', [], OWNER, OWNER_privKey);

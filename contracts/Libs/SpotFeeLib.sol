@@ -23,7 +23,7 @@ library SpotFeeLib {
         StructLib.SetFeeArgs memory a)
     public {
         require(tokenTypeId >= 1 && tokenTypeId <= std._tt_Count, "Bad tokenTypeId");
-        require(std._tt_Settle[tokenTypeId] == StructLib.SettlementType.SPOT, "Bad token settlement type");
+        require(std._tt_settle[tokenTypeId] == StructLib.SettlementType.SPOT, "Bad token settlement type");
         require(a.ccy_perMillion == 0, "ccy_perMillion unsupported for token-type fee");
         require(a.ccy_mirrorFee == false, "ccy_mirrorFee unsupported for token-type fee");
 

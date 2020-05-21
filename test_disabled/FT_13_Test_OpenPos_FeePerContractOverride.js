@@ -42,7 +42,7 @@ contract("StMaster", accounts => {
                initMarginBips: 50,
                 varMarginBips: 50,
                feePerContract: FEE_PER_CONTRACT.toString()
-         });
+        }, CONST.nullAddr);
         usdFT = (await stm.getSecTokenTypes()).tokenTypes.filter(p => p.name == ftTestName_USD)[0];
         usdFT_underlyer = spotTypes.filter(p => p.id == usdFT.ft.underlyerTypeId)[0];
         usdFT_refCcy = ccyTypes.filter(p => p.id == usdFT.refCcyId)[0];

@@ -11,8 +11,10 @@ const { db } = require('../../common/dist');
 module.exports = {
 
     Deploy: async (p) => {
-        const { deployer, artifacts, ok } = p;
-        const contractType = process.env.CONTRACT_TYPE;
+        const { deployer, artifacts, contractType, ok } = p; 
+        var stmAddr;
+        //const contractType = process.env.CONTRACT_TYPE;
+        if (contractType != "CASHFLOW" && contractType != "CASHFLOW_CONTROLLER" && contractType != "COMMODITY") throw ('Unknown contractType');
 
         const StructLib = artifacts.require('../Interfaces/StructLib.sol');
         const CcyLib = artifacts.require('./CcyLib.sol');
@@ -28,7 +30,7 @@ module.exports = {
 
         // deploy
         StMaster.synchronization_timeout = 42; // secs
-        return deployer.deploy(StructLib).then(async ccyLib => { 
+        await deployer.deploy(StructLib).then(async structLib => { 
             deployer.link(StructLib, CcyLib);
             deployer.link(StructLib, TokenLib);
             deployer.link(StructLib, LedgerLib);
@@ -38,39 +40,42 @@ module.exports = {
 
             deployer.link(StructLib, StMaster);
 
-        return deployer.deploy(LedgerLib).then(async ccyLib => { 
+        await deployer.deploy(LedgerLib).then(async ledgerLib => { 
             deployer.link(LedgerLib, StMaster);
 
-        return deployer.deploy(CcyLib).then(async ccyLib => {
+        await deployer.deploy(CcyLib).then(async ccyLib => {
             deployer.link(CcyLib, StMaster);
 
-        return deployer.deploy(TokenLib).then(async tokenLib => { 
+        await deployer.deploy(TokenLib).then(async tokenLib => { 
             deployer.link(TokenLib, StMaster);
 
-        return deployer.deploy(TransferLib).then(async transferLib => { 
+        await deployer.deploy(TransferLib).then(async transferLib => { 
             deployer.link(TransferLib, Erc20Lib);
             deployer.link(TransferLib, PayableLib);
 
             deployer.link(TransferLib, StMaster);
         
-        return deployer.deploy(SpotFeeLib).then(async feeLib => { 
+        await deployer.deploy(SpotFeeLib).then(async feeLib => { 
             deployer.link(SpotFeeLib, StMaster);
 
-        return deployer.deploy(Erc20Lib).then(async feeLib => { 
+        await deployer.deploy(Erc20Lib).then(async feeLib => { 
             deployer.link(Erc20Lib, StMaster);
 
-        return deployer.deploy(LoadLib).then(async loadLib => { 
+        await deployer.deploy(LoadLib).then(async loadLib => { 
             deployer.link(LoadLib, StMaster);
 
-        return deployer.deploy(PayableLib).then(async payableLib => { 
+        await deployer.deploy(PayableLib).then(async payableLib => { 
             deployer.link(PayableLib, StMaster);
 
-        return deployer.deploy(FuturesLib).then(async futuresLib => { 
+        await deployer.deploy(FuturesLib).then(async futuresLib => { 
             deployer.link(FuturesLib, StMaster);
             //console.log('cashflowArgs', CONST.contractProps[type].cashflowArgs);
             
-            return deployer.deploy(StMaster, 
-                contractType == "CASHFLOW" ? CONST.contractType.CASHFLOW : CONST.contractType.COMMODITY,
+            //return 
+            stmAddr = await deployer.deploy(StMaster,
+                contractType == "CASHFLOW"            ? CONST.contractType.CASHFLOW :
+                contractType == "CASHFLOW_CONTROLLER" ? CONST.contractType.CASHFLOW_CONTROLLER :
+                                                        CONST.contractType.COMMODITY,
                 CONST.contractProps[contractType].cashflowArgs,
                 CONST.contractProps[contractType].contractName,
                 CONST.contractProps[contractType].contractVer,
@@ -97,7 +102,7 @@ module.exports = {
                 const OWNER_privKey = accountAndKey.privKey;
                 // TODO: derive - an encryption key & salt [from contract name?] -> derivation code should be in a private repo (AWS lambda?)
                 // TODO: encrypt - privKey & display encrypted [for manual population of AWS secret, L1]
-                logEnv("DEPLOYMENT COMPLETE", OWNER, OWNER_privKey);
+                logEnv("DEPLOYMENT COMPLETE", OWNER, OWNER_privKey, contractType);
 
                 // save to DB
                 if (!deployer.network.includes("-fork")) {
@@ -116,11 +121,10 @@ module.exports = {
                         contractType,
                     });
                 }
-
-                if (ok) {
-                    ok(stm.address);
-                }
-                
+                // if (ok) {
+                //     ok(stm.address);
+                // }
+                return stm.address;
             }).catch(err => { console.error('failed deployment: StMaster', err); });
         }).catch(err => { console.error('failed deployment: FuturesLib', err); });
         }).catch(err => { console.error('failed deployment: PayableLib', err); });
@@ -128,17 +132,17 @@ module.exports = {
         }).catch(err => { console.error('failed deployment: Erc20Lib', err); });
         }).catch(err => { console.error('failed deployment: SpotFeeLib', err); });
         }).catch(err => { console.error('failed deployment: TransferLib', err); });
-        }).catch(err => { console.error('failed deployment: StLib', err); });
-        }).catch(err => { console.error('failed deployment: CcyLib', err); });
+        }).catch(err => { console.error('failed deployment: TokenLib', err); });
+        }).catch(err => { console.error('failed deployment: CcyLib', err); }); 
         }).catch(err => { console.error('failed deployment: LedgerLib', err); });
         }).catch(err => { console.error('failed deployment: StructLib', err); });
-
+        return stmAddr;
     }
 };
 
-function logEnv(phase, owner, ownerPrivKey) {
+function logEnv(phase, owner, ownerPrivKey, contractType) {
     console.log(chalk.black.bgWhite(phase));
-    console.log(chalk.red('\tprocess.env.CONTRACT_TYPE: '), process.env.CONTRACT_TYPE);
+    console.log(chalk.red('\t             contractType: '), contractType);
     console.log(chalk.red('\t      process.env.NETWORK: '), process.env.NETWORK);
     console.log(chalk.red('\t   process.env.NETWORK_ID: '), process.env.NETWORK_ID);
     console.log(chalk.red('\t                    owner: '), owner);

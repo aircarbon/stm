@@ -29,7 +29,7 @@ contract("StMaster", accounts => {
                expiryTimestamp: DateTime.local().plus({ days: 30 }).toMillis(),
                underlyerTypeId: spotTypes[0].id,
                       refCcyId: ccyTypes.find(p => p.name === 'USD').id,
-        });
+        }, CONST.nullAddr);
         usdFT = (await stm.getSecTokenTypes()).tokenTypes.filter(p => p.name == ftTestName_USD)[0];
         usdFT_underlyer = spotTypes.filter(p => p.id == usdFT.ft.underlyerTypeId)[0];
         usdFT_refCcy = ccyTypes.filter(p => p.id == usdFT.refCcyId)[0];

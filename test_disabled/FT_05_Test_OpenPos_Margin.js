@@ -41,7 +41,7 @@ contract("StMaster", accounts => {
                  contractSize: 1000,
                initMarginBips: 1000, // 10%
                 varMarginBips: 0,
-        });
+        }, CONST.nullAddr);
         usdFT = (await stm.getSecTokenTypes()).tokenTypes.filter(p => p.name == ftTestName_USD)[0];
         usdFT_underlyer = spotTypes.filter(p => p.id == usdFT.ft.underlyerTypeId)[0];
         usdFT_refCcy = ccyTypes.filter(p => p.id == usdFT.refCcyId)[0];
@@ -55,7 +55,7 @@ contract("StMaster", accounts => {
                contractSize: 1000,
              initMarginBips: 100, // 1%
               varMarginBips: 0,
-        });
+        }, CONST.nullAddr);
         ethFT = (await stm.getSecTokenTypes()).tokenTypes.filter(p => p.name == ftTestName_ETH)[0];
         ethFT_underlyer = spotTypes.filter(p => p.id == ethFT.ft.underlyerTypeId)[0];
         ethFT_refCcy = ccyTypes.filter(p => p.id == ethFT.refCcyId)[0];
