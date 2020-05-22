@@ -16,7 +16,7 @@
  > OR (better, for individual dev account separation by networkId): from repo root: `yarn ganache` after change NETWORK_ID=xxx in .env files.
 
 ## Configs
-Create the following .env config files, using the `.env.example` example:
+Create the following .env config files, using the `.env.example` as a template:
 `.env.DEMO`  => DEV AWS, DEMO instance
 `.env.UAT`   => DEV AWS, UAT instance
 `.env.DEV`   => DEV AWS, DEV instance
