@@ -1,4 +1,6 @@
-require('dotenv').config( { path: require('path').resolve(__dirname, "../.env." + (process.env.INSTANCE_ID !== undefined ? process.env.INSTANCE_ID : 'local')) });
+const envFile = require('path').resolve(__dirname, "./.env." + (process.env.INSTANCE_ID !== undefined ? (process.env.INSTANCE_ID) : ''));
+require('dotenv').config( { path: envFile });
+
 const chalk = require('chalk');
 const deploymentHelper = require('./deploymentHelper');
 const setup = require('../devSetupContract.js');
@@ -12,31 +14,36 @@ const setup = require('../devSetupContract.js');
 //    `export INSTANCE_ID=DEMO && truffle migrate --network ropsten_ac -f 2 --to 2 --reset`
 //    `unset INSTANCE_ID && truffle migrate --network ropsten_ac -f 2 --to 2 --reset`
 //
-// todo: need to pick named .env file, for DB connection
-//
 
 module.exports = async function (deployer) {
-    console.log(chalk.red('INSTANCE_ID'), process.env.INSTANCE_ID);
+    // override env network ID with deployer's value
+    //console.log(deployer);
+
     switch (process.env.INSTANCE_ID) {
         case undefined:
         case 'local': console.log(chalk.inverse(`Deploying localhost contract instance, saving to DB: ${process.env.sql_server}`)); break;
-        case 'DEV': console.log(chalk.inverse(`Deploying (AWS DEV/DEV) instance prefix, saving to DB: ${process.env.sql_server}`)); break;
-        case 'DEMO': console.log(chalk.inverse(`Deploying (AWS DEV/DEMO) instance prefix, saving to DB: ${process.env.sql_server}`)); break;
-        case 'UAT': console.log(chalk.inverse(`Deploying (AWS DEV/UAT) instance prefix, saving to DB: ${process.env.sql_server}`)); break;
-        default: console.log(chalk.red.bold.inverse('Unknown INSTANCE_ID')); process.exit(1);
+        case 'DEV': console.log(chalk.inverse(`Deploying (AWS DEV / DEV) instance, saving to DB: ${process.env.sql_server}`)); break;
+        case 'DEMO': console.log(chalk.inverse(`Deploying (AWS DEV / DEMO) instance, saving to DB: ${process.env.sql_server}`)); break;
+        case 'UAT': console.log(chalk.inverse(`Deploying (AWS DEV / UAT) instance, saving to DB: ${process.env.sql_server}`)); break;
+        case 'TEST_AC_1': console.log(chalk.inverse(`Deploying (TEST / ACPRIVNET) instance, saving to DB: ${process.env.sql_server}`)); break;
+        default: console.log(chalk.red.bold.inverse(`Unknown INSTANCE_ID (${process.env.INSTANCE_ID})`)); process.exit(1);
     }
-    console.log(chalk.red('NETWORK_ID'), process.env.NETWORK_ID);
-    console.log(chalk.red('CONTRACT_TYPE'), process.env.CONTRACT_TYPE);
+    console.log(chalk.red('INSTANCE_ID'), process.env.INSTANCE_ID);
+    console.log(chalk.red('process.env.NETWORK_ID'), process.env.NETWORK_ID);
+    console.log(chalk.red('process.env.CONTRACT_TYPE'), process.env.CONTRACT_TYPE);
     const contractPrefix = (process.env.INSTANCE_ID || 'local') + '_';
     console.log(chalk.red('CONTRACT_PREFIX'), process.env.CONTRACT_PREFIX);
-    //process.exit(1);
+    console.log(chalk.red('deployer.gasPrice (gwei)'), web3.utils.fromWei(deployer.networks[deployer.network].gasPrice.toString(), "gwei"));
 
-    // setup
-    process.env.NETWORK_ID = deployer.network_id;
+    // require the supplied env network_id (via INSTANCE_ID) to match the supplied deployer's network_id
+    //process.env.NETWORK_ID = deployer.network_id;
+    if (process.env.NETWORK_ID != deployer.network_id) {
+        console.log(chalk.red.bold.inverse(`process.env.NETWORK_ID (${process.env.NETWORK_ID}) != deployer.network_id (${deployer.network_id}): please supply a .env file (through INSTANCE_ID) that matches the supplied deployer network_id.`)); 
+        process.exit(1);
+    }
     process.env.WEB3_NETWORK_ID = deployer.network_id;
-    console.log('== SecTokMaster == DEPLOY...');
+
     switch (process.env.CONTRACT_TYPE) {
-        
         case 'CASHFLOW_CONTROLLER':
             // first deploy a base CASHFLOW contract
             const addrBase = await deploymentHelper.Deploy({ deployer, artifacts, contractType: 'CASHFLOW' });

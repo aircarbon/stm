@@ -1,14 +1,26 @@
+const chalk = require('chalk');
+const _ = require('lodash');
 
-require('dotenv').config( { path: require('path').resolve(__dirname, "./.env." + (process.env.INSTANCE_ID !== undefined ? process.env.INSTANCE_ID : 'local')) });
+const envFile = require('path').resolve(__dirname, "./.env." + (process.env.INSTANCE_ID !== undefined ? (process.env.INSTANCE_ID) : ''));
+if (!require('fs').existsSync(envFile)) {
+    console.log(chalk.red.bold.inverse(`envFile ${envFile} is invalid.`)); 
+    process.exit(1);        
+}
+require('dotenv').config( { path: envFile });
+console.log(chalk.red('envFile'), envFile);
 const Big = require('big.js');
 const Web3 = require('web3');
 const web3 = new Web3();
 const bip39 = require('bip39');
 const hdkey = require('ethereumjs-wallet/hdkey');
 const EthereumJsTx = require('ethereumjs-tx');
-const chalk = require('chalk');
+const EthereumJsCommon = require('ethereumjs-common').default;
+//let r = new EthereumJsCommon('ropsten');
+//console.log(r.hardforks());
+
 const truffleAssert = require('truffle-assertions');
 const { db } = require('../common/dist');
+
 
 const ETH_USD = 190;
 
@@ -89,6 +101,10 @@ module.exports = {
         "4": { // rinkeby
             btcUsd: '0x5498BB86BC934c8D34FDA08E81D444153d0D06aD',
             ethUsd: '0x0bF4e7bf3e1f6D6Dc29AA516A33134985cC3A5aA'
+        },
+        "42101": { // AC private testnet
+            btcUsd: '0x0000000000000000000000000000000000000000',
+            ethUsd: '0x0000000000000000000000000000000000000000'
         },
         "888": { // dev
             btcUsd: '0x0000000000000000000000000000000000000000',
@@ -235,20 +251,32 @@ EXCHANGE_FEE: 1,
 function getTestContextWeb3() {
     const context =
 
-        // DM
-          process.env.WEB3_NETWORK_ID == 888 ? { web3: new Web3('http://127.0.0.1:8545'),    ethereumTxChain: {} }
-        // Dung
-        : process.env.WEB3_NETWORK_ID == 889 ? { web3: new Web3('http://127.0.0.1:8545'),    ethereumTxChain: {} }
-        // Vince
-        : process.env.WEB3_NETWORK_ID == 890 ? { web3: new Web3('http://127.0.0.1:8545'),    ethereumTxChain: {} }
-        // Lakshmi
-        : process.env.WEB3_NETWORK_ID == 891 ? { web3: new Web3('http://127.0.0.1:8545'),    ethereumTxChain: {} }
+        // dev - DM
+          process.env.WEB3_NETWORK_ID == 888 ?   { web3: new Web3('http://127.0.0.1:8545'),    ethereumTxChain: {} }
+        // dev -Dung
+        : process.env.WEB3_NETWORK_ID == 889 ?   { web3: new Web3('http://127.0.0.1:8545'),    ethereumTxChain: {} }
+        // dev -Vince
+        : process.env.WEB3_NETWORK_ID == 890 ?   { web3: new Web3('http://127.0.0.1:8545'),    ethereumTxChain: {} }
+        // dev -Lakshmi
+        : process.env.WEB3_NETWORK_ID == 891 ?   { web3: new Web3('http://127.0.0.1:8545'),    ethereumTxChain: {} }
 
-        // Ropsten
-        : process.env.WEB3_NETWORK_ID == 3 ?   { web3: new Web3('https://ac-dev0.net:9545'), ethereumTxChain: { chain: 'ropsten', hardfork: 'petersburg' } }
+        // Ropsten - AC Geth
+        : process.env.WEB3_NETWORK_ID == 3 ?     { web3: new Web3('https://ac-dev0.net:9545'), ethereumTxChain: { chain: 'ropsten', hardfork: 'petersburg' } }
+      //: process.env.WEB3_NETWORK_ID == 3 ?     { web3: new Web3('https://ropsten.infura.io/v3/05a8b81beb9a41008f74864b5b1ed544'), ethereumTxChain: { chain: 'ropsten', hardfork: 'petersburg' } }
 
-        // Rinkeby
-        : process.env.WEB3_NETWORK_ID == 4 ?   { web3: new Web3('https://rinkeby.infura.io/v3/93db2c7fd899496d8400e86100058297'), ethereumTxChain: { chain: 'rinkeby', hardfork: 'petersburg' } }
+        // Rinkeby - Infura (AirCarbon-AwsDev)
+        : process.env.WEB3_NETWORK_ID == 4 ?     { web3: new Web3('https://rinkeby.infura.io/v3/05a8b81beb9a41008f74864b5b1ed544'), ethereumTxChain: { chain: 'rinkeby', hardfork: 'petersburg' } }
+
+        // Private Testnet - AC Geth
+        : process.env.WEB3_NETWORK_ID == 42101 ? { web3: new Web3('https://ac-dev1.net:9545'), ethereumTxChain: { common: EthereumJsCommon.forCustomChain(
+            'ropsten', // forCustomChain() requires a "known" name!?
+            {
+                name: 'test_ac',
+                networkId: 42101,
+                chainId: 42101,
+            },
+            'muirGlacier'
+        ) } }
 
         : undefined;
     if (!context) throw('WEB3_NETWORK_ID is not set!');
@@ -328,8 +356,8 @@ async function web3_tx(methodName, methodArgs, fromAddr, fromPrivKey, returnBefo
      }
 
     // estimate gas
-    const gasEstimate = await web3.eth.estimateGas(txData);
-    if (consoleOutput) console.log(chalk.dim.yellow('   -> gasEstimate=', gasEstimate));
+    //const gasEstimate = await web3.eth.estimateGas(txData);
+    //if (consoleOutput) console.log(chalk.dim.yellow('   -> gasEstimate=', gasEstimate));
 
     // send signed tx
     const EthereumTx = EthereumJsTx.Transaction

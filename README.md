@@ -17,10 +17,11 @@
 
 ## Configs
 Create the following .env config files, using the `.env.example` as a template:
-`.env.DEMO`  => DEV AWS, DEMO instance
-`.env.UAT`   => DEV AWS, UAT instance
-`.env.DEV`   => DEV AWS, DEV instance
-`.env.local` => localhost, debug instance
+`.env.local`     => localhost, debug instance
+`.env.DEMO`      => DEV AWS, DEMO instance
+`.env.UAT`       => DEV AWS, UAT instance
+`.env.DEV`       => DEV AWS, DEV instance
+`.env.AC_TEST_1` => TEST(AC PrivateNet), Test1 instance
 
 ## Dual Mode (CONTRACT_TYPE)
 Operates as a semi-fungible (multi-minting batch, multi-type) COMMODITY token, or as a fungible (single-minting batch, single-type) CASHFLOW token.
@@ -28,7 +29,7 @@ Operates as a semi-fungible (multi-minting batch, multi-type) COMMODITY token, o
 ## Migrate (Deploy) Contracts
 Set `INSTANCE_ID` environment variable to one of: `local`, `DEV`, `DEMO`, or `UAT` to control contract deployment prefix and database.
 Migration script `2_deploy_contract.js` will pickup this env var and deploy a test contract accordingly.
-- `export INSTANCE_ID=local && truffle migrate --network development --reset` (ganache-cli local node)
+- `unset INSTANCE_ID && truffle migrate --network development --reset` (ganache-cli local node)
 - `export INSTANCE_ID=DEV && truffle migrate --network ropsten_ac --reset` (Deploy AWS DEV instance using AirCarbon's ropsten Geth node)
 - `export INSTANCE_ID=UAT && truffle migrate --network ropsten_inufra --reset` (Deploy AWS UAT instance using Infura Ropsten)
 - `export INSTANCE_ID=DEMO && truffle migrate --network rinkeby_infura --reset` (Deploy AWS DEMO instance using Infura Rinkeby)
