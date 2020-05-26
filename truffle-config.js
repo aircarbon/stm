@@ -119,9 +119,9 @@ module.exports = {
             return wallet;
         },
         network_id: "*", // 42101
-        confirmations: 2,
+        //confirmations: 2,
         gas: 7800000,
-        gasPrice: web3.utils.toWei("1", "gwei")
+        gasPrice: web3.utils.toWei("1", "kwei")
     }
 
     // Another network with more advanced options...
