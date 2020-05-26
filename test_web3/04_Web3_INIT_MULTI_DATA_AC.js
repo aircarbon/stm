@@ -38,7 +38,7 @@ const WHITE_BUYERS = [];
 
 // whitelisted manual test accounts
 const TEST_ACCOUNT_START_NDX = WHITE_BUYER_START_NDX + WHITE_BUYER_COUNT;
-const TEST_ACCOUNT_COUNT = 100;
+const TEST_ACCOUNT_COUNT = 500;
 const TEST_ACCOUNTS = [];
 
 // off-exchange "graylist" external address
@@ -51,10 +51,11 @@ describe(`Contract Web3 Interface`, async () => {
     //           Local: ("export INSTANCE_ID=local && mocha test_web3 --timeout 10000000 --exit")
     //         AWS Dev: ("export INSTANCE_ID=DEV && export CONTRACT_TYPE=COMMODITY && mocha test_web3 --timeout 10000000 --exit")
     //         AWS UAT: ("export INSTANCE_ID=UAT && export CONTRACT_TYPE=COMMODITY && mocha test_web3 --timeout 10000000 --exit")
+    //        AWS DEMO: ("export INSTANCE_ID=DEMO && export CONTRACT_TYPE=COMMODITY && mocha test_web3 --timeout 10000000 --exit")
     //
 
     before(async function () {
-        await require('../devSetupContract.js').setDefaults();
+        //await require('../devSetupContract.js').setDefaults();
 
         var x;
         x = await CONST.getAccountAndKey(OWNER_NDX);
@@ -65,93 +66,114 @@ describe(`Contract Web3 Interface`, async () => {
         const sendEthTx = await CONST.web3_sendEthTestAddr(0, GRAY, "0.01"); // setup - fund GRAY eth
 
         const sealedStatus = await CONST.web3_call('getContractSeal', []);
+        var allWhitelisted = await CONST.web3_call('getWhitelist', []);
+        console.log('allWhitelisted', allWhitelisted);
+        console.log('sealedStatus', sealedStatus);
 
-        // setup whitelist: reserved/internal
-        var whiteNdx = 0;
-        const submittedToWhitelist = []
-        var wlMany = []
-        for (whiteNdx = 0; whiteNdx < WHITELIST_RESERVED_COUNT; whiteNdx++) {
-            x = await CONST.getAccountAndKey(whiteNdx);
-            wlMany.push(x.addr);
-            WHITE_RESERVED.push({ndx: whiteNdx, addr: x.addr, privKey: x.privKey});
-        }
-        console.log(chalk.inverse(`SETUP RESERVED WL (count=${wlMany.length}) last whiteNdx=${whiteNdx}...`));
-        try {
-            await CONST.web3_tx('whitelistMany', [ wlMany ], OWNER, OWNER_privKey);
-        } catch(ex) { console.warn(ex); }
-        for (whiteNdx = 0; whiteNdx < WHITELIST_RESERVED_COUNT; whiteNdx++) {
-            x = await CONST.getAccountAndKey(whiteNdx);
-            //assert((await CONST.web3_call('isWhitelisted', [x.addr])) == true, 'not whitelisted');
-        }
-        submittedToWhitelist.concat(wlMany);
+        if (sealedStatus == false) {
 
-        // setup whitelist: test minters
-        wlMany = []
-        for (whiteNdx = WHITELIST_RESERVED_COUNT; whiteNdx < WHITE_MINTER_START_NDX + WHITE_MINTER_COUNT; whiteNdx++) {
-            x = await CONST.getAccountAndKey(whiteNdx);
-            wlMany.push(x.addr);
-            WHITE_MINTERS.push({ndx: whiteNdx, addr: x.addr, privKey: x.privKey});
-        }
-        console.log(chalk.inverse(`SETUP MINTERS WL (count=${wlMany.length}) last whiteNdx=${whiteNdx}...`));
-        try {
-            await CONST.web3_tx('whitelistMany', [ wlMany ], OWNER, OWNER_privKey);
-        } catch(ex) { console.warn(ex); }
-        for (whiteNdx = WHITELIST_RESERVED_COUNT; whiteNdx < WHITE_MINTER_START_NDX + WHITE_MINTER_COUNT; whiteNdx++) {
-            x = await CONST.getAccountAndKey(whiteNdx);
-            //assert((await CONST.web3_call('isWhitelisted', [x.addr])) == true, 'not whitelisted');
-        }
-        submittedToWhitelist.concat(wlMany);
+            // setup whitelist: reserved/internal
+            var whiteNdx = 0;
+            const submittedToWhitelist = []
+            var wlMany = []
+            for (whiteNdx = 0; whiteNdx < WHITELIST_RESERVED_COUNT; whiteNdx++) {
+                x = await CONST.getAccountAndKey(whiteNdx);
+                if (!allWhitelisted.map(p => p.toLowerCase()).includes(x.addr.toLowerCase())) {
+                    wlMany.push(x.addr);
+                }
+                WHITE_RESERVED.push({ndx: whiteNdx, addr: x.addr, privKey: x.privKey});
+            }
+            console.log(chalk.inverse(`SETUP RESERVED WL (count=${wlMany.length}) last whiteNdx=${whiteNdx}...`));
+            try {
+                if (wlMany.length > 0) {
+                    await CONST.web3_tx('whitelistMany', [ wlMany ], OWNER, OWNER_privKey);
+                }
+            } catch(ex) { console.warn(ex); }
+            //whitelistChunked(wlMany, OWNER, OWNER_privKey);
+            submittedToWhitelist.concat(wlMany);
 
-        // setup whitelist: test buyers
-        wlMany = []
-        for (whiteNdx = WHITE_MINTER_START_NDX + WHITE_MINTER_COUNT; whiteNdx < WHITE_BUYER_START_NDX + WHITE_BUYER_COUNT; whiteNdx++) {
-            x = await CONST.getAccountAndKey(whiteNdx);
-            wlMany.push(x.addr);
-            WHITE_BUYERS.push({ndx: whiteNdx, addr: x.addr, privKey: x.privKey});
-        }
-        console.log(chalk.inverse(`SETUP BUYERS WL (count=${wlMany.length}) last whiteNdx=${whiteNdx}...`));
-        try {
-            await CONST.web3_tx('whitelistMany', [ wlMany ], OWNER, OWNER_privKey);
-        } catch(ex) { console.warn(ex); }
-        for (whiteNdx = WHITE_MINTER_START_NDX + WHITE_MINTER_COUNT; whiteNdx < WHITE_BUYER_START_NDX + WHITE_BUYER_COUNT; whiteNdx++) {
-            x = await CONST.getAccountAndKey(whiteNdx);
-            //assert((await CONST.web3_call('isWhitelisted', [x.addr])) == true, 'not whitelisted');
-        }
-        submittedToWhitelist.concat(wlMany);
+            // setup whitelist: test minters
+            wlMany = []
+            for (whiteNdx = WHITELIST_RESERVED_COUNT; whiteNdx < WHITE_MINTER_START_NDX + WHITE_MINTER_COUNT; whiteNdx++) {
+                x = await CONST.getAccountAndKey(whiteNdx);
+                if (!allWhitelisted.map(p => p.toLowerCase()).includes(x.addr.toLowerCase())) {
+                    wlMany.push(x.addr);
+                }
+                WHITE_MINTERS.push({ndx: whiteNdx, addr: x.addr, privKey: x.privKey});
+            }
+            console.log(chalk.inverse(`SETUP MINTERS WL (count=${wlMany.length}) last whiteNdx=${whiteNdx}...`));
+            try {
+                if (wlMany.length > 0) {
+                    await CONST.web3_tx('whitelistMany', [ wlMany ], OWNER, OWNER_privKey);
+                }
+            } catch(ex) { console.warn(ex); }
+            //await whitelistChunked(wlMany, OWNER, OWNER_privKey);
+            submittedToWhitelist.concat(wlMany);
 
-        // setup whitelist: manual testing exchange accounts
-        wlMany = []
-        for (whiteNdx = WHITE_BUYER_START_NDX + WHITE_BUYER_COUNT; whiteNdx < TEST_ACCOUNT_START_NDX + TEST_ACCOUNT_COUNT; whiteNdx++) {
-            x = await CONST.getAccountAndKey(whiteNdx);
-            wlMany.push(x.addr);
-            TEST_ACCOUNTS.push({ndx: whiteNdx, addr: x.addr, privKey: x.privKey});
-        }
-        console.log(chalk.inverse(`SETUP TEST ACCOUNTS WL (count=${wlMany.length}) last whiteNdx=${whiteNdx}...`));
-        try {
-            await CONST.web3_tx('whitelistMany', [ wlMany ], OWNER, OWNER_privKey);
-        } catch(ex) { console.warn(ex); }
-        for (whiteNdx = WHITE_BUYER_START_NDX + WHITE_BUYER_COUNT; whiteNdx < TEST_ACCOUNT_START_NDX + TEST_ACCOUNT_COUNT; whiteNdx++) {
-            x = await CONST.getAccountAndKey(whiteNdx);
-            //assert((await CONST.web3_call('isWhitelisted', [x.addr])) == true, 'not whitelisted');
-        }
-        submittedToWhitelist.concat(wlMany);
+            // setup whitelist: test buyers
+            wlMany = []
+            for (whiteNdx = WHITE_MINTER_START_NDX + WHITE_MINTER_COUNT; whiteNdx < WHITE_BUYER_START_NDX + WHITE_BUYER_COUNT; whiteNdx++) {
+                x = await CONST.getAccountAndKey(whiteNdx);
+                if (!allWhitelisted.map(p => p.toLowerCase()).includes(x.addr.toLowerCase())) {
+                    wlMany.push(x.addr);
+                }
+                WHITE_BUYERS.push({ndx: whiteNdx, addr: x.addr, privKey: x.privKey});
+            }
+            console.log(chalk.inverse(`SETUP BUYERS WL (count=${wlMany.length}) last whiteNdx=${whiteNdx}...`));
+            try {
+                if (wlMany.length > 0) {
+                    await CONST.web3_tx('whitelistMany', [ wlMany ], OWNER, OWNER_privKey);
+                }
+            } catch(ex) { console.warn(ex); }
+            //await whitelistChunked(wlMany, OWNER, OWNER_privKey);
+            submittedToWhitelist.concat(wlMany);
 
-        // dbg - get counts & whitelist
-        const allWhitelisted = await CONST.web3_call('getWhitelist', []);
-        //const allWhitelistedCount = await CONST.web3_call('getWhitelistCount', []);
-        console.log(chalk.inverse(`DONE WHITELISTING...`));
-        console.log('allWhitelisted.length: ', allWhitelisted.length);
-        //console.log('allWhitelistedCount: ', allWhitelistedCount.toString());
-        
-        console.dir(allWhitelisted);
-        console.dir(submittedToWhitelist);
-        const allPresent = _.every(submittedToWhitelist, p => allWhitelisted.contains(p));
-        console.log('allPresent: ', allPresent);
-        assert(allPresent == true, '!!!');
+            //
+            // setup whitelist: manual testing exchange accounts -- BATCHED/CHUNKED --
+            //
+            wlMany = []
+            for (whiteNdx = WHITE_BUYER_START_NDX + WHITE_BUYER_COUNT; whiteNdx < TEST_ACCOUNT_START_NDX + TEST_ACCOUNT_COUNT; whiteNdx++) {
+                x = await CONST.getAccountAndKey(whiteNdx);
+                if (!allWhitelisted.map(p => p.toLowerCase()).includes(x.addr.toLowerCase())) {
+                    wlMany.push(x.addr);
+                }
+                TEST_ACCOUNTS.push({ndx: whiteNdx, addr: x.addr, privKey: x.privKey});
+            }
+            console.log(chalk.inverse(`SETUP TEST ACCOUNTS WL (count=${wlMany.length}) last whiteNdx=${whiteNdx}...`));
+            await whitelistChunked(wlMany, OWNER, OWNER_privKey);
+            submittedToWhitelist.concat(wlMany);
 
-        // seal
-        if (!sealedStatus) {
-            await CONST.web3_tx('sealContract', [], OWNER, OWNER_privKey);
+                async function whitelistChunked(wlMany, OWNER, OWNER_privKey) {
+                    if (wlMany.length > 0) {
+                        const wlChunked = _.chunk(wlMany, 50);
+                        //console.log('wlMany', wlMany);
+                        //console.log('wlChunked', wlChunked);
+                        for (let chunk of wlChunked) {
+                            //console.log('chunk', chunk);
+                            try {
+                                await CONST.web3_tx('whitelistMany', [ chunk ], OWNER, OWNER_privKey);
+                            } catch(ex) { console.warn(ex); }
+                        }
+                    }
+                }
+
+            // dbg - get counts & whitelist
+            allWhitelisted = await CONST.web3_call('getWhitelist', []);
+            console.log(chalk.inverse(`DONE WHITELISTING...`));
+            console.log('allWhitelisted.length: ', allWhitelisted.length);
+            //console.dir(allWhitelisted);
+            //console.dir(submittedToWhitelist);
+            const allSubmittedPresent = _.every(submittedToWhitelist, p => allWhitelisted.includes(p));
+            console.log('allSubmittedPresent: ', allSubmittedPresent);
+            assert(allSubmittedPresent == true, '!!!');
+
+            // seal
+            if (!sealedStatus) {
+                await CONST.web3_tx('sealContract', [], OWNER, OWNER_privKey);
+            }
+        }
+        else {
+            console.log(`already sealed: WL - NOP (WL count=${allWhitelisted.length}).`);
         }
 
         if (EXEC_TEST_ACTIONS) {
