@@ -367,9 +367,9 @@ async function web3_tx(methodName, methodArgs, fromAddr, fromPrivKey, returnBefo
     const txPromise = new Promise((resolve, reject) =>  {
         var txHash;
         web3.eth.sendSignedTransaction(raw)
-        .on("receipt", receipt => {
-            if (consoleOutput) console.log(`   => receipt`, receipt);
-        })
+        // .on("receipt", receipt => {
+        //     if (consoleOutput) console.log(`   => receipt`, receipt);
+        // })
         .once("transactionHash", hash => {
             txHash = hash;
             if (consoleOutput) console.log(chalk.dim.yellow(`   => ${txHash} ...`));
@@ -437,11 +437,11 @@ async function web3_sendEthTestAddr(sendFromNdx, sendToAddr, ethValue) {
             resolve(txHash);
         })
         .once("error", error => {
-            if (!_.isEmpty(error.error)) {
-                console.log(chalk.gray(`   => ## error`, JSON.stringify(error)));
+            //if (!_.isEmpty(error.error)) {
+                console.log(chalk.red(`   => ## error`, JSON.stringify(error)));
                 //console.dir(error);
                 reject(error);
-            }
+            //}
         });
     });
     return txPromise;
