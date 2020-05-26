@@ -1,4 +1,6 @@
-require('dotenv').config( { path: require('path').resolve(__dirname, "./.env." + (process.env.INSTANCE_ID !== undefined ? process.env.INSTANCE_ID : 'local')) });
+const envFile = require('path').resolve(__dirname, "./.env." + (process.env.INSTANCE_ID !== undefined ? (process.env.INSTANCE_ID) : ''));
+require('dotenv').config( { path: envFile });
+
 const { getAccountAndKey, web3_call, web3_tx } = require('./const.js');
 
 process.env.WEB3_NETWORK_ID = Number(process.env.NETWORK_ID || 888);
@@ -13,6 +15,7 @@ process.env.WEB3_NETWORK_ID = Number(process.env.NETWORK_ID || 888);
 
     // initialize contract default values
     await require('./devSetupContract.js').setDefaults();
+    //process.exit();
 
     // whitelist & seal contract
     const contractSealed = await web3_call('getContractSeal', []);

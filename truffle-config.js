@@ -26,8 +26,6 @@ const NonceTrackerSubprovider = require("web3-provider-engine/subproviders/nonce
 const DEV_MNEMONIC = require('./DEV_MNEMONIC.js').MNEMONIC;
 const PROD_MNEMONIC = '...'; // **PROD TODO
 
-const gweiDeployment = "5";
-
 module.exports = {
   /**
    * Networks define how you connect to your ethereum client and let you set the
@@ -63,67 +61,67 @@ module.exports = {
       port: 8545,
       network_id: "*", // see: getTestContextWeb3() for dev network_id convention
       gas: 7900000,
-      gasPrice: web3.utils.toWei(gweiDeployment, "gwei")
+      gasPrice: web3.utils.toWei("1", "gwei")
     },
 
     // aircarbon ropsten geth node -- a bit faster than infura, representative of mainnet
     ropsten_ac: {
-      provider: //new HDWalletProvider(DEV_MNEMONIC, "https://ac-dev0.net:9545", 0, 1000), // # test accounts
-        function() { // https://ethereum.stackexchange.com/questions/44349/truffle-infura-on-mainnet-nonce-too-low-error
-          var wallet = new HDWalletProvider(DEV_MNEMONIC, 'https://ac-dev0.net:9545', 0, 1000);
-          var nonceTracker = new NonceTrackerSubprovider();
-          wallet.engine._providers.unshift(nonceTracker);
-          nonceTracker.setEngine(wallet.engine);
-          return wallet;
+        provider: function() { // https://ethereum.stackexchange.com/questions/44349/truffle-infura-on-mainnet-nonce-too-low-error
+            var wallet = new HDWalletProvider(DEV_MNEMONIC, 'https://ac-dev0.net:9545', 0, 1000); // # test accounts
+            var nonceTracker = new NonceTrackerSubprovider();
+            wallet.engine._providers.unshift(nonceTracker);
+            nonceTracker.setEngine(wallet.engine);
+            return wallet;
         },
-      network_id: "*", // 3
-      gas: 7800000,
-      gasPrice: web3.utils.toWei(gweiDeployment, "gwei"),
-      networkCheckTimeout: 30000,
-      
-      confirmations: 3,    // # of confs to wait between deployments. (default: 0)
-      skipDryRun: true,
-      timeoutBlocks: 200, // but web3 always times out at 50 blocks?!
+        network_id: "*", // 3
+        gas: 7800000,
+        gasPrice: web3.utils.toWei("1", "gwei"),
+        networkCheckTimeout: 30000,
+        confirmations: 3,    // # of confs to wait between deployments. (default: 0)
+        skipDryRun: true,
+        timeoutBlocks: 200, // but web3 always times out at 50 blocks?!
     },
     // ropsten infura -- much slower than rinkeby infura
-    ropsten_infura: {
-      provider: //() => new HDWalletProvider(DEV_MNEMONIC, "https://ropsten.infura.io/v3/93db2c7fd899496d8400e86100058297", 0, 1000), // # test accounts
-        function() {
-          var wallet = new HDWalletProvider(DEV_MNEMONIC, 'https://ropsten.infura.io/v3/93db2c7fd899496d8400e86100058297', 0, 1000);
-          var nonceTracker = new NonceTrackerSubprovider();
-          wallet.engine._providers.unshift(nonceTracker);
-          nonceTracker.setEngine(wallet.engine);
-          return wallet;
+    ropsten_infura: { // multi-client
+        provider: function() {
+            var wallet = new HDWalletProvider(DEV_MNEMONIC, 'https://ropsten.infura.io/v3/05a8b81beb9a41008f74864b5b1ed544', 0, 1000); // AirCarbon-AwsDev
+            var nonceTracker = new NonceTrackerSubprovider();
+            wallet.engine._providers.unshift(nonceTracker);
+            nonceTracker.setEngine(wallet.engine);
+            return wallet;
         },
-      network_id: "*", // 3
-      gas: 7800000,
-      gasPrice: web3.utils.toWei(gweiDeployment, "gwei"),
-
-      confirmations: 1,
-      skipDryRun: true,
-      timeoutBlocks: 200,
+        network_id: "*", // 3
+        gas: 7800000,
+        gasPrice: web3.utils.toWei("1", "gwei"),
+        confirmations: 1,
+        skipDryRun: true,
+        timeoutBlocks: 200,
     },
 
     // rinkeby infura
-    rinkeby_infura: {
-      provider: () => new HDWalletProvider(DEV_MNEMONIC, "https://rinkeby.infura.io/v3/93db2c7fd899496d8400e86100058297",
-                      0, 1000), // # test accounts
+    rinkeby_infura: { // geth-only
+      provider: () => new HDWalletProvider(DEV_MNEMONIC, "https://rinkeby.infura.io/v3/05a8b81beb9a41008f74864b5b1ed544", 0, 1000), // AirCarbon-AwsDev
       network_id: "*", // 4
       gas: 10000000,
-      gasPrice: web3.utils.toWei(gweiDeployment, "gwei"),
-      
+      gasPrice: web3.utils.toWei("1", "gwei"),
       confirmations: 1,
       skipDryRun: true,
       timeoutBlocks: 200,
     },
 
-    // aircarbon private testnet g eth node
-    testnet_ace: {
-      provider: () => new HDWalletProvider(DEV_MNEMONIC, "https://ac-dev1.net:9545",
-                      0, 1000), // # test accounts
-      network_id: "*", // 4242 ?
-      gas: 7800000,
-      gasPrice: web3.utils.toWei(gweiDeployment, "gwei")
+    // aircarbon private testnet (geth)
+    test_ac: {
+        provider: function() {
+            var wallet = new HDWalletProvider(DEV_MNEMONIC, 'https://ac-dev1.net:9545', 0, 1000); // # test accounts
+            var nonceTracker = new NonceTrackerSubprovider();
+            wallet.engine._providers.unshift(nonceTracker);
+            nonceTracker.setEngine(wallet.engine);
+            return wallet;
+        },
+        network_id: "*", // 42101
+        //confirmations: 2,
+        gas: 7800000,
+        gasPrice: web3.utils.toWei("1", "kwei")
     }
 
     // Another network with more advanced options...

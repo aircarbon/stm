@@ -234,11 +234,11 @@ contract("StMaster", accounts => {
 
         // transfer, with fee structure applied
         const data = await transferHelper.transferLedger({ stm, accounts, 
-                ledger_A: accounts[global.TaddrNdx + 0],                              ledger_B: accounts[global.TaddrNdx + 1],
-                   qty_A: 0,                                                     tokenTypeId_A: 0,
-                   qty_B: new BN(CONST.KT_CARBON).sub(new BN(vcsTokQtyFeeFixed)),    tokenTypeId_B: CONST.tokenType.NATURE,
-            ccy_amount_A: new BN(CONST.oneEth_wei).sub(new BN(ethFeeFixed_Wei)),   ccyTypeId_A: CONST.ccyType.ETH,
-            ccy_amount_B: 0,                                                       ccyTypeId_B: 0,
+                ledger_A: accounts[global.TaddrNdx + 0],                                ledger_B: accounts[global.TaddrNdx + 1],
+                   qty_A: 0,                                                       tokenTypeId_A: 0,
+                   qty_B: new BN(CONST.KT_CARBON).sub(new BN(vcsTokQtyFeeFixed)),  tokenTypeId_B: CONST.tokenType.NATURE,
+            ccy_amount_A: new BN(CONST.oneEth_wei).sub(new BN(ethFeeFixed_Wei)),     ccyTypeId_A: CONST.ccyType.ETH,
+            ccy_amount_B: 0,                                                         ccyTypeId_B: 0,
                applyFees: true,
         });
 
@@ -273,11 +273,11 @@ contract("StMaster", accounts => {
 
         // transfer, with fee structure applied
         const data = await transferHelper.transferLedger({ stm, accounts, 
-                ledger_A: accounts[global.TaddrNdx + 0],                                      ledger_B: accounts[global.TaddrNdx + 1],
-                   qty_A: 0,                                                             tokenTypeId_A: 0,
+                ledger_A: accounts[global.TaddrNdx + 0],                                          ledger_B: accounts[global.TaddrNdx + 1],
+                   qty_A: 0,                                                                 tokenTypeId_A: 0,
                    qty_B: new BN(CONST.KT_CARBON).sub(new BN(corsiaTokQtyFeeFixed)),         tokenTypeId_B: CONST.tokenType.CORSIA,
-            ccy_amount_A: new BN(CONST.millionCcy_cents).sub(new BN(usdFeeFixed_cents)),   ccyTypeId_A: CONST.ccyType.USD,
-            ccy_amount_B: 0,                                                               ccyTypeId_B: 0,
+            ccy_amount_A: new BN(CONST.millionCcy_cents).sub(new BN(usdFeeFixed_cents)),       ccyTypeId_A: CONST.ccyType.USD,
+            ccy_amount_B: 0,                                                                   ccyTypeId_B: 0,
                applyFees: true,
         });
 
@@ -319,11 +319,11 @@ contract("StMaster", accounts => {
 
         // transfer, with fee structure applied
         const data = await transferHelper.transferLedger({ stm, accounts, 
-                ledger_A: accounts[global.TaddrNdx + 0],                                           ledger_B: accounts[global.TaddrNdx + 1],
-                   qty_A: 0,                                                                  tokenTypeId_A: 0,
+                ledger_A: accounts[global.TaddrNdx + 0],                                               ledger_B: accounts[global.TaddrNdx + 1],
+                   qty_A: 0,                                                                      tokenTypeId_A: 0,
                    qty_B: new BN(CONST.KT_CARBON).sub(new BN(newSecTokenTypeTokQtyFeeFixed)),     tokenTypeId_B: newSecTokenTypeId,
-            ccy_amount_A: new BN(1000).sub(new BN(ccyFeeFixed_units)),                          ccyTypeId_A: newCcyTypeId,
-            ccy_amount_B: 0,                                                                    ccyTypeId_B: 0,
+            ccy_amount_A: new BN(1000).sub(new BN(ccyFeeFixed_units)),                              ccyTypeId_A: newCcyTypeId,
+            ccy_amount_B: 0,                                                                        ccyTypeId_B: 0,
                applyFees: true,
         });
 
