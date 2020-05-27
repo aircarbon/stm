@@ -275,7 +275,7 @@ function getTestContextWeb3() {
                 networkId: 42101,
                 chainId: 42101,
             },
-            'muirGlacier'
+            'petersburg'
         ) } }
 
         : undefined;
@@ -388,11 +388,12 @@ async function web3_tx(methodName, methodArgs, fromAddr, fromPrivKey, returnBefo
             resolve({ txHash, receipt, evs });
         })
         .once("error", error => {
-            if (!_.isEmpty(error.error)) {
-                console.log(chalk.gray(`   => ## error`, JSON.stringify(error)));
+            //console.error(`   => error`, error);
+            //if (!_.isEmpty(error.error)) {
+                console.log(chalk.red(`   => ## error`, JSON.stringify(error)));
                 //console.dir(error);
                 reject(error);
-            }
+            //}
         });
     });
     return txPromise;
@@ -436,11 +437,11 @@ async function web3_sendEthTestAddr(sendFromNdx, sendToAddr, ethValue) {
             resolve(txHash);
         })
         .once("error", error => {
-            if (!_.isEmpty(error.error)) {
-                console.log(chalk.gray(`   => ## error`, JSON.stringify(error)));
+            //if (!_.isEmpty(error.error)) {
+                console.log(chalk.red(`   => ## error`, JSON.stringify(error)));
                 //console.dir(error);
                 reject(error);
-            }
+            //}
         });
     });
     return txPromise;
