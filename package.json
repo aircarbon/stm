@@ -19,7 +19,7 @@
     "keywords": [],
     "license": "MIT",
     "dependencies": {
-        "@babel/runtime": "^7.9.6",
+        "@babel/runtime": "^7.10.1",
         "ascii-horizontal-barchart": "^1.3.3",
         "async": "^3.2.0",
         "big.js": "^5.2.2",
@@ -33,7 +33,7 @@
         "lodash": "^4.17.15",
         "luxon": "^1.22.2",
         "tcharts.js": "0.0.4",
-        "web3-provider-engine": "^15.0.7"
+        "web3-provider-engine": "^15.0.12"
     },
     "devDependencies": {
         "@digix/doxity": "^0.5.2",
@@ -51,7 +51,7 @@
         "markdown-it-emoji": "^1.4.0",
         "meow": "^6.0.0",
         "mocha": "^5.1.1",
-        "mssql": "^5.1.0",
+        "mssql": "^7.0.0-alpha.2",
         "mustache": "^4.0.0",
         "node-emoji": "^1.10.0",
         "pdf-from-html": "^0.1.2-beta.1",
