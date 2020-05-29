@@ -124,7 +124,7 @@ module.exports = {
         },
     },
 
-    getTestContextWeb3: () => getTestContextWeb3(),
+    getTestContextWeb3: (useWs) => getTestContextWeb3(useWs),
     getAccountAndKey: async (accountNdx, mnemonic) => getAccountAndKey(accountNdx, mnemonic),
 
     web3_sendEthTestAddr: (sendFromNdx, sendToAddr, ethValue) => web3_sendEthTestAddr(sendFromNdx, sendToAddr, ethValue),
@@ -248,7 +248,7 @@ EXCHANGE_FEE: 1,
     }
 };
 
-function getTestContextWeb3() {
+function getTestContextWeb3(useWs) {
     const context =
 
         // dev - DM
@@ -268,7 +268,8 @@ function getTestContextWeb3() {
         : process.env.WEB3_NETWORK_ID == 4 ?     { web3: new Web3('https://rinkeby.infura.io/v3/05a8b81beb9a41008f74864b5b1ed544'), ethereumTxChain: { chain: 'rinkeby', hardfork: 'petersburg' } }
 
         // Private Testnet - AC Geth
-        : process.env.WEB3_NETWORK_ID == 42101 ? { web3: new Web3('https://ac-dev1.net:9545'), ethereumTxChain: { common: EthereumJsCommon.forCustomChain(
+        : process.env.WEB3_NETWORK_ID == 42101 ? { web3: new Web3(useWs ? 'wss://ac-dev1.net:9546' : 'https://ac-dev1.net:9545'),
+            ethereumTxChain: { common: EthereumJsCommon.forCustomChain(
             'ropsten', // forCustomChain() requires a "known" name!?
             {
                 name: 'test_ac',
@@ -340,6 +341,7 @@ async function web3_tx(methodName, methodArgs, fromAddr, fromPrivKey, returnBefo
     //console.dir(web3);
 
     // tx data
+    const msStart = Date.now();
     const nonce = await web3.eth.getTransactionCount(fromAddr, "pending");
     if (consoleOutput) console.log(chalk.dim(` >   TX: nonce=${nonce} [${contractDb.contract_enum} ${contractDb.contract_ver} @${contractDb.addr}] ${chalk.reset.red.bgWhiteBright(methodName + '(' + methodArgs.map(p => JSON.stringify(p)).join() + ')')}` + chalk.dim(` [networkId: ${process.env.WEB3_NETWORK_ID} - ${web3.currentProvider.host}]`)));
     var paramsData = contract.methods
@@ -375,11 +377,14 @@ async function web3_tx(methodName, methodArgs, fromAddr, fromPrivKey, returnBefo
             if (consoleOutput) console.log(chalk.dim.yellow(`   => ${txHash} ...`));
         })
         .once("confirmation", async (confirms, receipt) => {
+            const msStop = Date.now();
+            const msElapsed = msStop - msStart;
+
             //const receipt = await web3.eth.getTransactionReceipt(txHash);
             const evs = await contract.getPastEvents("allEvents", { fromBlock: receipt.blockNumber, toBlock: receipt.blockNumber });
             //console.log('receipt', receipt);
             //console.log('evs', evs);
-            if (consoleOutput) console.log(chalk.dim.yellow(`   => ${txHash} - ${confirms} confirm(s), receipt.gasUsed=${receipt.gasUsed} receipt.blockNumber=${receipt.blockNumber} evs=${evs.map(p => `B# ${p.blockNumber}: ${p.event}`).join(',')}`));//, JSON.stringify(receipt)));
+            if (consoleOutput) console.log(chalk.dim.yellow(`   => ${txHash} - ${confirms} confirm(s), secs=${(msElapsed/1000).toFixed(1)} receipt.gasUsed=${receipt.gasUsed} receipt.blockNumber=${receipt.blockNumber} evs=${evs.map(p => `B# ${p.blockNumber}: ${p.event}`).join(',')}`));//, JSON.stringify(receipt)));
             // receipt.logs
             // receipt.blockNumber
             // receipt.blockHash
