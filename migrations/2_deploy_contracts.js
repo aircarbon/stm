@@ -11,8 +11,8 @@ const setup = require('../devSetupContract.js');
 //
 // Deploys a contract of type process.env.CONTRACT_TYPE according to defaults in const.js
 // Prefixes the contract name in const.contractProps with (process.env.INSTANCE_ID || 'local'), e.g.
+//    `export INSTANCE_ID=local && truffle migrate --network ropsten_ac -f 2 --to 2 --reset`
 //    `export INSTANCE_ID=DEMO && truffle migrate --network ropsten_ac -f 2 --to 2 --reset`
-//    `unset INSTANCE_ID && truffle migrate --network ropsten_ac -f 2 --to 2 --reset`
 //
 
 module.exports = async function (deployer) {

@@ -8,6 +8,7 @@ if (!require('fs').existsSync(envFile)) {
 }
 require('dotenv').config( { path: envFile });
 console.log(chalk.red('envFile'), envFile);
+
 const Big = require('big.js');
 const Web3 = require('web3');
 const web3 = new Web3();
