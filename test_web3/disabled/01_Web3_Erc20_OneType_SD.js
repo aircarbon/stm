@@ -83,19 +83,19 @@ describe(`Contract Web3 Interface`, async () => {
     it(`web3 direct - erc20 - should be able to send single token type from graylist addr to external wallet (erc20 => erc20)`, async () => {
         //await CONST.web3_tx('transfer', [ SCOOP_TESTNETS_1, "1" ], GRAY_1, GRAY_1_privKey);
 
-        await CONST.web3_tx('transfer', [ SINGDAX_DOM10_1,  "1" ], GRAY_1, GRAY_1_privKey, false);
+        await CONST.web3_tx('transfer', [ SINGDAX_DOM10_1,  "1" ], GRAY_1, GRAY_1_privKey);
         await CONST.web3_sendEthTestAddr(0, SINGDAX_DOM10_1, "0.01");
 
-        await CONST.web3_tx('transfer', [ SINGDAX_DOM10_1,  "2" ], GRAY_1, GRAY_1_privKey, false);
+        await CONST.web3_tx('transfer', [ SINGDAX_DOM10_1,  "2" ], GRAY_1, GRAY_1_privKey);
         await CONST.web3_sendEthTestAddr(0, SINGDAX_DOM10_1, "0.02");
 
-        await CONST.web3_tx('transfer', [ SINGDAX_DOM10_1,  "3" ], GRAY_1, GRAY_1_privKey, false);
+        await CONST.web3_tx('transfer', [ SINGDAX_DOM10_1,  "3" ], GRAY_1, GRAY_1_privKey);
         await CONST.web3_sendEthTestAddr(0, SINGDAX_DOM10_1, "0.03");
 
-        await CONST.web3_tx('transfer', [ SINGDAX_DOM10_1,  "4" ], GRAY_1, GRAY_1_privKey, false);
+        await CONST.web3_tx('transfer', [ SINGDAX_DOM10_1,  "4" ], GRAY_1, GRAY_1_privKey);
         await CONST.web3_sendEthTestAddr(0, SINGDAX_DOM10_1, "0.04");
         
-        await CONST.web3_tx('transfer', [ SINGDAX_DOM10_1,  "5" ], GRAY_1, GRAY_1_privKey, false);
+        await CONST.web3_tx('transfer', [ SINGDAX_DOM10_1,  "5" ], GRAY_1, GRAY_1_privKey);
         await CONST.web3_sendEthTestAddr(0, SINGDAX_DOM10_1, "0.05");
         //await CONST.web3_tx('transfer', [ SINGDAX_DOM10_1,  "1" ], GRAY_1, GRAY_1_privKey);
         //await CONST.web3_sendEthTestAddr(0, SINGDAX_DOM10_1, "0.05");

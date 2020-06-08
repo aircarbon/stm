@@ -1,5 +1,6 @@
-const envFile = require('path').resolve(__dirname, "./.env." + (process.env.INSTANCE_ID !== undefined ? (process.env.INSTANCE_ID) : ''));
-require('dotenv').config( { path: envFile });
+const CONST = require('../const.js');
+//const envFile = require('path').resolve(__dirname, "./.env." + (process.env.INSTANCE_ID !== undefined ? (process.env.INSTANCE_ID) : ''));
+//require('dotenv').config( { path: envFile });
 
 const chalk = require('chalk');
 const deploymentHelper = require('./deploymentHelper');
@@ -16,6 +17,7 @@ const setup = require('../devSetupContract.js');
 //
 
 module.exports = async function (deployer) {
+    const O = await CONST.getAccountAndKey(0);
     // override env network ID with deployer's value
     //console.log(deployer);
 
@@ -44,22 +46,28 @@ module.exports = async function (deployer) {
     process.env.WEB3_NETWORK_ID = deployer.network_id;
 
     switch (process.env.CONTRACT_TYPE) {
-        case 'CASHFLOW_CONTROLLER':
-            // first deploy a base CASHFLOW contract
-            const addrBase = await deploymentHelper.Deploy({ deployer, artifacts, contractType: 'CASHFLOW' });
-            process.env.CONTRACT_TYPE = 'CASHFLOW'; await setup.setDefaults();
-            
-            // then deploy wrapper CASHFLOW_CONTROLLER contract
+        case 'CASHFLOW_CONTROLLER': 
+            // base CFT type 1 - deploy a base CFT contract (an "indirect type", to be added to the controller)
+            const addrBase1 = await deploymentHelper.Deploy({ deployer, artifacts, contractType: 'CASHFLOW', nameOverride: "SDax_Base1" });
+            process.env.CONTRACT_TYPE = 'CASHFLOW'; await setup.setDefaults({ nameOverride: "SDax_Base1" });
+
+            // base CFT type 2 - deploy a second base CFT contract
+            const addrBase2 = await deploymentHelper.Deploy({ deployer, artifacts, contractType: 'CASHFLOW', nameOverride: "SDax_Base2" });
+            process.env.CONTRACT_TYPE = 'CASHFLOW'; await setup.setDefaults({ nameOverride: "SDax_Base2" });
+             
+            // deploy the wrapping CFT-C contract
             const addrController = await deploymentHelper.Deploy({ deployer, artifacts, contractType: 'CASHFLOW_CONTROLLER' });
             process.env.CONTRACT_TYPE = 'CASHFLOW_CONTROLLER'; await setup.setDefaults();
-
-            // now link base CASFHLOW to CONTROLLER
-            console.log(chalk.inverse('addrBase'), addrBase);
+ 
+            // link the base types into the CFT-C (add indirect types)
+            console.log(chalk.inverse('addrBase1'), addrBase1);
+            console.log(chalk.inverse('addrBase2'), addrBase2);
             console.log(chalk.inverse('addrController'), addrController);
-            
-            //... addType, passing in addrBase...
-            // WIP...
+            await CONST.web3_tx('addSecTokenType', [ 'CFT-Base1',  CONST.settlementType.SPOT, CONST.nullFutureArgs, addrBase1 ], O.addr, O.privKey);
+            await CONST.web3_tx('addSecTokenType', [ 'CFT-Base2',  CONST.settlementType.SPOT, CONST.nullFutureArgs, addrBase2 ], O.addr, O.privKey);
             break;
+
+                // todo -- post-deployment tests, for (a) query-types and (b) query split ledger...
 
         case 'CASHFLOW':
             // deploy an unattached base CASHFLOW contract

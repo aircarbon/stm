@@ -10,7 +10,7 @@ const { db } = require('../../common/dist');
 module.exports = {
 
     Deploy: async (p) => {
-        const { deployer, artifacts, contractType } = p; 
+        const { deployer, artifacts, contractType, nameOverride } = p; 
         var stmAddr;
         //const contractType = process.env.CONTRACT_TYPE;
         if (contractType != "CASHFLOW" && contractType != "CASHFLOW_CONTROLLER" && contractType != "COMMODITY") throw ('Unknown contractType');
@@ -71,7 +71,7 @@ module.exports = {
             //console.log('cashflowArgs', CONST.contractProps[type].cashflowArgs);
             
             //return 
-            const contractName = `${process.env.CONTRACT_PREFIX}${CONST.contractProps[contractType].contractName}`;
+            const contractName = `${process.env.CONTRACT_PREFIX}${nameOverride || CONST.contractProps[contractType].contractName}`;
             stmAddr = await deployer.deploy(StMaster,
                 contractType == "CASHFLOW"            ? CONST.contractType.CASHFLOW :
                 contractType == "CASHFLOW_CONTROLLER" ? CONST.contractType.CASHFLOW_CONTROLLER :
@@ -82,7 +82,7 @@ module.exports = {
                 CONST.contractProps[contractType].contractUnit,
                 CONST.contractProps[contractType].contractSymbol,
                 CONST.contractProps[contractType].contractDecimals,
-                //CONST.chainlinkAggregators[process.env.NETWORK_ID].btcUsd,    // 24k
+              //CONST.chainlinkAggregators[process.env.NETWORK_ID].btcUsd,    // 24k
                 CONST.chainlinkAggregators[process.env.NETWORK_ID].ethUsd
             ).then(async stm => {
                 //console.dir(stm);
@@ -102,7 +102,7 @@ module.exports = {
                 const OWNER_privKey = accountAndKey.privKey;
                 // TODO: derive - an encryption key & salt [from contract name?] -> derivation code should be in a private repo (AWS lambda?)
                 // TODO: encrypt - privKey & display encrypted [for manual population of AWS secret, L1]
-                logEnv("DEPLOYMENT COMPLETE", OWNER, OWNER_privKey, contractType);
+                logEnv("DEPLOYMENT COMPLETE", OWNER, OWNER_privKey, contractType, contractName);
 
                 // save to DB
                 if (!deployer.network.includes("-fork")) {
@@ -140,8 +140,10 @@ module.exports = {
     }
 };
 
-function logEnv(phase, owner, ownerPrivKey, contractType) {
+function logEnv(phase, owner, ownerPrivKey, contractType, contractName) {
     console.log(chalk.black.bgWhite(phase));
+
+    console.log(chalk.red('\t                contractName: '), contractName);
     console.log(chalk.red('\t                contractType: '), contractType);
     console.log(chalk.red('\t process.env.CONTRACT_PREFIX: '), process.env.CONTRACT_PREFIX);
     console.log(chalk.red('\t      process.env.NETWORK_ID: '), process.env.NETWORK_ID);

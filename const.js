@@ -59,7 +59,7 @@ const contractProps = {
     },
     CASHFLOW: {
         contractVer: contractVer,
-        contractName: `SingDax_CFT-1A`,
+        contractName: `SDax_CFT`,
         contractUnit: "Token(s)",
         contractSymbol: "SD1A",
         contractDecimals: 0,
@@ -72,7 +72,7 @@ const contractProps = {
     },
     CASHFLOW_CONTROLLER: {
         contractVer: contractVer,
-        contractName: `SingDax_CFT-C`,
+        contractName: `SDax_CFT-C`,
         contractUnit: "N/A",
         contractSymbol: "SDCFTC",
         contractDecimals: 0,
@@ -129,8 +129,11 @@ module.exports = {
     getAccountAndKey: async (accountNdx, mnemonic) => getAccountAndKey(accountNdx, mnemonic),
 
     web3_sendEthTestAddr: (sendFromNdx, sendToAddr, ethValue) => web3_sendEthTestAddr(sendFromNdx, sendToAddr, ethValue),
-    web3_call: (methodName, methodArgs) => web3_call(methodName, methodArgs),
-    web3_tx: (methodName, methodArgs, fromAddr, fromPrivKey, returnBeforeConfirmed) => web3_tx(methodName, methodArgs, fromAddr, fromPrivKey, returnBeforeConfirmed),
+    web3_call: (methodName, methodArgs, nameOverride) => 
+        web3_call(methodName, methodArgs, nameOverride),
+    
+    web3_tx: (methodName, methodArgs, fromAddr, fromPrivKey, nameOverride) =>
+        web3_tx(methodName, methodArgs, fromAddr, fromPrivKey, nameOverride),
 
     consoleOutput: (enabled) => { consoleOutput = enabled; },
 
@@ -299,9 +302,9 @@ async function getAccountAndKey(accountNdx, mnemonic) {
     return { addr, privKey: privKeyHex };
 }
 
-async function web3_call(methodName, methodArgs) {
+async function web3_call(methodName, methodArgs, nameOverride) {
     const { web3, ethereumTxChain } = getTestContextWeb3();
-    const contractName = process.env.CONTRACT_PREFIX + contractProps[process.env.CONTRACT_TYPE].contractName;
+    const contractName = process.env.CONTRACT_PREFIX + (nameOverride || contractProps[process.env.CONTRACT_TYPE].contractName);
     const contractDb = (await db.GetDeployment(process.env.WEB3_NETWORK_ID, contractName, contractProps[process.env.CONTRACT_TYPE].contractVer)).recordset[0];
     if (!contractDb) throw(Error(`Failed to lookup contract deployment for networkId=${process.env.WEB3_NETWORK_ID}, contractName=${contractName}, contractVer=${contractProps[process.env.CONTRACT_TYPE].contractVer} from ${process.env.sql_server}`));
     if (consoleOutput) console.log(chalk.dim(` > CALL: [${contractDb.contract_enum} ${contractDb.contract_ver} @${contractDb.addr}] ${chalk.reset.blue.bgWhite(methodName + '(' + methodArgs.map(p => JSON.stringify(p)).join() + ')')}` + chalk.dim(` [networkId: ${process.env.WEB3_NETWORK_ID} - ${web3.currentProvider.host}]`)));
@@ -311,10 +314,10 @@ async function web3_call(methodName, methodArgs) {
     return callRet;
 }
 
-async function web3_tx(methodName, methodArgs, fromAddr, fromPrivKey, returnBeforeConfirmed) {
+async function web3_tx(methodName, methodArgs, fromAddr, fromPrivKey, nameOverride) {
     const { web3, ethereumTxChain } = getTestContextWeb3();
-    const contractName = process.env.CONTRACT_PREFIX + contractProps[process.env.CONTRACT_TYPE].contractName;
-    const contractDb = (await db.GetDeployment(process.env.WEB3_NETWORK_ID, process.env.CONTRACT_PREFIX + contractProps[process.env.CONTRACT_TYPE].contractName, contractProps[process.env.CONTRACT_TYPE].contractVer)).recordset[0];
+    const contractName = process.env.CONTRACT_PREFIX + (nameOverride || contractProps[process.env.CONTRACT_TYPE].contractName);
+    const contractDb = (await db.GetDeployment(process.env.WEB3_NETWORK_ID, contractName, contractProps[process.env.CONTRACT_TYPE].contractVer)).recordset[0];
     if (!contractDb) throw(Error(`Failed to lookup contract deployment for networkId=${process.env.WEB3_NETWORK_ID}, contractName=${contractName}, contractVer=${contractProps[process.env.CONTRACT_TYPE].contractVer} from ${process.env.sql_server}`));
     var contract = new web3.eth.Contract(JSON.parse(contractDb.abi), contractDb.addr);
     if ((await contract.methods['version']().call()) != contractDb.contract_ver) throw('Deployed contract missing or version mismatch'); // test contract exists - will silently return null on calls if it's not deployed, wtf
@@ -344,7 +347,7 @@ async function web3_tx(methodName, methodArgs, fromAddr, fromPrivKey, returnBefo
     // tx data
     const msStart = Date.now();
     const nonce = await web3.eth.getTransactionCount(fromAddr, "pending");
-    if (consoleOutput) console.log(chalk.dim(` >   TX: nonce=${nonce} [${contractDb.contract_enum} ${contractDb.contract_ver} @${contractDb.addr}] ${chalk.reset.red.bgWhiteBright(methodName + '(' + methodArgs.map(p => JSON.stringify(p)).join() + ')')}` + chalk.dim(` [networkId: ${process.env.WEB3_NETWORK_ID} - ${web3.currentProvider.host}]`)));
+    if (consoleOutput) console.log(chalk.dim(` >   TX: [${contractDb.contract_enum} nonce=${nonce} ${contractDb.contract_ver} @${contractDb.addr}] ${chalk.reset.red.bgWhiteBright(methodName + '(' + methodArgs.map(p => JSON.stringify(p)).join() + ')')}` + chalk.dim(` [networkId: ${process.env.WEB3_NETWORK_ID} - ${web3.currentProvider.host}]`)));
     var paramsData = contract.methods
         [methodName](...methodArgs)
         .encodeABI();

@@ -15,6 +15,12 @@ import "./StFutures.sol";
 
 import "../Interfaces/StructLib.sol";
 
+/*
+JUN 2020
+TODO: I found that event TradedCcyTok, is saving parameter tokTypeId . It should be tokenTypeId to keep consistency on names.
+TODO: ... CFT refactor...
+*/
+
 //
 // truffle deploy using "infinite" gas?
 // bytecode limit (24576): https://github.com/trufflesuite/ganache/issues/960

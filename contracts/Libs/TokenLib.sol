@@ -36,14 +36,17 @@ library TokenLib {
         address payable cashflowBaseAddr
     )
     public {
-        // allow any number of cashflow-base (indirect) types on cashflow-controller contract
-        // (todo - probably should allow direct futures-settlement type on cashflow-controller; these are centralised i.e. can't be withdrawn, so don't need separate base contracts)
-        // allow only a single direct type on cashflow-base contract
-        // allow any number of of direct types on commodity contract
-        require((ld.contractType == StructLib.ContractType.COMMODITY           && bytes(name).length > 0 && cashflowBaseAddr == address(0x0)) ||
-                (ld.contractType == StructLib.ContractType.CASHFLOW            && bytes(name).length > 0 && cashflowBaseAddr == address(0x0) && std._tt_Count == 0) ||
-                (ld.contractType == StructLib.ContractType.CASHFLOW_CONTROLLER && bytes(name).length == 0 && cashflowBaseAddr != address(0x0))
+
+        // * allow any number of of direct spot or future types on commodity contract
+        // * allow only a single direct spot type on cashflow-base contract
+        // * allow any number of cashflow-base (indirect) spot types on cashflow-controller contract
+        //   (todo - probably should allow direct futures-settlement type on cashflow-controller; these are centralised i.e. can't be withdrawn, so don't need separate base contracts)
+        require((ld.contractType == StructLib.ContractType.COMMODITY           && cashflowBaseAddr == address(0x0)) ||
+                (ld.contractType == StructLib.ContractType.CASHFLOW            && cashflowBaseAddr == address(0x0) && settlementType == StructLib.SettlementType.SPOT && std._tt_Count == 0) ||
+                (ld.contractType == StructLib.ContractType.CASHFLOW_CONTROLLER && cashflowBaseAddr != address(0x0) && settlementType == StructLib.SettlementType.SPOT)
                , "Bad cashflow request");
+
+        require(bytes(name).length > 0, "Invalid name");
 
         for (uint256 tokenTypeId = 1; tokenTypeId <= std._tt_Count; tokenTypeId++) {
             require(keccak256(abi.encodePacked(std._tt_name[tokenTypeId])) != keccak256(abi.encodePacked(name)), "Duplicate name");
