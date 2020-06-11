@@ -94,7 +94,7 @@ module.exports = {
             // cashflow controller - holds ledger collateral, so ccy types only here
             const ccyTypes = (await CONST.web3_call('getCcyTypes', [], nameOverride)).ccyTypes;
             if (ccyTypes.length == 0) {
-                await CONST.web3_tx('addCcyType', [ 'USD', 'Cents',  2 ], O.addr, O.privKey, nameOverride);
+                await CONST.web3_tx('addCcyType', [ 'USD', 'cents',  2 ], O.addr, O.privKey, nameOverride);
                 await CONST.web3_tx('addCcyType', [ 'ETH', 'Wei',   18 ], O.addr, O.privKey, nameOverride);
             }
 

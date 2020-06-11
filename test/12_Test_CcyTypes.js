@@ -6,13 +6,17 @@ const setupHelper = require('../test/testSetupContract.js');
 contract("StMaster", accounts => {
     var stm;
 
-    const countDefaultCcyTypes = 3;
+    var DEF_CCY_TYPE_COUNT;
 
     before(async function () {
         stm = await st.deployed();
-        if (await stm.getContractType() == CONST.contractType.CASHFLOW) this.skip();
+        const contractType = await stm.getContractType();
+        if (contractType == CONST.contractType.CASHFLOW) this.skip();
+
         await stm.sealContract();
         await setupHelper.setDefaults({ stm, accounts });
+        DEF_CCY_TYPE_COUNT = contractType == CONST.contractType.COMMODITY ? 3 : 2;
+        
         if (!global.TaddrNdx) global.TaddrNdx = 0;
     });
 
@@ -24,7 +28,7 @@ contract("StMaster", accounts => {
 
     it(`ccy types - should have correct default (ID 1-based) values`, async () => {
         const types = (await stm.getCcyTypes()).ccyTypes;
-        assert(types.length == countDefaultCcyTypes, 'unexpected default ccy type count');
+        assert(types.length == DEF_CCY_TYPE_COUNT, 'unexpected default ccy type count');
 
         assert(types[0].name == 'USD', 'unexpected default ccy type name 1');
         assert(types[0].unit == 'cents', 'unexpected default ccy type unit 1');
@@ -41,9 +45,9 @@ contract("StMaster", accounts => {
         const types = (await stm.getCcyTypes()).ccyTypes;
 
         const newTypeId = types.filter(p => p.name == 'TEST_COIN')[0].id;
-        assert(types.filter(p => p.name == 'TEST_COIN')[0].id == countDefaultCcyTypes + 1, 'unexpected/missing new currency type id');
+        assert(types.filter(p => p.name == 'TEST_COIN')[0].id == DEF_CCY_TYPE_COUNT + 1, 'unexpected/missing new currency type id');
         assert(types.filter(p => p.name == 'TEST_COIN')[0].unit == 'TEST_UNIT', 'unexpected/missing new currency type unit');
-        truffleAssert.eventEmitted(addCcyTx, 'AddedCcyType', ev => ev.id == countDefaultCcyTypes + 1 && ev.name == 'TEST_COIN' && ev.unit == 'TEST_UNIT');
+        truffleAssert.eventEmitted(addCcyTx, 'AddedCcyType', ev => ev.id == DEF_CCY_TYPE_COUNT + 1 && ev.name == 'TEST_COIN' && ev.unit == 'TEST_UNIT');
 
         // validate ledger entry (non-existent) has the new type
         const ledgerEntryAfter = await stm.getLedgerEntry(accounts[global.TaddrNdx]);

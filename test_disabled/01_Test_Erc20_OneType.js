@@ -9,9 +9,11 @@ contract("StMaster", accounts => {
 
     var WHITE, GRAY_1, GRAY_2, NDX_GRAY_1, NDX_GRAY_2;
 
+    // ERC20 -- applies directly to CFT-B, and COMMODITY (not CFT-C)
+
     before(async function () {
         stm = await st.deployed();
-        if (await stm.getContractType() == CONST.contractType.CASHFLOW) this.skip();
+        if (await stm.getContractType() == CONST.contractType.CASHFLOW_CONTROLLER) this.skip();
 
         if (!global.TaddrNdx) global.TaddrNdx = 0;   // whitelist (exchange) test addr; managed by tests
         if (!global.XaddrNdx) global.XaddrNdx = 800; // graylist (erc20) test addr; managed by tests

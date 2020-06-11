@@ -11,7 +11,7 @@ contract("StMaster", accounts => {
 
     before(async function () {
         stm = await st.deployed();
-        if (await stm.getContractType() == CONST.contractType.CASHFLOW) this.skip();
+        if (await stm.getContractType() == CONST.contractType.CASHFLOW_CONTROLLER) this.skip();
 
         if (!global.TaddrNdx) global.TaddrNdx = 0;   // whitelist (exchange) test addr; managed by tests
         if (!global.XaddrNdx) global.XaddrNdx = 800; // graylist (erc20) test addr; managed by tests

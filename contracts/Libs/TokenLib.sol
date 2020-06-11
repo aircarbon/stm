@@ -70,8 +70,6 @@ library TokenLib {
         std._tt_Count++;
 
         if (cashflowBaseAddr != address(0x0)) {
-            // TODO: try a fixed-len name32 property, and reading from that...
-            
             // add cashflow (base, indirect) contract type to cashflow-controller contract
             //StMaster base = StMaster(cashflowBaseAddr);
             //string memory s0 = base.name;

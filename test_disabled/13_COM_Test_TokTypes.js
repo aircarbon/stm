@@ -6,13 +6,15 @@ const setupHelper = require('../test/testSetupContract.js');
 contract("StMaster", accounts => {
     var stm;
 
-    const countDefaultSecSecTokenTypes = 3;
+    const DEF_SEC_TOKEN_COUNT = 3;
 
     before(async function () {
         stm = await st.deployed();
-        if (await stm.getContractType() == CONST.contractType.CASHFLOW) this.skip();
+        const contractType = await stm.getContractType();
+        if (contractType != CONST.contractType.COMMODITY) this.skip();
         await stm.sealContract();
         await setupHelper.setDefaults({ stm, accounts });
+
         if (!global.TaddrNdx) global.TaddrNdx = 0;
     });
 
@@ -24,24 +26,24 @@ contract("StMaster", accounts => {
 
     it(`token types - should have correct default values`, async () => {
         const types = (await stm.getSecTokenTypes()).tokenTypes;
-        assert(types.length == countDefaultSecSecTokenTypes, 'unexpected default eeu type count');
+        assert(types.length == DEF_SEC_TOKEN_COUNT, 'unexpected default type count');
 
-        assert(types[0].name == 'AirCarbon CORSIA Token', `unexpected default eeu type name 1`);
-        assert(types[0].id == 1, 'unexpected default eeu type id 1');
+        assert(types[0].name == 'AirCarbon CORSIA Token', `unexpected default type name 1`);
+        assert(types[0].id == 1, 'unexpected default type id 1');
 
-        assert(types[1].name== 'AirCarbon Nature Token', `unexpected default eeu type name 2`);
-        assert(types[1].id == 2, 'unexpected default eeu type id 2');
+        assert(types[1].name== 'AirCarbon Nature Token', `unexpected default type name 2`);
+        assert(types[1].id == 2, 'unexpected default type id 2');
 
-        assert(types[2].name== 'AirCarbon Premium Token', `unexpected default eeu type name 3`);
-        assert(types[2].id == 3, 'unexpected default eeu type id 3');
+        assert(types[2].name== 'AirCarbon Premium Token', `unexpected default type name 3`);
+        assert(types[2].id == 3, 'unexpected default type id 3');
     });
 
     it(`token types - should be able to use newly added ST types`, async () => {
         // add new ST type
         const addSecTokenTx = await stm.addSecTokenType('NEW_TYPE_NAME_2', CONST.settlementType.SPOT, CONST.nullFutureArgs, CONST.nullAddr);
         const types = (await stm.getSecTokenTypes()).tokenTypes;
-        assert(types.filter(p => p.name == 'NEW_TYPE_NAME_2')[0].id == countDefaultSecSecTokenTypes + 1, 'unexpected/missing new eeu type (2)');
-        truffleAssert.eventEmitted(addSecTokenTx, 'AddedSecTokenType', ev => ev.id == countDefaultSecSecTokenTypes + 1 && ev.name == 'NEW_TYPE_NAME_2');
+        assert(types.filter(p => p.name == 'NEW_TYPE_NAME_2')[0].id == DEF_SEC_TOKEN_COUNT + 1, 'unexpected/missing new eeu type (2)');
+        truffleAssert.eventEmitted(addSecTokenTx, 'AddedSecTokenType', ev => ev.id == DEF_SEC_TOKEN_COUNT + 1 && ev.name == 'NEW_TYPE_NAME_2');
 
         // get new type id
         const newTypeId = types.filter(p => p.name == 'NEW_TYPE_NAME_2')[0].id;
