@@ -67,7 +67,7 @@ module.exports = {
             // set default exchange fee
             await CONST.web3_tx('setFee_CcyType', [ CONST.ccyType.USD, CONST.nullAddr, {...CONST.nullFees, ccy_perMillion: 300, ccy_mirrorFee: true, fee_min: 300 } ], O.addr, O.privKey);
 
-            // owner ledger entry
+            // create owner ledger entry
             await CONST.web3_tx('fund', [CONST.ccyType.USD, 0, O.addr], O.addr, O.privKey); 
         }
         else if (await CONST.web3_call('getContractType', [], nameOverride) == CONST.contractType.CASHFLOW) {
@@ -82,7 +82,7 @@ module.exports = {
             // base cashflow - does not track collateral, no ccy types at all
             ;
             
-            // owner ledger entry
+            // create owner ledger entry
             await CONST.web3_tx('setFee_TokType', [ 1, O.addr, CONST.nullFees ], O.addr, O.privKey, nameOverride);
         }
         else if (await CONST.web3_call('getContractType', [], nameOverride) == CONST.contractType.CASHFLOW_CONTROLLER) {
@@ -98,7 +98,7 @@ module.exports = {
                 await CONST.web3_tx('addCcyType', [ 'ETH', 'Wei',   18 ], O.addr, O.privKey, nameOverride);
             }
 
-            // owner ledger entry
+            // create owner ledger entry
             await CONST.web3_tx('setFee_CcyType', [ 1, O.addr, CONST.nullFees ], O.addr, O.privKey, nameOverride);
         }
         

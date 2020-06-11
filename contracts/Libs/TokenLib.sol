@@ -70,13 +70,15 @@ library TokenLib {
         std._tt_Count++;
 
         if (cashflowBaseAddr != address(0x0)) {
+            // TODO: try a fixed-len name32 property, and reading from that...
+            
             // add cashflow (base, indirect) contract type to cashflow-controller contract
             //StMaster base = StMaster(cashflowBaseAddr);
             //string memory s0 = base.name;
             //strings.slice memory s = "asd".toSlice();
             //string memory ss = s.toString();
             //string storage baseName = base.name;
-            std._tt_name[std._tt_Count] = "TODO: no (var-len) strings can be read from base..."; // https://ethereum.stackexchange.com/questions/3727/contract-reading-a-string-returned-by-another-contract
+            std._tt_name[std._tt_Count] = name; // https://ethereum.stackexchange.com/questions/3727/contract-reading-a-string-returned-by-another-contract
             std._tt_settle[std._tt_Count] = settlementType;
             std._tt_addr[std._tt_Count] = cashflowBaseAddr;
         }

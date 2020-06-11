@@ -8,7 +8,7 @@ module.exports = {
 
     //
     // Initializes deployed contract with default values (currencies, spot token-types, and global commodity exchange fee)
-    // (truffle version)
+    // (truffle version -- see devSetupContract.js for master web3 implementation)
     //
     setDefaults: async (a) => {
         const { stm, accounts,
@@ -16,6 +16,7 @@ module.exports = {
 
         // setup default currencies and spot token types
         if (await stm.getContractType() == CONST.contractType.COMMODITY) {
+            console.log('truffle setDefaults (COMMODITY)...');
             const spotTypes = (await stm.getSecTokenTypes()).tokenTypes.filter(p => p.settlementType == CONST.settlementType.SPOT);
             if (spotTypes.length == 0) {
                 await stm.addSecTokenType(`AirCarbon CORSIA Token`, CONST.settlementType.SPOT, CONST.nullFutureArgs, CONST.nullAddr);
@@ -33,19 +34,25 @@ module.exports = {
             stm.setFee_CcyType(CONST.ccyType.USD, CONST.nullAddr, {...CONST.nullFees, ccy_perMillion: 300, ccy_mirrorFee: true, fee_min: 300 } );
         }
         else if (await stm.getContractType() == CONST.contractType.CASHFLOW) {
+            console.log('truffle setDefaults (CASHFLOW)...');
             const spotTypes = (await stm.getSecTokenTypes()).tokenTypes.filter(p => p.settlementType == CONST.settlementType.SPOT);
             if (spotTypes.length == 0) {
                 await stm.addSecTokenType(`UNI_TOKEN`, CONST.settlementType.SPOT, CONST.nullFutureArgs, CONST.nullAddr);
             }
-
+            stm.setFee_TokType(1, accounts[0], CONST.nullFees);
+        }
+        else if (await stm.getContractType() == CONST.contractType.CASHFLOW_CONTROLLER) {
+            console.log('truffle setDefaults (CASHFLOW_CONTROLLER)...');
             const ccyTypes = (await stm.getCcyTypes()).ccyTypes;
             if (ccyTypes.length == 0) {
+                await stm.addCcyType('USD', 'cents', 2);
                 await stm.addCcyType('ETH', 'Wei', 18);
             }
+            stm.setFee_CcyType(CONST.ccyType.USD, CONST.nullAddr, CONST.nullFees);
         }
 
         // setup default owner ledger entry
-        await stm.fund(CONST.ccyType.USD, 0, accounts[0]);
+        //await stm.fund(CONST.ccyType.USD, 0, accounts[0]);
     },
 
     whitelistAndSeal: async (a) => {
