@@ -11,7 +11,7 @@ contract("StMaster", accounts => {
     before(async function () {
         stm = await st.deployed();
         const contractType = await stm.getContractType();
-        if (contractType != CONST.contractType.COMMODITY) this.skip();
+        if (await stm.getContractType() != CONST.contractType.COMMODITY) this.skip();
         await stm.sealContract();
         await setupHelper.setDefaults({ stm, accounts });
 
@@ -61,7 +61,7 @@ contract("StMaster", accounts => {
 
         // mint default ST type: 4 batches 
         for (var i=0 ; i < 4 ; i++) {
-            await stm.mintSecTokenBatch(CONST.tokenType.CORSIA, CONST.GT_CARBON * 100, 1, accounts[global.TaddrNdx], CONST.nullFees, 0, [], [], { from: accounts[0] });
+            await stm.mintSecTokenBatch(CONST.tokenType.TOK_T1, CONST.GT_CARBON * 100, 1, accounts[global.TaddrNdx], CONST.nullFees, 0, [], [], { from: accounts[0] });
         }
         const batchCountAfter_Mint2 = (await stm.getSecTokenBatchCount.call()).toNumber();
         assert(batchCountAfter_Mint2 == batchCountBefore + 6, `unexpected max batch id ${batchCountAfter_Mint2} after minting (2)`);
@@ -124,7 +124,7 @@ contract("StMaster", accounts => {
         try {
             await stm.addSecTokenType(`NEW_TYPE_NAME_${new Date().getTime()}`, CONST.settlementType.SPOT, { ...CONST.nullFutureArgs, 
                 expiryTimestamp: 0,
-                underlyerTypeId: CONST.tokenType.CORSIA,
+                underlyerTypeId: CONST.tokenType.TOK_T1,
                        refCcyId: 0
             }, CONST.nullAddr, { from: accounts[0] });
         } catch (ex) { 

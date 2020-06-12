@@ -21,7 +21,7 @@ contract("StMaster", accounts => {
 
     before(async function () {
         stm = await st.deployed();
-        if (await stm.getContractType() == CONST.contractType.CASHFLOW) this.skip();
+        if (await stm.getContractType() != CONST.contractType.COMMODITY) this.skip();
         
         await setupHelper.whitelistAndSeal({ stm, accounts });
         await setupHelper.setDefaults({ stm, accounts });
@@ -178,7 +178,7 @@ contract("StMaster", accounts => {
     it(`FT init margin override - should not be able to override initial margin for an invalid (non-future) token type`, async () => {
         const A = accounts[global.TaddrNdx]; await stm.fund(CONST.ccyType.USD, 100, A);
         try {
-            const x = await stm.initMarginOverride(CONST.tokenType.CORSIA, A, 1002);
+            const x = await stm.initMarginOverride(CONST.tokenType.TOK_T1, A, 1002);
         }
         catch (ex) { assert(ex.reason == 'Bad token settlement type', `unexpected: ${ex.reason}`); return; }
         assert.fail('expected contract exception');

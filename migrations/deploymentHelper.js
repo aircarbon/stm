@@ -73,7 +73,7 @@ module.exports = {
             //return 
             const contractName = `${process.env.CONTRACT_PREFIX}${nameOverride || CONST.contractProps[contractType].contractName}`;
             stmAddr = await deployer.deploy(StMaster,
-                contractType == "CASHFLOW"            ? CONST.contractType.CASHFLOW :
+                contractType == "CASHFLOW"            ? CONST.contractType.CASHFLOW_BASE :
                 contractType == "CASHFLOW_CONTROLLER" ? CONST.contractType.CASHFLOW_CONTROLLER :
                                                         CONST.contractType.COMMODITY,
                 CONST.contractProps[contractType].cashflowArgs,

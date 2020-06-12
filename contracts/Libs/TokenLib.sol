@@ -1,4 +1,5 @@
-pragma solidity >=0.4.21 <=0.6.6;
+// SPDX-License-Identifier: AGPL-3.0-only
+pragma solidity >=0.4.21 <=0.6.10;
 pragma experimental ABIEncoderV2;
 
 import "../Interfaces/StructLib.sol";
@@ -42,7 +43,7 @@ library TokenLib {
         // * allow any number of cashflow-base (indirect) spot types on cashflow-controller contract
         //   (todo - probably should allow direct futures-settlement type on cashflow-controller; these are centralised i.e. can't be withdrawn, so don't need separate base contracts)
         require((ld.contractType == StructLib.ContractType.COMMODITY           && cashflowBaseAddr == address(0x0)) ||
-                (ld.contractType == StructLib.ContractType.CASHFLOW            && cashflowBaseAddr == address(0x0) && settlementType == StructLib.SettlementType.SPOT && std._tt_Count == 0) ||
+                (ld.contractType == StructLib.ContractType.CASHFLOW_BASE       && cashflowBaseAddr == address(0x0) && settlementType == StructLib.SettlementType.SPOT && std._tt_Count == 0) ||
                 (ld.contractType == StructLib.ContractType.CASHFLOW_CONTROLLER && cashflowBaseAddr != address(0x0) && settlementType == StructLib.SettlementType.SPOT)
                , "Bad cashflow request");
 
@@ -165,7 +166,7 @@ library TokenLib {
         require(a.origTokFee.ccy_mirrorFee == false, "ccy_mirrorFee unsupported for token-type fee");
         require(a.origCcyFee_percBips_ExFee <= 10000, "Bad fee args");
 
-        if (ld.contractType == StructLib.ContractType.CASHFLOW)
+        if (ld.contractType == StructLib.ContractType.CASHFLOW_BASE) // CFT: uni-batch
             require(ld._batches_currentMax_id == 0, "Bad cashflow request");
 
         // ### string[] param lengths are reported as zero!
@@ -176,6 +177,7 @@ library TokenLib {
             require(bytes(metaKeys[i]).length == 0 || bytes(metaValues[i]).length == 0, "Zero-length metadata key or value supplied");
         }*/
 
+        // create batch (for all contract types, i.e. batch is duplicated/denormalized in cashflow base)
         StructLib.SecTokenBatch memory newBatch = StructLib.SecTokenBatch({
                          id: ld._batches_currentMax_id + 1,
             mintedTimestamp: block.timestamp,
@@ -190,29 +192,43 @@ library TokenLib {
         });
         ld._batches[newBatch.id] = newBatch;
         ld._batches_currentMax_id++;
-        emit Minted(newBatch.id, a.tokenTypeId, a.batchOwner, uint256(a.mintQty), uint256(a.mintSecTokenCount));
+        if (ld.contractType != StructLib.ContractType.CASHFLOW_BASE) { // emit batch event (core & cashflow controller)
+            emit Minted(newBatch.id, a.tokenTypeId, a.batchOwner, uint256(a.mintQty), uint256(a.mintSecTokenCount));
+        }
 
         // create ledger entry as required
         StructLib.initLedgerIfNew(ld, a.batchOwner);
 
-        // mint & assign STs
-        for (int256 ndx = 0; ndx < a.mintSecTokenCount; ndx++) {
-            uint256 newId = ld._tokens_currentMax_id + 1 + uint256(ndx);
+        // mint & assign STs (delegate to cashflow base in cashflow controller)
+        if (ld.contractType == StructLib.ContractType.CASHFLOW_CONTROLLER) { // CFT-C: passthrough to base
+            require(std._tt_addr[a.tokenTypeId] != address(0x0), "Bad cashflow request");
+            StMaster base = StMaster(std._tt_addr[a.tokenTypeId]);
+            base.mintSecTokenBatch(
+                1, //a.tokenTypeId, ==> maps to base typeId=1 (always: base is uni-type internally)
+                a.mintQty,
+                a.mintSecTokenCount,
+                a.batchOwner,
+                a.origTokFee,
+                a.origCcyFee_percBips_ExFee,
+                a.metaKeys,
+                a.metaValues
+            );
+        }
+        else {
+            for (int256 ndx = 0; ndx < a.mintSecTokenCount; ndx++) {
+                uint256 newId = ld._tokens_currentMax_id + 1 + uint256(ndx);
+                int64 stQty = int64(a.mintQty) / int64(a.mintSecTokenCount);
+                ld._sts[newId].batchId = uint64(newBatch.id);
+                ld._sts[newId].mintedQty = stQty;
+                ld._sts[newId].currentQty = stQty; // mint ST
 
-            // mint ST
-            int64 stQty = int64(a.mintQty) / int64(a.mintSecTokenCount);
-            ld._sts[newId].batchId = uint64(newBatch.id);
-            ld._sts[newId].mintedQty = stQty;
-            ld._sts[newId].currentQty = stQty;
-
-            emit MintedSecToken(newId, newBatch.id, a.tokenTypeId, a.batchOwner, uint256(stQty));
-
-            // assign ST to ledger
-            ld._ledger[a.batchOwner].tokenType_stIds[a.tokenTypeId].push(newId);
+                emit MintedSecToken(newId, newBatch.id, a.tokenTypeId, a.batchOwner, uint256(stQty));
+                ld._ledger[a.batchOwner].tokenType_stIds[a.tokenTypeId].push(newId); // assign ST to ledger
+            }
         }
 
+        // update totals and current/max STID (CFT-C: common/max values across all types, CFT-B: local/specific values for single type)
         ld._tokens_currentMax_id += uint256(a.mintSecTokenCount);
-
         ld._spot_totalMintedQty += uint256(a.mintQty);
         ld._ledger[a.batchOwner].spot_sumQtyMinted += uint256(a.mintQty);
     }

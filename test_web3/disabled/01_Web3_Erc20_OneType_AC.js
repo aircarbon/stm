@@ -67,13 +67,13 @@ describe(`Contract Web3 Interface`, async () => {
         // setup - mint for A
         //for (var i=0 ; i < 10 ; i++) {
             await CONST.web3_tx('mintSecTokenBatch', [
-                CONST.tokenType.NATURE,    100000, 1,      WHITE, CONST.nullFees, 0, [], [],
+                CONST.tokenType.TOK_T2,    100000, 1,      WHITE, CONST.nullFees, 0, [], [],
             ], OWNER, OWNER_privKey);
 
             // setup - transferOrTrade A -> GRAY_1 (withdraw)
             await CONST.web3_tx('transferOrTrade', [ {
                     ledger_A: WHITE,                               ledger_B: GRAY_1,
-                       qty_A: 100000,                         tokenTypeId_A: CONST.tokenType.NATURE,
+                       qty_A: 100000,                         tokenTypeId_A: CONST.tokenType.TOK_T2,
                        qty_B: 0,                              tokenTypeId_B: 0,
                 ccy_amount_A: 0,                                ccyTypeId_A: 0,
                 ccy_amount_B: 0,                                ccyTypeId_B: 0,

@@ -1,4 +1,5 @@
-pragma solidity >=0.4.21 <=0.6.6;
+// SPDX-License-Identifier: AGPL-3.0-only
+pragma solidity >=0.4.21 <=0.6.10;
 pragma experimental ABIEncoderV2;
 
 import "../Interfaces/StructLib.sol";
@@ -20,7 +21,7 @@ library CcyLib {
                 ld.contractType == StructLib.ContractType.CASHFLOW_CONTROLLER, "Bad cashflow request"); // disallow ccy's on base cashflow contract
 
         // require(ld.contractType == StructLib.ContractType.COMMODITY ||
-        //        (ld.contractType == StructLib.ContractType.CASHFLOW && ctd._ct_Count == 0), "Bad cashflow request"); // only allow single ccy-type for cashflow contract
+        //        (ld.contractType == StructLib.ContractType.CASHFLOW_BASE && ctd._ct_Count == 0), "Bad cashflow request"); // only allow single ccy-type for cashflow contract
         require(ctd._ct_Count < 32/*MAX_CCYS*/, "Too many currencies");
 
         for (uint256 ccyTypeId = 1; ccyTypeId <= ctd._ct_Count; ccyTypeId++) {

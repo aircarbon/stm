@@ -10,7 +10,7 @@ contract("StMaster", accounts => {
 
     before(async function () {
         stm = await st.deployed();
-        if (await stm.getContractType() == CONST.contractType.CASHFLOW) this.skip();
+        if (await stm.getContractType() != CONST.contractType.COMMODITY) this.skip();
         if (!global.TaddrNdx) global.TaddrNdx = 0;
         
         await setupHelper.whitelistAndSeal({ stm, accounts });
@@ -28,7 +28,7 @@ contract("StMaster", accounts => {
         const A = accounts[global.TaddrNdx + 0]
         const B = accounts[global.TaddrNdx + 1]
         await stm.fund(CONST.ccyType.USD,                      CONST.millionCcy_cents,  A,                            { from: accounts[0] });
-        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.MT_CARBON,  1,     B, CONST.nullFees, 0, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2,    CONST.MT_CARBON,  1,     B, CONST.nullFees, 0, [], [], { from: accounts[0] });
 
         // set global fee: ccy 3.00 /per Million qty received
         const ccy_perMillion = 300; // $3
@@ -47,7 +47,7 @@ contract("StMaster", accounts => {
             const data = await transferHelper.transferLedger({ stm, accounts,
                     ledger_A: A,                                         ledger_B: B,
                        qty_A: 0,                                    tokenTypeId_A: 0,
-                       qty_B: transferAmountTok,                    tokenTypeId_B: CONST.tokenType.NATURE,
+                       qty_B: transferAmountTok,                    tokenTypeId_B: CONST.tokenType.TOK_T2,
                 ccy_amount_A: transferAmountCcy,                      ccyTypeId_A: CONST.ccyType.USD,
                 ccy_amount_B: 0,                                      ccyTypeId_B: 0,
                    applyFees: true,
@@ -63,7 +63,7 @@ contract("StMaster", accounts => {
     it(`fees (ccy per million received) - apply USD ccy fee 3 USD/1m tokens received on trades (0.1KT, 1KT, 1.5KT, 11KT) (global fee on B)`, async () => {
         const A = accounts[global.TaddrNdx + 0]
         const B = accounts[global.TaddrNdx + 1]
-        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.MT_CARBON,  1,     A, CONST.nullFees, 0, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2,    CONST.MT_CARBON,  1,     A, CONST.nullFees, 0, [], [], { from: accounts[0] });
         await stm.fund(CONST.ccyType.USD,                      CONST.millionCcy_cents,  B,                            { from: accounts[0] });
 
         // set global fee: ccy 3.00 /per Million qty received
@@ -82,7 +82,7 @@ contract("StMaster", accounts => {
             //console.log('expectedFeeCcy', expectedFeeCcy);
             const data = await transferHelper.transferLedger({ stm, accounts,
                     ledger_A: A,                                         ledger_B: B,
-                       qty_A: transferAmountTok,                    tokenTypeId_A: CONST.tokenType.NATURE,
+                       qty_A: transferAmountTok,                    tokenTypeId_A: CONST.tokenType.TOK_T2,
                        qty_B: 0,                                    tokenTypeId_B: 0,
                 ccy_amount_A: 0,                                      ccyTypeId_A: 0,
                 ccy_amount_B: transferAmountCcy,                      ccyTypeId_B: CONST.ccyType.USD,
@@ -100,7 +100,7 @@ contract("StMaster", accounts => {
         const A = accounts[global.TaddrNdx + 0]
         const B = accounts[global.TaddrNdx + 1]
         await stm.fund(CONST.ccyType.USD,                      CONST.millionCcy_cents,  A,                            { from: accounts[0] });
-        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.MT_CARBON,  1,     B, CONST.nullFees, 0, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2,    CONST.MT_CARBON,  1,     B, CONST.nullFees, 0, [], [], { from: accounts[0] });
 
         // set global fee: ccy 3.00 /per Million qty received
         const setExchangeFeeTx = await stm.setFee_CcyType(CONST.ccyType.USD, CONST.nullAddr, { ccy_mirrorFee: false, ccy_perMillion: 300, fee_fixed: 0, fee_percBips: 0, fee_min: 0, fee_max: 0 } );
@@ -120,7 +120,7 @@ contract("StMaster", accounts => {
             const data = await transferHelper.transferLedger({ stm, accounts,
                     ledger_A: A,                                         ledger_B: B,
                        qty_A: 0,                                    tokenTypeId_A: 0,
-                       qty_B: transferAmountTok,                    tokenTypeId_B: CONST.tokenType.NATURE,
+                       qty_B: transferAmountTok,                    tokenTypeId_B: CONST.tokenType.TOK_T2,
                 ccy_amount_A: transferAmountCcy,                      ccyTypeId_A: CONST.ccyType.USD,
                 ccy_amount_B: 0,                                      ccyTypeId_B: 0,
                    applyFees: true,
@@ -136,7 +136,7 @@ contract("StMaster", accounts => {
     it(`fees (ccy per million received) - apply ledger override USD ccy fee 6 USD/1m tokens received, max USD 60, min USD 1, on trades (0.1KT, 1KT, 1.5KT, 11KT) (ledger fee on B)`, async () => {
         const A = accounts[global.TaddrNdx + 0]
         const B = accounts[global.TaddrNdx + 1]
-        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.MT_CARBON,  1,     A, CONST.nullFees, 0, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2,    CONST.MT_CARBON,  1,     A, CONST.nullFees, 0, [], [], { from: accounts[0] });
         await stm.fund(CONST.ccyType.USD,                      CONST.millionCcy_cents,  B,                            { from: accounts[0] });
 
         // set global fee: ccy 3.00 /per Million qty received
@@ -156,7 +156,7 @@ contract("StMaster", accounts => {
             //console.log('expectedFeeCcy', expectedFeeCcy);
             const data = await transferHelper.transferLedger({ stm, accounts,
                     ledger_A: A,                                         ledger_B: B,
-                       qty_A: transferAmountTok,                    tokenTypeId_A: CONST.tokenType.NATURE,
+                       qty_A: transferAmountTok,                    tokenTypeId_A: CONST.tokenType.TOK_T2,
                        qty_B: 0,                                    tokenTypeId_B: 0,
                 ccy_amount_A: 0,                                      ccyTypeId_A: 0,
                 ccy_amount_B: transferAmountCcy,                      ccyTypeId_B: CONST.ccyType.USD,

@@ -1,4 +1,5 @@
-pragma solidity >=0.4.21 <=0.6.6;
+// SPDX-License-Identifier: AGPL-3.0-only
+pragma solidity >=0.4.21 <=0.6.10;
 pragma experimental ABIEncoderV2;
 
 library StructLib {
@@ -70,7 +71,7 @@ library StructLib {
     }
 
     // CONTRACT TYPE
-    enum ContractType { COMMODITY, CASHFLOW, CASHFLOW_CONTROLLER }
+    enum ContractType { COMMODITY, CASHFLOW_BASE, CASHFLOW_CONTROLLER }
 
     // CCY TYPES
     struct Ccy {
@@ -105,7 +106,7 @@ library StructLib {
         mapping(uint256 => string)              _tt_name;       // typeId (1-based) -> typeName
         mapping(uint256 => SettlementType)      _tt_settle;
         mapping(uint256 => FutureTokenTypeArgs) _tt_ft;
-        mapping(uint256 => address)             _tt_addr;       // cashflow base
+        mapping(uint256 => address payable)     _tt_addr;       // cashflow base
         uint256 _tt_Count;
     }
         struct FutureTokenTypeArgs {
@@ -269,10 +270,10 @@ library StructLib {
         CashflowArgs args;
         uint256      wei_currentPrice;      // current subscription price, in wei per token; or
         uint256      cents_currentPrice;    // current subscription price, in USD cents per token
-        uint256      qty_issuanceMax;       // the amount minted in the issuance monobatch
-        uint256      qty_issuanceRemaining; // the amount remaining unsold of the issuance monobatch
-        uint256      qty_issuanceSold;      // the amount sold of the issuance monobatch
-        uint256      qty_saleAllocation;    // the amount of the issuance monobatch that is available for sale
+        uint256      qty_issuanceMax;       // the amount minted in the issuance uni-batch
+        uint256      qty_issuanceRemaining; // the amount remaining unsold of the issuance uni-batch
+        uint256      qty_issuanceSold;      // the amount sold of the issuance uni-batch
+        uint256      qty_saleAllocation;    // the amount of the issuance uni-batch that is available for sale
 
         //uint256      issued_Blk;         // issuance (start) block no
         // --> wei_totIssued

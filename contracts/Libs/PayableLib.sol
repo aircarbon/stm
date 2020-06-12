@@ -1,4 +1,5 @@
-pragma solidity >=0.4.21 <=0.6.6;
+// SPDX-License-Identifier: AGPL-3.0-only
+pragma solidity >=0.4.21 <=0.6.10;
 pragma experimental ABIEncoderV2;
 
 import "../Interfaces/StructLib.sol";
@@ -38,7 +39,7 @@ library PayableLib {
         require(msg.sender == issueBatch.originator, "Bad cashflow request: access denied");
 
         // qty_saleAllocation is the *cummulative* amount allowable for sale;
-        // i.e. it can't be set < the currently sold amount, and it can't be set > the total issuance monobatch size
+        // i.e. it can't be set < the currently sold amount, and it can't be set > the total issuance uni-batch size
         StructLib.CashflowStruct memory current = getCashflowData(ld, cashflowData);
         require(qty_saleAllocation <= current.qty_issuanceMax, "Bad cashflow request: qty_saleAllocation too large");
         require(qty_saleAllocation >= current.qty_issuanceSold, "Bad cashflow request: qty_saleAllocation too small");
@@ -75,7 +76,7 @@ library PayableLib {
         int256 ethSat_UsdCents
     )
     public {
-        require(ld.contractType == StructLib.ContractType.CASHFLOW, "Bad commodity request");
+        require(ld.contractType == StructLib.ContractType.CASHFLOW_BASE, "Bad commodity request");
         require(ld._contractSealed, "Contract is not sealed");
         require(ld._batches_currentMax_id == 1, "Bad cashflow request: no minted batch");
         require(cashflowData.wei_currentPrice > 0 || cashflowData.cents_currentPrice > 0, "Bad cashflow request: no price set");
@@ -256,7 +257,7 @@ library PayableLib {
     public view returns(StructLib.CashflowStruct memory) {
         StructLib.CashflowStruct memory ret = cashflowData;
 
-        if (ld.contractType == StructLib.ContractType.CASHFLOW) {
+        if (ld.contractType == StructLib.ContractType.CASHFLOW_BASE) {
             if (ld._batches_currentMax_id == 1) {
                 StructLib.SecTokenBatch storage issueBatch = ld._batches[1]; // CFT: uni-batch
                 uint256[] storage issuer_stIds = ld._ledger[issueBatch.originator].tokenType_stIds[1]; // CFT: uni-type

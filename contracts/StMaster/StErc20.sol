@@ -1,7 +1,6 @@
-pragma solidity >=0.4.21 <=0.6.6;
+// SPDX-License-Identifier: AGPL-3.0-only
+pragma solidity >=0.4.21 <=0.6.10;
 pragma experimental ABIEncoderV2;
-
-//import "../Interfaces/IErc20.sol";
 
 import "./Owned.sol";
 import "./StLedger.sol";
@@ -15,9 +14,8 @@ import "../Libs/Erc20Lib.sol";
 /**
   * Manages ERC20 operations & data
   */
-contract StErc20 is StFees//, IErc20
+contract StErc20 is StFees
 {
-
     StructLib.Erc20Struct erc20d;
 
     // ERC20 - OPTIONAL

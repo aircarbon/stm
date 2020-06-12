@@ -1,4 +1,5 @@
-pragma solidity >=0.4.21 <=0.6.6;
+// SPDX-License-Identifier: AGPL-3.0-only
+pragma solidity >=0.4.21 <=0.6.10;
 pragma experimental ABIEncoderV2;
 
 import "./Owned.sol";
@@ -7,7 +8,7 @@ import "../Interfaces/StructLib.sol";
 import "../Libs/LedgerLib.sol";
 import "../Libs/TokenLib.sol";
 
-contract StLedger is //IStLedger,
+contract StLedger is
     Owned {
 
     StructLib.LedgerStruct ld;

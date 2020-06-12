@@ -1,7 +1,6 @@
-pragma solidity >=0.4.21 <=0.6.6;
+// SPDX-License-Identifier: AGPL-3.0-only
+pragma solidity >=0.4.21 <=0.6.10;
 pragma experimental ABIEncoderV2;
-
-//import "../Interfaces/IStFees.sol";
 
 import "./Owned.sol";
 import "./StLedger.sol";
@@ -13,7 +12,7 @@ import "../Libs/SpotFeeLib.sol";
 // NOTE: fees are applied ON TOP OF the supplied transfer amounts to the transfer() fn.
 //       i.e. transfer amounts are not inclusive of fees, they are additional
 //
-contract StFees is //IStFees,
+contract StFees is
     Owned, StLedger {
 
     enum GetFeeType { CCY, TOK }

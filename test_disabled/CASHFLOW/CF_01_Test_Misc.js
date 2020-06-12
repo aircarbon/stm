@@ -16,7 +16,7 @@ contract("StMaster", accounts => {
 
     before(async function () {
         stm = await st.deployed();
-        if (await stm.getContractType() != CONST.contractType.CASHFLOW) this.skip();
+        if (await stm.getContractType() != CONST.contractType.CASHFLOW_BASE) this.skip();
         await stm.sealContract();
         await setupHelper.setDefaults({ stm, accounts });
         if (!global.TaddrNdx) global.TaddrNdx = 0;
@@ -57,7 +57,7 @@ contract("StMaster", accounts => {
         assert.fail('expected contract exception');
     });
 
-    it(`cashflow - misc - should not allow any payments unless mono-batch has been minted to issuer`, async () => {
+    it(`cashflow - misc - should not allow any payments unless uni-batch has been minted to issuer`, async () => {
         try {
             await stm.send(web3.utils.toWei("0.00001", "ether"), { from: accounts[0] });
         } catch (ex) {

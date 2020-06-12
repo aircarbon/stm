@@ -11,7 +11,7 @@ contract("StMaster", accounts => {
 
     before(async function () {
         stm = await st.deployed();
-        if (await stm.getContractType() == CONST.contractType.CASHFLOW) this.skip();
+        if (await stm.getContractType() != CONST.contractType.COMMODITY) this.skip();
 
         if (!global.TaddrNdx) global.TaddrNdx = 0;
         
@@ -33,8 +33,8 @@ contract("StMaster", accounts => {
         //await stm.whitelist(A);
         //await stm.whitelist(B);
 
-        const tokType_A = CONST.tokenType.NATURE;
-        const tokType_B = CONST.tokenType.CORSIA;
+        const tokType_A = CONST.tokenType.TOK_T2;
+        const tokType_B = CONST.tokenType.TOK_T1;
         var { qty: qty_A, M_multi: M_multi_A } = await MintAndTransfer({ tokenType: tokType_A, originatorCount: 2, batchesPerOriginator: 1, transferTo: A });
         var { qty: qty_B, M_multi: M_multi_B } = await MintAndTransfer({ tokenType: tokType_B, originatorCount: 1, batchesPerOriginator: 2, transferTo: B });
         //console.log('qty_A', qty_A.toString());

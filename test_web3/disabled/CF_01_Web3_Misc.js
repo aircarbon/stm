@@ -43,12 +43,12 @@ describe(`Contract Web3 Interface`, async () => {
         if (batchCount.eq(1)) {
             // get minted batch
             const batch = await CONST.web3_call('getSecTokenBatch', [ 1 ], OWNER, OWNER_privKey);
-            assert(batch && batch.originator, 'monobatch not yet minted');
+            assert(batch && batch.originator, 'uni-batch not yet minted');
 
             // get batch owner index in accounts list
             // #### web3.eth.getAccounts not working on ropsten provider ####
                 //const ISSUER_NDX = accounts.findIndex(p => p.toLowerCase() == batch.originator.toLowerCase());
-                //assert(ISSUER_NDX != -1, 'failed to lookup monobatch originator');
+                //assert(ISSUER_NDX != -1, 'failed to lookup uni-batch originator');
                 //const { addr: ISSUER, privKey: ISSUER_privKey } = await CONST.getAccountAndKey(ISSUER_NDX);
                 //console.log('ISSUER', ISSUER);
                 //console.log('ISSUER_privKey', ISSUER_privKey);

@@ -22,7 +22,7 @@ contract("StMaster", accounts => {
 
     before(async function () {
         stm = await st.deployed();
-        if (await stm.getContractType() == CONST.contractType.CASHFLOW) this.skip();
+        if (await stm.getContractType() != CONST.contractType.COMMODITY) this.skip();
         
         await setupHelper.whitelistAndSeal({ stm, accounts });
         await setupHelper.setDefaults({ stm, accounts });
@@ -196,7 +196,7 @@ contract("StMaster", accounts => {
     it(`FT positions - should not be able to open a futures position for an invalid (non-future) token type`, async () => {
         const A = accounts[global.TaddrNdx], B = accounts[global.TaddrNdx + 1];
         try {
-            const x = await futuresHelper.openFtPos({ stm, accounts, tokTypeId: CONST.tokenType.CORSIA, ledger_A: A, ledger_B: B, qty_A: +1, qty_B: -1, price: +1 });
+            const x = await futuresHelper.openFtPos({ stm, accounts, tokTypeId: CONST.tokenType.TOK_T1, ledger_A: A, ledger_B: B, qty_A: +1, qty_B: -1, price: +1 });
         }
         catch (ex) { assert(ex.reason == 'Bad token settlement type', `unexpected: ${ex.reason}`); return; }
         assert.fail('expected contract exception');

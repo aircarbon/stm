@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 // https://github.com/Arachnid/solidity-stringutils
 // https://github.com/tokencard/contracts/blob/master/contracts/externals/strings.sol
 
@@ -37,7 +38,7 @@
  *      corresponding to the left and right parts of the string.
  */
 
-pragma solidity >=0.4.21 <=0.6.6;
+pragma solidity >=0.4.21 <=0.6.10;
 
 library strings {
     struct slice {

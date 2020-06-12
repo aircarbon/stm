@@ -14,7 +14,8 @@ contract("StMaster", accounts => {
         stm_cur = await st.deployed();
         await setupHelper.setDefaults({ stm: stm_cur, accounts });
 
-        //if (await stm_cur.getContractType() == CONST.contractType.CASHFLOW) this.skip();
+        if (await stm_cur.getContractType() != CONST.contractType.COMMODITY) this.skip();
+        
         console.log(`stm_cur: @${stm_cur.address} ledgerHash=${await stm_cur.getLedgerHashcode()} / ${await stm_cur.name()} ${await stm_cur.version()}`);
 
         // explorers need unique contract names?!
@@ -43,7 +44,7 @@ contract("StMaster", accounts => {
     });
 
     it(`data dump - should be able to set (and then read) all contract data`, async function () {
-        if (await stm_cur.getContractType() == CONST.contractType.CASHFLOW) this.skip();
+        if (await stm_cur.getContractType() == CONST.contractType.CASHFLOW_BASE) this.skip();
 
         const WHITELIST_COUNT = 11;
         const TEST_ADDR_COUNT = 2;
@@ -136,10 +137,10 @@ contract("StMaster", accounts => {
             ];
             
             // mint
-            const mintTx_B1 = await stm_cur.mintSecTokenBatch(CONST.tokenType.CORSIA, 1000 * (i+1), 1, M, batchFee, 100, metaKVPs.map(p => p.k), metaKVPs.map(p => p.v), );
+            const mintTx_B1 = await stm_cur.mintSecTokenBatch(CONST.tokenType.TOK_T1, 1000 * (i+1), 1, M, batchFee, 100, metaKVPs.map(p => p.k), metaKVPs.map(p => p.v), );
             curHash = await checkHashUpdate(curHash);
             if (await stm_cur.getContractType() == CONST.contractType.COMMODITY) {
-                const mintTx_B2 = await stm_cur.mintSecTokenBatch(CONST.tokenType.NATURE, 10000 * (i+1), 1, M, batchFee, 100, metaKVPs.map(p => p.k), metaKVPs.map(p => p.v), );
+                const mintTx_B2 = await stm_cur.mintSecTokenBatch(CONST.tokenType.TOK_T2, 10000 * (i+1), 1, M, batchFee, 100, metaKVPs.map(p => p.k), metaKVPs.map(p => p.v), );
                 curHash = await checkHashUpdate(curHash);
             }
             const batchId = (await stm_cur.getSecTokenBatchCount.call()).toNumber();
@@ -161,7 +162,7 @@ contract("StMaster", accounts => {
             // transfer to owner - batch 1 CORSIA, no fees
             const send_tx_B1 = await stm_cur.transferOrTrade({ 
                         ledger_A: M,                            ledger_B: accounts[0], 
-                           qty_A: 200,                     tokenTypeId_A: CONST.tokenType.CORSIA, 
+                           qty_A: 200,                     tokenTypeId_A: CONST.tokenType.TOK_T1, 
                            qty_B: 0,                       tokenTypeId_B: 0, 
                     ccy_amount_A: 0,                         ccyTypeId_A: 0, 
                     ccy_amount_B: 0,                         ccyTypeId_B: 0, 
@@ -175,7 +176,7 @@ contract("StMaster", accounts => {
             if (await stm_cur.getContractType() == CONST.contractType.COMMODITY) {
                     const send_tx_B2 = await stm_cur.transferOrTrade({ 
                          ledger_A: M,                            ledger_B: accounts[0], 
-                            qty_A: 100,                     tokenTypeId_A: CONST.tokenType.NATURE, 
+                            qty_A: 100,                     tokenTypeId_A: CONST.tokenType.TOK_T2, 
                             qty_B: 0,                       tokenTypeId_B: 0, 
                      ccy_amount_A: 0,                         ccyTypeId_A: 0, 
                      ccy_amount_B: 0,                         ccyTypeId_B: 0, 
@@ -187,11 +188,11 @@ contract("StMaster", accounts => {
             }
 
             // burn - parital, CORSIA
-            const burn_tx_B1 = await stm_cur.burnTokens(M, CONST.tokenType.CORSIA, 1);
+            const burn_tx_B1 = await stm_cur.burnTokens(M, CONST.tokenType.TOK_T1, 1);
             curHash = await checkHashUpdate(curHash);
 
             // burn - full, batch 2 NATURE
-            const burn_tx_B2 = await stm_cur.burnTokens(M, CONST.tokenType.NATURE, 100);
+            const burn_tx_B2 = await stm_cur.burnTokens(M, CONST.tokenType.TOK_T2, 100);
             curHash = await checkHashUpdate(curHash);
 
         }
@@ -239,7 +240,7 @@ contract("StMaster", accounts => {
             if (entryOwner != accounts[0]) {
                  const tradeTx = await stm_cur.transferOrTrade({ 
                         ledger_A: entryOwner,                   ledger_B: accounts[0], 
-                           qty_A: 1,                       tokenTypeId_A: CONST.tokenType.CORSIA, 
+                           qty_A: 1,                       tokenTypeId_A: CONST.tokenType.TOK_T1, 
                            qty_B: 0,                       tokenTypeId_B: 0, 
                     ccy_amount_A: 0,                         ccyTypeId_A: 0, 
                     ccy_amount_B: CONST.ccyType.USD,         ccyTypeId_B: 1,

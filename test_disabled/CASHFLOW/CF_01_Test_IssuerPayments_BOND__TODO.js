@@ -21,7 +21,7 @@ contract("StMaster", accounts => {
 
     before(async function () {
         stm = await st.deployed();
-        if (await stm.getContractType() != CONST.contractType.CASHFLOW) this.skip();
+        if (await stm.getContractType() != CONST.contractType.CASHFLOW_BASE) this.skip();
         if (!global.TaddrNdx) global.TaddrNdx = 0;
 
         const x = await CONST.getAccountAndKey(0);

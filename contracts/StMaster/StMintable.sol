@@ -1,7 +1,6 @@
-pragma solidity >=0.4.21 <=0.6.6;
+// SPDX-License-Identifier: AGPL-3.0-only
+pragma solidity >=0.4.21 <=0.6.10;
 pragma experimental ABIEncoderV2;
-
-//import "../Interfaces/IStMintable.sol";
 
 import "./Owned.sol";
 import "./StLedger.sol";
@@ -10,7 +9,7 @@ import "../Libs/LedgerLib.sol";
 import "../Interfaces/StructLib.sol";
 import "../Libs/SpotFeeLib.sol";
 
-contract StMintable is //IStMintable,
+contract StMintable is
     Owned, StLedger {
 
     function mintSecTokenBatch(

@@ -1,8 +1,6 @@
-pragma solidity >=0.4.21 <=0.6.6;
+// SPDX-License-Identifier: AGPL-3.0-only
+pragma solidity >=0.4.21 <=0.6.10;
 pragma experimental ABIEncoderV2;
-
-//import "../Interfaces/IStMaster.sol";
-//import "../Interfaces/IPublicViews.sol";
 
 import "./CcyCollateralizable.sol";
 import "./StMintable.sol";
@@ -34,7 +32,7 @@ TODO: ... CFT refactor...
 // 24003: ... [restored cashflowArgs, optimizer runs down to 10]
 
 contract StMaster
-    is //IStMaster, IPublicViews,
+    is
     StMintable, StBurnable, Collateralizable, StTransferable, DataLoadable, StFutures
 {
     // === STM (AC COMMODITY) ===
@@ -164,7 +162,7 @@ contract StMaster
     //             feeArgsGlobalUsd
     //         );
     //     }
-    //     else if (_contractType == StructLib.ContractType.CASHFLOW) {
+    //     else if (_contractType == StructLib.ContractType.CASHFLOW_BASE) {
     //         std._tt_name[1] = 'UNI_TOKEN'; //contractName;
     //         std._tt_Count = 1;
     //         ctd._ct_Ccy[1] = StructLib.Ccy({ id: 1, name: 'ETH', unit: 'Wei',        decimals: 18 });

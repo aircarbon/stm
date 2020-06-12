@@ -31,7 +31,7 @@ contract("StMaster", accounts => {
 
     before(async function () {
         stm = await st.deployed();
-        if (await stm.getContractType() != CONST.contractType.CASHFLOW) this.skip();
+        if (await stm.getContractType() != CONST.contractType.CASHFLOW_BASE) this.skip();
         if (!global.TaddrNdx) global.TaddrNdx = 0;
 
         cashflowData = await stm.getCashflowData();
@@ -115,7 +115,7 @@ contract("StMaster", accounts => {
         assert.fail('expected contract exception');
     });
 
-    it(`cashflow - issuance (${bondPricing} bond) - should not allow issuer to set invalid issuer values (sale qty > monobatch)`, async () => {
+    it(`cashflow - issuance (${bondPricing} bond) - should not allow issuer to set invalid issuer values (sale qty > uni-batch)`, async () => {
         try {
             await stm.setIssuerValues(wei_currentPrice, cents_currentPrice, ISSUANCE_QTY + 1, { from: ISSUER });
         } catch (ex) {
@@ -135,7 +135,7 @@ contract("StMaster", accounts => {
         assert.fail('expected contract exception');
     });
 
-    it(`cashflow - issuance (${bondPricing} bond) - should be able to set valid issuer values (sale qty: all monobatch, price: ${wei_currentPrice})`, async () => {
+    it(`cashflow - issuance (${bondPricing} bond) - should be able to set valid issuer values (sale qty: all uni-batch, price: ${wei_currentPrice})`, async () => {
         const qty_saleAllocation = ISSUANCE_QTY;
         await stm.setIssuerValues(wei_currentPrice, cents_currentPrice, qty_saleAllocation, { from: ISSUER });
         cashflowData = await stm.getCashflowData();
@@ -192,7 +192,7 @@ contract("StMaster", accounts => {
         assert.fail('expected contract exception');
     });
 
-    it(`cashflow - issuance (${bondPricing} bond) - should not be able to subscribe more than the monobatch size`, async () => {
+    it(`cashflow - issuance (${bondPricing} bond) - should not be able to subscribe more than the uni-batch size`, async () => {
         try {
             const wei_maxSubscriptionValue = Big(
                 wei_priceForOne.toString()
@@ -211,7 +211,7 @@ contract("StMaster", accounts => {
         assert.fail('expected contract exception');
     });
 
-    it(`cashflow - issuance (${bondPricing} bond) - should be able to set valid issuer values (sale qty = 20% of monobatch)`, async () => {
+    it(`cashflow - issuance (${bondPricing} bond) - should be able to set valid issuer values (sale qty = 20% of uni-batch)`, async () => {
         const qty_saleAllocation = Math.ceil(ISSUANCE_QTY * 0.2);
         await stm.setIssuerValues(wei_currentPrice, cents_currentPrice, qty_saleAllocation, { from: ISSUER });
         cashflowData = await stm.getCashflowData();

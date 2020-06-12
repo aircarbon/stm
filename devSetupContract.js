@@ -70,8 +70,9 @@ module.exports = {
             // create owner ledger entry
             await CONST.web3_tx('fund', [CONST.ccyType.USD, 0, O.addr], O.addr, O.privKey); 
         }
-        else if (await CONST.web3_call('getContractType', [], nameOverride) == CONST.contractType.CASHFLOW) {
+        else if (await CONST.web3_call('getContractType', [], nameOverride) == CONST.contractType.CASHFLOW_BASE) {
             console.log(chalk.inverse('devSetupContract >> base cashflow contract...'));
+            await CONST.web3_tx('sealContract', [], O.addr, O.privKey, nameOverride); // always sealed - the controller governs the whitelist
 
             // base cashflow - unitype
             const spotTypes = (await CONST.web3_call('getSecTokenTypes', [], nameOverride)).tokenTypes.filter(p => p.settlementType == CONST.settlementType.SPOT);

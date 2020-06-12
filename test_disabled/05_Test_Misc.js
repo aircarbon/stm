@@ -16,7 +16,7 @@ contract("StMaster", accounts => {
 
     before(async function () {
         stm = await st.deployed();
-        if (await stm.getContractType() == CONST.contractType.CASHFLOW) this.skip();
+        if (await stm.getContractType() != CONST.contractType.COMMODITY) this.skip();
         await stm.sealContract();
         await setupHelper.setDefaults({ stm, accounts });
         if (!global.TaddrNdx) global.TaddrNdx = 0;
@@ -28,8 +28,10 @@ contract("StMaster", accounts => {
             console.log(`addrNdx: ${global.TaddrNdx} - contract @ ${stm.address} (owner: ${accounts[0]})`);
     });
 
-    it(`misc - should have default USD $3/1m tokens, mirrored`, async () => {
+    it(`misc - (commodity) should have default USD $3/1m tokens, mirrored`, async function() {
         const gfUsd = await stm.getFee(CONST.getFeeType.CCY, CONST.ccyType.USD, CONST.nullAddr);
+        if (await stm.getContractType() != CONST.contractType.COMMODITY) this.skip();
+
         assert(gfUsd.fee_min == 300, 'unexpected global fee USD fee_min');
         assert(gfUsd.ccy_perMillion == 300, 'unexpected global fee USD ccy_perMillion');
         assert(gfUsd.ccy_mirrorFee == true, 'unexpected global fee USD ccy_mirrorFee');
@@ -63,6 +65,8 @@ contract("StMaster", accounts => {
 
     it(`misc - should be able to read contract type`, async () => {
         const type = await stm.getContractType();
-        assert(type == CONST.contractType.COMMODITY || type == CONST.contractType.CASHFLOW);
+        assert(type == CONST.contractType.COMMODITY || 
+               type == CONST.contractType.CASHFLOW_BASE || 
+               type == CONST.contractType.CASHFLOW_CONTROLLER);
     });
 });

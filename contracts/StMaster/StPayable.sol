@@ -1,8 +1,7 @@
 
-pragma solidity >=0.4.21 <=0.6.6;
+// SPDX-License-Identifier: AGPL-3.0-only
+pragma solidity >=0.4.21 <=0.6.10;
 pragma experimental ABIEncoderV2;
-
-//import "../Interfaces/IStPayable.sol";
 
 import "./StFees.sol";
 import "./StErc20.sol";
@@ -11,18 +10,15 @@ import "../Libs/LedgerLib.sol";
 import "../Interfaces/StructLib.sol";
 import "../Libs/PayableLib.sol";
 
-//import "../Interfaces/IChainlinkAggregator.sol";
-
 //
 // 24k gas limit -- disabled for commodity branch...
 //
 
 abstract // solc 0.6
 contract StPayable is
-    //IStPayable,
     StErc20 {
 
-    // get basic (eq) issuer payments working, then look at split ledger ...
+    // SPLIT LEDGER WIP ...
 
     // === CFT === V1 ** =>>> MVP -- CFT SPLIT LEDGER (central WL, central collateral, central spot transferOrTrade...)
     //  Cashflow type is fundamentally way less fungible than Commodity type, i.e. loan A != loan B
@@ -34,11 +30,16 @@ contract StPayable is
     //                  (a) its n tokTypes wrap n CASHFLOW-type contracts
     //                  (b) so addSecTokType() for CFT-C needs to take the address of a deployed CFT contract...
     //
-    //          (2) CASHFLOW: is entry point for the split ledger - all clients talk only to it
+    //          (2) CASHFLOW_CONTROLLER: is entry point for the split ledger - all clients talk only to it
     //                  > getLedgerEntry: return (a) n ccy's from CFT-C ... UNION ... (b) n tok's from n CFT's
     //                  > transferOrTrade: update 1 ccy in CFT-C ... update 1 tok in CFT
     //
     //                  PROOF OF CONCEPT (READ AND WRITE ACROSS CONTRACTS...)
+    //
+    //          (3) CASHFLOW_CONTROLLER === (interface compatible) with COMMODITY (base) EXCEPT:
+    //                  > can only add indirect (CASHFLOW_BASE) types
+    //                  > only 1 mint action per sec-type (i.e. mint is passed through to the unitoken model on CASHFLOW_BASE)
+    //                  > no ERC20 support (not fungible, meaningless) -- but ERC20 should work on CASHFLOW_BASE
     //
  
     // === CFT === V0 ** =>>> MVP -- CFT CORE (*no whitelisting*, i.e. all external control ERC20 accounts, no collateral: aka private equity/ledger - no exchange)

@@ -31,7 +31,7 @@ contract("StMaster", accounts => {
 
     before(async function () {
         stm = await st.deployed();
-        if (await stm.getContractType() == CONST.contractType.CASHFLOW) this.skip();
+        if (await stm.getContractType() != CONST.contractType.COMMODITY) this.skip();
         await stm.sealContract();
         await setupHelper.setDefaults({ stm, accounts });
         if (!global.TaddrNdx) global.TaddrNdx = 0;
@@ -46,22 +46,22 @@ contract("StMaster", accounts => {
     it(`minting metadata - mint/burn/chk`, async () => {
         console.log('hash0', await stm.getLedgerHashcode())
 
-        const M = accounts[global.TaddrNdx]
+        const M = accounts[global.TaddrNdx];
         const batchId = await mintBatchWithMetadata( 
-            { tokenType: CONST.tokenType.CORSIA, qtyUnit: 1000, qtySecTokens: 1, receiver: M,
+            { tokenType: CONST.tokenType.TOK_T1, qtyUnit: 1000, qtySecTokens: 1, receiver: M,
              metaKeys: [],
            metaValues: []
         }, { from: accounts[0] } );
         //console.log('getSecToken_totalMintedQty', await getSecToken_totalMintedQty())
         console.log('hash1', await stm.getLedgerHashcode())
 
-        const burnTx = await stm.burnTokens(M, CONST.tokenType.CORSIA, 1000);
+        const burnTx = await stm.burnTokens(M, CONST.tokenType.TOK_T1, 1000);
         console.log('hash2', await stm.getLedgerHashcode())
     });
 
     it(`minting metadata - should allow metadata no KVP minting`, async () => {
         const batchId = await mintBatchWithMetadata( 
-            { tokenType: CONST.tokenType.CORSIA, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.TaddrNdx],
+            { tokenType: CONST.tokenType.TOK_T1, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.TaddrNdx],
              metaKeys: [],
            metaValues: []
         }, { from: accounts[0] } );
@@ -69,7 +69,7 @@ contract("StMaster", accounts => {
 
     it(`minting metadata - should allow metadata single KVP minting`, async () => {
         const batchId = await mintBatchWithMetadata( 
-            { tokenType: CONST.tokenType.CORSIA, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.TaddrNdx],
+            { tokenType: CONST.tokenType.TOK_T1, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.TaddrNdx],
              metaKeys: ['testKey_A'],
            metaValues: ['testValue_A']
         }, { from: accounts[0] } );
@@ -83,7 +83,7 @@ contract("StMaster", accounts => {
             metaValues.push(`${i}`);
         }
         const batchId = await mintBatchWithMetadata( 
-            { tokenType: CONST.tokenType.CORSIA, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.TaddrNdx],
+            { tokenType: CONST.tokenType.TOK_T1, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.TaddrNdx],
              metaKeys, metaValues
         }, { from: accounts[0] } );
     });
@@ -96,14 +96,14 @@ contract("StMaster", accounts => {
             metaValues.push(`testKey_LargerProjectValueString0000000000000000000000000000000000000000000000000000000000000000000000000001111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111_${i}`);
         }
         const batchId = await mintBatchWithMetadata( 
-            { tokenType: CONST.tokenType.CORSIA, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.TaddrNdx],
+            { tokenType: CONST.tokenType.TOK_T1, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.TaddrNdx],
              metaKeys, metaValues
         }, { from: accounts[0] } );
     });
 
     it(`minting metadata - should allow multiple metadata KVP minting, with null value`, async () => {
         const batchId = await mintBatchWithMetadata( 
-            { tokenType: CONST.tokenType.CORSIA, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.TaddrNdx],
+            { tokenType: CONST.tokenType.TOK_T1, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.TaddrNdx],
              metaKeys: ['testKey_A', 'testKey_B'],
            metaValues: ['', 'b']
         }, { from: accounts[0] } );
@@ -111,7 +111,7 @@ contract("StMaster", accounts => {
 
     it(`minting metadata - should allow multiple metadata KVP minting, with null key`, async () => {
         const batchId = await mintBatchWithMetadata( 
-            { tokenType: CONST.tokenType.CORSIA, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.TaddrNdx],
+            { tokenType: CONST.tokenType.TOK_T1, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.TaddrNdx],
              metaKeys: ['', 'testKey_B'],
            metaValues: ['a', 'b']
         }, { from: accounts[0] } );
@@ -119,7 +119,7 @@ contract("StMaster", accounts => {
 
     it(`minting metadata - should allow multiple metadata KVP minting, with mismatched key/value lengths (implied null values)`, async () => {
         const batchId = await mintBatchWithMetadata( 
-            { tokenType: CONST.tokenType.CORSIA, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.TaddrNdx],
+            { tokenType: CONST.tokenType.TOK_T1, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.TaddrNdx],
              metaKeys: ['testKey_A', 'testKey_B', 'testKey_C'],
            metaValues: ['a', 'b']
         }, { from: accounts[0] } );
@@ -127,7 +127,7 @@ contract("StMaster", accounts => {
 
     it(`minting metadata - should allow metadata KVP minting for example NATURE VCUs`, async () => {
         const batchId = await mintBatchWithMetadata( 
-            { tokenType: CONST.tokenType.NATURE, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.TaddrNdx],
+            { tokenType: CONST.tokenType.TOK_T2, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.TaddrNdx],
              metaKeys: nature_ExampleKvps.map(p => p.k),
            metaValues: nature_ExampleKvps.map(p => p.v),
         }, { from: accounts[0] } );
@@ -135,7 +135,7 @@ contract("StMaster", accounts => {
 
     it(`minting metadata - should allow metadata KVP minting for example CORSIA CERs`, async () => {
         const batchId = await mintBatchWithMetadata( 
-            { tokenType: CONST.tokenType.CORSIA, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.TaddrNdx],
+            { tokenType: CONST.tokenType.TOK_T1, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.TaddrNdx],
              metaKeys: corsia_ExampleKvps.map(p => p.k),
            metaValues: corsia_ExampleKvps.map(p => p.v),
         }, { from: accounts[0] } );
@@ -146,7 +146,7 @@ contract("StMaster", accounts => {
     // will need to do this validation in the API...
     // it(`minting - should not allow minting with empty metadata KVP lists`, async () => {
     //     try {
-    //         await mintBatchWithMetadata( { tokenType: CONST.tokenType.CORSIA, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.TaddrNdx], 
+    //         await mintBatchWithMetadata( { tokenType: CONST.tokenType.TOK_T1, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.TaddrNdx], 
     //             metaKeys: [],
     //           metaValues: [],
     //         }, { from: accounts[0] } );
@@ -156,7 +156,7 @@ contract("StMaster", accounts => {
     
     // it(`minting - should not allow minting with zero-length metadata keys or values`, async () => {
     //     try {
-    //         await mintBatchWithMetadata( { tokenType: CONST.tokenType.CORSIA, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.TaddrNdx], 
+    //         await mintBatchWithMetadata( { tokenType: CONST.tokenType.TOK_T1, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.TaddrNdx], 
     //             metaKeys: [''],
     //           metaValues: ['testValue'],
     //         }, { from: accounts[0] } );
@@ -166,7 +166,7 @@ contract("StMaster", accounts => {
 
     // it(`minting - should not allow minting with mismatched metadata KVP list lengths`, async () => {
     //     try {
-    //         await mintBatchWithMetadata( { tokenType: CONST.tokenType.CORSIA, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.TaddrNdx], 
+    //         await mintBatchWithMetadata( { tokenType: CONST.tokenType.TOK_T1, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.TaddrNdx], 
     //             metaKeys: ['testKey'],
     //           metaValues: [],
     //         }, { from: accounts[0] } );
@@ -181,7 +181,7 @@ contract("StMaster", accounts => {
     //         metaValues.push(`testValue_${i}`);
     //     }
     //     try {
-    //         await mintBatchWithMetadata( { tokenType: CONST.tokenType.CORSIA, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.TaddrNdx], 
+    //         await mintBatchWithMetadata( { tokenType: CONST.tokenType.TOK_T1, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.TaddrNdx], 
     //             metaKeys, metaValues
     //         }, { from: accounts[0] } );
     //     } catch (ex) { return; }
@@ -190,7 +190,7 @@ contract("StMaster", accounts => {
 
     it(`post-minting metadata - should allow adding of a new KVP after minting`, async () => {
         const batchId = await mintBatchWithMetadata( 
-            { tokenType: CONST.tokenType.CORSIA, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.TaddrNdx],
+            { tokenType: CONST.tokenType.TOK_T1, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.TaddrNdx],
              metaKeys: corsia_ExampleKvps.map(p => p.k),
            metaValues: corsia_ExampleKvps.map(p => p.v),
         }, { from: accounts[0] } );
@@ -212,7 +212,7 @@ contract("StMaster", accounts => {
 
     it(`post-minting metadata - should not allow non-owner to add a new KVP after minting`, async () => {
         const batchId = await mintBatchWithMetadata( 
-            { tokenType: CONST.tokenType.CORSIA, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.TaddrNdx],
+            { tokenType: CONST.tokenType.TOK_T1, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.TaddrNdx],
              metaKeys: corsia_ExampleKvps.map(p => p.k),
            metaValues: corsia_ExampleKvps.map(p => p.v),
         }, { from: accounts[0] } );
@@ -229,7 +229,7 @@ contract("StMaster", accounts => {
 
     it(`post-minting metadata - should not allow adding of a existing KVP after minting`, async () => {
         const batchId = await mintBatchWithMetadata( 
-            { tokenType: CONST.tokenType.CORSIA, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.TaddrNdx],
+            { tokenType: CONST.tokenType.TOK_T1, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.TaddrNdx],
              metaKeys: corsia_ExampleKvps.map(p => p.k),
            metaValues: corsia_ExampleKvps.map(p => p.v),
         }, { from: accounts[0] } );

@@ -11,7 +11,7 @@ contract("StMaster", accounts => {
     before(async function () {
         stm = await st.deployed();
         const contractType = await stm.getContractType();
-        if (contractType == CONST.contractType.CASHFLOW) this.skip();
+        if (await stm.getContractType() != CONST.contractType.COMMODITY) this.skip();
 
         await stm.sealContract();
         await setupHelper.setDefaults({ stm, accounts });

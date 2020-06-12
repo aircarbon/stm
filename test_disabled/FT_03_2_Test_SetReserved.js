@@ -20,7 +20,7 @@ contract("StMaster", accounts => {
 
     before(async function () {
         stm = await st.deployed();
-        if (await stm.getContractType() == CONST.contractType.CASHFLOW) this.skip();
+        if (await stm.getContractType() != CONST.contractType.COMMODITY) this.skip();
         if (!global.TaddrNdx) global.TaddrNdx = 0;
 
         await setupHelper.whitelistAndSeal({ stm, accounts });
@@ -93,15 +93,15 @@ contract("StMaster", accounts => {
         const FUNDED = new BN(10000), RESERVED = FUNDED.div(new BN(2)), AVAIL = FUNDED.sub(RESERVED);
 
         await stm.fund(CONST.ccyType.USD,                      FUNDED,                  A,                            );
-        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.MT_CARBON,  1,     B, CONST.nullFees, 0, [], [], );
+        await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2,    CONST.MT_CARBON,  1,     B, CONST.nullFees, 0, [], [], );
         await stm.setReservedCcy(CONST.ccyType.USD,            RESERVED,                A);
-        await stm.setFee_TokType(CONST.tokenType.NATURE, CONST.nullAddr, CONST.nullFees);
+        await stm.setFee_TokType(CONST.tokenType.TOK_T2, CONST.nullAddr, CONST.nullFees);
         await stm.setFee_CcyType(CONST.ccyType.USD,      CONST.nullAddr, CONST.nullFees);
         try {
             const x = await transferHelper.transferLedger({ stm, accounts,
                     ledger_A: A,                                         ledger_B: B,
                        qty_A: 0,                                    tokenTypeId_A: 0,
-                       qty_B: CONST.KT_CARBON,                      tokenTypeId_B: CONST.tokenType.NATURE,
+                       qty_B: CONST.KT_CARBON,                      tokenTypeId_B: CONST.tokenType.TOK_T2,
                 ccy_amount_A: AVAIL.add(new BN(1)),                   ccyTypeId_A: CONST.ccyType.USD,
                 ccy_amount_B: 0,                                      ccyTypeId_B: 0,
                    applyFees: true,
@@ -114,15 +114,15 @@ contract("StMaster", accounts => {
         const A = accounts[global.TaddrNdx + 0], B = accounts[global.TaddrNdx + 1];
         const FUNDED = new BN(10000), RESERVED = FUNDED.div(new BN(2)), AVAIL = FUNDED.sub(RESERVED);
 
-        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.MT_CARBON,  1,     A, CONST.nullFees, 0, [], [], );
+        await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2,    CONST.MT_CARBON,  1,     A, CONST.nullFees, 0, [], [], );
         await stm.fund(CONST.ccyType.USD,                      FUNDED,                  B,                            );
         await stm.setReservedCcy(CONST.ccyType.USD,            RESERVED,                B);
-        await stm.setFee_TokType(CONST.tokenType.NATURE, CONST.nullAddr, CONST.nullFees);
+        await stm.setFee_TokType(CONST.tokenType.TOK_T2, CONST.nullAddr, CONST.nullFees);
         await stm.setFee_CcyType(CONST.ccyType.USD,      CONST.nullAddr, CONST.nullFees);
         try {
             const x = await transferHelper.transferLedger({ stm, accounts,
                     ledger_A: A,                                         ledger_B: B,
-                       qty_A: CONST.KT_CARBON,                      tokenTypeId_A: CONST.tokenType.NATURE,
+                       qty_A: CONST.KT_CARBON,                      tokenTypeId_A: CONST.tokenType.TOK_T2,
                        qty_B: 0,                                    tokenTypeId_B: 0,
                 ccy_amount_A: 0,                                      ccyTypeId_A: 0,
                 ccy_amount_B: AVAIL.add(new BN(1)),                   ccyTypeId_B: CONST.ccyType.USD,
@@ -139,20 +139,20 @@ contract("StMaster", accounts => {
 
         // balance partially reserved on ccy sender A
         await stm.fund(CONST.ccyType.USD,                      FUNDED,                  A,                            );
-        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.MT_CARBON,  1,     B, CONST.nullFees, 0, [], [], );
+        await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2,    CONST.MT_CARBON,  1,     B, CONST.nullFees, 0, [], [], );
         await stm.setReservedCcy(CONST.ccyType.USD,            RESERVED,                A);
 
         // balance fully reserved on ccy receiver B - but he pays the mirrored fee from the ccy consideration
         await stm.fund(CONST.ccyType.USD,                      FUNDED,                  B,                            );
         await stm.setReservedCcy(CONST.ccyType.USD,            FUNDED,                  B);
 
-        await stm.setFee_TokType(CONST.tokenType.NATURE, CONST.nullAddr, CONST.nullFees);
+        await stm.setFee_TokType(CONST.tokenType.TOK_T2, CONST.nullAddr, CONST.nullFees);
         await stm.setFee_CcyType(CONST.ccyType.USD,      CONST.nullAddr, {...CONST.nullFees, ccy_mirrorFee: true, ccy_perMillion: 300 }); // fee per 1m KG: $3
         try {
             const x = await transferHelper.transferLedger({ stm, accounts,
                     ledger_A: A,                                         ledger_B: B,
                        qty_A: 0,                                    tokenTypeId_A: 0,
-                       qty_B: CONST.KT_CARBON,                      tokenTypeId_B: CONST.tokenType.NATURE, // 1m KG
+                       qty_B: CONST.KT_CARBON,                      tokenTypeId_B: CONST.tokenType.TOK_T2, // 1m KG
                 ccy_amount_A: AVAIL_EX_FEES.add(new BN(1)),           ccyTypeId_A: CONST.ccyType.USD,      // consideration in excess of available (unreserved) 
                 ccy_amount_B: 0,                                      ccyTypeId_B: 0,
                    applyFees: true,
@@ -166,7 +166,7 @@ contract("StMaster", accounts => {
         const FUNDED = new BN(10000), RESERVED = FUNDED.div(new BN(2)), AVAIL = FUNDED.sub(RESERVED), AVAIL_EX_FEES = AVAIL.sub(new BN(300)); // expected fee per 1m KG: $3
 
         // balance partially reserved on ccy sender B
-        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.MT_CARBON,  1,     A, CONST.nullFees, 0, [], [], );
+        await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2,    CONST.MT_CARBON,  1,     A, CONST.nullFees, 0, [], [], );
         await stm.fund(CONST.ccyType.USD,                      FUNDED,                  B,                            );
         await stm.setReservedCcy(CONST.ccyType.USD,            RESERVED,                B);
 
@@ -174,12 +174,12 @@ contract("StMaster", accounts => {
         await stm.fund(CONST.ccyType.USD,                      FUNDED,                  A,                            );
         await stm.setReservedCcy(CONST.ccyType.USD,            FUNDED,                  A);
 
-        await stm.setFee_TokType(CONST.tokenType.NATURE, CONST.nullAddr, CONST.nullFees);
+        await stm.setFee_TokType(CONST.tokenType.TOK_T2, CONST.nullAddr, CONST.nullFees);
         await stm.setFee_CcyType(CONST.ccyType.USD,      CONST.nullAddr, {...CONST.nullFees, ccy_mirrorFee: true, ccy_perMillion: 300 }); // fee per 1m KG: $3
         try {
             const x = await transferHelper.transferLedger({ stm, accounts,
                     ledger_A: A,                                         ledger_B: B,
-                       qty_A: CONST.KT_CARBON,                      tokenTypeId_A: CONST.tokenType.NATURE, // 1m KG
+                       qty_A: CONST.KT_CARBON,                      tokenTypeId_A: CONST.tokenType.TOK_T2, // 1m KG
                        qty_B: 0,                                    tokenTypeId_B: 0,
                 ccy_amount_A: 0,                                      ccyTypeId_A: 0,
                 ccy_amount_B: AVAIL_EX_FEES.add(new BN(1)),           ccyTypeId_B: CONST.ccyType.USD,     

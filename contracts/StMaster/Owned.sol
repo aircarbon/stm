@@ -1,8 +1,7 @@
-pragma solidity >=0.4.21 <=0.6.6;
+// SPDX-License-Identifier: AGPL-3.0-only
+pragma solidity >=0.4.21 <=0.6.10;
 
-//import "../Interfaces/IOwned.sol";
-
-contract Owned //is IOwned
+contract Owned
 {
     address payable owner;
 
@@ -15,7 +14,7 @@ contract Owned //is IOwned
     }
 
     modifier onlyOwner() {
-        require(msg.sender == owner, "Restricted");
+        require(tx.origin == owner, "Restricted"); // CFT: not msg.sender -- we want the TX origin to be checked, not the calling cashflow controller
         _; // required magic
     }
     modifier onlyWhenReadWrite() {

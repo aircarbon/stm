@@ -224,7 +224,7 @@ async function initTestMode(testMode) {
     if (!fts.find(p => p.name == TEST_FT_1)) {
         await CONST.web3_tx('addSecTokenType', [ TEST_FT_1, CONST.settlementType.FUTURE, { ...CONST.nullFutureArgs,
             expiryTimestamp: DateTime.local().plus({ days: 30 }).toMillis(),
-            underlyerTypeId: CONST.tokenType.CORSIA,
+            underlyerTypeId: CONST.tokenType.TOK_T1,
                    refCcyId: CONST.ccyType.USD,
                contractSize: 1000,
              feePerContract: 300, // $3.00

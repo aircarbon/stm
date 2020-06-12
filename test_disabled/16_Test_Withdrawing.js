@@ -9,7 +9,7 @@ contract("StMaster", accounts => {
 
     before(async function () {
         stm = await st.deployed();
-        if (await stm.getContractType() == CONST.contractType.CASHFLOW) this.skip();
+        if (await stm.getContractType() != CONST.contractType.COMMODITY) this.skip();
         await stm.sealContract();
         await setupHelper.setDefaults({ stm, accounts });
         if (!global.TaddrNdx) global.TaddrNdx = 0;
@@ -51,7 +51,7 @@ contract("StMaster", accounts => {
     });
 
     it(`withdrawing - should allow minting, funding and withdrawing on same ledger entry`, async () => {
-        await stm.mintSecTokenBatch(CONST.tokenType.NATURE, CONST.GT_CARBON, 1, accounts[global.TaddrNdx], CONST.nullFees, 0, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2, CONST.GT_CARBON, 1, accounts[global.TaddrNdx], CONST.nullFees, 0, [], [], { from: accounts[0] });
         await stm.fund(CONST.ccyType.USD, CONST.thousandCcy_cents, accounts[global.TaddrNdx],                                        { from: accounts[0] });
         await withdrawLedger({ ccyTypeId: CONST.ccyType.USD, amount: CONST.thousandCcy_cents / 2, withdrawer: accounts[global.TaddrNdx] });
         const ledgerEntryAfter = await stm.getLedgerEntry(accounts[global.TaddrNdx]);

@@ -1,7 +1,6 @@
-pragma solidity >=0.4.21 <=0.6.6;
+// SPDX-License-Identifier: AGPL-3.0-only
+pragma solidity >=0.4.21 <=0.6.10;
 pragma experimental ABIEncoderV2;
-
-//import "../Interfaces/IStFutures.sol";
 
 import "./Owned.sol";
 import "./StLedger.sol";
@@ -128,7 +127,6 @@ older:
 
 abstract // solc 0.6
 contract StFutures is Owned,
-    //IStFutures,
     StLedger, StFees, StErc20, StPayable {
 
     // set initial margin - ledger override

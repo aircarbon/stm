@@ -10,7 +10,7 @@ contract("StMaster", accounts => {
 
     before(async function () {
         stm = await st.deployed();
-        if (await stm.getContractType() == CONST.contractType.CASHFLOW) this.skip();
+        if (await stm.getContractType() != CONST.contractType.COMMODITY) this.skip();
         if (!global.TaddrNdx) global.TaddrNdx = 0;
         
         await setupHelper.whitelistAndSeal({ stm, accounts });
@@ -30,7 +30,7 @@ contract("StMaster", accounts => {
 
         const origCcyFee_bips = 100;
         await stm.fund(CONST.ccyType.USD,                      CONST.millionCcy_cents,  A,                                          { from: accounts[0] });
-        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.MT_CARBON,  1,     B, CONST.nullFees, origCcyFee_bips, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2,    CONST.MT_CARBON,  1,     B, CONST.nullFees, origCcyFee_bips, [], [], { from: accounts[0] });
 
         // set global fee: ccy 3.00 /per Million qty received, MIRRORED
         const ccy_perMillion = 300; // $3
@@ -50,7 +50,7 @@ contract("StMaster", accounts => {
             const data = await transferHelper.transferLedger({ stm, accounts,
                     ledger_A: A,                                         ledger_B: B,
                        qty_A: 0,                                    tokenTypeId_A: 0,
-                       qty_B: transferAmountTok,                    tokenTypeId_B: CONST.tokenType.NATURE,
+                       qty_B: transferAmountTok,                    tokenTypeId_B: CONST.tokenType.TOK_T2,
                 ccy_amount_A: transferAmountCcy,                      ccyTypeId_A: CONST.ccyType.USD,
                 ccy_amount_B: 0,                                      ccyTypeId_B: 0,
                    applyFees: true,
@@ -70,7 +70,7 @@ contract("StMaster", accounts => {
         const B = accounts[global.TaddrNdx + 1];
 
         const origCcyFee_bips = 100;
-        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    CONST.MT_CARBON,  1,     A, CONST.nullFees, origCcyFee_bips, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2,    CONST.MT_CARBON,  1,     A, CONST.nullFees, origCcyFee_bips, [], [], { from: accounts[0] });
         await stm.fund(CONST.ccyType.USD,                      CONST.millionCcy_cents,  B,                                          { from: accounts[0] });
 
         // set global fee: ccy 3.00 /per Million qty received, MIRRORED
@@ -90,7 +90,7 @@ contract("StMaster", accounts => {
             //console.log('expectedFeeCcy', expectedFeeCcy);
             const data = await transferHelper.transferLedger({ stm, accounts,
                     ledger_A: A,                                         ledger_B: B,
-                       qty_A: transferAmountTok,                    tokenTypeId_A: CONST.tokenType.NATURE,
+                       qty_A: transferAmountTok,                    tokenTypeId_A: CONST.tokenType.TOK_T2,
                        qty_B: 0,                                    tokenTypeId_B: 0,
                 ccy_amount_A: 0,                                      ccyTypeId_A: 0,
                 ccy_amount_B: transferAmountCcy,                      ccyTypeId_B: CONST.ccyType.USD,
@@ -114,8 +114,8 @@ contract("StMaster", accounts => {
         const origCcyFee_bips_B1 = 3000; // 30%
         const origCcyFee_bips_B2 = 9000; // 90%
         await stm.fund(CONST.ccyType.USD,                      CONST.millionCcy_cents,  A,                               { from: accounts[0] });
-        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    500000, 1, B, CONST.nullFees, origCcyFee_bips_B1, [], [], { from: accounts[0] });
-        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    500000, 1, B, CONST.nullFees, origCcyFee_bips_B2, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2,    500000, 1, B, CONST.nullFees, origCcyFee_bips_B1, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2,    500000, 1, B, CONST.nullFees, origCcyFee_bips_B2, [], [], { from: accounts[0] });
 
         // set global fee: ccy 3.00 /per Million qty received, MIRRORED
         const ccy_perMillion = 300, fee_min = 300; // $3
@@ -135,7 +135,7 @@ contract("StMaster", accounts => {
             const data = await transferHelper.transferLedger({ stm, accounts,
                     ledger_A: A,                                         ledger_B: B,
                        qty_A: 0,                                    tokenTypeId_A: 0,
-                       qty_B: transferAmountTok,                    tokenTypeId_B: CONST.tokenType.NATURE,
+                       qty_B: transferAmountTok,                    tokenTypeId_B: CONST.tokenType.TOK_T2,
                 ccy_amount_A: transferAmountCcy,                      ccyTypeId_A: CONST.ccyType.USD,
                 ccy_amount_B: 0,                                      ccyTypeId_B: 0,
                    applyFees: true,
@@ -156,8 +156,8 @@ contract("StMaster", accounts => {
 
         const origCcyFee_bips_B1 = 3000; // 30%
         const origCcyFee_bips_B2 = 9000; // 90%
-        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    500000, 1, A, CONST.nullFees, origCcyFee_bips_B1, [], [], { from: accounts[0] });
-        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    500000, 1, A, CONST.nullFees, origCcyFee_bips_B2, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2,    500000, 1, A, CONST.nullFees, origCcyFee_bips_B1, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2,    500000, 1, A, CONST.nullFees, origCcyFee_bips_B2, [], [], { from: accounts[0] });
         await stm.fund(CONST.ccyType.USD,                      CONST.millionCcy_cents,  B,                               { from: accounts[0] });
 
         // set global fee: ccy 3.00 /per Million qty received, MIRRORED
@@ -177,7 +177,7 @@ contract("StMaster", accounts => {
             //console.log('expectedFeeCcy', expectedFeeCcy);
             const data = await transferHelper.transferLedger({ stm, accounts,
                     ledger_A: A,                                         ledger_B: B,
-                       qty_A: transferAmountTok,                    tokenTypeId_A: CONST.tokenType.NATURE,
+                       qty_A: transferAmountTok,                    tokenTypeId_A: CONST.tokenType.TOK_T2,
                        qty_B: 0,                                    tokenTypeId_B: 0,
                 ccy_amount_A: 0,                                      ccyTypeId_A: 0,
                 ccy_amount_B: transferAmountCcy,                      ccyTypeId_B: CONST.ccyType.USD,
@@ -201,8 +201,8 @@ contract("StMaster", accounts => {
         const origCcyFee_bips_B1 = 3000; // 30%
         const origCcyFee_bips_B2 = 9000; // 90%
         await stm.fund(CONST.ccyType.USD,                      CONST.millionCcy_cents,  A,                               { from: accounts[0] });
-        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    500000, 1, B, CONST.nullFees, origCcyFee_bips_B1, [], [], { from: accounts[0] });
-        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    500000, 1, B, CONST.nullFees, origCcyFee_bips_B2, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2,    500000, 1, B, CONST.nullFees, origCcyFee_bips_B1, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2,    500000, 1, B, CONST.nullFees, origCcyFee_bips_B2, [], [], { from: accounts[0] });
 
         // set global fee: ccy 3.00 /per Million qty received, MIRRORED
         const ccy_perMillion = 300, fee_min = 300; // $3
@@ -222,7 +222,7 @@ contract("StMaster", accounts => {
             const data = await transferHelper.transferLedger({ stm, accounts,
                     ledger_A: A,                                         ledger_B: B,
                        qty_A: 0,                                    tokenTypeId_A: 0,
-                       qty_B: transferAmountTok,                    tokenTypeId_B: CONST.tokenType.NATURE,
+                       qty_B: transferAmountTok,                    tokenTypeId_B: CONST.tokenType.TOK_T2,
                 ccy_amount_A: transferAmountCcy,                      ccyTypeId_A: CONST.ccyType.USD,
                 ccy_amount_B: 0,                                      ccyTypeId_B: 0,
                    applyFees: true,
@@ -243,8 +243,8 @@ contract("StMaster", accounts => {
 
         const origCcyFee_bips_B1 = 3000; // 30%
         const origCcyFee_bips_B2 = 9000; // 90%
-        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    500000, 1, A, CONST.nullFees, origCcyFee_bips_B1, [], [], { from: accounts[0] });
-        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    500000, 1, A, CONST.nullFees, origCcyFee_bips_B2, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2,    500000, 1, A, CONST.nullFees, origCcyFee_bips_B1, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2,    500000, 1, A, CONST.nullFees, origCcyFee_bips_B2, [], [], { from: accounts[0] });
         await stm.fund(CONST.ccyType.USD,                      CONST.millionCcy_cents,  B,                               { from: accounts[0] });
 
         // set global fee: ccy 3.00 /per Million qty received, MIRRORED
@@ -264,7 +264,7 @@ contract("StMaster", accounts => {
             //console.log('expectedFeeCcy', expectedFeeCcy);
             const data = await transferHelper.transferLedger({ stm, accounts,
                     ledger_A: A,                                         ledger_B: B,
-                       qty_A: transferAmountTok,                    tokenTypeId_A: CONST.tokenType.NATURE,
+                       qty_A: transferAmountTok,                    tokenTypeId_A: CONST.tokenType.TOK_T2,
                        qty_B: 0,                                    tokenTypeId_B: 0,
                 ccy_amount_A: 0,                                      ccyTypeId_A: 0,
                 ccy_amount_B: transferAmountCcy,                      ccyTypeId_B: CONST.ccyType.USD,
@@ -288,8 +288,8 @@ contract("StMaster", accounts => {
         const origCcyFee_bips_B1 = 3000; // 30%
         const origCcyFee_bips_B2 = 9000; // 90%
         await stm.fund(CONST.ccyType.USD,                      CONST.millionCcy_cents,  A,                               { from: accounts[0] });
-        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    500000, 1, B, CONST.nullFees, origCcyFee_bips_B1, [], [], { from: accounts[0] });
-        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    500000, 1, B, CONST.nullFees, origCcyFee_bips_B2, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2,    500000, 1, B, CONST.nullFees, origCcyFee_bips_B1, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2,    500000, 1, B, CONST.nullFees, origCcyFee_bips_B2, [], [], { from: accounts[0] });
 
         // set global fee: ccy 3.00 /per Million qty received, max ccy 15.00, min ccy 3.00, MIRRORED
         const exchange_feeperMillion = 300, exchange_feeMax = 1500, exchange_feeMin = 300; // $3, $15, $3
@@ -319,7 +319,7 @@ contract("StMaster", accounts => {
             const data = await transferHelper.transferLedger({ stm, accounts,
                     ledger_A: A,                                         ledger_B: B,
                        qty_A: 0,                                    tokenTypeId_A: 0,
-                       qty_B: transferAmountTok,                    tokenTypeId_B: CONST.tokenType.NATURE,
+                       qty_B: transferAmountTok,                    tokenTypeId_B: CONST.tokenType.TOK_T2,
                 ccy_amount_A: transferAmountCcy,                      ccyTypeId_A: CONST.ccyType.USD,
                 ccy_amount_B: 0,                                      ccyTypeId_B: 0,
                    applyFees: true,
@@ -340,8 +340,8 @@ contract("StMaster", accounts => {
 
         const origCcyFee_bips_B1 = 3000; // 30%
         const origCcyFee_bips_B2 = 9000; // 90%
-        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    500000, 1, A, CONST.nullFees, origCcyFee_bips_B1, [], [], { from: accounts[0] });
-        await stm.mintSecTokenBatch(CONST.tokenType.NATURE,    500000, 1, A, CONST.nullFees, origCcyFee_bips_B2, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2,    500000, 1, A, CONST.nullFees, origCcyFee_bips_B1, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2,    500000, 1, A, CONST.nullFees, origCcyFee_bips_B2, [], [], { from: accounts[0] });
         await stm.fund(CONST.ccyType.USD,                      CONST.millionCcy_cents,  B,                               { from: accounts[0] });
 
         // set global fee: ccy 3.00 /per Million qty received, max ccy 15.00, min ccy 3.00, MIRRORED
@@ -371,7 +371,7 @@ contract("StMaster", accounts => {
             // console.log('expectedFeeCcy', expectedFeeCcy);
             const data = await transferHelper.transferLedger({ stm, accounts,
                     ledger_A: A,                                         ledger_B: B,
-                       qty_A: transferAmountTok,                    tokenTypeId_A: CONST.tokenType.NATURE,
+                       qty_A: transferAmountTok,                    tokenTypeId_A: CONST.tokenType.TOK_T2,
                        qty_B: 0,                                    tokenTypeId_B: 0,
                 ccy_amount_A: 0,                                      ccyTypeId_A: 0,
                 ccy_amount_B: transferAmountCcy,                      ccyTypeId_B: CONST.ccyType.USD,

@@ -1,4 +1,4 @@
-pragma solidity >=0.4.21 <=0.6.6;
+pragma solidity >=0.4.21 <=0.6.10;
 
 /**
  * @notice Partial ERC20

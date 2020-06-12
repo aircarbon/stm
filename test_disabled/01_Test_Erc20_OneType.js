@@ -13,7 +13,7 @@ contract("StMaster", accounts => {
 
     before(async function () {
         stm = await st.deployed();
-        if (await stm.getContractType() == CONST.contractType.CASHFLOW_CONTROLLER) this.skip();
+        if (await stm.getContractType() != CONST.contractType.COMMODITY) this.skip();
 
         if (!global.TaddrNdx) global.TaddrNdx = 0;   // whitelist (exchange) test addr; managed by tests
         if (!global.XaddrNdx) global.XaddrNdx = 800; // graylist (erc20) test addr; managed by tests
@@ -32,19 +32,19 @@ contract("StMaster", accounts => {
 
         // mint NATURE with originator fee - should be ignored by ERC20
         const testFee = { ccy_mirrorFee: false, ccy_perMillion: 0, fee_fixed: 1, fee_percBips: 10, fee_min: 0, fee_max: 0 };
-        await stm.mintSecTokenBatch(CONST.tokenType.NATURE, CONST.KT_CARBON, 1, WHITE, testFee, 0, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2, CONST.KT_CARBON, 1, WHITE, testFee, 0, [], [], { from: accounts[0] });
 
         // set exchange fee NATURE - should be ignored by ERC20
-        await stm.setFee_TokType(CONST.tokenType.NATURE, CONST.nullAddr, testFee );
+        await stm.setFee_TokType(CONST.tokenType.TOK_T2, CONST.nullAddr, testFee );
 
         // set ledger fees NATURE - should be ignored by ERC20
-        await stm.setFee_TokType(CONST.tokenType.NATURE, WHITE, testFee );
+        await stm.setFee_TokType(CONST.tokenType.TOK_T2, WHITE, testFee );
         
         await stm.fund(CONST.ccyType.USD, 1, GRAY_1, { from: accounts[0] });
-        await stm.setFee_TokType(CONST.tokenType.NATURE, GRAY_1, testFee );
+        await stm.setFee_TokType(CONST.tokenType.TOK_T2, GRAY_1, testFee );
 
         await stm.fund(CONST.ccyType.USD, 1, GRAY_2, { from: accounts[0] });
-        await stm.setFee_TokType(CONST.tokenType.NATURE, GRAY_2, testFee );
+        await stm.setFee_TokType(CONST.tokenType.TOK_T2, GRAY_2, testFee );
     });
 
     //
@@ -57,7 +57,7 @@ contract("StMaster", accounts => {
     async function white_to_gray_1() {
         const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: WHITE,                               ledger_B: GRAY_1,
-                   qty_A: CONST.KT_CARBON,                tokenTypeId_A: CONST.tokenType.NATURE,
+                   qty_A: CONST.KT_CARBON,                tokenTypeId_A: CONST.tokenType.TOK_T2,
                    qty_B: 0,                              tokenTypeId_B: 0,
             ccy_amount_A: 0,                                ccyTypeId_A: 0,
             ccy_amount_B: 0,                                ccyTypeId_B: 0,

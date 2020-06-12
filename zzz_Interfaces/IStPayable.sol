@@ -1,5 +1,5 @@
 
-pragma solidity >=0.4.21 <=0.6.6;
+pragma solidity >=0.4.21 <=0.6.10;
 pragma experimental ABIEncoderV2;
 
 import "./IOwned.sol";
@@ -37,7 +37,7 @@ import "../Libs/PayableLib.sol";
     /**
      * @notice Sets current values for the issuance
      * @dev (wei_currentPrice XOR cents_currentPrice) -- price per token: write-once for BOND, write-many for EQUITY
-     * @dev qty_saleAllocation                        -- sale allocation: must be >= current qty subscribed, and <= total monobatch size
+     * @dev qty_saleAllocation                        -- sale allocation: must be >= current qty subscribed, and <= total uni-batch size
      */
     function setIssuerValues(
         // address issuer,

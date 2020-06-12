@@ -157,8 +157,8 @@ module.exports = {
     },
 
     contractType: Object.freeze({
-        COMMODITY: 0,
-        CASHFLOW: 1,
+                  COMMODITY: 0,
+              CASHFLOW_BASE: 1,
         CASHFLOW_CONTROLLER: 2,
     }),
 
@@ -166,8 +166,8 @@ module.exports = {
 
     settlementType: Object.freeze({
         UNDEFINED: 0,
-        SPOT: 1,
-        FUTURE: 2,
+             SPOT: 1,
+           FUTURE: 2,
     }),
 
     getFeeType: Object.freeze({
@@ -186,9 +186,9 @@ EXCHANGE_FEE: 1,
 
     // token types (contract data)
     tokenType: Object.freeze({
-          CORSIA: 1,
-          NATURE: 2,
-         PREMIUM: 3,
+          TOK_T1: 1, // Corsia (commodity) || UniToken (cashflow base)
+          TOK_T2: 2, // Nature (commodity)
+          TOK_T3: 3, // Premium (commodity)
     }),
 
     // ccy types (contract data)

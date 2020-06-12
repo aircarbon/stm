@@ -1,7 +1,6 @@
-pragma solidity >=0.4.21 <=0.6.6;
+// SPDX-License-Identifier: AGPL-3.0-only
+pragma solidity >=0.4.21 <=0.6.10;
 pragma experimental ABIEncoderV2;
-
-//import "../Interfaces/IDataLoadable.sol";
 
 import "./Owned.sol";
 import "./StLedger.sol";
@@ -12,7 +11,7 @@ import "../Interfaces/StructLib.sol";
 import "../Libs/LoadLib.sol";
 
 abstract // solc 0.6
-contract DataLoadable is //IDataLoadable,
+contract DataLoadable is
     Owned, StLedger, StFees, StErc20 {
 
     function loadSecTokenBatch(

@@ -1,7 +1,6 @@
-pragma solidity >=0.4.21 <=0.6.6;
+// SPDX-License-Identifier: AGPL-3.0-only
+pragma solidity >=0.4.21 <=0.6.10;
 pragma experimental ABIEncoderV2;
-
-//import "../Interfaces/IStTransferable.sol";
 
 import "./Owned.sol";
 import "./StLedger.sol";
@@ -16,7 +15,6 @@ import "../Libs/LedgerLib.sol";
 
 abstract // solc 0.6
 contract StTransferable is Owned,
-    //IStTransferable,
     StLedger, StFees, StErc20, StPayable {
 
     function getLedgerHashcode() external view returns (bytes32) {

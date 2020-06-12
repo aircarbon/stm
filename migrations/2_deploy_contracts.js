@@ -67,8 +67,6 @@ module.exports = async function (deployer) {
             await CONST.web3_tx('addSecTokenType', [ 'CFT-Base2',  CONST.settlementType.SPOT, CONST.nullFutureArgs, addrBase2 ], O.addr, O.privKey);
             break;
 
-                // todo -- post-deployment tests, for (a) query-types and (b) query split ledger...
-
         case 'CASHFLOW':
             // deploy an unattached base CASHFLOW contract
             await deploymentHelper.Deploy({ deployer, artifacts, contractType: 'CASHFLOW' });

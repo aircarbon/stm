@@ -1,7 +1,6 @@
-pragma solidity >=0.4.21 <=0.6.6;
+// SPDX-License-Identifier: AGPL-3.0-only
+pragma solidity >=0.4.21 <=0.6.10;
 pragma experimental ABIEncoderV2;
-
-//import "../Interfaces/ICcyCollateralizable.sol";
 
 import "./Owned.sol";
 import "./StLedger.sol";
@@ -9,7 +8,7 @@ import "./StLedger.sol";
 import "../Interfaces/StructLib.sol";
 import "../Libs/CcyLib.sol";
 
-contract Collateralizable is //ICcyCollateralizable,
+contract Collateralizable is
     Owned, StLedger {
 
     function addCcyType(string memory name, string memory unit, uint16 decimals)
@@ -27,8 +26,6 @@ contract Collateralizable is //ICcyCollateralizable,
     public onlyOwner() onlyWhenReadWrite() {
         CcyLib.fund(ld, ctd, ccyTypeId, amount, ledgerOwner);
     }
-
-
 
     function withdraw(uint256 ccyTypeId,
                       int256  amount,
