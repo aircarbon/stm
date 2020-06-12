@@ -30,13 +30,13 @@ contract("StMaster", accounts => {
 
     // ORDERED
 
-    it(`cashflow controller - should be able to query of controller's indirect types (default deployer: 2 indirect types)`, async () => {
+    it(`cashflow controller - should be able to query controller's indirect types (default deployer: 2 indirect types)`, async () => {
         const types = (await stm.getSecTokenTypes()).tokenTypes;
         //console.log('types', types.map(p => { return `${p.cashflowBaseAddr} [${p.name}]` }));
         assert(types.length == 2);
     });
 
-    it(`cashflow controller - allow initial a unibatch mint on indirect passed-through cashflow base (type 1)`, async () => {
+    it(`cashflow controller - allow an initial unibatch mint on indirect passed-through cashflow base (type 1)`, async () => {
         const M = accounts[global.TaddrNdx];
         const { batchId, mintTx } = await mintBatchWithMetadata( 
             { tokenType: CONST.tokenType.TOK_T1, qtyUnit: 1000, qtySecTokens: 1, receiver: M,
@@ -59,7 +59,7 @@ contract("StMaster", accounts => {
         }
     });
 
-    it(`cashflow controller - should allow a unibatch mint on indirect passed-through cashflow base (type 2)`, async () => {
+    it(`cashflow controller - should allow an initial unibatch mint on different indirect passed-through cashflow base (type 2)`, async () => {
         const M = accounts[global.TaddrNdx];
         const { batchId, mintTx } = await mintBatchWithMetadata( 
             { tokenType: CONST.tokenType.TOK_T2, qtyUnit: 1000, qtySecTokens: 1, receiver: M,
