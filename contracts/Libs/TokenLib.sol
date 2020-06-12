@@ -201,7 +201,7 @@ library TokenLib {
 
         // mint & assign STs (delegate to cashflow base in cashflow controller)
         if (ld.contractType == StructLib.ContractType.CASHFLOW_CONTROLLER) { // CFT-C: passthrough to base
-            require(std._tt_addr[a.tokenTypeId] != address(0x0), "Bad cashflow request");
+            //require(std._tt_addr[a.tokenTypeId] != address(0x0), "Bad cashflow request");
             StMaster base = StMaster(std._tt_addr[a.tokenTypeId]);
             base.mintSecTokenBatch(
                 1, //a.tokenTypeId, ==> maps to base typeId=1 (always: base is uni-type internally)

@@ -14,7 +14,7 @@ contract("StMaster", accounts => {
 
     before(async function () {
         stm = await st.deployed();
-        console.log('before, stm.name=', (await stm.name()));
+        //console.log('before, stm.name=', (await stm.name()));
 
         if (await stm.getContractType() != CONST.contractType.CASHFLOW_CONTROLLER) this.skip();
         await stm.sealContract();
@@ -37,7 +37,7 @@ contract("StMaster", accounts => {
     });
 
     it(`cashflow controller - allow an initial unibatch mint on indirect passed-through cashflow base (type 1)`, async () => {
-        const M = accounts[global.TaddrNdx];
+        const M = accounts[0];
         const { batchId, mintTx } = await mintBatchWithMetadata( 
             { tokenType: CONST.tokenType.TOK_T1, qtyUnit: 1000, qtySecTokens: 1, receiver: M,
                metaKeys: [ 'key1', 'key2' ],
@@ -46,7 +46,7 @@ contract("StMaster", accounts => {
     });
 
     it(`cashflow controller - should not allow a subsequent batch mint for the same indirect base (type 1)`, async () => {
-        const M = accounts[global.TaddrNdx];
+        const M = accounts[0];
         try {
             const { batchId, mintTx } = await mintBatchWithMetadata( 
                 { tokenType: CONST.tokenType.TOK_T1, qtyUnit: 100, qtySecTokens: 1, receiver: M,
@@ -59,8 +59,8 @@ contract("StMaster", accounts => {
         }
     });
 
-    it(`cashflow controller - should allow an initial unibatch mint on different indirect passed-through cashflow base (type 2)`, async () => {
-        const M = accounts[global.TaddrNdx];
+    it(`cashflow controller - should allow an initial unibatch mint on a different indirect passed-through cashflow base (type 2)`, async () => {
+        const M = accounts[0];
         const { batchId, mintTx } = await mintBatchWithMetadata( 
             { tokenType: CONST.tokenType.TOK_T2, qtyUnit: 1000, qtySecTokens: 1, receiver: M,
                metaKeys: [ 'key5', 'key6' ],
@@ -69,15 +69,18 @@ contract("StMaster", accounts => {
         //console.log('mintTx', mintTx);
         //console.log('batchId', batchId);
     });
+
     // TODO: getLedgerEntry()
+    it(`cashflow controller - should be able to get a split ledger entry across all indirect token types`, async () => {
+        const le = await stm.getLedgerEntry(accounts[0]);
+        console.log('le', le);
+    });
+
+    // TODO: getSecToken() [delegation to base...]
 
     // TODO: getLedgerHashcode() -> controller needs to delegate to base for ST data...!
-    // TODO: mint for second type
+    
     // TODO: transferOrTrade()
-
-    // it(`cashflow controller - controller's ledger entry contains indirect token values`, async () => {
-    //     const le = await stm.getLedgerEntry(accounts[0]); //...
-    //     console.log('le', le);
 
     async function mintBatchWithMetadata({ tokenType, qtyUnit, qtySecTokens, receiver, metaKeys, metaValues }) {
         const mintTx = await stm.mintSecTokenBatch(tokenType, qtyUnit, qtySecTokens, receiver, CONST.nullFees, 0, metaKeys, metaValues, { from: accounts[0] });

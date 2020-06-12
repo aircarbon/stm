@@ -55,9 +55,11 @@ contract StLedger is
     function getLedgerOwner(uint256 index) external view returns (address) { return ld._ledgerOwners[index]; }
 
     function getLedgerEntry(address account) external view returns (StructLib.LedgerReturn memory) { return LedgerLib.getLedgerEntry(ld, std, ctd, account); }
+
     function getSecTokenBatchCount() external view returns (uint256) { return ld._batches_currentMax_id; } // 1-based
 
     function getSecToken(uint256 id) external view returns (StructLib.SecTokenReturn memory) {
+        // TODO: CFT-B
         return StructLib.SecTokenReturn({
                 exists: ld._sts[id].mintedQty != 0,
                     id: id,
