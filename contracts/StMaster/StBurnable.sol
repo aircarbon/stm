@@ -12,12 +12,12 @@ contract StBurnable is Owned, StLedger {
 
     function burnTokens(
         address          ledgerOwner,
-        uint256          tokenTypeId, // Supply: (tokenTypeId
-        int256           burnQty,     // AND burnQty)
-        uint256[] memory stIds        // OR (stIds, i.e. specific security token ids)
+        uint256          tokTypeId,   // tokTypeId AND (
+        int256           burnQty,     //   burnQty
+        uint256[] memory stIds        //   OR stIds)
     )
     public onlyOwner() onlyWhenReadWrite() {
-        TokenLib.burnTokens(ld, std, ledgerOwner, tokenTypeId, burnQty, stIds);
+        TokenLib.burnTokens(ld, std, ledgerOwner, tokTypeId, burnQty, stIds);
     }
 
     // 24k

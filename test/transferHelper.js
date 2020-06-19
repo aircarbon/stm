@@ -14,7 +14,8 @@ module.exports = {
             ccy_amount_A, ccyTypeId_A,
             ccy_amount_B, ccyTypeId_B,
             applyFees,
-            stIds,
+            k_stIds_A,
+            k_stIds_B,
         } = a;
         // console.dir(a);
         //console.log('ccyTypeId_A', ccyTypeId_A);
@@ -100,7 +101,8 @@ module.exports = {
             ccy_amount_B: ccy_amount_B.toString(),    ccyTypeId_B, 
                applyFees,
             feeAddrOwner: accounts[0],
-                   stIds: stIds || [],
+               k_stIds_A: k_stIds_A || [],
+               k_stIds_B: k_stIds_B || [],
         });
         // for (let i = 0; i < feesPreview.length; i++) {
         //     const x = feesPreview[i];
@@ -141,8 +143,9 @@ module.exports = {
                 ccy_amount_A, ccyTypeId_A, 
                 ccy_amount_B, ccyTypeId_B, 
                    applyFees,
-                       stIds,
-        }, { from: accounts[0] }
+                   k_stIds_A: k_stIds_A || [],
+                   k_stIds_B: k_stIds_B || [],
+            }, { from: accounts[0] }
         );
         //await CONST.logGas(web3, transferTx, `TransferHelper`);
 
@@ -603,7 +606,6 @@ module.exports = {
     ccy_amount_B, ccyTypeId_B, 
        applyFees,
             from,
-           //stIds
         ) => {
         return transferWrapped({ stm, accounts,
         ledger_A, ledger_B, 
@@ -612,7 +614,6 @@ module.exports = {
     ccy_amount_A, ccyTypeId_A, 
     ccy_amount_B, ccyTypeId_B, 
        applyFees,
-           stIds: [],
         }, from);
     },
 
@@ -653,7 +654,8 @@ async function transferWrapped({
     ccy_amount_A, ccyTypeId_A,
     ccy_amount_B, ccyTypeId_B,
     applyFees,
-    stIds
+    k_stIds_A,
+    k_stIds_B,
 }, from) {
     const tx = await stm.transferOrTrade({ 
                 ledger_A,                          ledger_B, 
@@ -663,7 +665,8 @@ async function transferWrapped({
             ccy_amount_B: ccy_amount_B.toString(), ccyTypeId_B, 
                applyFees,
             feeAddrOwner: CONST.nullAddr,
-                   stIds: stIds || [],
+               k_stIds_A: k_stIds_A || [],
+               k_stIds_B: k_stIds_B || [],
         },
         from //{ from: accounts[0] }
     );

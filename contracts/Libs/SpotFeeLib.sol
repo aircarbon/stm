@@ -19,12 +19,12 @@ library SpotFeeLib {
         StructLib.LedgerStruct storage ld,
         StructLib.StTypesStruct storage std,
         StructLib.FeeStruct storage globalFees,
-        uint256 tokenTypeId,
+        uint256 tokTypeId,
         address ledgerOwner,
         StructLib.SetFeeArgs memory a)
     public {
-        require(tokenTypeId >= 1 && tokenTypeId <= std._tt_Count, "Bad tokenTypeId");
-        require(std._tt_settle[tokenTypeId] == StructLib.SettlementType.SPOT, "Bad token settlement type");
+        require(tokTypeId >= 1 && tokTypeId <= std._tt_Count, "Bad tokTypeId");
+        require(std._tt_settle[tokTypeId] == StructLib.SettlementType.SPOT, "Bad token settlement type");
         require(a.ccy_perMillion == 0, "ccy_perMillion unsupported for token-type fee");
         require(a.ccy_mirrorFee == false, "ccy_mirrorFee unsupported for token-type fee");
 
@@ -35,23 +35,23 @@ library SpotFeeLib {
             feeStruct = ld._ledger[ledgerOwner].spot_customFees;
         }
 
-        feeStruct.tokType_Set[tokenTypeId] = a.fee_fixed != 0 || a.fee_percBips != 0 || a.fee_min != 0 || a.fee_max != 0;
+        feeStruct.tokType_Set[tokTypeId] = a.fee_fixed != 0 || a.fee_percBips != 0 || a.fee_min != 0 || a.fee_max != 0;
 
-        if (feeStruct.tok[tokenTypeId].fee_fixed != a.fee_fixed || a.fee_fixed != 0)
-            emit SetFeeTokFix(tokenTypeId, ledgerOwner, a.fee_fixed);
-        feeStruct.tok[tokenTypeId].fee_fixed = a.fee_fixed;
+        if (feeStruct.tok[tokTypeId].fee_fixed != a.fee_fixed || a.fee_fixed != 0)
+            emit SetFeeTokFix(tokTypeId, ledgerOwner, a.fee_fixed);
+        feeStruct.tok[tokTypeId].fee_fixed = a.fee_fixed;
 
-        if (feeStruct.tok[tokenTypeId].fee_percBips != a.fee_percBips || a.fee_percBips != 0)
-            emit SetFeeTokBps(tokenTypeId, ledgerOwner, a.fee_percBips);
-        feeStruct.tok[tokenTypeId].fee_percBips = a.fee_percBips;
+        if (feeStruct.tok[tokTypeId].fee_percBips != a.fee_percBips || a.fee_percBips != 0)
+            emit SetFeeTokBps(tokTypeId, ledgerOwner, a.fee_percBips);
+        feeStruct.tok[tokTypeId].fee_percBips = a.fee_percBips;
 
-        if (feeStruct.tok[tokenTypeId].fee_min != a.fee_min || a.fee_min != 0)
-            emit SetFeeTokMin(tokenTypeId, ledgerOwner, a.fee_min);
-        feeStruct.tok[tokenTypeId].fee_min = a.fee_min;
+        if (feeStruct.tok[tokTypeId].fee_min != a.fee_min || a.fee_min != 0)
+            emit SetFeeTokMin(tokTypeId, ledgerOwner, a.fee_min);
+        feeStruct.tok[tokTypeId].fee_min = a.fee_min;
 
-        if (feeStruct.tok[tokenTypeId].fee_max != a.fee_max || a.fee_max != 0)
-            emit SetFeeTokMax(tokenTypeId, ledgerOwner, a.fee_max);
-        feeStruct.tok[tokenTypeId].fee_max = a.fee_max;
+        if (feeStruct.tok[tokTypeId].fee_max != a.fee_max || a.fee_max != 0)
+            emit SetFeeTokMax(tokTypeId, ledgerOwner, a.fee_max);
+        feeStruct.tok[tokTypeId].fee_max = a.fee_max;
     }
 
     function setFee_CcyType(

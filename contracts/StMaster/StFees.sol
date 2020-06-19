@@ -36,9 +36,9 @@ contract StFees is
         });
     }
 
-    function setFee_TokType(uint256 tokenTypeId, address ledgerOwner, StructLib.SetFeeArgs memory feeArgs)
+    function setFee_TokType(uint256 tokTypeId, address ledgerOwner, StructLib.SetFeeArgs memory feeArgs)
     public onlyOwner() onlyWhenReadWrite() {
-        SpotFeeLib.setFee_TokType(ld, std, globalFees, tokenTypeId, ledgerOwner, feeArgs);
+        SpotFeeLib.setFee_TokType(ld, std, globalFees, tokTypeId, ledgerOwner, feeArgs);
     }
 
     function setFee_CcyType(uint256 ccyTypeId, address ledgerOwner, StructLib.SetFeeArgs memory feeArgs)

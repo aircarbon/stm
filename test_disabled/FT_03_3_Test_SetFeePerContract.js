@@ -79,7 +79,7 @@ contract("StMaster", accounts => {
         try {
             const x = await stm.setFuture_FeePerContract(0xdeaddead, 303);
         }
-        catch (ex) { assert(ex.reason == 'Bad tokenTypeId', `unexpected: ${ex.reason}`); return; }
+        catch (ex) { assert(ex.reason == 'Bad tokTypeId', `unexpected: ${ex.reason}`); return; }
         assert.fail('expected contract exception');
     });
     it(`FT fee per contract - should not be able to set fee on a spot token type`, async () => {

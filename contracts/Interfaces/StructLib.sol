@@ -290,20 +290,26 @@ library StructLib {
     struct TransferArgs {
         address ledger_A;
         address ledger_B;
+
         uint256 qty_A;           // ST quantity moving from A (excluding fees, if any)
+        uint256[] k_stIds_A;     // ...TODO: constant/specified ST IDs to transfer (overrides qty_A)
         uint256 tokenTypeId_A;   // ST type moving from A
+
         uint256 qty_B;           // ST quantity moving from B (excluding fees, if any)
+        uint256[] k_stIds_B;     // ...TODO: constant/specified ST IDs to transfer (overrides qty_B)
         uint256 tokenTypeId_B;   // ST type moving from B
+
         int256  ccy_amount_A;    // currency amount moving from A (excluding fees, if any)
                                  // (signed value: ledger supports -ve balances)
         uint256 ccyTypeId_A;     // currency type moving from A
+
         int256  ccy_amount_B;    // currency amount moving from B (excluding fees, if any)
                                  // (signed value: ledger supports -ve balances)
         uint256 ccyTypeId_B;     // currency type moving from B
+
         bool    applyFees;       // apply global fee structure to the transfer (both legs)
         address feeAddrOwner;    // exchange fees: receive address
 
-        uint256[] stIds;         //...
     }
     struct FeesCalc {
         uint256    fee_ccy_A;          // currency fee paid by A
@@ -373,16 +379,16 @@ library StructLib {
     /**
      * @notice Checks if the supplied ledger owner holds at least the specified quantity of supplied ST type
      * @param ledger Ledger owner
-     * @param tokenTypeId ST type
+     * @param tokTypeId ST type
      * @param qty Validation quantity in contract base unit
      */
     function sufficientTokens(
         StructLib.LedgerStruct storage ld,
-        address ledger, uint256 tokenTypeId, int256 qty, int256 fee
+        address ledger, uint256 tokTypeId, int256 qty, int256 fee
     ) public view returns (bool) {
         int256 qtyAvailable = 0;
-        for (uint i = 0; i < ld._ledger[ledger].tokenType_stIds[tokenTypeId].length; i++) {
-            qtyAvailable += ld._sts[ld._ledger[ledger].tokenType_stIds[tokenTypeId][i]].currentQty;
+        for (uint i = 0; i < ld._ledger[ledger].tokenType_stIds[tokTypeId].length; i++) {
+            qtyAvailable += ld._sts[ld._ledger[ledger].tokenType_stIds[tokTypeId][i]].currentQty;
         }
         return qtyAvailable >= qty + fee;
     }
@@ -402,5 +408,23 @@ library StructLib {
         return (ld._ledger[ledger].ccyType_balance[ccyTypeId]
                 + receiving - ld._ledger[ledger].ccyType_reserved[ccyTypeId]
                ) >= sending + fee;
+    }
+
+    /**
+     * @notice Checks if the supplied token of supplied type is present on the supplied ledger entry
+     * @param ledger Ledger owner
+     * @param tokTypeId Token type ID
+     * @param stId Security token ID
+     */
+    function tokenExistsOnLedger(
+        StructLib.LedgerStruct storage ld,
+        uint256 tokTypeId, address ledger, uint256 stId
+    ) public view returns(bool) {
+        for (uint256 x = 0; x < ld._ledger[ledger].tokenType_stIds[tokTypeId].length ; x++) {
+            if (ld._ledger[ledger].tokenType_stIds[tokTypeId][x] == stId) {
+                return true;
+            }
+        }
+        return false;
     }
 }

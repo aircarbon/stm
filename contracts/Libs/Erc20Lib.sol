@@ -64,16 +64,17 @@ library Erc20Lib {
                             ledger_A: msg.sender,
                             ledger_B: a.recipient,
                                qty_A: qtyTransfer,
+                           k_stIds_A: new uint256[](0),
                        tokenTypeId_A: tokenTypeId,
                                qty_B: 0,
+                           k_stIds_B: new uint256[](0),
                        tokenTypeId_B: 0,
                         ccy_amount_A: 0,
                          ccyTypeId_A: 0,
                         ccy_amount_B: 0,
                          ccyTypeId_B: 0,
                            applyFees: false,
-                        feeAddrOwner: a.owner, //address(0x0) // fees: disabled for erc20 - not used
-                               stIds: new uint256[](0)
+                        feeAddrOwner: a.owner //address(0x0) // fees: disabled for erc20 - not used
                     });
                     TransferLib.transferOrTrade(ld, ctd, globalFees, transferOrTradeArgs);
                     remainingToTransfer -= qtyTransfer;

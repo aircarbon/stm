@@ -269,7 +269,7 @@ library FuturesLib {
         //require(shortSt.batchId == 0 && shortSt.ft_price != 0, "Bad (unexpected data) on explicit short token");
         require(st.ft_ledgerOwner != address(0x0), "Bad token ledger owner");
         require(a.markPrice >= 0, "Bad markPrice"); // allow zero for marking
-        // require(tokenExistsOnLedger(ld, a.tokTypeId, st.ft_ledgerOwner, a.stId), "Bad or missing ledger token type on supplied token");
+        // require(StructLib.'(ld, a.tokTypeId, st.ft_ledgerOwner, a.stId), "Bad or missing ledger token type on supplied token");
         require(a.feePerSide >= 0, "Bad feePerSide");
 
         // get delta
@@ -367,7 +367,7 @@ library FuturesLib {
         StructLib.PackedSt storage masterSt = ld._sts[a.master_StId];
         require(masterSt.batchId == 0 && masterSt.ft_price != 0, "Bad (unexpected data) on master token");
         require(masterSt.ft_lastMarkPrice != -1, "Bad last mark price on master token");
-        require(tokenExistsOnLedger(ld, a.tokTypeId, masterSt.ft_ledgerOwner, a.master_StId), "Bad or missing ledger token type on master token");
+        require(StructLib.tokenExistsOnLedger(ld, a.tokTypeId, masterSt.ft_ledgerOwner, a.master_StId), "Bad or missing ledger token type on master token");
         require(masterSt.mintedQty == masterSt.currentQty, "Unexpected quantity on master token");
         totQtyAbs += abs64(masterSt.currentQty);
         totPriceQtyAbs += abs64(masterSt.currentQty) * masterSt.ft_price;
@@ -379,7 +379,7 @@ library FuturesLib {
             require(childSt.batchId == 0 && childSt.ft_price != 0, "Bad (unexpected data) on child token");
             require(childSt.ft_ledgerOwner == masterSt.ft_ledgerOwner, "Token ledger owner mismatch");
             require(childSt.ft_lastMarkPrice != -1, "Bad last mark price on child token");
-            require(tokenExistsOnLedger(ld, a.tokTypeId, masterSt.ft_ledgerOwner, a.child_StIds[x]), "Bad or missing ledger token type on child token");
+            require(StructLib.tokenExistsOnLedger(ld, a.tokTypeId, masterSt.ft_ledgerOwner, a.child_StIds[x]), "Bad or missing ledger token type on child token");
             require(childSt.ft_lastMarkPrice == masterSt.ft_lastMarkPrice, "Last mark price mismatch");
             require(childSt.mintedQty == childSt.currentQty, "Unexpected quantity on child token");
 
@@ -416,21 +416,21 @@ library FuturesLib {
         return delta;
     }
 
-    // checks if the supplied token of supplied type is present on the supplied ledger entry
-    function tokenExistsOnLedger(
-        StructLib.LedgerStruct storage ld,
-        uint256 tokTypeId,
-        //StructLib.PackedSt memory st,
-        address ledgerOwner,
-        uint256 stId
-    ) private view returns(bool) {
-        for (uint256 x = 0; x < ld._ledger[ledgerOwner].tokenType_stIds[tokTypeId].length ; x++) {
-            if (ld._ledger[ledgerOwner].tokenType_stIds[tokTypeId][x] == stId) {
-                return true;
-            }
-        }
-        return false;
-    }
+    // // checks if the supplied token of supplied type is present on the supplied ledger entry
+    // function tokenExistsOnLedger(
+    //     StructLib.LedgerStruct storage ld,
+    //     uint256 tokTypeId,
+    //     //StructLib.PackedSt memory st,
+    //     address ledgerOwner,
+    //     uint256 stId
+    // ) private view returns(bool) {
+    //     for (uint256 x = 0; x < ld._ledger[ledgerOwner].tokenType_stIds[tokTypeId].length ; x++) {
+    //         if (ld._ledger[ledgerOwner].tokenType_stIds[tokTypeId][x] == stId) {
+    //             return true;
+    //         }
+    //     }
+    //     return false;
+    // }
 
     // checks if the supplied token of supplied type is present on the supplied ledger entry
     function tokenTypeQtyOnledger(

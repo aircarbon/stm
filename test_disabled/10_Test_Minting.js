@@ -85,7 +85,7 @@ contract("StMaster", accounts => {
         try {
             await stm.mintSecTokenBatch(999, CONST.KT_CARBON, 1, accounts[global.TaddrNdx], CONST.nullFees, 0, [], [], { from: accounts[0] });
         } catch (ex) { 
-            assert(ex.reason == 'Bad tokenTypeId', `unexpected: ${ex.reason}`);
+            assert(ex.reason == 'Bad tokTypeId', `unexpected: ${ex.reason}`);
             return;
         }
         assert.fail('expected contract exception');

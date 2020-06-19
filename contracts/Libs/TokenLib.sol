@@ -97,24 +97,24 @@ library TokenLib {
     }
 
     function setFuture_FeePerContract(
-        StructLib.StTypesStruct storage std, uint256 tokenTypeId, uint128 feePerContract
+        StructLib.StTypesStruct storage std, uint256 tokTypeId, uint128 feePerContract
     )
     public {
-        require(tokenTypeId >= 1 && tokenTypeId <= std._tt_Count, "Bad tokenTypeId");
-        require(std._tt_settle[tokenTypeId] == StructLib.SettlementType.FUTURE, "Bad token settlement type");
-        std._tt_ft[tokenTypeId].feePerContract = feePerContract;
-        emit SetFutureFeePerContract(tokenTypeId, feePerContract);
+        require(tokTypeId >= 1 && tokTypeId <= std._tt_Count, "Bad tokTypeId");
+        require(std._tt_settle[tokTypeId] == StructLib.SettlementType.FUTURE, "Bad token settlement type");
+        std._tt_ft[tokTypeId].feePerContract = feePerContract;
+        emit SetFutureFeePerContract(tokTypeId, feePerContract);
     }
 
     function setFuture_VariationMargin(
-        StructLib.StTypesStruct storage std, uint256 tokenTypeId, uint16 varMarginBips
+        StructLib.StTypesStruct storage std, uint256 tokTypeId, uint16 varMarginBips
     )
     public {
-        require(tokenTypeId >= 1 && tokenTypeId <= std._tt_Count, "Bad tokenTypeId");
-        require(std._tt_settle[tokenTypeId] == StructLib.SettlementType.FUTURE, "Bad token settlement type");
-        require(std._tt_ft[tokenTypeId].initMarginBips + varMarginBips <= 10000, "Bad total margin");
-        std._tt_ft[tokenTypeId].varMarginBips = varMarginBips;
-        emit SetFutureVariationMargin(tokenTypeId, varMarginBips);
+        require(tokTypeId >= 1 && tokTypeId <= std._tt_Count, "Bad tokTypeId");
+        require(std._tt_settle[tokTypeId] == StructLib.SettlementType.FUTURE, "Bad token settlement type");
+        require(std._tt_ft[tokTypeId].initMarginBips + varMarginBips <= 10000, "Bad total margin");
+        std._tt_ft[tokTypeId].varMarginBips = varMarginBips;
+        emit SetFutureVariationMargin(tokTypeId, varMarginBips);
     }
 
     function getSecTokenTypes(
@@ -123,13 +123,13 @@ library TokenLib {
         StructLib.SecTokenTypeReturn[] memory tokenTypes;
         tokenTypes = new StructLib.SecTokenTypeReturn[](std._tt_Count);
 
-        for (uint256 tokenTypeId = 1; tokenTypeId <= std._tt_Count; tokenTypeId++) {
-            tokenTypes[tokenTypeId - 1] = StructLib.SecTokenTypeReturn({
-                    id: tokenTypeId,
-                  name: std._tt_name[tokenTypeId],
-        settlementType: std._tt_settle[tokenTypeId],
-                    ft: std._tt_ft[tokenTypeId],
-      cashflowBaseAddr: std._tt_addr[tokenTypeId]
+        for (uint256 tokTypeId = 1; tokTypeId <= std._tt_Count; tokTypeId++) {
+            tokenTypes[tokTypeId - 1] = StructLib.SecTokenTypeReturn({
+                    id: tokTypeId,
+                  name: std._tt_name[tokTypeId],
+        settlementType: std._tt_settle[tokTypeId],
+                    ft: std._tt_ft[tokTypeId],
+      cashflowBaseAddr: std._tt_addr[tokTypeId]
             });
         }
 
@@ -141,7 +141,7 @@ library TokenLib {
 
     // MINTING
     struct MintSecTokenBatchArgs {
-        uint256              tokenTypeId;
+        uint256              tokTypeId;
         uint256              mintQty; // accept 256 bits, so we can downcast and test if in 64-bit range
         int64                mintSecTokenCount;
         address payable      batchOwner;
@@ -157,7 +157,7 @@ library TokenLib {
     public {
 
         require(ld._contractSealed, "Contract is not sealed");
-        require(a.tokenTypeId >= 1 && a.tokenTypeId <= std._tt_Count, "Bad tokenTypeId");
+        require(a.tokTypeId >= 1 && a.tokTypeId <= std._tt_Count, "Bad tokTypeId");
         require(a.mintSecTokenCount == 1, "Set mintSecTokenCount 1");
         require(a.mintQty >= 0x1 && a.mintQty <= 0x7fffffffffffffff, "Bad mintQty"); // max int64
         require(uint256(ld._batches_currentMax_id) + 1 <= 0xffffffffffffffff, "Too many batches");
@@ -181,7 +181,7 @@ library TokenLib {
         StructLib.SecTokenBatch memory newBatch = StructLib.SecTokenBatch({
                          id: ld._batches_currentMax_id + 1,
             mintedTimestamp: block.timestamp,
-                tokenTypeId: a.tokenTypeId,
+                tokenTypeId: a.tokTypeId,
                   mintedQty: uint256(a.mintQty),
                   burnedQty: 0,
                    metaKeys: a.metaKeys,
@@ -193,7 +193,7 @@ library TokenLib {
         ld._batches[newBatch.id] = newBatch;
         ld._batches_currentMax_id++;
         if (ld.contractType != StructLib.ContractType.CASHFLOW_BASE) { // emit batch event (core & cashflow controller)
-            emit Minted(newBatch.id, a.tokenTypeId, a.batchOwner, uint256(a.mintQty), uint256(a.mintSecTokenCount));
+            emit Minted(newBatch.id, a.tokTypeId, a.batchOwner, uint256(a.mintQty), uint256(a.mintSecTokenCount));
         }
 
         // create ledger entry as required
@@ -201,10 +201,10 @@ library TokenLib {
 
         // mint & assign STs (delegate to cashflow base in cashflow controller)
         if (ld.contractType == StructLib.ContractType.CASHFLOW_CONTROLLER) { // CFT-C: passthrough to base
-            //require(std._tt_addr[a.tokenTypeId] != address(0x0), "Bad cashflow request");
-            StMaster base = StMaster(std._tt_addr[a.tokenTypeId]);
+            //require(std._tt_addr[a.tokTypeId] != address(0x0), "Bad cashflow request");
+            StMaster base = StMaster(std._tt_addr[a.tokTypeId]);
             base.mintSecTokenBatch(
-                1, //a.tokenTypeId, ==> maps to base typeId=1 (always: base is uni-type internally)
+                1, //a.tokTypeId, ==> maps to base typeId=1 (always: base is uni-type internally)
                 a.mintQty,
                 a.mintSecTokenCount,
                 a.batchOwner,
@@ -222,8 +222,8 @@ library TokenLib {
                 ld._sts[newId].mintedQty = stQty;
                 ld._sts[newId].currentQty = stQty; // mint ST
 
-                emit MintedSecToken(newId, newBatch.id, a.tokenTypeId, a.batchOwner, uint256(stQty));
-                ld._ledger[a.batchOwner].tokenType_stIds[a.tokenTypeId].push(newId); // assign ST to ledger
+                emit MintedSecToken(newId, newBatch.id, a.tokTypeId, a.batchOwner, uint256(stQty));
+                ld._ledger[a.batchOwner].tokenType_stIds[a.tokTypeId].push(newId); // assign ST to ledger
             }
         }
 
@@ -294,69 +294,89 @@ library TokenLib {
 
     // BURNING
     function burnTokens(
-        StructLib.LedgerStruct storage ld,
+        StructLib.LedgerStruct storage  ld,
         StructLib.StTypesStruct storage std,
-        //StructLib.BurnArgs memory a
-        address ledgerOwner,
-        uint256 tokenTypeId,
-        int256 burnQty, // accept 256 bits, so we can downcast and test if in 64-bit range
-        uint256[] memory stIds
+        address                         ledgerOwner,
+        uint256                         tokTypeId,
+        int256                          burnQty, // accept 256 bits, so we can downcast and test if in 64-bit range
+        uint256[] memory                k_stIds
     )
     public {
         require(ld._contractSealed, "Contract is not sealed");
         require(ld._ledger[ledgerOwner].exists == true, "Bad ledgerOwner");
-        require(burnQty >= 0x1 && burnQty <= 0x7fffffffffffffff, "Bad burnQty"); // max int64
-        require(tokenTypeId >= 1 && tokenTypeId <= std._tt_Count, "Bad tokenTypeId");
 
-        // check ledger owner has sufficient tokens of supplied type
-        require(StructLib.sufficientTokens(ld, ledgerOwner, tokenTypeId, int256(burnQty), 0) == true, "Insufficient tokens");
+        require(tokTypeId >= 1 && tokTypeId <= std._tt_Count, "Bad tokTypeId");
+        require((k_stIds.length > 0 && burnQty == 0) ||
+                (k_stIds.length == 0 && burnQty > 0),
+                "Specify tokTypeId AND (k_stIds OR burnQty)");
+
+        if (k_stIds.length == 0) {
+            require(burnQty >= 0x1 && burnQty <= 0x7fffffffffffffff, "Bad burnQty"); // max int64
+            require(StructLib.sufficientTokens(ld, ledgerOwner, tokTypeId, int256(burnQty), 0) == true, "Insufficient tokens");
+        }
+        else {
+            burnQty = 0; // no harm
+            for (uint256 i = 0; i < k_stIds.length; i++) {
+                require(StructLib.tokenExistsOnLedger(ld, tokTypeId, ledgerOwner, k_stIds[i]), "Bad stId");
+                burnQty += ld._sts[k_stIds[i]].currentQty; // get implied burn qty
+            }
+        }
 
         // burn (i.e. delete or resize) sufficient ST(s)
         uint256 ndx = 0;
         int64 remainingToBurn = int64(burnQty);
-
         while (remainingToBurn > 0) {
-            uint256[] storage tokenType_stIds = ld._ledger[ledgerOwner].tokenType_stIds[tokenTypeId];
+            uint256[] storage tokenType_stIds = ld._ledger[ledgerOwner].tokenType_stIds[tokTypeId];
             uint256 stId = tokenType_stIds[ndx];
             int64 stQty = ld._sts[stId].currentQty;
             uint64 batchId = ld._sts[stId].batchId;
 
-            if (remainingToBurn >= stQty) {
-                // burn the full ST
-                //ld._sts_currentQty[stId] = 0;
-                ld._sts[stId].currentQty = 0;
-
-                // remove from ledger
-                tokenType_stIds[ndx] = tokenType_stIds[tokenType_stIds.length - 1];
-                //tokenType_stIds.length--;
-                tokenType_stIds.pop(); // solc 0.6
-
-                //ld._ledger[ledgerOwner].tokenType_sumQty[tokenTypeId] -= stQty;
-
-                // burn from batch
-                ld._batches[batchId].burnedQty += uint256(stQty);
-
-                remainingToBurn -= stQty;
-                emit BurnedFullSecToken(stId, tokenTypeId, ledgerOwner, uint256(stQty));
+            // if burning by specific ST IDs, skip over STs that weren't specified
+            bool skip = false;
+            if (k_stIds.length > 0) {
+                skip = true;
+                for (uint256 i = 0; i < k_stIds.length; i++) {
+                    if (k_stIds[i] == stId) { skip = false; break; }
+                }
             }
-            else {
-                // resize the ST (partial burn)
-                //ld._sts_currentQty[stId] -= remainingToBurn;
-                ld._sts[stId].currentQty -= remainingToBurn;
+            if (!skip) {
+                if (remainingToBurn >= stQty) {
+                    // burn the full ST
+                    //ld._sts_currentQty[stId] = 0;
+                    ld._sts[stId].currentQty = 0;
 
-                // retain on ledger
-                //ld._ledger[ledgerOwner].tokenType_sumQty[tokenTypeId] -= remainingToBurn;
+                    // remove from ledger
+                    tokenType_stIds[ndx] = tokenType_stIds[tokenType_stIds.length - 1];
+                    //tokenType_stIds.length--;
+                    tokenType_stIds.pop(); // solc 0.6
 
-                // burn from batch
-                ld._batches[batchId].burnedQty += uint256(remainingToBurn);
+                    //ld._ledger[ledgerOwner].tokenType_sumQty[tokTypeId] -= stQty;
 
-                emit BurnedPartialSecToken(stId, tokenTypeId, ledgerOwner, uint256(remainingToBurn));
-                remainingToBurn = 0;
+                    // burn from batch
+                    ld._batches[batchId].burnedQty += uint256(stQty);
+
+                    remainingToBurn -= stQty;
+                    emit BurnedFullSecToken(stId, tokTypeId, ledgerOwner, uint256(stQty));
+                }
+                else {
+                    // resize the ST (partial burn)
+                    //ld._sts_currentQty[stId] -= remainingToBurn;
+                    ld._sts[stId].currentQty -= remainingToBurn;
+
+                    // retain on ledger
+                    //ld._ledger[ledgerOwner].tokenType_sumQty[tokTypeId] -= remainingToBurn;
+
+                    // burn from batch
+                    ld._batches[batchId].burnedQty += uint256(remainingToBurn);
+
+                    emit BurnedPartialSecToken(stId, tokTypeId, ledgerOwner, uint256(remainingToBurn));
+                    remainingToBurn = 0;
+                }
             }
         }
 
         ld._spot_totalBurnedQty += uint256(burnQty);
         ld._ledger[ledgerOwner].spot_sumQtyBurned += uint256(burnQty);
-        emit Burned(tokenTypeId, ledgerOwner, uint256(burnQty));
+        emit Burned(tokTypeId, ledgerOwner, uint256(burnQty));
     }
 }

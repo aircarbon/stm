@@ -13,7 +13,7 @@ contract StMintable is
     Owned, StLedger {
 
     function mintSecTokenBatch(
-        uint256                     tokenTypeId,
+        uint256                     tokTypeId,
         uint256                     mintQty,
         int64                       mintSecTokenCount,
         address payable             batchOwner,
@@ -23,7 +23,7 @@ contract StMintable is
         string[] memory             metaValues)
     public onlyOwner() onlyWhenReadWrite() {
         TokenLib.MintSecTokenBatchArgs memory args = TokenLib.MintSecTokenBatchArgs({
-              tokenTypeId: tokenTypeId,
+                tokTypeId: tokTypeId,
                   mintQty: mintQty,
         mintSecTokenCount: mintSecTokenCount,
                batchOwner: batchOwner,

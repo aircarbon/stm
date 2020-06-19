@@ -140,16 +140,17 @@ library PayableLib {
                     ledger_A: issueBatch.originator,
                     ledger_B: msg.sender,
                        qty_A: qtyTokens,
+                   k_stIds_A: new uint256[](0),
                tokenTypeId_A: 1,
                        qty_B: 0,
+                   k_stIds_B: new uint256[](0),
                tokenTypeId_B: 0,
                 ccy_amount_A: 0,
                  ccyTypeId_A: 0,
                 ccy_amount_B: 0,
                  ccyTypeId_B: 0,
                    applyFees: false,
-                feeAddrOwner: owner,
-                       stIds: new uint256[](0)
+                feeAddrOwner: owner
             });
             TransferLib.transferOrTrade(ld, ctd, globalFees, a);
         }
