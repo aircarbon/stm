@@ -11,16 +11,16 @@ import "../Libs/TokenLib.sol";
 contract StBurnable is Owned, StLedger {
 
     function burnTokens(
-        address ledgerOwner,
-        uint256 tokenTypeId,
-        int256  burnQty)
+        address          ledgerOwner,
+        uint256          tokenTypeId, // Supply: (tokenTypeId
+        int256           burnQty,     // AND burnQty)
+        uint256[] memory stIds        // OR (stIds, i.e. specific security token ids)
+    )
     public onlyOwner() onlyWhenReadWrite() {
-        TokenLib.burnTokens(ld, std, ledgerOwner, tokenTypeId, burnQty);
+        TokenLib.burnTokens(ld, std, ledgerOwner, tokenTypeId, burnQty, stIds);
     }
 
-    // 24k - exception/retain - needed for erc20 total supply
+    // 24k
     function getSecToken_totalBurnedQty()
-    external view returns (uint256 count) {
-        return ld._spot_totalBurnedQty;
-    }
+    external view returns (uint256 count) { return ld._spot_totalBurnedQty; }
 }

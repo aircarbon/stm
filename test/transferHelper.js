@@ -14,6 +14,7 @@ module.exports = {
             ccy_amount_A, ccyTypeId_A,
             ccy_amount_B, ccyTypeId_B,
             applyFees,
+            stIds,
         } = a;
         // console.dir(a);
         //console.log('ccyTypeId_A', ccyTypeId_A);
@@ -98,7 +99,8 @@ module.exports = {
             ccy_amount_A: ccy_amount_A.toString(),    ccyTypeId_A, 
             ccy_amount_B: ccy_amount_B.toString(),    ccyTypeId_B, 
                applyFees,
-            feeAddrOwner: accounts[0], 
+            feeAddrOwner: accounts[0],
+                   stIds: stIds || [],
         });
         // for (let i = 0; i < feesPreview.length; i++) {
         //     const x = feesPreview[i];
@@ -138,7 +140,8 @@ module.exports = {
                        qty_B, tokenTypeId_B, 
                 ccy_amount_A, ccyTypeId_A, 
                 ccy_amount_B, ccyTypeId_B, 
-                   applyFees
+                   applyFees,
+                       stIds,
         }, { from: accounts[0] }
         );
         //await CONST.logGas(web3, transferTx, `TransferHelper`);
@@ -599,7 +602,8 @@ module.exports = {
     ccy_amount_A, ccyTypeId_A, 
     ccy_amount_B, ccyTypeId_B, 
        applyFees,
-            from
+            from,
+           //stIds
         ) => {
         return transferWrapped({ stm, accounts,
         ledger_A, ledger_B, 
@@ -607,7 +611,8 @@ module.exports = {
            qty_B, tokenTypeId_B, 
     ccy_amount_A, ccyTypeId_A, 
     ccy_amount_B, ccyTypeId_B, 
-       applyFees
+       applyFees,
+           stIds: [],
         }, from);
     },
 
@@ -647,10 +652,10 @@ async function transferWrapped({
     qty_B,        tokenTypeId_B,
     ccy_amount_A, ccyTypeId_A,
     ccy_amount_B, ccyTypeId_B,
-    applyFees
+    applyFees,
+    stIds
 }, from) {
-    const tx = await stm.transferOrTrade(
-        { 
+    const tx = await stm.transferOrTrade({ 
                 ledger_A,                          ledger_B, 
                    qty_A: qty_A.toString(),        tokenTypeId_A, 
                    qty_B: qty_B.toString(),        tokenTypeId_B, 
@@ -658,6 +663,7 @@ async function transferWrapped({
             ccy_amount_B: ccy_amount_B.toString(), ccyTypeId_B, 
                applyFees,
             feeAddrOwner: CONST.nullAddr,
+                   stIds: stIds || [],
         },
         from //{ from: accounts[0] }
     );

@@ -148,7 +148,8 @@ library PayableLib {
                 ccy_amount_B: 0,
                  ccyTypeId_B: 0,
                    applyFees: false,
-                feeAddrOwner: owner
+                feeAddrOwner: owner,
+                       stIds: new uint256[](0)
             });
             TransferLib.transferOrTrade(ld, ctd, globalFees, a);
         }

@@ -62,9 +62,7 @@ origCcyFee_percBips_ExFee: origCcyFee_percBips_ExFee,
         return ld._tokens_currentMax_id; // 1-based
     }
 
-    // 24k - exception/retain - needed for erc20 total supply
+    // 24k
     function getSecToken_totalMintedQty()
-    external view returns (uint256) {
-        return ld._spot_totalMintedQty;
-    }
+    external view returns (uint256) { return ld._spot_totalMintedQty; }
 }

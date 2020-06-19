@@ -218,7 +218,7 @@ library StructLib {
         mapping(address => Ledger) _ledger;                     // main ledger list: all entries, by account
         address[] _ledgerOwners;                                // list of ledger owners (accounts)
 
-        // global totals
+        // global totals -- // 24k - exception/retain - needed for erc20 total supply
         uint256 _spot_totalMintedQty;                           // [SPOT types only] - todo: split by type?
         uint256 _spot_totalBurnedQty;                           // [SPOT types only] - todo: split by type?
 
@@ -302,6 +302,8 @@ library StructLib {
         uint256 ccyTypeId_B;     // currency type moving from B
         bool    applyFees;       // apply global fee structure to the transfer (both legs)
         address feeAddrOwner;    // exchange fees: receive address
+
+        uint256[] stIds;         //...
     }
     struct FeesCalc {
         uint256    fee_ccy_A;          // currency fee paid by A

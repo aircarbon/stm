@@ -68,12 +68,12 @@ library TransferLib {
        origTokFee_qty: 0,
    origTokFee_batchId: 0,
     origTokFee_struct: StructLib.SetFeeArgs({
-               fee_fixed: 0,
-            fee_percBips: 0,
-                 fee_min: 0,
-                 fee_max: 0,
-         ccy_perMillion: 0,
-           ccy_mirrorFee: false
+            fee_fixed: 0,
+         fee_percBips: 0,
+              fee_min: 0,
+              fee_max: 0,
+       ccy_perMillion: 0,
+        ccy_mirrorFee: false
         })
         });
 

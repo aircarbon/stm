@@ -22,6 +22,7 @@ TODO: ... CFT refactor...
 //
 // truffle deploy using "infinite" gas?
 // bytecode limit (24576): https://github.com/trufflesuite/ganache/issues/960
+// https://github.com/ethereum/EIPs/issues/1662
 //
 //  truffle compile --reset --all && grep \"bytecode\" build/contracts/* | awk '{print $1 " " length($3)/2}'
 //

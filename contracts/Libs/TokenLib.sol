@@ -296,9 +296,11 @@ library TokenLib {
     function burnTokens(
         StructLib.LedgerStruct storage ld,
         StructLib.StTypesStruct storage std,
+        //StructLib.BurnArgs memory a
         address ledgerOwner,
         uint256 tokenTypeId,
-        int256 burnQty // accept 256 bits, so we can downcast and test if in 64-bit range
+        int256 burnQty, // accept 256 bits, so we can downcast and test if in 64-bit range
+        uint256[] memory stIds
     )
     public {
         require(ld._contractSealed, "Contract is not sealed");

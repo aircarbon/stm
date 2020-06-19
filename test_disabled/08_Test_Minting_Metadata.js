@@ -55,7 +55,7 @@ contract("StMaster", accounts => {
         //console.log('getSecToken_totalMintedQty', await getSecToken_totalMintedQty())
         console.log('hash1', await stm.getLedgerHashcode())
 
-        const burnTx = await stm.burnTokens(M, CONST.tokenType.TOK_T1, 1000);
+        const burnTx = await stm.burnTokens(M, CONST.tokenType.TOK_T1, 1000, []);
         console.log('hash2', await stm.getLedgerHashcode())
     });
 

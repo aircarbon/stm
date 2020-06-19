@@ -50,17 +50,19 @@ contract StPayable is
     //      TODO: pri3 - wallet auto-converts
 
     StructLib.CashflowStruct cashflowData;
-    //address public chainlinkAggregator_btcUsd;
     address public chainlinkAggregator_ethUsd;
+    //address public chainlinkAggregator_btcUsd;
 
     function getCashflowData() public view returns(StructLib.CashflowStruct memory) {
         return PayableLib.getCashflowData(ld, cashflowData);
     }
+    
     // function get_btcUsd() public view returns(int256) {
     //     if (chainlinkAggregator_btcUsd == address(0x0)) return 100000000; // $1 - cents*satoshis
     //     IChainlinkAggregator ref = IChainlinkAggregator(chainlinkAggregator_btcUsd);
     //     return ref.latestAnswer();
     // }
+
     function get_ethUsd() public view returns(int256) {
         return PayableLib.get_ethUsd(chainlinkAggregator_ethUsd);
         // if (chainlinkAggregator_ethUsd == address(0x0)) return 100000000; // $1 - cents*satoshis

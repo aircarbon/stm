@@ -58,8 +58,8 @@ contract StLedger is
 
     function getSecTokenBatchCount() external view returns (uint256) { return ld._batches_currentMax_id; } // 1-based
 
+    // TODO: CFT-B
     function getSecToken(uint256 id) external view returns (StructLib.SecTokenReturn memory) {
-        // TODO: CFT-B
         return StructLib.SecTokenReturn({
                 exists: ld._sts[id].mintedQty != 0,
                     id: id,
@@ -72,9 +72,24 @@ contract StLedger is
                  ft_PL: ld._sts[id].ft_PL
         });
     }
+    // function getSecToken(uint256 id) external view returns (StructLib.LedgerSecTokenReturn memory) {
+    //     return StructLib.LedgerSecTokenReturn({
+    //           //exists: ld._sts[id].mintedQty != 0,
+    //               stId: id,
+    //        tokenTypeId: 0,
+    //      tokenTypeName: "",
+    //            batchId: ld._sts[id].batchId,
+    //          mintedQty: ld._sts[id].mintedQty,
+    //         currentQty: ld._sts[id].currentQty,
+    //           ft_price: ld._sts[id].ft_price,
+    //     ft_ledgerOwner: ld._sts[id].ft_ledgerOwner,
+    //   ft_lastMarkPrice: ld._sts[id].ft_lastMarkPrice,
+    //              ft_PL: ld._sts[id].ft_PL
+    //     });
+    // }
 
     function getSecTokenBatch(uint256 batchId) external view returns (StructLib.SecTokenBatch memory) {
-        require(batchId >= 1 && batchId <= ld._batches_currentMax_id, "Bad batchId");
+        //require(batchId >= 1 && batchId <= ld._batches_currentMax_id, "Bad batchId"); // 24k
         return ld._batches[batchId];
     }
 }

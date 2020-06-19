@@ -168,6 +168,7 @@ contract("StMaster", accounts => {
                     ccy_amount_B: 0,                         ccyTypeId_B: 0, 
                        applyFees: false,
                     feeAddrOwner: CONST.nullAddr,
+                           stIds: []
                 },
             );
             curHash = await checkHashUpdate(curHash);
@@ -182,17 +183,18 @@ contract("StMaster", accounts => {
                      ccy_amount_B: 0,                         ccyTypeId_B: 0, 
                         applyFees: true,
                      feeAddrOwner: CONST.nullAddr,
+                            stIds: []
                     },
                 );
                 curHash = await checkHashUpdate(curHash);
             }
 
             // burn - parital, CORSIA
-            const burn_tx_B1 = await stm_cur.burnTokens(M, CONST.tokenType.TOK_T1, 1);
+            const burn_tx_B1 = await stm_cur.burnTokens(M, CONST.tokenType.TOK_T1, 1, []);
             curHash = await checkHashUpdate(curHash);
 
             // burn - full, batch 2 NATURE
-            const burn_tx_B2 = await stm_cur.burnTokens(M, CONST.tokenType.TOK_T2, 100);
+            const burn_tx_B2 = await stm_cur.burnTokens(M, CONST.tokenType.TOK_T2, 100, []);
             curHash = await checkHashUpdate(curHash);
 
         }
@@ -246,6 +248,7 @@ contract("StMaster", accounts => {
                     ccy_amount_B: CONST.ccyType.USD,         ccyTypeId_B: 1,
                        applyFees: true,
                     feeAddrOwner: CONST.nullAddr,
+                           stIds: []
                 });
                 //truffleAssert.prettyPrintEmittedEvents(tradeTx);
                 curHash = await checkHashUpdate(curHash);
@@ -393,14 +396,10 @@ contract("StMaster", accounts => {
         // }
 
         // set token totals
-        //const curTotalExchangeFeesPaidQty = await stm_cur.getSecToken_totalExchangeFeesPaidQty();
-        //const curTotalOriginatorFeesPaidQty = await stm_cur.getSecToken_totalOriginatorFeesPaidQty();
-        //const curTotalTransferedQty = await stm_cur.getSecToken_totalTransferedQty();
         const curSecTokenMintedCount = await stm_cur.getSecToken_countMinted();
         const curSecTokenBurnedQty = await stm_cur.getSecToken_totalBurnedQty();
         const curSecTokenMintedQty = await stm_cur.getSecToken_totalMintedQty();
         await stm_new.setTokenTotals(
-            //curTotalExchangeFeesPaidQty, curTotalOriginatorFeesPaidQty, curTotalTransferedQty,
             curSecTokenMintedCount, curSecTokenMintedQty, curSecTokenBurnedQty
         );
 

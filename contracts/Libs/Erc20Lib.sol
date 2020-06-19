@@ -72,7 +72,8 @@ library Erc20Lib {
                         ccy_amount_B: 0,
                          ccyTypeId_B: 0,
                            applyFees: false,
-                        feeAddrOwner: a.owner //address(0x0) // fees: disabled for erc20 - not used
+                        feeAddrOwner: a.owner, //address(0x0) // fees: disabled for erc20 - not used
+                               stIds: new uint256[](0)
                     });
                     TransferLib.transferOrTrade(ld, ctd, globalFees, transferOrTradeArgs);
                     remainingToTransfer -= qtyTransfer;
