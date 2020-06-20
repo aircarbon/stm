@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-only
+// Author: https://github.com/7-of-9
 pragma solidity >=0.4.21 <=0.6.10;
 pragma experimental ABIEncoderV2;
 
@@ -181,34 +182,21 @@ library LedgerLib {
         return ledgerHash;
     }
 
-    function hashStringArray(string[] memory strings) private pure returns (bytes32) {
-        bytes32 arrayHash = 0;
-        for (uint256 i = 0 ; i < strings.length ; i++) {
-            arrayHash = keccak256(abi.encodePacked(arrayHash, strings[i]));
-        }
-        return arrayHash;
-    }
-
-    function hashSetFeeArgs(StructLib.SetFeeArgs memory setFeeArgs) private pure returns (bytes32) {
-        return keccak256(abi.encodePacked(
-            setFeeArgs.fee_fixed,
-            setFeeArgs.fee_percBips,
-            setFeeArgs.fee_min,
-            setFeeArgs.fee_max
-        ));
-    }
+    //
+    // GET LEDGER ENTRY
+    //
 
     // returns full ledger information - (delegates to cashflow base contracts' split ledgers for token counts, in cashflow controller)
     struct GetLedgerEntryVars {
         StructLib.LedgerSecTokenReturn[] tokens;
-        StructLib.LedgerCcyReturn[] ccys;
-        uint256 spot_sumQty;
+        StructLib.LedgerCcyReturn[]      ccys;
+        uint256                          spot_sumQty;
     }
     function getLedgerEntry(
-        StructLib.LedgerStruct storage ld,
-        StructLib.StTypesStruct storage std,
+        StructLib.LedgerStruct storage   ld,
+        StructLib.StTypesStruct storage  std,
         StructLib.CcyTypesStruct storage ctd,
-        address account
+        address                          account
     )
     public view returns (StructLib.LedgerReturn memory) {
         GetLedgerEntryVars memory v;
@@ -297,5 +285,26 @@ library LedgerLib {
   spot_sumQtyBurned: ld._ledger[account].spot_sumQtyBurned
         });
         return ret;
+    }
+
+    //
+    // INTERNAL
+    //
+
+    function hashStringArray(string[] memory strings) private pure returns (bytes32) {
+        bytes32 arrayHash = 0;
+        for (uint256 i = 0 ; i < strings.length ; i++) {
+            arrayHash = keccak256(abi.encodePacked(arrayHash, strings[i]));
+        }
+        return arrayHash;
+    }
+
+    function hashSetFeeArgs(StructLib.SetFeeArgs memory setFeeArgs) private pure returns (bytes32) {
+        return keccak256(abi.encodePacked(
+            setFeeArgs.fee_fixed,
+            setFeeArgs.fee_percBips,
+            setFeeArgs.fee_min,
+            setFeeArgs.fee_max
+        ));
     }
 }

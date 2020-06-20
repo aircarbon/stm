@@ -26,27 +26,37 @@ contract("StMaster", accounts => {
         const A = accounts[global.TaddrNdx];
 
         // mint STs for A
+        await stm.mintSecTokenBatch(CONST.tokenType.TOK_T1, CONST.GT_CARBON, 1, A, CONST.nullFees, 0, [], []); 
+        await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2, CONST.GT_CARBON, 1, A, CONST.nullFees, 0, [], []); 
+        await stm.mintSecTokenBatch(CONST.tokenType.TOK_T1, CONST.GT_CARBON, 1, A, CONST.nullFees, 0, [], []); 
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T1, CONST.GT_CARBON, 1, A, CONST.nullFees, 0, [], []);
-        await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2, CONST.GT_CARBON, 1, A, CONST.nullFees, 0, [], []);
+        await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2, CONST.GT_CARBON, 1, A, CONST.nullFees, 0, [], []); 
+        await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2, CONST.GT_CARBON, 1, A, CONST.nullFees, 0, [], []); 
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T1, CONST.GT_CARBON, 1, A, CONST.nullFees, 0, [], []);
-        await stm.mintSecTokenBatch(CONST.tokenType.TOK_T1, CONST.GT_CARBON, 1, A, CONST.nullFees, 0, [], []);
-        await stm.mintSecTokenBatch(CONST.tokenType.TOK_T3, CONST.GT_CARBON, 1, A, CONST.nullFees, 0, [], []);
-        await stm.mintSecTokenBatch(CONST.tokenType.TOK_T3, CONST.GT_CARBON, 1, A, CONST.nullFees, 0, [], []);
+        await stm.mintSecTokenBatch(CONST.tokenType.TOK_T3, CONST.GT_CARBON, 1, A, CONST.nullFees, 0, [], []); 
 
         const le_before = await stm.getLedgerEntry(A);
-        const burnSts = le_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.TOK_T1); // burn all type T1...
 
-        // burn STs by ID
+        // define tokens to burn
+        const burnType = CONST.tokenType.TOK_T1;
+        const burnSts = le_before.tokens.filter(p => p.tokenTypeId == burnType && p.stId % 2 == 1);
+        assert(burnSts.length > 0, 'bad test data');
+        //const burnType = CONST.tokenType.TOK_T3;
+        //const burnSts = le_before.tokens.filter(p => p.tokenTypeId == burnType);
+
         const burnStIds = burnSts.map(p => p.stId);
-        //console.log(burnStIds);
-        const burnTx = await stm.burnTokens(accounts[global.TaddrNdx], CONST.tokenType.TOK_T1, 0, burnStIds);
-        await CONST.logGas(web3, burnTx, `Burn STs by ID [${burnStIds.join(',')}]`);
+        const burnQty = burnSts.map(p => p.currentQty).reduce((a,b) => a.add(new BN(b)), new BN(0));
+        //console.log('le_before.tokens', le_before.tokens);
+        console.log('burnStIds', burnStIds);
+        console.log('burnQty.toString()', burnQty.toString());
+        const burnTx = await stm.burnTokens(accounts[global.TaddrNdx], burnType, burnQty.toString(), burnStIds);
+        await CONST.logGas(web3, burnTx, `Burn STs of type ${burnType} IDs: [${burnStIds.join(',')}]`);
 
         // validate burn full ST events
         //truffleAssert.prettyPrintEmittedEvents(burnTx);
         truffleAssert.eventEmitted(burnTx, 'BurnedFullSecToken', ev => {
             return burnStIds.includes(ev.stId.toString())
-                && ev.tokenTypeId == CONST.tokenType.TOK_T1
+                && ev.tokenTypeId == burnType
                 && ev.from == A
                 && ev.burnedQty == CONST.GT_CARBON
             ;

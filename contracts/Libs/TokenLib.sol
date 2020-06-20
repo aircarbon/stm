@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-only
+// Author: https://github.com/7-of-9
 pragma solidity >=0.4.21 <=0.6.10;
 pragma experimental ABIEncoderV2;
 
@@ -118,7 +119,8 @@ library TokenLib {
     }
 
     function getSecTokenTypes(
-        StructLib.StTypesStruct storage std)
+        StructLib.StTypesStruct storage std
+    )
     public view returns (StructLib.GetSecTokenTypesReturn memory) {
         StructLib.SecTokenTypeReturn[] memory tokenTypes;
         tokenTypes = new StructLib.SecTokenTypeReturn[](std._tt_Count);
@@ -151,9 +153,10 @@ library TokenLib {
         string[]             metaValues;
     }
     function mintSecTokenBatch(
-        StructLib.LedgerStruct storage ld,
+        StructLib.LedgerStruct storage  ld,
         StructLib.StTypesStruct storage std,
-        MintSecTokenBatchArgs memory a)
+        MintSecTokenBatchArgs memory    a
+    )
     public {
 
         require(ld._contractSealed, "Contract is not sealed");
@@ -236,9 +239,10 @@ library TokenLib {
     // POST-MINTING: add KVP metadata
     function addMetaSecTokenBatch(
         StructLib.LedgerStruct storage ld,
-        uint256 batchId,
-        string memory metaKeyNew,
-        string memory metaValueNew)
+        uint256                        batchId,
+        string memory                  metaKeyNew,
+        string memory                  metaValueNew
+    )
     public {
         require(ld._contractSealed, "Contract is not sealed");
         require(batchId >= 1 && batchId <= ld._batches_currentMax_id, "Bad batchId");
@@ -278,8 +282,9 @@ library TokenLib {
     // POST-MINTING: set batch CURRENCY fee
     function setOriginatorFeeCurrencyBatch(
         StructLib.LedgerStruct storage ld,
-        uint64 batchId,
-        uint16 origCcyFee_percBips_ExFee)
+        uint64                         batchId,
+        uint16                         origCcyFee_percBips_ExFee
+    )
     public {
         require(ld._contractSealed, "Contract is not sealed");
         require(batchId >= 1 && batchId <= ld._batches_currentMax_id, "Bad batchId");
@@ -292,7 +297,9 @@ library TokenLib {
         emit SetBatchOriginatorFee_Currency(batchId, origCcyFee_percBips_ExFee);
     }
 
+    //
     // BURNING
+    //
     function burnTokens(
         StructLib.LedgerStruct storage  ld,
         StructLib.StTypesStruct storage std,
@@ -306,20 +313,27 @@ library TokenLib {
         require(ld._ledger[ledgerOwner].exists == true, "Bad ledgerOwner");
 
         require(tokTypeId >= 1 && tokTypeId <= std._tt_Count, "Bad tokTypeId");
-        require((k_stIds.length > 0 && burnQty == 0) ||
-                (k_stIds.length == 0 && burnQty > 0),
-                "Specify tokTypeId AND (k_stIds OR burnQty)");
+        // require((k_stIds.length > 0 && burnQty == 0) ||
+        //         (k_stIds.length == 0 && burnQty > 0),
+        //         "Specify tokTypeId AND (k_stIds OR burnQty)");
+
+        require(burnQty >= 0x1 && burnQty <= 0x7fffffffffffffff, "Bad burnQty"); // max int64
 
         if (k_stIds.length == 0) {
-            require(burnQty >= 0x1 && burnQty <= 0x7fffffffffffffff, "Bad burnQty"); // max int64
             require(StructLib.sufficientTokens(ld, ledgerOwner, tokTypeId, int256(burnQty), 0) == true, "Insufficient tokens");
         }
         else {
-            burnQty = 0; // no harm
+            int256 stQty;
             for (uint256 i = 0; i < k_stIds.length; i++) {
-                require(StructLib.tokenExistsOnLedger(ld, tokTypeId, ledgerOwner, k_stIds[i]), "Bad stId");
-                burnQty += ld._sts[k_stIds[i]].currentQty; // get implied burn qty
+                require(StructLib.tokenExistsOnLedger(ld, tokTypeId, ledgerOwner, k_stIds[i]), "Bad stId"); // check supplied ST belongs to the supplied owner
+                stQty += ld._sts[k_stIds[i]].currentQty; // get implied burn qty
             }
+            require(stQty == burnQty, "Quantity mismatch");
+            //burnQty = 0;
+            // for (uint256 i = 0; i < k_stIds.length; i++) {
+            //     require(StructLib.tokenExistsOnLedger(ld, tokTypeId, ledgerOwner, k_stIds[i]), "Bad stId");
+            //     burnQty += ld._sts[k_stIds[i]].currentQty; // get implied burn qty
+            // }
         }
 
         // burn (i.e. delete or resize) sufficient ST(s)
@@ -339,7 +353,10 @@ library TokenLib {
                     if (k_stIds[i] == stId) { skip = false; break; }
                 }
             }
-            if (!skip) {
+            if (skip) {
+                ndx++;
+            }
+            else {
                 if (remainingToBurn >= stQty) {
                     // burn the full ST
                     //ld._sts_currentQty[stId] = 0;

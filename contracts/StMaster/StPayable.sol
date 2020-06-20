@@ -1,5 +1,6 @@
 
 // SPDX-License-Identifier: AGPL-3.0-only
+// Author: https://github.com/7-of-9
 pragma solidity >=0.4.21 <=0.6.10;
 pragma experimental ABIEncoderV2;
 

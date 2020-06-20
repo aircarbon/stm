@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-only
+// Author: https://github.com/7-of-9
 pragma solidity >=0.4.21 <=0.6.10;
 pragma experimental ABIEncoderV2;
 
@@ -55,7 +56,7 @@ library StructLib {
      * @param reservedAmount Reserved amount to set
      */
     function setReservedCcy(
-        StructLib.LedgerStruct storage ld,
+        StructLib.LedgerStruct storage   ld,
         StructLib.CcyTypesStruct storage ctd,
         address ledger, uint256 ccyTypeId, int256 reservedAmount
     ) public {
@@ -292,11 +293,11 @@ library StructLib {
         address ledger_B;
 
         uint256 qty_A;           // ST quantity moving from A (excluding fees, if any)
-        uint256[] k_stIds_A;     // ...TODO: constant/specified ST IDs to transfer (overrides qty_A)
+        uint256[] k_stIds_A;     // if len>0: the constant/specified ST IDs to transfer (must correlate with qty_A, if supplied)
         uint256 tokenTypeId_A;   // ST type moving from A
 
         uint256 qty_B;           // ST quantity moving from B (excluding fees, if any)
-        uint256[] k_stIds_B;     // ...TODO: constant/specified ST IDs to transfer (overrides qty_B)
+        uint256[] k_stIds_B;     // if len>0: the constant/specified ST IDs to transfer (must correlate with qty_B, if supplied)
         uint256 tokenTypeId_B;   // ST type moving from B
 
         int256  ccy_amount_A;    // currency amount moving from A (excluding fees, if any)

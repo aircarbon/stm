@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-only
+// Author: https://github.com/7-of-9
 pragma solidity >=0.4.21 <=0.6.10;
 pragma experimental ABIEncoderV2;
 
@@ -15,7 +16,7 @@ import "../Interfaces/StructLib.sol";
 
 /*
 JUN 2020
-TODO: I found that event TradedCcyTok, is saving parameter tokTypeId . It should be tokenTypeId to keep consistency on names.
+TODO: "I found that event TradedCcyTok, is saving parameter tokTypeId . It should be tokenTypeId to keep consistency on names."
 TODO: ... CFT refactor...
 */
 
