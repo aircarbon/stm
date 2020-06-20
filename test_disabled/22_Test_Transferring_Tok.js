@@ -35,8 +35,8 @@ contract("StMaster", accounts => {
             ccy_amount_A: 0,                                  ccyTypeId_A: 0,
             ccy_amount_B: 0,                                  ccyTypeId_B: 0,
         });
-        assert(data.eeuFullEvents.length == 1 && data.eeuPartialEvents == 0, 'unexpected event composition');
-        assert(data.eeuFullEvents[0].stId == data.ledgerA_before.tokens[0].stId, 'unexpected event eeu id vs. ledger A before');
+        assert(data.tokFullEvents.length == 1 && data.tokPartialEvents == 0, 'unexpected event composition');
+        assert(data.tokFullEvents[0].stId == data.ledgerA_before.tokens[0].stId, 'unexpected event eeu id vs. ledger A before');
         assert(data.ledgerA_after.tokens.length == 0, 'unexpected eeu count ledger A after');
         assert(data.ledgerB_after.tokens.length == 1, 'unexpected eeu count ledger B after');
         assert(data.ledgerB_after.tokens[0].stId == data.ledgerA_before.tokens[0].stId, 'unexpected eeu id ledger B after vs. ledger A before');
@@ -53,8 +53,8 @@ contract("StMaster", accounts => {
             ccy_amount_A: 0,                                  ccyTypeId_A: 0,
             ccy_amount_B: 0,                                  ccyTypeId_B: 0,
         });
-        assert(data.eeuFullEvents.length == 1 && data.eeuPartialEvents == 0, 'unexpected event composition');
-        assert(data.eeuFullEvents[0].stId == data.ledgerB_before.tokens[0].stId, 'unexpected event eeu id vs. ledger B before');
+        assert(data.tokFullEvents.length == 1 && data.tokPartialEvents == 0, 'unexpected event composition');
+        assert(data.tokFullEvents[0].stId == data.ledgerB_before.tokens[0].stId, 'unexpected event eeu id vs. ledger B before');
         assert(data.ledgerB_after.tokens.length == 0, 'unexpected eeu count ledger B after');
         assert(data.ledgerA_after.tokens.length == 1, 'unexpected eeu count ledger A after');
         assert(data.ledgerA_after.tokens[0].stId == data.ledgerB_before.tokens[0].stId, 'unexpected eeu id ledger A after vs. ledger B before');
@@ -72,9 +72,9 @@ contract("StMaster", accounts => {
             ccy_amount_A: 0,                                  ccyTypeId_A: 0,
             ccy_amount_B: 0,                                  ccyTypeId_B: 0,
         });
-        assert(data.eeuFullEvents.length == 0 && data.eeuPartialEvents.length == 1, 'unexpected event composition');
-        assert(data.eeuPartialEvents[0].splitFromSecTokenId == data.ledgerA_before.tokens[0].stId, 'unexpected event parent eeu id vs. ledger A before');
-        assert(data.eeuPartialEvents[0].newSecTokenId == data.ledgerB_after.tokens[0].stId, 'unexpected event soft-minted eeu id vs. ledger B after');
+        assert(data.tokFullEvents.length == 0 && data.tokPartialEvents.length == 1, 'unexpected event composition');
+        assert(data.tokPartialEvents[0].splitFromSecTokenId == data.ledgerA_before.tokens[0].stId, 'unexpected event parent eeu id vs. ledger A before');
+        assert(data.tokPartialEvents[0].newSecTokenId == data.ledgerB_after.tokens[0].stId, 'unexpected event soft-minted eeu id vs. ledger B after');
         assert(data.ledgerA_after.tokens.length == 1, 'unexpected eeu count ledger A after');
         assert(data.ledgerB_after.tokens.length == 1, 'unexpected eeu count ledger B after');
         assert(data.ledgerB_after.tokens[0].stId != data.ledgerA_after.tokens[0].stId, 'unexpected eeu id ledger B after vs. ledger A after');
@@ -91,9 +91,9 @@ contract("StMaster", accounts => {
             ccy_amount_A: 0,                                  ccyTypeId_A: 0,
             ccy_amount_B: 0,                                  ccyTypeId_B: 0,
         });
-        assert(data.eeuFullEvents.length == 0 && data.eeuPartialEvents.length == 1, 'unexpected event composition');
-        assert(data.eeuPartialEvents[0].splitFromSecTokenId == data.ledgerB_before.tokens[0].stId, 'unexpected event parent eeu id vs. ledger B before');
-        assert(data.eeuPartialEvents[0].newSecTokenId == data.ledgerA_after.tokens[0].stId, 'unexpected event soft-minted eeu id vs. ledger A after');
+        assert(data.tokFullEvents.length == 0 && data.tokPartialEvents.length == 1, 'unexpected event composition');
+        assert(data.tokPartialEvents[0].splitFromSecTokenId == data.ledgerB_before.tokens[0].stId, 'unexpected event parent eeu id vs. ledger B before');
+        assert(data.tokPartialEvents[0].newSecTokenId == data.ledgerA_after.tokens[0].stId, 'unexpected event soft-minted eeu id vs. ledger A after');
         assert(data.ledgerA_after.tokens.length == 1, 'unexpected eeu count ledger A after');
         assert(data.ledgerB_after.tokens.length == 1, 'unexpected eeu count ledger B after');
         assert(data.ledgerA_after.tokens[0].stId != data.ledgerB_after.tokens[0].stId, 'unexpected eeu id ledger A after vs. ledger B after');
@@ -112,8 +112,8 @@ contract("StMaster", accounts => {
     //         ccy_amount_B: 0,                                ccyTypeId_B: 0,
     //     });
     //     transferHelper.assert_nFull_1Partial({
-    //                    fullEvents: data.eeuFullEvents,
-    //                 partialEvents: data.eeuPartialEvents,
+    //                    fullEvents: data.tokFullEvents,
+    //                 partialEvents: data.tokPartialEvents,
     //   expectFullTransfer_eeuCount: 1,
     //           ledgerSender_before: data.ledgerA_before,   ledgerSender_after: data.ledgerA_after,
     //         ledgerReceiver_before: data.ledgerB_before, ledgerReceiver_after: data.ledgerB_after,
@@ -130,8 +130,8 @@ contract("StMaster", accounts => {
     //         ccy_amount_B: 0,                                ccyTypeId_B: 0,
     //     });
     //     transferHelper.assert_nFull_1Partial({
-    //                    fullEvents: data.eeuFullEvents,
-    //                 partialEvents: data.eeuPartialEvents,
+    //                    fullEvents: data.tokFullEvents,
+    //                 partialEvents: data.tokPartialEvents,
     //   expectFullTransfer_eeuCount: 1,
     //           ledgerSender_before: data.ledgerB_before,   ledgerSender_after: data.ledgerB_after,
     //         ledgerReceiver_before: data.ledgerA_before, ledgerReceiver_after: data.ledgerA_after,
@@ -151,8 +151,8 @@ contract("StMaster", accounts => {
             ccy_amount_B: 0,                                  ccyTypeId_B: 0,
         });
         transferHelper.assert_nFull_1Partial({
-                       fullEvents: data.eeuFullEvents,
-                    partialEvents: data.eeuPartialEvents,
+                       fullEvents: data.tokFullEvents,
+                    partialEvents: data.tokPartialEvents,
       expectFullTransfer_eeuCount: 0,
               ledgerSender_before: data.ledgerA_before,   ledgerSender_after: data.ledgerA_after,
             ledgerReceiver_before: data.ledgerB_before, ledgerReceiver_after: data.ledgerB_after,
@@ -173,8 +173,8 @@ contract("StMaster", accounts => {
             ccy_amount_B: 0,                                  ccyTypeId_B: 0,
         });
         transferHelper.assert_nFull_1Partial({
-                       fullEvents: data.eeuFullEvents,
-                    partialEvents: data.eeuPartialEvents,
+                       fullEvents: data.tokFullEvents,
+                    partialEvents: data.tokPartialEvents,
       expectFullTransfer_eeuCount: 1,
               ledgerSender_before: data.ledgerA_before,   ledgerSender_after: data.ledgerA_after,
             ledgerReceiver_before: data.ledgerB_before, ledgerReceiver_after: data.ledgerB_after,
@@ -193,11 +193,11 @@ contract("StMaster", accounts => {
             ccy_amount_A: 0,                                  ccyTypeId_A: 0,
             ccy_amount_B: 0,                                  ccyTypeId_B: 0,
         });
-        //console.log('data.eeuFullEvents', data.eeuFullEvents);
-        //console.log('data.eeuPartialEvents', data.eeuPartialEvents);
+        //console.log('data.tokFullEvents', data.tokFullEvents);
+        //console.log('data.tokPartialEvents', data.tokPartialEvents);
         transferHelper.assert_nFull_1Partial({
-                       fullEvents: data.eeuFullEvents,
-                    partialEvents: data.eeuPartialEvents,
+                       fullEvents: data.tokFullEvents,
+                    partialEvents: data.tokPartialEvents,
       expectFullTransfer_eeuCount: 1,
               ledgerSender_before: data.ledgerA_before,   ledgerSender_after: data.ledgerA_after,
             ledgerReceiver_before: data.ledgerB_before, ledgerReceiver_after: data.ledgerB_after,
@@ -257,7 +257,7 @@ contract("StMaster", accounts => {
             ccy_amount_B: 0,                                  ccyTypeId_B: 0,
         });
         assert(data.ledgerB_after.tokens.length == 1, 'ledger B was not merged');
-        assert(data.eeuPartialEvents.some(p => p.mergedToSecTokenId == data.ledgerB_before.tokens[0].stId), 'unexpected merge event data');
+        assert(data.tokPartialEvents.some(p => p.mergedToSecTokenId == data.ledgerB_before.tokens[0].stId), 'unexpected merge event data');
     });
 
     // merge test
@@ -285,7 +285,7 @@ contract("StMaster", accounts => {
             ccy_amount_B: 0,                             ccyTypeId_B: 0,
             });
             assert(data.ledgerB_after.tokens.length == data.ledgerB_before.tokens.length, 'ledger B was not merged');
-            assert(data.eeuPartialEvents.some(p => data.ledgerB_before.tokens.some(p2 => p2.stId == p.mergedToSecTokenId)), 'unexpected merge event data');
+            assert(data.tokPartialEvents.some(p => data.ledgerB_before.tokens.some(p2 => p2.stId == p.mergedToSecTokenId)), 'unexpected merge event data');
         }
     });
 
@@ -315,10 +315,10 @@ contract("StMaster", accounts => {
             ccy_amount_B: 0,                                  ccyTypeId_B: 0,
             });
             assert(data.ledgerB_after.tokens.length == data.ledgerB_before.tokens.length, 'ledger B was not merged');
-            assert(data.eeuPartialEvents.some(p => data.ledgerB_before.tokens.some(p2 => p2.stId == p.mergedToSecTokenId)), 'unexpected merge event data for ledger B');
+            assert(data.tokPartialEvents.some(p => data.ledgerB_before.tokens.some(p2 => p2.stId == p.mergedToSecTokenId)), 'unexpected merge event data for ledger B');
 
             assert(data.ledgerA_after.tokens.length == data.ledgerA_before.tokens.length, 'ledger A was not merged');
-            assert(data.eeuPartialEvents.some(p => data.ledgerA_before.tokens.some(p2 => p2.stId == p.mergedToSecTokenId)), 'unexpected merge event data for ledger A');
+            assert(data.tokPartialEvents.some(p => data.ledgerA_before.tokens.some(p2 => p2.stId == p.mergedToSecTokenId)), 'unexpected merge event data for ledger A');
         }
     });
 

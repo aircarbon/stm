@@ -118,10 +118,10 @@ module.exports = {
         // console.log('sumFees_tok_B', sumFees_tok_B.toFixed());
         // console.log('sumFees_ccy_A', sumFees_ccy_A.toFixed());
         // console.log('sumFees_ccy_B', sumFees_ccy_B.toFixed());
-        const exchangeFee_tok_A = Big(feesPreview[0].fee_tok_A);
-        const exchangeFee_tok_B = Big(feesPreview[0].fee_tok_B);
-        const exchangeFee_ccy_A = Big(feesPreview[0].fee_ccy_A);
-        const exchangeFee_ccy_B = Big(feesPreview[0].fee_ccy_B);
+        const exchangeFee_tok_A = applyFees ? Big(feesPreview[0].fee_tok_A) : Big(0);
+        const exchangeFee_tok_B = applyFees ? Big(feesPreview[0].fee_tok_B) : Big(0);
+        const exchangeFee_ccy_A = applyFees ? Big(feesPreview[0].fee_ccy_A) : Big(0);
+        const exchangeFee_ccy_B = applyFees ? Big(feesPreview[0].fee_ccy_B) : Big(0);
         const originatorFees_tok_A = feesPreview.slice(1).map(p => p.fee_tok_A).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
         const originatorFees_tok_B = feesPreview.slice(1).map(p => p.fee_tok_B).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
         // console.log('originatorFees_tok_A', originatorFees_tok_A.toFixed());
@@ -147,6 +147,8 @@ module.exports = {
                    k_stIds_B: k_stIds_B || [],
             }, { from: accounts[0] }
         );
+        //truffleAssert.prettyPrintEmittedEvents(transferTx);
+
         //await CONST.logGas(web3, transferTx, `TransferHelper`);
 
         // validate trade events
@@ -343,10 +345,14 @@ module.exports = {
             // console.log('B_bal_bef_ccyB', B_bal_bef_ccyB.toString());
             // console.log('fee_ccy_B', fee_ccy_B.toString());
             // console.log('deltaCcy_fromA[ccyTypeId_B]', deltaCcy_fromA[ccyTypeId_B].toString());
-
             assert(B_bal_aft_ccyB.minus(B_bal_bef_ccyB).plus(Big(fee_ccy_B)).eq(Big(deltaCcy_fromA[ccyTypeId_B]).times(-1)),
                 `(1) unexpected ledger B balance ${B_bal_aft_ccyB} after transfer B -> A amount ${ccy_amount_B} ccy type ${ccyTypeId_B}`);
 
+            // console.log('A_bal_aft_ccyB', A_bal_aft_ccyB.toString());
+            // console.log('A_bal_bef_ccyB', A_bal_bef_ccyB.toString());
+            // console.log('deltaCcy_fromA[ccyTypeId_B]', deltaCcy_fromA[ccyTypeId_B].toString());
+            // console.log('orig_ccyFee_toA', orig_ccyFee_toA.toString());
+            // console.log('exchangeFee_ccy_A', exchangeFee_ccy_A.toString());
             assert(A_bal_aft_ccyB.minus(A_bal_bef_ccyB).eq(Big(deltaCcy_fromA[ccyTypeId_B]).times(+1)
                     .plus(Big(orig_ccyFee_toA.toString())) // orig ccy fee paid by owner to A
                     .minus(Big(exchangeFee_ccy_A.toString()))), // ex ccy-fee mirror
@@ -389,49 +395,49 @@ module.exports = {
         //     `unexpected total transfered delta after, ccy B`);
 
         // validate token events
-        const eeuFullEvents = [];
-        const eeuPartialEvents = [];
+        const tokFullEvents = [];
+        const tokPartialEvents = [];
         const contractOwnerIsTransfering = ledger_A == accounts[0] || ledger_B == accounts[0];
         if (qty_A > 0 || qty_B > 0) {
             //truffleAssert.prettyPrintEmittedEvents(transferTx);
             
             // we expect n full events (possibly 0), and maximum one partial event (possibly 0)
-            try { truffleAssert.eventEmitted(transferTx, 'TransferedFullSecToken',    ev => { eeuFullEvents.push(ev);    return true; }); }
+            try { truffleAssert.eventEmitted(transferTx, 'TransferedFullSecToken',    ev => { tokFullEvents.push(ev);    return true; }); }
             catch {}
-            try { truffleAssert.eventEmitted(transferTx, 'TransferedPartialSecToken', ev => { eeuPartialEvents.push(ev); return true; }); }
+            try { truffleAssert.eventEmitted(transferTx, 'TransferedPartialSecToken', ev => { tokPartialEvents.push(ev); return true; }); }
             catch {}
 
             // user token events (non-fees)
             if (qty_A > 0) {
-                assert(eeuFullEvents.filter(p => p.from == ledger_A && p.transferType == CONST.transferType.USER).length > 0 ||
-                       eeuPartialEvents.filter(p => p.from == ledger_A && p.transferType == CONST.transferType.USER).length == 1,
+                assert(tokFullEvents.filter(p => p.from == ledger_A && p.transferType == CONST.transferType.USER).length > 0 ||
+                       tokPartialEvents.filter(p => p.from == ledger_A && p.transferType == CONST.transferType.USER).length == 1,
                        'unexpected transfer full vs. partial event count after transfer for ledger A');
             }
             if (qty_B > 0) {
-                assert(eeuFullEvents.filter(p => p.from == ledger_B && p.transferType == CONST.transferType.USER).length > 0 ||
-                       eeuPartialEvents.filter(p => p.from == ledger_B && p.transferType == CONST.transferType.USER).length == 1,
+                assert(tokFullEvents.filter(p => p.from == ledger_B && p.transferType == CONST.transferType.USER).length > 0 ||
+                       tokPartialEvents.filter(p => p.from == ledger_B && p.transferType == CONST.transferType.USER).length == 1,
                        'unexpected transfer full vs. partial event count after transfer for ledger B');
             }
             if ((qty_A > 0 && qty_B == 0) || (qty_B > 0 && qty_A == 0)) {
-                assert(eeuPartialEvents.filter(p => p.transferType == CONST.transferType.USER).length <= (!applyFees ? 1 : 2), 'unexpected transfer partial event count after single-sided eeu transfer');
+                assert(tokPartialEvents.filter(p => p.transferType == CONST.transferType.USER).length <= (!applyFees ? 1 : 2), 'unexpected transfer partial event count after single-sided eeu transfer');
             }
             else {
-                assert(eeuPartialEvents.filter(p => p.transferType == CONST.transferType.USER).length <= (!applyFees ? 2 : 3), 'unexpected transfer partial event count after two-sided eeu transfer');
+                assert(tokPartialEvents.filter(p => p.transferType == CONST.transferType.USER).length <= (!applyFees ? 2 : 3), 'unexpected transfer partial event count after two-sided eeu transfer');
             }
 
             // originator token fee events
             originatorFeeData.forEach(of => {
                 if (of.fee_tok_A > 0) {
                     const expectedFeeEventCount = originatorFeeData.filter(p2 => p2.fee_to == of.fee_to && p2.fee_tok_A > 0).length;
-                    const fullCount = eeuFullEvents.filter(p => p.from == ledger_A && p.to == of.fee_to && p.transferType == CONST.transferType.ORIG_FEE).length;
-                    const partialCount = eeuPartialEvents.filter(p => p.from == ledger_A && p.to == of.fee_to && p.transferType == CONST.transferType.ORIG_FEE).length;
+                    const fullCount = tokFullEvents.filter(p => p.from == ledger_A && p.to == of.fee_to && p.transferType == CONST.transferType.ORIG_FEE).length;
+                    const partialCount = tokPartialEvents.filter(p => p.from == ledger_A && p.to == of.fee_to && p.transferType == CONST.transferType.ORIG_FEE).length;
                     assert(fullCount > 0 || partialCount == expectedFeeEventCount,
                            'unexpected originator fee transfer full vs. partial event count after transfer for ledger A');
                 }
                 if (of.fee_tok_B > 0) {
                     const expectedFeeEventCount = originatorFeeData.filter(p2 => p2.fee_to == of.fee_to && p2.fee_tok_B > 0).length;
-                    const fullCount = eeuFullEvents.filter(p => p.from == ledger_B && p.to == of.fee_to && p.transferType == CONST.transferType.ORIG_FEE).length;
-                    const partialCount = eeuPartialEvents.filter(p => p.from == ledger_B && p.to == of.fee_to && p.transferType == CONST.transferType.ORIG_FEE).length;
+                    const fullCount = tokFullEvents.filter(p => p.from == ledger_B && p.to == of.fee_to && p.transferType == CONST.transferType.ORIG_FEE).length;
+                    const partialCount = tokPartialEvents.filter(p => p.from == ledger_B && p.to == of.fee_to && p.transferType == CONST.transferType.ORIG_FEE).length;
                     // console.log('             ledger_B', ledger_B);
                     // console.log('          orig_fee.to', of.fee_to);
                     // console.log('          fullCount B', fullCount);
@@ -586,7 +592,7 @@ module.exports = {
 
         return {
             transferTx, 
-            eeuFullEvents,              eeuPartialEvents,
+            tokFullEvents,              tokPartialEvents,
             ledgerA_before,             ledgerA_after,  
             ledgerB_before,             ledgerB_after,
             owner_before, owner_after,
