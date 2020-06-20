@@ -21,7 +21,7 @@ contract("StMaster", accounts => {
             console.log(`addrNdx: ${global.TaddrNdx} - contract @ ${stm.address} (owner: ${accounts[0]})`);
     });
 
-    it(`burning by id - should allow burning of multiple STs by ID`, async () => {
+    it(`burning by id - should allow burning of specific STs by ID`, async () => {
         const A = accounts[global.TaddrNdx];
 
         // mint STs for A
@@ -46,8 +46,8 @@ contract("StMaster", accounts => {
         const burnStIds = burnSts.map(p => p.stId);
         const burnQty = burnSts.map(p => p.currentQty).reduce((a,b) => a.add(new BN(b)), new BN(0));
         //console.log('le_before.tokens', le_before.tokens);
-        console.log('burnStIds', burnStIds);
-        console.log('burnQty.toString()', burnQty.toString());
+        //console.log('burnStIds', burnStIds);
+        //console.log('burnQty.toString()', burnQty.toString());
         const burnTx = await stm.burnTokens(accounts[global.TaddrNdx], burnType, burnQty.toString(), burnStIds);
         await CONST.logGas(web3, burnTx, `Burn STs of type ${burnType} IDs: [${burnStIds.join(',')}]`);
 

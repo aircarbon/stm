@@ -38,10 +38,9 @@ contract("StMaster", accounts => {
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2, CONST.KT_CARBON, 1,      A, CONST.nullFees, 0, [], []);
         await stm.fund(CONST.ccyType.USD,                   CONST.thousandCcy_cents, B,                          );
 
-        const burnType = CONST.tokenType.TOK_T2;
-        
+        const tokType = CONST.tokenType.TOK_T2;
         const le_before_A = await stm.getLedgerEntry(A);
-        const sts_A = le_before_A.tokens.filter(p => p.tokenTypeId == burnType && p.stId % 3 == 1);
+        const sts_A = le_before_A.tokens.filter(p => p.tokenTypeId == tokType && p.stId % 3 == 1);
         const stIds_A = sts_A.map(p => p.stId);
         const stsQty_A = sts_A.map(p => p.currentQty).reduce((a,b) => a.add(new BN(b)), new BN(0));
         //console.log('stIds_A', stIds_A);
@@ -50,12 +49,14 @@ contract("StMaster", accounts => {
 
         const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: A,                                     ledger_B: B,
-                   qty_A: stsQty_A.toString(),              tokenTypeId_A: burnType,
+                   qty_A: stsQty_A.toString(),              tokenTypeId_A: tokType,
                    qty_B: 0,                                tokenTypeId_B: 0,
                k_stIds_A: stIds_A,                              k_stIds_B: [],
             ccy_amount_A: 0,                                  ccyTypeId_A: 0,
             ccy_amount_B: 0,                                  ccyTypeId_B: 0,
         });
+        await CONST.logGas(web3, data.transferTx, `Transfer STs of type ${tokType} IDs: [${stIds_A.join(',')}]`);
+
         const le_after_A = await stm.getLedgerEntry(A);
         //console.log('le_after_A.tokens', le_after_A.tokens);
         assert(le_after_A.tokens.length == le_before_A.tokens.length - stIds_A.length, 'unexpected ledger A token count after transfer');
@@ -76,7 +77,7 @@ contract("StMaster", accounts => {
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2, CONST.KT_CARBON, 1,      B, CONST.nullFees, 0, [], []);
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2, CONST.KT_CARBON, 1,      B, CONST.nullFees, 0, [], []);
 
-        const burnType = CONST.tokenType.TOK_T1;
+        const tokType = CONST.tokenType.TOK_T1;
         const le_before_B = await stm.getLedgerEntry(B);
         const sts_B = le_before_B.tokens.filter(p => p.tokenTypeId == burnType && p.stId % 2 == 1);
         const stIds_B = sts_B.map(p => p.stId);
@@ -93,6 +94,7 @@ contract("StMaster", accounts => {
             ccy_amount_A: 0,                                  ccyTypeId_A: 0,
             ccy_amount_B: 0,                                  ccyTypeId_B: 0,
         });
+        await CONST.logGas(web3, data.transferTx, `Transfer STs of type ${tokType} IDs: [${stIds_B.join(',')}]`);
         const le_after_B = await stm.getLedgerEntry(B);
         //console.log('le_after_B.tokens', le_after_B.tokens);
         assert(le_after_B.tokens.length == le_before_B.tokens.length - stIds_B.length, 'unexpected ledger B token count after transfer');
@@ -142,6 +144,7 @@ contract("StMaster", accounts => {
             ccy_amount_B: 100 * 1000,                         ccyTypeId_B: CONST.ccyType.USD,
                applyFees: true,
         });
+        await CONST.logGas(web3, data.transferTx, `Transfer STs of type ${tokType} IDs: [${stIds_A.join(',')}]`);
         //truffleAssert.prettyPrintEmittedEvents(data.transferTx);
 
         const le_after_A = await stm.getLedgerEntry(A);
@@ -158,11 +161,11 @@ contract("StMaster", accounts => {
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T1, CONST.KT_CARBON, 1,      B, CONST.nullFees, 100, [], []);
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T3, CONST.KT_CARBON, 1,      B, CONST.nullFees, 100, [], []);
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2, CONST.KT_CARBON, 1,      B, CONST.nullFees, 100, [], []);
-        await stm.mintSecTokenBatch(CONST.tokenType.TOK_T1, CONST.KT_CARBON, 1,      B, CONST.nullFees, 100, [], []);
+        await stm.mintSecTokenBatch(CONST.tokenType.TOK_T3, CONST.KT_CARBON, 1,      B, CONST.nullFees, 100, [], []);
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2, CONST.KT_CARBON, 1,      B, CONST.nullFees, 100, [], []);
-        await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2, CONST.KT_CARBON, 1,      B, CONST.nullFees, 100, [], []);
-        await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2, CONST.KT_CARBON, 1,      B, CONST.nullFees, 100, [], []);
-        await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2, CONST.KT_CARBON, 1,      B, CONST.nullFees, 100, [], []);
+        await stm.mintSecTokenBatch(CONST.tokenType.TOK_T3, CONST.KT_CARBON, 1,      B, CONST.nullFees, 100, [], []);
+        await stm.mintSecTokenBatch(CONST.tokenType.TOK_T3, CONST.KT_CARBON, 1,      B, CONST.nullFees, 100, [], []);
+        await stm.mintSecTokenBatch(CONST.tokenType.TOK_T3, CONST.KT_CARBON, 1,      B, CONST.nullFees, 100, [], []);
 
         // set global fee: ccy 3.00 /per Million qty received, MIRRORED
         const ccy_perMillion = 300; // $3
@@ -171,9 +174,9 @@ contract("StMaster", accounts => {
         assert((await stm.getFee(CONST.getFeeType.CCY, CONST.ccyType.USD, CONST.nullAddr)).ccy_perMillion == ccy_perMillion, 'unexpected fee per Million received after setting ccy fee structure');
         
         // set specific transfer STs
-        const tokType = CONST.tokenType.TOK_T2;
+        const tokType = CONST.tokenType.TOK_T3;
         const le_before_B = await stm.getLedgerEntry(B);
-        const sts_B = le_before_B.tokens.filter(p => p.tokenTypeId == tokType);
+        const sts_B = le_before_B.tokens.filter(p => p.tokenTypeId == tokType && p.stId % 2 == 0);
         const stIds_B = sts_B.map(p => p.stId);
         const stsQty_B = sts_B.map(p => p.currentQty).reduce((a,b) => a.add(new BN(b)), new BN(0));
         // console.log('stIds_B', stIds_B);
@@ -189,6 +192,7 @@ contract("StMaster", accounts => {
             ccy_amount_B: 0,                                  ccyTypeId_B: 0,
                applyFees: true,
         });
+        await CONST.logGas(web3, data.transferTx, `Transfer STs of type ${tokType} IDs: [${stIds_B.join(',')}]`);
         //truffleAssert.prettyPrintEmittedEvents(data.transferTx);
 
         const le_after_B = await stm.getLedgerEntry(B);
