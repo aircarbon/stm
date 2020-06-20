@@ -15,7 +15,6 @@ library TransferLib {
     //
     // PUBLIC - transfer/trade
     //
-
     struct TransferVars { // misc. working vars for transfer() fn - struct packed to preserve stack slots
         TransferSplitPreviewReturn[2] ts_previews; // [0] = A->B, [1] = B->A
         TransferSplitArgs[2]          ts_args;
@@ -51,22 +50,7 @@ library TransferLib {
         if (a.qty_B > 0) require(a.tokenTypeId_B > 0, "Bad tokenTypeId_B");
 
         // transfer by ST ID: check supplied STs belong to supplied owner(s), and implied quantities match supplied quantities
-        if (a.k_stIds_A.length > 0) {
-            uint256 stQty;
-            for (uint256 i = 0; i < a.k_stIds_A.length; i++) {
-                require(StructLib.tokenExistsOnLedger(ld, a.tokenTypeId_A, a.ledger_A, a.k_stIds_A[i]), "Bad stId A");
-                stQty += uint256(ld._sts[a.k_stIds_A[i]].currentQty);
-            }
-            require(stQty == a.qty_A, "qty_A mismatch");
-        }
-        if (a.k_stIds_B.length > 0) {
-            uint256 stQty;
-            for (uint256 i = 0; i < a.k_stIds_B.length; i++) {
-                require(StructLib.tokenExistsOnLedger(ld, a.tokenTypeId_B, a.ledger_B, a.k_stIds_B[i]), "Bad stId B");
-                stQty += uint256(ld._sts[a.k_stIds_B[i]].currentQty);
-            }
-            require(stQty == a.qty_B, "qty_B mismatch");
-        }
+        checkStIds(ld, a);
 
         // erc20 support - initialize ledger entry if not known
         StructLib.initLedgerIfNew(ld, a.ledger_A);
@@ -125,7 +109,7 @@ library TransferLib {
         // potentially multiple: up to one originator token fee per distinct token batch
         //
         if (a.qty_A > 0) {
-            v.ts_args[0] = TransferSplitArgs({ from: a.ledger_A, to: a.ledger_B, tokenTypeId: a.tokenTypeId_A, qtyUnit: a.qty_A, transferType: StructLib.TransferType.User, maxStId: maxStId, k_stIds_take: new uint256[](0), k_stIds_skip: a.k_stIds_A });
+            v.ts_args[0] = TransferSplitArgs({ from: a.ledger_A, to: a.ledger_B, tokenTypeId: a.tokenTypeId_A, qtyUnit: a.qty_A, transferType: StructLib.TransferType.User, maxStId: maxStId, k_stIds_take: a.k_stIds_A, k_stIds_skip: new uint256[](0) });
             v.ts_previews[0] = transferSplitSecTokens_Preview(ld, v.ts_args[0]);
             for (uint i = 0; i < v.ts_previews[0].batchCount ; i++) {
                 StructLib.SecTokenBatch storage batch = ld._batches[v.ts_previews[0].batchIds[i]];
@@ -134,7 +118,7 @@ library TransferLib {
             }
         }
         if (a.qty_B > 0) {
-            v.ts_args[1] = TransferSplitArgs({ from: a.ledger_B, to: a.ledger_A, tokenTypeId: a.tokenTypeId_B, qtyUnit: a.qty_B, transferType: StructLib.TransferType.User, maxStId: maxStId, k_stIds_take: new uint256[](0), k_stIds_skip: a.k_stIds_B });
+            v.ts_args[1] = TransferSplitArgs({ from: a.ledger_B, to: a.ledger_A, tokenTypeId: a.tokenTypeId_B, qtyUnit: a.qty_B, transferType: StructLib.TransferType.User, maxStId: maxStId, k_stIds_take: a.k_stIds_B, k_stIds_skip: new uint256[](0) });
             v.ts_previews[1] = transferSplitSecTokens_Preview(ld, v.ts_args[1]);
             for (uint i = 0; i < v.ts_previews[1].batchCount ; i++) {
                 StructLib.SecTokenBatch storage batch = ld._batches[v.ts_previews[1].batchIds[i]];
@@ -215,7 +199,7 @@ library TransferLib {
                 }
             }
             // user transfer from A
-             maxStId = transferSplitSecTokens(ld,
+            maxStId = transferSplitSecTokens(ld,
                 TransferSplitArgs({ from: v.ts_args[0].from, to: v.ts_args[0].to, tokenTypeId: v.ts_args[0].tokenTypeId, qtyUnit: v.ts_args[0].qtyUnit, transferType: v.ts_args[0].transferType, maxStId: maxStId, k_stIds_take: a.k_stIds_A, k_stIds_skip: new uint256[](0) })
             );
             v.transferedQty += uint80(v.ts_args[0].qtyUnit);
@@ -287,6 +271,9 @@ library TransferLib {
         //
     ) {
         uint ndx = 0;
+
+        // transfer by ST ID: check supplied STs belong to supplied owner(s), and implied quantities match supplied quantities
+        checkStIds(ld, a);
 
         // exchange fee
         StructLib.FeeStruct storage exFeeStruct_ccy_A = ld._ledger[a.ledger_A].spot_customFees.ccyType_Set[a.ccyTypeId_A]   ? ld._ledger[a.ledger_A].spot_customFees : globalFees;
@@ -385,6 +372,9 @@ library TransferLib {
     public view returns (StructLib.FeesCalc[1] memory feesAll) { // 1 exchange fee only (single destination)
         uint ndx = 0;
 
+        // transfer by ST ID: check supplied STs belong to supplied owner(s), and implied quantities match supplied quantities
+        checkStIds(ld, a);
+
         // TODO: refactor - this is common/identical to transfer_feePreview...
 
         // exchange fee
@@ -436,7 +426,6 @@ library TransferLib {
     //
     // INTERNAL - calculate & send batch originator ccy fees (shares of exchange ccy fee)
     //
-
     function applyOriginatorCcyFees(
         StructLib.LedgerStruct storage    ld,
         TransferSplitPreviewReturn memory ts_preview,
@@ -472,7 +461,6 @@ library TransferLib {
     //
     // INTERNAL - transfer (split/merge) tokens
     //
-
     struct TransferSplitArgs {
         address                from;
         address                to;
@@ -487,6 +475,7 @@ library TransferLib {
         uint256 ndx;
         int64   remainingToTransfer;
         bool    mergedExisting;
+        int64   stQty;
     }
     function transferSplitSecTokens(
         StructLib.LedgerStruct storage ld,
@@ -505,7 +494,7 @@ library TransferLib {
         uint256 maxStId = a.maxStId;
         while (v.remainingToTransfer > 0) {
             uint256 stId = from_stIds[v.ndx];
-            //int64 stQty = ld._sts[stId].currentQty;
+            v.stQty = ld._sts[stId].currentQty;
 
             // if specific avoid (skip) tokens are specified, then skip them;
             // and inverse - if specific use (take) tokens are specified, then skip over others
@@ -525,7 +514,7 @@ library TransferLib {
                 v.ndx++;
             }
             else {
-                if (v.remainingToTransfer >= ld._sts[stId].currentQty) {
+                if (v.remainingToTransfer >= v.stQty) {
                     // reassign the full ST across the ledger entries
 
                     // remove from origin - replace hot index 0 with value at last (ndx++, in effect)
@@ -557,11 +546,11 @@ library TransferLib {
                         // TRANSFER - if no existing destination ST from same batch
                         //if (!mergedExisting) {
                             to_stIds.push(stId);
-                            emit TransferedFullSecToken(a.from, a.to, stId, 0, uint256(ld._sts[stId].currentQty), a.transferType);
+                            emit TransferedFullSecToken(a.from, a.to, stId, 0, uint256(v.stQty), a.transferType);
                         //}
                     //ld._ledger[to].tokenType_sumQty[tokenTypeId] += stQty;                //* gas - DROP DONE - only used internally, validation params
 
-                    v.remainingToTransfer -= ld._sts[stId].currentQty;
+                    v.remainingToTransfer -= v.stQty;
                     if (v.remainingToTransfer > 0) {
                         require(from_stIds.length > 0, "Insufficient tokens");
                     }
@@ -587,14 +576,12 @@ library TransferLib {
                                 ld._sts[to_stIds[i]].mintedQty += v.remainingToTransfer; // PACKED
 
                                 v.mergedExisting = true;
-
                                 emit TransferedPartialSecToken(a.from, a.to, stId, 0, to_stIds[i], uint256(v.remainingToTransfer), a.transferType);
                                 break;
                             }
                         }
                         // SOFT-MINT - if no existing destination ST from same batch; inherit batch ID from parent ST
                         if (!v.mergedExisting) {
-
                             // gas: 50k
                             ld._sts[maxStId + 1].batchId = ld._sts[stId].batchId; // PACKED
                             ld._sts[maxStId + 1].currentQty = v.remainingToTransfer; // PACKED
@@ -605,9 +592,7 @@ library TransferLib {
                             //ld._ledger[to].tokenType_sumQty[tokenTypeId] += remainingToTransfer; // gas - DROP DONE - only used internally, validation params
 
                             to_stIds.push(maxStId + 1); // gas: 94k
-
                             emit TransferedPartialSecToken(a.from, a.to, stId, maxStId + 1, 0, uint256(v.remainingToTransfer), a.transferType); // gas: 11k
-
                             maxStId++;
                         }
 
@@ -628,7 +613,6 @@ library TransferLib {
     //
     // INTERNAL - token transfer preview
     //
-
     /**
      * @dev Previews token transfer across ledger owners
      * @param a TransferSplitArgs args
@@ -726,7 +710,6 @@ library TransferLib {
     //
     // INTERNAL - fee calculations
     //
-
     /**
      * @notice Calculates capped & collared { fixed + basis points + fixed per Million consideration = total fee } based on the supplied fee structure
      * @param feeStructure Token or currency type fee structure mapping
@@ -758,5 +741,27 @@ library TransferLib {
             if (feeAmount < fs.fee_min && fs.fee_min > 0) return fs.fee_min;
         }
         return feeAmount;
+    }
+
+    //
+    // INTERNAL - param validation: security token IDs
+    //
+    function checkStIds(StructLib.LedgerStruct storage ld, StructLib.TransferArgs memory a) private view {
+        if (a.k_stIds_A.length > 0) {
+            uint256 stQty;
+            for (uint256 i = 0; i < a.k_stIds_A.length; i++) {
+                require(StructLib.tokenExistsOnLedger(ld, a.tokenTypeId_A, a.ledger_A, a.k_stIds_A[i]), "Bad stId A");
+                stQty += uint256(ld._sts[a.k_stIds_A[i]].currentQty);
+            }
+            require(stQty == a.qty_A, "qty_A / k_stIds_A mismatch");
+        }
+        if (a.k_stIds_B.length > 0) {
+            uint256 stQty;
+            for (uint256 i = 0; i < a.k_stIds_B.length; i++) {
+                require(StructLib.tokenExistsOnLedger(ld, a.tokenTypeId_B, a.ledger_B, a.k_stIds_B[i]), "Bad stId B");
+                stQty += uint256(ld._sts[a.k_stIds_B[i]].currentQty);
+            }
+            require(stQty == a.qty_B, "qty_B / k_stIds_B mismatch");
+        }
     }
 }

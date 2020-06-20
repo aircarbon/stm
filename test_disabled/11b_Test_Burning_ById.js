@@ -1,6 +1,5 @@
 const st = artifacts.require('StMaster');
 const truffleAssert = require('truffle-assertions');
-const Big = require('big.js');
 const BN = require('bn.js');
 const CONST = require('../const.js');
 const setupHelper = require('../test/testSetupContract.js');
