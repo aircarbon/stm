@@ -156,6 +156,8 @@ library StructLib {
         LedgerCcyReturn[]      ccys;                            // currency balances
         uint256                spot_sumQtyMinted;               // [SPOT types only]
         uint256                spot_sumQtyBurned;               // [SPOT types only]
+        uint256                dbg1;
+        uint256                dbg2;
     }
         struct LedgerSecTokenReturn {
             uint256 stId;

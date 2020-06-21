@@ -28,15 +28,17 @@ contract("StMaster", accounts => {
             console.log(`addrNdx: ${global.TaddrNdx} - contract @ ${stm.address} (owner: ${accounts[0]})`);
     });
 
+    //
     // ORDERED
+    //
 
+    // indirect types & minting
     it(`cashflow controller - should be able to query controller's indirect types (default deployer: 2 indirect types)`, async () => {
         const types = (await stm.getSecTokenTypes()).tokenTypes;
         //console.log('types', types.map(p => { return `${p.cashflowBaseAddr} [${p.name}]` }));
         assert(types.length == 2);
     });
-
-    it(`cashflow controller - allow an initial unibatch mint on indirect passed-through cashflow base (type 1)`, async () => {
+    it(`cashflow controller - allow an initial unibatch mint on an indirect passed-through cashflow base (type 1)`, async () => {
         const M = accounts[0];
         const { batchId, mintTx } = await mintBatchWithMetadata( 
             { tokenType: CONST.tokenType.TOK_T1, qtyUnit: 1000, qtySecTokens: 1, receiver: M,
@@ -44,7 +46,6 @@ contract("StMaster", accounts => {
              metaValues: [ 'val1', 'val2' ],
         }, { from: accounts[0] } );
     });
-
     it(`cashflow controller - should not allow a subsequent batch mint for the same indirect base (type 1)`, async () => {
         const M = accounts[0];
         try {
@@ -53,27 +54,28 @@ contract("StMaster", accounts => {
                    metaKeys: [ 'key3', 'key4' ],
                  metaValues: [ 'val4', 'val4' ],
             }, { from: accounts[0] } );
-        } catch (ex) { 
-            assert(ex.reason == 'Bad cashflow request', `unexpected: ${ex.reason}`);
-            return;
-        }
+        } catch (ex) { assert(ex.reason == 'Bad cashflow request', `unexpected: ${ex.reason}`); return; }
     });
-
     it(`cashflow controller - should allow an initial unibatch mint on a different indirect passed-through cashflow base (type 2)`, async () => {
         const M = accounts[0];
         const { batchId, mintTx } = await mintBatchWithMetadata( 
-            { tokenType: CONST.tokenType.TOK_T2, qtyUnit: 1000, qtySecTokens: 1, receiver: M,
+            { tokenType: CONST.tokenType.TOK_T2, qtyUnit: 2000, qtySecTokens: 1, receiver: M,
                metaKeys: [ 'key5', 'key6' ],
              metaValues: [ 'val5', 'val6' ],
         }, { from: accounts[0] } );
-        //console.log('mintTx', mintTx);
-        //console.log('batchId', batchId);
     });
 
-    // TODO: getLedgerEntry()
+    // // query ledger
     it(`cashflow controller - should be able to get a split ledger entry across all indirect token types`, async () => {
-        const le = await stm.getLedgerEntry(accounts[0]);
-        console.log('le', le);
+        const le_cftc = await stm.getLedgerEntry(accounts[0]); // TODO: split/delegate getLedgerEntry() ...
+        console.log('le_cftc', le_cftc);
+
+        const types = (await stm.getSecTokenTypes()).tokenTypes;
+        console.log('types', types.map(p => { return `${p.cashflowBaseAddr} [${p.name}]` }));
+        for (var type of types) {
+            const le_base = await CONST.web3_call('getLedgerEntry', [accounts[0]], /*nameOverride*/undefined, /*addrOverride*/type.cashflowBaseAddr);
+            console.log('le_base.tokens', le_base.tokens);
+        }
     });
 
     // TODO: getSecToken() [delegation to base...]

@@ -449,7 +449,6 @@ library FuturesLib {
     }
 
     // sets the total reserved margin amount for all open positions
-    event dbg1(uint256 tokTypeId, address addr, int256 totMargin, int64 qty, int128 price);
     function setReservedAllFtPos(
         StructLib.LedgerStruct storage ld,
         StructLib.StTypesStruct storage std,
