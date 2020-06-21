@@ -233,7 +233,7 @@ describe(`Contract Web3 Interface`, async () => {
             for (var buyNdx = 0; buyNdx < BUYS_PER_WHITE_BUYER; buyNdx++) {
                 const SELLER = WHITE_MINTERS[(whiteNdx+buyNdx) % WHITE_MINTERS.length];
                 const minterLedger = (await CONST.web3_call('getLedgerEntry', [SELLER.addr]));
-                const minterTokTypeId = minterLedger.tokens[0].tokenTypeId.toString();
+                const minterTokTypeId = minterLedger.tokens[0].tokTypeId.toString();
 
                 const exchangeCcyFee = { ccy_mirrorFee: false, ccy_perMillion: 0, fee_fixed: buyNdx * 11, fee_percBips: buyNdx * 6, fee_min: buyNdx * 11, fee_max: buyNdx * 51, };
                 const ledgerCcyFee =   { ccy_mirrorFee: false, ccy_perMillion: 0, fee_fixed: buyNdx * 12, fee_percBips: buyNdx * 7, fee_min: buyNdx * 12, fee_max: buyNdx * 52, };
@@ -247,8 +247,8 @@ describe(`Contract Web3 Interface`, async () => {
 
                 await CONST.web3_tx('transferOrTrade', [ {
                     ledger_A: SELLER.addr,                                    ledger_B: BUYER.addr,
-                       qty_A: minterLedger.tokens[0].currentQty.div(2),  tokenTypeId_A: minterTokTypeId,
-                       qty_B: 0,                                         tokenTypeId_B: 0,
+                       qty_A: minterLedger.tokens[0].currentQty.div(2),    tokTypeId_A: minterTokTypeId,
+                       qty_B: 0,                                           tokTypeId_B: 0,
                 ccy_amount_A: 0,                                           ccyTypeId_A: 0,
                 ccy_amount_B: 5000,                                        ccyTypeId_B: ccyTypeIdFunded,
                    applyFees: true,
@@ -266,8 +266,8 @@ describe(`Contract Web3 Interface`, async () => {
             for (var x = 0; x < buyerLedger.tokens.length ; x++) {
                 await CONST.web3_tx('transferOrTrade', [ {
                     ledger_A: BUYER.addr,                            ledger_B: GRAY,
-                       qty_A: buyerLedger.tokens[x].currentQty, tokenTypeId_A: buyerLedger.tokens[x].tokenTypeId.toString(),
-                       qty_B: 0,                                tokenTypeId_B: 0,
+                       qty_A: buyerLedger.tokens[x].currentQty,   tokTypeId_A: buyerLedger.tokens[x].tokTypeId.toString(),
+                       qty_B: 0,                                  tokTypeId_B: 0,
                 ccy_amount_A: 0,                                  ccyTypeId_A: 0,
                 ccy_amount_B: 0,                                  ccyTypeId_B: 0,
                    applyFees: false,

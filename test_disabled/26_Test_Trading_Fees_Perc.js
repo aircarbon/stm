@@ -31,28 +31,28 @@ contract("StMaster", accounts => {
         // set fee structure NATURE: 1%
         const feeBips = 100; // 100 bp = 1%
         const setFeeTx = await stm.setFee_TokType(CONST.tokenType.TOK_T2, CONST.nullAddr, { ccy_mirrorFee: false, ccy_perMillion: 0, fee_fixed: 0, fee_percBips: feeBips, fee_min: 0, fee_max: 0 } );
-        truffleAssert.eventEmitted(setFeeTx, 'SetFeeTokBps', ev => ev.tokenTypeId == CONST.tokenType.TOK_T2 && ev.fee_token_PercBips == feeBips && ev.ledgerOwner == CONST.nullAddr);
+        truffleAssert.eventEmitted(setFeeTx, 'SetFeeTokBps', ev => ev.tokTypeId == CONST.tokenType.TOK_T2 && ev.fee_token_PercBips == feeBips && ev.ledgerOwner == CONST.nullAddr);
 
         // transfer, with fee structure applied
         const transferAmountTokQty = new BN(100); // 100 kg
         const expectedFeeTokQty = Math.floor(Number(transferAmountTokQty.toString()) * (feeBips/10000));
         const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: accounts[global.TaddrNdx + 0],     ledger_B: accounts[global.TaddrNdx + 1],
-                   qty_A: transferAmountTokQty,           tokenTypeId_A: CONST.tokenType.TOK_T2,
-                   qty_B: 0,                              tokenTypeId_B: 0,
+                   qty_A: transferAmountTokQty,             tokTypeId_A: CONST.tokenType.TOK_T2,
+                   qty_B: 0,                                tokTypeId_B: 0,
             ccy_amount_A: 0,                                ccyTypeId_A: 0,
             ccy_amount_B: CONST.oneEth_wei,                 ccyTypeId_B: CONST.ccyType.ETH,
                applyFees: true,
         });
 
         // test contract owner has received expected carbon NATURE fee
-        const contractOwner_VcsTokQtyBefore = data.owner_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.TOK_T2).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
-        const contractOwner_VcsTokQtyAfter  =  data.owner_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.TOK_T2).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
+        const contractOwner_VcsTokQtyBefore = data.owner_before.tokens.filter(p => p.tokTypeId == CONST.tokenType.TOK_T2).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
+        const contractOwner_VcsTokQtyAfter  =  data.owner_after.tokens.filter(p => p.tokTypeId == CONST.tokenType.TOK_T2).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
         assert(contractOwner_VcsTokQtyAfter == Number(contractOwner_VcsTokQtyBefore) + Number(expectedFeeTokQty), 'unexpected contract owner (fee receiver) NATURE ST quantity after transfer');
         
         // fees are *additional* to the supplied transfer token qty's...
-        const ledgerA_VcsTokQtyBefore = data.ledgerA_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.TOK_T2).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
-        const ledgerA_VcsTokQtyAfter  =  data.ledgerA_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.TOK_T2).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
+        const ledgerA_VcsTokQtyBefore = data.ledgerA_before.tokens.filter(p => p.tokTypeId == CONST.tokenType.TOK_T2).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
+        const ledgerA_VcsTokQtyAfter  =  data.ledgerA_after.tokens.filter(p => p.tokTypeId == CONST.tokenType.TOK_T2).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
         assert(ledgerA_VcsTokQtyAfter == Number(ledgerA_VcsTokQtyBefore) - Number(expectedFeeTokQty) - Number(transferAmountTokQty), 'unexpected ledger A (fee payer) NATURE ST quantity after transfer');
     });
 
@@ -64,7 +64,7 @@ contract("StMaster", accounts => {
         const feeBips = 1;
         //const setFeeTx = await stm.setFee_SecTokenType_PercBips(CONST.tokenType.TOK_T1, feeBips);
         const setFeeTx = await stm.setFee_TokType(CONST.tokenType.TOK_T1, CONST.nullAddr, { ccy_mirrorFee: false, ccy_perMillion: 0, fee_fixed: 0, fee_percBips: feeBips, fee_min: 0, fee_max: 0 } );
-        truffleAssert.eventEmitted(setFeeTx, 'SetFeeTokBps', ev => ev.tokenTypeId == CONST.tokenType.TOK_T1 && ev.fee_token_PercBips == feeBips && ev.ledgerOwner == CONST.nullAddr);
+        truffleAssert.eventEmitted(setFeeTx, 'SetFeeTokBps', ev => ev.tokTypeId == CONST.tokenType.TOK_T1 && ev.fee_token_PercBips == feeBips && ev.ledgerOwner == CONST.nullAddr);
         assert((await stm.getFee(CONST.getFeeType.TOK, CONST.tokenType.TOK_T1, CONST.nullAddr)).fee_percBips == feeBips, 'unexpected CORSIA percentage fee after setting CORSIA fee structure');
 
         // transfer, with fee structure applied
@@ -72,21 +72,21 @@ contract("StMaster", accounts => {
         const expectedFeeTokQty = Math.floor(Number(transferAmountTokQty.toString()) * (feeBips/10000));
         const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: accounts[global.TaddrNdx + 0],       ledger_B: accounts[global.TaddrNdx + 1],
-                   qty_A: 0,                              tokenTypeId_A: 0,
-                   qty_B: transferAmountTokQty,           tokenTypeId_B: CONST.tokenType.TOK_T1,
+                   qty_A: 0,                                tokTypeId_A: 0,
+                   qty_B: transferAmountTokQty,             tokTypeId_B: CONST.tokenType.TOK_T1,
             ccy_amount_A: CONST.oneEth_wei,                 ccyTypeId_A: CONST.ccyType.ETH,
             ccy_amount_B: 0,                                ccyTypeId_B: 0,
                applyFees: true,
         });
 
         // test contract owner has received expected carbon CORSIA fee
-        const contractOwnercorsiaTokQtyBefore = data.owner_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.TOK_T1).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
-        const contractOwnercorsiaTokQtyAfter  =  data.owner_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.TOK_T1).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
+        const contractOwnercorsiaTokQtyBefore = data.owner_before.tokens.filter(p => p.tokTypeId == CONST.tokenType.TOK_T1).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
+        const contractOwnercorsiaTokQtyAfter  =  data.owner_after.tokens.filter(p => p.tokTypeId == CONST.tokenType.TOK_T1).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
         assert(contractOwnercorsiaTokQtyAfter == Number(contractOwnercorsiaTokQtyBefore) + Number(expectedFeeTokQty), 'unexpected contract owner (fee receiver) CORSIA ST quantity after transfer');
 
         // test contract owner has unchanged NATURE balance (i.e. no NATURE fees received)
-        const contractOwnerVcsTokQtyBefore = data.owner_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.TOK_T2).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
-        const contractOwnerVcsTokQtyAfter  =  data.owner_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.TOK_T2).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
+        const contractOwnerVcsTokQtyBefore = data.owner_before.tokens.filter(p => p.tokTypeId == CONST.tokenType.TOK_T2).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
+        const contractOwnerVcsTokQtyAfter  =  data.owner_after.tokens.filter(p => p.tokTypeId == CONST.tokenType.TOK_T2).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
         assert(contractOwnerVcsTokQtyAfter == Number(contractOwnerVcsTokQtyBefore), 'unexpected contract owner (fee receiver) NATURE ST quantity after transfer');
     })
 
@@ -103,7 +103,7 @@ contract("StMaster", accounts => {
         // set fee structure new ST type: 50% = 5000 BP(1.5 STs, 2 batches)
         const feeBips = 5000;
         const setFeeTx = await stm.setFee_TokType(newTypeId, CONST.nullAddr, { ccy_mirrorFee: false, ccy_perMillion: 0, fee_fixed: 0, fee_percBips: feeBips, fee_min: 0, fee_max: 0 } );
-        truffleAssert.eventEmitted(setFeeTx, 'SetFeeTokBps', ev => ev.tokenTypeId == newTypeId && ev.fee_token_PercBips == feeBips && ev.ledgerOwner == CONST.nullAddr);
+        truffleAssert.eventEmitted(setFeeTx, 'SetFeeTokBps', ev => ev.tokTypeId == newTypeId && ev.fee_token_PercBips == feeBips && ev.ledgerOwner == CONST.nullAddr);
         assert((await stm.getFee(CONST.getFeeType.TOK, newTypeId, CONST.nullAddr)).fee_percBips == feeBips, 'unexpected new eeu type percentage fee after setting fee structure');
 
         // transfer, with fee structure applied
@@ -111,16 +111,16 @@ contract("StMaster", accounts => {
         const expectedFeeTokQty = Math.floor(Number(transferAmountTokQty.toString()) * (feeBips/10000));
         const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: accounts[global.TaddrNdx + 0],       ledger_B: accounts[global.TaddrNdx + 1],
-                   qty_A: transferAmountTokQty,           tokenTypeId_A: newTypeId,
-                   qty_B: 0,                              tokenTypeId_B: 0,
+                   qty_A: transferAmountTokQty,             tokTypeId_A: newTypeId,
+                   qty_B: 0,                                tokTypeId_B: 0,
             ccy_amount_A: 0,                                ccyTypeId_A: 0,
             ccy_amount_B: CONST.oneEth_wei,                 ccyTypeId_B: CONST.ccyType.ETH,
                applyFees: true,
         });
 
         // test contract owner has received expected new ST type token fee
-        const owner_balBefore = data.owner_before.tokens.filter(p => p.tokenTypeId == newTypeId).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
-        const owner_balAfter  =  data.owner_after.tokens.filter(p => p.tokenTypeId == newTypeId).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
+        const owner_balBefore = data.owner_before.tokens.filter(p => p.tokTypeId == newTypeId).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
+        const owner_balAfter  =  data.owner_after.tokens.filter(p => p.tokTypeId == newTypeId).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
         assert(owner_balAfter == Number(owner_balBefore) + Number(expectedFeeTokQty), 'unexpected contract owner (fee receiver) new ST type quantity after transfer');
     });
 
@@ -143,8 +143,8 @@ contract("StMaster", accounts => {
         const expectedFeeCcy = Math.floor(Number(transferAmountCcy.toString()) * (ethFeePercBips/10000));
         const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: accounts[global.TaddrNdx + 0],                            ledger_B: accounts[global.TaddrNdx + 1],
-                   qty_A: 0,                                                   tokenTypeId_A: 0,
-                   qty_B: 750,                                                 tokenTypeId_B: CONST.tokenType.TOK_T2,
+                   qty_A: 0,                                                     tokTypeId_A: 0,
+                   qty_B: 750,                                                   tokTypeId_B: CONST.tokenType.TOK_T2,
             ccy_amount_A: transferAmountCcy,                                     ccyTypeId_A: CONST.ccyType.ETH,
             ccy_amount_B: 0,                                                     ccyTypeId_B: 0,
                applyFees: true,
@@ -172,8 +172,8 @@ contract("StMaster", accounts => {
         const expectedFeeCcy = Math.floor(Number(transferAmountCcy.toString()) * (usdFeePercBips/10000)); // 0.01% of 100$ = 1 cent
         const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: accounts[global.TaddrNdx + 0],                                      ledger_B: accounts[global.TaddrNdx + 1],
-                   qty_A: 750,                                                           tokenTypeId_A: CONST.tokenType.TOK_T2,
-                   qty_B: 0,                                                             tokenTypeId_B: 0,
+                   qty_A: 750,                                                             tokTypeId_A: CONST.tokenType.TOK_T2,
+                   qty_B: 0,                                                               tokTypeId_B: 0,
             ccy_amount_A: 0,                                                               ccyTypeId_A: 0,
             ccy_amount_B: transferAmountCcy,                                               ccyTypeId_B: CONST.ccyType.USD,
                applyFees: true,
@@ -204,8 +204,8 @@ contract("StMaster", accounts => {
         const expectedFeeCcy = Math.floor(Number(transferAmountCcy.toString()) * (feeBips/10000)); // 0.5% of 500 = 2.5 ccy units
         const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: accounts[global.TaddrNdx + 0],                       ledger_B: accounts[global.TaddrNdx + 1],
-                   qty_A: 750,                                            tokenTypeId_A: CONST.tokenType.TOK_T2,
-                   qty_B: 0,                                              tokenTypeId_B: 0,
+                   qty_A: 750,                                              tokTypeId_A: CONST.tokenType.TOK_T2,
+                   qty_B: 0,                                                tokTypeId_B: 0,
             ccy_amount_A: 0,                                                ccyTypeId_A: 0,
             ccy_amount_B: transferAmountCcy,                                ccyTypeId_B: newCcyTypeId,
                applyFees: true,
@@ -231,7 +231,7 @@ contract("StMaster", accounts => {
         // set fee structure NATURE: 100 bp (1%)
         const carbonFeeBps = 100;
         const setCarbonFeeTx = await stm.setFee_TokType(CONST.tokenType.TOK_T2, CONST.nullAddr, { ccy_mirrorFee: false, ccy_perMillion: 0, fee_fixed: 0, fee_percBips: carbonFeeBps, fee_min: 0, fee_max: 0 } );
-        truffleAssert.eventEmitted(setCarbonFeeTx, 'SetFeeTokBps', ev => ev.tokenTypeId == CONST.tokenType.TOK_T2 && ev.fee_token_PercBips == carbonFeeBps);
+        truffleAssert.eventEmitted(setCarbonFeeTx, 'SetFeeTokBps', ev => ev.tokTypeId == CONST.tokenType.TOK_T2 && ev.fee_token_PercBips == carbonFeeBps);
         assert((await stm.getFee(CONST.getFeeType.TOK, CONST.tokenType.TOK_T2, CONST.nullAddr)).fee_percBips == carbonFeeBps, 'unexpected NATURE basis points fee after setting NATURE fee structure');
 
         // transfer, with fee structure applied
@@ -243,8 +243,8 @@ contract("StMaster", accounts => {
 
         const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: accounts[global.TaddrNdx + 0],                              ledger_B: accounts[global.TaddrNdx + 1],
-                   qty_A: 0,                                                     tokenTypeId_A: 0,
-                   qty_B: transferAmountCarbon,                                  tokenTypeId_B: CONST.tokenType.TOK_T2,
+                   qty_A: 0,                                                       tokTypeId_A: 0,
+                   qty_B: transferAmountCarbon,                                    tokTypeId_B: CONST.tokenType.TOK_T2,
             ccy_amount_A: transferAmountCcy,                                       ccyTypeId_A: CONST.ccyType.ETH,
             ccy_amount_B: 0,                                                       ccyTypeId_B: 0,
                applyFees: true,
@@ -256,8 +256,8 @@ contract("StMaster", accounts => {
         assert(owner_balAfter == Number(owner_balBefore) + Number(expectedFeeCcy), 'unexpected contract owner (fee receiver) ETH balance after transfer');
         
         // test contract owner has received expected carbon NATURE fee
-        const contractOwnerVcsTokQtyBefore = data.owner_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.TOK_T2).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
-        const contractOwnerVcsTokQtyAfter  =  data.owner_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.TOK_T2).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
+        const contractOwnerVcsTokQtyBefore = data.owner_before.tokens.filter(p => p.tokTypeId == CONST.tokenType.TOK_T2).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
+        const contractOwnerVcsTokQtyAfter  =  data.owner_after.tokens.filter(p => p.tokTypeId == CONST.tokenType.TOK_T2).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
         assert(contractOwnerVcsTokQtyAfter == Number(contractOwnerVcsTokQtyBefore) + Number(expectedFeeCarbon), 'unexpected contract owner (fee receiver) NATURE ST quantity after transfer');
     });
 
@@ -278,8 +278,8 @@ contract("StMaster", accounts => {
 
         const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: accounts[global.TaddrNdx + 0],                    ledger_B: accounts[global.TaddrNdx + 1],
-                   qty_A: 0,                                           tokenTypeId_A: 0,
-                   qty_B: transferAmountCarbon,                        tokenTypeId_B: CONST.tokenType.TOK_T1,
+                   qty_A: 0,                                             tokTypeId_A: 0,
+                   qty_B: transferAmountCarbon,                          tokTypeId_B: CONST.tokenType.TOK_T1,
             ccy_amount_A: transferAmountCcy,                             ccyTypeId_A: CONST.ccyType.USD,
             ccy_amount_B: 0,                                             ccyTypeId_B: 0,
                applyFees: true,
@@ -290,8 +290,8 @@ contract("StMaster", accounts => {
         assert(owner_balAfter == Number(owner_balBefore) + Number(expectedFeeCcy), 'unexpected contract owner (fee receiver) USD balance after transfer');
         
         // test contract owner has received expected carbon CORSIA fee
-        const contractOwnerCarbonTokQtyBefore = data.owner_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.TOK_T1).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
-        const contractOwnerCarbonTokQtyAfter  =  data.owner_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.TOK_T1).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
+        const contractOwnerCarbonTokQtyBefore = data.owner_before.tokens.filter(p => p.tokTypeId == CONST.tokenType.TOK_T1).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
+        const contractOwnerCarbonTokQtyAfter  =  data.owner_after.tokens.filter(p => p.tokTypeId == CONST.tokenType.TOK_T1).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
         assert(contractOwnerCarbonTokQtyAfter == Number(contractOwnerCarbonTokQtyBefore) + Number(expectedFeeCarbon), 'unexpected contract owner (fee receiver) CORSIA ST quantity after transfer');
     });
     
@@ -325,8 +325,8 @@ contract("StMaster", accounts => {
         try {
             const data = await transferHelper.transferLedger({ stm, accounts, 
                     ledger_A: accounts[global.TaddrNdx + 0],                                      ledger_B: accounts[global.TaddrNdx + 1],
-                       qty_A: 0,                                                             tokenTypeId_A: 0,
-                       qty_B: new BN(CONST.KT_CARBON),                                       tokenTypeId_B: CONST.tokenType.TOK_T1,
+                       qty_A: 0,                                                               tokTypeId_A: 0,
+                       qty_B: new BN(CONST.KT_CARBON),                                         tokTypeId_B: CONST.tokenType.TOK_T1,
                 ccy_amount_A: new BN(CONST.millionCcy_cents),                                  ccyTypeId_A: CONST.ccyType.USD,
                 ccy_amount_B: 0,                                                               ccyTypeId_B: 0,
                    applyFees: true,
@@ -350,8 +350,8 @@ contract("StMaster", accounts => {
         try {
             await transferHelper.transferLedger({ stm, accounts, 
                     ledger_A: accounts[global.TaddrNdx + 0],                                      ledger_B: accounts[global.TaddrNdx + 1],
-                       qty_A: 0,                                                             tokenTypeId_A: 0,
-                       qty_B: new BN(CONST.GT_CARBON),                                        tokenTypeId_B: CONST.tokenType.TOK_T1,
+                       qty_A: 0,                                                               tokTypeId_A: 0,
+                       qty_B: new BN(CONST.GT_CARBON),                                          tokTypeId_B: CONST.tokenType.TOK_T1,
                 ccy_amount_A: new BN(CONST.millionCcy_cents),                                  ccyTypeId_A: CONST.ccyType.USD,
                 ccy_amount_B: 0,                                                               ccyTypeId_B: 0,
                    applyFees: true,

@@ -30,13 +30,13 @@ contract StLedger is
     // }
 
     // #### TODO - move to StFutures...
-    function setFuture_VariationMargin(uint256 tokenTypeId, uint16 varMarginBips)
+    function setFuture_VariationMargin(uint256 tokTypeId, uint16 varMarginBips)
     public onlyOwner() onlyWhenReadWrite() {
-        TokenLib.setFuture_VariationMargin(std, tokenTypeId, varMarginBips); // ### recalc all open pos margin/reserve; needs to be batched (job) - re. gas limits
+        TokenLib.setFuture_VariationMargin(std, tokTypeId, varMarginBips); // ### recalc all open pos margin/reserve; needs to be batched (job) - re. gas limits
     }
-    function setFuture_FeePerContract(uint256 tokenTypeId, uint128 feePerContract)
+    function setFuture_FeePerContract(uint256 tokTypeId, uint128 feePerContract)
     public onlyOwner() onlyWhenReadWrite() {
-        TokenLib.setFuture_FeePerContract(std, tokenTypeId, feePerContract);
+        TokenLib.setFuture_FeePerContract(std, tokTypeId, feePerContract);
     }
 
     function setReservedCcy(uint256 ccyTypeId, int256 reservedAmount, address ledger)
@@ -77,7 +77,7 @@ contract StLedger is
     //     return StructLib.LedgerSecTokenReturn({
     //           //exists: ld._sts[id].mintedQty != 0,
     //               stId: id,
-    //        tokenTypeId: 0,
+    //        tokTypeId: 0,
     //      tokenTypeName: "",
     //            batchId: ld._sts[id].batchId,
     //          mintedQty: ld._sts[id].mintedQty,

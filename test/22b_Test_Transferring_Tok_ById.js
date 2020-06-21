@@ -40,7 +40,7 @@ contract("StMaster", accounts => {
 
         const tokType = CONST.tokenType.TOK_T2;
         const le_before_A = await stm.getLedgerEntry(A);
-        const sts_A = le_before_A.tokens.filter(p => p.tokenTypeId == tokType && p.stId % 3 == 1);
+        const sts_A = le_before_A.tokens.filter(p => p.tokTypeId == tokType && p.stId % 3 == 1);
         const stIds_A = sts_A.map(p => p.stId);
         const stsQty_A = sts_A.map(p => p.currentQty).reduce((a,b) => a.add(new BN(b)), new BN(0));
         //console.log('stIds_A', stIds_A);
@@ -49,8 +49,8 @@ contract("StMaster", accounts => {
 
         const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: A,                                     ledger_B: B,
-                   qty_A: stsQty_A.toString(),              tokenTypeId_A: tokType,
-                   qty_B: 0,                                tokenTypeId_B: 0,
+                   qty_A: stsQty_A.toString(),                tokTypeId_A: tokType,
+                   qty_B: 0,                                  tokTypeId_B: 0,
                k_stIds_A: stIds_A,                              k_stIds_B: [],
             ccy_amount_A: 0,                                  ccyTypeId_A: 0,
             ccy_amount_B: 0,                                  ccyTypeId_B: 0,
@@ -79,7 +79,7 @@ contract("StMaster", accounts => {
 
         const tokType = CONST.tokenType.TOK_T1;
         const le_before_B = await stm.getLedgerEntry(B);
-        const sts_B = le_before_B.tokens.filter(p => p.tokenTypeId == burnType && p.stId % 2 == 1);
+        const sts_B = le_before_B.tokens.filter(p => p.tokTypeId == tokType && p.stId % 2 == 1);
         const stIds_B = sts_B.map(p => p.stId);
         const stsQty_B = sts_B.map(p => p.currentQty).reduce((a,b) => a.add(new BN(b)), new BN(0));
         //console.log('stIds_B', stIds_B);
@@ -88,8 +88,8 @@ contract("StMaster", accounts => {
 
         const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: A,                                     ledger_B: B,
-                   qty_A: 0,                                tokenTypeId_A: 0,
-                   qty_B: stsQty_B.toString(),              tokenTypeId_B: burnType,
+                   qty_A: 0,                                  tokTypeId_A: 0,
+                   qty_B: stsQty_B.toString(),                tokTypeId_B: tokType,
                k_stIds_A: [],                                   k_stIds_B: stIds_B,
             ccy_amount_A: 0,                                  ccyTypeId_A: 0,
             ccy_amount_B: 0,                                  ccyTypeId_B: 0,
@@ -128,7 +128,7 @@ contract("StMaster", accounts => {
         // set specific transfer STs
         const tokType = CONST.tokenType.TOK_T2;
         const le_before_A = await stm.getLedgerEntry(A);
-        const sts_A = le_before_A.tokens.filter(p => p.tokenTypeId == tokType);
+        const sts_A = le_before_A.tokens.filter(p => p.tokTypeId == tokType);
         const stIds_A = sts_A.map(p => p.stId);
         const stsQty_A = sts_A.map(p => p.currentQty).reduce((a,b) => a.add(new BN(b)), new BN(0));
         // console.log('stIds_A', stIds_A);
@@ -137,8 +137,8 @@ contract("StMaster", accounts => {
 
         const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: A,                                     ledger_B: B,
-                   qty_A: stsQty_A.toString(),              tokenTypeId_A: tokType,
-                   qty_B: 0,                                tokenTypeId_B: 0,
+                   qty_A: stsQty_A.toString(),                tokTypeId_A: tokType,
+                   qty_B: 0,                                  tokTypeId_B: 0,
                k_stIds_A: stIds_A,                              k_stIds_B: [],
             ccy_amount_A: 0,                                  ccyTypeId_A: 0,
             ccy_amount_B: 100 * 1000,                         ccyTypeId_B: CONST.ccyType.USD,
@@ -176,7 +176,7 @@ contract("StMaster", accounts => {
         // set specific transfer STs
         const tokType = CONST.tokenType.TOK_T3;
         const le_before_B = await stm.getLedgerEntry(B);
-        const sts_B = le_before_B.tokens.filter(p => p.tokenTypeId == tokType && p.stId % 2 == 0);
+        const sts_B = le_before_B.tokens.filter(p => p.tokTypeId == tokType && p.stId % 2 == 0);
         const stIds_B = sts_B.map(p => p.stId);
         const stsQty_B = sts_B.map(p => p.currentQty).reduce((a,b) => a.add(new BN(b)), new BN(0));
         // console.log('stIds_B', stIds_B);
@@ -185,8 +185,8 @@ contract("StMaster", accounts => {
 
         const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: A,                                     ledger_B: B,
-                   qty_A: 0,                                tokenTypeId_A: 0,
-                   qty_B: stsQty_B.toString(),              tokenTypeId_B: tokType,
+                   qty_A: 0,                                  tokTypeId_A: 0,
+                   qty_B: stsQty_B.toString(),                tokTypeId_B: tokType,
                k_stIds_A: [],                                   k_stIds_B: stIds_B,
             ccy_amount_A: 100 * 1000,                         ccyTypeId_A: CONST.ccyType.USD,
             ccy_amount_B: 0,                                  ccyTypeId_B: 0,

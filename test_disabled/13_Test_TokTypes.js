@@ -69,7 +69,7 @@ contract("StMaster", accounts => {
         // validate ledger: 6 vSTs, 2 of new type
         const ledgerEntryAfter = await stm.getLedgerEntry(accounts[global.TaddrNdx]);
         assert(ledgerEntryAfter.tokens.length == 6, 'unexpected eeu count in ledger');
-        assert(ledgerEntryAfter.tokens.filter(p => p.tokenTypeId == newTypeId).length == 2, 'unexpected new eeu type in ledger');
+        assert(ledgerEntryAfter.tokens.filter(p => p.tokTypeId == newTypeId).length == 2, 'unexpected new eeu type in ledger');
     });
 
     it(`token types - should not allow non-owner to add an ST type`, async () => {

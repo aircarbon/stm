@@ -162,13 +162,13 @@ contract("StMaster", accounts => {
             // transfer to owner - batch 1 CORSIA, no fees
             const send_tx_B1 = await stm_cur.transferOrTrade({ 
                         ledger_A: M,                            ledger_B: accounts[0], 
-                           qty_A: 200,                     tokenTypeId_A: CONST.tokenType.TOK_T1, 
-                           qty_B: 0,                       tokenTypeId_B: 0, 
+                           qty_A: 200,                       tokTypeId_A: CONST.tokenType.TOK_T1, 
+                           qty_B: 0,                         tokTypeId_B: 0, 
+                       k_stIds_A: [],                          k_stIds_B: [],
                     ccy_amount_A: 0,                         ccyTypeId_A: 0, 
                     ccy_amount_B: 0,                         ccyTypeId_B: 0, 
                        applyFees: false,
                     feeAddrOwner: CONST.nullAddr,
-                           stIds: []
                 },
             );
             curHash = await checkHashUpdate(curHash);
@@ -177,13 +177,13 @@ contract("StMaster", accounts => {
             if (await stm_cur.getContractType() == CONST.contractType.COMMODITY) {
                     const send_tx_B2 = await stm_cur.transferOrTrade({ 
                          ledger_A: M,                            ledger_B: accounts[0], 
-                            qty_A: 100,                     tokenTypeId_A: CONST.tokenType.TOK_T2, 
-                            qty_B: 0,                       tokenTypeId_B: 0, 
+                            qty_A: 100,                       tokTypeId_A: CONST.tokenType.TOK_T2, 
+                            qty_B: 0,                         tokTypeId_B: 0, 
+                        k_stIds_A: [],                          k_stIds_B: [],
                      ccy_amount_A: 0,                         ccyTypeId_A: 0, 
                      ccy_amount_B: 0,                         ccyTypeId_B: 0, 
                         applyFees: true,
                      feeAddrOwner: CONST.nullAddr,
-                            stIds: []
                     },
                 );
                 curHash = await checkHashUpdate(curHash);
@@ -242,13 +242,13 @@ contract("StMaster", accounts => {
             if (entryOwner != accounts[0]) {
                  const tradeTx = await stm_cur.transferOrTrade({ 
                         ledger_A: entryOwner,                   ledger_B: accounts[0], 
-                           qty_A: 1,                       tokenTypeId_A: CONST.tokenType.TOK_T1, 
-                           qty_B: 0,                       tokenTypeId_B: 0, 
+                           qty_A: 1,                         tokTypeId_A: CONST.tokenType.TOK_T1, 
+                           qty_B: 0,                         tokTypeId_B: 0, 
+                       k_stIds_A: [],                          k_stIds_B: [],
                     ccy_amount_A: 0,                         ccyTypeId_A: 0, 
                     ccy_amount_B: CONST.ccyType.USD,         ccyTypeId_B: 1,
                        applyFees: true,
                     feeAddrOwner: CONST.nullAddr,
-                           stIds: []
                 });
                 //truffleAssert.prettyPrintEmittedEvents(tradeTx);
                 curHash = await checkHashUpdate(curHash);
@@ -375,7 +375,7 @@ contract("StMaster", accounts => {
                 await stm_new.addSecToken(curEntryOwner, 
                     p.batchId,
                     p.stId,
-                    p.tokenTypeId,
+                    p.tokTypeId,
                     p.mintedQty,
                     p.currentQty,
                     p.ft_price,

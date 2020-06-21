@@ -34,30 +34,30 @@ contract("StMaster", accounts => {
         const feeCap = 10;
         const setEeuFeeTx = await stm.setFee_TokType(CONST.tokenType.TOK_T2, CONST.nullAddr, { ccy_mirrorFee: false, ccy_perMillion: 0, fee_fixed: feeFix, fee_percBips: feeBps, fee_min: 0, fee_max: feeCap } );
         const setCcyFeeTx = await stm.setFee_CcyType(CONST.ccyType.ETH, CONST.nullAddr,      CONST.nullFees);
-        truffleAssert.eventEmitted(setEeuFeeTx, 'SetFeeTokBps', ev => ev.tokenTypeId == CONST.tokenType.TOK_T2 && ev.fee_token_PercBips == feeBps && ev.ledgerOwner == CONST.nullAddr);
-        truffleAssert.eventEmitted(setEeuFeeTx, 'SetFeeTokFix', ev => ev.tokenTypeId == CONST.tokenType.TOK_T2 && ev.fee_tokenQty_Fixed == feeFix && ev.ledgerOwner == CONST.nullAddr);
-        truffleAssert.eventEmitted(setEeuFeeTx, 'SetFeeTokMax', ev => ev.tokenTypeId == CONST.tokenType.TOK_T2 && ev.fee_token_Max == feeCap && ev.ledgerOwner == CONST.nullAddr);
+        truffleAssert.eventEmitted(setEeuFeeTx, 'SetFeeTokBps', ev => ev.tokTypeId == CONST.tokenType.TOK_T2 && ev.fee_token_PercBips == feeBps && ev.ledgerOwner == CONST.nullAddr);
+        truffleAssert.eventEmitted(setEeuFeeTx, 'SetFeeTokFix', ev => ev.tokTypeId == CONST.tokenType.TOK_T2 && ev.fee_tokenQty_Fixed == feeFix && ev.ledgerOwner == CONST.nullAddr);
+        truffleAssert.eventEmitted(setEeuFeeTx, 'SetFeeTokMax', ev => ev.tokTypeId == CONST.tokenType.TOK_T2 && ev.fee_token_Max == feeCap && ev.ledgerOwner == CONST.nullAddr);
 
         // transfer, with fee structure applied
         const transferAmountTokQty = new BN(100); // 100 kg
         const expectedFeeTokQty = Math.min(Math.floor(Number(transferAmountTokQty.toString()) * (feeBps/10000)) + feeFix, feeCap);
         const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: accounts[global.TaddrNdx + 0],       ledger_B: accounts[global.TaddrNdx + 1],
-                   qty_A: transferAmountTokQty,           tokenTypeId_A: CONST.tokenType.TOK_T2,
-                   qty_B: 0,                              tokenTypeId_B: 0,
+                   qty_A: transferAmountTokQty,             tokTypeId_A: CONST.tokenType.TOK_T2,
+                   qty_B: 0,                                tokTypeId_B: 0,
             ccy_amount_A: 0,                                ccyTypeId_A: 0,
             ccy_amount_B: CONST.oneEth_wei,                 ccyTypeId_B: CONST.ccyType.ETH,
                applyFees: true,
         });
 
         // test contract owner has received expected token fees
-        const contractOwner_VcsTokQtyBefore = data.owner_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.TOK_T2).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
-        const contractOwner_VcsTokQtyAfter  =  data.owner_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.TOK_T2).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
+        const contractOwner_VcsTokQtyBefore = data.owner_before.tokens.filter(p => p.tokTypeId == CONST.tokenType.TOK_T2).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
+        const contractOwner_VcsTokQtyAfter  =  data.owner_after.tokens.filter(p => p.tokTypeId == CONST.tokenType.TOK_T2).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
         assert(contractOwner_VcsTokQtyAfter == Number(contractOwner_VcsTokQtyBefore) + Number(expectedFeeTokQty), 'unexpected contract owner (fee receiver) NATURE ST quantity after transfer');
         
         // test sender has sent expected quantity and fees
-        const ledgerA_VcsTokQtyBefore = data.ledgerA_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.TOK_T2).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
-        const ledgerA_VcsTokQtyAfter  =  data.ledgerA_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.TOK_T2).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
+        const ledgerA_VcsTokQtyBefore = data.ledgerA_before.tokens.filter(p => p.tokTypeId == CONST.tokenType.TOK_T2).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
+        const ledgerA_VcsTokQtyAfter  =  data.ledgerA_after.tokens.filter(p => p.tokTypeId == CONST.tokenType.TOK_T2).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
         assert(ledgerA_VcsTokQtyAfter == Number(ledgerA_VcsTokQtyBefore) - Number(expectedFeeTokQty) - Number(transferAmountTokQty), 'unexpected ledger A (fee payer) NATURE ST quantity after transfer');
     });
 
@@ -71,9 +71,9 @@ contract("StMaster", accounts => {
         const feeMin = 100000000; // 100m tons
         const setEeuFeeTx = await stm.setFee_TokType(CONST.tokenType.TOK_T2, CONST.nullAddr, { ccy_mirrorFee: false, ccy_perMillion: 0, fee_fixed: feeFix, fee_percBips: feeBps, fee_min: feeMin, fee_max: 0 } );
         const setCcyFeeTx = await stm.setFee_CcyType(CONST.ccyType.ETH, CONST.nullAddr,   CONST.nullFees);
-        truffleAssert.eventEmitted(setEeuFeeTx, 'SetFeeTokBps', ev => ev.tokenTypeId == CONST.tokenType.TOK_T2 && ev.fee_token_PercBips == feeBps && ev.ledgerOwner == CONST.nullAddr);
-        truffleAssert.eventEmitted(setEeuFeeTx, 'SetFeeTokFix', ev => ev.tokenTypeId == CONST.tokenType.TOK_T2 && ev.fee_tokenQty_Fixed == feeFix && ev.ledgerOwner == CONST.nullAddr);
-        truffleAssert.eventEmitted(setEeuFeeTx, 'SetFeeTokMin', ev => ev.tokenTypeId == CONST.tokenType.TOK_T2 && ev.fee_token_Min == feeMin && ev.ledgerOwner == CONST.nullAddr);
+        truffleAssert.eventEmitted(setEeuFeeTx, 'SetFeeTokBps', ev => ev.tokTypeId == CONST.tokenType.TOK_T2 && ev.fee_token_PercBips == feeBps && ev.ledgerOwner == CONST.nullAddr);
+        truffleAssert.eventEmitted(setEeuFeeTx, 'SetFeeTokFix', ev => ev.tokTypeId == CONST.tokenType.TOK_T2 && ev.fee_tokenQty_Fixed == feeFix && ev.ledgerOwner == CONST.nullAddr);
+        truffleAssert.eventEmitted(setEeuFeeTx, 'SetFeeTokMin', ev => ev.tokTypeId == CONST.tokenType.TOK_T2 && ev.fee_token_Min == feeMin && ev.ledgerOwner == CONST.nullAddr);
 
         // transfer, with fee structure applied
         const transferAmountTokQty = new BN(CONST.GT_CARBON / 2); // 0.5 giga ton
@@ -81,21 +81,21 @@ contract("StMaster", accounts => {
         //console.log('expectedFeeTokQty', expectedFeeTokQty.toFixed());
         const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: accounts[global.TaddrNdx + 0],       ledger_B: accounts[global.TaddrNdx + 1],
-                   qty_A: 0,                              tokenTypeId_A: 0,
-                   qty_B: transferAmountTokQty,           tokenTypeId_B: CONST.tokenType.TOK_T2,
+                   qty_A: 0,                                tokTypeId_A: 0,
+                   qty_B: transferAmountTokQty,             tokTypeId_B: CONST.tokenType.TOK_T2,
             ccy_amount_A: CONST.oneEth_wei,                 ccyTypeId_A: CONST.ccyType.ETH,
             ccy_amount_B: 0,                                ccyTypeId_B: 0,
                applyFees: true,
         });
 
         // test contract owner has received expected token fees
-        const contractOwner_VcsTokQtyBefore = data.owner_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.TOK_T2).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
-        const contractOwner_VcsTokQtyAfter  =  data.owner_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.TOK_T2).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
+        const contractOwner_VcsTokQtyBefore = data.owner_before.tokens.filter(p => p.tokTypeId == CONST.tokenType.TOK_T2).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
+        const contractOwner_VcsTokQtyAfter  =  data.owner_after.tokens.filter(p => p.tokTypeId == CONST.tokenType.TOK_T2).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
         assert(contractOwner_VcsTokQtyAfter == Number(contractOwner_VcsTokQtyBefore) + Number(expectedFeeTokQty), 'unexpected contract owner (fee receiver) NATURE ST quantity after transfer');
         
         // test sender has sent expected quantity and fees
-        const ledgerB_VcsTokQtyBefore = data.ledgerB_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.TOK_T2).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
-        const ledgerB_VcsTokQtyAfter  =  data.ledgerB_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.TOK_T2).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
+        const ledgerB_VcsTokQtyBefore = data.ledgerB_before.tokens.filter(p => p.tokTypeId == CONST.tokenType.TOK_T2).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
+        const ledgerB_VcsTokQtyAfter  =  data.ledgerB_after.tokens.filter(p => p.tokTypeId == CONST.tokenType.TOK_T2).map(p => p.currentQty).reduce((a,b) => Number(a) + Number(b), 0);
         assert(ledgerB_VcsTokQtyAfter == Number(ledgerB_VcsTokQtyBefore) - Number(expectedFeeTokQty) - Number(transferAmountTokQty), 'unexpected ledger A (fee payer) NATURE ST quantity after transfer');
     });
 
@@ -122,8 +122,8 @@ contract("StMaster", accounts => {
         const expectedFeeCcy = Math.max(Math.floor(Number(transferAmountCcy.toString()) * (ethFeeBps/10000)) + Number(ethFeeFix), ethFeeMin);
         const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: accounts[global.TaddrNdx + 0],                            ledger_B: accounts[global.TaddrNdx + 1],
-                   qty_A: 0,                                                   tokenTypeId_A: 0,
-                   qty_B: 750,                                                 tokenTypeId_B: CONST.tokenType.TOK_T2,
+                   qty_A: 0,                                                     tokTypeId_A: 0,
+                   qty_B: 750,                                                   tokTypeId_B: CONST.tokenType.TOK_T2,
             ccy_amount_A: transferAmountCcy,                                     ccyTypeId_A: CONST.ccyType.ETH,
             ccy_amount_B: 0,                                                     ccyTypeId_B: 0,
                applyFees: true,
@@ -146,8 +146,8 @@ contract("StMaster", accounts => {
         const expectedFeeCcy = Math.min(Math.floor(Number(transferAmountCcy.toString()) * (ethFeeBps/10000)) + Number(ethFeeFix), ethFeeMax);
         const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: accounts[global.TaddrNdx + 0],                            ledger_B: accounts[global.TaddrNdx + 1],
-                   qty_A: 750,                                                 tokenTypeId_A: CONST.tokenType.TOK_T2,
-                   qty_B: 0,                                                   tokenTypeId_B: 0,
+                   qty_A: 750,                                                   tokTypeId_A: CONST.tokenType.TOK_T2,
+                   qty_B: 0,                                                     tokTypeId_B: 0,
             ccy_amount_A: 0,                                                     ccyTypeId_A: 0,
             ccy_amount_B: transferAmountCcy,                                     ccyTypeId_B: CONST.ccyType.ETH,
                applyFees: true,
@@ -168,8 +168,8 @@ contract("StMaster", accounts => {
         const transferAmountTokQty = new BN(950); // not enough carbon for this trade, without the fee cap
         const data = await transferHelper.transferLedger({ stm, accounts, 
             ledger_A: accounts[global.TaddrNdx + 0],       ledger_B: accounts[global.TaddrNdx + 1],
-               qty_A: transferAmountTokQty,           tokenTypeId_A: CONST.tokenType.TOK_T2,
-               qty_B: 0,                              tokenTypeId_B: 0,
+               qty_A: transferAmountTokQty,             tokTypeId_A: CONST.tokenType.TOK_T2,
+               qty_B: 0,                                tokTypeId_B: 0,
         ccy_amount_A: 0,                                ccyTypeId_A: 0,
         ccy_amount_B: CONST.oneEth_wei,                 ccyTypeId_B: CONST.ccyType.ETH,
            applyFees: true,
@@ -192,8 +192,8 @@ contract("StMaster", accounts => {
             const transferAmountCcy = new BN(900);
             const data = await transferHelper.transferLedger({ stm, accounts,
                     ledger_A: accounts[global.TaddrNdx + 0],                            ledger_B: accounts[global.TaddrNdx + 1],
-                       qty_A: 0,                                                   tokenTypeId_A: 0,
-                       qty_B: 750,                                                 tokenTypeId_B: CONST.tokenType.TOK_T2,
+                       qty_A: 0,                                                     tokTypeId_A: 0,
+                       qty_B: 750,                                                   tokTypeId_B: CONST.tokenType.TOK_T2,
                 ccy_amount_A: transferAmountCcy,                                     ccyTypeId_A: CONST.ccyType.ETH,
                 ccy_amount_B: 0,                                                     ccyTypeId_B: 0,
                    applyFees: true,
@@ -221,8 +221,8 @@ contract("StMaster", accounts => {
             const transferAmountTokQty = new BN(900000);
             const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: accounts[global.TaddrNdx + 0],       ledger_B: accounts[global.TaddrNdx + 1],
-                   qty_A: 0,                              tokenTypeId_A: 0,
-                   qty_B: transferAmountTokQty,           tokenTypeId_B: CONST.tokenType.TOK_T2,
+                   qty_A: 0,                                tokTypeId_A: 0,
+                   qty_B: transferAmountTokQty,             tokTypeId_B: CONST.tokenType.TOK_T2,
             ccy_amount_A: CONST.oneEth_wei,                 ccyTypeId_A: CONST.ccyType.ETH,
             ccy_amount_B: 0,                                ccyTypeId_B: 0,
                applyFees: true,

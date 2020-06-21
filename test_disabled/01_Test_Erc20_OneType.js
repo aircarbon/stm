@@ -57,8 +57,8 @@ contract("StMaster", accounts => {
     async function white_to_gray_1() {
         const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: WHITE,                               ledger_B: GRAY_1,
-                   qty_A: CONST.KT_CARBON,                tokenTypeId_A: CONST.tokenType.TOK_T2,
-                   qty_B: 0,                              tokenTypeId_B: 0,
+                   qty_A: CONST.KT_CARBON,                  tokTypeId_A: CONST.tokenType.TOK_T2,
+                   qty_B: 0,                                tokTypeId_B: 0,
             ccy_amount_A: 0,                                ccyTypeId_A: 0,
             ccy_amount_B: 0,                                ccyTypeId_B: 0,
                applyFees: false,

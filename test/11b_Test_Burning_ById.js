@@ -38,10 +38,10 @@ contract("StMaster", accounts => {
 
         // define tokens to burn
         const burnType = CONST.tokenType.TOK_T1;
-        const burnSts = le_before.tokens.filter(p => p.tokenTypeId == burnType && p.stId % 2 == 1);
+        const burnSts = le_before.tokens.filter(p => p.tokTypeId == burnType && p.stId % 2 == 1);
         assert(burnSts.length > 0, 'bad test data');
         //const burnType = CONST.tokenType.TOK_T3;
-        //const burnSts = le_before.tokens.filter(p => p.tokenTypeId == burnType);
+        //const burnSts = le_before.tokens.filter(p => p.tokTypeId == burnType);
 
         const burnStIds = burnSts.map(p => p.stId);
         const burnQty = burnSts.map(p => p.currentQty).reduce((a,b) => a.add(new BN(b)), new BN(0));
@@ -55,7 +55,7 @@ contract("StMaster", accounts => {
         //truffleAssert.prettyPrintEmittedEvents(burnTx);
         truffleAssert.eventEmitted(burnTx, 'BurnedFullSecToken', ev => {
             return burnStIds.includes(ev.stId.toString())
-                && ev.tokenTypeId == burnType
+                && ev.tokTypeId == burnType
                 && ev.from == A
                 && ev.burnedQty == CONST.GT_CARBON
             ;

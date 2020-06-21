@@ -7,8 +7,8 @@ import "../Interfaces/StructLib.sol";
 
 library FuturesLib {
     event FutureOpenInterest(address indexed long, address indexed short, uint256 shortStId, uint256 tokTypeId, uint256 qty, uint256 price, uint256 feeLong, uint256 feeShort);
-    event SetInitialMarginOverride(uint256 tokenTypeId, address indexed ledgerOwner, uint16 initMarginBips);
-    event SetFeePerContractOverride(uint256 tokenTypeId, address indexed ledgerOwner, uint128 feePerContract);
+    event SetInitialMarginOverride(uint256 tokTypeId, address indexed ledgerOwner, uint16 initMarginBips);
+    event SetFeePerContractOverride(uint256 tokTypeId, address indexed ledgerOwner, uint128 feePerContract);
     //event TakePay(address indexed from, address indexed to, uint256 delta, uint256 done, address indexed feeTo, uint256 otmFee, uint256 itmFee, uint256 feeCcyId);
     event TakePay2(address indexed from, address indexed to, uint256 ccyId, uint256 delta, uint256 done, uint256 fee);
 

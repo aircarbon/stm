@@ -23,8 +23,8 @@ describe(`Contract Web3 Interface`, async () => {
         const data = await CONST.web3_call('transfer_feePreview_ExchangeOnly', [{
             ledger_A: (await CONST.getAccountAndKey(98)).addr,
             ledger_B: (await CONST.getAccountAndKey(99)).addr,
-            qty_A: 1,       tokenTypeId_A: 1,
-            qty_B: 0,       tokenTypeId_B: 0,
+            qty_A: 1,         tokTypeId_A: 1,
+            qty_B: 0,         tokTypeId_B: 0,
             ccy_amount_A: 0,  ccyTypeId_A: 0,
             ccy_amount_B: 1,  ccyTypeId_B: 1,
             applyFees: true,

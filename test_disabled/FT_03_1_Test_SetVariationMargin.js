@@ -51,7 +51,7 @@ contract("StMaster", accounts => {
         const tx = await stm.setFuture_VariationMargin(usdFT.id, 42);
         const tt = (await stm.getSecTokenTypes()).tokenTypes.filter(p => p.id == usdFT.id)[0];
         assert(tt.ft.varMarginBips = 42);
-        truffleAssert.eventEmitted(tx, 'SetFutureVariationMargin', ev => ev.tokenTypeId == usdFT.id && ev.varMarginBips == 42);
+        truffleAssert.eventEmitted(tx, 'SetFutureVariationMargin', ev => ev.tokTypeId == usdFT.id && ev.varMarginBips == 42);
     });
 
     it(`FT var margin - should not allow non-owner to set variation margin on a futures token type`, async () => {

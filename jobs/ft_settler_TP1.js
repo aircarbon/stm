@@ -33,8 +33,8 @@ module.exports = {
 //             }
 
 //             if (includeAccount) {
-//                 //console.log(`le: ${addr} ${le.tokens.map(p2 => `{ TT: ${p2.tokenTypeId} / stId: ${p2.stId} / P: ${p2.ft_price.toString()} / M_qty:${p2.mintedQty.toString().padStart(3)} }`).join(', ')}`);
-//                 const shortPositions = le.tokens.filter(p => p.tokenTypeId == ftId && p.currentQty.lt(0));
+//                 //console.log(`le: ${addr} ${le.tokens.map(p2 => `{ TT: ${p2.tokTypeId} / stId: ${p2.stId} / P: ${p2.ft_price.toString()} / M_qty:${p2.mintedQty.toString().padStart(3)} }`).join(', ')}`);
+//                 const shortPositions = le.tokens.filter(p => p.tokTypeId == ftId && p.currentQty.lt(0));
 //                 _.forEach(shortPositions, pos => {
 //                     shortPosIds.push(pos.stId.toString());
 //                 });

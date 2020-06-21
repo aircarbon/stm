@@ -16,7 +16,7 @@ import "../Interfaces/StructLib.sol";
 
 /*
 JUN 2020
-TODO: "I found that event TradedCcyTok, is saving parameter tokTypeId . It should be tokenTypeId to keep consistency on names."
+TODO: "I found that event TradedCcyTok, is saving parameter tokTypeId . It should be tokTypeId to keep consistency on names."
 TODO: ... CFT refactor...
 */
 
@@ -70,13 +70,13 @@ contract StMaster
     event CcyWithdrewLedger(uint256 ccyTypeId, address indexed from, int256 amount);
     // TokenLib events
     event AddedSecTokenType(uint256 id, string name, StructLib.SettlementType settlementType, uint64 expiryTimestamp, uint256 underlyerTypeId, uint256 refCcyId, uint16 initMarginBips, uint16 varMarginBips);
-    event SetFutureVariationMargin(uint256 tokenTypeId, uint16 varMarginBips);
-    event SetFutureFeePerContract(uint256 tokenTypeId, uint256 feePerContract);
-    event Burned(uint256 tokenTypeId, address indexed from, uint256 burnedQty);
-    event BurnedFullSecToken(uint256 indexed stId, uint256 tokenTypeId, address indexed from, uint256 burnedQty);
-    event BurnedPartialSecToken(uint256 indexed stId, uint256 tokenTypeId, address indexed from, uint256 burnedQty);
-    event Minted(uint256 indexed batchId, uint256 tokenTypeId, address indexed to, uint256 mintQty, uint256 mintSecTokenCount);
-    event MintedSecToken(uint256 indexed stId, uint256 indexed batchId, uint256 tokenTypeId, address indexed to, uint256 mintedQty);
+    event SetFutureVariationMargin(uint256 tokTypeId, uint16 varMarginBips);
+    event SetFutureFeePerContract(uint256 tokTypeId, uint256 feePerContract);
+    event Burned(uint256 tokTypeId, address indexed from, uint256 burnedQty);
+    event BurnedFullSecToken(uint256 indexed stId, uint256 tokTypeId, address indexed from, uint256 burnedQty);
+    event BurnedPartialSecToken(uint256 indexed stId, uint256 tokTypeId, address indexed from, uint256 burnedQty);
+    event Minted(uint256 indexed batchId, uint256 tokTypeId, address indexed to, uint256 mintQty, uint256 mintSecTokenCount);
+    event MintedSecToken(uint256 indexed stId, uint256 indexed batchId, uint256 tokTypeId, address indexed to, uint256 mintedQty);
     event AddedBatchMetadata(uint256 indexed batchId, string key, string value);
     event SetBatchOriginatorFee_Token(uint256 indexed batchId, StructLib.SetFeeArgs originatorFee);
     event SetBatchOriginatorFee_Currency(uint256 indexed batchId, uint16 origCcyFee_percBips_ExFee);
@@ -89,13 +89,13 @@ contract StMaster
     event TransferedLedgerCcy(address indexed from, address indexed to, uint256 ccyTypeId, uint256 amount, TransferType transferType);
     event ReervedLedgerCcy(address indexed ledgerOwner, uint256 ccyTypeId, uint256 amount);
     // SpotFeeLib events
-    event SetFeeTokFix(uint256 tokenTypeId, address indexed ledgerOwner, uint256 fee_tokenQty_Fixed);
+    event SetFeeTokFix(uint256 tokTypeId, address indexed ledgerOwner, uint256 fee_tokenQty_Fixed);
     event SetFeeCcyFix(uint256 ccyTypeId, address indexed ledgerOwner, uint256 fee_ccy_Fixed);
-    event SetFeeTokBps(uint256 tokenTypeId, address indexed ledgerOwner, uint256 fee_token_PercBips);
+    event SetFeeTokBps(uint256 tokTypeId, address indexed ledgerOwner, uint256 fee_token_PercBips);
     event SetFeeCcyBps(uint256 ccyTypeId, address indexed ledgerOwner, uint256 fee_ccy_PercBips);
-    event SetFeeTokMin(uint256 tokenTypeId, address indexed ledgerOwner, uint256 fee_token_Min);
+    event SetFeeTokMin(uint256 tokTypeId, address indexed ledgerOwner, uint256 fee_token_Min);
     event SetFeeCcyMin(uint256 ccyTypeId, address indexed ledgerOwner, uint256 fee_ccy_Min);
-    event SetFeeTokMax(uint256 tokenTypeId, address indexed ledgerOwner, uint256 fee_token_Max);
+    event SetFeeTokMax(uint256 tokTypeId, address indexed ledgerOwner, uint256 fee_token_Max);
     event SetFeeCcyMax(uint256 ccyTypeId, address indexed ledgerOwner, uint256 fee_ccy_Max);
     event SetFeeCcyPerMillion(uint256 ccyTypeId, address indexed ledgerOwner, uint256 fee_ccy_perMillion);
     // Erc20Lib events
@@ -105,7 +105,7 @@ contract StMaster
     event IssuanceSubscribed(address indexed subscriber, address indexed issuer, uint256 weiSent, uint256 weiChange, uint256 tokensSubscribed, uint256 weiPrice);
     // FuturesLib events
     event FutureOpenInterest(address indexed long, address indexed short, uint256 shortStId, uint256 tokTypeId, uint256 qty, uint256 price, uint256 feeLong, uint256 feeShort);
-    event SetInitialMarginOverride(uint256 tokenTypeId, address indexed ledgerOwner, uint16 initMarginBips);
+    event SetInitialMarginOverride(uint256 tokTypeId, address indexed ledgerOwner, uint16 initMarginBips);
     //event TakePay(address indexed from, address indexed to, uint256 delta, uint256 done, address indexed feeTo, uint256 otmFee, uint256 itmFee, uint256 feeCcyId);
     event TakePay2(address indexed from, address indexed to, uint256 ccyId, uint256 delta, uint256 done, uint256 fee);
     event Combine(address indexed to, uint256 masterStId, uint256 countTokensCombined);
@@ -197,7 +197,7 @@ contract StMaster
         //st2.set_batch_id1(__batches);
 
         St2x.set_batch_id1(__batches);
-        return __batches[42].tokenTypeId;
+        return __batches[42].tokTypeId;
 
         // ## visibility problem...
         //st2.set_batch_id1(__batches);

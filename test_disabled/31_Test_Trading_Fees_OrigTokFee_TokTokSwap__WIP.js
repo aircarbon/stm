@@ -60,8 +60,8 @@ contract("StMaster", accounts => {
         for (var i = 0 ; i < M_multi_B.length ; i++) M_multi_B[i].ledgerBefore = await stm.getLedgerEntry(M_multi_B[i].account);
         const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: A,                                   ledger_B: B,
-                   qty_A: qty_A,                          tokenTypeId_A: tokType_A,
-                   qty_B: qty_B,                          tokenTypeId_B: tokType_B,
+                   qty_A: qty_A,                            tokTypeId_A: tokType_A,
+                   qty_B: qty_B,                            tokTypeId_B: tokType_B,
             ccy_amount_A: 0,                                ccyTypeId_A: 0,
             ccy_amount_B: 0,                                ccyTypeId_B: 0,
                applyFees: true,
@@ -101,22 +101,22 @@ contract("StMaster", accounts => {
 
         // TEST - A has paid originator + exchange fees, and received from B
         var A_balBefore, A_balAfter;
-        A_balBefore = data.ledgerA_before.tokens.filter(p => p.tokenTypeId == tokType_A).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
-        A_balAfter  =  data.ledgerA_after.tokens.filter(p => p.tokenTypeId == tokType_A).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
+        A_balBefore = data.ledgerA_before.tokens.filter(p => p.tokTypeId == tokType_A).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
+        A_balAfter  =  data.ledgerA_after.tokens.filter(p => p.tokTypeId == tokType_A).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
         assert(Big(A_balAfter).eq(Big(A_balBefore).minus(Big(data.originatorFees_tok_A)).minus(Big(data.exchangeFee_tok_A)).minus(Big(qty_A))), 'unexpected A (type A) token balance after transfer');
         
-        A_balBefore = data.ledgerA_before.tokens.filter(p => p.tokenTypeId == tokType_B).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
-        A_balAfter  =  data.ledgerA_after.tokens.filter(p => p.tokenTypeId == tokType_B).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
+        A_balBefore = data.ledgerA_before.tokens.filter(p => p.tokTypeId == tokType_B).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
+        A_balAfter  =  data.ledgerA_after.tokens.filter(p => p.tokTypeId == tokType_B).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
         assert(Big(A_balAfter).eq(Big(A_balBefore).plus(qty_B)), 'unexpected A (type B) token balance after transfer');
 
         // TEST - B has paid originator + exchange fees, and received from A
         var B_balBefore, B_balAfter;
-        B_balBefore = data.ledgerB_before.tokens.filter(p => p.tokenTypeId == tokType_B).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
-        B_balAfter  =  data.ledgerB_after.tokens.filter(p => p.tokenTypeId == tokType_B).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
+        B_balBefore = data.ledgerB_before.tokens.filter(p => p.tokTypeId == tokType_B).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
+        B_balAfter  =  data.ledgerB_after.tokens.filter(p => p.tokTypeId == tokType_B).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
         assert(Big(B_balAfter).eq(Big(B_balBefore).minus(Big(data.originatorFees_tok_B)).minus(Big(data.exchangeFee_tok_B)).minus(Big(qty_B))), 'unexpected B (type B) token balance after transfer');
 
-        B_balBefore = data.ledgerB_before.tokens.filter(p => p.tokenTypeId == tokType_A).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
-        B_balAfter  =  data.ledgerB_after.tokens.filter(p => p.tokenTypeId == tokType_A).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
+        B_balBefore = data.ledgerB_before.tokens.filter(p => p.tokTypeId == tokType_A).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
+        B_balAfter  =  data.ledgerB_after.tokens.filter(p => p.tokTypeId == tokType_A).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
         assert(Big(B_balAfter).eq(Big(B_balBefore).plus(qty_A)), 'unexpected B (type A) token balance after transfer');
     });
 
@@ -145,15 +145,15 @@ contract("StMaster", accounts => {
         for (var i = 0 ; i < M_multi.length ; i++) {
             const M = M_multi[i].account;
             const le = await stm.getLedgerEntry(M);
-            const M_qty = le.tokens.filter(p => p.tokenTypeId == tokenType).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
+            const M_qty = le.tokens.filter(p => p.tokTypeId == tokenType).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
 
             await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        transferTo,    { from: accounts[0] });
             await stm.setFee_TokType(tokenType,                 CONST.nullAddr,          CONST.nullFees); // no exchange fees
             await stm.setFee_CcyType(CONST.ccyType.ETH,         CONST.nullAddr,          CONST.nullFees);
             const data_MA = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: M,                                   ledger_B: transferTo,
-                   qty_A: new BN(M_qty.toString()),       tokenTypeId_A: tokenType,
-                   qty_B: 0,                              tokenTypeId_B: 0,
+                   qty_A: new BN(M_qty.toString()),         tokTypeId_A: tokenType,
+                   qty_B: 0,                                tokTypeId_B: 0,
             ccy_amount_A: 0,                                ccyTypeId_A: 0,
             ccy_amount_B: CONST.oneEth_wei,                 ccyTypeId_B: CONST.ccyType.ETH,
                applyFees: true,
@@ -161,7 +161,7 @@ contract("StMaster", accounts => {
         }
 
         const le = await stm.getLedgerEntry(transferTo);
-        const A_qty = le.tokens.filter(p => p.tokenTypeId == tokenType).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
+        const A_qty = le.tokens.filter(p => p.tokTypeId == tokenType).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
         assert(Big(totalTokQty).eq(Big(totalTokQty)), 'test setup failed');
         return { qty: A_qty, M_multi };
     }

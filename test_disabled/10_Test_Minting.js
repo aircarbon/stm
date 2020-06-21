@@ -197,7 +197,7 @@ contract("StMaster", accounts => {
         truffleAssert.eventEmitted(mintTx, 'Minted', ev => {
             batchId = Number(ev.batchId);
             return ev.batchId == maxBatchIdAfter
-                && ev.tokenTypeId == tokenType
+                && ev.tokTypeId == tokenType
                 && ev.to == receiver
                 && ev.mintQty == qtyUnit
                 && ev.mintSecTokenCount == qtySecTokens
@@ -205,7 +205,7 @@ contract("StMaster", accounts => {
         });
         const batch = await stm.getSecTokenBatch(batchId);
         assert(batch.mintedQty == qtyUnit, 'invalid batch minted kg');
-        assert(batch.tokenTypeId == tokenType, 'invalid batch eeu-type');
+        assert(batch.tokTypeId == tokenType, 'invalid batch eeu-type');
 
         // validate vST(s) minted events
         const curMaxSecTokenId = (await stm.getSecToken_countMinted.call()).toNumber();
@@ -214,7 +214,7 @@ contract("StMaster", accounts => {
                 //console.log(`event: MintedSecToken ev.id=${ev.id} curMaxSecTokenId=${curMaxSecTokenId} ev.mintedQty=${ev.mintedQty}`);
                 return ev.stId > curMaxSecTokenId - qtySecTokens && ev.stId <= curMaxSecTokenId
                     && ev.batchId == batchId
-                    && ev.tokenTypeId == tokenType
+                    && ev.tokTypeId == tokenType
                     && ev.to == receiver
                     && ev.mintedQty == qtyUnit / qtySecTokens
                     ;

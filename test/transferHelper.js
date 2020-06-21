@@ -9,8 +9,8 @@ module.exports = {
     transferLedger: async (a) => {
         const { stm, accounts,
             ledger_A,     ledger_B, 
-            qty_A,        tokenTypeId_A,
-            qty_B,        tokenTypeId_B,
+            qty_A,        tokTypeId_A,
+            qty_B,        tokTypeId_B,
             ccy_amount_A, ccyTypeId_A,
             ccy_amount_B, ccyTypeId_B,
             applyFees,
@@ -95,8 +95,8 @@ module.exports = {
         // fee preview
         const feesPreview = await stm.transfer_feePreview({ 
                 ledger_A,                             ledger_B, 
-                   qty_A: qty_A.toString(),           tokenTypeId_A, 
-                   qty_B: qty_B.toString(),           tokenTypeId_B, 
+                   qty_A: qty_A.toString(),           tokTypeId_A, 
+                   qty_B: qty_B.toString(),           tokTypeId_B, 
             ccy_amount_A: ccy_amount_A.toString(),    ccyTypeId_A, 
             ccy_amount_B: ccy_amount_B.toString(),    ccyTypeId_B, 
                applyFees,
@@ -138,8 +138,8 @@ module.exports = {
         // ** TRANSFER **
         const transferTx = await transferWrapped( { stm, accounts,
                     ledger_A, ledger_B, 
-                       qty_A, tokenTypeId_A, 
-                       qty_B, tokenTypeId_B, 
+                       qty_A, tokTypeId_A, 
+                       qty_B, tokTypeId_B, 
                 ccy_amount_A, ccyTypeId_A, 
                 ccy_amount_B, ccyTypeId_B, 
                    applyFees,
@@ -154,11 +154,11 @@ module.exports = {
         // validate trade events
         if (qty_A > 0 && ccy_amount_B > 0) { // trade tokens A <--> currecncy B
             truffleAssert.eventEmitted(transferTx, 'TradedCcyTok', ev => 
-                ev.ccyTypeId == ccyTypeId_B && ev.tokTypeId == tokenTypeId_A && Big(ev.ccyAmount).eq(Big(ccy_amount_B)) && Big(ev.tokQty).eq(Big(qty_A)));
+                ev.ccyTypeId == ccyTypeId_B && ev.tokTypeId == tokTypeId_A && Big(ev.ccyAmount).eq(Big(ccy_amount_B)) && Big(ev.tokQty).eq(Big(qty_A)));
         }
         if (qty_B > 0 && ccy_amount_A > 0) { // trade tokens B <--> currecncy A
             truffleAssert.eventEmitted(transferTx, 'TradedCcyTok', 
-                ev => ev.ccyTypeId == ccyTypeId_A && ev.tokTypeId == tokenTypeId_B && Big(ev.ccyAmount).eq(Big(ccy_amount_A)) && Big(ev.tokQty).eq(Big(qty_B)));
+                ev => ev.ccyTypeId == ccyTypeId_A && ev.tokTypeId == tokTypeId_B && Big(ev.ccyAmount).eq(Big(ccy_amount_A)) && Big(ev.tokQty).eq(Big(qty_B)));
         }
 
         // ledger entries after
@@ -488,16 +488,16 @@ module.exports = {
 
         // calculate expected exchange token fees separately from fee preview
         var gf, lf, fix, bps, min, max;
-        gf = await stm.getFee(CONST.getFeeType.TOK, tokenTypeId_A, CONST.nullAddr);
-        lf = await stm.getFee(CONST.getFeeType.TOK, tokenTypeId_A, ledger_A);
-        // globalFee_Fix = Big(await stm.globalFee_tokType_Fix(tokenTypeId_A));
-        // ledgerFee_Fix = Big(await stm.ledgerFee_tokType_Fix(tokenTypeId_A, ledger_A));
-        // globalFee_Bps = Big(await stm.globalFee_tokType_Bps(tokenTypeId_A));
-        // ledgerFee_Bps = Big(await stm.ledgerFee_tokType_Bps(tokenTypeId_A, ledger_A));
-        // globalFee_Min = Big(await stm.globalFee_tokType_Min(tokenTypeId_A));
-        // ledgerFee_Min = Big(await stm.ledgerFee_tokType_Min(tokenTypeId_A, ledger_A));
-        // globalFee_Max = Big(await stm.globalFee_tokType_Max(tokenTypeId_A));
-        // ledgerFee_Max = Big(await stm.ledgerFee_tokType_Max(tokenTypeId_A, ledger_A));
+        gf = await stm.getFee(CONST.getFeeType.TOK, tokTypeId_A, CONST.nullAddr);
+        lf = await stm.getFee(CONST.getFeeType.TOK, tokTypeId_A, ledger_A);
+        // globalFee_Fix = Big(await stm.globalFee_tokType_Fix(tokTypeId_A));
+        // ledgerFee_Fix = Big(await stm.ledgerFee_tokType_Fix(tokTypeId_A, ledger_A));
+        // globalFee_Bps = Big(await stm.globalFee_tokType_Bps(tokTypeId_A));
+        // ledgerFee_Bps = Big(await stm.ledgerFee_tokType_Bps(tokTypeId_A, ledger_A));
+        // globalFee_Min = Big(await stm.globalFee_tokType_Min(tokTypeId_A));
+        // ledgerFee_Min = Big(await stm.ledgerFee_tokType_Min(tokTypeId_A, ledger_A));
+        // globalFee_Max = Big(await stm.globalFee_tokType_Max(tokTypeId_A));
+        // ledgerFee_Max = Big(await stm.ledgerFee_tokType_Max(tokTypeId_A, ledger_A));
         fix = lf.fee_fixed > 0 ? Big(lf.fee_fixed) : Big(gf.fee_fixed); //ledgerFee_Fix.gt(0) ? ledgerFee_Fix : globalFee_Fix;
         bps = lf.fee_percBips > 0 ? Big(lf.fee_percBips) : Big(gf.fee_percBips); //ledgerFee_Bps.gt(0) ? ledgerFee_Bps : globalFee_Bps;
         min = lf.fee_min > 0 ? Big(lf.fee_min) : Big(gf.fee_min); //ledgerFee_Min.gt(0) ? ledgerFee_Min : globalFee_Min;
@@ -511,16 +511,16 @@ module.exports = {
         //console.log('ex_eeuFee_A', ex_eeuFee_A); 
         assert(exchangeFee_tok_A.eq(Big(ex_tokFee_A)), 'unexpected fee preview exchange token fee (A)');
 
-        gf = await stm.getFee(CONST.getFeeType.TOK, tokenTypeId_B, CONST.nullAddr);
-        lf = await stm.getFee(CONST.getFeeType.TOK, tokenTypeId_B, ledger_B);
-        // globalFee_Fix = Big(await stm.globalFee_tokType_Fix(tokenTypeId_B));
-        // ledgerFee_Fix = Big(await stm.ledgerFee_tokType_Fix(tokenTypeId_B, ledger_B));
-        // globalFee_Bps = Big(await stm.globalFee_tokType_Bps(tokenTypeId_B));
-        // ledgerFee_Bps = Big(await stm.ledgerFee_tokType_Bps(tokenTypeId_B, ledger_B));
-        // globalFee_Min = Big(await stm.globalFee_tokType_Min(tokenTypeId_B));
-        // ledgerFee_Min = Big(await stm.ledgerFee_tokType_Min(tokenTypeId_B, ledger_B));
-        // globalFee_Max = Big(await stm.globalFee_tokType_Max(tokenTypeId_B));
-        // ledgerFee_Max = Big(await stm.ledgerFee_tokType_Max(tokenTypeId_B, ledger_B));
+        gf = await stm.getFee(CONST.getFeeType.TOK, tokTypeId_B, CONST.nullAddr);
+        lf = await stm.getFee(CONST.getFeeType.TOK, tokTypeId_B, ledger_B);
+        // globalFee_Fix = Big(await stm.globalFee_tokType_Fix(tokTypeId_B));
+        // ledgerFee_Fix = Big(await stm.ledgerFee_tokType_Fix(tokTypeId_B, ledger_B));
+        // globalFee_Bps = Big(await stm.globalFee_tokType_Bps(tokTypeId_B));
+        // ledgerFee_Bps = Big(await stm.ledgerFee_tokType_Bps(tokTypeId_B, ledger_B));
+        // globalFee_Min = Big(await stm.globalFee_tokType_Min(tokTypeId_B));
+        // ledgerFee_Min = Big(await stm.ledgerFee_tokType_Min(tokTypeId_B, ledger_B));
+        // globalFee_Max = Big(await stm.globalFee_tokType_Max(tokTypeId_B));
+        // ledgerFee_Max = Big(await stm.ledgerFee_tokType_Max(tokTypeId_B, ledger_B));
         fix = lf.fee_fixed > 0 ? Big(lf.fee_fixed) : Big(gf.fee_fixed); //ledgerFee_Fix.gt(0) ? ledgerFee_Fix : globalFee_Fix;
         bps = lf.fee_percBips > 0 ? Big(lf.fee_percBips) : Big(gf.fee_percBips); //ledgerFee_Bps.gt(0) ? ledgerFee_Bps : globalFee_Bps;
         min = lf.fee_min > 0 ? Big(lf.fee_min) : Big(gf.fee_min); //ledgerFee_Min.gt(0) ? ledgerFee_Min : globalFee_Min;
@@ -606,8 +606,8 @@ module.exports = {
 
     transferWrapper: (stm, accounts,
         ledger_A, ledger_B, 
-           qty_A, tokenTypeId_A, 
-           qty_B, tokenTypeId_B, 
+           qty_A, tokTypeId_A, 
+           qty_B, tokTypeId_B, 
     ccy_amount_A, ccyTypeId_A, 
     ccy_amount_B, ccyTypeId_B, 
        applyFees,
@@ -615,8 +615,8 @@ module.exports = {
         ) => {
         return transferWrapped({ stm, accounts,
         ledger_A, ledger_B, 
-           qty_A, tokenTypeId_A, 
-           qty_B, tokenTypeId_B, 
+           qty_A, tokTypeId_A, 
+           qty_B, tokTypeId_B, 
     ccy_amount_A, ccyTypeId_A, 
     ccy_amount_B, ccyTypeId_B, 
        applyFees,
@@ -639,7 +639,7 @@ module.exports = {
         
         const softMintedSecToken = ledgerReceiver_after.tokens.find(p => p.stId == partialEvents[0].newSecTokenId);
         const parentSplitSecToken = ledgerSender_after.tokens.find(p => p.stId == partialEvents[0].splitFromSecTokenId);
-        assert(softMintedSecToken.tokenTypeId == parentSplitSecToken.tokenTypeId, 'unexpected eeu type of soft-minted eeu');
+        assert(softMintedSecToken.tokTypeId == parentSplitSecToken.tokTypeId, 'unexpected eeu type of soft-minted eeu');
         assert(softMintedSecToken.batchId == parentSplitSecToken.batchId, 'unexpected batch id of soft-minted eeu');
 
         assert(fullEvents.every(p => ledgerSender_before.tokens.some(p2 => p2.stId == p.stId)), 'unexpected full event eeu id(s) vs. ledger A before');
@@ -655,8 +655,8 @@ module.exports = {
 async function transferWrapped({
     stm, accounts,
     ledger_A,     ledger_B, 
-    qty_A,        tokenTypeId_A,
-    qty_B,        tokenTypeId_B,
+    qty_A,        tokTypeId_A,
+    qty_B,        tokTypeId_B,
     ccy_amount_A, ccyTypeId_A,
     ccy_amount_B, ccyTypeId_B,
     applyFees,
@@ -665,8 +665,8 @@ async function transferWrapped({
 }, from) {
     const tx = await stm.transferOrTrade({ 
                 ledger_A,                          ledger_B, 
-                   qty_A: qty_A.toString(),        tokenTypeId_A, 
-                   qty_B: qty_B.toString(),        tokenTypeId_B, 
+                   qty_A: qty_A.toString(),        tokTypeId_A, 
+                   qty_B: qty_B.toString(),        tokTypeId_B, 
             ccy_amount_A: ccy_amount_A.toString(), ccyTypeId_A, 
             ccy_amount_B: ccy_amount_B.toString(), ccyTypeId_B, 
                applyFees,

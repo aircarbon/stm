@@ -59,9 +59,9 @@ contract("StMaster", accounts => {
     //         qty_B: POS_QTY,
     //         price: LAST_PRICE
     //     });
-    //     assert(x.ledger_A.tokens.filter(p => p.tokenTypeId == usdFT.id)[0].stId == 
-    //            x.ledger_B.tokens.filter(p => p.tokenTypeId == usdFT.id)[0].stId - 1, 'unexpected StId sequence');
-    //     SHORT_STID = x.ledger_A.tokens.filter(p => p.tokenTypeId == usdFT.id)[0].stId;
+    //     assert(x.ledger_A.tokens.filter(p => p.tokTypeId == usdFT.id)[0].stId == 
+    //            x.ledger_B.tokens.filter(p => p.tokTypeId == usdFT.id)[0].stId - 1, 'unexpected StId sequence');
+    //     SHORT_STID = x.ledger_A.tokens.filter(p => p.tokTypeId == usdFT.id)[0].stId;
     //     LONG_STID = Number(SHORT_STID) + 1;
     // });
 

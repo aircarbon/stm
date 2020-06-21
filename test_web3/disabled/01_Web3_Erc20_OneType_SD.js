@@ -67,8 +67,8 @@ describe(`Contract Web3 Interface`, async () => {
             // transferOrTrade A -> GRAY_1
             const transferTradeTx = await CONST.web3_tx('transferOrTrade', [ {
                     ledger_A: WHITE,                               ledger_B: GRAY_1,
-                       qty_A: 100000,                         tokenTypeId_A: 1,
-                       qty_B: 0,                              tokenTypeId_B: 0,
+                       qty_A: 100000,                           tokTypeId_A: 1,
+                       qty_B: 0,                                tokTypeId_B: 0,
                 ccy_amount_A: 0,                                ccyTypeId_A: 0,
                 ccy_amount_B: 0,                                ccyTypeId_B: 0,
                    applyFees: false,
@@ -116,8 +116,8 @@ describe(`Contract Web3 Interface`, async () => {
     //     // const whitelistTx = await CONST.web3_tx('whitelist', [ GRAY_1 ], OWNER, OWNER_privKey);
     //     // const trade = await CONST.web3_tx('transferOrTrade', [ { 
     //     //             ledger_A: GRAY_1,                              ledger_B: WHITE,
-    //     //                qty_A: 0001,                           tokenTypeId_A: CONST.tokenType.VCS,
-    //     //                qty_B: 0,                              tokenTypeId_B: 0,
+    //     //                qty_A: 0001,                             tokTypeId_A: CONST.tokenType.VCS,
+    //     //                qty_B: 0,                                tokTypeId_B: 0,
     //     //         ccy_amount_A: 0,                                ccyTypeId_A: 0,
     //     //         ccy_amount_B: 0,                                ccyTypeId_B: 0,
     //     //            applyFees: false,

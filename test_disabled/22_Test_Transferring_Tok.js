@@ -30,8 +30,8 @@ contract("StMaster", accounts => {
         
         const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: accounts[global.TaddrNdx + 0],         ledger_B: accounts[global.TaddrNdx + 1],
-                    qty_A: CONST.GT_CARBON,                 tokenTypeId_A: CONST.tokenType.TOK_T2,
-                    qty_B: 0,                               tokenTypeId_B: 0,
+                    qty_A: CONST.GT_CARBON,                   tokTypeId_A: CONST.tokenType.TOK_T2,
+                    qty_B: 0,                                 tokTypeId_B: 0,
             ccy_amount_A: 0,                                  ccyTypeId_A: 0,
             ccy_amount_B: 0,                                  ccyTypeId_B: 0,
         });
@@ -48,8 +48,8 @@ contract("StMaster", accounts => {
         
         const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: accounts[global.TaddrNdx + 0],         ledger_B: accounts[global.TaddrNdx + 1],
-                   qty_A: 0,                                tokenTypeId_A: 0,
-                   qty_B: CONST.GT_CARBON,                  tokenTypeId_B: CONST.tokenType.TOK_T1,
+                   qty_A: 0,                                  tokTypeId_A: 0,
+                   qty_B: CONST.GT_CARBON,                    tokTypeId_B: CONST.tokenType.TOK_T1,
             ccy_amount_A: 0,                                  ccyTypeId_A: 0,
             ccy_amount_B: 0,                                  ccyTypeId_B: 0,
         });
@@ -67,8 +67,8 @@ contract("StMaster", accounts => {
         
         const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: accounts[global.TaddrNdx + 0],         ledger_B: accounts[global.TaddrNdx + 1],
-                   qty_A: CONST.GT_CARBON / 2,              tokenTypeId_A: CONST.tokenType.TOK_T2,
-                   qty_B: 0,                                tokenTypeId_B: 0,
+                   qty_A: CONST.GT_CARBON / 2,                tokTypeId_A: CONST.tokenType.TOK_T2,
+                   qty_B: 0,                                  tokTypeId_B: 0,
             ccy_amount_A: 0,                                  ccyTypeId_A: 0,
             ccy_amount_B: 0,                                  ccyTypeId_B: 0,
         });
@@ -86,8 +86,8 @@ contract("StMaster", accounts => {
         
         const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: accounts[global.TaddrNdx + 0],         ledger_B: accounts[global.TaddrNdx + 1],
-                   qty_A: 0,                                tokenTypeId_A: 0,
-                   qty_B: CONST.GT_CARBON / 2,              tokenTypeId_B: CONST.tokenType.TOK_T2,
+                   qty_A: 0,                                  tokTypeId_A: 0,
+                   qty_B: CONST.GT_CARBON / 2,                tokTypeId_B: CONST.tokenType.TOK_T2,
             ccy_amount_A: 0,                                  ccyTypeId_A: 0,
             ccy_amount_B: 0,                                  ccyTypeId_B: 0,
         });
@@ -106,8 +106,8 @@ contract("StMaster", accounts => {
     //     await stm.fund        (CONST.ccyType.USD, CONST.thousandCcy_cents, accounts[global.TaddrNdx + 1],         { from: accounts[0] });
     //     const data = await transferHelper.transferLedger({ stm, accounts, 
     //             ledger_A: accounts[global.TaddrNdx + 0],     ledger_B: accounts[global.TaddrNdx + 1],
-    //                 qty_A: 750,                              tokenTypeId_A: CONST.tokenType.TOK_T2,
-    //                 qty_B: 0,                                tokenTypeId_B: 0,
+    //                 qty_A: 750,                                tokTypeId_A: CONST.tokenType.TOK_T2,
+    //                 qty_B: 0,                                  tokTypeId_B: 0,
     //         ccy_amount_A: 0,                                ccyTypeId_A: 0,
     //         ccy_amount_B: 0,                                ccyTypeId_B: 0,
     //     });
@@ -124,8 +124,8 @@ contract("StMaster", accounts => {
     //     await stm.mintSecTokenBatch(CONST.tokenType.TOK_T1, CONST.KT_CARBON, 2,      accounts[global.TaddrNdx + 1], CONST.nullFees, 0, [], [], { from: accounts[0] });
     //     const data = await transferHelper.transferLedger({ stm, accounts, 
     //             ledger_A: accounts[global.TaddrNdx + 0],     ledger_B: accounts[global.TaddrNdx + 1],
-    //                 qty_A: 0,                                tokenTypeId_A: 0,
-    //                 qty_B: 750,                              tokenTypeId_B: CONST.tokenType.TOK_T1,
+    //                 qty_A: 0,                                  tokTypeId_A: 0,
+    //                 qty_B: 750,                                tokTypeId_B: CONST.tokenType.TOK_T1,
     //         ccy_amount_A: 0,                                ccyTypeId_A: 0,
     //         ccy_amount_B: 0,                                ccyTypeId_B: 0,
     //     });
@@ -145,8 +145,8 @@ contract("StMaster", accounts => {
         
         const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: accounts[global.TaddrNdx + 0],         ledger_B: accounts[global.TaddrNdx + 1],
-                   qty_A: 500,                              tokenTypeId_A: CONST.tokenType.TOK_T2,
-                   qty_B: 0,                                tokenTypeId_B: 0,
+                   qty_A: 500,                                tokTypeId_A: CONST.tokenType.TOK_T2,
+                   qty_B: 0,                                  tokTypeId_B: 0,
             ccy_amount_A: 0,                                  ccyTypeId_A: 0,
             ccy_amount_B: 0,                                  ccyTypeId_B: 0,
         });
@@ -167,8 +167,8 @@ contract("StMaster", accounts => {
         
         const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: accounts[global.TaddrNdx + 0],         ledger_B: accounts[global.TaddrNdx + 1],
-                   qty_A: 1500000,                          tokenTypeId_A: CONST.tokenType.TOK_T2,
-                   qty_B: 0,                                tokenTypeId_B: 0,
+                   qty_A: 1500000,                            tokTypeId_A: CONST.tokenType.TOK_T2,
+                   qty_B: 0,                                  tokTypeId_B: 0,
             ccy_amount_A: 0,                                  ccyTypeId_A: 0,
             ccy_amount_B: 0,                                  ccyTypeId_B: 0,
         });
@@ -188,8 +188,8 @@ contract("StMaster", accounts => {
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2, CONST.KT_CARBON, 1, accounts[global.TaddrNdx + 1], CONST.nullFees, 0, [], [], { from: accounts[0] });
         const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: accounts[global.TaddrNdx + 0],         ledger_B: accounts[global.TaddrNdx + 1],
-                   qty_A: 1500000,                          tokenTypeId_A: CONST.tokenType.TOK_T2,
-                   qty_B: 0,                                tokenTypeId_B: 0,
+                   qty_A: 1500000,                            tokTypeId_A: CONST.tokenType.TOK_T2,
+                   qty_B: 0,                                  tokTypeId_B: 0,
             ccy_amount_A: 0,                                  ccyTypeId_A: 0,
             ccy_amount_B: 0,                                  ccyTypeId_B: 0,
         });
@@ -211,8 +211,8 @@ contract("StMaster", accounts => {
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2, CONST.KT_CARBON, 1, accounts[global.TaddrNdx + 1], CONST.nullFees, 0, [], [], { from: accounts[0] });
         const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: accounts[global.TaddrNdx + 0],         ledger_B: accounts[global.TaddrNdx + 1],
-                   qty_A: 750,                              tokenTypeId_A: CONST.tokenType.TOK_T2,
-                   qty_B: 250,                              tokenTypeId_B: CONST.tokenType.TOK_T2,
+                   qty_A: 750,                                tokTypeId_A: CONST.tokenType.TOK_T2,
+                   qty_B: 250,                                tokTypeId_B: CONST.tokenType.TOK_T2,
             ccy_amount_A: 0,                                  ccyTypeId_A: 0,
             ccy_amount_B: 0,                                  ccyTypeId_B: 0,
         });
@@ -226,8 +226,8 @@ contract("StMaster", accounts => {
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T1, CONST.KT_CARBON, 1, accounts[global.TaddrNdx + 1], CONST.nullFees, 0, [], [], { from: accounts[0] });
         const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: accounts[global.TaddrNdx + 0],         ledger_B: accounts[global.TaddrNdx + 1],
-                   qty_A: 750,                              tokenTypeId_A: CONST.tokenType.TOK_T2,
-                   qty_B: 250,                              tokenTypeId_B: CONST.tokenType.TOK_T1,
+                   qty_A: 750,                                tokTypeId_A: CONST.tokenType.TOK_T2,
+                   qty_B: 250,                                tokTypeId_B: CONST.tokenType.TOK_T1,
             ccy_amount_A: 0,                                  ccyTypeId_A: 0,
             ccy_amount_B: 0,                                  ccyTypeId_B: 0,
         });
@@ -242,8 +242,8 @@ contract("StMaster", accounts => {
         // setup: transfer 0.5, from batch 1 
         await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: accounts[global.TaddrNdx + 0],         ledger_B: accounts[global.TaddrNdx + 1],
-                   qty_A: 500,                              tokenTypeId_A: CONST.tokenType.TOK_T2,
-                   qty_B: 0,                                tokenTypeId_B: 0,
+                   qty_A: 500,                                tokTypeId_A: CONST.tokenType.TOK_T2,
+                   qty_B: 0,                                  tokTypeId_B: 0,
             ccy_amount_A: 0,                                  ccyTypeId_A: 0,
             ccy_amount_B: 0,                                  ccyTypeId_B: 0,
         });
@@ -251,8 +251,8 @@ contract("StMaster", accounts => {
         // transfer 0.25, also from batch 1 -- expect merge on existing destination eeu of same batch
         const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: accounts[global.TaddrNdx + 0],         ledger_B: accounts[global.TaddrNdx + 1],
-                   qty_A: 250,                              tokenTypeId_A: CONST.tokenType.TOK_T2,
-                   qty_B: 0,                                tokenTypeId_B: 0,
+                   qty_A: 250,                                tokTypeId_A: CONST.tokenType.TOK_T2,
+                   qty_B: 0,                                  tokTypeId_B: 0,
             ccy_amount_A: 0,                                  ccyTypeId_A: 0,
             ccy_amount_B: 0,                                  ccyTypeId_B: 0,
         });
@@ -269,8 +269,8 @@ contract("StMaster", accounts => {
         // setup: transfer 0.1, split batch 1 to receiver
         await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: accounts[global.TaddrNdx + 0],         ledger_B: accounts[global.TaddrNdx + 1],
-                   qty_A: 100,                              tokenTypeId_A: CONST.tokenType.TOK_T1,
-                   qty_B: 0,                                tokenTypeId_B: 0,
+                   qty_A: 100,                                tokTypeId_A: CONST.tokenType.TOK_T1,
+                   qty_B: 0,                                  tokTypeId_B: 0,
             ccy_amount_A: 0,                                  ccyTypeId_A: 0,
             ccy_amount_B: 0,                                  ccyTypeId_B: 0,
         });
@@ -279,8 +279,8 @@ contract("StMaster", accounts => {
         for (var i = 0; i < 3 ; i++) {
             const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: accounts[global.TaddrNdx + 0],    ledger_B: accounts[global.TaddrNdx + 1],
-                   qty_A: 1,                           tokenTypeId_A: CONST.tokenType.TOK_T1,
-                   qty_B: 0,                           tokenTypeId_B: 0,
+                   qty_A: 1,                             tokTypeId_A: CONST.tokenType.TOK_T1,
+                   qty_B: 0,                             tokTypeId_B: 0,
             ccy_amount_A: 0,                             ccyTypeId_A: 0,
             ccy_amount_B: 0,                             ccyTypeId_B: 0,
             });
@@ -299,8 +299,8 @@ contract("StMaster", accounts => {
         // setup B: transfer 0.1 from A, split batch 1 to B
         await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: accounts[global.TaddrNdx + 0],         ledger_B: accounts[global.TaddrNdx + 1],
-                   qty_A: 100,                              tokenTypeId_A: CONST.tokenType.TOK_T1,
-                   qty_B: 100,                              tokenTypeId_B: CONST.tokenType.TOK_T2,
+                   qty_A: 100,                                tokTypeId_A: CONST.tokenType.TOK_T1,
+                   qty_B: 100,                                tokTypeId_B: CONST.tokenType.TOK_T2,
             ccy_amount_A: 0,                                  ccyTypeId_A: 0,
             ccy_amount_B: 0,                                  ccyTypeId_B: 0,
         });
@@ -309,8 +309,8 @@ contract("StMaster", accounts => {
         for (var i = 0; i < 3 ; i++) {
             const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: accounts[global.TaddrNdx + 0],         ledger_B: accounts[global.TaddrNdx + 1],
-                   qty_A: 1,                                tokenTypeId_A: CONST.tokenType.TOK_T1,
-                   qty_B: 1,                                tokenTypeId_B: CONST.tokenType.TOK_T2,
+                   qty_A: 1,                                  tokTypeId_A: CONST.tokenType.TOK_T1,
+                   qty_B: 1,                                  tokTypeId_B: CONST.tokenType.TOK_T2,
             ccy_amount_A: 0,                                  ccyTypeId_A: 0,
             ccy_amount_B: 0,                                  ccyTypeId_B: 0,
             });
@@ -329,9 +329,9 @@ contract("StMaster", accounts => {
             await transferHelper.transferWrapper(stm, accounts,
                 accounts[global.TaddrNdx + 0], accounts[global.TaddrNdx + 1],
                 -1,                          // qty_A
-                CONST.tokenType.TOK_T2,      // tokenTypeId_A
+                CONST.tokenType.TOK_T2,      // tokTypeId_A
                 0,                           // qty_B
-                0,                           // tokenTypeId_B
+                0,                           // tokTypeId_B
                 0, 0, 0, 0, 
                 false,                       // applyFees
                 { from: accounts[0] });
@@ -349,9 +349,9 @@ contract("StMaster", accounts => {
             await transferHelper.transferWrapper(stm, accounts,
                 accounts[global.TaddrNdx + 0], accounts[global.TaddrNdx + 1],
                 0,                           // qty_A
-                0,                           // tokenTypeId_A
+                0,                           // tokTypeId_A
                 -1,                          // qty_B 
-                CONST.tokenType.TOK_T2,      // tokenTypeId_B
+                CONST.tokenType.TOK_T2,      // tokTypeId_B
                 0, 0, 0, 0, 
                 false,                       // applyFees
                 { from: accounts[0] });
@@ -369,9 +369,9 @@ contract("StMaster", accounts => {
             await transferHelper.transferWrapper(stm, accounts,
                 accounts[global.TaddrNdx + 0], accounts[global.TaddrNdx + 1],
                 CONST.KT_CARBON + 1,         // qty_A
-                CONST.tokenType.TOK_T2,      // tokenTypeId_A
+                CONST.tokenType.TOK_T2,      // tokTypeId_A
                 0,                           // qty_B
-                0,                           // tokenTypeId_B
+                0,                           // tokTypeId_B
                 0, 0, 0, 0, 
                 false,                       // applyFees
                 { from: accounts[0] });
@@ -389,9 +389,9 @@ contract("StMaster", accounts => {
             await transferHelper.transferWrapper(stm, accounts,
                 accounts[global.TaddrNdx + 0], accounts[global.TaddrNdx + 1],
                 CONST.KT_CARBON,             // qty_A
-                CONST.tokenType.TOK_T1,      // tokenTypeId_A
+                CONST.tokenType.TOK_T1,      // tokTypeId_A
                 0,                           // qty_B
-                0,                           // tokenTypeId_B
+                0,                           // tokTypeId_B
                 0, 0, 0, 0, 
                 false,                       // applyFees
                 { from: accounts[0] });
@@ -409,9 +409,9 @@ contract("StMaster", accounts => {
             await transferHelper.transferWrapper(stm, accounts,
                 accounts[global.TaddrNdx + 0], accounts[global.TaddrNdx + 1],
                 0,                           // qty_A
-                0,                           // tokenTypeId_A
+                0,                           // tokTypeId_A
                 CONST.KT_CARBON + 1,         // qty_B
-                CONST.tokenType.TOK_T2,      // tokenTypeId_B
+                CONST.tokenType.TOK_T2,      // tokTypeId_B
                 0, 0, 0, 0, 
                 false,                       // applyFees
                 { from: accounts[0] });
@@ -429,9 +429,9 @@ contract("StMaster", accounts => {
             await transferHelper.transferWrapper(stm, accounts,
                 accounts[global.TaddrNdx + 0], accounts[global.TaddrNdx + 1],
                 0,                           // qty_A
-                0,                           // tokenTypeId_A
+                0,                           // tokTypeId_A
                 CONST.KT_CARBON,             // qty_B
-                CONST.tokenType.TOK_T1,      // tokenTypeId_B
+                CONST.tokenType.TOK_T1,      // tokTypeId_B
                 0, 0, 0, 0, 
                 false,                       // applyFees
                 { from: accounts[0] });

@@ -85,8 +85,8 @@ contract("StMaster", accounts => {
         //const lA_before = await stm.getLedgerEntry(A);
         const txA = await stm.combineFtPos({ tokTypeId: usdFT.id, master_StId: posId_A, child_StIds: [childId_A] });
         const lA_after = await stm.getLedgerEntry(A);
-        //console.log(`lA_before: ${lA_before.tokens.map(p2 => `{ TT: ${p2.tokenTypeId} / stId: ${p2.stId} / P: ${p2.ft_price.toString()} / M_qty:${p2.mintedQty.toString().padStart(3)} }`).join(', ')}`);
-        //console.log(` lA_after: ${lA_after.tokens.map(p2 => `{ TT: ${p2.tokenTypeId} / stId: ${p2.stId} / P: ${p2.ft_price.toString()} / M_qty:${p2.mintedQty.toString().padStart(3)} }`).join(', ')}`);
+        //console.log(`lA_before: ${lA_before.tokens.map(p2 => `{ TT: ${p2.tokTypeId} / stId: ${p2.stId} / P: ${p2.ft_price.toString()} / M_qty:${p2.mintedQty.toString().padStart(3)} }`).join(', ')}`);
+        //console.log(` lA_after: ${lA_after.tokens.map(p2 => `{ TT: ${p2.tokTypeId} / stId: ${p2.stId} / P: ${p2.ft_price.toString()} / M_qty:${p2.mintedQty.toString().padStart(3)} }`).join(', ')}`);
         //truffleAssert.prettyPrintEmittedEvents(txA);
         assert(lA_after.tokens.length == 1 && lA_after.tokens[0].currentQty == +2, 'unexpected A side ledger after');
         truffleAssert.eventEmitted(txA, 'Combine', ev => ev.masterStId == posId_A && ev.countTokensCombined == 1);
@@ -95,8 +95,8 @@ contract("StMaster", accounts => {
         //const lB_before = await stm.getLedgerEntry(B);
         const txB = await stm.combineFtPos({ tokTypeId: usdFT.id, master_StId: posId_B, child_StIds: [childId_B] });
         const lB_after = await stm.getLedgerEntry(B);
-        //console.log(`lB_before: ${lB_before.tokens.map(p2 => `{ TT: ${p2.tokenTypeId} / stId: ${p2.stId} / P: ${p2.ft_price.toString()} / M_qty:${p2.mintedQty.toString().padStart(3)} }`).join(', ')}`);
-        //console.log(` lB_after: ${lB_after.tokens.map(p2 => `{ TT: ${p2.tokenTypeId} / stId: ${p2.stId} / P: ${p2.ft_price.toString()} / M_qty:${p2.mintedQty.toString().padStart(3)} }`).join(', ')}`);
+        //console.log(`lB_before: ${lB_before.tokens.map(p2 => `{ TT: ${p2.tokTypeId} / stId: ${p2.stId} / P: ${p2.ft_price.toString()} / M_qty:${p2.mintedQty.toString().padStart(3)} }`).join(', ')}`);
+        //console.log(` lB_after: ${lB_after.tokens.map(p2 => `{ TT: ${p2.tokTypeId} / stId: ${p2.stId} / P: ${p2.ft_price.toString()} / M_qty:${p2.mintedQty.toString().padStart(3)} }`).join(', ')}`);
         //truffleAssert.prettyPrintEmittedEvents(txB);
         assert(lB_after.tokens.length == 1 && lB_after.tokens[0].currentQty == -2, 'unexpected B side ledger after');
         truffleAssert.eventEmitted(txB, 'Combine', ev => ev.masterStId == posId_B && ev.countTokensCombined == 1);
@@ -123,8 +123,8 @@ contract("StMaster", accounts => {
         //const lA_before = await stm.getLedgerEntry(A);
         const txA = await stm.combineFtPos({ tokTypeId: usdFT.id, master_StId: posId_A, child_StIds: [childId_1A] });
         const lA_after = await stm.getLedgerEntry(A);
-        //console.log(`lA_before: ${lA_before.tokens.map(p2 => `{ TT: ${p2.tokenTypeId} / stId: ${p2.stId} / P: ${p2.ft_price.toString()} / M_qty:${p2.mintedQty.toString().padStart(3)} }`).join(', ')}`);
-        //console.log(` lA_after: ${lA_after.tokens.map(p2 => `{ TT: ${p2.tokenTypeId} / stId: ${p2.stId} / P: ${p2.ft_price.toString()} / M_qty:${p2.mintedQty.toString().padStart(3)} }`).join(', ')}`);
+        //console.log(`lA_before: ${lA_before.tokens.map(p2 => `{ TT: ${p2.tokTypeId} / stId: ${p2.stId} / P: ${p2.ft_price.toString()} / M_qty:${p2.mintedQty.toString().padStart(3)} }`).join(', ')}`);
+        //console.log(` lA_after: ${lA_after.tokens.map(p2 => `{ TT: ${p2.tokTypeId} / stId: ${p2.stId} / P: ${p2.ft_price.toString()} / M_qty:${p2.mintedQty.toString().padStart(3)} }`).join(', ')}`);
         //truffleAssert.prettyPrintEmittedEvents(txA);
         assert(lA_after.tokens.length == 1 && lA_after.tokens[0].currentQty == 0, 'unexpected A side ledger after');
         truffleAssert.eventEmitted(txA, 'Combine', ev => ev.masterStId == posId_A && ev.countTokensCombined == 1);
@@ -133,8 +133,8 @@ contract("StMaster", accounts => {
         //const lB_before = await stm.getLedgerEntry(B);
         const txB = await stm.combineFtPos({ tokTypeId: usdFT.id, master_StId: posId_B, child_StIds: [childId_1B] });
         const lB_after = await stm.getLedgerEntry(B);
-        //console.log(`lB_before: ${lB_before.tokens.map(p2 => `{ TT: ${p2.tokenTypeId} / stId: ${p2.stId} / P: ${p2.ft_price.toString()} / M_qty:${p2.mintedQty.toString().padStart(3)} }`).join(', ')}`);
-        //console.log(` lB_after: ${lB_after.tokens.map(p2 => `{ TT: ${p2.tokenTypeId} / stId: ${p2.stId} / P: ${p2.ft_price.toString()} / M_qty:${p2.mintedQty.toString().padStart(3)} }`).join(', ')}`);
+        //console.log(`lB_before: ${lB_before.tokens.map(p2 => `{ TT: ${p2.tokTypeId} / stId: ${p2.stId} / P: ${p2.ft_price.toString()} / M_qty:${p2.mintedQty.toString().padStart(3)} }`).join(', ')}`);
+        //console.log(` lB_after: ${lB_after.tokens.map(p2 => `{ TT: ${p2.tokTypeId} / stId: ${p2.stId} / P: ${p2.ft_price.toString()} / M_qty:${p2.mintedQty.toString().padStart(3)} }`).join(', ')}`);
         //truffleAssert.prettyPrintEmittedEvents(txB);
         assert(lB_after.tokens.length == 1 && lB_after.tokens[0].currentQty == 0, 'unexpected B side ledger after');
         truffleAssert.eventEmitted(txB, 'Combine', ev => ev.masterStId == posId_B && ev.countTokensCombined == 1);
@@ -168,8 +168,8 @@ contract("StMaster", accounts => {
         //const lA_before = await stm.getLedgerEntry(A);
         const txA = await stm.combineFtPos({ tokTypeId: usdFT.id, master_StId: posId_A, child_StIds: [childId_1A, childId_2A] });
         const lA_after = await stm.getLedgerEntry(A);
-        // console.log(`lA_before: ${lA_before.tokens.map(p2 => `{ TT: ${p2.tokenTypeId} / stId: ${p2.stId} / P: ${p2.ft_price.toString()} / M_qty:${p2.mintedQty.toString().padStart(3)} }`).join(', ')}`);
-        // console.log(` lA_after: ${lA_after.tokens.map(p2 => `{ TT: ${p2.tokenTypeId} / stId: ${p2.stId} / P: ${p2.ft_price.toString()} / M_qty:${p2.mintedQty.toString().padStart(3)} }`).join(', ')}`);
+        // console.log(`lA_before: ${lA_before.tokens.map(p2 => `{ TT: ${p2.tokTypeId} / stId: ${p2.stId} / P: ${p2.ft_price.toString()} / M_qty:${p2.mintedQty.toString().padStart(3)} }`).join(', ')}`);
+        // console.log(` lA_after: ${lA_after.tokens.map(p2 => `{ TT: ${p2.tokTypeId} / stId: ${p2.stId} / P: ${p2.ft_price.toString()} / M_qty:${p2.mintedQty.toString().padStart(3)} }`).join(', ')}`);
         // truffleAssert.prettyPrintEmittedEvents(txA);
         assert(lA_after.tokens.length == 1 && lA_after.tokens[0].currentQty == 0, 'unexpected A side ledger after');
         truffleAssert.eventEmitted(txA, 'Combine', ev => ev.masterStId == posId_A && ev.countTokensCombined == 2);
@@ -178,8 +178,8 @@ contract("StMaster", accounts => {
         //const lB_before = await stm.getLedgerEntry(B);
         const txB = await stm.combineFtPos({ tokTypeId: usdFT.id, master_StId: posId_B, child_StIds: [childId_1B, childId_2B] });
         const lB_after = await stm.getLedgerEntry(B);
-        // console.log(`lB_before: ${lB_before.tokens.map(p2 => `{ TT: ${p2.tokenTypeId} / stId: ${p2.stId} / P: ${p2.ft_price.toString()} / M_qty:${p2.mintedQty.toString().padStart(3)} }`).join(', ')}`);
-        // console.log(` lB_after: ${lB_after.tokens.map(p2 => `{ TT: ${p2.tokenTypeId} / stId: ${p2.stId} / P: ${p2.ft_price.toString()} / M_qty:${p2.mintedQty.toString().padStart(3)} }`).join(', ')}`);
+        // console.log(`lB_before: ${lB_before.tokens.map(p2 => `{ TT: ${p2.tokTypeId} / stId: ${p2.stId} / P: ${p2.ft_price.toString()} / M_qty:${p2.mintedQty.toString().padStart(3)} }`).join(', ')}`);
+        // console.log(` lB_after: ${lB_after.tokens.map(p2 => `{ TT: ${p2.tokTypeId} / stId: ${p2.stId} / P: ${p2.ft_price.toString()} / M_qty:${p2.mintedQty.toString().padStart(3)} }`).join(', ')}`);
         // truffleAssert.prettyPrintEmittedEvents(txB);
         assert(lB_after.tokens.length == 1 && lB_after.tokens[0].currentQty == 0, 'unexpected B side ledger after');
         truffleAssert.eventEmitted(txB, 'Combine', ev => ev.masterStId == posId_B && ev.countTokensCombined == 2);

@@ -50,21 +50,21 @@ contract("StMaster", accounts => {
         const expectedFeeTokQty = 0; // no fees expected: fee-sender == fee-receiver
         const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: A,                                   ledger_B: B,
-                   qty_A: transferAmountTokQty,           tokenTypeId_A: CONST.tokenType.TOK_T2,
-                   qty_B: 0,                              tokenTypeId_B: 0,
+                   qty_A: transferAmountTokQty,             tokTypeId_A: CONST.tokenType.TOK_T2,
+                   qty_B: 0,                                tokTypeId_B: 0,
             ccy_amount_A: 0,                                ccyTypeId_A: 0,
             ccy_amount_B: CONST.oneEth_wei,                 ccyTypeId_B: CONST.ccyType.ETH,
                applyFees: true,
         });
 
         // contract owner (A) has paid no fees
-        const owner_balBefore = data.owner_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.TOK_T2).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
-        const owner_balAfter  =  data.owner_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.TOK_T2).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
+        const owner_balBefore = data.owner_before.tokens.filter(p => p.tokTypeId == CONST.tokenType.TOK_T2).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
+        const owner_balAfter  =  data.owner_after.tokens.filter(p => p.tokTypeId == CONST.tokenType.TOK_T2).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
         assert(Big(owner_balAfter).eq(Big(owner_balBefore).minus(Big(transferAmountTokQty)).plus(Big(expectedFeeTokQty))), 'unexpected fee receiver token balance after transfer');
         
         // receiver (B) has received expected quantity
-        const receiver_balBefore = data.ledgerB_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.TOK_T2).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
-        const receiver_balAfter  =  data.ledgerB_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.TOK_T2).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
+        const receiver_balBefore = data.ledgerB_before.tokens.filter(p => p.tokTypeId == CONST.tokenType.TOK_T2).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
+        const receiver_balAfter  =  data.ledgerB_after.tokens.filter(p => p.tokTypeId == CONST.tokenType.TOK_T2).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
         assert(Big(receiver_balAfter).eq(Big(receiver_balBefore).plus(Big(transferAmountTokQty))), 'unexpected receiver carbon after transfer');
     });
 
@@ -89,21 +89,21 @@ contract("StMaster", accounts => {
         const expectedFeeTokQty = 0; // no fees expected: fee-sender == fee-receiver
         const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: A,                                   ledger_B: B,
-                   qty_A: 0,                              tokenTypeId_A: 0,
-                   qty_B: transferAmountTokQty,           tokenTypeId_B: CONST.tokenType.TOK_T2,
+                   qty_A: 0,                                tokTypeId_A: 0,
+                   qty_B: transferAmountTokQty,             tokTypeId_B: CONST.tokenType.TOK_T2,
             ccy_amount_A: CONST.oneEth_wei,                 ccyTypeId_A: CONST.ccyType.ETH,
             ccy_amount_B: 0,                                ccyTypeId_B: 0,
                applyFees: true,
         });
 
         // contract owner (B) has paid no fees
-        const owner_balBefore = data.owner_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.TOK_T2).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
-        const owner_balAfter  =  data.owner_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.TOK_T2).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
+        const owner_balBefore = data.owner_before.tokens.filter(p => p.tokTypeId == CONST.tokenType.TOK_T2).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
+        const owner_balAfter  =  data.owner_after.tokens.filter(p => p.tokTypeId == CONST.tokenType.TOK_T2).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
         assert(Big(owner_balAfter).eq(Big(owner_balBefore).minus(Big(transferAmountTokQty)).plus(Big(expectedFeeTokQty))), 'unexpected fee receiver token balance after transfer');
         
         // receiver (A) has received expected quantity
-        const receiver_balBefore = data.ledgerA_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.TOK_T2).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
-        const receiver_balAfter  =  data.ledgerA_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.TOK_T2).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
+        const receiver_balBefore = data.ledgerA_before.tokens.filter(p => p.tokTypeId == CONST.tokenType.TOK_T2).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
+        const receiver_balAfter  =  data.ledgerA_after.tokens.filter(p => p.tokTypeId == CONST.tokenType.TOK_T2).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
         assert(Big(receiver_balAfter).eq(Big(receiver_balBefore).plus(Big(transferAmountTokQty))), 'unexpected receiver carbon after transfer');
     });
 
@@ -134,21 +134,21 @@ contract("StMaster", accounts => {
 
         const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: A,                                   ledger_B: B,
-                   qty_A: transferAmountTokQty,           tokenTypeId_A: CONST.tokenType.TOK_T2,
-                   qty_B: 0,                              tokenTypeId_B: 0,
+                   qty_A: transferAmountTokQty,             tokTypeId_A: CONST.tokenType.TOK_T2,
+                   qty_B: 0,                                tokTypeId_B: 0,
             ccy_amount_A: 0,                                ccyTypeId_A: 0,
             ccy_amount_B: CONST.oneEth_wei,                 ccyTypeId_B: CONST.ccyType.ETH,
                applyFees: true,
         });
 
         // token sender (A) has has not paid originator fees to self, and has only paid exchange fee
-        const sender_balBefore = data.ledgerA_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.TOK_T2).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
-        const sender_balAfter  =  data.ledgerA_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.TOK_T2).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
+        const sender_balBefore = data.ledgerA_before.tokens.filter(p => p.tokTypeId == CONST.tokenType.TOK_T2).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
+        const sender_balAfter  =  data.ledgerA_after.tokens.filter(p => p.tokTypeId == CONST.tokenType.TOK_T2).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
         assert(Big(sender_balAfter).eq(Big(sender_balBefore).minus(Big(transferAmountTokQty)).minus(Big(expectedFeeTokQty))), 'unexpected token fee payer balance after transfer');
         
         // receiver (B) has received expected quantity
-        const receiver_balBefore = data.ledgerB_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.TOK_T2).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
-        const receiver_balAfter  =  data.ledgerB_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.TOK_T2).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
+        const receiver_balBefore = data.ledgerB_before.tokens.filter(p => p.tokTypeId == CONST.tokenType.TOK_T2).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
+        const receiver_balAfter  =  data.ledgerB_after.tokens.filter(p => p.tokTypeId == CONST.tokenType.TOK_T2).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
         assert(Big(receiver_balAfter).eq(Big(receiver_balBefore).plus(Big(transferAmountTokQty))), 'unexpected receiver token balance after transfer');
     });
 
@@ -179,21 +179,21 @@ contract("StMaster", accounts => {
 
         const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: A,                                   ledger_B: B,
-                   qty_A: 0,                              tokenTypeId_A: 0,
-                   qty_B: transferAmountTokQty,           tokenTypeId_B: CONST.tokenType.TOK_T2,
+                   qty_A: 0,                                tokTypeId_A: 0,
+                   qty_B: transferAmountTokQty,             tokTypeId_B: CONST.tokenType.TOK_T2,
             ccy_amount_A: CONST.oneEth_wei,                 ccyTypeId_A: CONST.ccyType.ETH,
             ccy_amount_B: 0,                                ccyTypeId_B: 0,
                applyFees: true,
         });
 
         // token sender (B) has has not paid originator fees to self, and has only paid exchange fee
-        const sender_balBefore = data.ledgerB_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.TOK_T2).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
-        const sender_balAfter  =  data.ledgerB_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.TOK_T2).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
+        const sender_balBefore = data.ledgerB_before.tokens.filter(p => p.tokTypeId == CONST.tokenType.TOK_T2).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
+        const sender_balAfter  =  data.ledgerB_after.tokens.filter(p => p.tokTypeId == CONST.tokenType.TOK_T2).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
         assert(Big(sender_balAfter).eq(Big(sender_balBefore).minus(Big(transferAmountTokQty)).minus(Big(expectedFeeTokQty))), 'unexpected token fee payer balance after transfer');
         
         // receiver (A) has received expected quantity
-        const receiver_balBefore = data.ledgerA_before.tokens.filter(p => p.tokenTypeId == CONST.tokenType.TOK_T2).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
-        const receiver_balAfter  =  data.ledgerA_after.tokens.filter(p => p.tokenTypeId == CONST.tokenType.TOK_T2).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
+        const receiver_balBefore = data.ledgerA_before.tokens.filter(p => p.tokTypeId == CONST.tokenType.TOK_T2).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
+        const receiver_balAfter  =  data.ledgerA_after.tokens.filter(p => p.tokTypeId == CONST.tokenType.TOK_T2).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
         assert(Big(receiver_balAfter).eq(Big(receiver_balBefore).plus(Big(transferAmountTokQty))), 'unexpected receiver token balance after transfer');
     });
 
@@ -220,8 +220,8 @@ contract("StMaster", accounts => {
         const expectedFeeEth = 0; // no fees expected: fee-sender == fee-receiver
         const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: A,                                   ledger_B: B,
-                   qty_A: 0,                              tokenTypeId_A: 0,
-                   qty_B: new BN(1500),                   tokenTypeId_B: CONST.tokenType.TOK_T2,
+                   qty_A: 0,                                tokTypeId_A: 0,
+                   qty_B: new BN(1500),                     tokTypeId_B: CONST.tokenType.TOK_T2,
             ccy_amount_A: transferAmountEth,                ccyTypeId_A: CONST.ccyType.ETH,
             ccy_amount_B: 0,                                ccyTypeId_B: 0,
                applyFees: true,
@@ -259,8 +259,8 @@ contract("StMaster", accounts => {
         const expectedFeeEth = 0; // no fees expected: fee-sender == fee-receiver
         const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: A,                                   ledger_B: B,
-                   qty_A: new BN(1500),                   tokenTypeId_A: CONST.tokenType.TOK_T2,
-                   qty_B: 0,                              tokenTypeId_B: 0,
+                   qty_A: new BN(1500),                     tokTypeId_A: CONST.tokenType.TOK_T2,
+                   qty_B: 0,                                tokTypeId_B: 0,
             ccy_amount_A: 0,                                ccyTypeId_A: 0,
             ccy_amount_B: transferAmountEth,                ccyTypeId_B: CONST.ccyType.ETH,
                applyFees: true,

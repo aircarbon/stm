@@ -51,7 +51,7 @@ contract("StMaster", accounts => {
         const tx = await stm.setFuture_FeePerContract(usdFT.id, 300);
         const tt = (await stm.getSecTokenTypes()).tokenTypes.filter(p => p.id == usdFT.id)[0];
         assert(tt.ft.feePerContract = 300);
-        truffleAssert.eventEmitted(tx, 'SetFutureFeePerContract', ev => ev.tokenTypeId == usdFT.id && ev.feePerContract == 300);
+        truffleAssert.eventEmitted(tx, 'SetFutureFeePerContract', ev => ev.tokTypeId == usdFT.id && ev.feePerContract == 300);
     });
 
     it(`FT fee per contract - should not allow non-owner to set variation margin on a futures token type`, async () => {

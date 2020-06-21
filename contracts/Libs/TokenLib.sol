@@ -13,15 +13,15 @@ library TokenLib {
     using strings for *;
 
     event AddedSecTokenType(uint256 id, string name, StructLib.SettlementType settlementType, uint64 expiryTimestamp, uint256 underlyerTypeId, uint256 refCcyId, uint16 initMarginBips, uint16 varMarginBips);
-    event SetFutureVariationMargin(uint256 tokenTypeId, uint16 varMarginBips);
-    event SetFutureFeePerContract(uint256 tokenTypeId, uint256 feePerContract);
+    event SetFutureVariationMargin(uint256 tokTypeId, uint16 varMarginBips);
+    event SetFutureFeePerContract(uint256 tokTypeId, uint256 feePerContract);
 
-    event Burned(uint256 tokenTypeId, address indexed from, uint256 burnedQty);
-    event BurnedFullSecToken(uint256 indexed stId, uint256 tokenTypeId, address indexed from, uint256 burnedQty);
-    event BurnedPartialSecToken(uint256 indexed stId, uint256 tokenTypeId, address indexed from, uint256 burnedQty);
+    event Burned(uint256 tokTypeId, address indexed from, uint256 burnedQty);
+    event BurnedFullSecToken(uint256 indexed stId, uint256 tokTypeId, address indexed from, uint256 burnedQty);
+    event BurnedPartialSecToken(uint256 indexed stId, uint256 tokTypeId, address indexed from, uint256 burnedQty);
 
-    event Minted(uint256 indexed batchId, uint256 tokenTypeId, address indexed to, uint256 mintQty, uint256 mintSecTokenCount);
-    event MintedSecToken(uint256 indexed stId, uint256 indexed batchId, uint256 tokenTypeId, address indexed to, uint256 mintedQty);
+    event Minted(uint256 indexed batchId, uint256 tokTypeId, address indexed to, uint256 mintQty, uint256 mintSecTokenCount);
+    event MintedSecToken(uint256 indexed stId, uint256 indexed batchId, uint256 tokTypeId, address indexed to, uint256 mintedQty);
 
     event AddedBatchMetadata(uint256 indexed batchId, string key, string value);
     event SetBatchOriginatorFee_Token(uint256 indexed batchId, StructLib.SetFeeArgs originatorFee);
@@ -50,8 +50,8 @@ library TokenLib {
 
         require(bytes(name).length > 0, "Invalid name");
 
-        for (uint256 tokenTypeId = 1; tokenTypeId <= std._tt_Count; tokenTypeId++) {
-            require(keccak256(abi.encodePacked(std._tt_name[tokenTypeId])) != keccak256(abi.encodePacked(name)), "Duplicate name");
+        for (uint256 tokTypeId = 1; tokTypeId <= std._tt_Count; tokTypeId++) {
+            require(keccak256(abi.encodePacked(std._tt_name[tokTypeId])) != keccak256(abi.encodePacked(name)), "Duplicate name");
         }
         if (settlementType == StructLib.SettlementType.FUTURE) {
             require(ft.expiryTimestamp > 1585699708, "Bad expiry");
@@ -184,7 +184,7 @@ library TokenLib {
         StructLib.SecTokenBatch memory newBatch = StructLib.SecTokenBatch({
                          id: ld._batches_currentMax_id + 1,
             mintedTimestamp: block.timestamp,
-                tokenTypeId: a.tokTypeId,
+                tokTypeId: a.tokTypeId,
                   mintedQty: uint256(a.mintQty),
                   burnedQty: 0,
                    metaKeys: a.metaKeys,

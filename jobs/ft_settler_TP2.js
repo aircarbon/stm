@@ -27,9 +27,9 @@ module.exports = {
                 }
             }
             if (includeAccount) {
-                const shorts = le.tokens.filter(p => p.tokenTypeId == ftId && p.currentQty.lt(0));
-                const longs = le.tokens.filter(p => p.tokenTypeId == ftId && p.currentQty.gt(0));
-                const closed = le.tokens.filter(p => p.tokenTypeId == ftId && p.currentQty.eq(0));
+                const shorts = le.tokens.filter(p => p.tokTypeId == ftId && p.currentQty.lt(0));
+                const longs = le.tokens.filter(p => p.tokTypeId == ftId && p.currentQty.gt(0));
+                const closed = le.tokens.filter(p => p.tokTypeId == ftId && p.currentQty.eq(0));
                 shortIds = shortIds.concat(shorts.map(p => p.stId.toString()));
                 longIds = longIds.concat(longs.map(p => p.stId.toString()));
                 closedIds = closedIds.concat(closed.map(p => p.stId.toString()));

@@ -100,8 +100,8 @@ contract("StMaster", accounts => {
         try {
             const x = await transferHelper.transferLedger({ stm, accounts,
                     ledger_A: A,                                         ledger_B: B,
-                       qty_A: 0,                                    tokenTypeId_A: 0,
-                       qty_B: CONST.KT_CARBON,                      tokenTypeId_B: CONST.tokenType.TOK_T2,
+                       qty_A: 0,                                      tokTypeId_A: 0,
+                       qty_B: CONST.KT_CARBON,                        tokTypeId_B: CONST.tokenType.TOK_T2,
                 ccy_amount_A: AVAIL.add(new BN(1)),                   ccyTypeId_A: CONST.ccyType.USD,
                 ccy_amount_B: 0,                                      ccyTypeId_B: 0,
                    applyFees: true,
@@ -122,8 +122,8 @@ contract("StMaster", accounts => {
         try {
             const x = await transferHelper.transferLedger({ stm, accounts,
                     ledger_A: A,                                         ledger_B: B,
-                       qty_A: CONST.KT_CARBON,                      tokenTypeId_A: CONST.tokenType.TOK_T2,
-                       qty_B: 0,                                    tokenTypeId_B: 0,
+                       qty_A: CONST.KT_CARBON,                        tokTypeId_A: CONST.tokenType.TOK_T2,
+                       qty_B: 0,                                      tokTypeId_B: 0,
                 ccy_amount_A: 0,                                      ccyTypeId_A: 0,
                 ccy_amount_B: AVAIL.add(new BN(1)),                   ccyTypeId_B: CONST.ccyType.USD,
                    applyFees: true,
@@ -151,8 +151,8 @@ contract("StMaster", accounts => {
         try {
             const x = await transferHelper.transferLedger({ stm, accounts,
                     ledger_A: A,                                         ledger_B: B,
-                       qty_A: 0,                                    tokenTypeId_A: 0,
-                       qty_B: CONST.KT_CARBON,                      tokenTypeId_B: CONST.tokenType.TOK_T2, // 1m KG
+                       qty_A: 0,                                      tokTypeId_A: 0,
+                       qty_B: CONST.KT_CARBON,                        tokTypeId_B: CONST.tokenType.TOK_T2, // 1m KG
                 ccy_amount_A: AVAIL_EX_FEES.add(new BN(1)),           ccyTypeId_A: CONST.ccyType.USD,      // consideration in excess of available (unreserved) 
                 ccy_amount_B: 0,                                      ccyTypeId_B: 0,
                    applyFees: true,
@@ -179,8 +179,8 @@ contract("StMaster", accounts => {
         try {
             const x = await transferHelper.transferLedger({ stm, accounts,
                     ledger_A: A,                                         ledger_B: B,
-                       qty_A: CONST.KT_CARBON,                      tokenTypeId_A: CONST.tokenType.TOK_T2, // 1m KG
-                       qty_B: 0,                                    tokenTypeId_B: 0,
+                       qty_A: CONST.KT_CARBON,                        tokTypeId_A: CONST.tokenType.TOK_T2, // 1m KG
+                       qty_B: 0,                                      tokTypeId_B: 0,
                 ccy_amount_A: 0,                                      ccyTypeId_A: 0,
                 ccy_amount_B: AVAIL_EX_FEES.add(new BN(1)),           ccyTypeId_B: CONST.ccyType.USD,     
                    applyFees: true,

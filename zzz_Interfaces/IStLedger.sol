@@ -27,21 +27,21 @@ contract IStLedger is IOwned {
 
     /**
      * @notice Updates variation margin on a future token-type
-     * @param tokenTypeId Future token type ID
+     * @param tokTypeId Future token type ID
      * @param varMarginBips New variation margin to set, in basis points
      */
     function setFuture_VariationMargin(
-        uint256 tokenTypeId, uint16 varMarginBips
+        uint256 tokTypeId, uint16 varMarginBips
     )
     public onlyOwner() onlyWhenReadWrite() { revert("Not implemented"); }
 
     /**
      * @notice Updates fee per contract on a future token-type
-     * @param tokenTypeId Future token type ID
+     * @param tokTypeId Future token type ID
      * @param feePerContract New fee per contract, paid in future reference currency by each side of open interest position
      */
     function setFuture_FeePerContract(
-        uint256 tokenTypeId, uint128 feePerContract
+        uint256 tokTypeId, uint128 feePerContract
     )
     public onlyOwner() onlyWhenReadWrite() { revert("Not implemented"); }
 }

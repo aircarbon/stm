@@ -124,7 +124,7 @@ library StructLib {
     struct SecTokenBatch { // ** DATA_DUMP: OK
         uint64     id;                                          // global sequential id: 1-based
         uint256    mintedTimestamp;                             // minting block.timestamp
-        uint256    tokenTypeId;                                 // token type of the batch
+        uint256    tokTypeId;                                 // token type of the batch
         uint256    mintedQty;                                   // total unit qty minted in the batch
         uint256    burnedQty;                                   // total unit qty burned from the batch
         string[]   metaKeys;                                    // metadata keys
@@ -136,7 +136,7 @@ library StructLib {
 
     struct Ledger {
         bool                          exists;                   // for existance check by address
-        mapping(uint256 => uint256[]) tokenType_stIds;          // SecTokenTypeId -> stId[] of all owned STs
+        mapping(uint256 => uint256[]) tokenType_stIds;          // SectokTypeId -> stId[] of all owned STs
 
         mapping(uint256 => int256)    ccyType_balance;          // CcyTypeId -> spot/total cash balance -- signed, for potential -ve balances
         mapping(uint256 => int256)    ccyType_reserved;         // CcyTypeId -> total margin requirement [FUTURES] (available = balance - reserved)
@@ -145,8 +145,8 @@ library StructLib {
         uint256                       spot_sumQtyMinted;
         uint256                       spot_sumQtyBurned;
 
-        mapping(uint256 => uint16)    ft_initMarginBips;        // SecTokenTypeId -> custom initial margin override ("hedge exemption"); overrides FT-type value if set
-        mapping(uint256 => uint128)   ft_feePerContract;        // SecTokenTypeId -> custom fee per contract override; overrides FT-type value if set
+        mapping(uint256 => uint16)    ft_initMarginBips;        // SectokTypeId -> custom initial margin override ("hedge exemption"); overrides FT-type value if set
+        mapping(uint256 => uint128)   ft_feePerContract;        // SectokTypeId -> custom fee per contract override; overrides FT-type value if set
     }
 
     struct LedgerReturn {                                       // ledger return structure
@@ -159,7 +159,7 @@ library StructLib {
     }
         struct LedgerSecTokenReturn {
             uint256 stId;
-            uint256 tokenTypeId;
+            uint256 tokTypeId;
             string  tokenTypeName;
             uint64  batchId;
             int64   mintedQty;
@@ -294,11 +294,11 @@ library StructLib {
 
         uint256 qty_A;           // ST quantity moving from A (excluding fees, if any)
         uint256[] k_stIds_A;     // if len>0: the constant/specified ST IDs to transfer (must correlate with qty_A, if supplied)
-        uint256 tokenTypeId_A;   // ST type moving from A
+        uint256 tokTypeId_A;   // ST type moving from A
 
         uint256 qty_B;           // ST quantity moving from B (excluding fees, if any)
         uint256[] k_stIds_B;     // if len>0: the constant/specified ST IDs to transfer (must correlate with qty_B, if supplied)
-        uint256 tokenTypeId_B;   // ST type moving from B
+        uint256 tokTypeId_B;   // ST type moving from B
 
         int256  ccy_amount_A;    // currency amount moving from A (excluding fees, if any)
                                  // (signed value: ledger supports -ve balances)

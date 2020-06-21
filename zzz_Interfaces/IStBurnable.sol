@@ -15,12 +15,12 @@ import "../Libs/TokenLib.sol";
      * @notice Burns the specified quantity of tokens, for the specified token type and ledger entry
      * @dev Burn works by resizing STs (partial burn), and/or removing STs from the ledger entry (full burn)
      * @param ledgerOwner Ledger owner to burn
-     * @param tokenTypeId Token type to burn
+     * @param tokTypeId Token type to burn
      * @param burnQty Quantity to burn
      */
     function burnTokens(
         address ledgerOwner,
-        uint256 tokenTypeId,
+        uint256 tokTypeId,
         uint256 burnQty)
     external onlyOwner() onlyWhenReadWrite() { revert("Not implemented"); }
 

@@ -19,7 +19,7 @@ contract IStFees is IOwned {
     /**
      * @notice Returns the current fee structure (global or ledger fee) for the supplied token or currency type
      * @param feeType Fee type: currency (0) or token (1)
-     * @param typeId The currencyTypeId or tokenTypeId for which to return fees
+     * @param typeId The currencyTypeId or tokTypeId for which to return fees
      * @param ledgerOwner If > 0x0, returns the ledger (override) fee in effect for the address, else returns the global fee
      */
     function getFee(GetFeeType feeType, uint256 typeId, address ledgerOwner)
@@ -45,11 +45,11 @@ contract IStFees is IOwned {
 
     /**
      * @notice Sets the current fee structure (global or ledger fee) for the supplied token type
-     * @param tokenTypeId Token type
+     * @param tokTypeId Token type
      * @param ledgerOwner The ledger address for which to set fee structure, or 0x0 to set global fee structure
      * @param feeArgs The fee structure to assign to the supplied leder entry address, or to set as the global fee structure
      */
-    function setFee_TokType(uint256 tokenTypeId, address ledgerOwner, StructLib.SetFeeArgs memory feeArgs)
+    function setFee_TokType(uint256 tokTypeId, address ledgerOwner, StructLib.SetFeeArgs memory feeArgs)
     public onlyOwner() onlyWhenReadWrite() { revert("Not implemented"); }
 
     /**

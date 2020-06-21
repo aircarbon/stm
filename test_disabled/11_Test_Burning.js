@@ -42,7 +42,7 @@ contract("StMaster", accounts => {
         //truffleAssert.prettyPrintEmittedEvents(a0_burnTx1);
         truffleAssert.eventEmitted(a0_burnTx1, 'BurnedPartialSecToken', ev => {
             return ev.stId == stId
-                && ev.tokenTypeId == CONST.tokenType.TOK_T1
+                && ev.tokTypeId == CONST.tokenType.TOK_T1
                 && ev.from == accounts[global.TaddrNdx]
                 && ev.burnedQty == burnTokQty
                 ;
@@ -90,7 +90,7 @@ contract("StMaster", accounts => {
         //truffleAssert.prettyPrintEmittedEvents(a0_burnTx1);
         truffleAssert.eventEmitted(a0_burnTx1, 'BurnedFullSecToken', ev => {
             return ev.stId == stId
-                && ev.tokenTypeId == CONST.tokenType.TOK_T1
+                && ev.tokTypeId == CONST.tokenType.TOK_T1
                 && ev.from == accounts[global.TaddrNdx]
                 && ev.burnedQty == burnTokQty
                 ;
@@ -138,14 +138,14 @@ contract("StMaster", accounts => {
         //truffleAssert.prettyPrintEmittedEvents(a0_burnTx1);
         truffleAssert.eventEmitted(a0_burnTx1, 'BurnedFullSecToken', ev => { 
             return ev.stId == ledgerBefore.tokens[0].stId
-                   && ev.tokenTypeId == CONST.tokenType.TOK_T1
+                   && ev.tokTypeId == CONST.tokenType.TOK_T1
                    && ev.from == accounts[global.TaddrNdx]
                    && ev.burnedQty == CONST.GT_CARBON / 2
                    ;
         });
         truffleAssert.eventEmitted(a0_burnTx1, 'BurnedPartialSecToken', ev => { 
             return ev.stId == ledgerBefore.tokens[1].stId
-                   && ev.tokenTypeId == CONST.tokenType.TOK_T1
+                   && ev.tokTypeId == CONST.tokenType.TOK_T1
                    && ev.from == accounts[global.TaddrNdx]
                    && ev.burnedQty == CONST.GT_CARBON - expectRemainTokQty - CONST.GT_CARBON / 2
                    ;
@@ -185,8 +185,8 @@ contract("StMaster", accounts => {
         
         const ledgerBefore = await stm.getLedgerEntry(accounts[global.TaddrNdx]);
         assert(ledgerBefore.tokens.length == 6, `unexpected ledger ST entry before burn (${ledgerBefore.tokens.length})`);
-        const unfcc_eeus = ledgerBefore.tokens.filter(p => p.tokenTypeId == CONST.tokenType.TOK_T1);
-        const nature_eeus = ledgerBefore.tokens.filter(p => p.tokenTypeId == CONST.tokenType.TOK_T2);
+        const unfcc_eeus = ledgerBefore.tokens.filter(p => p.tokTypeId == CONST.tokenType.TOK_T1);
+        const nature_eeus = ledgerBefore.tokens.filter(p => p.tokTypeId == CONST.tokenType.TOK_T2);
 
         // get CORSIA batch IDs
         const corsia_batch1 = await stm.getSecTokenBatch(unfcc_eeus[0].batchId);
@@ -232,7 +232,7 @@ contract("StMaster", accounts => {
         const ledgerAfter = await stm.getLedgerEntry(accounts[global.TaddrNdx]);
         assert(ledgerAfter.spot_sumQty == expectRemainTokQty, 'unexpected ledger TONS after burn');
         assert(ledgerAfter.tokens.length == 3, 'unexpected ledger ST entry after burn');
-        assert(ledgerAfter.tokens.every(p => p.tokenTypeId == CONST.tokenType.TOK_T1), 'unexpected eeu composition on ledger after burn');
+        assert(ledgerAfter.tokens.every(p => p.tokTypeId == CONST.tokenType.TOK_T1), 'unexpected eeu composition on ledger after burn');
 
         // check burned batches
         const nature_batch4_after = await stm.getSecTokenBatch(nature_batch4_before.id);

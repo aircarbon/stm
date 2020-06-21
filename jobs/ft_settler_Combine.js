@@ -24,7 +24,7 @@ module.exports = {
         var combines = [];
         for (let addr of ledgerOwners) {
             const le = await CONST.web3_call('getLedgerEntry', [addr]);
-            const positions = le.tokens.filter(p => p.tokenTypeId == ftId);
+            const positions = le.tokens.filter(p => p.tokTypeId == ftId);
             if (positions.length > 1) {
                 combines.push({
                     addr,

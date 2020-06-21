@@ -51,7 +51,7 @@ library LoadLib {
     function addSecToken(
         StructLib.LedgerStruct storage ld,
         address ledgerEntryOwner,
-        uint64 batchId, uint256 stId, uint256 tokenTypeId, int64 mintedQty, int64 currentQty,
+        uint64 batchId, uint256 stId, uint256 tokTypeId, int64 mintedQty, int64 currentQty,
         int128 ft_price, int128 ft_lastMarkPrice, address ft_ledgerOwner, int128 ft_PL
     )
     public {
@@ -63,7 +63,7 @@ library LoadLib {
         ld._sts[stId].ft_ledgerOwner = ft_ledgerOwner;
         ld._sts[stId].ft_lastMarkPrice = ft_lastMarkPrice;
         ld._sts[stId].ft_PL = ft_PL;
-        ld._ledger[ledgerEntryOwner].tokenType_stIds[tokenTypeId].push(stId);
+        ld._ledger[ledgerEntryOwner].tokenType_stIds[tokTypeId].push(stId);
     }
 
     function setTokenTotals(

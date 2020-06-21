@@ -56,8 +56,8 @@ contract("StMaster", accounts => {
             qty_A: -1,
             qty_B: +1,
         price: 100 });
-        assert(x.ledger_A.tokens.filter(p => p.tokenTypeId == usdFT.id)[0].stId == 
-               x.ledger_B.tokens.filter(p => p.tokenTypeId == usdFT.id)[0].stId - 1, 'unexpected StId sequence');
+        assert(x.ledger_A.tokens.filter(p => p.tokTypeId == usdFT.id)[0].stId == 
+               x.ledger_B.tokens.filter(p => p.tokTypeId == usdFT.id)[0].stId - 1, 'unexpected StId sequence');
     });
     it(`FT position pairs - short position should always be the first (lower) position/StId (short on B)`, async () => {
         const A = accounts[global.TaddrNdx], B = accounts[global.TaddrNdx + 1];
@@ -65,8 +65,8 @@ contract("StMaster", accounts => {
             qty_A: +1,
             qty_B: -1,
         price: 100 });
-        assert(x.ledger_B.tokens.filter(p => p.tokenTypeId == usdFT.id)[0].stId == 
-               x.ledger_A.tokens.filter(p => p.tokenTypeId == usdFT.id)[0].stId - 1, 'unexpected StId sequence');
+        assert(x.ledger_B.tokens.filter(p => p.tokTypeId == usdFT.id)[0].stId == 
+               x.ledger_A.tokens.filter(p => p.tokTypeId == usdFT.id)[0].stId - 1, 'unexpected StId sequence');
     });
 
 });

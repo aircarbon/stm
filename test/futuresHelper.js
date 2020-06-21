@@ -170,8 +170,8 @@ module.exports = {
         const ledgerO_before = await stm.getLedgerEntry(accounts[0]);
         const ledgerA_before = await stm.getLedgerEntry(ledger_A);
         const ledgerB_before = await stm.getLedgerEntry(ledger_B);
-        const ftsA_before = ledgerA_before.tokens.filter(p => p.tokenTypeId == tokTypeId);
-        const ftsB_before = ledgerB_before.tokens.filter(p => p.tokenTypeId == tokTypeId);
+        const ftsA_before = ledgerA_before.tokens.filter(p => p.tokTypeId == tokTypeId);
+        const ftsB_before = ledgerB_before.tokens.filter(p => p.tokTypeId == tokTypeId);
 
         // open futures position
         const st = (await stm.getSecTokenTypes()).tokenTypes.find(p => p.id == tokTypeId);
@@ -182,8 +182,8 @@ module.exports = {
         const ledgerO_after = await stm.getLedgerEntry(accounts[0]);
         const ledgerA_after = await stm.getLedgerEntry(ledger_A);
         const ledgerB_after = await stm.getLedgerEntry(ledger_B);
-        const ftsA_after = ledgerA_after.tokens.filter(p => p.tokenTypeId == tokTypeId);
-        const ftsB_after = ledgerB_after.tokens.filter(p => p.tokenTypeId == tokTypeId);
+        const ftsA_after = ledgerA_after.tokens.filter(p => p.tokTypeId == tokTypeId);
+        const ftsB_after = ledgerB_after.tokens.filter(p => p.tokTypeId == tokTypeId);
 
         //console.log('ledgerA_after', ledgerA_after);
         //console.log('ledgerB_after', ledgerB_after);
@@ -222,7 +222,7 @@ module.exports = {
         assert(ftsB_after.length == ftsB_before.length + 1, `unexpected futures ST count before vs. after (B)`);
         const ftA = _.differenceWith(ftsA_after, ftsA_before, _.isEqual)[0];
         const ftB = _.differenceWith(ftsB_after, ftsB_before, _.isEqual)[0];
-        assert(ftA.tokenTypeId == tokTypeId && ftB.tokenTypeId == tokTypeId, 'unexpected FT token type ID');
+        assert(ftA.tokTypeId == tokTypeId && ftB.tokTypeId == tokTypeId, 'unexpected FT token type ID');
         assert(ftA.batchId == 0 && ftB.batchId == 0, 'unexpected FT batch ID');
         assert(Big(ftA.ft_price).eq(Big(price)) && Big(ftB.ft_price).eq(Big(price)), 'unexpected FT price');
         assert(ftA.ft_lastMarkPrice == -1 && ftB.ft_lastMarkPrice == -1, 'unexpected FT last mark price');
