@@ -34,14 +34,14 @@ contract("StMaster", accounts => {
 
     it(`minting originator ccy fee - should allow decreasing of batch currency fee on a batch`, async () => {
         const M = accounts[global.TaddrNdx];
-        await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2, CONST.KT_CARBON, 1, M, CONST.nullFees, 100, [], [],   { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2, CONST.KT_CARBON, 1, M, CONST.nullFees, 100, [], [], { from: accounts[0] });
         const batchId = await stm.getSecTokenBatchCount.call();
         await stm.setOriginatorFeeCurrencyBatch(batchId, 50, { from: accounts[0] });
     });
 
     it(`minting originator ccy fee - should not allow increasing of batch currency fee after minting`, async () => {
         const M = accounts[global.TaddrNdx];
-        await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2, CONST.KT_CARBON, 1, M, CONST.nullFees, 100, [], [],   { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2, CONST.KT_CARBON, 1, M, CONST.nullFees, 100, [], [], { from: accounts[0] });
         const batchId = await stm.getSecTokenBatchCount.call();
         var origFee2;
 

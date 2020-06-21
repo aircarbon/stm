@@ -36,7 +36,7 @@ contract("StMaster", accounts => {
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2, CONST.KT_CARBON, 1,      A, CONST.nullFees, 0, [], []);
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2, CONST.KT_CARBON, 1,      A, CONST.nullFees, 0, [], []);
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2, CONST.KT_CARBON, 1,      A, CONST.nullFees, 0, [], []);
-        await stm.fund(CONST.ccyType.USD,                   CONST.thousandCcy_cents, B,                          );
+        await stm.fund(CONST.ccyType.USD,                   CONST.thousandCcy_cents, B,                             );
 
         const tokType = CONST.tokenType.TOK_T2;
         const le_before_A = await stm.getLedgerEntry(A);
@@ -68,7 +68,7 @@ contract("StMaster", accounts => {
     });
     it(`transferring tok by id - should allow one-sided transfer (B -> A) of specific STs across ledger entries`, async () => {
         const A = accounts[global.TaddrNdx + 0], B = accounts[global.TaddrNdx + 1];
-        await stm.fund(CONST.ccyType.USD,                   CONST.thousandCcy_cents, A,                          );
+        await stm.fund(CONST.ccyType.USD,                   CONST.thousandCcy_cents, A,                             );
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2, CONST.KT_CARBON, 1,      B, CONST.nullFees, 0, [], []);
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T1, CONST.KT_CARBON, 1,      B, CONST.nullFees, 0, [], []);
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T3, CONST.KT_CARBON, 1,      B, CONST.nullFees, 0, [], []);
@@ -117,7 +117,7 @@ contract("StMaster", accounts => {
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2, CONST.KT_CARBON, 1,      A, CONST.nullFees, 100, [], []);
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2, CONST.KT_CARBON, 1,      A, CONST.nullFees, 100, [], []);
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2, CONST.KT_CARBON, 1,      A, CONST.nullFees, 100, [], []);
-        await stm.fund(CONST.ccyType.USD,                   CONST.millionCcy_cents,  B,                            );
+        await stm.fund(CONST.ccyType.USD,                   CONST.millionCcy_cents,  B,                               );
 
         // set global fee: ccy 3.00 /per Million qty received, MIRRORED
         const ccy_perMillion = 300; // $3
@@ -156,7 +156,7 @@ contract("StMaster", accounts => {
     });
     it(`transferring tok by id - should allow two-sided exchange (B -> A) of specific STs for collateral across ledger entries, with batch originator & exchange mirrored ccy fees`, async () => {
         const A = accounts[global.TaddrNdx + 0], B = accounts[global.TaddrNdx + 1];
-        await stm.fund(CONST.ccyType.USD,                   CONST.millionCcy_cents,  A,                            );
+        await stm.fund(CONST.ccyType.USD,                   CONST.millionCcy_cents,  A,                              );
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2, CONST.KT_CARBON, 1,      B, CONST.nullFees, 100, [], []);
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T1, CONST.KT_CARBON, 1,      B, CONST.nullFees, 100, [], []);
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T3, CONST.KT_CARBON, 1,      B, CONST.nullFees, 100, [], []);

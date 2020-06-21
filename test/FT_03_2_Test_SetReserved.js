@@ -92,7 +92,7 @@ contract("StMaster", accounts => {
         const A = accounts[global.TaddrNdx + 0], B = accounts[global.TaddrNdx + 1];
         const FUNDED = new BN(10000), RESERVED = FUNDED.div(new BN(2)), AVAIL = FUNDED.sub(RESERVED);
 
-        await stm.fund(CONST.ccyType.USD,                      FUNDED,                  A,                            );
+        await stm.fund(CONST.ccyType.USD,                      FUNDED,                  A,                               );
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2,    CONST.MT_CARBON,  1,     B, CONST.nullFees, 0, [], [], );
         await stm.setReservedCcy(CONST.ccyType.USD,            RESERVED,                A);
         await stm.setFee_TokType(CONST.tokenType.TOK_T2, CONST.nullAddr, CONST.nullFees);
@@ -115,7 +115,7 @@ contract("StMaster", accounts => {
         const FUNDED = new BN(10000), RESERVED = FUNDED.div(new BN(2)), AVAIL = FUNDED.sub(RESERVED);
 
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2,    CONST.MT_CARBON,  1,     A, CONST.nullFees, 0, [], [], );
-        await stm.fund(CONST.ccyType.USD,                      FUNDED,                  B,                            );
+        await stm.fund(CONST.ccyType.USD,                      FUNDED,                  B,                               );
         await stm.setReservedCcy(CONST.ccyType.USD,            RESERVED,                B);
         await stm.setFee_TokType(CONST.tokenType.TOK_T2, CONST.nullAddr, CONST.nullFees);
         await stm.setFee_CcyType(CONST.ccyType.USD,      CONST.nullAddr, CONST.nullFees);
@@ -138,12 +138,12 @@ contract("StMaster", accounts => {
         const FUNDED = new BN(10000), RESERVED = FUNDED.div(new BN(2)), AVAIL = FUNDED.sub(RESERVED), AVAIL_EX_FEES = AVAIL.sub(new BN(300)); // expected fee per 1m KG: $3
 
         // balance partially reserved on ccy sender A
-        await stm.fund(CONST.ccyType.USD,                      FUNDED,                  A,                            );
+        await stm.fund(CONST.ccyType.USD,                      FUNDED,                  A,                               );
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2,    CONST.MT_CARBON,  1,     B, CONST.nullFees, 0, [], [], );
         await stm.setReservedCcy(CONST.ccyType.USD,            RESERVED,                A);
 
         // balance fully reserved on ccy receiver B - but he pays the mirrored fee from the ccy consideration
-        await stm.fund(CONST.ccyType.USD,                      FUNDED,                  B,                            );
+        await stm.fund(CONST.ccyType.USD,                      FUNDED,                  B,                               );
         await stm.setReservedCcy(CONST.ccyType.USD,            FUNDED,                  B);
 
         await stm.setFee_TokType(CONST.tokenType.TOK_T2, CONST.nullAddr, CONST.nullFees);
@@ -167,11 +167,11 @@ contract("StMaster", accounts => {
 
         // balance partially reserved on ccy sender B
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2,    CONST.MT_CARBON,  1,     A, CONST.nullFees, 0, [], [], );
-        await stm.fund(CONST.ccyType.USD,                      FUNDED,                  B,                            );
+        await stm.fund(CONST.ccyType.USD,                      FUNDED,                  B,                               );
         await stm.setReservedCcy(CONST.ccyType.USD,            RESERVED,                B);
 
         // balance fully reserved on ccy receiver A - but he pays the mirrored fee from the ccy consideration
-        await stm.fund(CONST.ccyType.USD,                      FUNDED,                  A,                            );
+        await stm.fund(CONST.ccyType.USD,                      FUNDED,                  A,                               );
         await stm.setReservedCcy(CONST.ccyType.USD,            FUNDED,                  A);
 
         await stm.setFee_TokType(CONST.tokenType.TOK_T2, CONST.nullAddr, CONST.nullFees);

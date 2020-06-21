@@ -21,7 +21,7 @@ contract StFees is
     // GLOBAL FEES
     StructLib.FeeStruct globalFees;
 
-    constructor() public {}
+    //constructor() public {}
 
     function getFee(GetFeeType feeType, uint256 typeId, address ledgerOwner)
     external view onlyOwner() returns(StructLib.SetFeeArgs memory) {

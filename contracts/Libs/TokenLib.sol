@@ -151,6 +151,7 @@ library TokenLib {
         uint16               origCcyFee_percBips_ExFee;
         string[]             metaKeys;
         string[]             metaValues;
+        //uint256              cftc_maxStId; // for cashflow base: pass controller's current `ld._tokens_currentMax_id` (sync's ST IDs across base types)
     }
     function mintSecTokenBatch(
         StructLib.LedgerStruct storage  ld,
@@ -169,8 +170,10 @@ library TokenLib {
         require(a.origTokFee.ccy_mirrorFee == false, "ccy_mirrorFee unsupported for token-type fee");
         require(a.origCcyFee_percBips_ExFee <= 10000, "Bad fee args");
 
-        if (ld.contractType == StructLib.ContractType.CASHFLOW_BASE) // CFT: uni-batch
-            require(ld._batches_currentMax_id == 0, "Bad cashflow request");
+        if (ld.contractType == StructLib.ContractType.CASHFLOW_BASE) {
+            require(ld._batches_currentMax_id == 0, "Bad cashflow request"); // cashflow base: uni-batch
+            // TODO: cashflow base: only allow mint from controller (tx.origin == ...)
+        }
 
         // ### string[] param lengths are reported as zero!
         /*require(metaKeys.length == 0, "At least one metadata key must be provided");
@@ -184,7 +187,7 @@ library TokenLib {
         StructLib.SecTokenBatch memory newBatch = StructLib.SecTokenBatch({
                          id: ld._batches_currentMax_id + 1,
             mintedTimestamp: block.timestamp,
-                tokenTypeId: a.tokTypeId,
+                  tokTypeId: a.tokTypeId,
                   mintedQty: uint256(a.mintQty),
                   burnedQty: 0,
                    metaKeys: a.metaKeys,
@@ -203,13 +206,10 @@ library TokenLib {
         StructLib.initLedgerIfNew(ld, a.batchOwner);
 
         // mint & assign STs (delegate to cashflow base in cashflow controller)
-        if (ld.contractType == StructLib.ContractType.CASHFLOW_CONTROLLER) { // CFT-C: passthrough to base
+        if (ld.contractType == StructLib.ContractType.CASHFLOW_CONTROLLER) { // cashflow controller: passthrough to base
             //require(std._tt_addr[a.tokTypeId] != address(0x0), "Bad cashflow request");
             StMaster base = StMaster(std._tt_addr[a.tokTypeId]);
             base.mintSecTokenBatch(
-                // TODO: base - only allow mint from controller;
-                //       base - accept controller's current max stId, so bases have unique/sync'd stIds...
-
                 1/*tokTypeId*/, // base: UNI_TOKEN (controller does type ID mapping for clients)
                 a.mintQty,
                 a.mintSecTokenCount,
@@ -218,9 +218,17 @@ library TokenLib {
                 a.origCcyFee_percBips_ExFee,
                 a.metaKeys,
                 a.metaValues
+                //,ld._tokens_currentMax_id // base - accept controller's current max stId, so bases have unique/sync'd stIds...
             );
         }
         else {
+            // if (ld.contractType == StructLib.ContractType.CASHFLOW_BASE) { // synchronise/serialize base types' ST IDs (i.e. non-sequential IDs in base...)
+            //     ld._tokens_currentMax_id = a.cftc_maxStId; //...?
+            // }
+            // TODO: better -- ctor should accept a defualt starting value for _tokens_currentMax_id;
+            //       base types get segmented starting values e.g. 2^^128 * {typeCount} [i.e. effective STID range shrinks form 2^256 to 2^128]
+            // (allows for faster lookup by ID into correct base insstance, in controller [desegment, then lookup])
+
             for (int256 ndx = 0; ndx < a.mintSecTokenCount; ndx++) {
                 uint256 newId = ld._tokens_currentMax_id + 1 + uint256(ndx);
                 int64 stQty = int64(a.mintQty) / int64(a.mintSecTokenCount);

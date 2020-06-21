@@ -57,7 +57,7 @@ const contractProps = {
         contractDecimals: 0,
         cashflowArgs: nullCashflowArgs,
     },
-    CASHFLOW: {
+    CASHFLOW_BASE: {
         contractVer: contractVer,
         contractName: `SDax_CFT`,
         contractUnit: "Token(s)",

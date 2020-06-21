@@ -32,7 +32,7 @@ contract("StMaster", accounts => {
         const A = accounts[global.TaddrNdx + 0];
         const B = accounts[global.TaddrNdx + 1];
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2,    CONST.KT_CARBON, 1,      A, CONST.nullFees, 0, [], [], { from: accounts[0] });
-        await stm.fund(CONST.ccyType.ETH,                      CONST.oneEth_wei,        B,                            { from: accounts[0] });
+        await stm.fund(CONST.ccyType.ETH,                      CONST.oneEth_wei,        B,                               { from: accounts[0] });
 
         // set global fee structure (zero)
         await stm.setFee_TokType(CONST.tokenType.TOK_T2, CONST.nullAddr, { ccy_mirrorFee: false, ccy_perMillion: 0, fee_fixed: 0, fee_percBips: 0, fee_min: 0, fee_max: 0 } );
@@ -80,12 +80,12 @@ contract("StMaster", accounts => {
         const A = accounts[global.TaddrNdx + 0];
         const B = accounts[global.TaddrNdx + 1];
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2,    CONST.KT_CARBON, 1,      A, CONST.nullFees, 0, [], [], { from: accounts[0] });
-        await stm.fund(CONST.ccyType.ETH,                      CONST.oneEth_wei,        B,                            { from: accounts[0] });
+        await stm.fund(CONST.ccyType.ETH,                      CONST.oneEth_wei,        B,                               { from: accounts[0] });
 
         // set global fee structure (non-zero)
         const globalFeeBps = 100, globalFeeFix = 1, globalFeeCap = 5;
         await stm.setFee_TokType(CONST.tokenType.TOK_T2, CONST.nullAddr, { ccy_mirrorFee: false, ccy_perMillion: 0, fee_fixed: globalFeeFix, fee_percBips: globalFeeBps, fee_min: 0, fee_max: globalFeeCap } );
-        await stm.setFee_CcyType(CONST.ccyType.ETH, CONST.nullAddr,      { ccy_mirrorFee: false, ccy_perMillion: 0, fee_fixed: 0,             fee_percBips: 0,            fee_min: 0, fee_max: 0 } );
+        await stm.setFee_CcyType(CONST.ccyType.ETH, CONST.nullAddr,      { ccy_mirrorFee: false, ccy_perMillion: 0, fee_fixed: 0,            fee_percBips: 0,            fee_min: 0, fee_max: 0 } );
 
         // set ledger fee structure NATURE for A: 10% + 5 TONS, CAP 10 TONS
         var feeBps = 1000; 
@@ -135,7 +135,7 @@ contract("StMaster", accounts => {
         const A = accounts[global.TaddrNdx + 0];
         const B = accounts[global.TaddrNdx + 1];
 
-        await stm.fund(CONST.ccyType.ETH,                      CONST.oneEth_wei,        A,                            { from: accounts[0] });
+        await stm.fund(CONST.ccyType.ETH,                      CONST.oneEth_wei,        A,                                { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2,    CONST.GT_CARBON, 1,       B, CONST.nullFees, 0, [], [], { from: accounts[0] });
 
         // set global fee structure (zero)
@@ -185,7 +185,7 @@ contract("StMaster", accounts => {
         const A = accounts[global.TaddrNdx + 0];
         const B = accounts[global.TaddrNdx + 1];
 
-        await stm.fund(CONST.ccyType.ETH,                      CONST.oneEth_wei,         A,                            { from: accounts[0] });
+        await stm.fund(CONST.ccyType.ETH,                      CONST.oneEth_wei,         A,                               { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2,    CONST.GT_CARBON, 1,       B, CONST.nullFees, 0, [], [], { from: accounts[0] });
 
         // set global fee structure (non-zero)
@@ -243,7 +243,7 @@ contract("StMaster", accounts => {
     it(`fees (ledger) - apply ETH ccy override fee 2500 BP + 0.01 ETH fixed (collar 0.2 ETH), on a small trade (fee on A)`, async () => {
         const A = accounts[global.TaddrNdx + 0];
         const B = accounts[global.TaddrNdx + 1];
-        await stm.fund(CONST.ccyType.ETH,                      CONST.oneEth_wei,        A,                            { from: accounts[0] });
+        await stm.fund(CONST.ccyType.ETH,                      CONST.oneEth_wei,        A,                               { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2,    CONST.KT_CARBON, 1,      B, CONST.nullFees, 0, [], [], { from: accounts[0] });
 
         // set global fee structure (zero)
@@ -291,7 +291,7 @@ contract("StMaster", accounts => {
     it(`fees (ledger) - apply then clear ETH ccy override fee 2500 BP + 0.01 ETH fixed (collar 0.2 ETH), on a small trade (fee on A)`, async () => {
         const A = accounts[global.TaddrNdx + 0];
         const B = accounts[global.TaddrNdx + 1];
-        await stm.fund(CONST.ccyType.ETH,                      CONST.oneEth_wei,        A,                            { from: accounts[0] });
+        await stm.fund(CONST.ccyType.ETH,                      CONST.oneEth_wei,        A,                               { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2,    CONST.KT_CARBON, 1,      B, CONST.nullFees, 0, [], [], { from: accounts[0] });
 
         // set global fee structure (non-zero)
@@ -348,7 +348,7 @@ contract("StMaster", accounts => {
         const B = accounts[global.TaddrNdx + 1];
 
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2,    CONST.KT_CARBON, 1,      A, CONST.nullFees, 0, [], [], { from: accounts[0] });
-        await stm.fund(CONST.ccyType.ETH,                      CONST.millionEth_wei,    B,                            { from: accounts[0] });
+        await stm.fund(CONST.ccyType.ETH,                      CONST.millionEth_wei,    B,                               { from: accounts[0] });
 
         // set global fee structure (zero)
         await stm.setFee_CcyType(CONST.ccyType.ETH, CONST.nullAddr,      { ccy_mirrorFee: false, ccy_perMillion: 0, fee_fixed: 0, fee_percBips: 0, fee_min: 0, fee_max: 0 } );
@@ -398,7 +398,7 @@ contract("StMaster", accounts => {
         const B = accounts[global.TaddrNdx + 1];
 
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2,    CONST.KT_CARBON, 1,      A, CONST.nullFees, 0, [], [], { from: accounts[0] });
-        await stm.fund(CONST.ccyType.ETH,                      CONST.millionEth_wei,    B,                            { from: accounts[0] });
+        await stm.fund(CONST.ccyType.ETH,                      CONST.millionEth_wei,    B,                               { from: accounts[0] });
 
         // set global fee structure (non-zero)
         const globalFeeBps = 100, globalFeeFix = 100, globalFeeMax = 100;
@@ -458,7 +458,7 @@ contract("StMaster", accounts => {
 
         // 102,999,999 tons
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2,    CONST.KT_CARBON, 1,      A, CONST.nullFees, 0, [], [], { from: accounts[0] });
-        await stm.fund(CONST.ccyType.ETH,                      CONST.oneEth_wei,        B,                            { from: accounts[0] });
+        await stm.fund(CONST.ccyType.ETH,                      CONST.oneEth_wei,        B,                               { from: accounts[0] });
 
         // set ledger fee structure NATURE (A): 10% + 50kg, max 50kg
         const ledgerFeeBps = 1000;
@@ -516,7 +516,7 @@ contract("StMaster", accounts => {
 
         // 102,999,999 tons
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2,    CONST.KT_CARBON, 1,      A, CONST.nullFees, 0, [], [], { from: accounts[0] });
-        await stm.fund(CONST.ccyType.ETH,                      CONST.oneEth_wei,        B,                            { from: accounts[0] });
+        await stm.fund(CONST.ccyType.ETH,                      CONST.oneEth_wei,        B,                               { from: accounts[0] });
 
         // set global fee structure NATURE (A)
         const globalFeeFix = 0;
@@ -572,7 +572,7 @@ contract("StMaster", accounts => {
         const A = accounts[global.TaddrNdx + 0];
         const B = accounts[global.TaddrNdx + 1];
 
-        await stm.fund(CONST.ccyType.ETH,                      CONST.oneEth_wei,        A,                            { from: accounts[0] });
+        await stm.fund(CONST.ccyType.ETH,                      CONST.oneEth_wei,        A,                               { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2,    CONST.KT_CARBON, 1,      B, CONST.nullFees, 0, [], [], { from: accounts[0] });
 
         // set fee structure NATURE (B): 1% + 1kg, min 101kg
@@ -606,7 +606,7 @@ contract("StMaster", accounts => {
         const B = accounts[global.TaddrNdx + 1];
 
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2,    CONST.KT_CARBON, 1,      A, CONST.nullFees, 0, [], [], { from: accounts[0] });
-        await stm.fund(CONST.ccyType.ETH,                      CONST.oneEth_wei,        B,                            { from: accounts[0] });
+        await stm.fund(CONST.ccyType.ETH,                      CONST.oneEth_wei,        B,                               { from: accounts[0] });
 
         // set fee structure NATURE (A): 1% + 1kg, min 101kg
         const feeBps = 100; 

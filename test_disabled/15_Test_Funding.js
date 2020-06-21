@@ -63,7 +63,7 @@ contract("StMaster", accounts => {
 
     it(`funding - should allow minting and funding on same ledger entry`, async () => {
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2, CONST.GT_CARBON, 1, accounts[global.TaddrNdx], CONST.nullFees, 0, [], [], { from: accounts[0] });
-        await stm.fund(CONST.ccyType.USD, CONST.thousandCcy_cents, accounts[global.TaddrNdx],                                        { from: accounts[0] });
+        await stm.fund(CONST.ccyType.USD, CONST.thousandCcy_cents, accounts[global.TaddrNdx],                                            { from: accounts[0] });
         const ledgerEntryAfter = await stm.getLedgerEntry(accounts[global.TaddrNdx]);
 
         assert(ledgerEntryAfter.tokens.length == 1, 'unexpected eeu count in ledger entry after minting & funding');

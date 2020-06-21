@@ -13,7 +13,7 @@ module.exports = {
         const { deployer, artifacts, contractType, nameOverride } = p; 
         var stmAddr;
         //const contractType = process.env.CONTRACT_TYPE;
-        if (contractType != "CASHFLOW" && contractType != "CASHFLOW_CONTROLLER" && contractType != "COMMODITY") throw ('Unknown contractType');
+        if (contractType != 'CASHFLOW_BASE' && contractType != 'CASHFLOW_CONTROLLER' && contractType != 'COMMODITY') throw ('Unknown contractType');
 
         const StructLib = artifacts.require('../Interfaces/StructLib.sol');
         const CcyLib = artifacts.require('./CcyLib.sol');
@@ -73,8 +73,8 @@ module.exports = {
             //return 
             const contractName = `${process.env.CONTRACT_PREFIX}${nameOverride || CONST.contractProps[contractType].contractName}`;
             stmAddr = await deployer.deploy(StMaster,
-                contractType == "CASHFLOW"            ? CONST.contractType.CASHFLOW_BASE :
-                contractType == "CASHFLOW_CONTROLLER" ? CONST.contractType.CASHFLOW_CONTROLLER :
+                contractType == 'CASHFLOW_BASE'       ? CONST.contractType.CASHFLOW_BASE :
+                contractType == 'CASHFLOW_CONTROLLER' ? CONST.contractType.CASHFLOW_CONTROLLER :
                                                         CONST.contractType.COMMODITY,
                 CONST.contractProps[contractType].cashflowArgs,
                 contractName,

@@ -29,7 +29,7 @@ contract("StMaster", accounts => {
         const B = accounts[global.TaddrNdx + 1];
 
         const origCcyFee_bips = 100;
-        await stm.fund(CONST.ccyType.USD,                      CONST.millionCcy_cents,  A,                                          { from: accounts[0] });
+        await stm.fund(CONST.ccyType.USD,                      CONST.millionCcy_cents,  A,                                             { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2,    CONST.MT_CARBON,  1,     B, CONST.nullFees, origCcyFee_bips, [], [], { from: accounts[0] });
 
         // set global fee: ccy 3.00 /per Million qty received, MIRRORED
@@ -71,7 +71,7 @@ contract("StMaster", accounts => {
 
         const origCcyFee_bips = 100;
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2,    CONST.MT_CARBON,  1,     A, CONST.nullFees, origCcyFee_bips, [], [], { from: accounts[0] });
-        await stm.fund(CONST.ccyType.USD,                      CONST.millionCcy_cents,  B,                                          { from: accounts[0] });
+        await stm.fund(CONST.ccyType.USD,                      CONST.millionCcy_cents,  B,                                             { from: accounts[0] });
 
         // set global fee: ccy 3.00 /per Million qty received, MIRRORED
         const ccy_perMillion = 300; // $3
@@ -113,7 +113,7 @@ contract("StMaster", accounts => {
 
         const origCcyFee_bips_B1 = 3000; // 30%
         const origCcyFee_bips_B2 = 9000; // 90%
-        await stm.fund(CONST.ccyType.USD,                      CONST.millionCcy_cents,  A,                               { from: accounts[0] });
+        await stm.fund(CONST.ccyType.USD,                      CONST.millionCcy_cents,  A,                                  { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2,    500000, 1, B, CONST.nullFees, origCcyFee_bips_B1, [], [], { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2,    500000, 1, B, CONST.nullFees, origCcyFee_bips_B2, [], [], { from: accounts[0] });
 
@@ -158,7 +158,7 @@ contract("StMaster", accounts => {
         const origCcyFee_bips_B2 = 9000; // 90%
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2,    500000, 1, A, CONST.nullFees, origCcyFee_bips_B1, [], [], { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2,    500000, 1, A, CONST.nullFees, origCcyFee_bips_B2, [], [], { from: accounts[0] });
-        await stm.fund(CONST.ccyType.USD,                      CONST.millionCcy_cents,  B,                               { from: accounts[0] });
+        await stm.fund(CONST.ccyType.USD,                      CONST.millionCcy_cents,  B,                                  { from: accounts[0] });
 
         // set global fee: ccy 3.00 /per Million qty received, MIRRORED
         const ccy_perMillion = 300, fee_min = 300; // $3
@@ -200,7 +200,7 @@ contract("StMaster", accounts => {
 
         const origCcyFee_bips_B1 = 3000; // 30%
         const origCcyFee_bips_B2 = 9000; // 90%
-        await stm.fund(CONST.ccyType.USD,                      CONST.millionCcy_cents,  A,                               { from: accounts[0] });
+        await stm.fund(CONST.ccyType.USD,                      CONST.millionCcy_cents,  A,                                  { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2,    500000, 1, B, CONST.nullFees, origCcyFee_bips_B1, [], [], { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2,    500000, 1, B, CONST.nullFees, origCcyFee_bips_B2, [], [], { from: accounts[0] });
 
@@ -245,7 +245,7 @@ contract("StMaster", accounts => {
         const origCcyFee_bips_B2 = 9000; // 90%
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2,    500000, 1, A, CONST.nullFees, origCcyFee_bips_B1, [], [], { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2,    500000, 1, A, CONST.nullFees, origCcyFee_bips_B2, [], [], { from: accounts[0] });
-        await stm.fund(CONST.ccyType.USD,                      CONST.millionCcy_cents,  B,                               { from: accounts[0] });
+        await stm.fund(CONST.ccyType.USD,                      CONST.millionCcy_cents,  B,                                  { from: accounts[0] });
 
         // set global fee: ccy 3.00 /per Million qty received, MIRRORED
         const ccy_perMillion = 300, fee_min = 300; // $3
@@ -287,7 +287,7 @@ contract("StMaster", accounts => {
 
         const origCcyFee_bips_B1 = 3000; // 30%
         const origCcyFee_bips_B2 = 9000; // 90%
-        await stm.fund(CONST.ccyType.USD,                      CONST.millionCcy_cents,  A,                               { from: accounts[0] });
+        await stm.fund(CONST.ccyType.USD,                      CONST.millionCcy_cents,  A,                                  { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2,    500000, 1, B, CONST.nullFees, origCcyFee_bips_B1, [], [], { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2,    500000, 1, B, CONST.nullFees, origCcyFee_bips_B2, [], [], { from: accounts[0] });
 
@@ -342,7 +342,7 @@ contract("StMaster", accounts => {
         const origCcyFee_bips_B2 = 9000; // 90%
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2,    500000, 1, A, CONST.nullFees, origCcyFee_bips_B1, [], [], { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2,    500000, 1, A, CONST.nullFees, origCcyFee_bips_B2, [], [], { from: accounts[0] });
-        await stm.fund(CONST.ccyType.USD,                      CONST.millionCcy_cents,  B,                               { from: accounts[0] });
+        await stm.fund(CONST.ccyType.USD,                      CONST.millionCcy_cents,  B,                                  { from: accounts[0] });
 
         // set global fee: ccy 3.00 /per Million qty received, max ccy 15.00, min ccy 3.00, MIRRORED
         const exchange_feeperMillion = 300, exchange_feeMax = 1500, exchange_feeMin = 300; // $3, $15, $3

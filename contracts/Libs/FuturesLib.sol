@@ -15,38 +15,42 @@ library FuturesLib {
     event Combine(address indexed to, uint256 masterStId, uint256 countTokensCombined);
 
     //
-    // PUBLIC - initial margin ledger override
+    // PUBLIC - ledger overrides (initial margin & fee per contract)
     //
-    function initMarginOverride(
+    function setLedgerOverride(
+        uint256 overrideType,
         StructLib.LedgerStruct storage ld,
         StructLib.StTypesStruct storage std,
-        uint256 tokTypeId,
-        address ledgerOwner,
-        uint16  initMarginBips
+        uint256 tokTypeId, address ledgerOwner, uint128 value
     ) public {
-        require(tokTypeId >= 0 && tokTypeId <= std._tt_Count, "Bad tokTypeId");
-        require(std._tt_settle[tokTypeId] == StructLib.SettlementType.FUTURE, "Bad token settlement type");
-        require(/*std._tt_ft[tokTypeId].varMarginBips +*/initMarginBips <= 10000, "Bad total margin");
-
-        StructLib.initLedgerIfNew(ld, ledgerOwner);
-        ld._ledger[ledgerOwner].ft_initMarginBips[tokTypeId] = initMarginBips;
-        emit SetInitialMarginOverride(tokTypeId, ledgerOwner, initMarginBips);
+        if (overrideType == 1) initMarginOverride(ld, std, tokTypeId, ledgerOwner, uint16(value));
+        else if (overrideType == 2) feePerContractOverride(ld, std, tokTypeId, ledgerOwner, value);
     }
+        function initMarginOverride(
+            StructLib.LedgerStruct storage ld,
+            StructLib.StTypesStruct storage std,
+            uint256 tokTypeId, address ledgerOwner, uint16  initMarginBips
+        ) private {
+            require(tokTypeId >= 0 && tokTypeId <= std._tt_Count, "Bad tokTypeId");
+            require(std._tt_settle[tokTypeId] == StructLib.SettlementType.FUTURE, "Bad token settlement type");
+            require(/*std._tt_ft[tokTypeId].varMarginBips +*/initMarginBips <= 10000, "Bad total margin");
 
-    function feePerContractOverride(
-        StructLib.LedgerStruct storage ld,
-        StructLib.StTypesStruct storage std,
-        uint256 tokTypeId,
-        address ledgerOwner,
-        uint128 feePerContract
-    ) public {
-        require(tokTypeId >= 0 && tokTypeId <= std._tt_Count, "Bad tokTypeId");
-        require(std._tt_settle[tokTypeId] == StructLib.SettlementType.FUTURE, "Bad token settlement type");
+            StructLib.initLedgerIfNew(ld, ledgerOwner);
+            ld._ledger[ledgerOwner].ft_initMarginBips[tokTypeId] = initMarginBips;
+            emit SetInitialMarginOverride(tokTypeId, ledgerOwner, initMarginBips);
+        }
+        function feePerContractOverride(
+            StructLib.LedgerStruct storage ld,
+            StructLib.StTypesStruct storage std,
+            uint256 tokTypeId, address ledgerOwner, uint128 feePerContract
+        ) private {
+            require(tokTypeId >= 0 && tokTypeId <= std._tt_Count, "Bad tokTypeId");
+            require(std._tt_settle[tokTypeId] == StructLib.SettlementType.FUTURE, "Bad token settlement type");
 
-        StructLib.initLedgerIfNew(ld, ledgerOwner);
-        ld._ledger[ledgerOwner].ft_feePerContract[tokTypeId] = feePerContract;
-        emit SetFeePerContractOverride(tokTypeId, ledgerOwner, feePerContract);
-    }
+            StructLib.initLedgerIfNew(ld, ledgerOwner);
+            ld._ledger[ledgerOwner].ft_feePerContract[tokTypeId] = feePerContract;
+            emit SetFeePerContractOverride(tokTypeId, ledgerOwner, feePerContract);
+        }
 
     //
     // PUBLIC - open futures position

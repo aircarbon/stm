@@ -130,23 +130,33 @@ abstract // solc 0.6
 contract StFutures is Owned,
     StLedger, StFees, StErc20, StPayable {
 
-    // set initial margin - ledger override
-    function initMarginOverride(
-        uint256 tokTypeId,
-        address ledgerOwner,
-        uint16  initMarginBips)
+    //senum OverrideType { INIT_MARGIN, FEE_PER_CONTRACT }
+    function setLedgerOverride(uint256 overrideType, uint256 tokTypeId, address ledgerOwner, uint128 value)
     public onlyOwner() onlyWhenReadWrite() {
-        FuturesLib.initMarginOverride(ld, std, tokTypeId, ledgerOwner, initMarginBips);
+        FuturesLib.setLedgerOverride(overrideType, ld, std, tokTypeId, ledgerOwner, value);
+        // if (overrideType == OverrideType.INIT_MARGIN) {
+        //     FuturesLib.initMarginOverride(ld, std, tokTypeId, ledgerOwner, uint16(value));
+        // }
+        // else if (overrideType == OverrideType.FEE_PER_CONTRACT) {
+        //     FuturesLib.feePerContractOverride(ld, std, tokTypeId, ledgerOwner, value);
+        // }
     }
-
-    // set fee per contract - ledger override
-    function feePerContractOverride(
-        uint256 tokTypeId,
-        address ledgerOwner,
-        uint128 feePerContract)
-    public onlyOwner() onlyWhenReadWrite() {
-        FuturesLib.feePerContractOverride(ld, std, tokTypeId, ledgerOwner, feePerContract);
-    }
+    // // set initial margin - ledger override
+    // function initMarginOverride(
+    //     uint256 tokTypeId,
+    //     address ledgerOwner,
+    //     uint16  initMarginBips)
+    // public onlyOwner() onlyWhenReadWrite() {
+    //     FuturesLib.initMarginOverride(ld, std, tokTypeId, ledgerOwner, initMarginBips);
+    // }
+    // // set fee per contract - ledger override
+    // function feePerContractOverride(
+    //     uint256 tokTypeId,
+    //     address ledgerOwner,
+    //     uint128 feePerContract)
+    // public onlyOwner() onlyWhenReadWrite() {
+    //     FuturesLib.feePerContractOverride(ld, std, tokTypeId, ledgerOwner, feePerContract);
+    // }
 
     function openFtPos(StructLib.FuturesPositionArgs memory a)
     public onlyOwner() onlyWhenReadWrite() {

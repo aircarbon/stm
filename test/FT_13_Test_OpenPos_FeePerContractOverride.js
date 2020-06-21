@@ -62,8 +62,8 @@ contract("StMaster", accounts => {
         
         const FPC_A = new BN(100); // $1.00
         const FPC_B = new BN(200); // $2.00
-        await stm.feePerContractOverride(usdFT.id, A, FPC_A);
-        await stm.feePerContractOverride(usdFT.id, B, FPC_B);
+        await stm.setLedgerOverride(2, usdFT.id, A, FPC_A); //await stm.feePerContractOverride(usdFT.id, A, FPC_A);
+        await stm.setLedgerOverride(2, usdFT.id, B, FPC_B); //await stm.feePerContractOverride(usdFT.id, B, FPC_B);
 
         const POS_MARGIN = (((new BN(100) // total margin, bips - 1.00%
                               .mul(new BN(1000000))).div(new BN(10000))).mul(NOTIONAL)).div(new BN(1000000));
@@ -84,7 +84,7 @@ contract("StMaster", accounts => {
         const NOTIONAL = new BN(usdFT.ft.contractSize).mul(POS_QTY).mul(CONTRACT_PRICE);
         
         const FPC_A = new BN(100); // $1.00
-        await stm.feePerContractOverride(usdFT.id, A, FPC_A);
+        await stm.setLedgerOverride(2, usdFT.id, A, FPC_A); //await stm.feePerContractOverride(usdFT.id, A, FPC_A);
 
         const POS_MARGIN = (((new BN(100) // total margin, bips - 1.00%
                               .mul(new BN(1000000))).div(new BN(10000))).mul(NOTIONAL)).div(new BN(1000000));
@@ -104,7 +104,7 @@ contract("StMaster", accounts => {
         const NOTIONAL = new BN(usdFT.ft.contractSize).mul(POS_QTY).mul(CONTRACT_PRICE);
         
         const FPC_B = new BN(100); // $1.00
-        await stm.feePerContractOverride(usdFT.id, B, FPC_B);
+        await stm.setLedgerOverride(2, usdFT.id, B, FPC_B); //await stm.feePerContractOverride(usdFT.id, B, FPC_B);
 
         const POS_MARGIN = (((new BN(100) // total margin, bips - 1.00%
                               .mul(new BN(1000000))).div(new BN(10000))).mul(NOTIONAL)).div(new BN(1000000));
@@ -121,7 +121,7 @@ contract("StMaster", accounts => {
     it(`FT fee per contract override - should not allow non-owner to override fee per contract`, async () => {
         const A = accounts[global.TaddrNdx];
         try {
-            const x = await stm.feePerContractOverride(usdFT.id, A, 100, { from: accounts[1] });
+            const x = await stm.setLedgerOverride(2, usdFT.id, A, 100, { from: accounts[1] }); //await stm.feePerContractOverride(usdFT.id, A, 100, { from: accounts[1] });
         }
         catch (ex) { assert(ex.reason == 'Restricted', `unexpected: ${ex.reason}`); return; }
         assert.fail('expected contract exception');
@@ -130,7 +130,7 @@ contract("StMaster", accounts => {
         const A = accounts[global.TaddrNdx];
         try {
             await stm.setReadOnly(true, { from: accounts[0] });
-            const x = await stm.feePerContractOverride(usdFT.id, A, 100);
+            const x = await stm.setLedgerOverride(2, usdFT.id, A, 100); //await stm.feePerContractOverride(usdFT.id, A, 100);
             await stm.setReadOnly(false, { from: accounts[0] });
         }
         catch (ex) { 
@@ -144,7 +144,7 @@ contract("StMaster", accounts => {
     it(`FT fee per contract override - should not be able to override fee per contract for an invalid (non-existent) token type`, async () => {
         const A = accounts[global.TaddrNdx]; await stm.fund(CONST.ccyType.USD, 100, A);
         try {
-            const x = await stm.feePerContractOverride(0xdeaddead, A, 1001);
+            const x = await stm.setLedgerOverride(2, 0xdeaddead, A, 1001); //await stm.feePerContractOverride(0xdeaddead, A, 1001);
         }
         catch (ex) { assert(ex.reason == 'Bad tokTypeId', `unexpected: ${ex.reason}`); return; }
         assert.fail('expected contract exception');
@@ -152,7 +152,7 @@ contract("StMaster", accounts => {
     it(`FT fee per contract override - should not be able to override fee per contract for an invalid (non-future) token type`, async () => {
         const A = accounts[global.TaddrNdx]; await stm.fund(CONST.ccyType.USD, 100, A);
         try {
-            const x = await stm.feePerContractOverride(CONST.tokenType.TOK_T1, A, 1002);
+            const x = await stm.setLedgerOverride(2, CONST.tokenType.TOK_T1, A, 1002); //await stm.feePerContractOverride(CONST.tokenType.TOK_T1, A, 1002);
         }
         catch (ex) { assert(ex.reason == 'Bad token settlement type', `unexpected: ${ex.reason}`); return; }
         assert.fail('expected contract exception');

@@ -187,6 +187,7 @@ contract("StMaster", accounts => {
             qtySecTokens, 
             receiver, 
             CONST.nullFees, 0, [], [],
+            0, 
         { from: accounts[0] });
 
         // validate batch ID

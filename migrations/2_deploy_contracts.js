@@ -48,12 +48,12 @@ module.exports = async function (deployer) {
     switch (process.env.CONTRACT_TYPE) {
         case 'CASHFLOW_CONTROLLER': 
             // base CFT type 1 - deploy a base CFT contract (an "indirect type", to be added to the controller)
-            const addrBase1 = await deploymentHelper.Deploy({ deployer, artifacts, contractType: 'CASHFLOW', nameOverride: "SDax_Base1" });
-            process.env.CONTRACT_TYPE = 'CASHFLOW'; await setup.setDefaults({ nameOverride: "SDax_Base1" });
+            const addrBase1 = await deploymentHelper.Deploy({ deployer, artifacts, contractType: 'CASHFLOW_BASE', nameOverride: "SDax_Base1" });
+            process.env.CONTRACT_TYPE = 'CASHFLOW_BASE'; await setup.setDefaults({ nameOverride: "SDax_Base1" });
 
             // base CFT type 2 - deploy a second base CFT contract
-            const addrBase2 = await deploymentHelper.Deploy({ deployer, artifacts, contractType: 'CASHFLOW', nameOverride: "SDax_Base2" });
-            process.env.CONTRACT_TYPE = 'CASHFLOW'; await setup.setDefaults({ nameOverride: "SDax_Base2" });
+            const addrBase2 = await deploymentHelper.Deploy({ deployer, artifacts, contractType: 'CASHFLOW_BASE', nameOverride: "SDax_Base2" });
+            process.env.CONTRACT_TYPE = 'CASHFLOW_BASE'; await setup.setDefaults({ nameOverride: "SDax_Base2" });
              
             // deploy the wrapping CFT-C contract
             const addrController = await deploymentHelper.Deploy({ deployer, artifacts, contractType: 'CASHFLOW_CONTROLLER' });
@@ -67,9 +67,9 @@ module.exports = async function (deployer) {
             await CONST.web3_tx('addSecTokenType', [ 'CFT-Base2',  CONST.settlementType.SPOT, CONST.nullFutureArgs, addrBase2 ], O.addr, O.privKey);
             break;
 
-        case 'CASHFLOW':
+        case 'CASHFLOW_BASE':
             // deploy an unattached base CASHFLOW contract
-            await deploymentHelper.Deploy({ deployer, artifacts, contractType: 'CASHFLOW' });
+            await deploymentHelper.Deploy({ deployer, artifacts, contractType: 'CASHFLOW_BASE' });
             await setup.setDefaults();
             break;
 

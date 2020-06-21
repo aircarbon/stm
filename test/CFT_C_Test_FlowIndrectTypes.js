@@ -85,7 +85,10 @@ contract("StMaster", accounts => {
     // TODO: transferOrTrade()
 
     async function mintBatchWithMetadata({ tokenType, qtyUnit, qtySecTokens, receiver, metaKeys, metaValues }) {
-        const mintTx = await stm.mintSecTokenBatch(tokenType, qtyUnit, qtySecTokens, receiver, CONST.nullFees, 0, metaKeys, metaValues, { from: accounts[0] });
+        const mintTx = await stm.mintSecTokenBatch(
+            tokenType, qtyUnit, qtySecTokens, receiver, CONST.nullFees, 0, metaKeys, metaValues,
+            //0,
+        { from: accounts[0] });
         //truffleAssert.prettyPrintEmittedEvents(mintTx);
 
         const batchId = (await stm.getSecTokenBatchCount.call()).toNumber();

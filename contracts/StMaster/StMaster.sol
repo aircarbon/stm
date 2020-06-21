@@ -16,7 +16,6 @@ import "../Interfaces/StructLib.sol";
 
 /*
 JUN 2020
-TODO: "I found that event TradedCcyTok, is saving parameter tokTypeId . It should be tokTypeId to keep consistency on names."
 TODO: ... CFT refactor...
 */
 

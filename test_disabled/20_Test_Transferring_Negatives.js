@@ -27,7 +27,7 @@ contract("StMaster", accounts => {
         try {
             const A = accounts[888], B = accounts[global.TaddrNdx + 0];
             await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2, CONST.GT_CARBON, 1,      A, CONST.nullFees, 0, [], []);
-            await stm.fund(CONST.ccyType.USD,                   CONST.thousandCcy_cents, B,                          );
+            await stm.fund(CONST.ccyType.USD,                   CONST.thousandCcy_cents, B,                             );
             await transferHelper.transferWrapper(stm, accounts, A, B,
                 1, CONST.tokenType.TOK_T2, // qty_A, tokTypeId_A, 
                 0, 0,                      // qty_B, tokTypeId_B, 
@@ -43,7 +43,7 @@ contract("StMaster", accounts => {
     it(`transferring - should not allow transfer of tokens from non-whitelisted ledger entry (B)`, async () => {
         try {
             const A = accounts[global.TaddrNdx + 0], B = accounts[888];
-            await stm.fund(CONST.ccyType.USD,                   CONST.thousandCcy_cents, A,                          );
+            await stm.fund(CONST.ccyType.USD,                   CONST.thousandCcy_cents, A,                             );
             await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2, CONST.GT_CARBON, 1,      B, CONST.nullFees, 0, [], []);
             await transferHelper.transferWrapper(stm, accounts, A, B,
                 0, 0,                      // qty_A, tokTypeId_A, 
@@ -82,7 +82,7 @@ contract("StMaster", accounts => {
 
     it(`transferring - should not allow transfer of invalid (2^64) quantity of token units (A)`, async () => {
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2, CONST.GT_CARBON, 1,            accounts[global.TaddrNdx + 0], CONST.nullFees, 0, [], [], { from: accounts[0] });
-        await stm.fund(CONST.ccyType.USD,                   CONST.thousandCcy_cents,       accounts[global.TaddrNdx + 1],                            { from: accounts[0] });
+        await stm.fund(CONST.ccyType.USD,                   CONST.thousandCcy_cents,       accounts[global.TaddrNdx + 1],                               { from: accounts[0] });
         try {
             const qty_A = Big(2).pow(64);//.minus(1);
             await transferHelper.transferWrapper(stm, accounts, accounts[global.TaddrNdx + 0], accounts[global.TaddrNdx + 1], 
@@ -104,7 +104,7 @@ contract("StMaster", accounts => {
     });
 
     it(`transferring - should not allow transfer of invalid (2^64) quantity of token units (B)`, async () => {
-        await stm.fund(CONST.ccyType.USD,                   CONST.thousandCcy_cents,       accounts[global.TaddrNdx + 0],                            { from: accounts[0] });
+        await stm.fund(CONST.ccyType.USD,                   CONST.thousandCcy_cents,       accounts[global.TaddrNdx + 0],                               { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2, CONST.GT_CARBON, 1,            accounts[global.TaddrNdx + 1], CONST.nullFees, 0, [], [], { from: accounts[0] });
         try {
             const qty_A = Big(2).pow(64);//.minus(1);
@@ -127,9 +127,9 @@ contract("StMaster", accounts => {
     });
 
     it(`transferring - should not allow single-origin multiple-asset transfers (1)`, async () => {
-        await stm.fund(CONST.ccyType.USD,                   CONST.thousandCcy_cents,       accounts[global.TaddrNdx + 0],                            { from: accounts[0] });
+        await stm.fund(CONST.ccyType.USD,                   CONST.thousandCcy_cents,       accounts[global.TaddrNdx + 0],                               { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2, CONST.GT_CARBON, 1,            accounts[global.TaddrNdx + 0], CONST.nullFees, 0, [], [], { from: accounts[0] });
-        await stm.fund(CONST.ccyType.USD,                   CONST.thousandCcy_cents,       accounts[global.TaddrNdx + 1],                            { from: accounts[0] });
+        await stm.fund(CONST.ccyType.USD,                   CONST.thousandCcy_cents,       accounts[global.TaddrNdx + 1],                               { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2, CONST.GT_CARBON, 1,            accounts[global.TaddrNdx + 1], CONST.nullFees, 0, [], [], { from: accounts[0] });
         try {
             await transferHelper.transferWrapper(stm, accounts, accounts[global.TaddrNdx + 0], accounts[global.TaddrNdx + 1], 
@@ -151,9 +151,9 @@ contract("StMaster", accounts => {
     });
 
     it(`transferring - should not allow single-origin multiple-asset transfers (2)`, async () => {
-        await stm.fund(CONST.ccyType.USD,                   CONST.thousandCcy_cents,       accounts[global.TaddrNdx + 0],                            { from: accounts[0] });
+        await stm.fund(CONST.ccyType.USD,                   CONST.thousandCcy_cents,       accounts[global.TaddrNdx + 0],                               { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2, CONST.GT_CARBON, 1,            accounts[global.TaddrNdx + 0], CONST.nullFees, 0, [], [], { from: accounts[0] });
-        await stm.fund(CONST.ccyType.USD,                   CONST.thousandCcy_cents,       accounts[global.TaddrNdx + 1],                            { from: accounts[0] });
+        await stm.fund(CONST.ccyType.USD,                   CONST.thousandCcy_cents,       accounts[global.TaddrNdx + 1],                               { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2, CONST.GT_CARBON, 1,            accounts[global.TaddrNdx + 1], CONST.nullFees, 0, [], [], { from: accounts[0] });
         try {
             await transferHelper.transferWrapper(stm, accounts, accounts[global.TaddrNdx + 0], accounts[global.TaddrNdx + 1], 
@@ -175,9 +175,9 @@ contract("StMaster", accounts => {
     });
 
     it(`transferring - should not allow single-origin multiple-asset transfers (3)`, async () => {
-        await stm.fund(CONST.ccyType.USD,                   CONST.thousandCcy_cents,       accounts[global.TaddrNdx + 0],                            { from: accounts[0] });
+        await stm.fund(CONST.ccyType.USD,                   CONST.thousandCcy_cents,       accounts[global.TaddrNdx + 0],                               { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2, CONST.GT_CARBON, 1,            accounts[global.TaddrNdx + 0], CONST.nullFees, 0, [], [], { from: accounts[0] });
-        await stm.fund(CONST.ccyType.USD,                   CONST.thousandCcy_cents,       accounts[global.TaddrNdx + 1],                            { from: accounts[0] });
+        await stm.fund(CONST.ccyType.USD,                   CONST.thousandCcy_cents,       accounts[global.TaddrNdx + 1],                               { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2, CONST.GT_CARBON, 1,            accounts[global.TaddrNdx + 1], CONST.nullFees, 0, [], [], { from: accounts[0] });
         try {
             await transferHelper.transferWrapper(stm, accounts, accounts[global.TaddrNdx + 0], accounts[global.TaddrNdx + 1], 

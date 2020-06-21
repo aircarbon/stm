@@ -124,7 +124,7 @@ library StructLib {
     struct SecTokenBatch { // ** DATA_DUMP: OK
         uint64     id;                                          // global sequential id: 1-based
         uint256    mintedTimestamp;                             // minting block.timestamp
-        uint256    tokTypeId;                                 // token type of the batch
+        uint256    tokTypeId;                                   // token type of the batch
         uint256    mintedQty;                                   // total unit qty minted in the batch
         uint256    burnedQty;                                   // total unit qty burned from the batch
         string[]   metaKeys;                                    // metadata keys

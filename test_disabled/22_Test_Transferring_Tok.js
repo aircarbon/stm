@@ -26,7 +26,7 @@ contract("StMaster", accounts => {
     // one-sided kg transfer, no consideration, 1 full ST
     it(`transferring tok - should allow one-sided transfer (A -> B) of 1.0 vST (NATURE) across ledger entries`, async () => {
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2, CONST.GT_CARBON, 1,      accounts[global.TaddrNdx + 0], CONST.nullFees, 0, [], [], { from: accounts[0] });
-        await stm.fund(CONST.ccyType.USD,                   CONST.thousandCcy_cents, accounts[global.TaddrNdx + 1],                            { from: accounts[0] });
+        await stm.fund(CONST.ccyType.USD,                   CONST.thousandCcy_cents, accounts[global.TaddrNdx + 1],                               { from: accounts[0] });
         
         const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: accounts[global.TaddrNdx + 0],         ledger_B: accounts[global.TaddrNdx + 1],
@@ -43,7 +43,7 @@ contract("StMaster", accounts => {
     });
 
     it(`transferring tok - should allow one-sided transfer (B -> A) of 1.0 vST (CORSIA) across ledger entries`, async () => {
-        await stm.fund(CONST.ccyType.USD,                   CONST.thousandCcy_cents, accounts[global.TaddrNdx + 0],                            { from: accounts[0] });
+        await stm.fund(CONST.ccyType.USD,                   CONST.thousandCcy_cents, accounts[global.TaddrNdx + 0],                               { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T1, CONST.GT_CARBON, 1,      accounts[global.TaddrNdx + 1], CONST.nullFees, 0, [], [], { from: accounts[0] });
         
         const data = await transferHelper.transferLedger({ stm, accounts, 
@@ -63,7 +63,7 @@ contract("StMaster", accounts => {
     // one-sided kg transfer, no consideration, 0.5 ST (split)
     it(`transferring tok - should allow one-sided transfer (A -> B) of 0.5 vST (NATURE) across ledger entries`, async () => {
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2, CONST.GT_CARBON, 1,      accounts[global.TaddrNdx + 0], CONST.nullFees, 0, [], [], { from: accounts[0] });
-        await stm.fund(CONST.ccyType.USD,                   CONST.thousandCcy_cents, accounts[global.TaddrNdx + 1],                            { from: accounts[0] });
+        await stm.fund(CONST.ccyType.USD,                   CONST.thousandCcy_cents, accounts[global.TaddrNdx + 1],                               { from: accounts[0] });
         
         const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: accounts[global.TaddrNdx + 0],         ledger_B: accounts[global.TaddrNdx + 1],
@@ -81,7 +81,7 @@ contract("StMaster", accounts => {
     });
 
     it(`transferring tok - should allow one-sided transfer (B -> A) of 0.5 vST (NATURE) across ledger entries`, async () => {
-        await stm.fund(CONST.ccyType.USD,                   CONST.thousandCcy_cents, accounts[global.TaddrNdx + 0],                            { from: accounts[0] });
+        await stm.fund(CONST.ccyType.USD,                   CONST.thousandCcy_cents, accounts[global.TaddrNdx + 0],                               { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2, CONST.GT_CARBON, 1,      accounts[global.TaddrNdx + 1], CONST.nullFees, 0, [], [], { from: accounts[0] });
         
         const data = await transferHelper.transferLedger({ stm, accounts, 
@@ -237,7 +237,7 @@ contract("StMaster", accounts => {
     // one-sided kg transfer, no consideration, partial ST (split), receiver owns same type, same batch (merge)
     it(`transferring tok - should allow one-sided transfer (A -> B) of 0.5 + 0.25 vSTs (NATURE) across ledger entries, receiver owns same type, same batch`, async () => {
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2,    CONST.KT_CARBON, 1,      accounts[global.TaddrNdx + 0], CONST.nullFees, 0, [], [], { from: accounts[0] });
-        await stm.fund(CONST.ccyType.USD,                      0,                       accounts[global.TaddrNdx + 1],                            { from: accounts[0] });
+        await stm.fund(CONST.ccyType.USD,                      0,                       accounts[global.TaddrNdx + 1],                               { from: accounts[0] });
         
         // setup: transfer 0.5, from batch 1 
         await transferHelper.transferLedger({ stm, accounts, 
