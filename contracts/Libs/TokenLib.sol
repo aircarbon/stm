@@ -27,17 +27,20 @@ library TokenLib {
     event SetBatchOriginatorFee_Token(uint256 indexed batchId, StructLib.SetFeeArgs originatorFee);
     event SetBatchOriginatorFee_Currency(uint256 indexed batchId, uint16 origCcyFee_percBips_ExFee);
 
-    event dbg1(uint256 id, uint256 typeNo);
+    //event dbg1(uint256 id, uint256 typeId);
+    //event dbg2(uint256 postIdShifted);
 
+    //
     // TOKEN TYPES
+    //
     function addSecTokenType(
-        StructLib.LedgerStruct storage ld,
-        StructLib.StTypesStruct storage std,
-        StructLib.CcyTypesStruct storage ctd,
-        string memory name,
-        StructLib.SettlementType settlementType,
+        StructLib.LedgerStruct storage       ld,
+        StructLib.StTypesStruct storage      std,
+        StructLib.CcyTypesStruct storage     ctd,
+        string memory                        name,
+        StructLib.SettlementType             settlementType,
         StructLib.FutureTokenTypeArgs memory ft,
-        address payable cashflowBaseAddr
+        address payable                      cashflowBaseAddr
     )
     public {
         // * allow any number of of direct spot or future types on commodity contract
@@ -71,6 +74,7 @@ library TokenLib {
         }
 
         std._tt_Count++;
+        require(std._tt_Count <= 0xFFFFFFFFFFFFFFFF, "Too many types"); // max 2^64
 
         if (cashflowBaseAddr != address(0x0)) {
             // add base, indirect type (to cashflow controller)
@@ -83,17 +87,13 @@ library TokenLib {
             std._tt_settle[std._tt_Count] = settlementType;
             std._tt_addr[std._tt_Count] = cashflowBaseAddr;
 
-            // TODO: set proper values...
             // set/segment base's curMaxId...
-            uint256 xid = (
-                    ((0x3) << 192) // segment - first 64 bits: type no (3) [ max type no: 0xFFFFFFFFFFFFFFFF ]
-                    | 4            // remainder - sub-ID [ max subid: 2**192 ]
-                );
-            // TEST: deconstruct from segmented ID
-            uint256 typeNo = xid >> 192;
+            uint256 id = (std._tt_Count << 192)
+                //| ((1 << 192) - 1) // test: token id overflow
+                | 0 // segment - first 64 bits: type ID (max 0xFFFFFFFFFFFFFFFF), remaining 192 bits: local/segmented sub-id
+            ;
             StMaster base = StMaster(cashflowBaseAddr);
-            base.setTokenTotals(xid, 0, 0);
-            emit dbg1(xid, typeNo);
+            base.setTokenTotals(id, 0, 0);
         }
         else {
             // add direct type (to commodity or cashflow base)
@@ -154,7 +154,9 @@ library TokenLib {
         return ret;
     }
 
+    //
     // MINTING
+    //
     struct MintSecTokenBatchArgs {
         uint256              tokTypeId;
         uint256              mintQty; // accept 256 bits, so we can downcast and test if in 64-bit range
@@ -183,9 +185,17 @@ library TokenLib {
         require(a.origTokFee.ccy_mirrorFee == false, "ccy_mirrorFee unsupported for token-type fee");
         require(a.origCcyFee_percBips_ExFee <= 10000, "Bad fee args");
 
+        // cashflow base: enforce uni-batch
         if (ld.contractType == StructLib.ContractType.CASHFLOW_BASE) {
-            require(ld._batches_currentMax_id == 0, "Bad cashflow request"); // cashflow base: uni-batch
-            // TODO: cashflow base: only allow mint from controller (tx.origin == ...)
+            require(ld._batches_currentMax_id == 0, "Bad cashflow request");
+            // todo: cashflow base - only allow mint from controller...
+        }
+
+        // check for token id overflow
+        if (ld.contractType != StructLib.ContractType.CASHFLOW_CONTROLLER) {
+            uint256 l_id = ld._tokens_currentMax_id & ((1 << 192) - 1); // strip leading 64-bits (controller's type ID)
+            //emit dbg2(l_id + uint256(a.mintSecTokenCount));
+            require(l_id + uint256(a.mintSecTokenCount) <= 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF, "Too many tokens"); // max 192-bits
         }
 
         // ### string[] param lengths are reported as zero!
@@ -219,7 +229,7 @@ library TokenLib {
         StructLib.initLedgerIfNew(ld, a.batchOwner);
 
         // mint & assign STs (delegate to cashflow base in cashflow controller)
-        if (ld.contractType == StructLib.ContractType.CASHFLOW_CONTROLLER) { // cashflow controller: passthrough to base
+        if (ld.contractType == StructLib.ContractType.CASHFLOW_CONTROLLER) { // controller: delegate to base
             //require(std._tt_addr[a.tokTypeId] != address(0x0), "Bad cashflow request");
             StMaster base = StMaster(std._tt_addr[a.tokTypeId]);
             base.mintSecTokenBatch(
@@ -235,13 +245,6 @@ library TokenLib {
             );
         }
         else {
-            // if (ld.contractType == StructLib.ContractType.CASHFLOW_BASE) { // synchronise/serialize base types' ST IDs (i.e. non-sequential IDs in base...)
-            //     ld._tokens_currentMax_id = a.cftc_maxStId; //...?
-            // }
-            // TODO: better -- ctor should accept a defualt starting value for _tokens_currentMax_id;
-            //       base types get segmented starting values e.g. 2^^128 * {typeCount} [i.e. effective STID range shrinks form 2^256 to 2^128]
-            // (allows for faster lookup by ID into correct base insstance, in controller [desegment, then lookup])
-
             for (int256 ndx = 0; ndx < a.mintSecTokenCount; ndx++) {
                 uint256 newId = ld._tokens_currentMax_id + 1 + uint256(ndx);
                 int64 stQty = int64(a.mintQty) / int64(a.mintSecTokenCount);
@@ -254,10 +257,46 @@ library TokenLib {
             }
         }
 
-        // update totals and current/max STID (CFT-C: common/max values across all types, CFT-B: local/specific values for single type)
-        ld._tokens_currentMax_id += uint256(a.mintSecTokenCount);
+        // update totals and current/max STID (controller: common/max values across all types, CFT-B: local/specific values for single type)
+        ld._tokens_currentMax_id += uint256(a.mintSecTokenCount); // controller: minted COUNT (not an ID!), base/commodity: true max. LOCAL ID
         ld._spot_totalMintedQty += uint256(a.mintQty);
         ld._ledger[a.batchOwner].spot_sumQtyMinted += uint256(a.mintQty);
+    }
+
+    function getSecToken(
+        StructLib.LedgerStruct storage  ld,
+        StructLib.StTypesStruct storage std,
+        uint256                         stId
+    )
+    public view returns (StructLib.SecTokenReturn memory) {
+        if (ld.contractType == StructLib.ContractType.CASHFLOW_CONTROLLER) { // controller: delegate to base
+            uint256 tokTypeId = stId >> 192;
+            StMaster base = StMaster(std._tt_addr[tokTypeId]);
+            StructLib.SecTokenReturn memory ret = base.getSecToken(stId);
+
+            for (uint64 batchId = 1; batchId <= ld._batches_currentMax_id; batchId++) { // map from base unibatch id (1) to controller batch id (by token type id)
+                if (ld._batches[batchId].tokTypeId == tokTypeId) {
+                    ret.batchId = batchId;
+                    break;
+                }
+            }
+
+            //ret.tokTypeId = !!!
+            return ret;
+        }
+        else {
+            return StructLib.SecTokenReturn({
+                    exists: ld._sts[stId].mintedQty != 0,
+                        id: stId,
+                 mintedQty: ld._sts[stId].mintedQty,
+                currentQty: ld._sts[stId].currentQty,
+                   batchId: ld._sts[stId].batchId,
+                  ft_price: ld._sts[stId].ft_price,
+            ft_ledgerOwner: ld._sts[stId].ft_ledgerOwner,
+          ft_lastMarkPrice: ld._sts[stId].ft_lastMarkPrice,
+                     ft_PL: ld._sts[stId].ft_PL
+            });
+        }
     }
 
     // POST-MINTING: add KVP metadata

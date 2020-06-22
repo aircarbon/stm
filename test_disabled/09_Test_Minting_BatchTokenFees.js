@@ -27,7 +27,7 @@ contract("StMaster", accounts => {
         const M = accounts[global.TaddrNdx];
         const origFee = { ccy_mirrorFee: false, ccy_perMillion: 0, fee_fixed: 1, fee_percBips: 10, fee_min: 1, fee_max: 10 }
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T1, CONST.KT_CARBON, 1, M, origFee, 0, [], [], { from: accounts[0] });
-        const batchId = await stm.getSecTokenBatchCount.call();
+        const batchId = await stm.getSecTokenBatch_MaxId.call();
         const batch = await stm.getSecTokenBatch(batchId);
         assert(batch.originator == M, 'unexpected originator on minted batch');
         assert(batch.origTokFee.fee_fixed    == origFee.fee_fixed,     'unexpected originator fee_fixed on minted batch');
@@ -51,7 +51,7 @@ contract("StMaster", accounts => {
         const M = accounts[global.TaddrNdx];
         const origFee1 = { ccy_mirrorFee: false, ccy_perMillion: 0, fee_fixed: 100, fee_percBips: 10, fee_min: 10, fee_max: 0 }
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2, CONST.KT_CARBON, 1, M, origFee1, 0, [], [], { from: accounts[0] });
-        const batchId = await stm.getSecTokenBatchCount.call();
+        const batchId = await stm.getSecTokenBatch_MaxId.call();
 
         var origFee2 = { ccy_mirrorFee: false, ccy_perMillion: 0, fee_fixed: 100, fee_percBips: 10, fee_min: 9, fee_max: 0 }
         await stm.setOriginatorFeeTokenBatch(batchId, origFee2, { from: accounts[0] });
@@ -61,7 +61,7 @@ contract("StMaster", accounts => {
         const M = accounts[global.TaddrNdx];
         const origFee1 = { ccy_mirrorFee: false, ccy_perMillion: 0, fee_fixed: 10, fee_percBips: 10, fee_min: 10, fee_max: 10 }
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2, CONST.KT_CARBON, 1, M, origFee1, 0, [], [], { from: accounts[0] });
-        const batchId = await stm.getSecTokenBatchCount.call();
+        const batchId = await stm.getSecTokenBatch_MaxId.call();
         var origFee2;
 
         origFee2 = { ccy_mirrorFee: false, ccy_perMillion: 0, fee_fixed: 9, fee_percBips: 9, fee_min: 9, fee_max: 9 }; // set all fields down
@@ -93,7 +93,7 @@ contract("StMaster", accounts => {
         const M = accounts[global.TaddrNdx];
         const origFee1 = { ccy_mirrorFee: false, ccy_perMillion: 0, fee_fixed: 1, fee_percBips: 10, fee_min: 1, fee_max: 10 }
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2, CONST.KT_CARBON, 1, M, origFee1, 0, [], [], { from: accounts[0] });
-        const batchId = await stm.getSecTokenBatchCount.call();
+        const batchId = await stm.getSecTokenBatch_MaxId.call();
         var origFee2;
 
         origFee2 = { ccy_mirrorFee: false, ccy_perMillion: 0, fee_fixed: 2, fee_percBips: 10, fee_min: 1, fee_max: 10 };
@@ -117,7 +117,7 @@ contract("StMaster", accounts => {
         const M = accounts[global.TaddrNdx];
         const origFee1 = { ccy_mirrorFee: false, ccy_perMillion: 0, fee_fixed: 1, fee_percBips: 10, fee_min: 1, fee_max: 10 };
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2, CONST.KT_CARBON, 1, M, origFee1, 0, [], [], { from: accounts[0] });
-        const batchId = await stm.getSecTokenBatchCount.call();
+        const batchId = await stm.getSecTokenBatch_MaxId.call();
         
         const origFee2 = { ccy_mirrorFee: false, ccy_perMillion: 0, fee_fixed: 0, fee_percBips: 10, fee_min: 1, fee_max: 10 };
         try {
@@ -143,7 +143,7 @@ contract("StMaster", accounts => {
 
         origFee = { ccy_mirrorFee: false, ccy_perMillion: 0, fee_fixed: 1, fee_percBips: 10, fee_min: 10, fee_max: 0 }; // no cap
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2, CONST.KT_CARBON, 1, M, origFee, 0, [], [], { from: accounts[0] });
-        const batchId = await stm.getSecTokenBatchCount.call();
+        const batchId = await stm.getSecTokenBatch_MaxId.call();
         origFee = { ccy_mirrorFee: false, ccy_perMillion: 0, fee_fixed: 1, fee_percBips: 10, fee_min: 9, fee_max: 0 }; // edit down - no cap
         await stm.setOriginatorFeeTokenBatch(batchId, origFee,                                            { from: accounts[0] });
         
@@ -167,7 +167,7 @@ contract("StMaster", accounts => {
         var origFee;
         origFee = { ccy_mirrorFee: false, ccy_perMillion: 0, fee_fixed: 1, fee_percBips: 10, fee_min: 10, fee_max: 0 };
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2, CONST.KT_CARBON, 1, M, origFee, 0, [], [],  { from: accounts[0] });
-        const batchId = await stm.getSecTokenBatchCount.call();
+        const batchId = await stm.getSecTokenBatch_MaxId.call();
         
         try {
             origFee = { ccy_mirrorFee: false, ccy_perMillion: 0, fee_fixed: 1, fee_percBips: 10001, fee_min: 10, fee_max: 0 }; // bad basis points

@@ -249,7 +249,7 @@ contract("StMaster", accounts => {
     async function mintBatchWithMetadata({ tokenType, qtyUnit, qtySecTokens, receiver, metaKeys, metaValues }) {
         const mintTx = await stm.mintSecTokenBatch(tokenType, qtyUnit, qtySecTokens, receiver, CONST.nullFees, 0, metaKeys, metaValues, { from: accounts[0] });
 
-        const batchId = (await stm.getSecTokenBatchCount.call()).toNumber();
+        const batchId = (await stm.getSecTokenBatch_MaxId.call()).toNumber();
         const batch = await stm.getSecTokenBatch(batchId);
         
         const batchKeys = batch.metaKeys;

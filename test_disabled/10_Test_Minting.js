@@ -180,7 +180,7 @@ contract("StMaster", accounts => {
         const ledgerOwnersBefore = await stm.getLedgerOwners();
 
         // mint new vST match
-        const maxBatchIdBefore = (await stm.getSecTokenBatchCount.call()).toNumber();
+        const maxBatchIdBefore = (await stm.getSecTokenBatch_MaxId.call()).toNumber();
         const mintTx = await stm.mintSecTokenBatch(
             tokenType, 
             qtyUnit, 
@@ -191,7 +191,7 @@ contract("StMaster", accounts => {
         { from: accounts[0] });
 
         // validate batch ID
-        const maxBatchIdAfter = (await stm.getSecTokenBatchCount.call()).toNumber();
+        const maxBatchIdAfter = (await stm.getSecTokenBatch_MaxId.call()).toNumber();
         assert(maxBatchIdAfter == maxBatchIdBefore + 1, 'unexpected batch id after minting');
 
         // validate batch minted event
@@ -209,7 +209,7 @@ contract("StMaster", accounts => {
         assert(batch.tokTypeId == tokenType, 'invalid batch eeu-type');
 
         // validate vST(s) minted events
-        const curMaxSecTokenId = (await stm.getSecToken_countMinted.call()).toNumber();
+        const curMaxSecTokenId = (await stm.getSecToken_MaxId.call()).toNumber();
         for (var eeuCount = 1; eeuCount < 1 + qtySecTokens; eeuCount++) {
             truffleAssert.eventEmitted(mintTx, 'MintedSecToken', ev => {
                 //console.log(`event: MintedSecToken ev.id=${ev.id} curMaxSecTokenId=${curMaxSecTokenId} ev.mintedQty=${ev.mintedQty}`);

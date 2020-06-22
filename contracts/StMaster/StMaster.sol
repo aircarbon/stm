@@ -110,7 +110,8 @@ contract StMaster
     event Combine(address indexed to, uint256 masterStId, uint256 countTokensCombined);
 
     // DBG
-    event dbg1(uint256 id, uint256 typeNo);
+    //event dbg1(uint256 id, uint256 typeId);
+    //event dbg2(uint256 postIdShifted);
 
     constructor(
         StructLib.ContractType        _contractType,

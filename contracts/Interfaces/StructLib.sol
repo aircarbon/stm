@@ -189,7 +189,10 @@ library StructLib {
         int128  ft_lastMarkPrice;                               // [FUTURE types only]
         int128  ft_PL;                                          // [FUTURE types only] -- running total P&L
     }
-        struct SecTokenReturn { // todo: drop this - use LedgerSecTokenReturn (would need tokTypeId to be packed in PackedSt struct...)
+
+        // TODO: drop this - use LedgerSecTokenReturn (would need tokTypeId to be packed in PackedSt struct...)
+        //   (also want TokTypeId on new getSecToken()...)
+        struct SecTokenReturn {
             bool    exists;                                     // for existence check by id
             uint256 id;                                         // global sequential id: 1-based
             int256  mintedQty;
@@ -296,11 +299,11 @@ library StructLib {
 
         uint256 qty_A;           // ST quantity moving from A (excluding fees, if any)
         uint256[] k_stIds_A;     // if len>0: the constant/specified ST IDs to transfer (must correlate with qty_A, if supplied)
-        uint256 tokTypeId_A;   // ST type moving from A
+        uint256 tokTypeId_A;     // ST type moving from A
 
         uint256 qty_B;           // ST quantity moving from B (excluding fees, if any)
         uint256[] k_stIds_B;     // if len>0: the constant/specified ST IDs to transfer (must correlate with qty_B, if supplied)
-        uint256 tokTypeId_B;   // ST type moving from B
+        uint256 tokTypeId_B;     // ST type moving from B
 
         int256  ccy_amount_A;    // currency amount moving from A (excluding fees, if any)
                                  // (signed value: ledger supports -ve balances)

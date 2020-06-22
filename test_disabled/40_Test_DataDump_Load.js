@@ -150,7 +150,7 @@ contract("StMaster", accounts => {
                 );
                 curHash = await checkHashUpdate(curHash);
             }
-            const batchId = (await stm_cur.getSecTokenBatchCount.call()).toNumber();
+            const batchId = (await stm_cur.getSecTokenBatch_MaxId.call()).toNumber();
             
             // add batch metadata
             const addBatchKvpTx = await stm_cur.addMetaSecTokenBatch(batchId, "NEW_KEY", "NEW_VALUE");
@@ -206,7 +206,7 @@ contract("StMaster", accounts => {
 
         }
 
-        const batchCount = await stm_cur.getSecTokenBatchCount.call();
+        const batchCount = await stm_cur.getSecTokenBatch_MaxId.call();
         for (let i=1 ; i <= batchCount; i++) { // read all
             const x = await stm_cur.getSecTokenBatch(i);
             console.log(`Batch Data: id=${i} mintedQty=${x.mintedQty} burnedQty=${x.burnedQty} metaKeys=${x.metaKeys.join()} metaValues=${x.metaValues.join()} { x.fee_fixed=${x.origTokFee.fee_fixed} / x.fee_percBips=${x.origTokFee.fee_percBips} / x.fee_min=${x.origTokFee.fee_min} / x.fee_max=${x.origTokFee.fee_max} }`);
@@ -300,8 +300,8 @@ contract("StMaster", accounts => {
                 //         price: j+1
                 // });
                 curHash = await checkHashUpdate(curHash);
-                const longStId = Number(await stm_cur.getSecToken_countMinted()) - 0;
-                const shortStId = Number(await stm_cur.getSecToken_countMinted()) - 1;
+                const longStId = Number(await stm_cur.getSecToken_MaxId()) - 0;
+                const shortStId = Number(await stm_cur.getSecToken_MaxId()) - 1;
 
                 // FT - run one settlement cycle
                 await stm_cur.takePay2(FT.id, shortStId, j+2/*markPrice*/, 1/*feePerSide*/);
@@ -351,7 +351,7 @@ contract("StMaster", accounts => {
         });
 
         // load batches
-        const curBatchCount = await stm_cur.getSecTokenBatchCount();
+        const curBatchCount = await stm_cur.getSecTokenBatch_MaxId();
         const curBatches = [];
         for (let batchId=1; batchId <= curBatchCount; batchId++) curBatches.push(await stm_cur.getSecTokenBatch(batchId));
         for (let p of _.chunk(curBatches, 2)) { // ** tune chunk size
@@ -406,7 +406,7 @@ contract("StMaster", accounts => {
         // }
 
         // set token totals
-        const curSecTokenMintedCount = await stm_cur.getSecToken_countMinted();
+        const curSecTokenMintedCount = await stm_cur.getSecToken_MaxId();
         const curSecTokenBurnedQty = await stm_cur.getSecToken_totalBurnedQty();
         const curSecTokenMintedQty = await stm_cur.getSecToken_totalMintedQty();
         await stm_new.setTokenTotals(

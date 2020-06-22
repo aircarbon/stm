@@ -188,7 +188,7 @@ async function processTestContext(ft, T) { //, test_shortPosIds) {
                 tokTypeId: ft.ftId, ledger_A: p.account, ledger_B: shortAccount, qty_A: ft_long.q, qty_B: ft_long.q * -1, price: ft_long.p
             }], O.addr, O.privKey);
             //console.log('ev... shortStId:', evs.find(p => p.event == 'FutureOpenInterest').returnValues.shortStId); // ## stack too deep for shortStId
-            const shortStId = Number(await CONST.web3_call('getSecToken_countMinted', [])) - 1;
+            const shortStId = Number(await CONST.web3_call('getSecToken_MaxId', [])) - 1;
             //console.log('new test pos: ', shortStId);
             //test_shortPosIds.push(shortStId);
         }

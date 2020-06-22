@@ -38,7 +38,7 @@ describe(`Contract Web3 Interface`, async () => {
         //const accounts = await web3.eth.getAccounts();
         //console.log(accounts);
 
-        const batchCount = await CONST.web3_call('getSecTokenBatchCount', []);
+        const batchCount = await CONST.web3_call('getSecTokenBatch_MaxId', []);
         console.log('batchCount', batchCount);
         if (batchCount.eq(1)) {
             // get minted batch

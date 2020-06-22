@@ -61,11 +61,6 @@ origCcyFee_percBips_ExFee: origCcyFee_percBips_ExFee,
         TokenLib.setOriginatorFeeCurrencyBatch(ld, batchId, origCcyFee_percBips_ExFee);
     }
 
-    function getSecToken_countMinted()
-    external view returns (uint256) {
-        return ld._tokens_currentMax_id; // 1-based
-    }
-
     // 24k
     function getSecToken_totalMintedQty()
     external view returns (uint256) { return ld._spot_totalMintedQty; }
