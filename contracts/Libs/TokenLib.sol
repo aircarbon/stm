@@ -27,6 +27,8 @@ library TokenLib {
     event SetBatchOriginatorFee_Token(uint256 indexed batchId, StructLib.SetFeeArgs originatorFee);
     event SetBatchOriginatorFee_Currency(uint256 indexed batchId, uint16 origCcyFee_percBips_ExFee);
 
+    event dbg1(uint256 id, uint256 typeNo);
+
     // TOKEN TYPES
     function addSecTokenType(
         StructLib.LedgerStruct storage ld,
@@ -38,7 +40,6 @@ library TokenLib {
         address payable cashflowBaseAddr
     )
     public {
-
         // * allow any number of of direct spot or future types on commodity contract
         // * allow only a single direct spot type on cashflow-base contract
         // * allow any number of cashflow-base (indirect) spot types on cashflow-controller contract
@@ -72,7 +73,7 @@ library TokenLib {
         std._tt_Count++;
 
         if (cashflowBaseAddr != address(0x0)) {
-            // add cashflow (base, indirect) contract type to cashflow-controller contract
+            // add base, indirect type (to cashflow controller)
             //StMaster base = StMaster(cashflowBaseAddr);
             //string memory s0 = base.name;
             //strings.slice memory s = "asd".toSlice();
@@ -81,9 +82,21 @@ library TokenLib {
             std._tt_name[std._tt_Count] = name; // https://ethereum.stackexchange.com/questions/3727/contract-reading-a-string-returned-by-another-contract
             std._tt_settle[std._tt_Count] = settlementType;
             std._tt_addr[std._tt_Count] = cashflowBaseAddr;
+
+            // TODO: set proper values...
+            // set/segment base's curMaxId...
+            uint256 xid = (
+                    ((0x3) << 192) // segment - first 64 bits: type no (3) [ max type no: 0xFFFFFFFFFFFFFFFF ]
+                    | 4            // remainder - sub-ID [ max subid: 2**192 ]
+                );
+            // TEST: deconstruct from segmented ID
+            uint256 typeNo = xid >> 192;
+            StMaster base = StMaster(cashflowBaseAddr);
+            base.setTokenTotals(xid, 0, 0);
+            emit dbg1(xid, typeNo);
         }
         else {
-            // add direct type to
+            // add direct type (to commodity or cashflow base)
             std._tt_name[std._tt_Count] = name;
             std._tt_settle[std._tt_Count] = settlementType;
             std._tt_addr[std._tt_Count] = cashflowBaseAddr;

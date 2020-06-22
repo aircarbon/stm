@@ -47,24 +47,26 @@ module.exports = async function (deployer) {
 
     switch (process.env.CONTRACT_TYPE) {
         case 'CASHFLOW_CONTROLLER': 
-            // base CFT type 1 - deploy a base CFT contract (an "indirect type", to be added to the controller)
-            const addrBase1 = await deploymentHelper.Deploy({ deployer, artifacts, contractType: 'CASHFLOW_BASE', nameOverride: "SDax_Base1" });
-            process.env.CONTRACT_TYPE = 'CASHFLOW_BASE'; await setup.setDefaults({ nameOverride: "SDax_Base1" });
-
-            // base CFT type 2 - deploy a second base CFT contract
-            const addrBase2 = await deploymentHelper.Deploy({ deployer, artifacts, contractType: 'CASHFLOW_BASE', nameOverride: "SDax_Base2" });
-            process.env.CONTRACT_TYPE = 'CASHFLOW_BASE'; await setup.setDefaults({ nameOverride: "SDax_Base2" });
-             
             // deploy the wrapping CFT-C contract
             const addrController = await deploymentHelper.Deploy({ deployer, artifacts, contractType: 'CASHFLOW_CONTROLLER' });
             process.env.CONTRACT_TYPE = 'CASHFLOW_CONTROLLER'; await setup.setDefaults();
  
-            // link the base types into the CFT-C (add indirect types)
+            // deploy two indirect/base CFT contracts
+            const addrBase1 = await deploymentHelper.Deploy({ deployer, artifacts, contractType: 'CASHFLOW_BASE', nameOverride: "SDax_Base1" });
+            const addrBase2 = await deploymentHelper.Deploy({ deployer, artifacts, contractType: 'CASHFLOW_BASE', nameOverride: "SDax_Base2" });
+             
+            // link base types into the CFT-C (add indirect types)
             console.log(chalk.inverse('addrBase1'), addrBase1);
             console.log(chalk.inverse('addrBase2'), addrBase2);
             console.log(chalk.inverse('addrController'), addrController);
-            await CONST.web3_tx('addSecTokenType', [ 'CFT-Base1',  CONST.settlementType.SPOT, CONST.nullFutureArgs, addrBase1 ], O.addr, O.privKey);
-            await CONST.web3_tx('addSecTokenType', [ 'CFT-Base2',  CONST.settlementType.SPOT, CONST.nullFutureArgs, addrBase2 ], O.addr, O.privKey);
+            const { evs: evsBase1 } = await CONST.web3_tx('addSecTokenType', [ 'CFT-Base1',  CONST.settlementType.SPOT, CONST.nullFutureArgs, addrBase1 ], O.addr, O.privKey);
+            console.log('evsBase1', evsBase1.find(p => p.event == 'dbg1').returnValues);
+            const { evs: evsBase2 } = await CONST.web3_tx('addSecTokenType', [ 'CFT-Base2',  CONST.settlementType.SPOT, CONST.nullFutureArgs, addrBase2 ], O.addr, O.privKey);
+            console.log('evsBase2', evsBase2.find(p => p.event == 'dbg1').returnValues);
+
+            // set & seal base types
+            process.env.CONTRACT_TYPE = 'CASHFLOW_BASE'; await setup.setDefaults({ nameOverride: "SDax_Base1" });
+            process.env.CONTRACT_TYPE = 'CASHFLOW_BASE'; await setup.setDefaults({ nameOverride: "SDax_Base2" });
             break;
 
         case 'CASHFLOW_BASE':

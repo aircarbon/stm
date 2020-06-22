@@ -109,6 +109,9 @@ contract StMaster
     event TakePay2(address indexed from, address indexed to, uint256 ccyId, uint256 delta, uint256 done, uint256 fee);
     event Combine(address indexed to, uint256 masterStId, uint256 countTokensCombined);
 
+    // DBG
+    event dbg1(uint256 id, uint256 typeNo);
+
     constructor(
         StructLib.ContractType        _contractType,
         StructLib.CashflowArgs memory _cashflowArgs,
