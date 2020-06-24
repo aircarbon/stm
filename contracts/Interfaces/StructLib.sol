@@ -189,7 +189,6 @@ library StructLib {
         int128  ft_lastMarkPrice;                               // [FUTURE types only]
         int128  ft_PL;                                          // [FUTURE types only] -- running total P&L
     }
-
         // TODO: drop this - use LedgerSecTokenReturn (would need tokTypeId to be packed in PackedSt struct...)
         //   (also want TokTypeId on new getSecToken()...)
         struct SecTokenReturn {
