@@ -78,9 +78,10 @@ library LedgerLib {
 
                     // STs by type
                     v.tokens[flatSecTokenNdx] = StructLib.LedgerSecTokenReturn({
+                             exists: ld._sts[stId].mintedQty != 0,
                                stId: stId,
                           tokTypeId: tokTypeId,
-                      tokenTypeName: std._tt_name[tokTypeId],
+                      tokTypeName: std._tt_name[tokTypeId],
                             batchId: ld._sts[stId].batchId,
                           mintedQty: ld._sts[stId].mintedQty,
                          currentQty: ld._sts[stId].currentQty,

@@ -268,29 +268,39 @@ library TokenLib {
         StructLib.StTypesStruct storage std,
         uint256                         stId
     )
-    public view returns (StructLib.SecTokenReturn memory) {
+    public view returns (
+        StructLib.LedgerSecTokenReturn memory
+    ) {
         if (ld.contractType == StructLib.ContractType.CASHFLOW_CONTROLLER) { // controller: delegate to base
             uint256 tokTypeId = stId >> 192;
             StMaster base = StMaster(std._tt_addr[tokTypeId]);
-            StructLib.SecTokenReturn memory ret = base.getSecToken(stId);
+            StructLib.LedgerSecTokenReturn memory ret = base.getSecToken(stId);
 
-            for (uint64 batchId = 1; batchId <= ld._batches_currentMax_id; batchId++) { // map from base unibatch id (1) to controller batch id (by token type id)
+            // remap base return field: tokTypeId
+            //  (from base unitype id (1) to controller type id)
+            ret.tokTypeId = tokTypeId;
+
+            // remap base return field: batchId
+            // (from base unibatch id (1) to controller batch id;
+            //  ASSUMES: only one batch per type in the controller (uni-batch/uni-mint model))
+            for (uint64 batchId = 1; batchId <= ld._batches_currentMax_id; batchId++) {
                 if (ld._batches[batchId].tokTypeId == tokTypeId) {
                     ret.batchId = batchId;
                     break;
                 }
             }
 
-            //ret.tokTypeId = !!!
             return ret;
         }
         else {
-            return StructLib.SecTokenReturn({
+            return StructLib.LedgerSecTokenReturn({
                     exists: ld._sts[stId].mintedQty != 0,
-                        id: stId,
+                      stId: stId,
+                 tokTypeId: ld._batches[ld._sts[stId].batchId].tokTypeId,
+               tokTypeName: std._tt_name[ld._batches[ld._sts[stId].batchId].tokTypeId],
+                   batchId: ld._sts[stId].batchId,
                  mintedQty: ld._sts[stId].mintedQty,
                 currentQty: ld._sts[stId].currentQty,
-                   batchId: ld._sts[stId].batchId,
                   ft_price: ld._sts[stId].ft_price,
             ft_ledgerOwner: ld._sts[stId].ft_ledgerOwner,
           ft_lastMarkPrice: ld._sts[stId].ft_lastMarkPrice,

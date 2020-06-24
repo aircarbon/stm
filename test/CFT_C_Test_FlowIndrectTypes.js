@@ -82,12 +82,13 @@ contract("StMaster", accounts => {
     });
 
     // query ledger
-    it(`cashflow controller - should be able to delegate-fetch a single token with mapped batch ID from base (type 2)`, async () => {
+    it(`cashflow controller - should be able to delegate-fetch a single token with mapped batch ID & mapped token rtype ID from base (type 2)`, async () => {
         //const maxId = await stm.getSecToken_MaxId(); // (## token IDs in controller are fragmented, i.e. getSecToken_MaxId is a COUNT in the controller, not a MAX id)
         const maxId = new BN('12554203470773361527671578846415332832204710888928069025793'); // 0x0000000000000002000000000000000000000000000000000000000000000001
-        console.log('maxId', maxId.toString(16, 64));
+        //console.log('maxId', maxId.toString(16, 64));
         const st = await stm.getSecToken(maxId);
         console.log('st', st);
+        assert(st.tokTypeId == 2, 'unexpected (unmapped?) tok-type id on token from controller');
         assert(st.batchId == 2, 'unexpected (unmapped?) batch id on token from controller');
     });
 
