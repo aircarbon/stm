@@ -32,6 +32,7 @@ contract StPayable is
     //                  (b) so addSecTokType() for CFT-C needs to take the address of a deployed CFT contract...
     //
     //          (2) CASHFLOW_CONTROLLER: is entry point for the split ledger - all clients talk only to it
+    //                  > getSecToken: DONE (passthrough to bases)
     //                  > getLedgerEntry: return (a) n ccy's from CFT-C ... UNION ... (b) n tok's from n CFT's
     //                  > transferOrTrade: update 1 ccy in CFT-C ... update 1 tok in CFT
     //

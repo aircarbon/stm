@@ -166,7 +166,6 @@ library TokenLib {
         uint16               origCcyFee_percBips_ExFee;
         string[]             metaKeys;
         string[]             metaValues;
-        //uint256              cftc_maxStId; // for cashflow base: pass controller's current `ld._tokens_currentMax_id` (sync's ST IDs across base types)
     }
     function mintSecTokenBatch(
         StructLib.LedgerStruct storage  ld,
@@ -193,7 +192,7 @@ library TokenLib {
 
         // check for token id overflow
         if (ld.contractType != StructLib.ContractType.CASHFLOW_CONTROLLER) {
-            uint256 l_id = ld._tokens_currentMax_id & ((1 << 192) - 1); // strip leading 64-bits (controller's type ID)
+            uint256 l_id = ld._tokens_currentMax_id & ((1 << 192) - 1); // get a "loacal id" (count); strip leading 64-bits (controller's type ID)
             //emit dbg2(l_id + uint256(a.mintSecTokenCount));
             require(l_id + uint256(a.mintSecTokenCount) <= 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF, "Too many tokens"); // max 192-bits
         }
@@ -221,7 +220,9 @@ library TokenLib {
         });
         ld._batches[newBatch.id] = newBatch;
         ld._batches_currentMax_id++;
-        if (ld.contractType != StructLib.ContractType.CASHFLOW_BASE) { // emit batch event (core & cashflow controller)
+
+        // emit batch create event (core & controller - not base; its batch and tok-type IDs are local)
+        if (ld.contractType != StructLib.ContractType.CASHFLOW_BASE) {
             emit Minted(newBatch.id, a.tokTypeId, a.batchOwner, uint256(a.mintQty), uint256(a.mintSecTokenCount));
         }
 
@@ -241,8 +242,14 @@ library TokenLib {
                 a.origCcyFee_percBips_ExFee,
                 a.metaKeys,
                 a.metaValues
-                //,ld._tokens_currentMax_id // base - accept controller's current max stId, so bases have unique/sync'd stIds...
             );
+
+            // emit token minted event(s) (controller - not base; its batch and tok-type IDs are local)
+            for (int256 ndx = 0; ndx < a.mintSecTokenCount; ndx++) {
+                uint256 newId = base.getSecToken_MaxId() + 1 + uint256(ndx);
+                int64 stQty = int64(a.mintQty) / int64(a.mintSecTokenCount);
+                emit MintedSecToken(newId, newBatch.id, a.tokTypeId, a.batchOwner, uint256(stQty));
+            }
         }
         else {
             for (int256 ndx = 0; ndx < a.mintSecTokenCount; ndx++) {
@@ -252,7 +259,11 @@ library TokenLib {
                 ld._sts[newId].mintedQty = stQty;
                 ld._sts[newId].currentQty = stQty; // mint ST
 
-                emit MintedSecToken(newId, newBatch.id, a.tokTypeId, a.batchOwner, uint256(stQty));
+                // emit token minted event(s) (core)
+                if (ld.contractType == StructLib.ContractType.COMMODITY) {
+                    emit MintedSecToken(newId, newBatch.id, a.tokTypeId, a.batchOwner, uint256(stQty));
+                }
+
                 ld._ledger[a.batchOwner].tokenType_stIds[a.tokTypeId].push(newId); // assign ST to ledger
             }
         }

@@ -43,10 +43,10 @@ contract("StMaster", accounts => {
     });
     it(`cashflow controller - allow an initial unibatch mint on an indirect passed-through cashflow base (type 1)`, async () => {
         const M = accounts[0];
-        const { batchId, mintTx1 } = await mintBatchWithMetadata( 
+        const { batchId, mintTx } = await mintBatchWithMetadata( 
             { tokenType: CONST.tokenType.TOK_T1, qtyUnit: 1000, qtySecTokens: 1, receiver: M, metaKeys: [ 'key1', 'key2' ],  metaValues: [ 'val1', 'val2' ],
         }, );
-        // //truffleAssert.prettyPrintEmittedEvents(mintTx1);
+        truffleAssert.prettyPrintEmittedEvents(mintTx);
 
         // //const maxId = await stm.getSecToken_MaxId(); // ### this is a COUNT for the controller, not a max id
         // const maxId = new BN('6277101735386680763835789423207666416102355444464034512897'); // 0x0000000000000001000000000000000000000000000000000000000000000001
@@ -79,6 +79,8 @@ contract("StMaster", accounts => {
             { tokenType: CONST.tokenType.TOK_T2, qtyUnit: 2000, qtySecTokens: 1, receiver: M, metaKeys: [ 'key5', 'key6' ], metaValues: [ 'val5', 'val6' ],
         }, );
         truffleAssert.prettyPrintEmittedEvents(mintTx);
+        // truffleAssert.eventEmitted(mintTx, 'MintedSecToken', ev => {
+        // });
     });
 
     // query ledger
@@ -87,7 +89,7 @@ contract("StMaster", accounts => {
         const maxId = new BN('12554203470773361527671578846415332832204710888928069025793'); // 0x0000000000000002000000000000000000000000000000000000000000000001
         //console.log('maxId', maxId.toString(16, 64));
         const st = await stm.getSecToken(maxId);
-        console.log('st', st);
+        //console.log('st', st);
         assert(st.tokTypeId == 2, 'unexpected (unmapped?) tok-type id on token from controller');
         assert(st.batchId == 2, 'unexpected (unmapped?) batch id on token from controller');
     });

@@ -22,7 +22,6 @@ contract StMintable is
         uint16                      origCcyFee_percBips_ExFee,
         string[] memory             metaKeys,
         string[] memory             metaValues
-        //,uint256                     cftc_maxStId
     )
     public onlyOwner() onlyWhenReadWrite() {
         TokenLib.MintSecTokenBatchArgs memory args = TokenLib.MintSecTokenBatchArgs({
@@ -34,7 +33,6 @@ contract StMintable is
 origCcyFee_percBips_ExFee: origCcyFee_percBips_ExFee,
                  metaKeys: metaKeys,
                metaValues: metaValues
-               //,cftc_maxStId: cftc_maxStId
         });
         TokenLib.mintSecTokenBatch(ld, std, args);
     }
