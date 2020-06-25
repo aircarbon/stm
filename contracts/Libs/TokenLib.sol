@@ -233,6 +233,15 @@ library TokenLib {
         if (ld.contractType == StructLib.ContractType.CASHFLOW_CONTROLLER) { // controller: delegate to base
             //require(std._tt_addr[a.tokTypeId] != address(0x0), "Bad cashflow request");
             StMaster base = StMaster(std._tt_addr[a.tokTypeId]);
+
+            // emit (preempt) token minted event(s) (controller - not base; its batch and tok-type IDs are local)
+            for (int256 ndx = 0; ndx < a.mintSecTokenCount; ndx++) {
+                uint256 newId = base.getSecToken_MaxId() + 1 + uint256(ndx);
+                int64 stQty = int64(a.mintQty) / int64(a.mintSecTokenCount);
+                emit MintedSecToken(newId, newBatch.id, a.tokTypeId, a.batchOwner, uint256(stQty));
+            }
+
+            // mint - passthrough to base
             base.mintSecTokenBatch(
                 1/*tokTypeId*/, // base: UNI_TOKEN (controller does type ID mapping for clients)
                 a.mintQty,
@@ -243,13 +252,6 @@ library TokenLib {
                 a.metaKeys,
                 a.metaValues
             );
-
-            // emit token minted event(s) (controller - not base; its batch and tok-type IDs are local)
-            for (int256 ndx = 0; ndx < a.mintSecTokenCount; ndx++) {
-                uint256 newId = base.getSecToken_MaxId() + 1 + uint256(ndx);
-                int64 stQty = int64(a.mintQty) / int64(a.mintSecTokenCount);
-                emit MintedSecToken(newId, newBatch.id, a.tokTypeId, a.batchOwner, uint256(stQty));
-            }
         }
         else {
             for (int256 ndx = 0; ndx < a.mintSecTokenCount; ndx++) {
@@ -287,9 +289,10 @@ library TokenLib {
             StMaster base = StMaster(std._tt_addr[tokTypeId]);
             StructLib.LedgerSecTokenReturn memory ret = base.getSecToken(stId);
 
-            // remap base return field: tokTypeId
-            //  (from base unitype id (1) to controller type id)
+            // remap base return field: tokTypeId & tokTypeName
+            //  (from base unitype to controller type)
             ret.tokTypeId = tokTypeId;
+            ret.tokTypeName = std._tt_name[tokTypeId];
 
             // remap base return field: batchId
             // (from base unibatch id (1) to controller batch id;

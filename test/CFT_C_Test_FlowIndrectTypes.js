@@ -47,52 +47,51 @@ contract("StMaster", accounts => {
             { tokenType: CONST.tokenType.TOK_T1, qtyUnit: 1000, qtySecTokens: 1, receiver: M, metaKeys: [ 'key1', 'key2' ],  metaValues: [ 'val1', 'val2' ],
         }, );
         truffleAssert.prettyPrintEmittedEvents(mintTx);
+        truffleAssert.eventEmitted(mintTx, 'Minted', ev => ev.batchId == 1 && ev.tokTypeId == CONST.tokenType.TOK_T1 && ev.mintQty == 1000);
+        truffleAssert.eventEmitted(mintTx, 'MintedSecToken', ev => { 
+            //console.log('ev.stId', ev.stId);
+            console.log('ev.stId', ev.stId.toString(16,64));
+            return ev.stId.eq(new BN('6277101735386680763835789423207666416102355444464034512897')) // 0x0000000000000001000000000000000000000000000000000000000000000001
+              //&& ev.tokTypeId == CONST.tokenType.TOK_T1 && ev.mintedQty == 1000
+            }
+        );
 
-        // //const maxId = await stm.getSecToken_MaxId(); // ### this is a COUNT for the controller, not a max id
-        // const maxId = new BN('6277101735386680763835789423207666416102355444464034512897'); // 0x0000000000000001000000000000000000000000000000000000000000000001
-        // //console.log('maxId', maxId.toString(16, 64));
-        // const st = await stm.getSecToken(maxId);
-        // console.log('st', st);
-
-        // // truffleAssert.prettyPrintEmittedEvents(mintTx);
-        // // truffleAssert.eventEmitted(mintTx, 'dbg2', ev => {
-        // //     const bn = new BN(ev.postIdShifted);
-        // //     console.log(chalk.bgBlue.white(`dbg2 - postIdShifted: / 0x${bn.toString(16, 64)}`));
-        // //     console.log('bn16', bn.toString(16, 64));
-        // //     console.log('bn02', bn.toString(2));
-        // //     return true;
-        // // });
-    });
-    it(`cashflow controller - should not allow a subsequent batch mint for the same indirect base (type 1)`, async () => {
-        const M = accounts[0];
-        try {
-            const { batchId, mintTx } = await mintBatchWithMetadata( 
-                { tokenType: CONST.tokenType.TOK_T1, qtyUnit: 100, qtySecTokens: 1, receiver: M,
-                   metaKeys: [ 'key3', 'key4' ],
-                 metaValues: [ 'val4', 'val4' ],
-            }, { from: accounts[0] } );
-        } catch (ex) { assert(ex.reason == 'Bad cashflow request', `unexpected: ${ex.reason}`); return; }
-    });
-    it(`cashflow controller - should allow an initial unibatch mint on a different indirect passed-through cashflow base (type 2)`, async () => {
-        const M = accounts[0];
-        const { batchId, mintTx } = await mintBatchWithMetadata( 
-            { tokenType: CONST.tokenType.TOK_T2, qtyUnit: 2000, qtySecTokens: 1, receiver: M, metaKeys: [ 'key5', 'key6' ], metaValues: [ 'val5', 'val6' ],
-        }, );
-        truffleAssert.prettyPrintEmittedEvents(mintTx);
-        // truffleAssert.eventEmitted(mintTx, 'MintedSecToken', ev => {
-        // });
-    });
-
-    // query ledger
-    it(`cashflow controller - should be able to delegate-fetch a single token with mapped batch ID & mapped token rtype ID from base (type 2)`, async () => {
-        //const maxId = await stm.getSecToken_MaxId(); // (## token IDs in controller are fragmented, i.e. getSecToken_MaxId is a COUNT in the controller, not a MAX id)
-        const maxId = new BN('12554203470773361527671578846415332832204710888928069025793'); // 0x0000000000000002000000000000000000000000000000000000000000000001
+        //const maxId = await stm.getSecToken_MaxId(); // ### this is a COUNT for the controller, not a max id
         //console.log('maxId', maxId.toString(16, 64));
+        const maxId = new BN('6277101735386680763835789423207666416102355444464034512897'); // 0x0000000000000001000000000000000000000000000000000000000000000001
         const st = await stm.getSecToken(maxId);
-        //console.log('st', st);
-        assert(st.tokTypeId == 2, 'unexpected (unmapped?) tok-type id on token from controller');
-        assert(st.batchId == 2, 'unexpected (unmapped?) batch id on token from controller');
+        console.log('st', st);
     });
+    // it(`cashflow controller - should not allow a subsequent batch mint for the same indirect base (type 1)`, async () => {
+    //     const M = accounts[0];
+    //     try {
+    //         const { batchId, mintTx } = await mintBatchWithMetadata( 
+    //             { tokenType: CONST.tokenType.TOK_T1, qtyUnit: 100, qtySecTokens: 1, receiver: M,
+    //                metaKeys: [ 'key3', 'key4' ],
+    //              metaValues: [ 'val4', 'val4' ],
+    //         }, { from: accounts[0] } );
+    //     } catch (ex) { assert(ex.reason == 'Bad cashflow request', `unexpected: ${ex.reason}`); return; }
+    // });
+    // it(`cashflow controller - should allow an initial unibatch mint on a different indirect passed-through cashflow base (type 2)`, async () => {
+    //     const M = accounts[0];
+    //     const { batchId, mintTx } = await mintBatchWithMetadata( 
+    //         { tokenType: CONST.tokenType.TOK_T2, qtyUnit: 2000, qtySecTokens: 1, receiver: M, metaKeys: [ 'key5', 'key6' ], metaValues: [ 'val5', 'val6' ],
+    //     }, );
+    //     truffleAssert.prettyPrintEmittedEvents(mintTx);
+    //     // truffleAssert.eventEmitted(mintTx, 'MintedSecToken', ev => {
+    //     // });
+    // });
+
+    // // query ledger
+    // it(`cashflow controller - should be able to delegate-fetch a single token with mapped batch ID & mapped token rtype ID from base (type 2)`, async () => {
+    //     //const maxId = await stm.getSecToken_MaxId(); // (## token IDs in controller are fragmented, i.e. getSecToken_MaxId is a COUNT in the controller, not a MAX id)
+    //     const maxId = new BN('12554203470773361527671578846415332832204710888928069025793'); // 0x0000000000000002000000000000000000000000000000000000000000000001
+    //     //console.log('maxId', maxId.toString(16, 64));
+    //     const st = await stm.getSecToken(maxId);
+    //     //console.log('st', st);
+    //     assert(st.tokTypeId == 2, 'unexpected (unmapped?) tok-type id on token from controller');
+    //     assert(st.batchId == 2, 'unexpected (unmapped?) batch id on token from controller');
+    // });
 
     // it(`cashflow controller - should be able to get a split ledger entry across all indirect token types`, async () => {
     //     const le_cftc = await stm.getLedgerEntry(accounts[0]); // TODO: split/delegate getLedgerEntry() ...
