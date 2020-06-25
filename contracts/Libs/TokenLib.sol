@@ -276,6 +276,9 @@ library TokenLib {
         ld._ledger[a.batchOwner].spot_sumQtyMinted += uint256(a.mintQty);
     }
 
+    //
+    // GET TOKEN
+    //
     function getSecToken(
         StructLib.LedgerStruct storage  ld,
         StructLib.StTypesStruct storage std,

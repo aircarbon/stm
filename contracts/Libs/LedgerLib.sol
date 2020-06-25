@@ -9,9 +9,6 @@ import "../StMaster/StMaster.sol";
 
 library LedgerLib {
 
-    //event dbg1_queriedBaseLedger(address baseAddr, address account, uint baseTokensCount);
-    //event dbg2_foundBaseToken(address baseAddr, address account, uint tokTypeId, uint curControllerTokenCount);
-
     //
     // PUBLIC - GET LEDGER ENTRY
     //
@@ -39,21 +36,15 @@ library LedgerLib {
         // count total # of tokens (i.e. token count distinct by batch,type) across all types
         uint256 countAllSecTokens = 0;
         StructLib.LedgerReturn[] memory baseLedgers;
-        if (ld.contractType == StructLib.ContractType.CASHFLOW_CONTROLLER) { // CFT-C: save base ledger return structures
+        if (ld.contractType == StructLib.ContractType.CASHFLOW_CONTROLLER) { // controller: save/resuse base types' ledgers
             baseLedgers = new StructLib.LedgerReturn[](std._tt_Count);
         }
         for (uint256 tokTypeId = 1; tokTypeId <= std._tt_Count; tokTypeId++) {
-            if (ld.contractType == StructLib.ContractType.CASHFLOW_CONTROLLER) { // CFT-C: passthrough to base
+            if (ld.contractType == StructLib.ContractType.CASHFLOW_CONTROLLER) { // controller: passthrough to base type
                 StMaster base = StMaster(std._tt_addr[tokTypeId]);
-                //StructLib.LedgerReturn memory baseLedger = base.getLedgerEntry(account);
-                baseLedgers[tokTypeId - 1] = base.getLedgerEntry(account); // get base ledger
-                //emit dbg1_queriedBaseLedger(std._tt_addr[tokTypeId], account, baseLedgers[tokTypeId - 1].tokens.length);
-
+                baseLedgers[tokTypeId - 1] = base.getLedgerEntry(account);
                 for (uint256 i = 0; i < baseLedgers[tokTypeId - 1].tokens.length; i++) {
-                    if (baseLedgers[tokTypeId - 1].tokens[i].tokTypeId == tokTypeId) {
-                        countAllSecTokens++;
-                        //emit dbg2_foundBaseToken(std._tt_addr[tokTypeId], account, tokTypeId, countAllSecTokens);
-                    }
+                    countAllSecTokens++;
                 }
             }
             else {
@@ -62,10 +53,10 @@ library LedgerLib {
         }
         v.tokens = new StructLib.LedgerSecTokenReturn[](countAllSecTokens);
 
-        // core - flatten STs (and sum total spot size)
+        // core & base: flatten STs (and sum total spot size)
+        uint256 flatSecTokenNdx = 0;
         if (ld.contractType != StructLib.ContractType.CASHFLOW_CONTROLLER) {
-            uint256 flatSecTokenNdx = 0;
-            for (uint256 tokTypeId = 1; tokTypeId <= std._tt_Count; tokTypeId++) {
+            for (uint256 tokTypeId = 1; tokTypeId <= std._tt_Count; tokTypeId++) { // get ST IDs & data from local storage
                 uint256[] memory tokenType_stIds = ld._ledger[account].tokenType_stIds[tokTypeId];
 
                 for (uint256 ndx = 0; ndx < tokenType_stIds.length; ndx++) {
@@ -81,7 +72,7 @@ library LedgerLib {
                              exists: ld._sts[stId].mintedQty != 0,
                                stId: stId,
                           tokTypeId: tokTypeId,
-                      tokTypeName: std._tt_name[tokTypeId],
+                        tokTypeName: std._tt_name[tokTypeId],
                             batchId: ld._sts[stId].batchId,
                           mintedQty: ld._sts[stId].mintedQty,
                          currentQty: ld._sts[stId].currentQty,
@@ -94,13 +85,45 @@ library LedgerLib {
                 }
             }
         }
-        // controller - get STs from base ledger types (and sum total spot sizes across all types)
-        // // TODO...
-        // else {
-        //    ;
-        // }
+        // controller: get STs from base ledger types (and sum total spot sizes across all types)
+        else {
+            for (uint256 tokTypeId = 1; tokTypeId <= std._tt_Count; tokTypeId++) { // get ST IDs & data from base types' storage
+                StructLib.LedgerReturn memory baseLedger = baseLedgers[tokTypeId - 1];
+                for (uint256 i = 0; i < baseLedger.tokens.length; i++) {
+                    uint256 stId = baseLedger.tokens[i].stId;
 
-        // core - populate balances for each currency type
+                    if (std._tt_settle[tokTypeId] == StructLib.SettlementType.SPOT) {
+                        v.spot_sumQty += uint256(baseLedger.tokens[i].currentQty);
+                    }
+
+                    v.tokens[flatSecTokenNdx] = StructLib.LedgerSecTokenReturn({
+                             exists: baseLedger.tokens[i].exists,
+                               stId: stId,                                  // controller/base value (common)
+                          tokTypeId: tokTypeId,                             // controller value
+                        tokTypeName: std._tt_name[tokTypeId],               // controller value
+                            batchId: 0,                                     // controller value lookup below
+                          mintedQty: baseLedger.tokens[i].mintedQty,        // base type value
+                         currentQty: baseLedger.tokens[i].currentQty,       // "
+                           ft_price: baseLedger.tokens[i].ft_price,         // "
+                     ft_ledgerOwner: baseLedger.tokens[i].ft_ledgerOwner,   // "
+                   ft_lastMarkPrice: baseLedger.tokens[i].ft_lastMarkPrice, // "
+                              ft_PL: baseLedger.tokens[i].ft_PL             // "
+                    });
+
+                    // map/lookup return field: batchId - ASSUMES: only one batch per type in the controller (uni-batch/uni-mint model)
+                    for (uint64 batchId = 1; batchId <= ld._batches_currentMax_id; batchId++) {
+                        if (ld._batches[batchId].tokTypeId == tokTypeId) {
+                            v.tokens[flatSecTokenNdx].batchId = batchId;
+                            break;
+                        }
+                    }
+
+                    flatSecTokenNdx++;
+                }
+            }
+        }
+
+        // common: populate balances for each currency type
         v.ccys = new StructLib.LedgerCcyReturn[](ctd._ct_Count);
         for (uint256 ccyTypeId = 1; ccyTypeId <= ctd._ct_Count; ccyTypeId++) {
             v.ccys[ccyTypeId - 1] = StructLib.LedgerCcyReturn({
@@ -118,9 +141,7 @@ library LedgerLib {
         spot_sumQty: v.spot_sumQty,
                ccys: v.ccys,
   spot_sumQtyMinted: ld._ledger[account].spot_sumQtyMinted,
-  spot_sumQtyBurned: ld._ledger[account].spot_sumQtyBurned,
-               dbg1: countAllSecTokens,
-               dbg2: std._tt_Count
+  spot_sumQtyBurned: ld._ledger[account].spot_sumQtyBurned
         });
         return ret;
     }
