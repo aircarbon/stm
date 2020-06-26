@@ -187,7 +187,7 @@ contract("StMaster", accounts => {
             qtySecTokens, 
             receiver, 
             CONST.nullFees, 0, [], [],
-            0, 
+            //0, 
         { from: accounts[0] });
 
         // validate batch ID
@@ -241,7 +241,7 @@ contract("StMaster", accounts => {
             const eeu = await stm.getSecToken(stId);
             assert(eeu.exists == true, 'missing vST after minting');
             assert(eeu.batchId == batchId, 'unexpected vST batch after minting');
-            assert(eeu.mintedTimestamp != 0, 'missing mint timestamp on vST after minting');
+            //assert(eeu.mintedTimestamp != 0, 'missing mint timestamp on vST after minting');
             assert(eeu.mintedQty == qtyUnit / qtySecTokens, 'unexpected vST minted TONS value after minting');
             assert(eeu.currentQty == qtyUnit / qtySecTokens, 'unexpected vST remaining (unburned) TONS value after minting');
         }

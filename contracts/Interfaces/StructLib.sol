@@ -156,13 +156,12 @@ library StructLib {
         LedgerCcyReturn[]      ccys;                            // currency balances
         uint256                spot_sumQtyMinted;               // [SPOT types only]
         uint256                spot_sumQtyBurned;               // [SPOT types only]
-        uint256                dbg1;
-        uint256                dbg2;
     }
         struct LedgerSecTokenReturn {
+            bool    exists;
             uint256 stId;
             uint256 tokTypeId;
-            string  tokenTypeName;
+            string  tokTypeName;
             uint64  batchId;
             int64   mintedQty;
             int64   currentQty;
@@ -189,19 +188,6 @@ library StructLib {
         int128  ft_lastMarkPrice;                               // [FUTURE types only]
         int128  ft_PL;                                          // [FUTURE types only] -- running total P&L
     }
-        // TODO: drop this - use LedgerSecTokenReturn (would need tokTypeId to be packed in PackedSt struct...)
-        //   (also want TokTypeId on new getSecToken()...)
-        struct SecTokenReturn {
-            bool    exists;                                     // for existence check by id
-            uint256 id;                                         // global sequential id: 1-based
-            int256  mintedQty;
-            int256  currentQty;
-            uint64  batchId;
-            int128  ft_price;
-            address ft_ledgerOwner;
-            int128  ft_lastMarkPrice;
-            int128  ft_PL;
-        }
     // struct PackedStTotals {
     //     uint80 transferedQty;
     //     uint80 exchangeFeesPaidQty;

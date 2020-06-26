@@ -166,7 +166,6 @@ library TokenLib {
         uint16               origCcyFee_percBips_ExFee;
         string[]             metaKeys;
         string[]             metaValues;
-        //uint256              cftc_maxStId; // for cashflow base: pass controller's current `ld._tokens_currentMax_id` (sync's ST IDs across base types)
     }
     function mintSecTokenBatch(
         StructLib.LedgerStruct storage  ld,
@@ -193,7 +192,7 @@ library TokenLib {
 
         // check for token id overflow
         if (ld.contractType != StructLib.ContractType.CASHFLOW_CONTROLLER) {
-            uint256 l_id = ld._tokens_currentMax_id & ((1 << 192) - 1); // strip leading 64-bits (controller's type ID)
+            uint256 l_id = ld._tokens_currentMax_id & ((1 << 192) - 1); // get a "loacal id" (count); strip leading 64-bits (controller's type ID)
             //emit dbg2(l_id + uint256(a.mintSecTokenCount));
             require(l_id + uint256(a.mintSecTokenCount) <= 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF, "Too many tokens"); // max 192-bits
         }
@@ -221,7 +220,9 @@ library TokenLib {
         });
         ld._batches[newBatch.id] = newBatch;
         ld._batches_currentMax_id++;
-        if (ld.contractType != StructLib.ContractType.CASHFLOW_BASE) { // emit batch event (core & cashflow controller)
+
+        // emit batch create event (core & controller - not base; its batch and tok-type IDs are local)
+        if (ld.contractType != StructLib.ContractType.CASHFLOW_BASE) {
             emit Minted(newBatch.id, a.tokTypeId, a.batchOwner, uint256(a.mintQty), uint256(a.mintSecTokenCount));
         }
 
@@ -232,6 +233,15 @@ library TokenLib {
         if (ld.contractType == StructLib.ContractType.CASHFLOW_CONTROLLER) { // controller: delegate to base
             //require(std._tt_addr[a.tokTypeId] != address(0x0), "Bad cashflow request");
             StMaster base = StMaster(std._tt_addr[a.tokTypeId]);
+
+            // emit (preempt) token minted event(s) (controller - not base; its batch and tok-type IDs are local)
+            for (int256 ndx = 0; ndx < a.mintSecTokenCount; ndx++) {
+                uint256 newId = base.getSecToken_MaxId() + 1 + uint256(ndx);
+                int64 stQty = int64(a.mintQty) / int64(a.mintSecTokenCount);
+                emit MintedSecToken(newId, newBatch.id, a.tokTypeId, a.batchOwner, uint256(stQty));
+            }
+
+            // mint - passthrough to base
             base.mintSecTokenBatch(
                 1/*tokTypeId*/, // base: UNI_TOKEN (controller does type ID mapping for clients)
                 a.mintQty,
@@ -241,7 +251,6 @@ library TokenLib {
                 a.origCcyFee_percBips_ExFee,
                 a.metaKeys,
                 a.metaValues
-                //,ld._tokens_currentMax_id // base - accept controller's current max stId, so bases have unique/sync'd stIds...
             );
         }
         else {
@@ -252,7 +261,11 @@ library TokenLib {
                 ld._sts[newId].mintedQty = stQty;
                 ld._sts[newId].currentQty = stQty; // mint ST
 
-                emit MintedSecToken(newId, newBatch.id, a.tokTypeId, a.batchOwner, uint256(stQty));
+                // emit token minted event(s) (core)
+                if (ld.contractType == StructLib.ContractType.COMMODITY) {
+                    emit MintedSecToken(newId, newBatch.id, a.tokTypeId, a.batchOwner, uint256(stQty));
+                }
+
                 ld._ledger[a.batchOwner].tokenType_stIds[a.tokTypeId].push(newId); // assign ST to ledger
             }
         }
@@ -263,34 +276,48 @@ library TokenLib {
         ld._ledger[a.batchOwner].spot_sumQtyMinted += uint256(a.mintQty);
     }
 
+    //
+    // GET TOKEN
+    //
     function getSecToken(
         StructLib.LedgerStruct storage  ld,
         StructLib.StTypesStruct storage std,
         uint256                         stId
     )
-    public view returns (StructLib.SecTokenReturn memory) {
+    public view returns (
+        StructLib.LedgerSecTokenReturn memory
+    ) {
         if (ld.contractType == StructLib.ContractType.CASHFLOW_CONTROLLER) { // controller: delegate to base
             uint256 tokTypeId = stId >> 192;
             StMaster base = StMaster(std._tt_addr[tokTypeId]);
-            StructLib.SecTokenReturn memory ret = base.getSecToken(stId);
+            StructLib.LedgerSecTokenReturn memory ret = base.getSecToken(stId);
 
-            for (uint64 batchId = 1; batchId <= ld._batches_currentMax_id; batchId++) { // map from base unibatch id (1) to controller batch id (by token type id)
+            // remap base return field: tokTypeId & tokTypeName
+            //  (from base unitype to controller type)
+            ret.tokTypeId = tokTypeId;
+            ret.tokTypeName = std._tt_name[tokTypeId];
+
+            // remap base return field: batchId
+            // (from base unibatch id (1) to controller batch id;
+            //  ASSUMES: only one batch per type in the controller (uni-batch/uni-mint model))
+            for (uint64 batchId = 1; batchId <= ld._batches_currentMax_id; batchId++) {
                 if (ld._batches[batchId].tokTypeId == tokTypeId) {
                     ret.batchId = batchId;
                     break;
                 }
             }
 
-            //ret.tokTypeId = !!!
             return ret;
         }
         else {
-            return StructLib.SecTokenReturn({
+            return StructLib.LedgerSecTokenReturn({
                     exists: ld._sts[stId].mintedQty != 0,
-                        id: stId,
+                      stId: stId,
+                 tokTypeId: ld._batches[ld._sts[stId].batchId].tokTypeId,
+               tokTypeName: std._tt_name[ld._batches[ld._sts[stId].batchId].tokTypeId],
+                   batchId: ld._sts[stId].batchId,
                  mintedQty: ld._sts[stId].mintedQty,
                 currentQty: ld._sts[stId].currentQty,
-                   batchId: ld._sts[stId].batchId,
                   ft_price: ld._sts[stId].ft_price,
             ft_ledgerOwner: ld._sts[stId].ft_ledgerOwner,
           ft_lastMarkPrice: ld._sts[stId].ft_lastMarkPrice,
