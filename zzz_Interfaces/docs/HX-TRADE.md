@@ -17,7 +17,7 @@ Request body schema:
   },
   "tokSender": {
     "addr": "string",  // Address of seller
-    "tokenTypeId": 0,  // Token type ID
+    "tokTypeId": 0,  // Token type ID
     "tokenQty": 0      // Token quantity to be sold
   }
 }
