@@ -3,6 +3,8 @@
 pragma solidity >=0.4.21 <=0.6.10;
 pragma experimental ABIEncoderV2;
 
+import "../StMaster/StMaster.sol";
+
 library StructLib {
 
     // EVENTS - SHARED (FuturesLib & TransferLib)
@@ -375,8 +377,13 @@ library StructLib {
      */
     function sufficientTokens(
         StructLib.LedgerStruct storage ld,
+        StructLib.StTypesStruct storage std,
         address ledger, uint256 tokTypeId, int256 qty, int256 fee
     ) public view returns (bool) {
+        // if (ld.contractType == StructLib.ContractType.CASHFLOW_CONTROLLER) { // controller: delegate to base
+        //     //StMaster base = StMaster(std._tt_addr[a.tokTypeId]);
+        //     return base.sufficientTokens(...)
+        // }
         int256 qtyAvailable = 0;
         for (uint i = 0; i < ld._ledger[ledger].tokenType_stIds[tokTypeId].length; i++) {
             qtyAvailable += ld._sts[ld._ledger[ledger].tokenType_stIds[tokTypeId][i]].currentQty;

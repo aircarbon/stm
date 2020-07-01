@@ -29,9 +29,6 @@ library LedgerLib {
     public view returns (StructLib.LedgerReturn memory) {
 
         GetLedgerEntryVars memory v;
-        // StructLib.LedgerSecTokenReturn[] memory tokens;
-        // StructLib.LedgerCcyReturn[] memory ccys;
-        // uint256 spot_sumQty = 0;
 
         // count total # of tokens (i.e. token count distinct by batch,type) across all types
         uint256 countAllSecTokens = 0;

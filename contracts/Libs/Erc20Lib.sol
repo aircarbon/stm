@@ -77,7 +77,7 @@ library Erc20Lib {
                            applyFees: false,
                         feeAddrOwner: a.owner //address(0x0) // fees: disabled for erc20 - not used
                     });
-                    TransferLib.transferOrTrade(ld, ctd, globalFees, transferOrTradeArgs);
+                    TransferLib.transferOrTrade(ld, std, ctd, globalFees, transferOrTradeArgs);
                     remainingToTransfer -= qtyTransfer;
                 }
             }

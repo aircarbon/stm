@@ -29,7 +29,7 @@ contract StTransferable is Owned,
         require(!(a.qty_B > 0 && !erc20d._whitelisted[a.ledger_B]), "Not whitelisted (B)");
 
         a.feeAddrOwner = owner;
-        TransferLib.transferOrTrade(ld, ctd, globalFees, a);
+        TransferLib.transferOrTrade(ld, std, ctd, globalFees, a);
     }
 
     // FAST - fee preview exchange fee only

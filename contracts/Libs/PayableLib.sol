@@ -71,8 +71,9 @@ library PayableLib {
     // v1: multi-sub
     function pay(
         StructLib.LedgerStruct storage ld,
-        StructLib.CashflowStruct storage cashflowData,
+        StructLib.StTypesStruct storage std,
         StructLib.CcyTypesStruct storage ctd,
+        StructLib.CashflowStruct storage cashflowData,
         StructLib.FeeStruct storage globalFees, address owner,
         int256 ethSat_UsdCents
     )
@@ -95,14 +96,15 @@ library PayableLib {
             // TODO...
         }
         else {
-            processSubscriberPayment(ld, cashflowData, ctd, issueBatch, globalFees, owner, ethSat_UsdCents); // all other senders
+            processSubscriberPayment(ld, std, ctd, cashflowData, issueBatch, globalFees, owner, ethSat_UsdCents); // all other senders
         }
     }
 
     function processSubscriberPayment(
         StructLib.LedgerStruct storage ld,
-        StructLib.CashflowStruct storage cashflowData,
+        StructLib.StTypesStruct storage std,
         StructLib.CcyTypesStruct storage ctd,
+        StructLib.CashflowStruct storage cashflowData,
         StructLib.SecTokenBatch storage issueBatch,
         StructLib.FeeStruct storage globalFees,
         address owner,
@@ -153,7 +155,7 @@ library PayableLib {
                    applyFees: false,
                 feeAddrOwner: owner
             });
-            TransferLib.transferOrTrade(ld, ctd, globalFees, a);
+            TransferLib.transferOrTrade(ld, std, ctd, globalFees, a);
         }
 
         // todo: issuance fees (set then clear ledgerFee?)

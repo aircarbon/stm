@@ -32,9 +32,12 @@ contract StPayable is
     //                  (b) so addSecTokType() for CFT-C needs to take the address of a deployed CFT contract...
     //
     //          (2) CASHFLOW_CONTROLLER: is entry point for the split ledger - all clients talk only to it
+    //                  > mint: DONE (passthrough to base)
     //                  > getSecToken: DONE (passthrough to bases)
-    //                  > getLedgerEntry: return (a) n ccy's from CFT-C ... UNION ... (b) n tok's from n CFT's
-    //                  > transferOrTrade: update 1 ccy in CFT-C ... update 1 tok in CFT
+    //                  > getLedgerEntry: DONE (return (a) n ccy's from CFT-C ... UNION ... (b) n tok's from n CFT's)
+    //                >>> TODO: burn: ...
+    //                  > TODO: ledgerhashcode: ...???
+    //                  > TODO: transferOrTrade: update 1 ccy in CFT-C ... update 1 tok in CFT
     //
     //                  PROOF OF CONCEPT (READ AND WRITE ACROSS CONTRACTS...)
     //
@@ -74,7 +77,7 @@ contract StPayable is
 
     //function() external  payable  onlyWhenReadWrite() {
     receive() external payable onlyWhenReadWrite() {
-        PayableLib.pay(ld, cashflowData, ctd, globalFees, owner, get_ethUsd());
+        PayableLib.pay(ld, std, ctd, cashflowData, globalFees, owner, get_ethUsd());
     }
 
     function setIssuerValues(

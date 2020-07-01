@@ -88,12 +88,12 @@ library TokenLib {
             std._tt_addr[std._tt_Count] = cashflowBaseAddr;
 
             // set/segment base's curMaxId...
-            uint256 id = (std._tt_Count << 192)
+            uint256 segmentStartId = (std._tt_Count << 192)
                 //| ((1 << 192) - 1) // test: token id overflow
                 | 0 // segment - first 64 bits: type ID (max 0xFFFFFFFFFFFFFFFF), remaining 192 bits: local/segmented sub-id
             ;
             StMaster base = StMaster(cashflowBaseAddr);
-            base.setTokenTotals(id, 0, 0);
+            base.setTokenTotals(segmentStartId, 0, 0);
         }
         else {
             // add direct type (to commodity or cashflow base)
@@ -173,7 +173,6 @@ library TokenLib {
         MintSecTokenBatchArgs memory    a
     )
     public {
-
         require(ld._contractSealed, "Contract is not sealed");
         require(a.tokTypeId >= 1 && a.tokTypeId <= std._tt_Count, "Bad tokTypeId");
         require(a.mintSecTokenCount == 1, "Set mintSecTokenCount 1");
@@ -191,10 +190,10 @@ library TokenLib {
         }
 
         // check for token id overflow
-        if (ld.contractType != StructLib.ContractType.CASHFLOW_CONTROLLER) {
+        if (ld.contractType == StructLib.ContractType.CASHFLOW_BASE) {
             uint256 l_id = ld._tokens_currentMax_id & ((1 << 192) - 1); // get a "loacal id" (count); strip leading 64-bits (controller's type ID)
             //emit dbg2(l_id + uint256(a.mintSecTokenCount));
-            require(l_id + uint256(a.mintSecTokenCount) <= 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF, "Too many tokens"); // max 192-bits
+            require(l_id + uint256(a.mintSecTokenCount) <= 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF, "Too many tokens"); // max 192-bits trailing bits
         }
 
         // ### string[] param lengths are reported as zero!
@@ -270,10 +269,124 @@ library TokenLib {
             }
         }
 
-        // update totals and current/max STID (controller: common/max values across all types, CFT-B: local/specific values for single type)
-        ld._tokens_currentMax_id += uint256(a.mintSecTokenCount); // controller: minted COUNT (not an ID!), base/commodity: true max. LOCAL ID
-        ld._spot_totalMintedQty += uint256(a.mintQty);
-        ld._ledger[a.batchOwner].spot_sumQtyMinted += uint256(a.mintQty);
+        // core - update current/max STID
+        ld._tokens_currentMax_id += uint256(a.mintSecTokenCount); // controller: minted COUNT (not an ID), base / commodity: a true max. LOCAL ID
+
+        // controller / commodity: update global totals
+        if (ld.contractType != StructLib.ContractType.CASHFLOW_BASE) {
+            ld._spot_totalMintedQty += uint256(a.mintQty);
+            ld._ledger[a.batchOwner].spot_sumQtyMinted += uint256(a.mintQty);
+        }
+    }
+
+    //
+    // BURNING
+    //
+    struct BurnTokenArgs {
+        address                         ledgerOwner;
+        uint256                         tokTypeId;
+        int256                          burnQty; // accept 256 bits, so we can downcast and test if in 64-bit range
+        uint256[]                       k_stIds;
+    }
+    function burnTokens(
+        StructLib.LedgerStruct storage  ld,
+        StructLib.StTypesStruct storage std,
+        BurnTokenArgs memory            a
+    )
+    public {
+        require(ld._contractSealed, "Contract is not sealed");
+        require(ld._ledger[a.ledgerOwner].exists == true, "Bad ledgerOwner");
+        require(a.burnQty >= 0x1 && a.burnQty <= 0x7fffffffffffffff, "Bad burnQty"); // max int64
+
+        // controller / commodity: (preemptively) update global totals & emit main event
+        if (ld.contractType != StructLib.ContractType.CASHFLOW_BASE) {
+            ld._spot_totalBurnedQty += uint256(a.burnQty);
+            ld._ledger[a.ledgerOwner].spot_sumQtyBurned += uint256(a.burnQty);
+            emit Burned(a.tokTypeId, a.ledgerOwner, uint256(a.burnQty));
+        }
+
+        // controller: delegate burn op. to base
+        if (ld.contractType == StructLib.ContractType.CASHFLOW_CONTROLLER) {
+            StMaster base = StMaster(std._tt_addr[a.tokTypeId]);
+            base.burnTokens(
+                a.ledgerOwner,
+                1/*a.tokTypeId*/, // base: UNI_TOKEN (controller does type ID mapping for clients),
+                a.burnQty,
+                a.k_stIds
+            );
+            return;
+        }
+
+        // base / commodity: validate, burn & emit events
+        require(a.tokTypeId >= 1 && a.tokTypeId <= std._tt_Count, "Bad tokTypeId");
+        if (a.k_stIds.length == 0) { // burn by qty
+            require(StructLib.sufficientTokens(ld, std, a.ledgerOwner, a.tokTypeId, int256(a.burnQty), 0) == true, "Insufficient tokens");
+        }
+        else { // burn by ID(s)
+            int256 stQty;
+            for (uint256 i = 0; i < a.k_stIds.length; i++) {
+                require(StructLib.tokenExistsOnLedger(ld, a.tokTypeId, a.ledgerOwner, a.k_stIds[i]), "Bad stId"); // check supplied ST belongs to the supplied owner
+                stQty += ld._sts[a.k_stIds[i]].currentQty; // get implied burn qty
+            }
+            require(stQty == a.burnQty, "Quantity mismatch");
+        }
+
+        // burn (remove or resize) sufficient ST(s)
+        uint256 ndx = 0;
+        int64 remainingToBurn = int64(a.burnQty);
+        while (remainingToBurn > 0) {
+            uint256[] storage tokenType_stIds = ld._ledger[a.ledgerOwner].tokenType_stIds[a.tokTypeId];
+            uint256 stId = tokenType_stIds[ndx];
+            int64 stQty = ld._sts[stId].currentQty;
+            uint64 batchId = ld._sts[stId].batchId;
+
+            // if burning by specific ST IDs, skip over STs that weren't specified
+            bool skip = false;
+            if (a.k_stIds.length > 0) {
+                skip = true;
+                for (uint256 i = 0; i < a.k_stIds.length; i++) {
+                    if (a.k_stIds[i] == stId) { skip = false; break; }
+                }
+            }
+            if (skip) {
+                ndx++;
+            }
+            else {
+                if (remainingToBurn >= stQty) {
+                    // burn the full ST
+                    //ld._sts_currentQty[stId] = 0;
+                    ld._sts[stId].currentQty = 0;
+
+                    // remove from ledger
+                    tokenType_stIds[ndx] = tokenType_stIds[tokenType_stIds.length - 1];
+                    //tokenType_stIds.length--;
+                    tokenType_stIds.pop(); // solc 0.6
+
+                    //ld._ledger[a.ledgerOwner].tokenType_sumQty[a.tokTypeId] -= stQty;
+
+                    // burn from batch
+                    ld._batches[batchId].burnedQty += uint256(stQty);
+
+                    remainingToBurn -= stQty;
+
+                    emit BurnedFullSecToken(stId, ld.contractType == StructLib.ContractType.CASHFLOW_BASE ? stId >> 192 : a.tokTypeId, a.ledgerOwner, uint256(stQty));
+                }
+                else {
+                    // resize the ST (partial burn)
+                    //ld._sts_currentQty[stId] -= remainingToBurn;
+                    ld._sts[stId].currentQty -= remainingToBurn;
+
+                    // retain on ledger
+                    //ld._ledger[a.ledgerOwner].tokenType_sumQty[a.tokTypeId] -= remainingToBurn;
+
+                    // burn from batch
+                    ld._batches[batchId].burnedQty += uint256(remainingToBurn);
+
+                    emit BurnedPartialSecToken(stId, ld.contractType == StructLib.ContractType.CASHFLOW_BASE ? stId >> 192 : a.tokTypeId, a.ledgerOwner, uint256(remainingToBurn));
+                    remainingToBurn = 0;
+                }
+            }
+        }
     }
 
     //
@@ -387,103 +500,4 @@ library TokenLib {
         emit SetBatchOriginatorFee_Currency(batchId, origCcyFee_percBips_ExFee);
     }
 
-    //
-    // BURNING
-    //
-    function burnTokens(
-        StructLib.LedgerStruct storage  ld,
-        StructLib.StTypesStruct storage std,
-        address                         ledgerOwner,
-        uint256                         tokTypeId,
-        int256                          burnQty, // accept 256 bits, so we can downcast and test if in 64-bit range
-        uint256[] memory                k_stIds
-    )
-    public {
-        require(ld._contractSealed, "Contract is not sealed");
-        require(ld._ledger[ledgerOwner].exists == true, "Bad ledgerOwner");
-
-        require(tokTypeId >= 1 && tokTypeId <= std._tt_Count, "Bad tokTypeId");
-        // require((k_stIds.length > 0 && burnQty == 0) ||
-        //         (k_stIds.length == 0 && burnQty > 0),
-        //         "Specify tokTypeId AND (k_stIds OR burnQty)");
-
-        require(burnQty >= 0x1 && burnQty <= 0x7fffffffffffffff, "Bad burnQty"); // max int64
-
-        if (k_stIds.length == 0) {
-            require(StructLib.sufficientTokens(ld, ledgerOwner, tokTypeId, int256(burnQty), 0) == true, "Insufficient tokens");
-        }
-        else {
-            int256 stQty;
-            for (uint256 i = 0; i < k_stIds.length; i++) {
-                require(StructLib.tokenExistsOnLedger(ld, tokTypeId, ledgerOwner, k_stIds[i]), "Bad stId"); // check supplied ST belongs to the supplied owner
-                stQty += ld._sts[k_stIds[i]].currentQty; // get implied burn qty
-            }
-            require(stQty == burnQty, "Quantity mismatch");
-            //burnQty = 0;
-            // for (uint256 i = 0; i < k_stIds.length; i++) {
-            //     require(StructLib.tokenExistsOnLedger(ld, tokTypeId, ledgerOwner, k_stIds[i]), "Bad stId");
-            //     burnQty += ld._sts[k_stIds[i]].currentQty; // get implied burn qty
-            // }
-        }
-
-        // burn (i.e. delete or resize) sufficient ST(s)
-        uint256 ndx = 0;
-        int64 remainingToBurn = int64(burnQty);
-        while (remainingToBurn > 0) {
-            uint256[] storage tokenType_stIds = ld._ledger[ledgerOwner].tokenType_stIds[tokTypeId];
-            uint256 stId = tokenType_stIds[ndx];
-            int64 stQty = ld._sts[stId].currentQty;
-            uint64 batchId = ld._sts[stId].batchId;
-
-            // if burning by specific ST IDs, skip over STs that weren't specified
-            bool skip = false;
-            if (k_stIds.length > 0) {
-                skip = true;
-                for (uint256 i = 0; i < k_stIds.length; i++) {
-                    if (k_stIds[i] == stId) { skip = false; break; }
-                }
-            }
-            if (skip) {
-                ndx++;
-            }
-            else {
-                if (remainingToBurn >= stQty) {
-                    // burn the full ST
-                    //ld._sts_currentQty[stId] = 0;
-                    ld._sts[stId].currentQty = 0;
-
-                    // remove from ledger
-                    tokenType_stIds[ndx] = tokenType_stIds[tokenType_stIds.length - 1];
-                    //tokenType_stIds.length--;
-                    tokenType_stIds.pop(); // solc 0.6
-
-                    //ld._ledger[ledgerOwner].tokenType_sumQty[tokTypeId] -= stQty;
-
-                    // burn from batch
-                    ld._batches[batchId].burnedQty += uint256(stQty);
-
-                    remainingToBurn -= stQty;
-                    emit BurnedFullSecToken(stId, tokTypeId, ledgerOwner, uint256(stQty));
-                }
-                else {
-                    // resize the ST (partial burn)
-                    //ld._sts_currentQty[stId] -= remainingToBurn;
-                    ld._sts[stId].currentQty -= remainingToBurn;
-
-                    // retain on ledger
-                    //ld._ledger[ledgerOwner].tokenType_sumQty[tokTypeId] -= remainingToBurn;
-
-                    // burn from batch
-                    ld._batches[batchId].burnedQty += uint256(remainingToBurn);
-
-                    emit BurnedPartialSecToken(stId, tokTypeId, ledgerOwner, uint256(remainingToBurn));
-                    remainingToBurn = 0;
-                }
-            }
-        }
-
-        ld._spot_totalBurnedQty += uint256(burnQty);
-        ld._ledger[ledgerOwner].spot_sumQtyBurned += uint256(burnQty);
-        emit Burned(tokTypeId, ledgerOwner, uint256(burnQty));
-    }
 }

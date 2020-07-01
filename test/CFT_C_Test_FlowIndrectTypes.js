@@ -52,16 +52,16 @@ contract("StMaster", accounts => {
         const st = await stm.getSecToken(new BN('6277101735386680763835789423207666416102355444464034512897'));
         assert(st.tokTypeId == CONST.tokenType.TOK_T1 && st.batchId == 1, 'unexpected token data');
     });
-    // it(`cashflow controller - should not allow a subsequent batch mint for the same indirect base (type 1)`, async () => {
-    //     const M = accounts[0];
-    //     try {
-    //         const { batchId, mintTx } = await mintBatchWithMetadata( 
-    //             { tokenType: CONST.tokenType.TOK_T1, qtyUnit: 100, qtySecTokens: 1, receiver: M,
-    //                metaKeys: [ 'key3', 'key4' ],
-    //              metaValues: [ 'val4', 'val4' ],
-    //         }, { from: accounts[0] } );
-    //     } catch (ex) { assert(ex.reason == 'Bad cashflow request', `unexpected: ${ex.reason}`); return; }
-    // });
+    it(`cashflow controller - should not allow a subsequent batch mint for the same indirect base (type 1)`, async () => {
+        const M = accounts[0];
+        try {
+            const { batchId, mintTx } = await mintBatchWithMetadata( 
+                { tokenType: CONST.tokenType.TOK_T1, qtyUnit: 100, qtySecTokens: 1, receiver: M,
+                   metaKeys: [ 'key3', 'key4' ],
+                 metaValues: [ 'val4', 'val4' ],
+            }, { from: accounts[0] } );
+        } catch (ex) { assert(ex.reason == 'Bad cashflow request', `unexpected: ${ex.reason}`); return; }
+    });
     it(`cashflow controller - should allow an initial unibatch mint on a different indirect passed-through cashflow base (type 2)`, async () => {
         const M = accounts[0];
         const { batchId, mintTx } = await mintBatchWithMetadata( 
@@ -77,31 +77,51 @@ contract("StMaster", accounts => {
         assert(st.tokTypeId == CONST.tokenType.TOK_T2 && st.batchId == 2, 'unexpected token data');
     });
 
-    // // query sec token 
-    // it(`cashflow controller - should be able to delegate-fetch a single token with mapped batch ID & mapped token rtype ID from base (type 2)`, async () => {
-    //     //const maxId = await stm.getSecToken_MaxId(); // (## token IDs in controller are fragmented, i.e. getSecToken_MaxId is a COUNT in the controller, not a MAX id)
-    //     const st = await stm.getSecToken(new BN('12554203470773361527671578846415332832204710888928069025793'));
-    //     assert(st.tokTypeId == 2, 'unexpected (unmapped?) tok-type id on token from controller');
-    //     assert(st.batchId == 2, 'unexpeMayBE cted (unmapped?) batch id on token from controller');
-    // });
+    // query contoller for single delegated sec token 
+    it(`cashflow controller - should be able to delegate-fetch a single token with mapped batch ID & mapped token rtype ID from base (type 2)`, async () => {
+        //const maxId = await stm.getSecToken_MaxId(); // (## token IDs in controller are fragmented, i.e. getSecToken_MaxId is a COUNT in the controller, not a MAX id)
+        const st = await stm.getSecToken(new BN('12554203470773361527671578846415332832204710888928069025793'));
+        assert(st.tokTypeId == 2, 'unexpected (unmapped?) tok-type id on token from controller');
+        assert(st.batchId == 2, 'unexpeMayBE cted (unmapped?) batch id on token from controller');
+    });
 
-    // query ledger entry
-    // TODO: split/delegate getLedgerEntry() ...
+    // query controller's split ledger entry
     it(`cashflow controller - should be able to fetch a split (multi-delegated) ledger entry across all indirect token types`, async () => {
         const le_cftc = await stm.getLedgerEntry(accounts[0]); 
         console.log('le_cftc', le_cftc);
+        assert(new BN(le_cftc.tokens[0].stId).eq(new BN('6277101735386680763835789423207666416102355444464034512897')), 'unexpected ledger token id (0)');
+        assert(new BN(le_cftc.tokens[1].stId).eq(new BN('12554203470773361527671578846415332832204710888928069025793')), 'unexpected ledger token id (1)');
 
-        // query base types directly
+        assert(le_cftc.tokens[0].tokTypeId == CONST.tokenType.TOK_T1 && le_cftc.tokens[0].batchId == 1 && le_cftc.tokens[0].mintedQty == 1000, 'unexpected ledger token data (0)');
+        assert(le_cftc.tokens[1].tokTypeId == CONST.tokenType.TOK_T2 && le_cftc.tokens[1].batchId == 2 && le_cftc.tokens[1].mintedQty == 2000, 'unexpected ledger token data (1)');
+        assert(le_cftc.spot_sumQty == 3000, 'unexpected ledger sum data');
+
+        // query base types directly - note: addr override on web3 helper methods
         const types = (await stm.getSecTokenTypes()).tokenTypes;
-        //console.log('types', types.map(p => { return `${p.cashflowBaseAddr} [${p.name}]` }));
         for (var type of types) {
             const le_base = await CONST.web3_call('getLedgerEntry', [accounts[0]], /*nameOverride*/undefined, /*addrOverride*/type.cashflowBaseAddr);
             console.log('le_base.tokens', le_base.tokens);
         }
     });
 
-    // TODO: !!! getLedgerHashcode() -> controller needs to delegate to base for ST data...!!!!
-    
+    it(`cashflow controller - should be able to partially burn (split) an indirect token on a base type`, async () => {
+        const M = accounts[0];
+        
+        // by qty - type 1
+        const burnTx1 = await stm.burnTokens(M, CONST.tokenType.TOK_T1, 100, []);
+        const le1 = await stm.getLedgerEntry(accounts[0]); 
+        console.log('le1', le1);
+
+        // by qty - type 2
+        const burnTx2 = await stm.burnTokens(M, CONST.tokenType.TOK_T2, 200, []);
+        const le2 = await stm.getLedgerEntry(accounts[0]); 
+        console.log('le2', le2);
+
+        // TODO: by id(s)...
+        //...
+    });
+
+    // TODO: !? getLedgerHashcode() -> controller needs to delegate to base for ST data...?
     // TODO: transferOrTrade()
 
     async function mintBatchWithMetadata({ tokenType, qtyUnit, qtySecTokens, receiver, metaKeys, metaValues }) {

@@ -18,7 +18,12 @@ contract StBurnable is Owned, StLedger {
         uint256[] memory stIds      // IFF supplied (len > 0): sum of supplied STs current qty must == supplied burnQty
     )
     public onlyOwner() onlyWhenReadWrite() {
-        TokenLib.burnTokens(ld, std, ledgerOwner, tokTypeId, burnQty, stIds);
+        TokenLib.burnTokens(ld, std, TokenLib.BurnTokenArgs({
+               ledgerOwner: ledgerOwner,
+                 tokTypeId: tokTypeId,
+                   burnQty: burnQty,
+                   k_stIds: stIds
+        }));
     }
 
     // 24k
