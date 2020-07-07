@@ -189,10 +189,9 @@ library TokenLib {
             // todo: cashflow base - only allow mint from controller...
         }
 
-        // check for token id overflow
+        // check for token id overflow (192 bit range is vast - really not necessary)
         if (ld.contractType == StructLib.ContractType.CASHFLOW_BASE) {
-            uint256 l_id = ld._tokens_currentMax_id & ((1 << 192) - 1); // get a "loacal id" (count); strip leading 64-bits (controller's type ID)
-            //emit dbg2(l_id + uint256(a.mintSecTokenCount));
+            uint256 l_id = ld._tokens_currentMax_id & ((1 << 192) - 1); // strip leading 64-bits (controller's type ID) - gets a "local id", i.e. a count
             require(l_id + uint256(a.mintSecTokenCount) <= 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF, "Too many tokens"); // max 192-bits trailing bits
         }
 

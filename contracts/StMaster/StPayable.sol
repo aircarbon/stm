@@ -35,9 +35,11 @@ contract StPayable is
     //                  > mint: DONE (passthrough to base)
     //                  > getSecToken: DONE (passthrough to bases)
     //                  > getLedgerEntry: DONE (return (a) n ccy's from CFT-C ... UNION ... (b) n tok's from n CFT's)
-    //                >>> TODO: burn: ...
-    //                  > TODO: ledgerhashcode: ...???
+    //                  > burn: DONE (passthrough to base)
     //                  > TODO: transferOrTrade: update 1 ccy in CFT-C ... update 1 tok in CFT
+    //                  > TODO: transfer_feePreview[_ExchangeOnly] ... >> combine/merge base output (orig tok fees w/ ccy fees...)
+    //
+    //                  > TODO: ledgerhashcode: ...???
     //
     //                  PROOF OF CONCEPT (READ AND WRITE ACROSS CONTRACTS...)
     //
