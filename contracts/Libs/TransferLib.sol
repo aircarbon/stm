@@ -47,13 +47,20 @@ library TransferLib {
         // disallow single origin multiple asset type transfers
         require(!((a.qty_A > 0 && a.ccy_amount_A > 0) || (a.qty_B > 0 && a.ccy_amount_B > 0)), "Bad transfer types");
 
-        // disallow currency swaps - we need consistent ccy types on each sides for ccy fee mirroring
+        // disallow currency swaps - we need single consistent ccy type on each side for ccy-fee mirroring
         require(a.ccyTypeId_A == 0 || a.ccyTypeId_B == 0, "Bad ccy swap");
 
         if (a.ccy_amount_A > 0) require(a.ccyTypeId_A > 0 && a.ccyTypeId_A <= ctd._ct_Count, "Bad ccyTypeId A");
         if (a.ccy_amount_B > 0) require(a.ccyTypeId_B > 0 && a.ccyTypeId_B <= ctd._ct_Count, "Bad ccyTypeId B");
         if (a.qty_A > 0) require(a.tokTypeId_A > 0, "Bad tokTypeId_A");
         if (a.qty_B > 0) require(a.tokTypeId_B > 0, "Bad tokTypeId_B");
+
+        // cashflow controller: delegate token actions to base type
+        // if (ld.contractType == StructLib.ContractType.CASHFLOW_CONTROLLER) { //**
+        //...
+        //      UP TO TWO TYPES TO DELEGATE!
+        //     //StMaster base = StMaster(std._tt_addr[a.tokTypeId]);
+        // }
 
         // transfer by ST ID: check supplied STs belong to supplied owner(s), and implied quantities match supplied quantities
         if (ld.contractType != StructLib.ContractType.CASHFLOW_CONTROLLER) { //**

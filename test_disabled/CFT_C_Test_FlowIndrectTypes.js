@@ -134,8 +134,11 @@ contract("StMaster", accounts => {
 
     it(`cashflow controller - should be able to delegate-transfer base indirect token types across ledger entries (type 1)`, async () => {
         const A = accounts[0], B = accounts[global.TaddrNdx + 0];
-        var le = await stm.getLedgerEntry(A); 
-        console.log('le', le);
+
+        var le_A = await stm.getLedgerEntry(A); 
+        var le_B = await stm.getLedgerEntry(B); 
+        console.log('le_A', le_A);
+        console.log('le_B', le_B);
 
         // one sided token transfer
         await transferHelper.transferLedger({ stm, accounts, 
@@ -147,8 +150,8 @@ contract("StMaster", accounts => {
             ccy_amount_B: 0,                     ccyTypeId_B: 0,
         });
 
-        var le_A = await stm.getLedgerEntry(A);
-        var le_B = await stm.getLedgerEntry(B); 
+        le_A = await stm.getLedgerEntry(A);
+        le_B = await stm.getLedgerEntry(B); 
         console.log('le_A', le_A);
         console.log('le_B', le_B);
     });
