@@ -54,7 +54,7 @@ module.exports = async function (deployer) {
 
             // deploy controller
             const addrController = await deploymentHelper.Deploy({ deployer, artifacts, contractType: 'CASHFLOW_CONTROLLER' });
-            process.env.CONTRACT_TYPE = 'CASHFLOW_CONTROLLER'; await setup.setDefaults();
+                process.env.CONTRACT_TYPE = 'CASHFLOW_CONTROLLER'; await setup.setDefaults();
 
             // link base types
             console.log(chalk.inverse('addrBase1'), addrBase1);

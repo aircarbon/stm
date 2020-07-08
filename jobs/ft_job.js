@@ -77,7 +77,7 @@ var ledgerOwners, accounts;
 
         //     // dbg - show participant FT balances
         //     for (let p of ft.data.TEST_PARTICIPANTS) {
-        //         const le = await CONST.web3_call('getLedgerEntry', [ p.account ], O.addr, O.privKey);
+        //         const le = await CONST.web3_call('getLedgerEntry', [ p.account ]);//, O.addr, O.privKey);
         //         console.log(chalk.blue(`PID=${p.id}`) + 
         //             chalk.dim(` ${le.tokens.map(p2 => `{ #${p2.stId}/Q:${p2.mintedQty.toString().padStart(3)} }`).join(', ')}`
         //         )); //, le.tokens);
@@ -94,7 +94,7 @@ var ledgerOwners, accounts;
 
             // dbg - show participant FT balances
             for (let p of ft.data.TEST_PARTICIPANTS) {
-                const le = await CONST.web3_call('getLedgerEntry', [ p.account ], O.addr, O.privKey);
+                const le = await CONST.web3_call('getLedgerEntry', [ p.account ]);//, O.addr, O.privKey);
                 console.log(chalk.blue(`PID=${p.id}`) + 
                     chalk.dim(` ${le.tokens.map(p2 => `{ #${p2.stId}/Q:${p2.mintedQty.toString().padStart(3)} }`).join(', ')}`
                 )); //, le.tokens);

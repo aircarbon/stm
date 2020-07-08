@@ -325,15 +325,15 @@ async function web3_call(methodName, methodArgs, nameOverride, addrOverride) {
 async function web3_tx(methodName, methodArgs, fromAddr, fromPrivKey, nameOverride, addrOverride) {
     const { web3, ethereumTxChain } = getTestContextWeb3();
     var contractDb;
-    //if (addrOverride == undefined) {
+    if (addrOverride == undefined) {
         const contractName = process.env.CONTRACT_PREFIX + (nameOverride || contractProps[process.env.CONTRACT_TYPE].contractName);
         contractDb = (await db.GetDeployment(process.env.WEB3_NETWORK_ID, contractName, contractProps[process.env.CONTRACT_TYPE].contractVer)).recordset[0];
         if (!contractDb) throw(Error(`Failed to lookup contract deployment for (nameOverride=[${nameOverride}]): networkId=${process.env.WEB3_NETWORK_ID}, contractName=${contractName}, contractVer=${contractProps[process.env.CONTRACT_TYPE].contractVer} from ${process.env.sql_server}`));
-    // }
-    // else {
-    //     contractDb = (await db.GetDeploymentByAddress(process.env.WEB3_NETWORK_ID, addrOverride)).recordset[0];
-    //     if (!contractDb) throw(Error(`Failed to lookup contract deployment for (addrOverride=[${addrOverride}]): networkId=${process.env.WEB3_NETWORK_ID} from ${process.env.sql_server}`));
-    // }
+    }
+    else {
+        contractDb = (await db.GetDeploymentByAddress(process.env.WEB3_NETWORK_ID, addrOverride)).recordset[0];
+        if (!contractDb) throw(Error(`Failed to lookup contract deployment for (addrOverride=[${addrOverride}]): networkId=${process.env.WEB3_NETWORK_ID} from ${process.env.sql_server}`));
+    }
     var contract = new web3.eth.Contract(JSON.parse(contractDb.abi), contractDb.addr);
     if ((await contract.methods['version']().call()) != contractDb.contract_ver) throw('Deployed contract missing or version mismatch'); // test contract exists - will silently return null on calls if it's not deployed, wtf
 

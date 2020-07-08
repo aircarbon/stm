@@ -5,6 +5,8 @@ pragma experimental ABIEncoderV2;
 
 import "../Interfaces/StructLib.sol";
 
+import "../StMaster/StMaster.sol";
+
 library TransferLib {
     event TransferedFullSecToken(address indexed from, address indexed to, uint256 indexed stId, uint256 mergedToSecTokenId, uint256 qty, StructLib.TransferType transferType);
     event TransferedPartialSecToken(address indexed from, address indexed to, uint256 indexed splitFromSecTokenId, uint256 newSecTokenId, uint256 mergedToSecTokenId, uint256 qty, StructLib.TransferType transferType);
@@ -56,11 +58,16 @@ library TransferLib {
         if (a.qty_B > 0) require(a.tokTypeId_B > 0, "Bad tokTypeId_B");
 
         // cashflow controller: delegate token actions to base type
-        // if (ld.contractType == StructLib.ContractType.CASHFLOW_CONTROLLER) { //**
-        //...
-        //      UP TO TWO TYPES TO DELEGATE!
-        //     //StMaster base = StMaster(std._tt_addr[a.tokTypeId]);
-        // }
+        if (ld.contractType == StructLib.ContractType.CASHFLOW_CONTROLLER) { //**
+            if (a.qty_A > 0) {
+                StMaster base_A = StMaster(std._tt_addr[a.tokTypeId_A]);
+                base_A.transferOrTrade(a);
+            }
+            if (a.qty_B > 0) {
+                StMaster base_B = StMaster(std._tt_addr[a.tokTypeId_B]);
+                base_B.transferOrTrade(a);
+            }
+        }
 
         // transfer by ST ID: check supplied STs belong to supplied owner(s), and implied quantities match supplied quantities
         if (ld.contractType != StructLib.ContractType.CASHFLOW_CONTROLLER) { //**

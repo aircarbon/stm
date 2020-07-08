@@ -20,9 +20,20 @@ contract("StMaster", accounts => {
         if (await stm.getContractType() != CONST.contractType.CASHFLOW_CONTROLLER) this.skip();
         if (!global.TaddrNdx) global.TaddrNdx = 0;
 
-        await stm.whitelistMany(accounts.slice(global.TaddrNdx, global.TaddrNdx + 50));
+        // whitelist & seal ontroller
+        const wlAddrs = accounts.slice(global.TaddrNdx, global.TaddrNdx + 50);
+        await stm.whitelistMany(wlAddrs);
         await stm.sealContract();
-        await setupHelper.setDefaults({ stm, accounts });
+
+        // whitelist & seal base types
+        const types = (await stm.getSecTokenTypes()).tokenTypes;
+        const O = await CONST.getAccountAndKey(0);
+        for (var type of types) {
+            await CONST.web3_tx('whitelistMany', [wlAddrs], O.addr, O.privKey, /*nameOverride*/undefined, /*addrOverride*/type.cashflowBaseAddr);
+            await CONST.web3_tx('sealContract', [], O.addr, O.privKey, /*nameOverride*/undefined, /*addrOverride*/type.cashflowBaseAddr);
+        }
+
+        //await setupHelper.setDefaults({ stm, accounts });
     });
 
     beforeEach(async () => {
