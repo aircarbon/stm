@@ -248,7 +248,7 @@ EXCHANGE_FEE: 1,
         const weiCost = web3Tx.gasPrice * truffleTx.receipt.gasUsed;
         const usdCost = actualGasPriceEth * truffleTx.receipt.gasUsed * ETH_USD;
 
-        console.log(`>>> gasUsed - ${desc}: ${truffleTx.receipt.gasUsed} @${actualGasPriceEth} ETH/gas = Ξ${(actualGasPriceEth * truffleTx.receipt.gasUsed).toFixed(4)} ~= $${(usdCost).toFixed(4)}`);
+        console.log(`>>> gasUsed - ${desc}: ${truffleTx.receipt.gasUsed} gas * ${/*actualGasPriceEth*/web3.utils.fromWei(web3Tx.gasPrice, 'gwei')}gwei = Ξ${(actualGasPriceEth * truffleTx.receipt.gasUsed).toFixed(4)} ~= $${(usdCost).toFixed(4)}`);
         return { usdCost, weiCost };
     }
 };

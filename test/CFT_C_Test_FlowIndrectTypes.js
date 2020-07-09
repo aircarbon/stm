@@ -164,16 +164,12 @@ contract("StMaster", accounts => {
         console.log('le_A', le_A);
         console.log('le_B', le_B);
 
-        // B->A: by ID -- batch org fees set... ## failing with silent revert...
-        // ## two different kinds of failure w/ orig-tok fees set
-        //   ## 1 -- transfer by qty: "unexpected ledger B quantity sum after transfer B -> A"
-        //   ## 2 -- transer by ID: unspecified reevert...
         const stIds = le_B.tokens.map(p => p.stId);
         console.log('stIds', stIds);
         await transferHelper.transferLedger({ stm, accounts, 
             ledger_A: A,                        ledger_B: B,
                qty_A: 0,                     tokTypeId_A: 0,                        k_stIds_A: [],   
-               qty_B: 99 ,                   tokTypeId_B: CONST.tokenType.TOK_T1,   k_stIds_B: [], //stIds, // ## failing in CFT + orig tok fees, due to IDs?
+               qty_B: 99 ,                   tokTypeId_B: CONST.tokenType.TOK_T1,   k_stIds_B: stIds, // ## by ID (single): failing in CFT w/ orig tok fees - gas excess; loop not terminating               qty_B: 99 ,                   tokTypeId_B: CONST.tokenType.TOK_T1,   k_stIds_B: stIds, // ## by ID (single): failing in CFT w/ orig tok fees
         ccy_amount_A: 0,                     ccyTypeId_A: 0,
         ccy_amount_B: 0,                     ccyTypeId_B: 0,
            applyFees: true,
@@ -183,6 +179,12 @@ contract("StMaster", accounts => {
         le_B = await stm.getLedgerEntry(B); 
         console.log('le_A', le_A);
         console.log('le_B', le_B);
+
+        // TODO: TESTS (COMMODITY) -- by ID, w/ orig tok fees + w/ exchange tok fees...
+        
+        // TODO: #0 fund/withdraw - comment/desc to events (for arbitrary off-chain fees)
+        // TODO: #1 k_stIds[] + qty (differing, i.e. partial transfer/burn, by ID)
+        // TODO: #2 getBatches[]
     });
     // todo: B ->A by Qty & ID
     // todo: A<->B, 4 permutations

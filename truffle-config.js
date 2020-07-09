@@ -61,7 +61,7 @@ module.exports = {
       port: 8545,
       network_id: "*", // see: getTestContextWeb3() for dev network_id convention
       gas: 7900000,
-      gasPrice: web3.utils.toWei("1", "gwei")
+      gasPrice: web3.utils.toWei("10", "gwei")
     },
 
     // aircarbon ropsten geth node -- a bit faster than infura, representative of mainnet
