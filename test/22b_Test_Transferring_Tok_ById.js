@@ -286,7 +286,7 @@ contract("StMaster", accounts => {
         const le_before_A = await stm.getLedgerEntry(A);
 
         // setup: mint M2 -> B
-        await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2, CONST.KT_CARBON, 1,      M2, origFee, 0, [], []);
+        await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2, CONST.KT_CARBON, 1,      M2, origFee, 0,        [], []);
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2, CONST.KT_CARBON, 1,      M2, CONST.nullFees, 0, [], []);
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2, CONST.KT_CARBON, 1,      M2, CONST.nullFees, 0, [], []);
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T3, CONST.KT_CARBON, 1,      M2, CONST.nullFees, 0, [], []);
@@ -320,7 +320,7 @@ contract("StMaster", accounts => {
         });
         await CONST.logGas(web3, data.transferTx, `Swap STs A:(Type ${tokTypeId_A} / [${stIds_A.join(',')}]) / B:(Type ${tokTypeId_B} [${stIds_B.join(',')}])`);
         truffleAssert.prettyPrintEmittedEvents(data.transferTx);
-        console.log(data);
+        //console.log(data);
 
         const le_after_A = await stm.getLedgerEntry(A);
         const le_after_B = await stm.getLedgerEntry(B);
@@ -334,7 +334,7 @@ contract("StMaster", accounts => {
               == stIds_A.length + stIds_B.length, 'unexpected event composition');
 
         assert(data.tokFullEvents.every(p => stIds_A.includes(p.stId.toString()) || stIds_B.includes(p.stId.toString()))
-            && data.tokPartialEvents.every(p => stIds_A.includes(p.stId.toString()) || stIds_B.includes(p.stId.toString())), 'unexpected event detail');  
+            && data.tokPartialEvents.every(p => stIds_A.includes(p.splitFromSecTokenId.toString()) || stIds_B.includes(p.splitFromSecTokenId.toString())), 'unexpected event detail');  
     });
 
     // TODO: exchange token fees...

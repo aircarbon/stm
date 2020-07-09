@@ -164,12 +164,13 @@ contract("StMaster", accounts => {
         console.log('le_A', le_A);
         console.log('le_B', le_B);
 
+        // B->A: by ID (residual), w/ batch tok orig fee
         const stIds = le_B.tokens.map(p => p.stId);
         console.log('stIds', stIds);
         await transferHelper.transferLedger({ stm, accounts, 
             ledger_A: A,                        ledger_B: B,
                qty_A: 0,                     tokTypeId_A: 0,                        k_stIds_A: [],   
-               qty_B: 99 ,                   tokTypeId_B: CONST.tokenType.TOK_T1,   k_stIds_B: stIds, // ## by ID (single): failing in CFT w/ orig tok fees - gas excess; loop not terminating               qty_B: 99 ,                   tokTypeId_B: CONST.tokenType.TOK_T1,   k_stIds_B: stIds, // ## by ID (single): failing in CFT w/ orig tok fees
+               qty_B: 99,                    tokTypeId_B: CONST.tokenType.TOK_T1,   k_stIds_B: stIds,
         ccy_amount_A: 0,                     ccyTypeId_A: 0,
         ccy_amount_B: 0,                     ccyTypeId_B: 0,
            applyFees: true,
