@@ -17,7 +17,7 @@ contract("StMaster", accounts => {
 
     before(async function () {
         stm = await st.deployed();
-        if (await stm.getContractType() != CONST.contractType.CASHFLOW_CONTROLLER) this.skip();
+        //if (await stm.getContractType() != CONST.contractType.CASHFLOW_CONTROLLER) this.skip();
         if (!global.TaddrNdx) global.TaddrNdx = 0;
 
         // whitelist & seal ontroller
@@ -26,18 +26,20 @@ contract("StMaster", accounts => {
         await stm.sealContract();
 
         // whitelist & seal base types
-        const types = (await stm.getSecTokenTypes()).tokenTypes;
-        const O = await CONST.getAccountAndKey(0);
-        for (var type of types) {
-            await CONST.web3_tx('whitelistMany', [wlAddrs], O.addr, O.privKey, /*nameOverride*/undefined, /*addrOverride*/type.cashflowBaseAddr);
-            await CONST.web3_tx('sealContract', [], O.addr, O.privKey, /*nameOverride*/undefined, /*addrOverride*/type.cashflowBaseAddr);
-        }
+        if (await stm.getContractType() == CONST.contractType.CASHFLOW_CONTROLLER) {
+            const types = (await stm.getSecTokenTypes()).tokenTypes;
+            const O = await CONST.getAccountAndKey(0);
+            for (var type of types) {
+                await CONST.web3_tx('whitelistMany', [wlAddrs], O.addr, O.privKey, /*nameOverride*/undefined, /*addrOverride*/type.cashflowBaseAddr);
+                await CONST.web3_tx('sealContract', [], O.addr, O.privKey, /*nameOverride*/undefined, /*addrOverride*/type.cashflowBaseAddr);
+            }
 
+        }
         //await setupHelper.setDefaults({ stm, accounts });
     });
 
     beforeEach(async () => {
-        global.TaddrNdx++;
+        global.TaddrNdx += 2;
         if (CONST.logTestAccountUsage)
             console.log(`addrNdx: ${global.TaddrNdx} - contract @ ${stm.address} (owner: ${accounts[0]})`);
     });
@@ -47,24 +49,27 @@ contract("StMaster", accounts => {
     //
 
     // indirect types & minting
-    it(`cashflow controller - should be able to query controller's indirect types (default deployer: 2 indirect types)`, async () => {
-        const types = (await stm.getSecTokenTypes()).tokenTypes;
-        assert(types.length == 2);
-    });
+    // it(`cashflow controller - should be able to query controller's indirect types (default deployer: 2 indirect types)`, async () => {
+    //     const types = (await stm.getSecTokenTypes()).tokenTypes;
+    //     assert(types.length == 2);
+    // });
     it(`cashflow controller - allow an initial unibatch mint on an indirect passed-through cashflow base (type 1)`, async () => {
         const M = accounts[0];
+        const origFee = { ccy_mirrorFee: false, ccy_perMillion: 0, fee_fixed: 1, fee_percBips: 0, fee_min: 1, fee_max: 0 };
+        //const origFee = CONST.nullFees;
         const { batchId, mintTx } = await mintBatchWithMetadata( 
-            { tokenType: CONST.tokenType.TOK_T1, qtyUnit: 1000, qtySecTokens: 1, receiver: M, metaKeys: [ 'key1', 'key2' ],  metaValues: [ 'val1', 'val2' ],
+            { tokenType: CONST.tokenType.TOK_T1, qtyUnit: 1000, qtySecTokens: 1, receiver: M, origTokFees: origFee, metaKeys: [ 'key1', 'key2' ],  metaValues: [ 'val1', 'val2' ],
         }, );
         //truffleAssert.prettyPrintEmittedEvents(mintTx);
-        truffleAssert.eventEmitted(mintTx, 'Minted', ev => ev.batchId == 1 && ev.tokTypeId == CONST.tokenType.TOK_T1 && ev.mintQty == 1000);
-        truffleAssert.eventEmitted(mintTx, 'MintedSecToken', ev => { 
-            return ev.stId.eq(new BN('6277101735386680763835789423207666416102355444464034512897')) // 0x0000000000000001000000000000000000000000000000000000000000000001
-              && ev.tokTypeId == CONST.tokenType.TOK_T1 && ev.mintedQty == 1000
-            }
-        );
-        const st = await stm.getSecToken(new BN('6277101735386680763835789423207666416102355444464034512897'));
-        assert(st.tokTypeId == CONST.tokenType.TOK_T1 && st.batchId == 1, 'unexpected token data');
+        
+        // truffleAssert.eventEmitted(mintTx, 'Minted', ev => ev.batchId == 1 && ev.tokTypeId == CONST.tokenType.TOK_T1 && ev.mintQty == 1000);
+        // truffleAssert.eventEmitted(mintTx, 'MintedSecToken', ev => { 
+        //     return ev.stId.eq(new BN('6277101735386680763835789423207666416102355444464034512897')) // 0x0000000000000001000000000000000000000000000000000000000000000001
+        //       && ev.tokTypeId == CONST.tokenType.TOK_T1 && ev.mintedQty == 1000
+        //     }
+        // );
+        // const st = await stm.getSecToken(new BN('6277101735386680763835789423207666416102355444464034512897'));
+        // assert(st.tokTypeId == CONST.tokenType.TOK_T1 && st.batchId == 1, 'unexpected token data');
     });
     // it(`cashflow controller - should not allow a subsequent batch mint for the same indirect base (type 1)`, async () => {
     //     const M = accounts[0];
@@ -143,22 +148,37 @@ contract("StMaster", accounts => {
     //     // console.log('le', le);
     // });
 
-    it(`cashflow controller - should be able to delegate-transfer base indirect token types across ledger entries (type 1)`, async () => {
+    it(`cashflow controller - should be able to delegate-transfer base indirect token types across ledger entries (one-sided, A->B by qty & by ID)`, async () => {
         const A = accounts[0], B = accounts[global.TaddrNdx + 0];
 
-        var le_A = await stm.getLedgerEntry(A); 
-        var le_B = await stm.getLedgerEntry(B); 
-        console.log('le_A', le_A);
-        console.log('le_B', le_B);
-
-        // one sided token transfer
+        // A->B: by qty
         await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: A,                        ledger_B: B,
-                   qty_A: 1,                     tokTypeId_A: CONST.tokenType.TOK_T1,
+                   qty_A: 100,                   tokTypeId_A: CONST.tokenType.TOK_T1,
                    qty_B: 0,                     tokTypeId_B: 0,
                k_stIds_A: [],                      k_stIds_B: [],
             ccy_amount_A: 0,                     ccyTypeId_A: 0,
             ccy_amount_B: 0,                     ccyTypeId_B: 0,
+               applyFees: true,
+        });
+        var le_A = await stm.getLedgerEntry(A);
+        var le_B = await stm.getLedgerEntry(B);
+        console.log('le_A', le_A);
+        console.log('le_B', le_B);
+
+        // B->A: by ID -- batch org fees set... ## failing with silent revert...
+        // ## two different kinds of failure w/ orig-tok fees set
+        //   ## 1 -- transfer by qty: "unexpected ledger B quantity sum after transfer B -> A"
+        //   ## 2 -- transer by ID: unspecified reevert...
+        const stIds = le_B.tokens.map(p => p.stId);
+        console.log('stIds', stIds);
+        await transferHelper.transferLedger({ stm, accounts, 
+            ledger_A: A,                        ledger_B: B,
+               qty_A: 0,                     tokTypeId_A: 0,                        k_stIds_A: [],   
+               qty_B: 99 ,                   tokTypeId_B: CONST.tokenType.TOK_T1,   k_stIds_B: [], //stIds, // ## failing in CFT + orig tok fees, due to IDs?
+        ccy_amount_A: 0,                     ccyTypeId_A: 0,
+        ccy_amount_B: 0,                     ccyTypeId_B: 0,
+           applyFees: true,
         });
 
         le_A = await stm.getLedgerEntry(A);
@@ -166,8 +186,11 @@ contract("StMaster", accounts => {
         console.log('le_A', le_A);
         console.log('le_B', le_B);
     });
+    // todo: B ->A by Qty & ID
+    // todo: A<->B, 4 permutations
+    // 8 total perms!
 
-    // TODO: transferOrTrade()
+    // TODO: previews...()
     //
     // TODO: !? getLedgerHashcode() -> controller needs to delegate to base for ST data...? 
     //        > multiple upgrade cases: 
@@ -175,9 +198,9 @@ contract("StMaster", accounts => {
     //              (2) bases upgraded, controller remains
     //              (3) base & controllers upgraded
 
-    async function mintBatchWithMetadata({ tokenType, qtyUnit, qtySecTokens, receiver, metaKeys, metaValues }) {
+    async function mintBatchWithMetadata({ tokenType, qtyUnit, qtySecTokens, receiver, origTokFees, metaKeys, metaValues }) {
         const mintTx = await stm.mintSecTokenBatch(
-            tokenType, qtyUnit, qtySecTokens, receiver, CONST.nullFees, 0, metaKeys, metaValues,
+            tokenType, qtyUnit, qtySecTokens, receiver, origTokFees, 0, metaKeys, metaValues,
             //0,
         { from: accounts[0] });
         //truffleAssert.prettyPrintEmittedEvents(mintTx);

@@ -9,13 +9,11 @@ module.exports = {
     transferLedger: async (a) => {
         const { stm, accounts,
             ledger_A,     ledger_B, 
-            qty_A,        tokTypeId_A,
-            qty_B,        tokTypeId_B,
+            qty_A,        tokTypeId_A, k_stIds_A,
+            qty_B,        tokTypeId_B, k_stIds_B,
             ccy_amount_A, ccyTypeId_A,
             ccy_amount_B, ccyTypeId_B,
             applyFees,
-            k_stIds_A,
-            k_stIds_B,
         } = a;
         // console.dir(a);
         //console.log('ccyTypeId_A', ccyTypeId_A);
@@ -104,11 +102,11 @@ module.exports = {
                k_stIds_A: k_stIds_A || [],
                k_stIds_B: k_stIds_B || [],
         });
-        // for (let i = 0; i < feesPreview.length; i++) {
-        //     const x = feesPreview[i];
-        //     if (i == 0 || x.origTokFee_qty > 0)
-        //         console.log(`FEE PREVIEW ndx: ${i} fee_ccy_A=${x.fee_ccy_A} fee_ccy_B=${x.fee_ccy_B} fee_tok_A=${x.fee_tok_A} fee_tok_B=${x.fee_tok_B} origTokFee_batchId=${x.origTokFee_batchId} origTokFee_qty=${x.origTokFee_qty}`);
-        // }
+        for (let i = 0; i < feesPreview.length; i++) {
+            const x = feesPreview[i];
+            if (i == 0 || x.origTokFee_qty > 0)
+                console.log(`FEE PREVIEW ndx: ${i} fee_ccy_A=${x.fee_ccy_A} fee_ccy_B=${x.fee_ccy_B} fee_tok_A=${x.fee_tok_A} fee_tok_B=${x.fee_tok_B} origTokFee_batchId=${x.origTokFee_batchId} origTokFee_qty=${x.origTokFee_qty}`);
+        }
 
         const sumFees_tok_A = feesPreview.map(p => p.fee_tok_A).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
         const sumFees_tok_B = feesPreview.map(p => p.fee_tok_B).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
@@ -450,13 +448,18 @@ module.exports = {
             });
             
             // validate that total quantity across A, B and contract owner (fee receiver) is unchanged
-            // console.log('            ledgerA_before.spot_sumQty', ledgerA_before.spot_sumQty);
-            // console.log('            ledgerB_before.spot_sumQty', ledgerB_before.spot_sumQty);
-            // console.log('owner_before.spot_sumQty', owner_before.spot_sumQty);
+            console.log('            ledgerA_before.spot_sumQty', ledgerA_before.spot_sumQty);
+            console.log('            ledgerB_before.spot_sumQty', ledgerB_before.spot_sumQty);
+            console.log('              owner_before.spot_sumQty', owner_before.spot_sumQty);
 
-            // console.log('             ledgerA_after.spot_sumQty', ledgerA_after.spot_sumQty);
-            // console.log('             ledgerB_after.spot_sumQty', ledgerB_after.spot_sumQty);
-            // console.log(' owner_after.spot_sumQty', owner_after.spot_sumQty);
+            console.log('             ledgerA_after.spot_sumQty', ledgerA_after.spot_sumQty);
+            console.log('             ledgerB_after.spot_sumQty', ledgerB_after.spot_sumQty);
+            console.log('               owner_after.spot_sumQty', owner_after.spot_sumQty);
+
+            console.log('            contractOwnerIsTransfering', contractOwnerIsTransfering.toString());
+            
+            console.log('       originatorFeeData(...fee_tok_A)', originatorFeeData.map(p => p.fee_tok_A).reduce((a,b) => Number(a) + Number(b), Number(0)));
+            console.log('       originatorFeeData(...fee_tok_B)', originatorFeeData.map(p => p.fee_tok_B).reduce((a,b) => Number(a) + Number(b), Number(0)));
 
             // don't double count sender/receiver and master contract owner, if the contract owner is on one side of the transfer
             assert(Number(ledgerA_before.spot_sumQty) + 
@@ -466,8 +469,8 @@ module.exports = {
                    Number(ledgerA_after.spot_sumQty)  + 
                    Number(ledgerB_after.spot_sumQty)  + 
                    (contractOwnerIsTransfering ? 0 : Number(owner_after.spot_sumQty)) + // exchange fee receiver after
-                   originatorFeeData.map(p => p.fee_tok_A).reduce((a,b) => Number(a) + Number(b), Number(0)) + // originator fees paid by A
-                   originatorFeeData.map(p => p.fee_tok_B).reduce((a,b) => Number(a) + Number(b), Number(0))   // originator fees paid by B
+                   (contractOwnerIsTransfering ? 0 : originatorFeeData.map(p => p.fee_tok_A).reduce((a,b) => Number(a) + Number(b), Number(0))) + // originator fees paid by A
+                   (contractOwnerIsTransfering ? 0 : originatorFeeData.map(p => p.fee_tok_B).reduce((a,b) => Number(a) + Number(b), Number(0)))   // originator fees paid by B
                    , 'unexpected total quantity sum across ledger before vs. after');
         }
 
@@ -477,12 +480,12 @@ module.exports = {
                 Big(originatorFeeData.filter(p2 => p2.fee_to == p.fee_to).map(p2 => p2.fee_tok_A).reduce((a,b) => Big(a).plus(Big(b)), Big(0)))
           .plus(Big(originatorFeeData.filter(p2 => p2.fee_to == p.fee_to).map(p2 => p2.fee_tok_B).reduce((a,b) => Big(a).plus(Big(b)), Big(0))))
 
-        //   console.log(' p.ledgerBefore.spot_sumQty', p.ledgerBefore.spot_sumQty.toString());
-        //   console.log('  p.ledgerAfter.spot_sumQty', p.ledgerAfter.spot_sumQty.toString());
-        //   console.log('allOriginatorFeesPaidToLedger', allOriginatorFeesPaidToLedger.toFixed());
+          console.log(`   p.ledgerBefore.spot_sumQty ${p.fee_to}`, p.ledgerBefore.spot_sumQty.toString());
+          console.log(`    p.ledgerAfter.spot_sumQty ${p.fee_to}`, p.ledgerAfter.spot_sumQty.toString());
+          console.log(`allOriginatorFeesPaidToLedger ${p.fee_to}`, allOriginatorFeesPaidToLedger.toFixed());
 
-            // originator ledger after = ledger before + all originator fees paid to that ledger
-            assert(Big(p.ledgerAfter.spot_sumQty.toString()).eq(Big(p.ledgerBefore.spot_sumQty.toString()).plus(allOriginatorFeesPaidToLedger))
+            // originator ledger after >= ledger before + all originator fees paid to that ledger (will be > if the fee receiver account is also the main user TX receiver account)
+            assert(Big(p.ledgerAfter.spot_sumQty.toString()).gte(Big(p.ledgerBefore.spot_sumQty.toString()).plus(allOriginatorFeesPaidToLedger))
                 , `unexpected originator ${p.fee_to} token sum across ledger before vs. after`);
         });
 
@@ -569,7 +572,14 @@ module.exports = {
             totalqty_AllSecSecTokenTypes_fees = totalqty_AllSecSecTokenTypes_fees.add(new BN(ex_tokFee_B));
             netTokQty_tfd += qty_B; // transfered by B
             netTokQty_tfd -= qty_A; // received from A
+
+            console.log('ledgerB_after.spot_sumQty', ledgerB_after.spot_sumQty.toString());
+            console.log('ledgerB_before.spot_sumQty', ledgerB_before.spot_sumQty.toString());
+            console.log('netTokQty_tfd', netTokQty_tfd.toString());
+            console.log('ex_tokFee_B', ex_tokFee_B.toString());
+            console.log('originatorFees_tok_B', originatorFees_tok_B.toString());
             assert(ledgerB_after.spot_sumQty == Number(ledgerB_before.spot_sumQty) - netTokQty_tfd - ex_tokFee_B - Number(originatorFees_tok_B.toFixed()), 'unexpected ledger B quantity sum after transfer B -> A');
+
             assert(ledgerA_after.spot_sumQty == Number(ledgerA_before.spot_sumQty) + netTokQty_tfd - ex_tokFee_A - Number(originatorFees_tok_A.toFixed()), 'unexpected ledger A tokens sum after transfer B -> A');
             
             totalTokQty_tfd_incFees = totalTokQty_tfd_incFees.add(new BN(originatorFees_tok_B.toFixed()));

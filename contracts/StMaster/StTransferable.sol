@@ -43,7 +43,7 @@ contract StTransferable is Owned,
     uint256 constant MAX_BATCHES_PREVIEW = 128; // library constants not accessible in contract; must duplicate TransferLib value
     function transfer_feePreview(StructLib.TransferArgs calldata a)
     external view returns (StructLib.FeesCalc[1 + MAX_BATCHES_PREVIEW * 2] memory feesAll) {
-        return TransferLib.transfer_feePreview(ld, globalFees, owner, a);
+        return TransferLib.transfer_feePreview(ld, std, globalFees, owner, a);
     }
 
     // 24k

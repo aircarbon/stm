@@ -288,10 +288,11 @@ library TransferLib {
     // PUBLIC - fee preview (FULL - includes originator token fees)
     //
     function transfer_feePreview(
-        StructLib.LedgerStruct storage ld,
-        StructLib.FeeStruct storage    globalFees,
-        address                        feeAddrOwner,
-        StructLib.TransferArgs memory  a
+        StructLib.LedgerStruct storage   ld,
+        StructLib.StTypesStruct storage  std,
+        StructLib.FeeStruct storage      globalFees,
+        address                          feeAddrOwner,
+        StructLib.TransferArgs memory    a
     )
     public view
     // 1 exchange fee (single destination) + maximum of MAX_BATCHES_PREVIEW of originator fees on each side (x2) of the transfer
@@ -311,7 +312,9 @@ library TransferLib {
         uint ndx = 0;
 
         // transfer by ST ID: check supplied STs belong to supplied owner(s), and implied quantities match supplied quantities
-        checkStIds(ld, a);
+        if (ld.contractType != StructLib.ContractType.CASHFLOW_CONTROLLER) { //**
+            checkStIds(ld, a);
+        }
 
         // exchange fee
         StructLib.FeeStruct storage exFeeStruct_ccy_A = ld._ledger[a.ledger_A].spot_customFees.ccyType_Set[a.ccyTypeId_A] ? ld._ledger[a.ledger_A].spot_customFees : globalFees;
@@ -398,7 +401,26 @@ library TransferLib {
                 }
             }
         }
-        // TODO: delegate-base, merge token fees & ccy fees...
+        else { // controller - delegate token fee previews to base type(s) & merge results
+            if (a.qty_A > 0) {
+                StMaster base_A = StMaster(std._tt_addr[a.tokTypeId_A]);
+                StructLib.FeesCalc[1 + MAX_BATCHES_PREVIEW * 2] memory feesBase = base_A.transfer_feePreview(a);
+                for (uint i = 1 ; i < feesBase.length ; i++) {
+                    if (feesBase[i].fee_tok_A > 0) {
+                        feesAll[i] = feesBase[i];
+                    }
+                }
+            }
+            if (a.qty_B > 0) {
+                StMaster base_B = StMaster(std._tt_addr[a.tokTypeId_B]);
+                StructLib.FeesCalc[1 + MAX_BATCHES_PREVIEW * 2] memory feesBase = base_B.transfer_feePreview(a);
+                for (uint i = 1 ; i < feesBase.length ; i++) {
+                    if (feesBase[i].fee_tok_B > 0) {
+                        feesAll[i] = feesBase[i];
+                    }
+                }
+            }
+        }
     }
 
     //
@@ -414,7 +436,9 @@ library TransferLib {
         uint ndx = 0;
 
         // transfer by ST ID: check supplied STs belong to supplied owner(s), and implied quantities match supplied quantities
-        checkStIds(ld, a);
+        if (ld.contractType != StructLib.ContractType.CASHFLOW_CONTROLLER) { //**
+            checkStIds(ld, a);
+        }
 
         // TODO: refactor - this is common/identical to transfer_feePreview...
 
@@ -462,6 +486,7 @@ library TransferLib {
                 feesAll[0].fee_ccy_A = a.ledger_A != a.feeAddrOwner ? calcFeeWithCapCollar(exFeeStruct_ccy_A.ccy[a.ccyTypeId_A], uint256(a.ccy_amount_B), a.qty_A) : 0;
             }
         }
+        // TODO: delegate-base, & merge...
     }
 
     //
