@@ -17,7 +17,7 @@ contract("StMaster", accounts => {
 
     before(async function () {
         stm = await st.deployed();
-        //if (await stm.getContractType() != CONST.contractType.CASHFLOW_CONTROLLER) this.skip();
+        if (await stm.getContractType() != CONST.contractType.CASHFLOW_CONTROLLER) this.skip();
         if (!global.TaddrNdx) global.TaddrNdx = 0;
 
         // whitelist & seal ontroller
@@ -26,16 +26,14 @@ contract("StMaster", accounts => {
         await stm.sealContract();
 
         // whitelist & seal base types
-        if (await stm.getContractType() == CONST.contractType.CASHFLOW_CONTROLLER) {
+        //if (await stm.getContractType() == CONST.contractType.CASHFLOW_CONTROLLER) {
             const types = (await stm.getSecTokenTypes()).tokenTypes;
             const O = await CONST.getAccountAndKey(0);
             for (var type of types) {
                 await CONST.web3_tx('whitelistMany', [wlAddrs], O.addr, O.privKey, /*nameOverride*/undefined, /*addrOverride*/type.cashflowBaseAddr);
                 await CONST.web3_tx('sealContract', [], O.addr, O.privKey, /*nameOverride*/undefined, /*addrOverride*/type.cashflowBaseAddr);
             }
-
-        }
-        //await setupHelper.setDefaults({ stm, accounts });
+        //}
     });
 
     beforeEach(async () => {
@@ -62,14 +60,14 @@ contract("StMaster", accounts => {
         }, );
         //truffleAssert.prettyPrintEmittedEvents(mintTx);
         
-        // truffleAssert.eventEmitted(mintTx, 'Minted', ev => ev.batchId == 1 && ev.tokTypeId == CONST.tokenType.TOK_T1 && ev.mintQty == 1000);
-        // truffleAssert.eventEmitted(mintTx, 'MintedSecToken', ev => { 
-        //     return ev.stId.eq(new BN('6277101735386680763835789423207666416102355444464034512897')) // 0x0000000000000001000000000000000000000000000000000000000000000001
-        //       && ev.tokTypeId == CONST.tokenType.TOK_T1 && ev.mintedQty == 1000
-        //     }
-        // );
-        // const st = await stm.getSecToken(new BN('6277101735386680763835789423207666416102355444464034512897'));
-        // assert(st.tokTypeId == CONST.tokenType.TOK_T1 && st.batchId == 1, 'unexpected token data');
+        truffleAssert.eventEmitted(mintTx, 'Minted', ev => ev.batchId == 1 && ev.tokTypeId == CONST.tokenType.TOK_T1 && ev.mintQty == 1000);
+        truffleAssert.eventEmitted(mintTx, 'MintedSecToken', ev => { 
+            return ev.stId.eq(new BN('6277101735386680763835789423207666416102355444464034512897')) // 0x0000000000000001000000000000000000000000000000000000000000000001
+              && ev.tokTypeId == CONST.tokenType.TOK_T1 && ev.mintedQty == 1000
+            }
+        );
+        const st = await stm.getSecToken(new BN('6277101735386680763835789423207666416102355444464034512897'));
+        assert(st.tokTypeId == CONST.tokenType.TOK_T1 && st.batchId == 1, 'unexpected token data');
     });
     // it(`cashflow controller - should not allow a subsequent batch mint for the same indirect base (type 1)`, async () => {
     //     const M = accounts[0];
