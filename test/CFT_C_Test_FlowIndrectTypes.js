@@ -164,7 +164,7 @@ contract("StMaster", accounts => {
         //console.log('le_B', le_B);
 
         // exchange token fee
-        await stm.setFee_TokType(CONST.tokenType.TOK_T1, CONST.nullFees, CONST.nullFees );
+        await stm.setFee_TokType(CONST.tokenType.TOK_T1, CONST.nullAddr, CONST.nullFees );
         await stm.setFee_TokType(CONST.tokenType.TOK_T1, B, { ccy_mirrorFee: false, ccy_perMillion: 0, fee_fixed: 2, fee_percBips: 0, fee_min: 0, fee_max: 0 } );
 
         // B->A: by ID (residual), w/ batch tok orig fee + exchange tok fees
@@ -189,7 +189,7 @@ contract("StMaster", accounts => {
         // TODO: #1 k_stIds[] + qty (differing, i.e. partial transfer/burn, by ID)
         // TODO: #2 getBatches[]
     });
-    // todo: B ->A by Qty & ID
+    // todo: inverse above -- B ->A by Qty & ID
     // todo: A<->B, 4 permutations
     // 8 total perms!
 

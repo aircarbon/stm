@@ -56,7 +56,7 @@ library SpotFeeLib {
             emit SetFeeTokMax(tokTypeId, ledgerOwner, a.fee_max);
         feeStruct.tok[tokTypeId].fee_max = a.fee_max;
 
-        // cashflow controller: delegate to all base types (denormlize fee structures: they are read directly from delegated base types' storages during transferOrTrade())
+        // cashflow controller: delegate to base type (denormlize fee structures: they are read directly from delegated base types' storages during transferOrTrade())
         if (ld.contractType == StructLib.ContractType.CASHFLOW_CONTROLLER) {
             StMaster base = StMaster(std._tt_addr[tokTypeId]);
             base.setFee_TokType(tokTypeId,ledgerOwner, a);
