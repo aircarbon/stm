@@ -5,6 +5,8 @@ pragma experimental ABIEncoderV2;
 
 import "../Interfaces/StructLib.sol";
 
+import "../StMaster/StMaster.sol";
+
 library SpotFeeLib {
     event SetFeeTokFix(uint256 tokTypeId, address indexed ledgerOwner, uint256 fee_tokenQty_Fixed);
     event SetFeeCcyFix(uint256 ccyTypeId, address indexed ledgerOwner, uint256 fee_ccy_Fixed);
@@ -53,6 +55,12 @@ library SpotFeeLib {
         if (feeStruct.tok[tokTypeId].fee_max != a.fee_max || a.fee_max != 0)
             emit SetFeeTokMax(tokTypeId, ledgerOwner, a.fee_max);
         feeStruct.tok[tokTypeId].fee_max = a.fee_max;
+
+        // cashflow controller: delegate to all base types (denormlize fee structures: they are read directly from delegated base types' storages during transferOrTrade())
+        if (ld.contractType == StructLib.ContractType.CASHFLOW_CONTROLLER) {
+            StMaster base = StMaster(std._tt_addr[tokTypeId]);
+            base.setFee_TokType(tokTypeId,ledgerOwner, a);
+        }
     }
 
     function setFee_CcyType(

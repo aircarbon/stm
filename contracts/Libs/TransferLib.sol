@@ -132,7 +132,7 @@ library TransferLib {
         //
         if (ld.contractType != StructLib.ContractType.CASHFLOW_CONTROLLER) { //**
             if (a.qty_A > 0) {
-                v.ts_args[0] = TransferSplitArgs({ from: a.ledger_A, to: a.ledger_B, tokTypeId: a.tokTypeId_A, qtyUnit: a.qty_A, transferType: StructLib.TransferType.User, maxStId: maxStId, k_stIds_take: a.k_stIds_A, k_stIds_skip: new uint256[](0) });
+                v.ts_args[0] = TransferSplitArgs({ from: a.ledger_A, to: a.ledger_B, tokTypeId: a.tokTypeId_A, qtyUnit: a.qty_A, transferType: StructLib.TransferType.User, maxStId: maxStId, k_stIds_take: a.k_stIds_A/*, k_stIds_skip: new uint256[](0)*/ });
                 v.ts_previews[0] = transferSplitSecTokens_Preview(ld, v.ts_args[0]);
                 for (uint i = 0; i < v.ts_previews[0].batchCount ; i++) {
                     StructLib.SecTokenBatch storage batch = ld._batches[v.ts_previews[0].batchIds[i]];
@@ -141,7 +141,7 @@ library TransferLib {
                 }
             }
             if (a.qty_B > 0) {
-                v.ts_args[1] = TransferSplitArgs({ from: a.ledger_B, to: a.ledger_A, tokTypeId: a.tokTypeId_B, qtyUnit: a.qty_B, transferType: StructLib.TransferType.User, maxStId: maxStId, k_stIds_take: a.k_stIds_B, k_stIds_skip: new uint256[](0) });
+                v.ts_args[1] = TransferSplitArgs({ from: a.ledger_B, to: a.ledger_A, tokTypeId: a.tokTypeId_B, qtyUnit: a.qty_B, transferType: StructLib.TransferType.User, maxStId: maxStId, k_stIds_take: a.k_stIds_B/*, k_stIds_skip: new uint256[](0)*/ });
                 v.ts_previews[1] = transferSplitSecTokens_Preview(ld, v.ts_args[1]);
                 for (uint i = 0; i < v.ts_previews[1].batchCount ; i++) {
                     StructLib.SecTokenBatch storage batch = ld._batches[v.ts_previews[1].batchIds[i]];
@@ -217,7 +217,7 @@ library TransferLib {
                 if (a.applyFees) {
                     // exchange token fee transfer from A
                     if (exFees.fee_tok_A > 0) {
-                        maxStId = transferSplitSecTokens(ld, TransferSplitArgs({ from: a.ledger_A, to: a.feeAddrOwner, tokTypeId: a.tokTypeId_A, qtyUnit: exFees.fee_tok_A, transferType: StructLib.TransferType.ExchangeFee, maxStId: maxStId, k_stIds_take: new uint256[](0), k_stIds_skip: /*a.k_stIds_A*/new uint256[](0) }));
+                        maxStId = transferSplitSecTokens(ld, TransferSplitArgs({ from: a.ledger_A, to: a.feeAddrOwner, tokTypeId: a.tokTypeId_A, qtyUnit: exFees.fee_tok_A, transferType: StructLib.TransferType.ExchangeFee, maxStId: maxStId, k_stIds_take: a.k_stIds_A/*, k_stIds_skip: new uint256[](0)*/ }));
                         v.exchangeFeesPaidQty += uint80(exFees.fee_tok_A);
                     }
 
@@ -226,14 +226,14 @@ library TransferLib {
                         StructLib.SecTokenBatch storage batch = ld._batches[v.ts_previews[0].batchIds[i]];
                         uint256 tokFee = a.ledger_A != batch.originator ? calcFeeWithCapCollar(batch.origTokFee, v.ts_previews[0].transferQty[i], 0) : 0;
                         if (tokFee > 0) {
-                            maxStId = transferSplitSecTokens(ld, TransferSplitArgs({ from: a.ledger_A, to: batch.originator, tokTypeId: a.tokTypeId_A, qtyUnit: tokFee, transferType: StructLib.TransferType.OriginatorFee, maxStId: maxStId, k_stIds_take: new uint256[](0), k_stIds_skip: /*a.k_stIds_A*/new uint256[](0) }));
+                            maxStId = transferSplitSecTokens(ld, TransferSplitArgs({ from: a.ledger_A, to: batch.originator, tokTypeId: a.tokTypeId_A, qtyUnit: tokFee, transferType: StructLib.TransferType.OriginatorFee, maxStId: maxStId, k_stIds_take: a.k_stIds_A/*, k_stIds_skip: new uint256[](0)*/ }));
                             v.originatorFeesPaidQty += uint80(tokFee);
                         }
                     }
                 }
                 // user transfer from A
                 maxStId = transferSplitSecTokens(ld,
-                    TransferSplitArgs({ from: v.ts_args[0].from, to: v.ts_args[0].to, tokTypeId: v.ts_args[0].tokTypeId, qtyUnit: v.ts_args[0].qtyUnit, transferType: v.ts_args[0].transferType, maxStId: maxStId, k_stIds_take: a.k_stIds_A, k_stIds_skip: new uint256[](0) })
+                    TransferSplitArgs({ from: v.ts_args[0].from, to: v.ts_args[0].to, tokTypeId: v.ts_args[0].tokTypeId, qtyUnit: v.ts_args[0].qtyUnit, transferType: v.ts_args[0].transferType, maxStId: maxStId, k_stIds_take: a.k_stIds_A/*, k_stIds_skip: new uint256[](0)*/ })
                 );
                 v.transferedQty += uint80(v.ts_args[0].qtyUnit);
             }
@@ -241,7 +241,7 @@ library TransferLib {
                 if (a.applyFees) {
                     // exchange token fee transfer from B
                     if (exFees.fee_tok_B > 0) {
-                        maxStId = transferSplitSecTokens(ld, TransferSplitArgs({ from: a.ledger_B, to: a.feeAddrOwner, tokTypeId: a.tokTypeId_B, qtyUnit: exFees.fee_tok_B, transferType: StructLib.TransferType.ExchangeFee, maxStId: maxStId, k_stIds_take: new uint256[](0), k_stIds_skip: /*a.k_stIds_B*/new uint256[](0) }));
+                        maxStId = transferSplitSecTokens(ld, TransferSplitArgs({ from: a.ledger_B, to: a.feeAddrOwner, tokTypeId: a.tokTypeId_B, qtyUnit: exFees.fee_tok_B, transferType: StructLib.TransferType.ExchangeFee, maxStId: maxStId, k_stIds_take: a.k_stIds_B/*, k_stIds_skip: new uint256[](0)*/ }));
                         v.exchangeFeesPaidQty += uint80(exFees.fee_tok_B);
                     }
 
@@ -250,14 +250,14 @@ library TransferLib {
                         StructLib.SecTokenBatch storage batch = ld._batches[v.ts_previews[1].batchIds[i]];
                         uint256 tokFee = a.ledger_B != batch.originator ? calcFeeWithCapCollar(batch.origTokFee, v.ts_previews[1].transferQty[i], 0) : 0;
                         if (tokFee > 0) {
-                            maxStId = transferSplitSecTokens(ld, TransferSplitArgs({ from: a.ledger_B, to: batch.originator, tokTypeId: a.tokTypeId_B, qtyUnit: tokFee, transferType: StructLib.TransferType.OriginatorFee, maxStId: maxStId, k_stIds_take: new uint256[](0), k_stIds_skip: /*a.k_stIds_B*/new uint256[](0) }));
+                            maxStId = transferSplitSecTokens(ld, TransferSplitArgs({ from: a.ledger_B, to: batch.originator, tokTypeId: a.tokTypeId_B, qtyUnit: tokFee, transferType: StructLib.TransferType.OriginatorFee, maxStId: maxStId, k_stIds_take: a.k_stIds_B/*, k_stIds_skip: new uint256[](0)*/ }));
                             v.originatorFeesPaidQty += uint80(tokFee);
                         }
                     }
                 }
                 // user transfer from B
                 maxStId = transferSplitSecTokens(ld,
-                    TransferSplitArgs({ from: v.ts_args[1].from, to: v.ts_args[1].to, tokTypeId: v.ts_args[1].tokTypeId, qtyUnit: v.ts_args[1].qtyUnit, transferType: v.ts_args[1].transferType, maxStId: maxStId, k_stIds_take: a.k_stIds_B, k_stIds_skip: new uint256[](0) })
+                    TransferSplitArgs({ from: v.ts_args[1].from, to: v.ts_args[1].to, tokTypeId: v.ts_args[1].tokTypeId, qtyUnit: v.ts_args[1].qtyUnit, transferType: v.ts_args[1].transferType, maxStId: maxStId, k_stIds_take: a.k_stIds_B/*, k_stIds_skip: new uint256[](0)*/ })
                 );
                 v.transferedQty += uint80(v.ts_args[1].qtyUnit);
             }
@@ -363,7 +363,7 @@ library TransferLib {
         if (ld.contractType != StructLib.ContractType.CASHFLOW_CONTROLLER) { //**
             uint256 maxStId = ld._tokens_currentMax_id;
             if (a.qty_A > 0) {
-                TransferSplitPreviewReturn memory preview = transferSplitSecTokens_Preview(ld, TransferSplitArgs({ from: a.ledger_A, to: a.ledger_B, tokTypeId: a.tokTypeId_A, qtyUnit: a.qty_A, transferType: StructLib.TransferType.User, maxStId: maxStId, k_stIds_take: a.k_stIds_A, k_stIds_skip: new uint256[](0) }));
+                TransferSplitPreviewReturn memory preview = transferSplitSecTokens_Preview(ld, TransferSplitArgs({ from: a.ledger_A, to: a.ledger_B, tokTypeId: a.tokTypeId_A, qtyUnit: a.qty_A, transferType: StructLib.TransferType.User, maxStId: maxStId, k_stIds_take: a.k_stIds_A/*, k_stIds_skip: new uint256[](0)*/ }));
                 for (uint i = 0; i < preview.batchCount ; i++) {
                     StructLib.SecTokenBatch storage batch = ld._batches[preview.batchIds[i]];
                     if (a.ledger_A != batch.originator) {
@@ -381,7 +381,7 @@ library TransferLib {
                 }
             }
             if (a.qty_B > 0) {
-                TransferSplitPreviewReturn memory preview = transferSplitSecTokens_Preview(ld, TransferSplitArgs({ from: a.ledger_B, to: a.ledger_A, tokTypeId: a.tokTypeId_B, qtyUnit: a.qty_B, transferType: StructLib.TransferType.User, maxStId: maxStId, k_stIds_take: a.k_stIds_B, k_stIds_skip: new uint256[](0) }));
+                TransferSplitPreviewReturn memory preview = transferSplitSecTokens_Preview(ld, TransferSplitArgs({ from: a.ledger_B, to: a.ledger_A, tokTypeId: a.tokTypeId_B, qtyUnit: a.qty_B, transferType: StructLib.TransferType.User, maxStId: maxStId, k_stIds_take: a.k_stIds_B/*, k_stIds_skip: new uint256[](0)*/ }));
                 for (uint i = 0; i < preview.batchCount ; i++) {
                     StructLib.SecTokenBatch storage batch = ld._batches[preview.batchIds[i]];
                     if (a.ledger_B != batch.originator) {
@@ -484,7 +484,6 @@ library TransferLib {
                 feesAll[0].fee_ccy_A = a.ledger_A != a.feeAddrOwner ? calcFeeWithCapCollar(exFeeStruct_ccy_A.ccy[a.ccyTypeId_A], uint256(a.ccy_amount_B), a.qty_A) : 0;
             }
         }
-        // TODO: delegate-base, & merge...
     }
 
     //
@@ -533,7 +532,7 @@ library TransferLib {
         StructLib.TransferType transferType;
         uint256                maxStId;
         uint256[]              k_stIds_take; // IFF len>0: only use these specific tokens (skip any others)
-        uint256[]              k_stIds_skip; // IFF len>0: don't use these specific tokens (use any others) -- UNUSED, CAN REMOVE
+        //uint256[]              k_stIds_skip; // IFF len>0: don't use these specific tokens (use any others) -- UNUSED, CAN REMOVE
     }
     struct TransferSpltVars {
         uint256 ndx;
@@ -563,11 +562,11 @@ library TransferLib {
             // if specific avoid (skip) tokens are specified, then skip them;
             // and inverse - if specific use (take) tokens are specified, then skip over others
             bool skip = false;
-            if (a.k_stIds_skip.length > 0) {
-                for (uint256 i = 0; i < a.k_stIds_skip.length; i++) {
-                    if (a.k_stIds_skip[i] == stId) { skip = true; break; }
-                }
-            }
+            // if (a.k_stIds_skip.length > 0) {
+            //     for (uint256 i = 0; i < a.k_stIds_skip.length; i++) {
+            //         if (a.k_stIds_skip[i] == stId) { skip = true; break; }
+            //     }
+            // }
             if (a.k_stIds_take.length > 0) {
                 skip = true;
                 for (uint256 i = 0; i < a.k_stIds_take.length; i++) {
@@ -722,11 +721,11 @@ library TransferLib {
             uint64 fromBatchId = ld._sts[stId].batchId;
 
             bool skip = false;
-            if (a.k_stIds_skip.length > 0) {
-                for (uint256 i = 0; i < a.k_stIds_skip.length; i++) {
-                    if (a.k_stIds_skip[i] == stId) { skip = true; break; }
-                }
-            }
+            // if (a.k_stIds_skip.length > 0) {
+            //     for (uint256 i = 0; i < a.k_stIds_skip.length; i++) {
+            //         if (a.k_stIds_skip[i] == stId) { skip = true; break; }
+            //     }
+            // }
             if (a.k_stIds_take.length > 0) {
                 skip = true;
                 for (uint256 i = 0; i < a.k_stIds_take.length; i++) {

@@ -54,7 +54,6 @@ contract("StMaster", accounts => {
     it(`cashflow controller - allow an initial unibatch mint on an indirect passed-through cashflow base (type 1)`, async () => {
         const M = accounts[0];
         const origFee = { ccy_mirrorFee: false, ccy_perMillion: 0, fee_fixed: 1, fee_percBips: 0, fee_min: 1, fee_max: 0 };
-        //const origFee = CONST.nullFees;
         const { batchId, mintTx } = await mintBatchWithMetadata( 
             { tokenType: CONST.tokenType.TOK_T1, qtyUnit: 1000, qtySecTokens: 1, receiver: M, origTokFees: origFee, metaKeys: [ 'key1', 'key2' ],  metaValues: [ 'val1', 'val2' ],
         }, );
@@ -146,10 +145,10 @@ contract("StMaster", accounts => {
     //     // console.log('le', le);
     // });
 
-    it(`cashflow controller - should be able to delegate-transfer base indirect token types across ledger entries (one-sided, A->B by qty & by ID)`, async () => {
+    it(`cashflow controller - should be able to delegate-transfer base indirect token types across ledger entries: one-sided, A->B by qty, B->A by ID, w/ token batch & exchange fees`, async () => {
         const A = accounts[0], B = accounts[global.TaddrNdx + 0];
 
-        // A->B: by qty
+        // A->B: by qty (A = minter, no fees)
         await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: A,                        ledger_B: B,
                    qty_A: 100,                   tokTypeId_A: CONST.tokenType.TOK_T1,
@@ -164,25 +163,28 @@ contract("StMaster", accounts => {
         //console.log('le_A', le_A);
         //console.log('le_B', le_B);
 
-        // B->A: by ID (residual), w/ batch tok orig fee
+        // exchange token fee
+        await stm.setFee_TokType(CONST.tokenType.TOK_T1, CONST.nullFees, CONST.nullFees );
+        await stm.setFee_TokType(CONST.tokenType.TOK_T1, B, { ccy_mirrorFee: false, ccy_perMillion: 0, fee_fixed: 2, fee_percBips: 0, fee_min: 0, fee_max: 0 } );
+
+        // B->A: by ID (residual), w/ batch tok orig fee + exchange tok fees
         const stIds = le_B.tokens.map(p => p.stId);
-        //console.log('stIds', stIds);
-        await transferHelper.transferLedger({ stm, accounts, 
+        const data = await transferHelper.transferLedger({ stm, accounts, 
             ledger_A: A,                        ledger_B: B,
                qty_A: 0,                     tokTypeId_A: 0,                        k_stIds_A: [],   
-               qty_B: 99,                    tokTypeId_B: CONST.tokenType.TOK_T1,   k_stIds_B: stIds,
+               qty_B: 50,                    tokTypeId_B: CONST.tokenType.TOK_T1,   k_stIds_B: stIds,
         ccy_amount_A: 0,                     ccyTypeId_A: 0,
         ccy_amount_B: 0,                     ccyTypeId_B: 0,
            applyFees: true,
         });
+        truffleAssert.prettyPrintEmittedEvents(data.transferTx);
+        await CONST.logGas(web3, data.transferTx, `Transfer STs B:(Type TOK_T1 / [${stIds.join(',')}]) / A:(null)`);
 
         le_A = await stm.getLedgerEntry(A);
         le_B = await stm.getLedgerEntry(B);
         //console.log('le_A', le_A);
         //console.log('le_B', le_B);
 
-        // TODO: TESTS (COMMODITY) -- by ID, w/ orig tok fees + w/ exchange tok fees...
-        
         // TODO: #0 fund/withdraw - comment/desc to events (for arbitrary off-chain fees)
         // TODO: #1 k_stIds[] + qty (differing, i.e. partial transfer/burn, by ID)
         // TODO: #2 getBatches[]
