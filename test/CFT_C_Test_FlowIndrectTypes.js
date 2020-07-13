@@ -161,12 +161,12 @@ contract("StMaster", accounts => {
         });
         var le_A = await stm.getLedgerEntry(A);
         var le_B = await stm.getLedgerEntry(B);
-        console.log('le_A', le_A);
-        console.log('le_B', le_B);
+        //console.log('le_A', le_A);
+        //console.log('le_B', le_B);
 
         // B->A: by ID (residual), w/ batch tok orig fee
         const stIds = le_B.tokens.map(p => p.stId);
-        console.log('stIds', stIds);
+        //console.log('stIds', stIds);
         await transferHelper.transferLedger({ stm, accounts, 
             ledger_A: A,                        ledger_B: B,
                qty_A: 0,                     tokTypeId_A: 0,                        k_stIds_A: [],   
@@ -177,9 +177,9 @@ contract("StMaster", accounts => {
         });
 
         le_A = await stm.getLedgerEntry(A);
-        le_B = await stm.getLedgerEntry(B); 
-        console.log('le_A', le_A);
-        console.log('le_B', le_B);
+        le_B = await stm.getLedgerEntry(B);
+        //console.log('le_A', le_A);
+        //console.log('le_B', le_B);
 
         // TODO: TESTS (COMMODITY) -- by ID, w/ orig tok fees + w/ exchange tok fees...
         

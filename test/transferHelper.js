@@ -506,7 +506,7 @@ module.exports = {
         min = lf.fee_min > 0 ? Big(lf.fee_min) : Big(gf.fee_min); //ledgerFee_Min.gt(0) ? ledgerFee_Min : globalFee_Min;
         max = lf.fee_max > 0 ? Big(lf.fee_max) : Big(gf.fee_max); //ledgerFee_Max.gt(0) ? ledgerFee_Max : globalFee_Max;
         var ex_tokFee_A = 0;
-        if (ledger_A != accounts[0]) { // fees not applied by contract if fee-sender == fee-receiver
+        if (ledger_A != accounts[0] && applyFees) { // fees not applied by contract if fee-sender == fee-receiver
             ex_tokFee_A = Math.floor(Number(fix) + Number((qty_A / 10000) * Number(bps)));
             if (Big(ex_tokFee_A).gt(max) && max.gt(0)) ex_tokFee_A = max.toFixed();
             if (Big(ex_tokFee_A).lt(min) && min.gt(0)) ex_tokFee_A = min.toFixed();
@@ -529,7 +529,7 @@ module.exports = {
         min = lf.fee_min > 0 ? Big(lf.fee_min) : Big(gf.fee_min); //ledgerFee_Min.gt(0) ? ledgerFee_Min : globalFee_Min;
         max = lf.fee_max > 0 ? Big(lf.fee_max) : Big(gf.fee_max); //ledgerFee_Max.gt(0) ? ledgerFee_Max : globalFee_Max;
         var ex_tokFee_B = 0;
-        if (ledger_B != accounts[0]) { // fees not applied by contract if fee-sender == fee-receiver
+        if (ledger_B != accounts[0] && applyFees) { // fees not applied by contract if fee-sender == fee-receiver
             ex_tokFee_B = Math.floor(Number(fix) + Number((qty_B / 10000) * Number(bps))); 
             if (Big(ex_tokFee_B).gt(max) && max.gt(0)) ex_tokFee_B = max.toFixed();
             if (Big(ex_tokFee_B).lt(min) && min.gt(0)) ex_tokFee_B = min.toFixed();                     
