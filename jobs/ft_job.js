@@ -162,7 +162,7 @@ async function processTestContext(ft, T) { //, test_shortPosIds) {
         const ccy_deposit = p.ccy_deposits[T];
         if (ccy_deposit.a) {
             console.log(chalk.blue.dim(`TEST_PARTICIPANT: PID=${p.id}, account=${p.account}`) + chalk.blue(` ** DEPOSIT ** `), ccy_deposit);
-            await CONST.web3_tx('fund', [ CONST.ccyType.USD, ccy_deposit.a, p.account ], O.addr, O.privKey);
+            await CONST.web3_tx('fundOrWithdraw', [ CONST.fundWithdrawType.FUND, CONST.ccyType.USD, ccy_deposit.a, p.account, 'TEST_FT' ], O.addr, O.privKey);
         }
     }
     
@@ -171,7 +171,7 @@ async function processTestContext(ft, T) { //, test_shortPosIds) {
         const ccy_withdraw = p.ccy_withdraws[T];
         if (ccy_withdraw.a) {
             console.log(chalk.blue.dim(`TEST_PARTICIPANT: PID=${p.id}, account=${p.account}`) + chalk.blue(` ** WITHDRAW ** `), ccy_withdraw);
-            await CONST.web3_tx('withdraw', [ CONST.ccyType.USD, ccy_withdraw.a, p.account ], O.addr, O.privKey);
+            await CONST.web3_tx('fundOrWithdraw', [ CONST.fundWithdrawType.WITHDRAW, CONST.ccyType.USD, ccy_withdraw.a, p.account, 'TEST_FT' ], O.addr, O.privKey);
         }
     }
 

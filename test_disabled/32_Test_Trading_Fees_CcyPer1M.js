@@ -27,7 +27,7 @@ contract("StMaster", accounts => {
     it(`fees (ccy per million received) - apply USD ccy fee 3 USD/1m tokens received on trades (0.1KT, 1KT, 1.5KT, 11KT) (global fee on A)`, async () => {
         const A = accounts[global.TaddrNdx + 0]
         const B = accounts[global.TaddrNdx + 1]
-        await stm.fund(CONST.ccyType.USD,                      CONST.millionCcy_cents,  A,                               { from: accounts[0] });
+        await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, CONST.ccyType.USD,                      CONST.millionCcy_cents,  A, 'TEST');
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2,    CONST.MT_CARBON,  1,     B, CONST.nullFees, 0, [], [], { from: accounts[0] });
 
         // set global fee: ccy 3.00 /per Million qty received
@@ -64,7 +64,7 @@ contract("StMaster", accounts => {
         const A = accounts[global.TaddrNdx + 0]
         const B = accounts[global.TaddrNdx + 1]
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2,    CONST.MT_CARBON,  1,     A, CONST.nullFees, 0, [], [], { from: accounts[0] });
-        await stm.fund(CONST.ccyType.USD,                      CONST.millionCcy_cents,  B,                               { from: accounts[0] });
+        await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, CONST.ccyType.USD,                      CONST.millionCcy_cents,  B, 'TEST');
 
         // set global fee: ccy 3.00 /per Million qty received
         const ccy_perMillion = 300; // $3
@@ -99,7 +99,7 @@ contract("StMaster", accounts => {
     it(`fees (ccy per million received) - apply ledger override USD ccy fee 6 USD/1m tokens received, capped USD 60, on trades (0.1KT, 1KT, 1.5KT, 11KT) (ledger fee on A)`, async () => {
         const A = accounts[global.TaddrNdx + 0]
         const B = accounts[global.TaddrNdx + 1]
-        await stm.fund(CONST.ccyType.USD,                      CONST.millionCcy_cents,  A,                               { from: accounts[0] });
+        await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, CONST.ccyType.USD,                      CONST.millionCcy_cents,  A, 'TEST');
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2,    CONST.MT_CARBON,  1,     B, CONST.nullFees, 0, [], [], { from: accounts[0] });
 
         // set global fee: ccy 3.00 /per Million qty received
@@ -137,7 +137,7 @@ contract("StMaster", accounts => {
         const A = accounts[global.TaddrNdx + 0]
         const B = accounts[global.TaddrNdx + 1]
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2,    CONST.MT_CARBON,  1,     A, CONST.nullFees, 0, [], [], { from: accounts[0] });
-        await stm.fund(CONST.ccyType.USD,                      CONST.millionCcy_cents,  B,                               { from: accounts[0] });
+        await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, CONST.ccyType.USD,                      CONST.millionCcy_cents,  B, 'TEST');
 
         // set global fee: ccy 3.00 /per Million qty received
         const setExchangeFeeTx = await stm.setFee_CcyType(CONST.ccyType.USD, CONST.nullAddr, { ccy_mirrorFee: false, ccy_perMillion: 300, fee_fixed: 0, fee_percBips: 0, fee_min: 0, fee_max: 0 } );

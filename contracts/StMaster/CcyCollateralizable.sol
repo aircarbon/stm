@@ -21,28 +21,27 @@ contract Collateralizable is
         return CcyLib.getCcyTypes(ctd);
     }
 
-    // TODO:
-    // function fundOrWithdraw(
-    //     StructLib.FundWithdrawType direction,
-    //     uint256 ccyTypeId,
-    //     int256  amount,
-    //     address ledgerOwner,
-    //     string  calldata desc)
+    function fundOrWithdraw(
+        StructLib.FundWithdrawType direction,
+        uint256 ccyTypeId,
+        int256  amount,
+        address ledgerOwner,
+        string  calldata desc)
+    public onlyOwner() onlyWhenReadWrite() {
+        CcyLib.fundOrWithdraw(ld, ctd, direction, ccyTypeId, amount, ledgerOwner, desc);
+    }
+    // function fund(uint256 ccyTypeId,
+    //               int256  amount,
+    //               address ledgerOwner)
     // public onlyOwner() onlyWhenReadWrite() {
-    //     CcyLib.fundOrWithdraw(ld, ctd, direction, ccyTypeId, amount, ledgerOwner, desc);
+    //     CcyLib.fund(ld, ctd, ccyTypeId, amount, ledgerOwner);
     // }
-    function fund(uint256 ccyTypeId,
-                  int256  amount,
-                  address ledgerOwner)
-    public onlyOwner() onlyWhenReadWrite() {
-        CcyLib.fund(ld, ctd, ccyTypeId, amount, ledgerOwner);
-    }
-    function withdraw(uint256 ccyTypeId,
-                      int256  amount,
-                      address ledgerOwner)
-    public onlyOwner() onlyWhenReadWrite() {
-        CcyLib.withdraw(ld, ctd, ccyTypeId, amount, ledgerOwner);
-    }
+    // function withdraw(uint256 ccyTypeId,
+    //                   int256  amount,
+    //                   address ledgerOwner)
+    // public onlyOwner() onlyWhenReadWrite() {
+    //     CcyLib.withdraw(ld, ctd, ccyTypeId, amount, ledgerOwner);
+    // }
 
     // 24k
     // function getTotalCcyFunded(uint256 ccyTypeId)

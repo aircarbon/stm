@@ -45,7 +45,7 @@ contract("StMaster", accounts => {
 
         // SETUP - M -> A: no fees
         const MA_qty = 2000;
-        await stm.fund(CONST.ccyType.ETH,                      CONST.oneEth_wei,        A,                    { from: accounts[0] });
+        await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, CONST.ccyType.ETH,                      CONST.oneEth_wei,        A, 'TEST');
         await stm.setFee_TokType(CONST.tokenType.TOK_T2,       CONST.nullAddr,          CONST.nullFees);
         await stm.setFee_CcyType(CONST.ccyType.ETH,            CONST.nullAddr,          CONST.nullFees);
         const data_MA = await transferHelper.transferLedger({ stm, accounts, 
@@ -60,7 +60,7 @@ contract("StMaster", accounts => {
         assert(Big(MA_B_balAfter).eq(Big(MA_qty)), 'test setup failed');
 
         // SETUP - B: fund, so ready to trade with A
-        await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        B,                       { from: accounts[0] });        
+        await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, CONST.ccyType.ETH,                   CONST.oneEth_wei,        B, 'TEST');
 
         // TEST - set ledger fee NATURE for A
         const ledgerFeeTok = { ccy_mirrorFee: false, ccy_perMillion: 0, fee_fixed: ORIG_FEES_VCS_B1.fee_fixed * 4, fee_percBips: 0, fee_min: 0, fee_max: 0, };
@@ -125,7 +125,7 @@ contract("StMaster", accounts => {
 
         // SETUP - M -> B: no fees
         const MA_qty = 3000;
-        await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        B,                       { from: accounts[0] });
+        await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, CONST.ccyType.ETH,                   CONST.oneEth_wei,        B, 'TEST');
         await stm.setFee_TokType(CONST.tokenType.TOK_T1,    CONST.nullAddr,          CONST.nullFees);
         await stm.setFee_CcyType(CONST.ccyType.ETH,         CONST.nullAddr,          CONST.nullFees);
         const data_MA = await transferHelper.transferLedger({ stm, accounts, 
@@ -140,7 +140,7 @@ contract("StMaster", accounts => {
         assert(Big(MA_B_balAfter).eq(Big(MA_qty)), 'test setup failed');
 
         // SETUP - A: fund, so ready to trade with B
-        await stm.fund(CONST.ccyType.USD,                   CONST.millionCcy_cents,  A,                       { from: accounts[0] });        
+        await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, CONST.ccyType.USD,                   CONST.millionCcy_cents,  A, 'TEST');
 
         // TEST - set global fee structure CORSIA: 8x originator fee
         var globalFeeTok = { ccy_mirrorFee: false, ccy_perMillion: 0,
@@ -222,7 +222,7 @@ contract("StMaster", accounts => {
         for (var i = 0 ; i < M_multi.length ; i++) {
             const M = M_multi[i].account;
             const MA_qty = CONST.KT_CARBON;
-            await stm.fund(CONST.ccyType.ETH,                      CONST.oneEth_wei,        A,                          { from: accounts[0] });
+            await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, CONST.ccyType.ETH,                      CONST.oneEth_wei,        A, 'TEST');
             await stm.setFee_TokType(CONST.tokenType.TOK_T2,       CONST.nullAddr,          CONST.nullFees);
             await stm.setFee_CcyType(CONST.ccyType.ETH,            CONST.nullAddr,          CONST.nullFees);
             const data_MA = await transferHelper.transferLedger({ stm, accounts, 
@@ -238,7 +238,7 @@ contract("StMaster", accounts => {
         }
 
         // SETUP - B: fund, so ready to trade with A
-        await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,            B,                          { from: accounts[0] });        
+        await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, CONST.ccyType.ETH,                   CONST.oneEth_wei,            B, 'TEST');
 
         // TEST - set global fee structure NATURE: 0
         await stm.setFee_TokType(CONST.tokenType.TOK_T2, CONST.nullAddr, CONST.nullFees);
@@ -326,7 +326,7 @@ contract("StMaster", accounts => {
         for (var i = 0 ; i < M_multi.length ; i++) {
             const M = M_multi[i].account;
             const MA_qty = CONST.KT_CARBON;
-            await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        B,                    { from: accounts[0] });
+            await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, CONST.ccyType.ETH,                   CONST.oneEth_wei,        B, 'TEST');
             await stm.setFee_TokType(CONST.tokenType.TOK_T1,    CONST.nullAddr,          CONST.nullFees);
             await stm.setFee_CcyType(CONST.ccyType.ETH,         CONST.nullAddr,          CONST.nullFees);
             const data_MA = await transferHelper.transferLedger({ stm, accounts, 
@@ -342,7 +342,7 @@ contract("StMaster", accounts => {
         }
 
         // SETUP - A: fund, so ready to trade with B
-        await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,            A,                    { from: accounts[0] });        
+        await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, CONST.ccyType.ETH,                   CONST.oneEth_wei,            A, 'TEST');
 
         // TEST - set global fee structure: 0
         await stm.setFee_TokType(CONST.tokenType.TOK_T1, CONST.nullAddr, CONST.nullFees);

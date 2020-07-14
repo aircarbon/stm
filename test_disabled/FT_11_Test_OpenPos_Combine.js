@@ -229,8 +229,8 @@ contract("StMaster", accounts => {
     it(`FT pos-combine - should not allow combine of futures positions for a mark mismatch position (child vs. master)`, async () => {
         try { 
             const A = accounts[global.TaddrNdx], B = accounts[global.TaddrNdx + 1];
-            await stm.fund(usdFT.ft.refCcyId, CONST.millionCcy_cents, A);
-            await stm.fund(usdFT.ft.refCcyId, CONST.millionCcy_cents, B);
+            await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, usdFT.ft.refCcyId, CONST.millionCcy_cents, A, 'TEST');
+            await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, usdFT.ft.refCcyId, CONST.millionCcy_cents, B, 'TEST');
 
             await futuresHelper.openFtPos({ stm, accounts, tokTypeId: usdFT.id, ledger_A: A, ledger_B: B, qty_A:  -1, qty_B:  +1, price: 100 });
             const posId = Number(await stm.getSecToken_MaxId()) - 1;

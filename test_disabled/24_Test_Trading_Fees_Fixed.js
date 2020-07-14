@@ -26,7 +26,7 @@ contract("StMaster", accounts => {
     // ST FEES
     it(`fees (fixed) - apply NATURE token fee on a trade (fee on A)`, async () => {
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2,    CONST.KT_CARBON, 1,      accounts[global.TaddrNdx + 0], CONST.nullFees, 0, [], [], { from: accounts[0] });
-        await stm.fund(CONST.ccyType.ETH,                      CONST.oneEth_wei,        accounts[global.TaddrNdx + 1],                               { from: accounts[0] });
+        await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, CONST.ccyType.ETH,        CONST.oneEth_wei,        accounts[global.TaddrNdx + 1],   'TEST', );
 
         // set fee structure NATURE: 2 TONS carbon fixed
         const carbonTokQtyFixedFee = 2;
@@ -59,7 +59,7 @@ contract("StMaster", accounts => {
     });
 
     it(`fees (fixed) - apply CORSIA token fee on a trade (fee on B)`, async () => {
-        await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        accounts[global.TaddrNdx + 0],                               { from: accounts[0] });
+        await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, CONST.ccyType.ETH,     CONST.oneEth_wei,        accounts[global.TaddrNdx + 0], 'TEST', );
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T1, CONST.KT_CARBON, 1,      accounts[global.TaddrNdx + 1], CONST.nullFees, 0, [], [], { from: accounts[0] });
 
         // set fee structure CORSIA: 1 TONS carbon fixed, NATURE: no fee
@@ -101,7 +101,7 @@ contract("StMaster", accounts => {
         await stm.mintSecTokenBatch(newSectokTypeId, 1000, 1,                            accounts[global.TaddrNdx + 0], CONST.nullFees, 0, [], [], { from: accounts[0] });
         await stm.mintSecTokenBatch(newSectokTypeId, 1000, 1,                            accounts[global.TaddrNdx + 0], CONST.nullFees, 0, [], [], { from: accounts[0] });
         await stm.mintSecTokenBatch(newSectokTypeId, 1000, 1,                            accounts[global.TaddrNdx + 0], CONST.nullFees, 0, [], [], { from: accounts[0] });
-        await stm.fund(CONST.ccyType.ETH,            CONST.oneEth_wei,        accounts[global.TaddrNdx + 1],                                          { from: accounts[0] });
+        await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, CONST.ccyType.ETH,         CONST.oneEth_wei,              accounts[global.TaddrNdx + 1], 'TEST', );
 
         // set fee structure new ST type: 1500 TONS carbon fixed (1.5 STs, 2 batches)
         const newSecTokenTypeFixedFee = 1500;
@@ -127,8 +127,8 @@ contract("StMaster", accounts => {
 
     // CCY FEES
     it(`fees (fixed) - apply ETH ccy fee on a max. trade (fee on A)`, async () => {
-        await stm.fund(CONST.ccyType.ETH,                      CONST.oneEth_wei,        accounts[global.TaddrNdx + 0],                               { from: accounts[0] });
-        await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2,    CONST.KT_CARBON, 1,      accounts[global.TaddrNdx + 1], CONST.nullFees, 0, [], [], { from: accounts[0] });
+        await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, CONST.ccyType.ETH,      CONST.oneEth_wei,              accounts[global.TaddrNdx + 0], 'TEST');
+        await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2,  CONST.KT_CARBON, 1,      accounts[global.TaddrNdx + 1], CONST.nullFees, 0, [], [], { from: accounts[0] });
 
         // set fee structure ETH: 1000 Wei fixed
         const ethFeeFixed_Wei = 1000;
@@ -157,7 +157,7 @@ contract("StMaster", accounts => {
 
     it(`fees (fixed) - apply USD ccy fee on a max. trade (fee on B)`, async () => {
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2,    CONST.KT_CARBON, 1,      accounts[global.TaddrNdx + 0], CONST.nullFees, 0, [], [], { from: accounts[0] });
-        await stm.fund(CONST.ccyType.USD,                      CONST.millionCcy_cents,  accounts[global.TaddrNdx + 1],                               { from: accounts[0] });
+        await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, CONST.ccyType.USD,        CONST.millionCcy_cents,  accounts[global.TaddrNdx + 1], 'TEST', );
 
         // set fee structure USD: 1000 $ in cents
         const usdFeeFixed_cents = CONST.thousandCcy_cents;
@@ -188,7 +188,7 @@ contract("StMaster", accounts => {
         const newCcyTypeId = types.filter(p => p.name == 'TEST_CCY_TYPE')[0].id;
 
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2,    CONST.KT_CARBON, 1,      accounts[global.TaddrNdx + 0], CONST.nullFees, 0, [], [], { from: accounts[0] });
-        await stm.fund(newCcyTypeId,                           1000,                    accounts[global.TaddrNdx + 1],                               { from: accounts[0] });
+        await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, newCcyTypeId,             1000,                          accounts[global.TaddrNdx + 1], 'TEST', );  
 
         // set fee structure new ccy: 100 units
         const newCcyFeeFixed_units = 100;
@@ -214,7 +214,7 @@ contract("StMaster", accounts => {
 
     // ST + CCY FEES
     it(`fees (fixed) - apply ETH ccy & NATURE ST fee on a max. trade (fees on both sides)`, async () => {
-        await stm.fund(CONST.ccyType.ETH,                      CONST.oneEth_wei,        accounts[global.TaddrNdx + 0],                               { from: accounts[0] });
+        await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND,  CONST.ccyType.ETH,       CONST.oneEth_wei,              accounts[global.TaddrNdx + 0], 'TEST', );
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2,    CONST.KT_CARBON, 1,      accounts[global.TaddrNdx + 1], CONST.nullFees, 0, [], [], { from: accounts[0] });
 
         // set fee structure ETH: 1000 Wei fixed
@@ -254,7 +254,7 @@ contract("StMaster", accounts => {
     });
 
     it(`fees (fixed) - apply USD ccy & CORSIA ST fee on a max. trade (fees on both sides)`, async () => {
-        await stm.fund(CONST.ccyType.USD,                   CONST.millionCcy_cents,  accounts[global.TaddrNdx + 0],                               { from: accounts[0] });
+        await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, CONST.ccyType.USD,     CONST.millionCcy_cents,        accounts[global.TaddrNdx + 0], 'TEST', );
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T1, CONST.KT_CARBON, 1,      accounts[global.TaddrNdx + 1], CONST.nullFees, 0, [], [], { from: accounts[0] });
 
         // set fee structure USD: 100 cents
@@ -301,7 +301,7 @@ contract("StMaster", accounts => {
         const tokenTypes = (await stm.getSecTokenTypes()).tokenTypes;
         const newSectokTypeId = tokenTypes.filter(p => p.name == 'TEST_EEU_TYPE_2')[0].id;
 
-        await stm.fund(newCcyTypeId,                           1000,                    accounts[global.TaddrNdx + 0],                             { from: accounts[0] });
+        await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, newCcyTypeId,           1000,                         accounts[global.TaddrNdx + 0], 'TEST', );
         await stm.mintSecTokenBatch(newSectokTypeId,         CONST.KT_CARBON, 1,      accounts[global.TaddrNdx + 1], CONST.nullFees, 0, [], [], { from: accounts[0] });
 
         // set fee structure new ccy
@@ -360,7 +360,7 @@ contract("StMaster", accounts => {
     });
 
     it(`fees (fixed) - should not allow a transfer with insufficient ccy to cover fees (A)`, async () => {
-        await stm.fund(CONST.ccyType.USD,                   CONST.millionCcy_cents,  accounts[global.TaddrNdx + 0],                               { from: accounts[0] });
+        await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, CONST.ccyType.USD,     CONST.millionCcy_cents,        accounts[global.TaddrNdx + 0], 'TEST', );
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T1, CONST.KT_CARBON, 1,      accounts[global.TaddrNdx + 1], CONST.nullFees, 0, [], [], { from: accounts[0] });
 
         await stm.setFee_CcyType(CONST.ccyType.USD, CONST.nullAddr,      { ccy_mirrorFee: false, ccy_perMillion: 0, fee_fixed: 1, fee_percBips: 0, fee_min: 0, fee_max: 0 } );
@@ -384,7 +384,7 @@ contract("StMaster", accounts => {
     });
 
     it(`fees (fixed) - should not allow a transfer with insufficient tokens to cover fees (B)`, async () => {
-        await stm.fund(CONST.ccyType.USD,                   CONST.millionCcy_cents,  accounts[global.TaddrNdx + 0],                               { from: accounts[0] });
+        await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, CONST.ccyType.USD,     CONST.millionCcy_cents,        accounts[global.TaddrNdx + 0], 'TEST', );
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T1, CONST.KT_CARBON, 1,      accounts[global.TaddrNdx + 1], CONST.nullFees, 0, [], [], { from: accounts[0] });
 
         await stm.setFee_CcyType(CONST.ccyType.USD, CONST.nullAddr,      CONST.nullFees );

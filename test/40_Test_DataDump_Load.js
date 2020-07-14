@@ -229,7 +229,7 @@ contract("StMaster", accounts => {
                 const FUND = (j+1)*100000+(i+1), RESERVE = Math.ceil(FUND / 2), WITHDRAW = Math.ceil(FUND / 4);
 
                 // fund 
-                await stm_cur.fund(ccyType.id, FUND, entryOwner);
+                await stm_cur.fundOrWithdraw(CONST.fundWithdrawType.FUND, ccyType.id, FUND, entryOwner, 'TEST');
                 if (entryOwner != accounts[0]) curHash = await checkHashUpdate(curHash);
 
                 // reserve 

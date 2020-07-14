@@ -67,8 +67,8 @@ contract("StMaster", accounts => {
         
         const FEE = new BN(300), POS_QTY = new BN(1000);
         await stm.setFuture_FeePerContract(usdFT.id, FEE);
-        await stm.fund(CONST.ccyType.USD, FEE.mul(POS_QTY).toString(), A);
-        await stm.fund(CONST.ccyType.USD, FEE.mul(POS_QTY).toString(), B);
+        await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, CONST.ccyType.USD, FEE.mul(POS_QTY).toString(), A, 'TEST');
+        await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, CONST.ccyType.USD, FEE.mul(POS_QTY).toString(), B, 'TEST');
         
         const x = await futuresHelper.openFtPos({ stm, accounts, tokTypeId: usdFT.id, ledger_A: A, ledger_B: B, qty_A: POS_QTY, qty_B: POS_QTY.neg(), price: 100 });
         //await CONST.logGas(web3, x.tx, `Open futures position (USD)`);
@@ -79,8 +79,8 @@ contract("StMaster", accounts => {
         
         const FEE = new BN(CONST.oneEth_wei), POS_QTY = new BN(1000000000);
         await stm.setFuture_FeePerContract(ethFT.id, FEE);
-        await stm.fund(ethFT.ft.refCcyId, FEE.mul(POS_QTY), A);
-        await stm.fund(ethFT.ft.refCcyId, FEE.mul(POS_QTY), B);
+        await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, ethFT.ft.refCcyId, FEE.mul(POS_QTY), A, 'TEST');
+        await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, ethFT.ft.refCcyId, FEE.mul(POS_QTY), B, 'TEST');
 
         const x = await futuresHelper.openFtPos({ stm, accounts, tokTypeId: ethFT.id, ledger_A: A, ledger_B: B, qty_A: POS_QTY, qty_B: POS_QTY.neg(), price: CONST.millionEth_wei });
         //await CONST.logGas(web3, x.tx, `Open futures position (ETH)`);
@@ -91,7 +91,7 @@ contract("StMaster", accounts => {
         const A = accounts[global.TaddrNdx], B = accounts[global.TaddrNdx + 1];
         const FEE = new BN(300), POS_QTY = new BN(1000);
         await stm.setFuture_FeePerContract(usdFT.id, FEE);
-        await stm.fund(CONST.ccyType.USD, FEE.mul(POS_QTY).toString(), B);
+        await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, CONST.ccyType.USD, FEE.mul(POS_QTY).toString(), B, 'TEST');
         try {
             const x = await futuresHelper.openFtPos({ stm, accounts, tokTypeId: usdFT.id, ledger_A: A, ledger_B: B, qty_A: POS_QTY, qty_B: POS_QTY.neg(), price: 100 });
         }
@@ -102,7 +102,7 @@ contract("StMaster", accounts => {
         const A = accounts[global.TaddrNdx], B = accounts[global.TaddrNdx + 1];
         const FEE = new BN(300), POS_QTY = new BN(1000);
         await stm.setFuture_FeePerContract(usdFT.id, FEE);
-        await stm.fund(CONST.ccyType.USD, FEE.mul(POS_QTY).toString(), A);
+        await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, CONST.ccyType.USD, FEE.mul(POS_QTY).toString(), A, 'TEST');
         try {
             const x = await futuresHelper.openFtPos({ stm, accounts, tokTypeId: usdFT.id, ledger_A: A, ledger_B: B, qty_A: POS_QTY, qty_B: POS_QTY.neg(), price: 100 });
         }
@@ -114,8 +114,8 @@ contract("StMaster", accounts => {
         const A = accounts[global.TaddrNdx], B = accounts[global.TaddrNdx + 1];
         const FEE = new BN(300), POS_QTY = new BN(1000);
         await stm.setFuture_FeePerContract(usdFT.id, FEE);
-        await stm.fund(CONST.ccyType.USD, FEE.mul(POS_QTY).toString(), A); await stm.setReservedCcy(CONST.ccyType.USD, 1, A);
-        await stm.fund(CONST.ccyType.USD, FEE.mul(POS_QTY).toString(), B);
+        await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, CONST.ccyType.USD, FEE.mul(POS_QTY).toString(), A, 'TEST'); await stm.setReservedCcy(CONST.ccyType.USD, 1, A);
+        await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, CONST.ccyType.USD, FEE.mul(POS_QTY).toString(), B, 'TEST');
         try {
             const x = await futuresHelper.openFtPos({ stm, accounts, tokTypeId: usdFT.id, ledger_A: A, ledger_B: B, qty_A: POS_QTY, qty_B: POS_QTY.neg(), price: 100 });
         }
@@ -126,8 +126,8 @@ contract("StMaster", accounts => {
         const A = accounts[global.TaddrNdx], B = accounts[global.TaddrNdx + 1];
         const FEE = new BN(300), POS_QTY = new BN(1000);
         await stm.setFuture_FeePerContract(usdFT.id, FEE);
-        await stm.fund(CONST.ccyType.USD, FEE.mul(POS_QTY).toString(), A);
-        await stm.fund(CONST.ccyType.USD, FEE.mul(POS_QTY).toString(), B); await stm.setReservedCcy(CONST.ccyType.USD, 1, B);
+        await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, CONST.ccyType.USD, FEE.mul(POS_QTY).toString(), A, 'TEST');
+        await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, CONST.ccyType.USD, FEE.mul(POS_QTY).toString(), B, 'TEST'); await stm.setReservedCcy(CONST.ccyType.USD, 1, B);
         try {
             const x = await futuresHelper.openFtPos({ stm, accounts, tokTypeId: usdFT.id, ledger_A: A, ledger_B: B, qty_A: POS_QTY, qty_B: POS_QTY.neg(), price: 100 });
         }

@@ -101,7 +101,7 @@ contract("StMaster", accounts => {
     //     const DELTA_P = new BN(-10);
     //     LAST_PRICE = LAST_PRICE.add(DELTA_P);
     //     const DELTA = DELTA_P.abs().mul(POS_QTY).mul(FT_SIZE);
-    //     await stm.fund(usdFT.ft.refCcyId, DELTA.div(new BN(2)), LONG);
+    //     await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, usdFT.ft.refCcyId, DELTA.div(new BN(2)), LONG, 'TEST');
     //     const data = await futuresHelper.takePay({ stm, accounts, tokTypeId: usdFT.id, shortStId: SHORT_STID, markPrice: LAST_PRICE, feePerSide: 0 });
     //     truffleAssert.eventEmitted(data.tx, 'TakePay', ev =>
     //         ev.from == LONG && ev.to == SHORT && ev.delta == DELTA.toString() && ev.done.eq(ev.delta.div(new BN(2)))

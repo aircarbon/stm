@@ -61,27 +61,33 @@ library CcyLib {
         return ret;
     }
 
-    // TODO:...
+    // FUND & WITHDRAW
     function fundOrWithdraw(
         StructLib.LedgerStruct storage   ld,
         StructLib.CcyTypesStruct storage ctd,
-        StructLib.FundWithdrawType direction,
-        uint256 ccyTypeId,
-        int256  amount,
-        address ledgerOwner,
-        string  calldata desc)
+        StructLib.FundWithdrawType       direction,
+        uint256                          ccyTypeId,
+        int256                           amount,
+        address                          ledgerOwner,
+        string                           calldata desc)
     public  {
-        //...
+        if (direction == StructLib.FundWithdrawType.Fund) {
+            fund(ld, ctd, ccyTypeId, amount, ledgerOwner, desc);
+        }
+        else if (direction == StructLib.FundWithdrawType.Withdraw) {
+            withdraw(ld, ctd, ccyTypeId, amount, ledgerOwner, desc);
+        }
+        else revert("Bad direction");
     }
 
-    // FUNDING
     function fund(
         StructLib.LedgerStruct storage   ld,
         StructLib.CcyTypesStruct storage ctd,
-        uint256 ccyTypeId,
-        int256  amount, // signed value: ledger supports -ve balances
-        address ledgerOwner)
-    public {
+        uint256                          ccyTypeId,
+        int256                           amount, // signed value: ledger supports -ve balances
+        address                          ledgerOwner,
+        string                           calldata desc)
+    private {
         // allow funding while not sealed - for initialization of owner ledger (see testSetupContract.js)
         //require(ld._contractSealed, "Contract is not sealed");
         require(ccyTypeId >= 1 && ccyTypeId <= ctd._ct_Count, "Bad ccyTypeId");
@@ -100,17 +106,17 @@ library CcyLib {
         // 24k
         //ld._ccyType_totalFunded[ccyTypeId] += uint256(amount);
 
-        emit CcyFundedLedger(ccyTypeId, ledgerOwner, amount, "TEST_DESC");
+        emit CcyFundedLedger(ccyTypeId, ledgerOwner, amount, desc);
     }
 
-    // WITHDRAWING
     function withdraw(
         StructLib.LedgerStruct storage   ld,
         StructLib.CcyTypesStruct storage ctd,
-        uint256 ccyTypeId,
-        int256  amount,
-        address ledgerOwner)
-    public {
+        uint256                          ccyTypeId,
+        int256                           amount,
+        address                          ledgerOwner,
+        string                           calldata desc)
+    private {
         require(ld._contractSealed, "Contract is not sealed");
         require(ccyTypeId >= 1 && ccyTypeId <= ctd._ct_Count, "Bad ccyTypeId");
         require(amount > 0, "Bad amount");
@@ -125,7 +131,7 @@ library CcyLib {
         // 24k
         //ld._ccyType_totalWithdrawn[ccyTypeId] += uint256(amount);
 
-        emit CcyWithdrewLedger(ccyTypeId, ledgerOwner, amount, "TEST_DESC");
+        emit CcyWithdrewLedger(ccyTypeId, ledgerOwner, amount, desc);
     }
 }
 

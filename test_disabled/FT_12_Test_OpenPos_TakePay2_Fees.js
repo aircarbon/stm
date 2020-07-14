@@ -73,8 +73,8 @@ contract("StMaster", accounts => {
     // null/zero balance cap on take
     it(`FT unilateral take/pay fees - should apply fees on null take/pay (markPrice == lastMarkPrice)`, async () => {
         const DELTA_P = new BN(0);
-        await stm.fund(usdFT.ft.refCcyId, FEE_PER_SIDE, LONG);
-        await stm.fund(usdFT.ft.refCcyId, FEE_PER_SIDE, SHORT);
+        await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, usdFT.ft.refCcyId, FEE_PER_SIDE, LONG, 'TEST');
+        await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, usdFT.ft.refCcyId, FEE_PER_SIDE, SHORT, 'TEST');
 
         const short = await futuresHelper.takePay2({ stm, accounts, tokTypeId: usdFT.id, stId: SHORT_STID, markPrice: LAST_PRICE.add(DELTA_P), feePerSide: FEE_PER_SIDE });
         //truffleAssert.prettyPrintEmittedEvents(short.tx);
@@ -93,9 +93,9 @@ contract("StMaster", accounts => {
         LAST_PRICE = LAST_PRICE.add(DELTA_P);
         const DELTA = DELTA_P.abs().mul(POS_QTY).mul(FT_SIZE);
         const PARTIAL = DELTA.div(new BN(2));
-        await stm.fund(usdFT.ft.refCcyId, FEE_PER_SIDE, LONG);
-        await stm.fund(usdFT.ft.refCcyId, FEE_PER_SIDE, SHORT);
-        await stm.fund(usdFT.ft.refCcyId, PARTIAL, LONG);
+        await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, usdFT.ft.refCcyId, FEE_PER_SIDE, LONG, 'TEST');
+        await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, usdFT.ft.refCcyId, FEE_PER_SIDE, SHORT, 'TEST');
+        await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, usdFT.ft.refCcyId, PARTIAL, LONG, 'TEST');
 
         // LONG - OTM, capped
         const long = await futuresHelper.takePay2({ stm, accounts, tokTypeId: usdFT.id, stId: LONG_STID, markPrice: LAST_PRICE, feePerSide: FEE_PER_SIDE });
@@ -104,7 +104,7 @@ contract("StMaster", accounts => {
         //await CONST.logGas(web3, long.tx, `unilateral capped OTM LONG take`);
 
         // SHORT - ITM, uncapped
-        await stm.fund(usdFT.ft.refCcyId, DELTA.sub(PARTIAL).sub(FEE_PER_SIDE), accounts[0]); // fund central owner minimum requred to supply ITM
+        await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, usdFT.ft.refCcyId, DELTA.sub(PARTIAL).sub(FEE_PER_SIDE), accounts[0]); // fund central owner minimum requred to supply ITM
         const short = await futuresHelper.takePay2({ stm, accounts, tokTypeId: usdFT.id, stId: SHORT_STID, markPrice: LAST_PRICE, feePerSide: FEE_PER_SIDE });
         //truffleAssert.prettyPrintEmittedEvents(short.tx);
         truffleAssert.eventEmitted(short.tx, 'TakePay2', ev => ev.delta == DELTA.toString() && ev.done == DELTA.toString());
@@ -115,9 +115,9 @@ contract("StMaster", accounts => {
         LAST_PRICE = LAST_PRICE.add(DELTA_P);
         const DELTA = DELTA_P.abs().mul(POS_QTY).mul(FT_SIZE);
         const PARTIAL = DELTA.div(new BN(2));
-        await stm.fund(usdFT.ft.refCcyId, FEE_PER_SIDE, LONG);
-        await stm.fund(usdFT.ft.refCcyId, FEE_PER_SIDE, SHORT);
-        //await stm.fund(usdFT.ft.refCcyId, PARTIAL, SHORT);
+        await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, usdFT.ft.refCcyId, FEE_PER_SIDE, LONG, 'TEST');
+        await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, usdFT.ft.refCcyId, FEE_PER_SIDE, SHORT, 'TEST');
+        //await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, usdFT.ft.refCcyId, PARTIAL, SHORT);
 
         // SHORT - OTM, capped
         const otm = await futuresHelper.takePay2({ stm, accounts, tokTypeId: usdFT.id, stId: SHORT_STID, markPrice: LAST_PRICE, feePerSide: FEE_PER_SIDE });
@@ -126,7 +126,7 @@ contract("StMaster", accounts => {
         //await CONST.logGas(web3, otm.tx, `unilateral capped OTM SHORT take`);
 
         // LONG - ITM, uncapped
-        await stm.fund(usdFT.ft.refCcyId, DELTA.sub(PARTIAL).sub(FEE_PER_SIDE), accounts[0]); // fund central owner minimum requred to supply ITM
+        await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, usdFT.ft.refCcyId, DELTA.sub(PARTIAL).sub(FEE_PER_SIDE), accounts[0]); // fund central owner minimum requred to supply ITM
         const itm = await futuresHelper.takePay2({ stm, accounts, tokTypeId: usdFT.id, stId: LONG_STID, markPrice: LAST_PRICE, feePerSide: FEE_PER_SIDE });
         //truffleAssert.prettyPrintEmittedEvents(itm.tx);
         truffleAssert.eventEmitted(itm.tx, 'TakePay2', ev => ev.delta == DELTA.toString() && ev.done == DELTA.toString());
@@ -139,8 +139,8 @@ contract("StMaster", accounts => {
         LAST_PRICE = LAST_PRICE.add(DELTA_P);
 
         const DELTA = DELTA_P.abs().mul(POS_QTY).mul(FT_SIZE);
-        await stm.fund(usdFT.ft.refCcyId, FEE_PER_SIDE, LONG);
-        await stm.fund(usdFT.ft.refCcyId, FEE_PER_SIDE, SHORT);
+        await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, usdFT.ft.refCcyId, FEE_PER_SIDE, LONG, 'TEST');
+        await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, usdFT.ft.refCcyId, FEE_PER_SIDE, SHORT, 'TEST');
 
         // LONG - OTM, no cap on take
         const long = await futuresHelper.takePay2({ stm, accounts, tokTypeId: usdFT.id, stId: LONG_STID, markPrice: LAST_PRICE, feePerSide: FEE_PER_SIDE });
@@ -159,8 +159,8 @@ contract("StMaster", accounts => {
         LAST_PRICE = LAST_PRICE.add(DELTA_P);
 
         const DELTA = DELTA_P.abs().mul(POS_QTY).mul(FT_SIZE);
-        await stm.fund(usdFT.ft.refCcyId, FEE_PER_SIDE, LONG);
-        await stm.fund(usdFT.ft.refCcyId, FEE_PER_SIDE, SHORT);
+        await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, usdFT.ft.refCcyId, FEE_PER_SIDE, LONG, 'TEST');
+        await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, usdFT.ft.refCcyId, FEE_PER_SIDE, SHORT, 'TEST');
 
         // SHORT - OTM, no cap on take
         const otm = await futuresHelper.takePay2({ stm, accounts, tokTypeId: usdFT.id, stId: SHORT_STID, markPrice: LAST_PRICE, feePerSide: FEE_PER_SIDE });

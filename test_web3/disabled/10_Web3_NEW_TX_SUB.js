@@ -39,7 +39,7 @@ describe(`Contract Web3 Interface`, async () => {
             console.log('...');
 
             // owner ledger entry
-            await CONST.web3_tx('fund', [CONST.ccyType.USD, 0, O.addr], O.addr, O.privKey); 
+            await CONST.web3_tx('fundOrWithdraw', [ CONST.fundWithdrawType.FUND, CONST.fundWithdrawType.FUND, CONST.ccyType.USD, 0, O.addr, 'TEST_INIT' ], O.addr, O.privKey); 
         }
     });
 

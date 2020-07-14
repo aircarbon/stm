@@ -64,7 +64,7 @@ contract("StMaster", accounts => {
         assert(types.filter(p => p.name == 'TEST_COIN2')[0].decimals == 42, 'unexpected # decimal places on new currency type');
 
         // fund new ccy type & validate
-        await stm.fund(newTypeId, 424242, accounts[global.TaddrNdx], { from: accounts[0] });
+        await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, newTypeId, 424242, accounts[global.TaddrNdx], 'TEST');
         ledgerEntryAfter = await stm.getLedgerEntry(accounts[global.TaddrNdx]);
         assert(ledgerEntryAfter.ccys.find(p => p.ccyTypeId == newTypeId).balance == 424242, 'unexpected ledger balance of new currency type after funding');
     });

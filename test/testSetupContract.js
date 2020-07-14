@@ -53,7 +53,7 @@ module.exports = {
         }
 
         // setup default owner ledger entry
-        //await stm.fund(CONST.ccyType.USD, 0, accounts[0]);
+        //await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, CONST.ccyType.USD, 0, accounts[0], 'TEST');
     },
 
     whitelistAndSeal: async (a) => {

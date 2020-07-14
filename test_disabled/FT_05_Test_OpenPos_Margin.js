@@ -88,8 +88,8 @@ contract("StMaster", accounts => {
         //console.log('POS_MARGIN $', Number(POS_MARGIN.toString())/100);
         //console.log('MIN_BALANCE $', Number(MIN_BALANCE.toString())/100);
 
-        await stm.fund(usdFT.ft.refCcyId, MIN_BALANCE.toString(), A);
-        await stm.fund(usdFT.ft.refCcyId, MIN_BALANCE.toString(), B);
+        await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, usdFT.ft.refCcyId, MIN_BALANCE.toString(), A, 'TEST');
+        await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, usdFT.ft.refCcyId, MIN_BALANCE.toString(), B, 'TEST');
         const x = await futuresHelper.openFtPos({ stm, accounts, tokTypeId: usdFT.id, ledger_A: A, ledger_B: B, qty_A: POS_QTY, qty_B: POS_QTY.neg(), price: CONTRACT_PRICE });
         //console.log('ledger_A', x.ledger_A.ccys.find(p => p.ccyTypeId == usdFT.ft.refCcyId));
         //console.log('ledger_B', x.ledger_B.ccys.find(p => p.ccyTypeId == usdFT.ft.refCcyId));
@@ -118,8 +118,8 @@ contract("StMaster", accounts => {
         //console.log('POS_MARGIN Ξ', web3.utils.fromWei(POS_MARGIN).toString());
         //console.log('MIN_BALANCE Ξ', web3.utils.fromWei(MIN_BALANCE).toString());
 
-        await stm.fund(ethFT.ft.refCcyId, MIN_BALANCE.toString(), A);
-        await stm.fund(ethFT.ft.refCcyId, MIN_BALANCE.toString(), B);
+        await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, ethFT.ft.refCcyId, MIN_BALANCE.toString(), A, 'TEST');
+        await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, ethFT.ft.refCcyId, MIN_BALANCE.toString(), B, 'TEST');
 
         const x = await futuresHelper.openFtPos({ stm, accounts, tokTypeId: ethFT.id, ledger_A: A, ledger_B: B, qty_A: POS_QTY, qty_B: POS_QTY.neg(), price: CONTRACT_PRICE });
         //console.log('ledger_A', x.ledger_A.ccys.find(p => p.ccyTypeId == ethFT.ft.refCcyId));
@@ -141,8 +141,8 @@ contract("StMaster", accounts => {
         const POS_MARGIN = NOTIONAL.div(new BN(5)); // 20%
         const MIN_BALANCE = FEE_PER_CONTRACT.mul(POS_QTY).add(new BN(POS_MARGIN));
 
-        await stm.fund(usdFT.ft.refCcyId, MIN_BALANCE.toString(), A);
-        await stm.fund(usdFT.ft.refCcyId, MIN_BALANCE.toString(), B);
+        await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, usdFT.ft.refCcyId, MIN_BALANCE.toString(), A, 'TEST');
+        await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, usdFT.ft.refCcyId, MIN_BALANCE.toString(), B, 'TEST');
 
         // A: +1 / B: -1
         const x = await futuresHelper.openFtPos({ stm, accounts, tokTypeId: usdFT.id, ledger_A: A, ledger_B: B, qty_A: POS_QTY, qty_B: POS_QTY.neg(),
@@ -170,9 +170,9 @@ contract("StMaster", accounts => {
         const POS_MARGIN = NOTIONAL.div(new BN(5)); // 20%
         const MIN_BALANCE = FEE_PER_CONTRACT.mul(POS_QTY).add(new BN(POS_MARGIN));
 
-        await stm.fund(usdFT.ft.refCcyId, MIN_BALANCE.toString(), A);
-        await stm.fund(usdFT.ft.refCcyId, MIN_BALANCE.toString(), B);
-        await stm.fund(usdFT.ft.refCcyId, MIN_BALANCE.mul(new BN(4)).toString(), C);
+        await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, usdFT.ft.refCcyId, MIN_BALANCE.toString(), A, 'TEST');
+        await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, usdFT.ft.refCcyId, MIN_BALANCE.toString(), B, 'TEST');
+        await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, usdFT.ft.refCcyId, MIN_BALANCE.mul(new BN(4)).toString(), C, 'TEST');
 
         // A: +1 / B: -1
         const x = await futuresHelper.openFtPos({ stm, accounts, tokTypeId: usdFT.id, ledger_A: A, ledger_B: B, qty_A: POS_QTY, qty_B: POS_QTY.neg(),
@@ -200,9 +200,9 @@ contract("StMaster", accounts => {
         const POS_MARGIN = NOTIONAL.div(new BN(5)); // 20%
         const MIN_BALANCE = FEE_PER_CONTRACT.mul(POS_QTY).add(new BN(POS_MARGIN));
 
-        await stm.fund(usdFT.ft.refCcyId, MIN_BALANCE.toString(), A);
-        await stm.fund(usdFT.ft.refCcyId, MIN_BALANCE.toString(), B);
-        await stm.fund(usdFT.ft.refCcyId, MIN_BALANCE.mul(new BN(4)).toString(), C);
+        await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, usdFT.ft.refCcyId, MIN_BALANCE.toString(), A, 'TEST');
+        await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, usdFT.ft.refCcyId, MIN_BALANCE.toString(), B, 'TEST');
+        await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, usdFT.ft.refCcyId, MIN_BALANCE.mul(new BN(4)).toString(), C, 'TEST');
 
         // A: +1 / B: -1
         const x = await futuresHelper.openFtPos({ stm, accounts, tokTypeId: usdFT.id, ledger_A: A, ledger_B: B, qty_A: POS_QTY, qty_B: POS_QTY.neg(),
@@ -231,10 +231,10 @@ contract("StMaster", accounts => {
         const POS_MARGIN = NOTIONAL.div(new BN(5)); // 20%
         const MIN_BALANCE = FEE_PER_CONTRACT.mul(POS_QTY).add(POS_MARGIN);
 
-        //await stm.fund(usdFT.ft.refCcyId, MIN_BALANCE.sub(POS_MARGIN).toString(), A); // sufficient for fees (applied first), insufficient for margin 
-        await stm.fund(usdFT.ft.refCcyId, MIN_BALANCE.sub(new BN(1)), A); // or, just this is enough to trigger
+        //await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, usdFT.ft.refCcyId, MIN_BALANCE.sub(POS_MARGIN).toString(), A); // sufficient for fees (applied first), insufficient for margin 
+        await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, usdFT.ft.refCcyId, MIN_BALANCE.sub(new BN(1)), A, 'TEST'); // or, just this is enough to trigger
 
-        await stm.fund(usdFT.ft.refCcyId, MIN_BALANCE.toString(), B);
+        await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, usdFT.ft.refCcyId, MIN_BALANCE.toString(), B, 'TEST');
         try {
             const x = await futuresHelper.openFtPos({ stm, accounts, tokTypeId: usdFT.id, ledger_A: A, ledger_B: B, qty_A: POS_QTY, qty_B: POS_QTY.neg(), price: CONTRACT_PRICE });
         }
@@ -252,8 +252,8 @@ contract("StMaster", accounts => {
         const POS_MARGIN = NOTIONAL.div(new BN(5)); // 20%
         const MIN_BALANCE = FEE_PER_CONTRACT.mul(POS_QTY).add(POS_MARGIN);
 
-        await stm.fund(usdFT.ft.refCcyId, MIN_BALANCE.toString(), A);
-        await stm.fund(usdFT.ft.refCcyId, MIN_BALANCE.sub(POS_MARGIN).toString(), B); // sufficient for fees (applied first), insufficient for margin 
+        await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, usdFT.ft.refCcyId, MIN_BALANCE.toString(), A, 'TEST');
+        await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, usdFT.ft.refCcyId, MIN_BALANCE.sub(POS_MARGIN).toString(), B, 'TEST'); // sufficient for fees (applied first), insufficient for margin 
         try {
             const x = await futuresHelper.openFtPos({ stm, accounts, tokTypeId: usdFT.id, ledger_A: A, ledger_B: B, qty_A: POS_QTY, qty_B: POS_QTY.neg(), price: CONTRACT_PRICE });
         }

@@ -72,8 +72,8 @@ contract("StMaster", accounts => {
 
         const MIN_BALANCE_A = FPC_A.mul(POS_QTY).add(new BN(POS_MARGIN));
         const MIN_BALANCE_B = FPC_B.mul(POS_QTY).add(new BN(POS_MARGIN));
-        await stm.fund(usdFT.ft.refCcyId, MIN_BALANCE_A.toString(), A);
-        await stm.fund(usdFT.ft.refCcyId, MIN_BALANCE_B.toString(), B);
+        await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, usdFT.ft.refCcyId, MIN_BALANCE_A.toString(), A, 'TEST');
+        await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, usdFT.ft.refCcyId, MIN_BALANCE_B.toString(), B, 'TEST');
         await futuresHelper.openFtPos({ stm, accounts, tokTypeId: usdFT.id, ledger_A: A, ledger_B: B, qty_A: POS_QTY, qty_B: POS_QTY.neg(), price: CONTRACT_PRICE });
     });
 
@@ -93,8 +93,8 @@ contract("StMaster", accounts => {
 
         const MIN_BALANCE_A = FPC_A.mul(POS_QTY).add(new BN(POS_MARGIN));
         const MIN_BALANCE_B = FEE_PER_CONTRACT.mul(POS_QTY).add(new BN(POS_MARGIN));
-        await stm.fund(usdFT.ft.refCcyId, MIN_BALANCE_A.toString(), A);
-        await stm.fund(usdFT.ft.refCcyId, MIN_BALANCE_B.toString(), B);
+        await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, usdFT.ft.refCcyId, MIN_BALANCE_A.toString(), A, 'TEST');
+        await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, usdFT.ft.refCcyId, MIN_BALANCE_B.toString(), B, 'TEST');
         await futuresHelper.openFtPos({ stm, accounts, tokTypeId: usdFT.id, ledger_A: A, ledger_B: B, qty_A: POS_QTY, qty_B: POS_QTY.neg(), price: CONTRACT_PRICE });
     });
     it(`FT fee per contract override - should be able to override fee per contract for a ledger entry (B)`, async () => {
@@ -113,8 +113,8 @@ contract("StMaster", accounts => {
 
         const MIN_BALANCE_A = FEE_PER_CONTRACT.mul(POS_QTY).add(new BN(POS_MARGIN));
         const MIN_BALANCE_B = FPC_B.mul(POS_QTY).add(new BN(POS_MARGIN));
-        await stm.fund(usdFT.ft.refCcyId, MIN_BALANCE_A.toString(), A);
-        await stm.fund(usdFT.ft.refCcyId, MIN_BALANCE_B.toString(), B);
+        await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, usdFT.ft.refCcyId, MIN_BALANCE_A.toString(), A, 'TEST');
+        await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, usdFT.ft.refCcyId, MIN_BALANCE_B.toString(), B, 'TEST');
         await futuresHelper.openFtPos({ stm, accounts, tokTypeId: usdFT.id, ledger_A: A, ledger_B: B, qty_A: POS_QTY, qty_B: POS_QTY.neg(), price: CONTRACT_PRICE });
     });
 
@@ -142,7 +142,7 @@ contract("StMaster", accounts => {
     });
 
     it(`FT fee per contract override - should not be able to override fee per contract for an invalid (non-existent) token type`, async () => {
-        const A = accounts[global.TaddrNdx]; await stm.fund(CONST.ccyType.USD, 100, A);
+        const A = accounts[global.TaddrNdx]; await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, CONST.ccyType.USD, 100, A, 'TEST');
         try {
             const x = await stm.setLedgerOverride(2, 0xdeaddead, A, 1001); //await stm.feePerContractOverride(0xdeaddead, A, 1001);
         }
@@ -150,7 +150,7 @@ contract("StMaster", accounts => {
         assert.fail('expected contract exception');
     });
     it(`FT fee per contract override - should not be able to override fee per contract for an invalid (non-future) token type`, async () => {
-        const A = accounts[global.TaddrNdx]; await stm.fund(CONST.ccyType.USD, 100, A);
+        const A = accounts[global.TaddrNdx]; await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, CONST.ccyType.USD, 100, A, 'TEST');
         try {
             const x = await stm.setLedgerOverride(2, CONST.tokenType.TOK_T1, A, 1002); //await stm.feePerContractOverride(CONST.tokenType.TOK_T1, A, 1002);
         }

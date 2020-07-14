@@ -35,7 +35,7 @@ contract("StMaster", accounts => {
         const A = accounts[0];
         
         // fund with truffle
-        //const truffle_fundTx = await stm.fund(CONST.ccyType.USD, CONST.hundredCcy_cents, A, { from: accounts[0] });
+        //const truffle_fundTx = await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, CONST.ccyType.USD, CONST.hundredCcy_cents, A, 'TEST');
 
         // fund $100 - web3
         var paramsData = contract.methods

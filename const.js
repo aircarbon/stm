@@ -47,7 +47,7 @@ const blocksFromMonths = (months) => Math.ceil(blocksFromDays(months * 30.42));
 //
 // MAIN: deployer definitions -- contract ctor() params
 //
-const contractVer = "0.98b";
+const contractVer = "0.98c";
 const contractProps = {
     COMMODITY: {
         contractVer: contractVer,
@@ -201,6 +201,11 @@ EXCHANGE_FEE: 1,
         // EUR: 5,
         // HKD: 6,
         // GBP: 7
+    }),
+
+    fundWithdrawType: Object.freeze({
+        FUND: 0,
+        WITHDRAW: 1,
     }),
 
     // eeu qty constants - tons

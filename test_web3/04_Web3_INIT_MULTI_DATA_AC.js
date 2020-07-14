@@ -226,7 +226,7 @@ describe(`Contract Web3 Interface`, async () => {
 
             // fund white buyer (deposit ccy)
             const ccyTypeIdFunded = (whiteNdx % ccyTypes.length) + 1;
-            await CONST.web3_tx('fund', [ccyTypeIdFunded, 1000000 * (whiteNdx+1), BUYER.addr], OWNER, OWNER_privKey);
+            await CONST.web3_tx('fundOrWithdraw', [ CONST.fundWithdrawType.FUND, ccyTypeIdFunded, 1000000 * (whiteNdx+1), BUYER.addr, 'TEST_DATA' ], OWNER, OWNER_privKey);
 
             // trade with minters
             console.group(chalk.inverse(`BUYING FOR ${BUYER.addr}...`));
@@ -258,7 +258,7 @@ describe(`Contract Web3 Interface`, async () => {
             console.groupEnd();
 
             // withdraw some ccy
-            await CONST.web3_tx('withdraw', [ccyTypeIdFunded, 100 * (whiteNdx+1), BUYER.addr], OWNER, OWNER_privKey);
+            await CONST.web3_tx('fundOrWithdraw', [ CONST.fundWithdrawType.WITHDRAW, ccyTypeIdFunded, 100 * (whiteNdx+1), BUYER.addr, 'TEST_DATA' ], OWNER, OWNER_privKey);
 
             // withdraw all tokens to graylist addr
             const buyerLedger = (await CONST.web3_call('getLedgerEntry', [BUYER.addr]));

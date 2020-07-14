@@ -147,7 +147,7 @@ contract("StMaster", accounts => {
             const le = await stm.getLedgerEntry(M);
             const M_qty = le.tokens.filter(p => p.tokTypeId == tokenType).map(p => p.currentQty).reduce((a,b) => Big(a).plus(Big(b)), Big(0));
 
-            await stm.fund(CONST.ccyType.ETH,                   CONST.oneEth_wei,        transferTo,    { from: accounts[0] });
+            await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, CONST.ccyType.ETH,                   CONST.oneEth_wei,        transferTo, 'TEST');
             await stm.setFee_TokType(tokenType,                 CONST.nullAddr,          CONST.nullFees); // no exchange fees
             await stm.setFee_CcyType(CONST.ccyType.ETH,         CONST.nullAddr,          CONST.nullFees);
             const data_MA = await transferHelper.transferLedger({ stm, accounts, 
