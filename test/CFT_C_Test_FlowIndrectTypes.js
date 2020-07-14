@@ -185,13 +185,14 @@ contract("StMaster", accounts => {
         //console.log('le_A', le_A);
         //console.log('le_B', le_B);
 
-        // TODO: #0 fund/withdraw - comment/desc to events (for arbitrary off-chain fees)
-        // TODO: #1 k_stIds[] + qty (differing, i.e. partial transfer/burn, by ID)
-        // TODO: #2 getBatches[]
     });
     // todo: inverse above -- B ->A by Qty & ID
     // todo: A<->B, 4 permutations
     // 8 total perms!
+
+    // TODO: #0 fund/withdraw - comment/desc to events (for arbitrary off-chain fees)
+    // TODO: #1 k_stIds[] + qty (differing, i.e. partial transfer/burn, by ID)
+    // TODO: #2 getBatches[]
 
     // TODO: previews...()
     //

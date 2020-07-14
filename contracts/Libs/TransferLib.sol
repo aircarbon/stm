@@ -10,7 +10,7 @@ import "../StMaster/StMaster.sol";
 library TransferLib {
     event TransferedFullSecToken(address indexed from, address indexed to, uint256 indexed stId, uint256 mergedToSecTokenId, uint256 qty, StructLib.TransferType transferType);
     event TransferedPartialSecToken(address indexed from, address indexed to, uint256 indexed splitFromSecTokenId, uint256 newSecTokenId, uint256 mergedToSecTokenId, uint256 qty, StructLib.TransferType transferType);
-    event TradedCcyTok(uint256 ccyTypeId, uint256 ccyAmount, uint256 tokTypeId, address indexed /*tokens*/from, address indexed /*tokens*/to, uint256 tokQty);
+    event TradedCcyTok(uint256 ccyTypeId, uint256 ccyAmount, uint256 tokTypeId, address indexed /*tokens*/from, address indexed /*tokens*/to, uint256 tokQty, uint256 ccyFeeFrom, uint256 ccyFeeTo);
 
     uint256 constant MAX_BATCHES_PREVIEW = 128; // for fee previews: max distinct batch IDs that can participate in one side of a trade fee preview
 
@@ -167,21 +167,17 @@ library TransferLib {
         // transfer currencies
         //
         if (ld.contractType != StructLib.ContractType.CASHFLOW_BASE) { //**
-            if (a.ccy_amount_A > 0) {
-                // user transfer from A
+            if (a.ccy_amount_A > 0) { // user transfer from A
                 StructLib.transferCcy(ld, StructLib.TransferCcyArgs({ from: a.ledger_A, to: a.ledger_B, ccyTypeId: a.ccyTypeId_A, amount: uint256(a.ccy_amount_A), transferType: StructLib.TransferType.User }));
             }
-            if (a.applyFees && exFees.fee_ccy_A > 0) {
-                // exchange fee transfer from A
+            if (a.applyFees && exFees.fee_ccy_A > 0) { // exchange fee transfer from A
                 StructLib.transferCcy(ld, StructLib.TransferCcyArgs({ from: a.ledger_A, to: a.feeAddrOwner, ccyTypeId: a.ccyTypeId_A, amount: exFees.fee_ccy_A, transferType: StructLib.TransferType.ExchangeFee }));
             }
 
-            if (a.ccy_amount_B > 0) {
-                // user transfer from B
+            if (a.ccy_amount_B > 0) { // user transfer from B
                 StructLib.transferCcy(ld, StructLib.TransferCcyArgs({ from: a.ledger_B, to: a.ledger_A, ccyTypeId: a.ccyTypeId_B, amount: uint256(a.ccy_amount_B), transferType: StructLib.TransferType.User }));
             }
-            if (a.applyFees && exFees.fee_ccy_B > 0) {
-                // exchange fee transfer from B
+            if (a.applyFees && exFees.fee_ccy_B > 0) { // exchange fee transfer from B
                 StructLib.transferCcy(ld, StructLib.TransferCcyArgs({ from: a.ledger_B, to: a.feeAddrOwner, ccyTypeId: a.ccyTypeId_B, amount: exFees.fee_ccy_B, transferType: StructLib.TransferType.ExchangeFee }));
             }
         }
@@ -274,10 +270,10 @@ library TransferLib {
         // emit trade events
         if (ld.contractType != StructLib.ContractType.CASHFLOW_BASE) { //**
             if (a.ccy_amount_A > 0 && a.qty_B > 0) {
-                emit TradedCcyTok(a.ccyTypeId_A, uint256(a.ccy_amount_A), a.tokTypeId_B, a.ledger_B, a.ledger_A, a.qty_B);
+                emit TradedCcyTok(a.ccyTypeId_A, uint256(a.ccy_amount_A), a.tokTypeId_B, a.ledger_B, a.ledger_A, a.qty_B, a.applyFees ? exFees.fee_ccy_B : 0, a.applyFees ? exFees.fee_ccy_A : 0);
             }
             if (a.ccy_amount_B > 0 && a.qty_A > 0) {
-                emit TradedCcyTok(a.ccyTypeId_B, uint256(a.ccy_amount_B), a.tokTypeId_A, a.ledger_A, a.ledger_B, a.qty_A);
+                emit TradedCcyTok(a.ccyTypeId_B, uint256(a.ccy_amount_B), a.tokTypeId_A, a.ledger_A, a.ledger_B, a.qty_A, a.applyFees ? exFees.fee_ccy_A : 0, a.applyFees ? exFees.fee_ccy_B : 0);
             }
         }
     }

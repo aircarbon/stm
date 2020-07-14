@@ -77,6 +77,7 @@ library StructLib {
     enum ContractType { COMMODITY, CASHFLOW_BASE, CASHFLOW_CONTROLLER }
 
     // CCY TYPES
+    enum FundWithdrawType { Fund, Withdraw }
     struct Ccy {
         uint256 id;
         string  name; // e.g. "USD", "BTC"

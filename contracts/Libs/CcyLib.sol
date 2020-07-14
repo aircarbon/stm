@@ -7,8 +7,8 @@ import "../Interfaces/StructLib.sol";
 
 library CcyLib {
     event AddedCcyType(uint256 id, string name, string unit);
-    event CcyFundedLedger(uint256 ccyTypeId, address indexed to, int256 amount);
-    event CcyWithdrewLedger(uint256 ccyTypeId, address indexed from, int256 amount);
+    event CcyFundedLedger(uint256 ccyTypeId, address indexed to, int256 amount, string desc);
+    event CcyWithdrewLedger(uint256 ccyTypeId, address indexed from, int256 amount, string desc);
 
     // CCY TYPES
     function addCcyType(
@@ -61,6 +61,19 @@ library CcyLib {
         return ret;
     }
 
+    // TODO:...
+    function fundOrWithdraw(
+        StructLib.LedgerStruct storage   ld,
+        StructLib.CcyTypesStruct storage ctd,
+        StructLib.FundWithdrawType direction,
+        uint256 ccyTypeId,
+        int256  amount,
+        address ledgerOwner,
+        string  calldata desc)
+    public  {
+        //...
+    }
+
     // FUNDING
     function fund(
         StructLib.LedgerStruct storage   ld,
@@ -87,7 +100,7 @@ library CcyLib {
         // 24k
         //ld._ccyType_totalFunded[ccyTypeId] += uint256(amount);
 
-        emit CcyFundedLedger(ccyTypeId, ledgerOwner, amount);
+        emit CcyFundedLedger(ccyTypeId, ledgerOwner, amount, "TEST_DESC");
     }
 
     // WITHDRAWING
@@ -112,7 +125,7 @@ library CcyLib {
         // 24k
         //ld._ccyType_totalWithdrawn[ccyTypeId] += uint256(amount);
 
-        emit CcyWithdrewLedger(ccyTypeId, ledgerOwner, amount);
+        emit CcyWithdrewLedger(ccyTypeId, ledgerOwner, amount, "TEST_DESC");
     }
 }
 

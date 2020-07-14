@@ -67,8 +67,8 @@ contract StMaster
     // need to be defined (duplicated) here - web3 can't see event signatures in libraries
     // CcyLib events
     event AddedCcyType(uint256 id, string name, string unit);
-    event CcyFundedLedger(uint256 ccyTypeId, address indexed to, int256 amount);
-    event CcyWithdrewLedger(uint256 ccyTypeId, address indexed from, int256 amount);
+    event CcyFundedLedger(uint256 ccyTypeId, address indexed to, int256 amount, string desc);
+    event CcyWithdrewLedger(uint256 ccyTypeId, address indexed from, int256 amount, string desc);
     // TokenLib events
     event AddedSecTokenType(uint256 id, string name, StructLib.SettlementType settlementType, uint64 expiryTimestamp, uint256 underlyerTypeId, uint256 refCcyId, uint16 initMarginBips, uint16 varMarginBips);
     event SetFutureVariationMargin(uint256 tokTypeId, uint16 varMarginBips);
@@ -84,7 +84,7 @@ contract StMaster
     // TransferLib events
     event TransferedFullSecToken(address indexed from, address indexed to, uint256 indexed stId, uint256 mergedToSecTokenId, uint256 qty, TransferType transferType);
     event TransferedPartialSecToken(address indexed from, address indexed to, uint256 indexed splitFromSecTokenId, uint256 newSecTokenId, uint256 mergedToSecTokenId, uint256 qty, TransferType transferType);
-    event TradedCcyTok(uint256 ccyTypeId, uint256 ccyAmount, uint256 tokTypeId, address indexed /*tokens*/from, address indexed /*tokens*/to, uint256 tokQty);
+    event TradedCcyTok(uint256 ccyTypeId, uint256 ccyAmount, uint256 tokTypeId, address indexed /*tokens*/from, address indexed /*tokens*/to, uint256 tokQty, uint256 ccyFeeFrom, uint256 ccyFeeTo);
     // StructLib events
     enum TransferType { User, ExchangeFee, OriginatorFee, TakePay, TakePayFee, SettleTake, SettlePay }
     event TransferedLedgerCcy(address indexed from, address indexed to, uint256 ccyTypeId, uint256 amount, TransferType transferType);
