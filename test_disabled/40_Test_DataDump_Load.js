@@ -237,7 +237,7 @@ contract("StMaster", accounts => {
                 if (entryOwner != accounts[0]) curHash = await checkHashUpdate(curHash);
 
                 // withdraw 
-                await stm_cur.withdraw(ccyType.id, WITHDRAW, entryOwner);
+                await stm_cur.fundOrWithdraw(CONST.fundWithdrawType.WITHDRAW, ccyType.id, WITHDRAW, entryOwner, 'TEST');
                 if (entryOwner != accounts[0]) curHash = await checkHashUpdate(curHash);
 
                 // set ledger ccy fee

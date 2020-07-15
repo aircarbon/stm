@@ -92,9 +92,9 @@ contract("StMaster", accounts => {
         const A = accounts[global.TaddrNdx + 0], B = accounts[global.TaddrNdx + 1];
         const FUNDED = new BN(10000), RESERVED = FUNDED.div(new BN(2)), AVAIL = FUNDED.sub(RESERVED);
 
-        await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, CONST.ccyType.USD,                      FUNDED,                  A,                               );
-        await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2,    CONST.MT_CARBON,  1,     B, CONST.nullFees, 0, [], [], );
-        await stm.setReservedCcy(CONST.ccyType.USD,            RESERVED,                A);
+        await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, CONST.ccyType.USD,       FUNDED, A, 'TEST');
+        await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2,   CONST.MT_CARBON,  1,     B, CONST.nullFees, 0, [], [], );
+        await stm.setReservedCcy(CONST.ccyType.USD,           RESERVED,                A);
         await stm.setFee_TokType(CONST.tokenType.TOK_T2, CONST.nullAddr, CONST.nullFees);
         await stm.setFee_CcyType(CONST.ccyType.USD,      CONST.nullAddr, CONST.nullFees);
         try {
@@ -114,9 +114,9 @@ contract("StMaster", accounts => {
         const A = accounts[global.TaddrNdx + 0], B = accounts[global.TaddrNdx + 1];
         const FUNDED = new BN(10000), RESERVED = FUNDED.div(new BN(2)), AVAIL = FUNDED.sub(RESERVED);
 
-        await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2,    CONST.MT_CARBON,  1,     A, CONST.nullFees, 0, [], [], );
-        await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND,  CONST.ccyType.USD,       FUNDED, B, 'TEST');
-        await stm.setReservedCcy(CONST.ccyType.USD,            RESERVED,                B);
+        await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2,   CONST.MT_CARBON,  1,     A, CONST.nullFees, 0, [], [], );
+        await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, CONST.ccyType.USD,       FUNDED, B, 'TEST');
+        await stm.setReservedCcy(CONST.ccyType.USD,           RESERVED,                B);
         await stm.setFee_TokType(CONST.tokenType.TOK_T2, CONST.nullAddr, CONST.nullFees);
         await stm.setFee_CcyType(CONST.ccyType.USD,      CONST.nullAddr, CONST.nullFees);
         try {
@@ -138,13 +138,13 @@ contract("StMaster", accounts => {
         const FUNDED = new BN(10000), RESERVED = FUNDED.div(new BN(2)), AVAIL = FUNDED.sub(RESERVED), AVAIL_EX_FEES = AVAIL.sub(new BN(300)); // expected fee per 1m KG: $3
 
         // balance partially reserved on ccy sender A
-        await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, CONST.ccyType.USD,                      FUNDED,                  A, 'TEST');
-        await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2,    CONST.MT_CARBON,  1,     B, CONST.nullFees, 0, [], [], );
-        await stm.setReservedCcy(CONST.ccyType.USD,            RESERVED,                A);
+        await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, CONST.ccyType.USD, FUNDED, A, 'TEST');
+        await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2,   CONST.MT_CARBON,  1,       B, CONST.nullFees, 0, [], [], );
+        await stm.setReservedCcy(CONST.ccyType.USD,           RESERVED,                  A);
 
         // balance fully reserved on ccy receiver B - but he pays the mirrored fee from the ccy consideration
-        await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, CONST.ccyType.USD,                      FUNDED,                  B, 'TEST');
-        await stm.setReservedCcy(CONST.ccyType.USD,            FUNDED,                  B);
+        await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, CONST.ccyType.USD, FUNDED, B, 'TEST');
+        await stm.setReservedCcy(CONST.ccyType.USD,           FUNDED,                    B);
 
         await stm.setFee_TokType(CONST.tokenType.TOK_T2, CONST.nullAddr, CONST.nullFees);
         await stm.setFee_CcyType(CONST.ccyType.USD,      CONST.nullAddr, {...CONST.nullFees, ccy_mirrorFee: true, ccy_perMillion: 300 }); // fee per 1m KG: $3
@@ -166,13 +166,13 @@ contract("StMaster", accounts => {
         const FUNDED = new BN(10000), RESERVED = FUNDED.div(new BN(2)), AVAIL = FUNDED.sub(RESERVED), AVAIL_EX_FEES = AVAIL.sub(new BN(300)); // expected fee per 1m KG: $3
 
         // balance partially reserved on ccy sender B
-        await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2,    CONST.MT_CARBON,  1,     A, CONST.nullFees, 0, [], [], );
-        await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, CONST.ccyType.USD,                      FUNDED,                  B, 'TEST');
-        await stm.setReservedCcy(CONST.ccyType.USD,            RESERVED,                B);
+        await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2,   CONST.MT_CARBON,  1,       A, CONST.nullFees, 0, [], [], );
+        await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, CONST.ccyType.USD, FUNDED, B, 'TEST');
+        await stm.setReservedCcy(CONST.ccyType.USD,           RESERVED,                  B);
 
         // balance fully reserved on ccy receiver A - but he pays the mirrored fee from the ccy consideration
-        await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, CONST.ccyType.USD,                      FUNDED,                  A, 'TEST');
-        await stm.setReservedCcy(CONST.ccyType.USD,            FUNDED,                  A);
+        await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, CONST.ccyType.USD,         FUNDED, A, 'TEST');
+        await stm.setReservedCcy(CONST.ccyType.USD,           FUNDED,                    A);
 
         await stm.setFee_TokType(CONST.tokenType.TOK_T2, CONST.nullAddr, CONST.nullFees);
         await stm.setFee_CcyType(CONST.ccyType.USD,      CONST.nullAddr, {...CONST.nullFees, ccy_mirrorFee: true, ccy_perMillion: 300 }); // fee per 1m KG: $3
@@ -193,8 +193,8 @@ contract("StMaster", accounts => {
     it(`FT reserved ccy - should not be able to withdraw USD in excess of the ledger unreserved balance`, async () => {
         const A = accounts[global.TaddrNdx];
         const FUNDED = new BN(10000), RESERVED = FUNDED.div(new BN(2)), AVAIL = FUNDED.sub(RESERVED);
-        await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, CONST.ccyType.USD,                      FUNDED,                  A, 'TEST');
-        await stm.setReservedCcy(CONST.ccyType.USD,            RESERVED,                A);
+        await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, CONST.ccyType.USD,        FUNDED, A, 'TEST');
+        await stm.setReservedCcy(CONST.ccyType.USD,           RESERVED,                 A);
         try {
             await stm.fundOrWithdraw(CONST.fundWithdrawType.WITHDRAW, CONST.ccyType.USD, AVAIL.add(new BN(1)), A, 'TEST');
         }
