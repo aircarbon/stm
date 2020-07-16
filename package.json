@@ -14,7 +14,7 @@
         "migrate": "rimraf -rf ./build/contracts && export INSTANCE_ID=local && truffle migrate --network development --reset",
         "console": "truffle console",
         "dev": "truffle develop",
-        "ft": "cross-env WEB3_NETWORK_ID=888 CONTRACT_TYPE=COMMODITY node ./jobs/ft_job TEST_1"
+        "ft": "cross-env WEB3_NETWORK_ID=888 NETWORK_ID=888 INSTANCE_ID=local node ./jobs/ft_job TEST_1"
     },
     "keywords": [],
     "license": "MIT",

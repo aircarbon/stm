@@ -15,8 +15,7 @@ import "./StFutures.sol";
 import "../Interfaces/StructLib.sol";
 
 /*
-JUN 2020
-TODO: ... CFT refactor...
+https://diligence.consensys.net/blog/2019/09/how-to-prepare-for-a-smart-contract-audit/
 */
 
 //

@@ -77,7 +77,7 @@ module.exports = {
         gas: 7800000,
         gasPrice: web3.utils.toWei("5", "gwei"),
         networkCheckTimeout: 30000,
-        confirmations: 3,    // # of confs to wait between deployments. (default: 0)
+        confirmations: 1,    // # of confs to wait between deployments. (default: 0)
         skipDryRun: true,
         timeoutBlocks: 200, // but web3 always times out at 50 blocks?!
     },

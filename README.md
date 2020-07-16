@@ -31,7 +31,7 @@ Set `INSTANCE_ID` environment variable to one of: `local`, `DEV`, `DEMO`, or `UA
 Migration script `2_deploy_contract.js` will pickup this env var and deploy a test contract accordingly.
 - `export INSTANCE_ID=local && truffle migrate --network development --reset` (ganache-cli local node)
 - `export INSTANCE_ID=DEV && truffle migrate --network ropsten_ac --reset` (Deploy AWS DEV instance using AirCarbon's Ropsten Geth node)
-- `export INSTANCE_ID=UAT && truffle migrate --network ropsten_inufra --reset` (Deploy AWS UAT instance using Infura Ropsten)
+- `export INSTANCE_ID=UAT && truffle migrate --network ropsten_infura --reset` (Deploy AWS UAT instance using Infura Ropsten)
 - `export INSTANCE_ID=DEMO && truffle migrate --network test_ac --reset` (Deploy AWS DEMO instance on AirCarbon's privnet)
 
 ## Whitelist & seal Deployed Contract

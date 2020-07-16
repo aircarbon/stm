@@ -38,7 +38,7 @@ const WHITE_BUYERS = [];
 
 // whitelisted manual test accounts
 const TEST_ACCOUNT_START_NDX = WHITE_BUYER_START_NDX + WHITE_BUYER_COUNT;
-const TEST_ACCOUNT_COUNT = 500;
+const TEST_ACCOUNT_COUNT = 5000;
 const TEST_ACCOUNTS = [];
 
 // off-exchange "graylist" external address

@@ -29,7 +29,7 @@ library FuturesLib {
         function initMarginOverride(
             StructLib.LedgerStruct storage ld,
             StructLib.StTypesStruct storage std,
-            uint256 tokTypeId, address ledgerOwner, uint16  initMarginBips
+            uint256 tokTypeId, address ledgerOwner, uint16 initMarginBips
         ) private {
             require(tokTypeId >= 0 && tokTypeId <= std._tt_Count, "Bad tokTypeId");
             require(std._tt_settle[tokTypeId] == StructLib.SettlementType.FUTURE, "Bad token settlement type");

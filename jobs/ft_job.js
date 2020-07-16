@@ -15,8 +15,8 @@ process.env.WEB3_NETWORK_ID = Number(process.env.NETWORK_ID || 888);
 //
 // >> RUN FROM ./ERC20 << (not from ./jobs - config will fail if so)
 //
-//         Dev: ("export WEB3_NETWORK_ID=888 && node ./ft.js")
-//  Ropsten AC: ("export WEB3_NETWORK_ID=3 && node ./ft.js")
+//         Dev: ("export WEB3_NETWORK_ID=888 NETWORK_ID=888 INSTANCE_ID=local && node ./jobs/ft_job TEST_1")
+//  Ropsten AC: ("export WEB3_NETWORK_ID=3 NETWORK_ID=3 INSTANCE_ID=DEV && node ./jobs/ft_job TEST_1")
 //
 
 var ledgerOwners, accounts;
@@ -34,7 +34,7 @@ var ledgerOwners, accounts;
     CONST.consoleOutput(false);
     const O = await CONST.getAccountAndKey(0);
 
-    const TakePay_v1 = require('./ft_settler_TP1').TakePay_v1;
+    //const TakePay_v1 = require('./ft_settler_TP1').TakePay_v1;
     const TakePay_v2 = require('./ft_settler_TP2').TakePay_v2;
     const Combine = require('./ft_settler_Combine').Combine;
     var ctx;
@@ -70,23 +70,6 @@ var ledgerOwners, accounts;
         // TODO - TX: setReadOnly(true)... ?
 
         // PHASE (1) - process TAKE/PAY (all types, all positions) [v1]
-        // for (let ft of ctx) {
-        //     console.group();
-        //     const MP = ft.data.price[T]; // mark price
-        //     console.log(chalk.dim(`ftId=${ft.ftId}, MP=${MP}...`));
-
-        //     // dbg - show participant FT balances
-        //     for (let p of ft.data.TEST_PARTICIPANTS) {
-        //         const le = await CONST.web3_call('getLedgerEntry', [ p.account ]);//, O.addr, O.privKey);
-        //         console.log(chalk.blue(`PID=${p.id}`) + 
-        //             chalk.dim(` ${le.tokens.map(p2 => `{ #${p2.stId}/Q:${p2.mintedQty.toString().padStart(3)} }`).join(', ')}`
-        //         )); //, le.tokens);
-        //     }
-            
-        //     // main - process take/pay for all positions on this future
-        //     await TakePay_v1(ft.ftId, MP, ft.data.TEST_PARTICIPANTS.map(p => p.account));
-        //     console.groupEnd();
-        // }
         for (let ft of ctx) {
             console.group();
             const MP = ft.data.price[T]; // mark price
@@ -94,8 +77,8 @@ var ledgerOwners, accounts;
 
             // dbg - show participant FT balances
             for (let p of ft.data.TEST_PARTICIPANTS) {
-                const le = await CONST.web3_call('getLedgerEntry', [ p.account ]);//, O.addr, O.privKey);
-                console.log(chalk.blue(`PID=${p.id}`) + 
+                const le = await CONST.web3_call('getLedgerEntry', [ p.account ]);
+                console.log(chalk.blue.italic(`PID=${p.id}`) + 
                     chalk.dim(` ${le.tokens.map(p2 => `{ #${p2.stId}/Q:${p2.mintedQty.toString().padStart(3)} }`).join(', ')}`
                 )); //, le.tokens);
             }
@@ -161,7 +144,7 @@ async function processTestContext(ft, T) { //, test_shortPosIds) {
     for (let p of TEST_PARTICIPANTS.filter(p => p.id > 0)) {
         const ccy_deposit = p.ccy_deposits[T];
         if (ccy_deposit.a) {
-            console.log(chalk.blue.dim(`TEST_PARTICIPANT: PID=${p.id}, account=${p.account}`) + chalk.blue(` ** DEPOSIT ** `), ccy_deposit);
+            console.log(chalk.blue.italic(`TEST_PARTICIPANT: PID=${p.id}, account=${p.account}`) + chalk.blue(` ** DEPOSIT ** `), ccy_deposit);
             await CONST.web3_tx('fundOrWithdraw', [ CONST.fundWithdrawType.FUND, CONST.ccyType.USD, ccy_deposit.a, p.account, 'TEST_FT' ], O.addr, O.privKey);
         }
     }
@@ -170,7 +153,7 @@ async function processTestContext(ft, T) { //, test_shortPosIds) {
     for (let p of TEST_PARTICIPANTS.filter(p => p.id > 0)) {
         const ccy_withdraw = p.ccy_withdraws[T];
         if (ccy_withdraw.a) {
-            console.log(chalk.blue.dim(`TEST_PARTICIPANT: PID=${p.id}, account=${p.account}`) + chalk.blue(` ** WITHDRAW ** `), ccy_withdraw);
+            console.log(chalk.blue.italic(`TEST_PARTICIPANT: PID=${p.id}, account=${p.account}`) + chalk.blue(` ** WITHDRAW ** `), ccy_withdraw);
             await CONST.web3_tx('fundOrWithdraw', [ CONST.fundWithdrawType.WITHDRAW, CONST.ccyType.USD, ccy_withdraw.a, p.account, 'TEST_FT' ], O.addr, O.privKey);
         }
     }
@@ -181,7 +164,7 @@ async function processTestContext(ft, T) { //, test_shortPosIds) {
     for (let p of TEST_PARTICIPANTS.filter(p => p.id > 0)) {
         const ft_long = p.ft_longs[T];
         if (ft_long.q) {
-            console.log(chalk.blue.dim(`TEST_PARTICIPANT: PID=${p.id}, account=${p.account}`) + chalk.blue(` ** OPEN FUTURES POSITION ** `), ft_long);
+            console.log(chalk.blue.italic(`TEST_PARTICIPANT: PID=${p.id}, account=${p.account}`) + chalk.blue(` ** OPEN FUTURES POSITION ** `), ft_long);
             const shortAccount = TEST_PARTICIPANTS.find(p => p.id == ft_long.cid).account;
 
             const { txHash, receipt, evs } = await CONST.web3_tx('openFtPos', [{

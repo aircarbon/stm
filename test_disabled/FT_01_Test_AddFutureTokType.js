@@ -45,7 +45,7 @@ contract("StMaster", accounts => {
         const ftName = `FT_TEST1_${new Date().getTime()}`;
         const addFtTx = await stm.addSecTokenType(ftName, CONST.settlementType.FUTURE, { ...CONST.nullFutureArgs,
             expiryTimestamp: expirySG.toMillis(), 
-            underlyerTypeId: spotTypes[0].id, 
+            underlyerTypeId: spotTypes[0].id,
                    refCcyId: ccyTypes[0].id,
              initMarginBips: 1000,
               varMarginBips: 1500,
