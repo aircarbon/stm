@@ -321,14 +321,14 @@ library TokenLib {
         if (a.k_stIds.length == 0) { // burn by qty
             require(StructLib.sufficientTokens(ld, std, a.ledgerOwner, a.tokTypeId, int256(a.burnQty), 0) == true, "Insufficient tokens");
         }
-        else { // burn by ID(s)
-            int256 stQty;
-            for (uint256 i = 0; i < a.k_stIds.length; i++) {
-                require(StructLib.tokenExistsOnLedger(ld, a.tokTypeId, a.ledgerOwner, a.k_stIds[i]), "Bad stId"); // check supplied ST belongs to the supplied owner
-                stQty += ld._sts[a.k_stIds[i]].currentQty; // get implied burn qty
-            }
-            require(stQty == a.burnQty, "Quantity mismatch");
-        }
+        // else { // burn by ID(s)
+        //     int256 stQty;
+        //     for (uint256 i = 0; i < a.k_stIds.length; i++) {
+        //         require(StructLib.tokenExistsOnLedger(ld, a.tokTypeId, a.ledgerOwner, a.k_stIds[i]), "Bad stId"); // check supplied ST belongs to the supplied owner
+        //         stQty += ld._sts[a.k_stIds[i]].currentQty; // get implied burn qty
+        //     }
+        //     require(stQty == a.burnQty, "Quantity mismatch");
+        // }
 
         // burn (remove or resize) sufficient ST(s)
         uint256 ndx = 0;

@@ -118,8 +118,9 @@ contract("StMaster", accounts => {
         // query base types directly - note: addr override on web3 helper methods
         const types = (await stm.getSecTokenTypes()).tokenTypes;
         for (var type of types) {
-            const le_base = await CONST.web3_call('getLedgerEntry', [accounts[0]], /*nameOverride*/undefined, /*addrOverride*/type.cashflowBaseAddr);
+            const le_base = await CONST.web3_call('getLedgerEntry', [M1], /*nameOverride*/undefined, /*addrOverride*/type.cashflowBaseAddr);
             console.log('le_base.tokens', le_base.tokens);
+            assert(le_base.tokens.length == 1, 'unexpected base type (direct-query) token count');
         }
     });
 
