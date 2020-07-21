@@ -22,11 +22,10 @@ const EthereumJsCommon = require('ethereumjs-common').default;
 const truffleAssert = require('truffle-assertions');
 const { db } = require('../common/dist');
 
-
-const ETH_USD = 190;
+const ETH_USD = 230;
 
 // misc
-const WEB3_GWEI_GAS_BID = '15';
+const WEB3_GWEI_GAS_BID = '5';
 const WEB3_GAS_LIMIT = 5000000;
 
 // CFT helpers
