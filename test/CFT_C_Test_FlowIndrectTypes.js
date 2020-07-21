@@ -119,7 +119,7 @@ contract("StMaster", accounts => {
         const types = (await stm.getSecTokenTypes()).tokenTypes;
         for (var type of types) {
             const le_base = await CONST.web3_call('getLedgerEntry', [M1], /*nameOverride*/undefined, /*addrOverride*/type.cashflowBaseAddr);
-            console.log('le_base.tokens', le_base.tokens);
+            //console.log('le_base.tokens', le_base.tokens);
             assert(le_base.tokens.length == 1, 'unexpected base type (direct-query) token count');
         }
     });
@@ -150,18 +150,19 @@ contract("StMaster", accounts => {
         //
 
         // by id - type 1
-        // le_before = await stm.getLedgerEntry(M1);
-        // const burnTx1_byId = await stm.burnTokens(M1, CONST.tokenType.TOK_T1, 10, [le_before.tokens[0].stId]);
-        // le_after = await stm.getLedgerEntry(M1); 
-        // assert(le_after.tokens.filter(p => p.tokTypeId == CONST.tokenType.TOK_T1)[0].currentQty == 
-        //        le_before.tokens.filter(p => p.tokTypeId == CONST.tokenType.TOK_T1)[0].currentQty - 10, 'unexpected token qty (type 1) after burn by id');
+        le_before = await stm.getLedgerEntry(M1);
+        const burnTx1_byId = await stm.burnTokens(M1, CONST.tokenType.TOK_T1, 10, [le_before.tokens.filter(p => p.tokTypeId == CONST.tokenType.TOK_T1)[0].stId]);
+        le_after = await stm.getLedgerEntry(M1); 
+        assert(le_after.tokens.filter(p => p.tokTypeId == CONST.tokenType.TOK_T1)[0].currentQty == 
+               le_before.tokens.filter(p => p.tokTypeId == CONST.tokenType.TOK_T1)[0].currentQty - 10, 'unexpected token qty (type 1) after burn by id');
         
-        // // by id - type 2
-        // le_before = await stm.getLedgerEntry(M1);
-        // const burnTx2_byId = await stm.burnTokens(M1, CONST.tokenType.TOK_T2, 20, [le.tokens[0].stId]);
-        // le_after = await stm.getLedgerEntry(M1); 
-        // assert(le_after.tokens.filter(p => p.tokTypeId == CONST.tokenType.TOK_T2)[0].currentQty == 
-        //        le_before.tokens.filter(p => p.tokTypeId == CONST.tokenType.TOK_T2)[0].currentQty - 20, 'unexpected token qty (type 2) after burn by id');
+        // by id - type 2
+        le_before = await stm.getLedgerEntry(M1);
+        //console.log('le_before.tokens', le_before.tokens);
+        const burnTx2_byId = await stm.burnTokens(M1, CONST.tokenType.TOK_T2, 20, [le_before.tokens.filter(p => p.tokTypeId == CONST.tokenType.TOK_T2)[0].stId]);
+        le_after = await stm.getLedgerEntry(M1); 
+        assert(le_after.tokens.filter(p => p.tokTypeId == CONST.tokenType.TOK_T2)[0].currentQty == 
+               le_before.tokens.filter(p => p.tokTypeId == CONST.tokenType.TOK_T2)[0].currentQty - 20, 'unexpected token qty (type 2) after burn by id');
     });
 
     // TOK-TRANSFER: ONE SIDED (w/ token batch token exchange fees)
@@ -245,7 +246,6 @@ contract("StMaster", accounts => {
         });
         //truffleAssert.prettyPrintEmittedEvents(data.transferTx);
         await CONST.logGas(web3, data.transferTx, `Transfer STs A:(Type TOK_T1 / [${stIds.join(',')}]) / B:(null)`);
-
         le_A = await stm.getLedgerEntry(A);
         le_B = await stm.getLedgerEntry(B);
         //console.log('le_A', le_A);
@@ -292,7 +292,6 @@ contract("StMaster", accounts => {
     //     const le_after_B = await stm.getLedgerEntry(B);
     // });
 
-    // TODO: #1 k_stIds[] + qty (differing, i.e. partial transfer/burn, by ID)
     // TODO: #2 getBatches[]
 
     // DONE: #0 fund/withdraw - comment/desc to events (for arbitrary off-chain fees)
