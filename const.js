@@ -295,15 +295,12 @@ function getTestContextWeb3(useWs) {
 
 async function getAccountAndKey(accountNdx, mnemonic) {
     const MNEMONIC = mnemonic || require('./DEV_MNEMONIC.js').MNEMONIC;
-    //console.log('MNEMONIC: ', MNEMONIC);
     const seed = await bip39.mnemonicToSeed(MNEMONIC);
     const hdk = hdkey.fromMasterSeed(seed);
     const addr_node = hdk.derivePath(`m/44'/60'/0'/0/${accountNdx}`);
     const addr = addr_node.getWallet().getAddressString();
     const privKeyBytes = addr_node.getWallet().getPrivateKey();
-    //console.dir(privKeyBytes);
     const privKeyHex = privKeyBytes.toString('hex');
-    //console.log('privKeyHex', privKeyHex);
     return { addr, privKey: privKeyHex };
 }
 
