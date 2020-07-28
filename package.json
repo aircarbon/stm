@@ -52,7 +52,7 @@
         "markdown-it-emoji": "^1.4.0",
         "meow": "^6.0.0",
         "mocha": "^5.1.1",
-        "mssql": "^6.2.0",
+        "mssql": "^6.2.1",
         "mustache": "^4.0.0",
         "node-emoji": "^1.10.0",
         "pdf-from-html": "^0.1.2-beta.1",
