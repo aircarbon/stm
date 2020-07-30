@@ -129,6 +129,8 @@ module.exports = {
     getTestContextWeb3: (useWs) => getTestContextWeb3(useWs),
     getAccountAndKey: async (accountNdx, mnemonic) => getAccountAndKey(accountNdx, mnemonic),
 
+    getAccountAndKeyHelper : async (accountNdx, mnemonic) => getAccountAndKeyHelper(accountNdx, mnemonic),
+
     web3_sendEthTestAddr: (sendFromNdx, sendToAddr, ethValue) => web3_sendEthTestAddr(sendFromNdx, sendToAddr, ethValue),
 
     web3_call: (methodName, methodArgs, nameOverride, addrOverride) => 
@@ -302,6 +304,16 @@ function getTestContextWeb3(useWs) {
 async function getAccountAndKey(accountNdx, mnemonic) {
     const MNEMONIC = process.env.INSTANCE_ID === 'PROD' ? (require('./PROD_MNEMONIC.js').MNEMONIC) : mnemonic || require('./DEV_MNEMONIC.js').MNEMONIC;
     const seed = await bip39.mnemonicToSeed(MNEMONIC);
+    const hdk = hdkey.fromMasterSeed(seed);
+    const addr_node = hdk.derivePath(`m/44'/60'/0'/0/${accountNdx}`);
+    const addr = addr_node.getWallet().getAddressString();
+    const privKeyBytes = addr_node.getWallet().getPrivateKey();
+    const privKeyHex = privKeyBytes.toString('hex');
+    return { addr, privKey: privKeyHex };
+}
+
+async function getAccountAndKeyHelper(accountNdx, mnemonic) {
+    const seed = await bip39.mnemonicToSeed(mnemonic);
     const hdk = hdkey.fromMasterSeed(seed);
     const addr_node = hdk.derivePath(`m/44'/60'/0'/0/${accountNdx}`);
     const addr = addr_node.getWallet().getAddressString();
