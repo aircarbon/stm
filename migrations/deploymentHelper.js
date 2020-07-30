@@ -102,10 +102,11 @@ module.exports = {
                 const OWNER_privKey = accountAndKey.privKey;
                 // TODO: derive - an encryption key & salt [from contract name?] -> derivation code should be in a private repo (AWS lambda?)
                 // TODO: encrypt - privKey & display encrypted [for manual population of AWS secret, L1]
-                logEnv("DEPLOYMENT COMPLETE", OWNER, OWNER_privKey, contractType, contractName);
 
                 // save to DB
                 if (!deployer.network.includes("-fork")) {
+                    logEnv("DEPLOYMENT COMPLETE", OWNER, OWNER_privKey, contractType, contractName);
+                    
                     var ip = "unknown";
                     publicIp.v4().then(p => ip = p).catch(e => { console.log("\tWARN: could not get IP - will write 'unknown'"); });
 

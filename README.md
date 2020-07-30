@@ -33,6 +33,7 @@ Migration script `2_deploy_contract.js` will pickup this env var and deploy a te
 - `export INSTANCE_ID=DEV && truffle migrate --network ropsten_ac --reset` (Deploy AWS DEV instance using AirCarbon's Ropsten Geth node)
 - `export INSTANCE_ID=UAT && truffle migrate --network ropsten_infura --reset` (Deploy AWS UAT instance using Infura Ropsten)
 - `export INSTANCE_ID=DEMO && truffle migrate --network test_ac --reset` (Deploy AWS DEMO instance on AirCarbon's privnet)
+- `export INSTANCE_ID=PROD && truffle migrate --network mainnet_ac --reset` (Deploy AWS PROD instance on AirCarbon's Mainnet Geth node)
 
 ## Whitelist & seal Deployed Contract
 For setup of deployed contract ready for use, see `04_Web3_INIT_MULTI_DATA_AC.js` web3 test(s), to: add addresses to the contract's whitelist, seal the contract and optionally submit test transactions/data.

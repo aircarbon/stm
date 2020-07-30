@@ -43,10 +43,10 @@ contract("StMaster", accounts => {
             const x = await CONST.getAccountAndKey(i,
                 '...');
 
-            //console.log(`${i} addr: ${x.addr} privKey: ${x.privKey}`);
-            if (i==0) {
-                assert(x.privKey == '...', 'unexpected key')
-            }
+            console.log(`${i} addr: ${x.addr} privKey: ${x.privKey}`);
+            // if (i==0) {
+            //     assert(x.privKey == '...', 'unexpected key')
+            // }
         }
     });
 

@@ -38,7 +38,7 @@ const WHITE_BUYERS = [];
 
 // whitelisted manual test accounts
 const TEST_ACCOUNT_START_NDX = WHITE_BUYER_START_NDX + WHITE_BUYER_COUNT;
-const TEST_ACCOUNT_COUNT = 5000;
+const TEST_ACCOUNT_COUNT = 100;
 const TEST_ACCOUNTS = [];
 
 // off-exchange "graylist" external address
@@ -52,12 +52,13 @@ describe(`Contract Web3 Interface`, async () => {
     //         AWS Dev: ("export INSTANCE_ID=DEV && export CONTRACT_TYPE=COMMODITY && mocha test_web3 --timeout 10000000 --exit")
     //         AWS UAT: ("export INSTANCE_ID=UAT && export CONTRACT_TYPE=COMMODITY && mocha test_web3 --timeout 10000000 --exit")
     //        AWS DEMO: ("export INSTANCE_ID=DEMO && export CONTRACT_TYPE=COMMODITY && mocha test_web3 --timeout 10000000 --exit")
+    //        AWS PROD: ("export INSTANCE_ID=PROD && export CONTRACT_TYPE=COMMODITY && mocha test_web3 --timeout 10000000 --exit")
     //
 
     before(async function () {
-        //await require('../devSetupContract.js').setDefaults();
+        await require('../devSetupContract.js').setDefaults();
 
-        var x;
+        /*var x;
         x = await CONST.getAccountAndKey(OWNER_NDX);
         OWNER = x.addr; OWNER_privKey = x.privKey;
 
@@ -186,7 +187,7 @@ describe(`Contract Web3 Interface`, async () => {
             if (!(await CONST.web3_call('getCcyTypes',[])).ccyTypes.some(p => p.name == 'NEW_CCY_TYPE_A')) {
                 await CONST.web3_tx('addCcyType', [ 'NEW_CCY_TYPE_A', 'cents', 2 ], OWNER, OWNER_privKey);
             }
-        }
+        }*/
     });
 
     it(`web3 direct - multi - should be able to mint multiple batches for all whitelist minters`, async () => {

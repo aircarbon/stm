@@ -1,6 +1,7 @@
 const chalk = require('chalk');
 const _ = require('lodash');
 
+// env setup
 const envFile = require('path').resolve(__dirname, "./.env." + (process.env.INSTANCE_ID !== undefined ? (process.env.INSTANCE_ID) : ''));
 if (!require('fs').existsSync(envFile)) {
     console.log(chalk.red.bold.inverse(`envFile ${envFile} is invalid.`)); 
@@ -22,10 +23,11 @@ const EthereumJsCommon = require('ethereumjs-common').default;
 const truffleAssert = require('truffle-assertions');
 const { db } = require('../common/dist');
 
-const ETH_USD = 230;
+const ETH_USD = 322;
 
 // misc
-const WEB3_GWEI_GAS_BID = '5';
+const WEB3_NONCE_REPLACE = undefined; // set to replace/drop a slow mainnet TX
+const WEB3_GWEI_GAS_BID = process.env.INSTANCE_ID === 'PROD' ? '87' : '5';
 const WEB3_GAS_LIMIT = 5000000;
 
 // CFT helpers
@@ -288,13 +290,17 @@ function getTestContextWeb3(useWs) {
             'petersburg'
         ) } }
 
+        // Rinkeby - Infura (AirCarbon-AwsDev)
+      //: process.env.WEB3_NETWORK_ID == 1 ?     { web3: new Web3('https://ac-dev0.net:10545'), ethereumTxChain: {} }
+        : process.env.WEB3_NETWORK_ID == 1 ?     { web3: new Web3('https://mainnet.infura.io/v3/25a36609b48744bdaa0639e7c2b008d9'), ethereumTxChain: {} }
+
         : undefined;
     if (!context) throw('WEB3_NETWORK_ID is not set!');
     return context;
 }
 
 async function getAccountAndKey(accountNdx, mnemonic) {
-    const MNEMONIC = mnemonic || require('./DEV_MNEMONIC.js').MNEMONIC;
+    const MNEMONIC = process.env.INSTANCE_ID === 'PROD' ? (require('./PROD_MNEMONIC.js').MNEMONIC) : mnemonic || require('./DEV_MNEMONIC.js').MNEMONIC;
     const seed = await bip39.mnemonicToSeed(MNEMONIC);
     const hdk = hdkey.fromMasterSeed(seed);
     const addr_node = hdk.derivePath(`m/44'/60'/0'/0/${accountNdx}`);
@@ -362,8 +368,11 @@ async function web3_tx(methodName, methodArgs, fromAddr, fromPrivKey, nameOverri
 
     // tx data
     const msStart = Date.now();
-    const nonce = await web3.eth.getTransactionCount(fromAddr, "pending");
-    if (consoleOutput) console.log(chalk.dim(` >   TX: [${chalk.greenBright(contractDb.contract_enum)} nonce=${nonce} ${contractDb.contract_ver} @${contractDb.addr}] ${chalk.reset.red.bgWhiteBright(methodName + '(' + methodArgs.map(p => JSON.stringify(p)).join() + ')')}` + chalk.dim(` [networkId: ${process.env.WEB3_NETWORK_ID} - ${web3.currentProvider.host}] - ${process.env.sql_server}`)));
+    const nonce = WEB3_NONCE_REPLACE || await web3.eth.getTransactionCount(fromAddr, "pending");
+    if (consoleOutput) console.log(
+            chalk.dim(` >   TX: [${chalk.greenBright(contractDb.contract_enum)} nonce=${nonce} ${contractDb.contract_ver} @${contractDb.addr}] ${chalk.reset.red.bgWhiteBright(methodName + '(' + methodArgs.map(p => JSON.stringify(p)).join() + ')')}\n` +
+            chalk.dim(`     ... (from: ${fromAddr} / gwei: ${WEB3_GWEI_GAS_BID} / networkId: ${process.env.WEB3_NETWORK_ID} / node: ${web3.currentProvider.host} db: ${process.env.sql_server})`))
+    );
     var paramsData = contract.methods
         [methodName](...methodArgs)
         .encodeABI();

@@ -28,11 +28,11 @@ contract StFees is
         StructLib.FeeStruct storage fs = ledgerOwner == address(0x0) ? globalFees : ld._ledger[ledgerOwner].spot_customFees;
         mapping(uint256 => StructLib.SetFeeArgs) storage fa = feeType == GetFeeType.CCY ? fs.ccy : fs.tok;
         return StructLib.SetFeeArgs( {
-               fee_fixed: fa[typeId].fee_fixed,
-            fee_percBips: fa[typeId].fee_percBips,
-                 fee_min: fa[typeId].fee_min,
-                 fee_max: fa[typeId].fee_max,
-          ccy_perMillion: fa[typeId].ccy_perMillion,
+               fee_fixed: uint256(fa[typeId].fee_fixed),
+            fee_percBips: uint256(fa[typeId].fee_percBips),
+                 fee_min: uint256(fa[typeId].fee_min),
+                 fee_max: uint256(fa[typeId].fee_max),
+          ccy_perMillion: uint256(fa[typeId].ccy_perMillion),
            ccy_mirrorFee: fa[typeId].ccy_mirrorFee
         });
     }

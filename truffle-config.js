@@ -24,7 +24,9 @@ const HDWalletProvider = require("@truffle/hdwallet-provider");
 const NonceTrackerSubprovider = require("web3-provider-engine/subproviders/nonce-tracker");
 
 const DEV_MNEMONIC = require('./DEV_MNEMONIC.js').MNEMONIC;
-const PROD_MNEMONIC = '...'; // **PROD TODO
+
+const GWEI_MAINNET = "80";
+const GWEI_TESTNET = "5";
 
 module.exports = {
   /**
@@ -61,7 +63,25 @@ module.exports = {
       port: 8545,
       network_id: "*", // see: getTestContextWeb3() for dev network_id convention
       gas: 7900000,
-      gasPrice: web3.utils.toWei("10", "gwei")
+      gasPrice: web3.utils.toWei(GWEI_MAINNET, "gwei"), // we use mainnet pricing for accurate logGas() fiat cost estimates
+    },
+
+    // aircarbon mainnet geth node
+    mainnet_ac: {
+        provider: function() {
+            var wallet = new HDWalletProvider(require('./PROD_MNEMONIC.js').MNEMONIC, 'https://ac-dev0.net:10545', 0, 1000);
+            var nonceTracker = new NonceTrackerSubprovider();
+            wallet.engine._providers.unshift(nonceTracker);
+            nonceTracker.setEngine(wallet.engine);
+            return wallet;
+        },
+        network_id: "*", // 1
+        gas: 10000000, // 10m 
+        gasPrice: web3.utils.toWei(GWEI_MAINNET, "gwei"),
+        networkCheckTimeout: 30000,
+        confirmations: 1,
+        skipDryRun: false,
+        timeoutBlocks: 200, 
     },
 
     // aircarbon ropsten geth node -- a bit faster than infura, representative of mainnet
@@ -75,7 +95,7 @@ module.exports = {
         },
         network_id: "*", // 3
         gas: 7800000,
-        gasPrice: web3.utils.toWei("5", "gwei"),
+        gasPrice: web3.utils.toWei(GWEI_TESTNET, "gwei"),
         networkCheckTimeout: 30000,
         confirmations: 1,    // # of confs to wait between deployments. (default: 0)
         skipDryRun: true,
@@ -92,7 +112,7 @@ module.exports = {
         },
         network_id: "*", // 3
         gas: 7800000,
-        gasPrice: web3.utils.toWei("5", "gwei"),
+        gasPrice: web3.utils.toWei(GWEI_TESTNET, "gwei"),
         confirmations: 1,
         skipDryRun: true,
         timeoutBlocks: 200,
@@ -103,7 +123,7 @@ module.exports = {
       provider: () => new HDWalletProvider(DEV_MNEMONIC, "https://rinkeby.infura.io/v3/05a8b81beb9a41008f74864b5b1ed544", 0, 1000), // AirCarbon-AwsDev
       network_id: "*", // 4
       gas: 10000000,
-      gasPrice: web3.utils.toWei("5", "gwei"),
+      gasPrice: web3.utils.toWei(GWEI_TESTNET, "gwei"),
       confirmations: 1,
       skipDryRun: true,
       timeoutBlocks: 200,
