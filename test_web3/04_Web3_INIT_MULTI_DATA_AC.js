@@ -1,7 +1,7 @@
 const assert = require('assert');
 const EthereumJsTx = require('ethereumjs-tx');
 const BN = require('bn.js');
-const { db } = require('../../common/dist');
+const { db } = require('../../db/dist');
 const _ = require('lodash');
 const chalk = require('chalk');
 
@@ -196,7 +196,7 @@ describe(`Contract Web3 Interface`, async () => {
         const curTokTypes = (await CONST.web3_call('getSecTokenTypes', [])).tokenTypes;
         for (var whiteNdx = 0; whiteNdx < WHITE_MINTERS.length ; whiteNdx++) {
             const WM = WHITE_MINTERS[whiteNdx];
-            
+
             console.group(chalk.inverse(`MINTING FOR ${WM.addr}...`));
             for (var batchNdx = 0; batchNdx < BATCHES_PER_WHITE_MINTER ; batchNdx++) {
                 const batchFees = {
@@ -276,7 +276,7 @@ describe(`Contract Web3 Interface`, async () => {
             }], OWNER, OWNER_privKey);
             }
             console.groupEnd();
-            
+
             // deposit tokens back (erc20 in)
             console.group(chalk.inverse(`DEPOSITING ALL FOR ${BUYER.addr}...`));
             const grayLedger = (await CONST.web3_call('getLedgerEntry', [GRAY]));
@@ -290,4 +290,3 @@ describe(`Contract Web3 Interface`, async () => {
     });
 });
 
-  

@@ -3,7 +3,7 @@ const assert = require('assert');
 //const abi = acmJson['abi'];
 const EthereumJsTx = require('ethereumjs-tx');
 const BN = require('bn.js');
-const { db } = require('../../common/dist');
+const { db } = require('../../db/dist');
 
 const CONST = require('../const.js');
 process.env.WEB3_NETWORK_ID = Number(process.env.NETWORK_ID || 888);
@@ -21,7 +21,7 @@ describe(`Contract Web3 Interface`, async () => {
 
     it(`web3 direct - block time estimates...`, async () => {
         const { web3, ethereumTxChain } = CONST.getTestContextWeb3();
-        
+
         var timestamp_est = 1479642530; // block 1
         for (var i=1 ; i < 100 ; i++) {
             const b = await web3.eth.getBlock(i);
@@ -30,4 +30,3 @@ describe(`Contract Web3 Interface`, async () => {
     });
 });
 
-  

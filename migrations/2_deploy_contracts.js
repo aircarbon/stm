@@ -5,7 +5,7 @@ const BN = require('bn.js');
 
 const deploymentHelper = require('./deploymentHelper');
 const setup = require('../devSetupContract.js');
-const { db } = require('../../common/dist');
+const { db } = require('../../db/dist');
 
 //
 // Deploy steps: from/to, inclusive:
@@ -20,7 +20,7 @@ const { db } = require('../../common/dist');
 
 module.exports = async function (deployer) {
     const O = await CONST.getAccountAndKey(0);
-    console.log(chalk.red.bold.inverse(`deployer...`)); 
+    console.log(chalk.red.bold.inverse(`deployer...`));
     switch (process.env.INSTANCE_ID) {
         case undefined:
         case 'local': console.log(chalk.inverse(`Deploying localhost contract instance, saving to DB: ${process.env.sql_server}`)); break;
@@ -40,7 +40,7 @@ module.exports = async function (deployer) {
 
     // require the supplied env network_id (via INSTANCE_ID) to match the supplied deployer's network_id
     if (process.env.NETWORK_ID != deployer.network_id) {
-        console.log(chalk.red.bold.inverse(`process.env.NETWORK_ID (${process.env.NETWORK_ID}) != deployer.network_id (${deployer.network_id}): please supply a .env file (through INSTANCE_ID) that matches the supplied deployer network_id.`)); 
+        console.log(chalk.red.bold.inverse(`process.env.NETWORK_ID (${process.env.NETWORK_ID}) != deployer.network_id (${deployer.network_id}): please supply a .env file (through INSTANCE_ID) that matches the supplied deployer network_id.`));
         process.exit(1);
     }
     process.env.WEB3_NETWORK_ID = deployer.network_id;
@@ -48,12 +48,12 @@ module.exports = async function (deployer) {
     // test DB connection
     const dbData = (await db.GetDeployment(3, `dummy_contractName`, `dummy_contractVer`));
     if (dbData === undefined || dbData.recordsets === undefined) {
-        console.log(chalk.red.bold.inverse(`DB connection failure.`)); 
+        console.log(chalk.red.bold.inverse(`DB connection failure.`));
         process.exit(1);
     }
 
     switch (process.env.CONTRACT_TYPE) {
-        case 'CASHFLOW_CONTROLLER': 
+        case 'CASHFLOW_CONTROLLER':
             // deploy two base types
             const addrBase1 = await deploymentHelper.Deploy({ deployer, artifacts, contractType: 'CASHFLOW_BASE', nameOverride: "SDax_Base1" });
             const addrBase2 = await deploymentHelper.Deploy({ deployer, artifacts, contractType: 'CASHFLOW_BASE', nameOverride: "SDax_Base2" });
@@ -67,7 +67,7 @@ module.exports = async function (deployer) {
                 console.log(chalk.inverse('addrBase1'), addrBase1);
                 console.log(chalk.inverse('addrBase2'), addrBase2);
                 console.log(chalk.inverse('addrController'), addrController);
-                
+
                 const { evs: evsBase1 } = await CONST.web3_tx('addSecTokenType', [ 'CFT-Base1',  CONST.settlementType.SPOT, CONST.nullFutureArgs, addrBase1 ], O.addr, O.privKey);
                 // const evDbg1 = evsBase1.find(p => p.event == 'dbg1').returnValues;
                 // const id1 = new BN(evDbg1.id.toString());
@@ -87,16 +87,16 @@ module.exports = async function (deployer) {
         case 'CASHFLOW_BASE':
             // deploy an unattached base CASHFLOW contract
             await deploymentHelper.Deploy({ deployer, artifacts, contractType: 'CASHFLOW_BASE' });
-            
+
             if (!deployer.network.includes("-fork")) {
                 await setup.setDefaults();
             }
             break;
 
-        case 'COMMODITY': 
+        case 'COMMODITY':
             // deploy a singleton COMMODITY contract
             await deploymentHelper.Deploy({ deployer, artifacts, contractType: 'COMMODITY' });
-            
+
             if (!deployer.network.includes("-fork")) {
                 await setup.setDefaults();
             }

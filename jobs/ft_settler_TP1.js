@@ -3,7 +3,7 @@ const _ = require('lodash');
 const chalk = require('chalk');
 const BN = require('bn.js');
 
-const { db } = require('../../common/dist');
+const { db } = require('../../db/dist');
 const CONST = require('../const.js');
 
 module.exports = {
@@ -12,9 +12,9 @@ module.exports = {
 
 //     TakePay_v1: async (ftId, MP, test_ledgerOwners) => {
 //         const O = await CONST.getAccountAndKey(0);
-        
+
 //         //console.log('test_ledgerOwners', test_ledgerOwners);
-        
+
 //         //console.group();
 //         const ft = (await CONST.web3_call('getSecTokenTypes', [])).tokenTypes.find(p => p.id == ftId);
 
@@ -46,7 +46,7 @@ module.exports = {
 //         // take/pay each pos-pair
 //         const FEE_PER_SIDE = 0; // TODO: ### fixed ccy unit for testing
 //         for (shortId of shortPosIds) {
-            
+
 //             //const short_ST = await CONST.web3_call('getSecToken', [shortId]);
 //             //console.log(`pre TP / shortId: ${shortId}: `, short_ST);
 

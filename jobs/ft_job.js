@@ -4,7 +4,7 @@ const { DateTime } = require('luxon');
 const figlet = require('figlet')
 const TCharts = require('tcharts.js'); // for tables
 
-const { db } = require('../../common/dist');
+const { db } = require('../../db/dist');
 const CONST = require('../const.js');
 process.env.WEB3_NETWORK_ID = Number(process.env.NETWORK_ID || 888);
 
@@ -78,13 +78,13 @@ var ledgerOwners, accounts;
             // dbg - show participant FT balances
             for (let p of ft.data.TEST_PARTICIPANTS) {
                 const le = await CONST.web3_call('getLedgerEntry', [ p.account ]);
-                console.log(chalk.blue.italic(`PID=${p.id}`) + 
+                console.log(chalk.blue.italic(`PID=${p.id}`) +
                     chalk.dim(` ${le.tokens.map(p2 => `{ #${p2.stId}/Q:${p2.mintedQty.toString().padStart(3)} }`).join(', ')}`
                 )); //, le.tokens);
             }
-            
+
             // main - process take/pay for all positions on this future
-            //        
+            //
             //
             await TakePay_v2(ft.ftId, MP, ft.data.TEST_PARTICIPANTS.map(p => p.account));
             console.groupEnd();
@@ -118,7 +118,7 @@ var ledgerOwners, accounts;
             const ccyWithdraws = Number(p.ccy_withdraws ? p.ccy_withdraws.map(p => p.a).reduce((a,b)=>(a||0)+(b||0),0).toString() : 0);
             const net = ccyAfter - ccyBefore - ccyDeposits + ccyWithdraws;
             data.push([
-                p.account, 
+                p.account,
                 `$${ccyBefore.toString()}`,
                 `$${ccyAfter.toString()}`,
                 `$${ccyDeposits.toString()}`,
@@ -148,7 +148,7 @@ async function processTestContext(ft, T) { //, test_shortPosIds) {
             await CONST.web3_tx('fundOrWithdraw', [ CONST.fundWithdrawType.FUND, CONST.ccyType.USD, ccy_deposit.a, p.account, 'TEST_FT' ], O.addr, O.privKey);
         }
     }
-    
+
     // process ctx withdraws
     for (let p of TEST_PARTICIPANTS.filter(p => p.id > 0)) {
         const ccy_withdraw = p.ccy_withdraws[T];
@@ -195,7 +195,7 @@ async function initTestMode(testMode) {
         for (let whiteNdx = 0; whiteNdx < 15; whiteNdx++) {
             wl.push((await CONST.getAccountAndKey(whiteNdx)).addr);
         }
-        
+
         await CONST.web3_tx('whitelistMany', [ wl ], O.addr, O.privKey);
         await CONST.web3_tx('sealContract', [], O.addr, O.privKey);
     }
@@ -230,18 +230,18 @@ async function initTestMode(testMode) {
     if (testMode == "TEST_1") { // single position
         ret = [ { ftId: fts.find(p => p.name == TEST_FT_1).id.toString(), data: {
 price:
-               [ 100,               101,               102,               103,               104,               105,               106,                107,                108 ], 
+               [ 100,               101,               102,               103,               104,               105,               106,                107,                108 ],
 TEST_PARTICIPANTS: [ {
            id: 1, account: freshAccounts[i++],
- ccy_deposits: [ {a:+20300},        {},                {},                {},                {},                {},                {},                 {},                 {} ], 
-ccy_withdraws: [ {a:+0000},         {},                {},                {},                {},                {},                {},                 {},                 {} ], 
+ ccy_deposits: [ {a:+20300},        {},                {},                {},                {},                {},                {},                 {},                 {} ],
+ccy_withdraws: [ {a:+0000},         {},                {},                {},                {},                {},                {},                 {},                 {} ],
      ft_longs: [ {q:1,cid:2,p:100}, {},                {},                {},                {},                {},                {},                 {},                 {} ],
   //ft_shorts: [ {},                {},                {},                {},                {},                {},                {},                 {},                 {} ],
 },
-{ 
+{
            id: 2, account: freshAccounts[i++],
  ccy_deposits: [ {a:+20300},        {},                {},                {},                {},                {},                {},                 {},                 {} ],
-ccy_withdraws: [ {a:+0000},         {},                {},                {},                {},                {},                {},                 {},                 {} ], 
+ccy_withdraws: [ {a:+0000},         {},                {},                {},                {},                {},                {},                 {},                 {} ],
      ft_longs: [ {},                {},                {},                {},                {},                {},                {},                 {},                 {} ],
 }
 ]
@@ -250,18 +250,18 @@ ccy_withdraws: [ {a:+0000},         {},                {},                {},   
     }
     else if (testMode == "TEST_2") { // adding to positions, 2 parties (pos-combine)
         ret =  [ { ftId: fts.find(p => p.name == TEST_FT_1).id.toString(), data: {
-price: 
-               [ 100,               101,               102,               103,               104,               105,               106,                107,                108 ], 
+price:
+               [ 100,               101,               102,               103,               104,               105,               106,                107,                108 ],
 TEST_PARTICIPANTS: [ {
            id: 1, account: freshAccounts[i++],
- ccy_deposits: [ {a:+20300},        {a:+21300},        {a:+22300},        {},                {},                {},                {},                 {},                 {} ], 
-ccy_withdraws: [ {a:+0000},         {},                {},                {},                {},                {},                {},                 {},                 {} ], 
+ ccy_deposits: [ {a:+20300},        {a:+21300},        {a:+22300},        {},                {},                {},                {},                 {},                 {} ],
+ccy_withdraws: [ {a:+0000},         {},                {},                {},                {},                {},                {},                 {},                 {} ],
      ft_longs: [ {q:1,cid:2,p:100}, {q:1,cid:2,p:101}, {q:1,cid:2,p:102}, {},                {},                {},                {},                 {},                 {} ],
 },
-{ 
+{
            id: 2, account: freshAccounts[i++],
  ccy_deposits: [ {a:+20300},        {a:+21300},        {a:+22300},        {},                {},                {},                {},                 {},                 {} ],
-ccy_withdraws: [ {a:+0000},         {},                {},                {},                {},                {},                {},                 {},                 {} ], 
+ccy_withdraws: [ {a:+0000},         {},                {},                {},                {},                {},                {},                 {},                 {} ],
      ft_longs: [ {},                {},                {},                {},                {},                {},                {},                 {},                 {} ],
 }
 ]
@@ -270,24 +270,24 @@ ccy_withdraws: [ {a:+0000},         {},                {},                {},   
     }
     else if (testMode == "TEST_3") { // A - B - C (counterparty gets swapped)
         ret =  [ { ftId: fts.find(p => p.name == TEST_FT_1).id.toString(), data: {
-price: 
-               [ 100,               101,               102,               103,               104,               105,               106,                107,                108 ], 
+price:
+               [ 100,               101,               102,               103,               104,               105,               106,                107,                108 ],
 TEST_PARTICIPANTS: [ {
            id: 1, account: freshAccounts[i++],
- ccy_deposits: [ {a:+20300},        {},                {},                {},                {},                {},                {},                 {},                 {} ], 
-ccy_withdraws: [ {},                {},                {},                {},                {},                {},                {},                 {},                 {} ], 
+ ccy_deposits: [ {a:+20300},        {},                {},                {},                {},                {},                {},                 {},                 {} ],
+ccy_withdraws: [ {},                {},                {},                {},                {},                {},                {},                 {},                 {} ],
      ft_longs: [ {q:1,cid:2,p:100}, {},                {},                {},                {},                {},                {},                 {},                 {} ],
 },
-{ 
+{
            id: 2, account: freshAccounts[i++],
  ccy_deposits: [ {a:+20300},        {a:+21300},        {},                {},                {},                {},                {},                 {},                 {} ],
-ccy_withdraws: [ {},                {},                {},                {},                {},                {},                {},                 {},                 {} ], 
+ccy_withdraws: [ {},                {},                {},                {},                {},                {},                {},                 {},                 {} ],
      ft_longs: [ {},                {q:1,cid:3,p:101}, {},                {},                {},                {},                {},                 {},                 {} ],
 },
-{ 
+{
            id: 3, account: freshAccounts[i++],
  ccy_deposits: [ {},                {a:+21300},        {},                {},                {},                {},                {},                 {},                 {} ],
-ccy_withdraws: [ {},                {},                {},                {},                {},                {},                {},                 {},                 {} ], 
+ccy_withdraws: [ {},                {},                {},                {},                {},                {},                {},                 {},                 {} ],
      ft_longs: [ {},                {},                {},                {},                {},                {},                {},                 {},                 {} ],
 }
 ]
@@ -296,18 +296,18 @@ ccy_withdraws: [ {},                {},                {},                {},   
     }
     else if (testMode == "TEST_4") { // margin call -> zero (## settelment fails, by design ##)
         ret =  [ { ftId: fts.find(p => p.name == TEST_FT_1).id.toString(), data: {
-price: 
-               [ 100,               110,               120,               130,               140,               150,               160,                170,                180 ], 
+price:
+               [ 100,               110,               120,               130,               140,               150,               160,                170,                180 ],
 TEST_PARTICIPANTS: [ {
            id: 1, account: freshAccounts[i++],
- ccy_deposits: [ {a:+20300},        {},                {},                {},                {},                {},                {},                 {},                 {} ], 
-ccy_withdraws: [ {a:+0000},         {},                {},                {},                {},                {},                {},                 {},                 {} ], 
+ ccy_deposits: [ {a:+20300},        {},                {},                {},                {},                {},                {},                 {},                 {} ],
+ccy_withdraws: [ {a:+0000},         {},                {},                {},                {},                {},                {},                 {},                 {} ],
      ft_longs: [ {q:1,cid:2,p:100}, {},                {},                {},                {},                {},                {},                 {},                 {} ],
 },
-{ 
+{
            id: 2, account: freshAccounts[i++],
  ccy_deposits: [ {a:+20300},        {},                {},                {},                {},                {},                {},                 {},                 {} ],
-ccy_withdraws: [ {a:+0000},         {},                {},                {},                {},                {},                {},                 {},                 {} ], 
+ccy_withdraws: [ {a:+0000},         {},                {},                {},                {},                {},                {},                 {},                 {} ],
      ft_longs: [ {},                {},                {},                {},                {},                {},                {},                 {},                 {} ],
 }
 ]

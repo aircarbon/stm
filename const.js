@@ -4,8 +4,8 @@ const _ = require('lodash');
 // env setup
 const envFile = require('path').resolve(__dirname, "./.env." + (process.env.INSTANCE_ID !== undefined ? (process.env.INSTANCE_ID) : ''));
 if (!require('fs').existsSync(envFile)) {
-    console.log(chalk.red.bold.inverse(`envFile ${envFile} is invalid.`)); 
-    process.exit(1);        
+    console.log(chalk.red.bold.inverse(`envFile ${envFile} is invalid.`));
+    process.exit(1);
 }
 require('dotenv').config( { path: envFile });
 console.log(chalk.red('envFile'), envFile);
@@ -21,7 +21,7 @@ const EthereumJsCommon = require('ethereumjs-common').default;
 //console.log(r.hardforks());
 
 const truffleAssert = require('truffle-assertions');
-const { db } = require('../common/dist');
+const { db } = require('../db/dist');
 
 const ETH_USD = 322;
 
@@ -133,9 +133,9 @@ module.exports = {
 
     web3_sendEthTestAddr: (sendFromNdx, sendToAddr, ethValue) => web3_sendEthTestAddr(sendFromNdx, sendToAddr, ethValue),
 
-    web3_call: (methodName, methodArgs, nameOverride, addrOverride) => 
+    web3_call: (methodName, methodArgs, nameOverride, addrOverride) =>
         web3_call(methodName, methodArgs, nameOverride, addrOverride),
-    
+
     web3_tx: (methodName, methodArgs, fromAddr, fromPrivKey, nameOverride, addrOverride) =>
         web3_tx(methodName, methodArgs, fromAddr, fromPrivKey, nameOverride, addrOverride),
 

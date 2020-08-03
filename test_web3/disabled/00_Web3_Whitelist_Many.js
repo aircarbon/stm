@@ -3,7 +3,7 @@ const assert = require('assert');
 //const abi = acmJson['abi'];
 const EthereumJsTx = require('ethereumjs-tx');
 const BN = require('bn.js');
-const { db } = require('../../common/dist');
+const { db } = require('../../db/dist');
 
 const CONST = require('../const.js');
 process.env.WEB3_NETWORK_ID = Number(process.env.NETWORK_ID || 888);
@@ -47,7 +47,7 @@ describe(`Contract Web3 Interface`, async () => {
 
     it(`web3 direct - whitelist many - should be able to write & read a large number of accounts to the whitelist`, async () => {
         const O = await CONST.getAccountAndKey(0);
-        
+
         for (var i=0; i < CHUNKS; i++) {
             console.log(`Whitelisting ${CHUNK_SIZE} addresses (chunk ${i} of ${CHUNKS})...`);
             const tx = await CONST.web3_tx('whitelistMany', [ test_accounts.slice(i * CHUNK_SIZE, (i+1) * CHUNK_SIZE) ], O.addr, O.privKey);
@@ -59,4 +59,3 @@ describe(`Contract Web3 Interface`, async () => {
     });
 });
 
-  

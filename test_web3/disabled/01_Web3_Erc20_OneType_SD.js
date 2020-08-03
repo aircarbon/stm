@@ -3,7 +3,7 @@ const assert = require('assert');
 //const abi = acmJson['abi'];
 const EthereumJsTx = require('ethereumjs-tx');
 const BN = require('bn.js');
-const { db } = require('../../common/dist');
+const { db } = require('../../db/dist');
 
 const CONST = require('../const.js');
 process.env.WEB3_NETWORK_ID = Number(process.env.NETWORK_ID || 888);
@@ -94,18 +94,18 @@ describe(`Contract Web3 Interface`, async () => {
 
         await CONST.web3_tx('transfer', [ SINGDAX_DOM10_1,  "4" ], GRAY_1, GRAY_1_privKey);
         await CONST.web3_sendEthTestAddr(0, SINGDAX_DOM10_1, "0.04");
-        
+
         await CONST.web3_tx('transfer', [ SINGDAX_DOM10_1,  "5" ], GRAY_1, GRAY_1_privKey);
         await CONST.web3_sendEthTestAddr(0, SINGDAX_DOM10_1, "0.05");
         //await CONST.web3_tx('transfer', [ SINGDAX_DOM10_1,  "1" ], GRAY_1, GRAY_1_privKey);
         //await CONST.web3_sendEthTestAddr(0, SINGDAX_DOM10_1, "0.05");
-        
+
         //await CONST.web3_tx('transfer', [ SINGDAX_DOM10_2,  "1" ], GRAY_1, GRAY_1_privKey);
         //await CONST.web3_sendEthTestAddr(0, SINGDAX_DOM10_2, "0.05");
 
         //await CONST.web3_tx('transfer', [ SINGDAX_DOM10_2,  "1" ], GRAY_1, GRAY_1_privKey);
     });
-   
+
     // it(`web3 direct - erc20 - should be able to send from graylist addr to whitelist addr (DEPOSIT: erc20 => exchange)`, async () => {
     //     // var le;
     //     // le = await CONST.web3_call('getLedgerEntry', [ GRAY_1 ]);
@@ -114,7 +114,7 @@ describe(`Contract Web3 Interface`, async () => {
     //     // });
 
     //     // const whitelistTx = await CONST.web3_tx('whitelist', [ GRAY_1 ], OWNER, OWNER_privKey);
-    //     // const trade = await CONST.web3_tx('transferOrTrade', [ { 
+    //     // const trade = await CONST.web3_tx('transferOrTrade', [ {
     //     //             ledger_A: GRAY_1,                              ledger_B: WHITE,
     //     //                qty_A: 0001,                             tokTypeId_A: CONST.tokenType.VCS,
     //     //                qty_B: 0,                                tokTypeId_B: 0,
@@ -130,4 +130,3 @@ describe(`Contract Web3 Interface`, async () => {
     // });
 });
 
-  

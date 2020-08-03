@@ -1,7 +1,7 @@
 const assert = require('assert');
 const EthereumJsTx = require('ethereumjs-tx');
 const BN = require('bn.js');
-const { db } = require('../../common/dist');
+const { db } = require('../../db/dist');
 const _ = require('lodash');
 const chalk = require('chalk');
 
@@ -39,14 +39,13 @@ describe(`Contract Web3 Interface`, async () => {
             console.log('...');
 
             // owner ledger entry
-            await CONST.web3_tx('fundOrWithdraw', [ CONST.fundWithdrawType.FUND, CONST.fundWithdrawType.FUND, CONST.ccyType.USD, 0, O.addr, 'TEST_INIT' ], O.addr, O.privKey); 
+            await CONST.web3_tx('fundOrWithdraw', [ CONST.fundWithdrawType.FUND, CONST.fundWithdrawType.FUND, CONST.ccyType.USD, 0, O.addr, 'TEST_INIT' ], O.addr, O.privKey);
         }
     });
 
     function sleep(ms) {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
-    
+
 });
 
-  

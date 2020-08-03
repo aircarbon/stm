@@ -3,7 +3,7 @@ const _ = require('lodash');
 const chalk = require('chalk');
 const BN = require('bn.js');
 
-const { db } = require('../../common/dist');
+const { db } = require('../../db/dist');
 const CONST = require('../const.js');
 
 module.exports = {
@@ -42,7 +42,7 @@ module.exports = {
             //console.log('combine / master.ft_lastMarkPrice: ', master_ST.ft_lastMarkPrice);
 
             //const le_before = await CONST.web3_call('getLedgerEntry', [p.addr]);
-            const { txHash, receipt, evs } = await CONST.web3_tx('combineFtPos', [{ 
+            const { txHash, receipt, evs } = await CONST.web3_tx('combineFtPos', [{
                 tokTypeId: ftId,
               master_StId: p.master,
               child_StIds: p.combines,
