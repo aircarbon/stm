@@ -3,7 +3,7 @@ const _ = require('lodash');
 const chalk = require('chalk');
 const BN = require('bn.js');
 
-const { db } = require('../../db/dist');
+const { db } = require('../utils-server/dist');
 const CONST = require('../const.js');
 
 module.exports = {
