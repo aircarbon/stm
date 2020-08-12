@@ -9,7 +9,7 @@ const CONST = require('../const.js');
 process.env.WEB3_NETWORK_ID = Number(process.env.NETWORK_ID || 888);
 
 //
-// INITIALIZES a deployed contract, & optionally populates it with arbitrary volumes of random/representative test data
+// INITIALIZES a deployed contract, (& optionally populates it with arbitrary volumes of random/representative test data)
 //
 
 // if false, will produce an empty state: only whitelisted accounts + sealed
@@ -49,16 +49,16 @@ describe(`Contract Web3 Interface`, async () => {
 
     //
     //           Local: ("export INSTANCE_ID=local && mocha test_web3 --timeout 10000000 --exit")
-    //         AWS Dev: ("export INSTANCE_ID=DEV && export CONTRACT_TYPE=COMMODITY && mocha test_web3 --timeout 10000000 --exit")
-    //         AWS UAT: ("export INSTANCE_ID=UAT && export CONTRACT_TYPE=COMMODITY && mocha test_web3 --timeout 10000000 --exit")
-    //        AWS DEMO: ("export INSTANCE_ID=DEMO && export CONTRACT_TYPE=COMMODITY && mocha test_web3 --timeout 10000000 --exit")
-    //        AWS PROD: ("export INSTANCE_ID=PROD && export CONTRACT_TYPE=COMMODITY && mocha test_web3 --timeout 10000000 --exit")
+    //         AWS Dev: ("export INSTANCE_ID=DEV && mocha test_web3 --timeout 10000000 --exit")
+    //         AWS UAT: ("export INSTANCE_ID=UAT && mocha test_web3 --timeout 10000000 --exit")
+    //        AWS DEMO: ("export INSTANCE_ID=DEMO && mocha test_web3 --timeout 10000000 --exit")
+    //        AWS PROD: ("export INSTANCE_ID=PROD && mocha test_web3 --timeout 10000000 --exit")
     //
 
     before(async function () {
         await require('../devSetupContract.js').setDefaults();
 
-        /*var x;
+        var x;
         x = await CONST.getAccountAndKey(OWNER_NDX);
         OWNER = x.addr; OWNER_privKey = x.privKey;
 
@@ -187,7 +187,7 @@ describe(`Contract Web3 Interface`, async () => {
             if (!(await CONST.web3_call('getCcyTypes',[])).ccyTypes.some(p => p.name == 'NEW_CCY_TYPE_A')) {
                 await CONST.web3_tx('addCcyType', [ 'NEW_CCY_TYPE_A', 'cents', 2 ], OWNER, OWNER_privKey);
             }
-        }*/
+        }
     });
 
     it(`web3 direct - multi - should be able to mint multiple batches for all whitelist minters`, async () => {
