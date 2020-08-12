@@ -43,58 +43,39 @@ module.exports = {
             // add spot types
             const spotTypes = (await CONST.web3_call('getSecTokenTypes', [], nameOverride)).tokenTypes.filter(p => p.settlementType == CONST.settlementType.SPOT);
             console.log('spotTypes', spotTypes.map(p => { return { id: p.id, name: p.name } }));
-            async function addSecTokenIfNotPresent(spotTypes, name, O) {
-                if (!spotTypes.some(p => p.name == name)) { await CONST.web3_tx('addSecTokenType', [ name, CONST.settlementType.SPOT, CONST.nullFutureArgs, CONST.nullAddr ], O.addr, O.privKey, nameOverride); }
-                else console.log(chalk.gray(`${name} already present; nop.`));
-            }
-            await addSecTokenIfNotPresent(spotTypes, 'AirCarbon CORSIA Token', O);
-            await addSecTokenIfNotPresent(spotTypes, 'AirCarbon Nature Token', O);
-            await addSecTokenIfNotPresent(spotTypes, 'AirCarbon Premium Token', O);
+            await addSecTokenIfNotPresent(spotTypes, 'AirCarbon CORSIA Token', O, nameOverride);
+            await addSecTokenIfNotPresent(spotTypes, 'AirCarbon Nature Token', O, nameOverride);
+            await addSecTokenIfNotPresent(spotTypes, 'AirCarbon Premium Token', O, nameOverride);
 
             // ad ccy types
             const ccyTypes = (await CONST.web3_call('getCcyTypes', [], nameOverride)).ccyTypes;
             console.log('ccyTypes', ccyTypes.map(p => { return { id: p.id, name: p.name } }));
-            async function addCcyIfNotPresent(ccyTypes, name, unit, decimals, O) {
-                if (!ccyTypes.some(p => p.name == name)) {
-                    await CONST.web3_tx('addCcyType', [ name, unit, decimals ], O.addr, O.privKey, nameOverride);
-                } else console.log(chalk.gray(`${name} already present; nop.`));
-            }
-            await addCcyIfNotPresent(ccyTypes, 'USD', 'cents', 2, O);
-            await addCcyIfNotPresent(ccyTypes, 'ETH', 'Wei', 18, O);
-            await addCcyIfNotPresent(ccyTypes, 'BTC', 'Satoshi', 8, O);
+            await addCcyIfNotPresent(ccyTypes, 'USD', 'cents', 2, O, nameOverride);
+            await addCcyIfNotPresent(ccyTypes, 'ETH', 'Wei', 18, O, nameOverride);
+            await addCcyIfNotPresent(ccyTypes, 'BTC', 'Satoshi', 8, O, nameOverride);
 
-            //
-            // set default exchange fee -- FAILS *EVERYWHERE* ...
-            //    ## ropsten_infura: FAILS (Error: insufficient data for uint256 type (arg="fee_max", coderType="uint256", value="0x00000000", version=4.0.47))
-            //    ##     ropsten_ac: FAILS (Error: insufficient data for uint256 type (arg="fee_max", coderType="uint256", value="0x00000000", version=4.0.47))
-            //    ##     mainnet_ac: FAILS (Error: insufficient data for uint256 type (arg="fee_max", coderType="uint256", value="0x00000000", version=4.0.47))
-            //    ##        test_ac: FAILS (Error: insufficient data for uint256 type (arg="fee_max", coderType="uint256", value="0x00000000", version=4.0.47))
-            //    ## mainnet_infura: FAILS (Error: insufficient data for uint256 type (arg="fee_max", coderType="uint256", value="0x00000000", version=4.0.47))
-            // "web3": "^2.0.0-alpha.1" / https://ac-dev0.net:10545 /  #### Error: insufficient data for uint256 ####
-            //" web3": "^2.0.0-alpha.1" / https://mainnet.infura.io/v3/25a36609b48744bdaa0639e7c2b008d9 /   #### Error: insufficient data for uint256 ####
-            // 
-            // TODO: try repro/fix on test_ac... / DEMO
-
-            // problem type = StructLib.SetFeeArgs (on return only?) -- seems ok passing IN to setFee_CcyType...
-            const test1 = (await CONST.web3_call('getFee', [CONST.getFeeType.CCY, CONST.ccyType.USD, O.addr], nameOverride));
-
-            const usdFee = (await CONST.web3_call('getFee', [CONST.getFeeType.CCY, CONST.ccyType.USD, CONST.nullAddr], nameOverride));
-            console.log('usdFee', usdFee);
-            await CONST.web3_tx('setFee_CcyType', [ CONST.ccyType.USD, CONST.nullAddr, {...CONST.nullFees, ccy_perMillion: 300, ccy_mirrorFee: true, fee_min: 300 } ], O.addr, O.privKey);
+            const usdFee = (await CONST.web3_call('getFee', [CONST.getFeeType.CCY, CONST.ccyType.USD, CONST.nullAddr], nameOverride, undefined/*addrOverride*/, O.addr));
+            //console.log('usdFee', usdFee);
+            if (usdFee.ccy_perMillion.toString() != '300') {
+                await CONST.web3_tx('setFee_CcyType', [ CONST.ccyType.USD, CONST.nullAddr, {...CONST.nullFees, ccy_perMillion: 300, ccy_mirrorFee: true, fee_min: 300 } ], O.addr, O.privKey);
+            } else console.log(chalk.gray(`exchange fee already set for USD; nop.`));
 
             // create owner ledger entry
-            //const ownerLedger = (await CONST.web3_call('getLedgerEntry', [O.addr], nameOverride));
+            const ownerLedger = (await CONST.web3_call('getLedgerEntry', [O.addr], nameOverride));
             //console.log('ownerLedger', ownerLedger);
-            // await CONST.web3_tx('fundOrWithdraw', [ CONST.fundWithdrawType.FUND, CONST.ccyType.USD, 0, O.addr, 'DEV_INIT' ], O.addr, O.privKey); 
+            if (!ownerLedger.exists) {
+                await CONST.web3_tx('fundOrWithdraw', [ CONST.fundWithdrawType.FUND, CONST.ccyType.USD, 0, O.addr, 'DEV_INIT' ], O.addr, O.privKey); 
+            } else console.log(chalk.gray(`owner ledger already set; nop.`));
         }
         else if (await CONST.web3_call('getContractType', [], nameOverride) == CONST.contractType.CASHFLOW_BASE) {
             console.log(chalk.inverse('devSetupContract >> base cashflow contract...'));
 
             // base cashflow - unitype
-            const spotTypes = (await CONST.web3_call('getSecTokenTypes', [], nameOverride)).tokenTypes.filter(p => p.settlementType == CONST.settlementType.SPOT);
-            if (spotTypes.length == 0) {
-                await CONST.web3_tx('addSecTokenType', [ 'UNI_TOKEN',  CONST.settlementType.SPOT, CONST.nullFutureArgs, CONST.nullAddr ], O.addr, O.privKey, nameOverride);
-            }
+            await addSecTokenIfNotPresent(spotTypes, 'UNI_TOKEN', O, nameOverride);
+            // const spotTypes = (await CONST.web3_call('getSecTokenTypes', [], nameOverride)).tokenTypes.filter(p => p.settlementType == CONST.settlementType.SPOT);
+            // if (spotTypes.length == 0) {
+            //     await CONST.web3_tx('addSecTokenType', [ 'UNI_TOKEN',  CONST.settlementType.SPOT, CONST.nullFutureArgs, CONST.nullAddr ], O.addr, O.privKey, nameOverride);
+            // }
 
             // base cashflow - does not track collateral, no ccy types at all
             ;
@@ -109,17 +90,30 @@ module.exports = {
             ;
 
             // cashflow controller - holds ledger collateral, so ccy types only here
-            const ccyTypes = (await CONST.web3_call('getCcyTypes', [], nameOverride)).ccyTypes;
-            if (ccyTypes.length == 0) {
-                await CONST.web3_tx('addCcyType', [ 'USD', 'cents',  2 ], O.addr, O.privKey, nameOverride);
-                await CONST.web3_tx('addCcyType', [ 'ETH', 'Wei',   18 ], O.addr, O.privKey, nameOverride);
-            }
+            // const ccyTypes = (await CONST.web3_call('getCcyTypes', [], nameOverride)).ccyTypes;
+            // if (ccyTypes.length == 0) {
+            //     await CONST.web3_tx('addCcyType', [ 'USD', 'cents',  2 ], O.addr, O.privKey, nameOverride);
+            //     await CONST.web3_tx('addCcyType', [ 'ETH', 'Wei',   18 ], O.addr, O.privKey, nameOverride);
+            // }
+            await addCcyIfNotPresent(ccyTypes, 'USD', 'cents', 2, O, nameOverride);
+            await addCcyIfNotPresent(ccyTypes, 'ETH', 'Wei', 18, O, nameOverride);
 
             // create owner ledger entry
-            await CONST.web3_tx('setFee_CcyType', [ 1, O.addr, CONST.nullFees ], O.addr, O.privKey, nameOverride);
+            await CONST.web3_tx('setFee_CcyType', [ CONST.ccyType.USD, O.addr, CONST.nullFees ], O.addr, O.privKey, nameOverride);
         }
         
         console.groupEnd();
         console.log(chalk.inverse('devSetupContract >> DONE'));
     },
 };
+
+async function addSecTokenIfNotPresent(spotTypes, name, O, nameOverride) {
+    if (!spotTypes.some(p => p.name == name)) { await CONST.web3_tx('addSecTokenType',
+        [ name, CONST.settlementType.SPOT, CONST.nullFutureArgs, CONST.nullAddr ], O.addr, O.privKey, nameOverride); }
+    else console.log(chalk.gray(`${name} already present; nop.`));
+}
+async function addCcyIfNotPresent(ccyTypes, name, unit, decimals, O, nameOverride) {
+    if (!ccyTypes.some(p => p.name == name)) {
+        await CONST.web3_tx('addCcyType', [ name, unit, decimals ], O.addr, O.privKey, nameOverride);
+    } else console.log(chalk.gray(`${name} already present; nop.`));
+}

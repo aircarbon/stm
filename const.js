@@ -133,8 +133,8 @@ module.exports = {
 
     web3_sendEthTestAddr: (sendFromNdx, sendToAddr, ethValue) => web3_sendEthTestAddr(sendFromNdx, sendToAddr, ethValue),
 
-    web3_call: (methodName, methodArgs, nameOverride, addrOverride) =>
-        web3_call(methodName, methodArgs, nameOverride, addrOverride),
+    web3_call: (methodName, methodArgs, nameOverride, addrOverride, fromAddr) =>
+        web3_call(methodName, methodArgs, nameOverride, addrOverride, fromAddr),
 
     web3_tx: (methodName, methodArgs, fromAddr, fromPrivKey, nameOverride, addrOverride) =>
         web3_tx(methodName, methodArgs, fromAddr, fromPrivKey, nameOverride, addrOverride),
@@ -322,7 +322,7 @@ async function getAccountAndKeyHelper(accountNdx, mnemonic) {
     return { addr, privKey: privKeyHex };
 }
 
-async function web3_call(methodName, methodArgs, nameOverride, addrOverride) {
+async function web3_call(methodName, methodArgs, nameOverride, addrOverride, fromAddr) {
     const { web3, ethereumTxChain } = getTestContextWeb3();
     var contractDb;
     if (addrOverride == undefined) {
@@ -337,8 +337,12 @@ async function web3_call(methodName, methodArgs, nameOverride, addrOverride) {
     if (consoleOutput) console.log(chalk.dim(` > CALL: [${chalk.greenBright(contractDb.contract_enum)} ${contractDb.contract_ver} @${contractDb.addr}] ${chalk.reset.blue.bgWhite(methodName + '(' + methodArgs.map(p => JSON.stringify(p)).join() + ')')}` + chalk.dim(` [networkId: ${process.env.WEB3_NETWORK_ID} - ${web3.currentProvider.host}] - ${process.env.sql_server}`)));
     var contract = new web3.eth.Contract(JSON.parse(contractDb.abi), contractDb.addr);
     if ((await contract.methods['version']().call()) != contractDb.contract_ver) throw('Deployed contract missing or version mismatch'); // test contract exists - will silently return null on calls if it's not deployed, wtf
-    const callRet = await contract.methods[methodName](...methodArgs).call();
-    return callRet;
+    if (fromAddr) {
+        return await contract.methods[methodName](...methodArgs).call({from: fromAddr});
+    }
+    else {
+        return await contract.methods[methodName](...methodArgs).call();
+    }
 }
 
 async function web3_tx(methodName, methodArgs, fromAddr, fromPrivKey, nameOverride, addrOverride) {
