@@ -21,7 +21,7 @@ const EthereumJsCommon = require('ethereumjs-common').default;
 //console.log(r.hardforks());
 
 const truffleAssert = require('truffle-assertions');
-const { db } = require('../utils-server/dist');
+const { db } = require('../../utils-server/dist');
 
 const ETH_USD = 322;
 

@@ -3,7 +3,7 @@ const assert = require('assert');
 //const abi = acmJson['abi'];
 const EthereumJsTx = require('ethereumjs-tx');
 const BN = require('bn.js');
-const { db } = require('../utils-server/dist');
+const { db } = require('../../utils-server/dist');
 
 const CONST = require('../const.js');
 process.env.WEB3_NETWORK_ID = Number(process.env.NETWORK_ID || 888);

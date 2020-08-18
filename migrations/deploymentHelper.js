@@ -5,7 +5,7 @@ const os = require('os');
 const publicIp = require('public-ip');
 
 const CONST = require('../const.js');
-const { db } = require('../utils-server/dist');
+const { db } = require('../../utils-server/dist');
 
 module.exports = {
 
