@@ -4,7 +4,7 @@ const { DateTime } = require('luxon');
 const figlet = require('figlet')
 const TCharts = require('tcharts.js'); // for tables
 
-const { db } = require('../utils-server/dist');
+const { db } = require('../../utils-server/dist');
 const CONST = require('../const.js');
 process.env.WEB3_NETWORK_ID = Number(process.env.NETWORK_ID || 888);
 
