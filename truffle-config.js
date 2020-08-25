@@ -66,23 +66,27 @@ module.exports = {
       gasPrice: web3.utils.toWei(GWEI_MAINNET, "gwei"), // we use mainnet pricing for accurate logGas() fiat cost estimates
     },
 
-    // aircarbon mainnet geth node
+    // aircarbon Eth mainnet (1) geth node
     mainnet_ac: {
         provider: function() {
-            var wallet = new HDWalletProvider(require('./PROD_MNEMONIC.js').MNEMONIC, 'https://ac-dev0.net:10545', 0, 1000);
+            var wallet = new HDWalletProvider(require('./PROD_MNEMONIC.js').MNEMONIC,
+                'https://ac-dev0.net:10545', 
+                0, 1000);
+
             var nonceTracker = new NonceTrackerSubprovider();
             wallet.engine._providers.unshift(nonceTracker);
             nonceTracker.setEngine(wallet.engine);
             return wallet;
         },
-        network_id: "*", // 1
         gas: 10000000, // 10m 
         gasPrice: web3.utils.toWei(GWEI_MAINNET, "gwei"),
+        network_id: "1",
         networkCheckTimeout: 30000,
         confirmations: 1,
         skipDryRun: false,
         timeoutBlocks: 200, 
     },
+
 
     // aircarbon ropsten geth node -- a bit faster than infura, representative of mainnet
     ropsten_ac: {
@@ -129,7 +133,7 @@ module.exports = {
       timeoutBlocks: 200,
     },
 
-    // aircarbon private testnet (geth)
+    // AirCarbon private/sidechain (42101) TestNet Geth
     test_ac: {
         provider: function() {
             var wallet = new HDWalletProvider(DEV_MNEMONIC, 'https://ac-dev1.net:9545', 0, 1000); // # test accounts
@@ -138,11 +142,30 @@ module.exports = {
             nonceTracker.setEngine(wallet.engine);
             return wallet;
         },
-        network_id: "*", // 42101
-        //confirmations: 2,
+        network_id: "42101",
         gas: 7800000,
         gasPrice: web3.utils.toWei("1", "kwei")
-    }
+    },
+
+    // AirCarbon private/sidechain (52101) ProdNet Geth
+    prodnet_ac: {
+        provider: function() {
+            var wallet = new HDWalletProvider(require('./PROD_MNEMONIC.js').MNEMONIC,
+                'https://ac-prod0.aircarbon.co:9545', 
+                0, 1000);
+            var nonceTracker = new NonceTrackerSubprovider();
+            wallet.engine._providers.unshift(nonceTracker);
+            nonceTracker.setEngine(wallet.engine);
+            return wallet;
+        },
+        gas: 8000000, // 8m
+        gasPrice: web3.utils.toWei("1", "gwei"),
+        network_id: "52101", 
+        networkCheckTimeout: 30000,
+        confirmations: 1,
+        skipDryRun: false,
+        timeoutBlocks: 200, 
+    },
 
     // Another network with more advanced options...
     // advanced: {

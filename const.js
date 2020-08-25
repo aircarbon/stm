@@ -92,7 +92,7 @@ module.exports = {
 
     // https://docs.chain.link/docs/using-chainlink-reference-contracts
     chainlinkAggregators: {
-        "1": { // mainnet
+        "1": { // eth mainnet
             btcUsd: '0xF5fff180082d6017036B771bA883025c654BC935',
             ethUsd: '0x79fEbF6B9F76853EDBcBc913e6aAE8232cFB9De9'
         },
@@ -104,7 +104,11 @@ module.exports = {
             btcUsd: '0x5498BB86BC934c8D34FDA08E81D444153d0D06aD',
             ethUsd: '0x0bF4e7bf3e1f6D6Dc29AA516A33134985cC3A5aA'
         },
-        "42101": { // AC private testnet
+        "42101": { // AC sidechain testnet
+            btcUsd: '0x0000000000000000000000000000000000000000',
+            ethUsd: '0x0000000000000000000000000000000000000000'
+        },
+        "52101": { // AC sidechain prodnet
             btcUsd: '0x0000000000000000000000000000000000000000',
             ethUsd: '0x0000000000000000000000000000000000000000'
         },
@@ -280,7 +284,7 @@ function getTestContextWeb3(useWs) {
         // Rinkeby - Infura (AirCarbon-AwsDev)
         : process.env.WEB3_NETWORK_ID == 4 ?     { web3: new Web3('https://rinkeby.infura.io/v3/05a8b81beb9a41008f74864b5b1ed544'), ethereumTxChain: { chain: 'rinkeby', hardfork: 'petersburg' } }
 
-        // Private Testnet - AC Geth
+        // Sidechain Testnet - AC Geth
         : process.env.WEB3_NETWORK_ID == 42101 ? { web3: new Web3(useWs ? 'wss://ac-dev1.net:9546' : 'https://ac-dev1.net:9545'),
             ethereumTxChain: { common: EthereumJsCommon.forCustomChain(
             'ropsten', // forCustomChain() requires a "known" name!?
@@ -292,7 +296,19 @@ function getTestContextWeb3(useWs) {
             'petersburg'
         ) } }
 
-        // Rinkeby - Infura (AirCarbon-AwsDev)
+        // Sidechain Prodnet - AC Geth
+        : process.env.WEB3_NETWORK_ID == 52101 ? { web3: new Web3(useWs ? 'wss://ac-prod0.aircarbon.co:9546' : 'https://ac-prod0.aircarbon.co:9545'),
+            ethereumTxChain: { common: EthereumJsCommon.forCustomChain(
+            'ropsten',
+            {
+                name: 'prodnet_ac',
+                networkId: 52101,
+                chainId: 52101,
+            },
+            'petersburg'
+        ) } }
+
+        // Eth Mainnet - Infura (AirCarbon-AwsDev)
       //: process.env.WEB3_NETWORK_ID == 1 ?     { web3: new Web3('https://ac-dev0.net:10545'), ethereumTxChain: {} }
         : process.env.WEB3_NETWORK_ID == 1 ?     { web3: new Web3('https://mainnet.infura.io/v3/25a36609b48744bdaa0639e7c2b008d9'), ethereumTxChain: {} }
 

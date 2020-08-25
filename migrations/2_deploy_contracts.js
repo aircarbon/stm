@@ -15,7 +15,7 @@ const { db } = require('../../utils-server/dist');
 // Prefixes the contract name in const.contractProps with (process.env.INSTANCE_ID || 'local'), e.g.
 //    `export INSTANCE_ID=local && truffle migrate --network ropsten_ac -f 2 --to 2 --reset`
 //    `export INSTANCE_ID=DEMO && truffle migrate --network test_ac -f 2 --to 2 --reset`
-//    `export INSTANCE_ID=PROD && truffle migrate --network mainnet_ac -f 2 --to 2 --reset`
+//    `export INSTANCE_ID=PROD && truffle migrate --network prodnet_ac -f 2 --to 2 --reset`
 //
 
 module.exports = async function (deployer) {
