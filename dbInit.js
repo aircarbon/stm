@@ -6,10 +6,13 @@ const got = require('got');
 const { web3_call } = require('./const.js');
 const { db } = require('../utils-server/dist');
 
+// TODO: ...
+// Copy whitelist address to ....
+//           Local: ("export INSTANCE_ID=local node dbInit.js")
+//           DEV: ("export INSTANCE_ID=DEV node dbInit.js")
+//           UAT: ("export INSTANCE_ID=UAT node dbInit.js")
+//           PROD: ("export INSTANCE_ID=PROD node dbInit.js")
 //
-// Initializes test/local DB with default/test values
-//
-
 process.env.WEB3_NETWORK_ID = Number(process.env.NETWORK_ID || 888);
 
 (async function () {
@@ -81,6 +84,7 @@ process.env.WEB3_NETWORK_ID = Number(process.env.NETWORK_ID || 888);
     }
 
     // insert all whitelist addresses
+    // TODO: empty list address on table
     const allWhitelisted = await web3_call('getWhitelist', []);
     mapSeries(
       allWhitelisted,
