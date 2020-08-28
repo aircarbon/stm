@@ -77,7 +77,7 @@ module.exports = {
             //     await CONST.web3_tx('addSecTokenType', [ 'UNI_TOKEN',  CONST.settlementType.SPOT, CONST.nullFutureArgs, CONST.nullAddr ], O.addr, O.privKey, nameOverride);
             // }
 
-            // base cashflow - does not track collateral, no ccy types at all
+            // base cashflow - does not track collateral, i.e. no ccy types at all
             ;
             
             // create owner ledger entry
