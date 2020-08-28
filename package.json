@@ -1,73 +1,80 @@
 {
-    "name": "@aircarbon/erc20",
-    "author": "Dominic Morris",
-    "version": "0.0.1",
-    "description": "",
-    "main": "truffle-config.js",
-    "directories": {
-        "test": "test"
-    },
-    "scripts": {
-        "devInitSealContract": "node devInitSealContract",
-        "test": "truffle test",
-        "solium:lint": "solium lint -d ./contracts",
-        "migrate": "rimraf -rf ./build/contracts && export INSTANCE_ID=local && truffle migrate --network development --reset",
-        "console": "truffle console",
-        "dev": "truffle develop",
-        "ft": "cross-env WEB3_NETWORK_ID=888 NETWORK_ID=888 INSTANCE_ID=local node ./jobs/ft_job TEST_1"
-    },
-    "keywords": [],
-    "license": "MIT",
-    "dependencies": {
-        "@babel/runtime": "^7.11.2",
-        "ascii-horizontal-barchart": "^1.3.3",
-        "async": "^3.2.0",
-        "big.js": "^5.2.2",
-        "bip39": "^3.0.2",
-        "bn.js": "^5.1.2",
-        "chainlink": "^0.7.10",
-        "chalk": "^3.0.0",
-        "dotenv": "^8.1.0",
-        "figlet": "^1.3.0",
-        "got": "^11.5.2",
-        "lodash": "^4.17.20",
-        "luxon": "^1.22.2",
-        "psol": "^1.0.9",
-        "tcharts.js": "0.0.4",
-        "web3-provider-engine": "^15.0.12"
-    },
-    "devDependencies": {
-        "@digix/doxity": "^0.5.2",
-        "@truffle/hdwallet-provider": "1.0.18",
-        "big-number": "2.0.0",
-        "cross-env": "^7.0.2",
-        "directory-tree": "^2.2.4",
-        "eth-gas-reporter": "0.2.14",
-        "ethereumjs-abi": "^0.6.8",
-        "ethereumjs-common": "^1.5.1",
-        "ethereumjs-tx": "^2.1.1",
-        "ethereumjs-wallet": "^0.6.3",
-        "highlight.js": "^9.18.0",
-        "markdown-it": "^10.0.0",
-        "markdown-it-emoji": "^1.4.0",
-        "meow": "^6.0.0",
-        "mocha": "^5.1.1",
-        "mssql": "^6.2.1",
-        "mustache": "^4.0.0",
-        "node-emoji": "^1.10.0",
-        "pdf-from-html": "^0.1.2-beta.1",
-        "public-ip": "3.2.0",
-        "puppeteer": "^5.2.1",
-        "rimraf": "^3.0.0",
-        "soldoc": "^0.1.3-beta.0",
-        "solidity-docgen": "^0.3.14",
-        "truffle": "5.1.22",
-        "truffle-assertions": "^0.9.1",
-        "web3": "^2.0.0-alpha.1"
-    },
-    "husky": {
-        "hooks": {
-            "precommit": "truffle compile && npm run solium:lint"
-        }
+  "name": "@aircarbon/erc20",
+  "author": "Dominic Morris",
+  "version": "0.0.1",
+  "description": "",
+  "main": "truffle-config.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "devInitSealContract": "node devInitSealContract",
+    "test": "truffle test",
+    "solium:lint": "solium lint -d ./contracts",
+    "migrate": "rimraf -rf ./build/contracts && export INSTANCE_ID=local && truffle migrate --network development --reset",
+    "console": "truffle console",
+    "dev": "truffle develop",
+    "ft": "cross-env WEB3_NETWORK_ID=888 NETWORK_ID=888 INSTANCE_ID=local node ./jobs/ft_job TEST_1"
+  },
+  "keywords": [],
+  "license": "MIT",
+  "dependencies": {
+    "@babel/runtime": "^7.11.2",
+    "ascii-horizontal-barchart": "^1.3.3",
+    "async": "^3.2.0",
+    "big.js": "^5.2.2",
+    "bip39": "^3.0.2",
+    "bn.js": "^5.1.2",
+    "chainlink": "^0.7.10",
+    "chalk": "^3.0.0",
+    "dotenv": "^8.1.0",
+    "figlet": "^1.3.0",
+    "ky": "^0.23.0",
+    "ky-universal": "^0.8.1",
+    "lodash": "^4.17.20",
+    "luxon": "^1.22.2",
+    "psol": "^1.0.9",
+    "tcharts.js": "0.0.4",
+    "web3-provider-engine": "^15.0.12"
+  },
+  "devDependencies": {
+    "@digix/doxity": "^0.5.2",
+    "@truffle/hdwallet-provider": "1.0.18",
+    "big-number": "2.0.0",
+    "cross-env": "^7.0.2",
+    "directory-tree": "^2.2.4",
+    "eth-gas-reporter": "0.2.14",
+    "ethereumjs-abi": "^0.6.8",
+    "ethereumjs-common": "^1.5.1",
+    "ethereumjs-tx": "^2.1.1",
+    "ethereumjs-wallet": "^0.6.3",
+    "highlight.js": "^9.18.0",
+    "markdown-it": "^10.0.0",
+    "markdown-it-emoji": "^1.4.0",
+    "meow": "^6.0.0",
+    "mocha": "^5.1.1",
+    "mssql": "^6.2.1",
+    "mustache": "^4.0.0",
+    "node-emoji": "^1.10.0",
+    "pdf-from-html": "^0.1.2-beta.1",
+    "public-ip": "3.2.0",
+    "puppeteer": "^5.2.1",
+    "rimraf": "^3.0.0",
+    "soldoc": "^0.1.3-beta.0",
+    "solidity-docgen": "^0.3.14",
+    "truffle": "5.1.22",
+    "truffle-assertions": "^0.9.1",
+    "web3": "^2.0.0-alpha.1"
+  },
+  "husky": {
+    "hooks": {
+      "precommit": "truffle compile && npm run solium:lint"
     }
+  },
+  "workspaces": {
+    "nohoist": [
+      "**/agent-base",
+      "**/agent-base/**"
+    ]
+  }
 }
