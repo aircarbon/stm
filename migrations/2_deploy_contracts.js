@@ -102,6 +102,6 @@ module.exports = async function (deployer) {
             }
             break;
 
-        default: throw(`Missing or unknown CONTRACT_TYPE ("${process.env.CONTRACT_TYPE}"): set to CASHFLOW, CASHFLOW_CONTROLLER, or COMMODITY.`);
+        default: throw(`Missing or unknown CONTRACT_TYPE ("${process.env.CONTRACT_TYPE}"): set to CASHFLOW_BASE, CASHFLOW_CONTROLLER, or COMMODITY.`);
     }
 };

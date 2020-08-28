@@ -71,8 +71,8 @@ module.exports = {
             console.log(chalk.inverse('devSetupContract >> base cashflow contract...'));
 
             // base cashflow - unitype
+            const spotTypes = (await CONST.web3_call('getSecTokenTypes', [], nameOverride)).tokenTypes.filter(p => p.settlementType == CONST.settlementType.SPOT);
             await addSecTokenIfNotPresent(spotTypes, 'UNI_TOKEN', O, nameOverride);
-            // const spotTypes = (await CONST.web3_call('getSecTokenTypes', [], nameOverride)).tokenTypes.filter(p => p.settlementType == CONST.settlementType.SPOT);
             // if (spotTypes.length == 0) {
             //     await CONST.web3_tx('addSecTokenType', [ 'UNI_TOKEN',  CONST.settlementType.SPOT, CONST.nullFutureArgs, CONST.nullAddr ], O.addr, O.privKey, nameOverride);
             // }
@@ -90,11 +90,7 @@ module.exports = {
             ;
 
             // cashflow controller - holds ledger collateral, so ccy types only here
-            // const ccyTypes = (await CONST.web3_call('getCcyTypes', [], nameOverride)).ccyTypes;
-            // if (ccyTypes.length == 0) {
-            //     await CONST.web3_tx('addCcyType', [ 'USD', 'cents',  2 ], O.addr, O.privKey, nameOverride);
-            //     await CONST.web3_tx('addCcyType', [ 'ETH', 'Wei',   18 ], O.addr, O.privKey, nameOverride);
-            // }
+            const ccyTypes = (await CONST.web3_call('getCcyTypes', [], nameOverride)).ccyTypes;
             await addCcyIfNotPresent(ccyTypes, 'USD', 'cents', 2, O, nameOverride);
             await addCcyIfNotPresent(ccyTypes, 'ETH', 'Wei', 18, O, nameOverride);
 
