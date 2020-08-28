@@ -1,18 +1,19 @@
-const envFile = require('path').resolve(__dirname, "./.env." + (process.env.INSTANCE_ID !== undefined ? (process.env.INSTANCE_ID) : ''));
-require('dotenv').config( { path: envFile });
+const envFile = require('path').resolve(
+  __dirname,
+  './.env.' + (process.env.INSTANCE_ID !== undefined ? process.env.INSTANCE_ID : ''),
+);
+require('dotenv').config({ path: envFile });
 const mapSeries = require('async/mapSeries');
 const allSettled = require('promise.allsettled');
-const got = require('got');
+const ky = require('ky-universal');
 const { web3_call } = require('./const.js');
 const { db } = require('../utils-server/dist');
 
-// TODO: ...
-// Copy whitelist address to ....
+// Copy whitelist address to DB and init whitelist & oracle price settings
 //           Local: ("export INSTANCE_ID=local node dbInit.js")
 //           DEV: ("export INSTANCE_ID=DEV node dbInit.js")
 //           UAT: ("export INSTANCE_ID=UAT node dbInit.js")
 //           PROD: ("export INSTANCE_ID=PROD node dbInit.js")
-//
 process.env.WEB3_NETWORK_ID = Number(process.env.NETWORK_ID || 888);
 
 (async function () {
@@ -21,7 +22,11 @@ process.env.WEB3_NETWORK_ID = Number(process.env.NETWORK_ID || 888);
   if (contractSealed) {
     // reset whitelist index to default
     console.warn('Reset default whitelist index');
-    await db.AddConfigSetting('next_wl_index', DEFAULT_WHITELIST_INDEX);
+    try {
+      await db.AddConfigSetting('next_wl_index', DEFAULT_WHITELIST_INDEX);
+    } catch (error) {
+      console.warn('Whitelist index is already configured');
+    }
 
     const defaultGasPrices = [
       'gasPrice_admin_mintSecTokenBatch_mwei',
@@ -38,20 +43,20 @@ process.env.WEB3_NETWORK_ID = Number(process.env.NETWORK_ID || 888);
 
     const gasPricesPromise = defaultGasPrices.map((action) => db.AddConfigSetting(action, 'fast'));
 
-    await Promise.all(gasPricesPromise);
+    try {
+      await Promise.all(gasPricesPromise);
+    } catch (error) {
+      console.warn('Gas price setting has been setup');
+    }
 
     // insert gas prices
     try {
       const [ethChainResult, gasStationResult] = await allSettled([
-        got('https://www.etherchain.org/api/gasPriceOracle'),
-        got('https://ethgasstation.info/json/ethgasAPI.json'),
+        ky('https://www.etherchain.org/api/gasPriceOracle').json(),
+        ky('https://ethgasstation.info/json/ethgasAPI.json').json(),
       ]);
-      console.warn({
-        ethChainResult,
-        gasStationResult,
-      });
       if (ethChainResult.status === 'fulfilled') {
-        const { safeLow, standard, fast, fastest } = JSON.parse(ethChainResult.value.body);
+        const { safeLow, standard, fast, fastest } = ethChainResult.value;
         console.warn('Oracles prices in GWei', {
           safeLow,
           standard,
@@ -65,7 +70,7 @@ process.env.WEB3_NETWORK_ID = Number(process.env.NETWORK_ID || 888);
           db.AddGasPriceValue('fastest', fastest),
         ]);
       } else if (gasStationResult.status === 'fulfilled') {
-        const { safeLow, average, fast, fastest } = JSON.parse(gasStationResult.value.body);
+        const { safeLow, average, fast, fastest } = gasStationResult.value;
         console.warn('Oracles prices in GWei', {
           safeLow,
           average,
@@ -84,24 +89,38 @@ process.env.WEB3_NETWORK_ID = Number(process.env.NETWORK_ID || 888);
     }
 
     // insert all whitelist addresses
-    // TODO: empty list address on table
     const allWhitelisted = await web3_call('getWhitelist', []);
-    mapSeries(
-      allWhitelisted,
-      async (addr) => {
-        console.warn(addr);
-        await db.AddWhitelistAddress(addr);
-        return addr;
-      },
-      (err, result) => {
-        if (err) {
-          console.warn(err);
-        } else {
-          console.warn(result);
-        }
-        process.exit();
-      },
-    );
+    const totalAddresses = await db.GetTotalWhitelistAddress();
+    console.warn(totalAddresses.recordsets[0][0].total, allWhitelisted.length);
+    if (totalAddresses.recordsets[0][0].total < allWhitelisted.length) {
+      mapSeries(
+        allWhitelisted,
+        async (addr) => {
+          console.warn(addr);
+          try {
+            await db.AddWhitelistAddress(addr);
+          } catch (error) {
+            if (error.message.includes('Cannot insert duplicate key row in object')) {
+              console.warn('This address has been added.');
+            } else {
+              throw new Error(error.message);
+            }
+          }
+          return addr;
+        },
+        (err, result) => {
+          if (err) {
+            console.warn(err);
+          } else {
+            console.warn(result);
+          }
+          process.exit();
+        },
+      );
+    } else {
+      console.warn('Whitelist address is ready');
+      process.exit();
+    }
   } else {
     console.warn('NOT SEALED YET!');
   }
