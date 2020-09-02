@@ -38,7 +38,7 @@ const WHITE_BUYERS = [];
 
 // whitelisted manual test accounts
 const TEST_ACCOUNT_START_NDX = WHITE_BUYER_START_NDX + WHITE_BUYER_COUNT;
-const TEST_ACCOUNT_COUNT = 100;
+const TEST_ACCOUNT_COUNT = process.env.WHITELIST_COUNT || 100;
 const TEST_ACCOUNTS = [];
 
 // off-exchange "graylist" external address
@@ -66,7 +66,7 @@ describe(`Contract Web3 Interface`, async () => {
         GRAY = x.addr; GRAY_privKey = x.privKey;
         const sendEthTx = await CONST.web3_sendEthTestAddr(0, GRAY, "0.01"); // setup - fund GRAY eth
 
-        whitelistAndSeal();
+        await whitelistAndSeal();
 
         // cashflow controller - need to whitelist & seal each base type (mirror base cashflow, i.e. WL set will be identical in base types)
         if ((await CONST.web3_call('getContractType', [])) == CONST.contractType.CASHFLOW_CONTROLLER) {
@@ -161,7 +161,7 @@ describe(`Contract Web3 Interface`, async () => {
                 // setup whitelist: manual testing exchange accounts -- BATCHED/CHUNKED --
                 //
                 wlMany = []
-                for (whiteNdx = WHITE_BUYER_START_NDX + WHITE_BUYER_COUNT; whiteNdx < TEST_ACCOUNT_START_NDX + TEST_ACCOUNT_COUNT; whiteNdx++) {
+                for (whiteNdx = WHITE_BUYER_START_NDX + WHITE_BUYER_COUNT; whiteNdx < Number(TEST_ACCOUNT_START_NDX) + Number(TEST_ACCOUNT_COUNT); whiteNdx++) {
                     x = await CONST.getAccountAndKey(whiteNdx);
                     if (!allWhitelisted.map(p => p.toLowerCase()).includes(x.addr.toLowerCase())) {
                         wlMany.push(x.addr);
