@@ -63,11 +63,41 @@ library TransferLib {
         if (ld.contractType == StructLib.ContractType.CASHFLOW_CONTROLLER) { //**
             if (a.qty_A > 0) {
                 StMaster base_A = StMaster(std._tt_addr[a.tokTypeId_A]);
-                base_A.transferOrTrade(a);
+                base_A.transferOrTrade(StructLib.TransferArgs({ 
+                     ledger_A: a.ledger_A,
+                     ledger_B: a.ledger_B,
+                        qty_A: a.qty_A,
+                    k_stIds_A: a.k_stIds_A,
+                  tokTypeId_A: 1/*a.tokTypeId_A*/, // base: UNI_TOKEN (controller does type ID mapping for clients)
+                        qty_B: a.qty_B,
+                    k_stIds_B: a.k_stIds_B,
+                  tokTypeId_B: a.tokTypeId_B,
+                 ccy_amount_A: a.ccy_amount_A,
+                  ccyTypeId_A: a.ccyTypeId_A,
+                 ccy_amount_B: a.ccy_amount_B,
+                  ccyTypeId_B: a.ccyTypeId_B,
+                    applyFees: a.applyFees,
+                 feeAddrOwner: a.feeAddrOwner
+                }));
             }
             if (a.qty_B > 0) {
                 StMaster base_B = StMaster(std._tt_addr[a.tokTypeId_B]);
-                base_B.transferOrTrade(a);
+                base_B.transferOrTrade(StructLib.TransferArgs({ 
+                     ledger_A: a.ledger_A,
+                     ledger_B: a.ledger_B,
+                        qty_A: a.qty_A,
+                    k_stIds_A: a.k_stIds_A,
+                  tokTypeId_A: a.tokTypeId_A,
+                        qty_B: a.qty_B,
+                    k_stIds_B: a.k_stIds_B,
+                  tokTypeId_B: 1/*a.tokTypeId_B*/, // base: UNI_TOKEN (controller does type ID mapping for clients)
+                 ccy_amount_A: a.ccy_amount_A,
+                  ccyTypeId_A: a.ccyTypeId_A,
+                 ccy_amount_B: a.ccy_amount_B,
+                  ccyTypeId_B: a.ccyTypeId_B,
+                    applyFees: a.applyFees,
+                 feeAddrOwner: a.feeAddrOwner
+                }));
             }
         }
 
@@ -400,7 +430,22 @@ library TransferLib {
         else { // controller - delegate token fee previews to base type(s) & merge results
             if (a.qty_A > 0) {
                 StMaster base_A = StMaster(std._tt_addr[a.tokTypeId_A]);
-                StructLib.FeesCalc[1 + MAX_BATCHES_PREVIEW * 2] memory feesBase = base_A.transfer_feePreview(a);
+                StructLib.FeesCalc[1 + MAX_BATCHES_PREVIEW * 2] memory feesBase = base_A.transfer_feePreview(StructLib.TransferArgs({ 
+                     ledger_A: a.ledger_A,
+                     ledger_B: a.ledger_B,
+                        qty_A: a.qty_A,
+                    k_stIds_A: a.k_stIds_A,
+                  tokTypeId_A: 1/*a.tokTypeId_A*/, // base: UNI_TOKEN (controller does type ID mapping for clients)
+                        qty_B: a.qty_B,
+                    k_stIds_B: a.k_stIds_B,
+                  tokTypeId_B: a.tokTypeId_B,
+                 ccy_amount_A: a.ccy_amount_A,
+                  ccyTypeId_A: a.ccyTypeId_A,
+                 ccy_amount_B: a.ccy_amount_B,
+                  ccyTypeId_B: a.ccyTypeId_B,
+                    applyFees: a.applyFees,
+                 feeAddrOwner: a.feeAddrOwner
+                }));
                 for (uint i = 1 ; i < feesBase.length ; i++) {
                     if (feesBase[i].fee_tok_A > 0) {
                         feesAll[i] = feesBase[i];
@@ -409,7 +454,22 @@ library TransferLib {
             }
             if (a.qty_B > 0) {
                 StMaster base_B = StMaster(std._tt_addr[a.tokTypeId_B]);
-                StructLib.FeesCalc[1 + MAX_BATCHES_PREVIEW * 2] memory feesBase = base_B.transfer_feePreview(a);
+                StructLib.FeesCalc[1 + MAX_BATCHES_PREVIEW * 2] memory feesBase = base_B.transfer_feePreview(StructLib.TransferArgs({ 
+                     ledger_A: a.ledger_A,
+                     ledger_B: a.ledger_B,
+                        qty_A: a.qty_A,
+                    k_stIds_A: a.k_stIds_A,
+                  tokTypeId_A: a.tokTypeId_A,
+                        qty_B: a.qty_B,
+                    k_stIds_B: a.k_stIds_B,
+                  tokTypeId_B: 1/*a.tokTypeId_B*/, // base: UNI_TOKEN (controller does type ID mapping for clients)
+                 ccy_amount_A: a.ccy_amount_A,
+                  ccyTypeId_A: a.ccyTypeId_A,
+                 ccy_amount_B: a.ccy_amount_B,
+                  ccyTypeId_B: a.ccyTypeId_B,
+                    applyFees: a.applyFees,
+                 feeAddrOwner: a.feeAddrOwner
+                }));
                 for (uint i = 1 ; i < feesBase.length ; i++) {
                     if (feesBase[i].fee_tok_B > 0) {
                         feesAll[i] = feesBase[i];

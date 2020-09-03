@@ -65,6 +65,7 @@ contract StLedger is
     }
 
     // get token(s)
+    function getSecToken_BaseId() external view returns (uint256) { return ld._tokens_base_id; } // 1-based
     function getSecToken_MaxId() external view returns (uint256) { return ld._tokens_currentMax_id; } // 1-based
     function getSecToken(uint256 id) external view returns (
         StructLib.LedgerSecTokenReturn memory

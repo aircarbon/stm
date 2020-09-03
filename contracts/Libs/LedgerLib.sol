@@ -144,7 +144,7 @@ library LedgerLib {
     }
 
     //
-    // PUBLIC - GET LEDER HASH
+    // PUBLIC - GET LEDGER HASH
     //
     struct ConsistencyCheck {
         uint256 totalCur;
@@ -198,7 +198,7 @@ library LedgerLib {
             ledgerHash = keccak256(abi.encodePacked(ledgerHash, std._tt_ft[stTypeId].contractSize));
             ledgerHash = keccak256(abi.encodePacked(ledgerHash, std._tt_ft[stTypeId].feePerContract));
 
-            ledgerHash = keccak256(abi.encodePacked(ledgerHash, std._tt_addr[stTypeId]));
+            ledgerHash = keccak256(abi.encodePacked(ledgerHash, std._tt_addr[stTypeId])); // ? should exclude, to allow CFT-C to upgrade and point to upgraded base types?!
 
             if (globalFees.tokType_Set[stTypeId]) {
                 ledgerHash = keccak256(abi.encodePacked(ledgerHash, hashSetFeeArgs(globalFees.tok[stTypeId])));
@@ -234,7 +234,6 @@ library LedgerLib {
         }
 
         // walk ledger -- exclude contract owner from hashes
-        ConsistencyCheck memory chk;
         for (uint256 ledgerNdx = 0; ledgerNdx < ld._ledgerOwners.length; ledgerNdx++) {
             address entryOwner = ld._ledgerOwners[ledgerNdx];
             StructLib.Ledger storage entry = ld._ledger[entryOwner];
@@ -243,62 +242,72 @@ library LedgerLib {
             if (ledgerNdx != 0)
                 ledgerHash = keccak256(abi.encodePacked(ledgerHash, entryOwner));
 
-            // hash ledger tokens, custom spot fees, by token types
+            // hash ledger token types: ID list, custom spot fees & FT type data
             for (uint256 stTypeId = 1; stTypeId <= std._tt_Count; stTypeId++) {
+                
+                // ### TODO? ## switch -- delegate-base types for CFT-C... ## 
+                // ### ??? IDs themselves are not material, can skip this hashing?
                 uint256[] storage stIds = entry.tokenType_stIds[stTypeId];
-
-                // hash token type id list
                 ledgerHash = keccak256(abi.encodePacked(ledgerHash, stIds));
 
-                // hash spot-type ledger fee override
+                // ### then left only with FT types & spot custom fees per type -- can read direct from controller???
                 if (entry.spot_customFees.tokType_Set[stTypeId]) {
                     ledgerHash = keccak256(abi.encodePacked(ledgerHash, hashSetFeeArgs(entry.spot_customFees.tok[stTypeId])));
                 }
-
-                // hash future-type ledger overrides (init-margin, and fee-per-contract)
                 ledgerHash = keccak256(abi.encodePacked(ledgerHash, entry.ft_initMarginBips[stTypeId]));
                 ledgerHash = keccak256(abi.encodePacked(ledgerHash, entry.ft_feePerContract[stTypeId]));
+
+                // ### i.e. no delegation required at all?
             }
 
-            // hash ledger currency balances & custom fees
+            // hash balances & custom ccy fees
             for (uint256 ccyTypeId = 1; ccyTypeId <= ctd._ct_Count; ccyTypeId++) {
-                // hash currency type balance & reservation
                 ledgerHash = keccak256(abi.encodePacked(ledgerHash, entry.ccyType_balance[ccyTypeId]));
                 ledgerHash = keccak256(abi.encodePacked(ledgerHash, entry.ccyType_reserved[ccyTypeId]));
-
-                // hash currency type ledger fee
                 if (entry.spot_customFees.ccyType_Set[ccyTypeId]) {
                     ledgerHash = keccak256(abi.encodePacked(ledgerHash, hashSetFeeArgs(entry.spot_customFees.ccy[ccyTypeId])));
                 }
             }
 
-            // hash ledger entry total minted & burned counts
+            // hash entry total minted & burned counts
             ledgerHash = keccak256(abi.encodePacked(ledgerHash, entry.spot_sumQtyMinted));
             ledgerHash = keccak256(abi.encodePacked(ledgerHash, entry.spot_sumQtyBurned));
         }
 
         // walk all tokens (including those fully deleted from the ledger by burn()), hash
-        for (uint256 stId = 1; stId <= ld._tokens_currentMax_id; stId++) {
-            StructLib.PackedSt memory st = ld._sts[stId];
-
-            ledgerHash = keccak256(abi.encodePacked(ledgerHash,
-                st.batchId,
-                st.mintedQty,
-                st.currentQty,
-                st.ft_price,
-                st.ft_ledgerOwner,
-                st.ft_lastMarkPrice,
-                st.ft_PL
-            ));
-
-            // consistency check
-            chk.totalCur += uint256(st.currentQty);
-            chk.totalMinted += uint256(st.mintedQty);
+        ConsistencyCheck memory chk;
+        if (ld.contractType == StructLib.ContractType.CASHFLOW_CONTROLLER) { 
+            // controller - passthrough delegate-base call to getLedgerHashcode() to each base type
+            for (uint256 tokTypeId = 1; tokTypeId <= std._tt_Count; tokTypeId++) {
+                StMaster base = StMaster(std._tt_addr[tokTypeId]);
+                bytes32 baseTypeHashcode = base.getLedgerHashcode();
+                ledgerHash = keccak256(abi.encodePacked(ledgerHash, baseTypeHashcode));
+            }
+        }
+        else {
+            // base & commodity - walk & hash individual tokens, and apply consistency check on totals
+            //for (uint256 stId = 1; stId <= ld._tokens_currentMax_id; stId++) {
+            for (uint256 stId = ld._tokens_base_id; stId <= ld._tokens_currentMax_id; stId++) {
+                StructLib.PackedSt memory st = ld._sts[stId];
+                ledgerHash = keccak256(abi.encodePacked(ledgerHash,
+                    st.batchId,
+                    st.mintedQty,
+                    st.currentQty,
+                    st.ft_price,
+                    st.ft_ledgerOwner,
+                    st.ft_lastMarkPrice,
+                    st.ft_PL
+                ));
+                chk.totalCur += uint256(st.currentQty); // consistency check (base & commodity)
+                chk.totalMinted += uint256(st.mintedQty);
+            }
         }
 
-        // consistency check - global totals vs. all STs
-        require(chk.totalMinted == ld._spot_totalMintedQty, "Consistency check failed (1)");
-        require(chk.totalMinted - chk.totalCur == ld._spot_totalBurnedQty, "Consistency check failed (2)");
+        // base & commodity - apply consistency check: global totals vs. sum ST totals
+        if (ld.contractType != StructLib.ContractType.CASHFLOW_CONTROLLER) {
+            require(chk.totalMinted == ld._spot_totalMintedQty, "Consistency check failed (1)");
+            require(chk.totalMinted - chk.totalCur == ld._spot_totalBurnedQty, "Consistency check failed (2)");
+        }
 
         // hash totals & counters
         ledgerHash = keccak256(abi.encodePacked(ledgerHash, ld._tokens_currentMax_id));

@@ -33,6 +33,7 @@ https://diligence.consensys.net/blog/2019/09/how-to-prepare-for-a-smart-contract
 // 24380: ... [added stIds[] to burn & transferArgs; optimizer runs down to 1]
 // 24560: ... [split ledger - wip; at limit]
 // 24241: ... [refactor/remove SecTokenReturn in favour of LedgerSecTokenReturn]
+// 24478: ... [+ _tokens_base_id, getSecToken_BaseId()]
 // TODO: fork/conditional compile -- StPayable || StFutures
 
 contract StMaster

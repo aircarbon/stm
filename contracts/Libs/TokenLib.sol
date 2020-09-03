@@ -87,13 +87,13 @@ library TokenLib {
             std._tt_settle[std._tt_Count] = settlementType;
             std._tt_addr[std._tt_Count] = cashflowBaseAddr;
 
-            // set/segment base's curMaxId...
+            // set/segment base's curMaxId
             uint256 segmentStartId = (std._tt_Count << 192)
                 //| ((1 << 192) - 1) // test: token id overflow
                 | 0 // segment - first 64 bits: type ID (max 0xFFFFFFFFFFFFFFFF), remaining 192 bits: local/segmented sub-id
             ;
             StMaster base = StMaster(cashflowBaseAddr);
-            base.setTokenTotals(segmentStartId, 0, 0);
+            base.setTokenTotals(segmentStartId, segmentStartId, 0, 0);
         }
         else {
             // add direct type (to commodity or cashflow base)
@@ -219,7 +219,7 @@ library TokenLib {
         ld._batches[newBatch.id] = newBatch;
         ld._batches_currentMax_id++;
 
-        // emit batch create event (core & controller - not base; its batch and tok-type IDs are local)
+        // emit batch create event (commodity & controller - not base; its batch and tok-type IDs are local)
         if (ld.contractType != StructLib.ContractType.CASHFLOW_BASE) {
             emit Minted(newBatch.id, a.tokTypeId, a.batchOwner, uint256(a.mintQty), uint256(a.mintSecTokenCount));
         }
@@ -265,17 +265,24 @@ library TokenLib {
                 }
 
                 ld._ledger[a.batchOwner].tokenType_stIds[a.tokTypeId].push(newId); // assign ST to ledger
+
+                // initialize base token ID, if not already set
+                // this is needed because cashflow base types use a segmented ID [64 leading bits of controller type ID data & 192 trailing bits of token ID data]
+                // without base ID being set, there's not way for base types to walk their maps of {ID => token}
+                if (ld._tokens_base_id == 0) {
+                    ld._tokens_base_id = newId;
+                }
             }
         }
 
         // core - update current/max STID
         ld._tokens_currentMax_id += uint256(a.mintSecTokenCount); // controller: minted COUNT (not an ID), base / commodity: a true max. LOCAL ID
 
-        // controller / commodity: update global totals
-        if (ld.contractType != StructLib.ContractType.CASHFLOW_BASE) {
+        // core - update global totals; note - totals are maintained on base AND on controller/commodity
+        //if (ld.contractType != StructLib.ContractType.CASHFLOW_BASE) {
             ld._spot_totalMintedQty += uint256(a.mintQty);
             ld._ledger[a.batchOwner].spot_sumQtyMinted += uint256(a.mintQty);
-        }
+        //}
     }
 
     //
@@ -297,10 +304,14 @@ library TokenLib {
         require(ld._ledger[a.ledgerOwner].exists == true, "Bad ledgerOwner");
         require(a.burnQty >= 0x1 && a.burnQty <= 0x7fffffffffffffff, "Bad burnQty"); // max int64
 
-        // controller / commodity: (preemptively) update global totals & emit main event
-        if (ld.contractType != StructLib.ContractType.CASHFLOW_BASE) {
+        // core - update global totals, preemptively; note - totals are maintained on base AND on controller/commodity
+        //if (ld.contractType != StructLib.ContractType.CASHFLOW_BASE) {
             ld._spot_totalBurnedQty += uint256(a.burnQty);
             ld._ledger[a.ledgerOwner].spot_sumQtyBurned += uint256(a.burnQty);
+        //}
+
+        // emit burn event (core & controller)
+        if (ld.contractType != StructLib.ContractType.CASHFLOW_BASE) {
             emit Burned(a.tokTypeId, a.ledgerOwner, uint256(a.burnQty));
         }
 
