@@ -43,10 +43,12 @@ contract DataLoadable is
 
     function setTokenTotals(
         //uint80 packed_ExchangeFeesPaidQty, uint80 packed_OriginatorFeesPaidQty, uint80 packed_TransferedQty,
+        uint256 base_id,
         uint256 currentMax_id, uint256 totalMintedQty, uint256 totalBurnedQty
     ) public onlyOwner() {
         LoadLib.setTokenTotals(ld,
             //packed_ExchangeFeesPaidQty, packed_OriginatorFeesPaidQty, packed_TransferedQty,
+            base_id,
             currentMax_id, totalMintedQty, totalBurnedQty
         );
     }

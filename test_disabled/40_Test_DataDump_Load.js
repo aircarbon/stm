@@ -406,10 +406,12 @@ contract("StMaster", accounts => {
         // }
 
         // set token totals
+        const curSecTokenBaseId = await stm_cur.getSecToken_BaseId();
         const curSecTokenMintedCount = await stm_cur.getSecToken_MaxId();
         const curSecTokenBurnedQty = await stm_cur.getSecToken_totalBurnedQty();
         const curSecTokenMintedQty = await stm_cur.getSecToken_totalMintedQty();
         await stm_new.setTokenTotals(
+            curSecTokenBaseId,
             curSecTokenMintedCount, curSecTokenMintedQty, curSecTokenBurnedQty
         );
 

@@ -69,6 +69,7 @@ library LoadLib {
     function setTokenTotals(
         StructLib.LedgerStruct storage ld,
         //uint80 packed_ExchangeFeesPaidQty, uint80 packed_OriginatorFeesPaidQty, uint80 packed_TransferedQty,
+        uint256 base_id,
         uint256 currentMax_id, uint256 totalMintedQty, uint256 totalBurnedQty
     )
     public {
@@ -77,6 +78,7 @@ library LoadLib {
         //ld._spot_total.originatorFeesPaidQty = packed_OriginatorFeesPaidQty;
         //ld._spot_total.transferedQty = packed_TransferedQty;
 
+        ld._tokens_base_id = base_id;
         ld._tokens_currentMax_id = currentMax_id;
         ld._spot_totalMintedQty = totalMintedQty;
         ld._spot_totalBurnedQty = totalBurnedQty;

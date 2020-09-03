@@ -206,6 +206,7 @@ library StructLib {
 
         // *** SecTokens LIST
         mapping(uint256 => PackedSt) _sts;                      // stId => PackedSt
+        uint256 _tokens_base_id;                                // 1-based - assigned (once, when set to initial zero value) by Mint()
         uint256 _tokens_currentMax_id;                          // 1-based - updated by Mint() and by transferSplitSecTokens()
 
         // *** LEDGER

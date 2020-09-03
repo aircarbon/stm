@@ -6,7 +6,7 @@ const CONST = require('../const.js');
 
 module.exports = {
 
-    transferLedger: async (a) => {
+    transferLedger: async(a) => {
         const { stm, accounts,
             ledger_A,     ledger_B, 
             qty_A,        tokTypeId_A, k_stIds_A,
