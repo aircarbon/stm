@@ -59,7 +59,7 @@ contract("StMaster", accounts => {
 
     it(`withdrawing - should have reasonable gas cost for withdrawing`, async () => {
         await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, CONST.ccyType.USD, CONST.thousandCcy_cents, accounts[global.TaddrNdx], 'TEST');
-        const withdrawTx = await stm.fundOrWithdraw(CONST.fundWithdrawType.WITHDRAW, CONST.ccyType.USD, CONST.thousandCcy_cents, accounts[global.TaddrNdx], { from: accounts[0] });
+        const withdrawTx = await stm.fundOrWithdraw(CONST.fundWithdrawType.WITHDRAW, CONST.ccyType.USD, CONST.thousandCcy_cents, accounts[global.TaddrNdx], 'TEST');
         await CONST.logGas(web3, withdrawTx, `Withdrawing`);
     });
 

@@ -23,8 +23,8 @@ const EthereumJsCommon = require('ethereumjs-common').default;
 const truffleAssert = require('truffle-assertions');
 const { db } = require('../utils-server/dist');
 
-//const ETH_USD = 322; // ETH
-const ETH_USD = 30;  // BNB
+//const GAS_USD = 322; // ETHUSD (for ETH mainnet) or BNBUSD (for BSC mainnet)
+const GAS_USD = 30; // ETHUSD (for ETH mainnet) or BNBUSD (for BSC mainnet)
 
 // misc
 const WEB3_NONCE_REPLACE = undefined; // set to replace/drop a slow mainnet TX
@@ -265,9 +265,9 @@ EXCHANGE_FEE: 1,
         //console.log('actualGasPriceEth', actualGasPriceEth);
 
         const weiCost = web3Tx.gasPrice * truffleTx.receipt.gasUsed;
-        const usdCost = actualGasPriceEth * truffleTx.receipt.gasUsed * ETH_USD;
+        const usdCost = actualGasPriceEth * truffleTx.receipt.gasUsed * GAS_USD;
 
-        console.log(`>>> gasUsed - ${desc}: ${truffleTx.receipt.gasUsed} gas * ${/*actualGasPriceEth*/web3.utils.fromWei(web3Tx.gasPrice, 'gwei')}gwei = Ξ${(actualGasPriceEth * truffleTx.receipt.gasUsed).toFixed(4)} ~= $${(usdCost).toFixed(4)}`);
+        console.log(`>>> gasUsed - [${process.env.INSTANCE_ID}] ${desc}: ${truffleTx.receipt.gasUsed} gas * ${web3.utils.fromWei(web3Tx.gasPrice, 'gwei')}gwei = Ξ${(actualGasPriceEth * truffleTx.receipt.gasUsed).toFixed(4)} ~= $${(usdCost).toFixed(4)} (@ $${GAS_USD} ETH[||BNB]/USD)`);
         return { usdCost, weiCost };
     }
 };

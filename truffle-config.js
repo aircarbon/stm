@@ -25,8 +25,9 @@ const NonceTrackerSubprovider = require("web3-provider-engine/subproviders/nonce
 
 const DEV_MNEMONIC = require('./DEV_MNEMONIC.js').MNEMONIC;
 
-const GWEI_MAINNET = "80";
-const GWEI_TESTNET = "5";
+const GWEI_MAINNET_1  = "80";
+const GWEI_MAINNET_56 = "20"; // 20 gwei minimum [PoA validator cartel!]?! trial & error - not clear at all; <20 gwei seems to never mine...
+const GWEI_TESTNET    = "5";
 
 //
 // https://chainid.network/chains/
@@ -67,7 +68,7 @@ module.exports = {
       port: 8545,
       network_id: "*", // see: getTestContextWeb3() for dev network_id convention
       gas: 7900000,
-      gasPrice: web3.utils.toWei(GWEI_MAINNET, "gwei"), // we use mainnet pricing for accurate logGas() fiat cost estimates
+      gasPrice: web3.utils.toWei(GWEI_MAINNET_56, "gwei"), // we use mainnet pricing for accurate logGas() fiat cost estimates
     },
 
     // aircarbon Eth mainnet (1) geth node
@@ -82,7 +83,7 @@ module.exports = {
             return wallet;
         },
         gas: 10000000, // 10m 
-        gasPrice: web3.utils.toWei(GWEI_MAINNET, "gwei"),
+        gasPrice: web3.utils.toWei(GWEI_MAINNET_1, "gwei"),
         network_id: "1",
         networkCheckTimeout: 30000,
         confirmations: 1,
@@ -181,8 +182,7 @@ module.exports = {
             return wallet;
         },
         gas: 8000000, // 8m
-        gasPrice: web3.utils.toWei("20", "gwei"), // 20 gwei minimum?! trial & error - not clear at all; <20 gwei seems to never mine...
-                                                  // "--txpool.pricelimit 0" or similar on BCS Geth instance seems to result in no TX's being mined at all
+        gasPrice: web3.utils.toWei(GWEI_MAINNET_56, "gwei"), // "--txpool.pricelimit 0" or similar on BCS Geth instance seems to result in no TX's being mined at all
         network_id: "56", 
         networkCheckTimeout: 30000,
         confirmations: 1,

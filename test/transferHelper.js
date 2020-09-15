@@ -104,8 +104,8 @@ module.exports = {
         });
         for (let i = 0; i < feesPreview.length; i++) {
             const x = feesPreview[i];
-            if (i == 0 || x.origTokFee_qty > 0)
-                console.log(`FEE PREVIEW ndx: ${i} fee_ccy_A=${x.fee_ccy_A} fee_ccy_B=${x.fee_ccy_B} fee_tok_A=${x.fee_tok_A} fee_tok_B=${x.fee_tok_B} origTokFee_batchId=${x.origTokFee_batchId} origTokFee_qty=${x.origTokFee_qty}`);
+            // if (i == 0 || x.origTokFee_qty > 0)
+            //     console.log(`FEE PREVIEW ndx: ${i} fee_ccy_A=${x.fee_ccy_A} fee_ccy_B=${x.fee_ccy_B} fee_tok_A=${x.fee_tok_A} fee_tok_B=${x.fee_tok_B} origTokFee_batchId=${x.origTokFee_batchId} origTokFee_qty=${x.origTokFee_qty}`);
         }
 
         const sumFees_tok_A = feesPreview.map(p => p.fee_tok_A).reduce((a,b) => Big(a).plus(Big(b)), Big(0));

@@ -42,14 +42,14 @@ module.exports = {
 
             // add spot types
             const spotTypes = (await CONST.web3_call('getSecTokenTypes', [], nameOverride)).tokenTypes.filter(p => p.settlementType == CONST.settlementType.SPOT);
-            console.log('spotTypes', spotTypes.map(p => { return { id: p.id, name: p.name } }));
+            //console.log('spotTypes', spotTypes.map(p => { return { id: p.id, name: p.name } }));
             await addSecTokenIfNotPresent(spotTypes, 'AirCarbon CORSIA Token', O, nameOverride);
             await addSecTokenIfNotPresent(spotTypes, 'AirCarbon Nature Token', O, nameOverride);
             await addSecTokenIfNotPresent(spotTypes, 'AirCarbon Premium Token', O, nameOverride);
 
             // ad ccy types
             const ccyTypes = (await CONST.web3_call('getCcyTypes', [], nameOverride)).ccyTypes;
-            console.log('ccyTypes', ccyTypes.map(p => { return { id: p.id, name: p.name } }));
+            //console.log('ccyTypes', ccyTypes.map(p => { return { id: p.id, name: p.name } }));
             await addCcyIfNotPresent(ccyTypes, 'USD', 'cents', 2, O, nameOverride);
             await addCcyIfNotPresent(ccyTypes, 'ETH', 'Wei', 18, O, nameOverride);
             await addCcyIfNotPresent(ccyTypes, 'BTC', 'Satoshi', 8, O, nameOverride);
