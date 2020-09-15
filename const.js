@@ -23,7 +23,8 @@ const EthereumJsCommon = require('ethereumjs-common').default;
 const truffleAssert = require('truffle-assertions');
 const { db } = require('../utils-server/dist');
 
-const ETH_USD = 322;
+//const ETH_USD = 322; // ETH
+const ETH_USD = 30;  // BNB
 
 // misc
 const WEB3_NONCE_REPLACE = undefined; // set to replace/drop a slow mainnet TX
@@ -120,19 +121,19 @@ module.exports = {
             btcUsd: '0x0000000000000000000000000000000000000000',
             ethUsd: '0x0000000000000000000000000000000000000000'
         },
-        "888": { // dev
+        "888": { // dev - DM
             btcUsd: '0x0000000000000000000000000000000000000000',
             ethUsd: '0x0000000000000000000000000000000000000000'
         },
-        "889": { // dev
+        "889": { // dev - Dung
             btcUsd: '0x0000000000000000000000000000000000000000',
             ethUsd: '0x0000000000000000000000000000000000000000'
         },
-        "890": { // dev
+        "890": { // dev - Vince
             btcUsd: '0x0000000000000000000000000000000000000000',
             ethUsd: '0x0000000000000000000000000000000000000000'
         },
-        "891": { // dev
+        "891": { // dev - Ankur
             btcUsd: '0x0000000000000000000000000000000000000000',
             ethUsd: '0x0000000000000000000000000000000000000000'
         },
@@ -276,11 +277,11 @@ function getTestContextWeb3(useWs) {
 
         // dev - DM
           process.env.WEB3_NETWORK_ID == 888 ?   { web3: new Web3('http://127.0.0.1:8545'),    ethereumTxChain: {} }
-        // dev -Dung
+        // dev - Dung
         : process.env.WEB3_NETWORK_ID == 889 ?   { web3: new Web3('http://127.0.0.1:8545'),    ethereumTxChain: {} }
-        // dev -Vince
+        // dev - Vince
         : process.env.WEB3_NETWORK_ID == 890 ?   { web3: new Web3('http://127.0.0.1:8545'),    ethereumTxChain: {} }
-        // dev -Lakshmi
+        // dev - Ankur
         : process.env.WEB3_NETWORK_ID == 891 ?   { web3: new Web3('http://127.0.0.1:8545'),    ethereumTxChain: {} }
 
         // Ropsten - AC Geth
