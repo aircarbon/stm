@@ -27,7 +27,11 @@ const ETH_USD = 322;
 
 // misc
 const WEB3_NONCE_REPLACE = undefined; // set to replace/drop a slow mainnet TX
-const WEB3_GWEI_GAS_BID = process.env.INSTANCE_ID === 'PROD' ? '87' : '5';
+const WEB3_GWEI_GAS_BID = 
+    process.env.INSTANCE_ID === 'PROD_56'    ? '20' // BSC -- see: truffle_config.js re. gas cost
+  : process.env.INSTANCE_ID === 'PROD_52101' ? '1'  // AC privnet
+  : process.env.INSTANCE_ID === 'PROD_1'     ? '80' // ETH mainnet
+                                             : '5';
 const WEB3_GAS_LIMIT = 5000000;
 
 // CFT helpers
@@ -92,7 +96,7 @@ module.exports = {
 
     // https://docs.chain.link/docs/using-chainlink-reference-contracts
     chainlinkAggregators: {
-        "1": { // eth mainnet
+        "1": { // ETH mainnet
             btcUsd: '0xF5fff180082d6017036B771bA883025c654BC935',
             ethUsd: '0x79fEbF6B9F76853EDBcBc913e6aAE8232cFB9De9'
         },
@@ -109,6 +113,10 @@ module.exports = {
             ethUsd: '0x0000000000000000000000000000000000000000'
         },
         "52101": { // AC sidechain prodnet
+            btcUsd: '0x0000000000000000000000000000000000000000',
+            ethUsd: '0x0000000000000000000000000000000000000000'
+        },
+        "56": { // BSC mainnet - TODO: BSC has ChainLinks...?
             btcUsd: '0x0000000000000000000000000000000000000000',
             ethUsd: '0x0000000000000000000000000000000000000000'
         },
@@ -131,9 +139,7 @@ module.exports = {
     },
 
     getTestContextWeb3: (useWs) => getTestContextWeb3(useWs),
-    getAccountAndKey: async (accountNdx, mnemonic) => getAccountAndKey(accountNdx, mnemonic),
-
-    getAccountAndKeyHelper : async (accountNdx, mnemonic) => getAccountAndKeyHelper(accountNdx, mnemonic),
+    getAccountAndKey: async (accountNdx, mnemonic, coinTypeSlip44) => getAccountAndKey(accountNdx, mnemonic, coinTypeSlip44),
 
     web3_sendEthTestAddr: (sendFromNdx, sendToAddr, ethValue) => web3_sendEthTestAddr(sendFromNdx, sendToAddr, ethValue),
 
@@ -299,7 +305,7 @@ function getTestContextWeb3(useWs) {
         // Sidechain Prodnet - AC Geth
         : process.env.WEB3_NETWORK_ID == 52101 ? { web3: new Web3(useWs ? 'wss://ac-prod0.aircarbon.co:9546' : 'https://ac-prod0.aircarbon.co:9545'),
             ethereumTxChain: { common: EthereumJsCommon.forCustomChain(
-            'ropsten',
+            'ropsten', // forCustomChain() requires a "known" name!?
             {
                 name: 'prodnet_ac',
                 networkId: 52101,
@@ -308,34 +314,39 @@ function getTestContextWeb3(useWs) {
             'petersburg'
         ) } }
 
-        // Eth Mainnet - Infura (AirCarbon-AwsDev)
-      //: process.env.WEB3_NETWORK_ID == 1 ?     { web3: new Web3('https://ac-dev0.net:10545'), ethereumTxChain: {} }
-        : process.env.WEB3_NETWORK_ID == 1 ?     { web3: new Web3('https://mainnet.infura.io/v3/25a36609b48744bdaa0639e7c2b008d9'), ethereumTxChain: {} }
+        // BSC Mainnet - AC BSC Geth
+        : process.env.WEB3_NETWORK_ID == 56 ? { web3: new Web3(useWs ? 'wss://ac-prod1.aircarbon.co:9546' : 'https://ac-prod1.aircarbon.co:9545'),
+            ethereumTxChain: { common: EthereumJsCommon.forCustomChain(
+            'ropsten', // forCustomChain() requires a "known" name!?
+            {
+                name: 'bsc_mainnet_ac',
+                networkId: 56,
+                chainId: 56,
+            },
+            'petersburg'
+        ) } }
+
+        // ETH Mainnet - Infura (AirCarbon-AwsDev)
+      //: process.env.WEB3_NETWORK_ID == 1 ? { web3: new Web3('https://ac-dev0.net:10545'), ethereumTxChain: {} }
+        : process.env.WEB3_NETWORK_ID == 1 ? { web3: new Web3('https://mainnet.infura.io/v3/25a36609b48744bdaa0639e7c2b008d9'), ethereumTxChain: {} }
 
         : undefined;
     if (!context) throw('WEB3_NETWORK_ID is not set!');
     return context;
 }
 
-async function getAccountAndKey(accountNdx, mnemonic) {
-    const MNEMONIC = process.env.INSTANCE_ID === 'PROD' ? (require('./PROD_MNEMONIC.js').MNEMONIC) : mnemonic || require('./DEV_MNEMONIC.js').MNEMONIC;
+async function getAccountAndKey(accountNdx, mnemonic, coinTypeSlip44) {
+    const MNEMONIC =
+        process.env.INSTANCE_ID === 'PROD_1' || process.env.INSTANCE_ID === 'PROD_56' || process.env.INSTANCE_ID === 'PROD_52101'
+            ? (require('./PROD_MNEMONIC.js').MNEMONIC)
+            : mnemonic || require('./DEV_MNEMONIC.js').MNEMONIC;
     const seed = await bip39.mnemonicToSeed(MNEMONIC);
     const hdk = hdkey.fromMasterSeed(seed);
-    const addr_node = hdk.derivePath(`m/44'/60'/0'/0/${accountNdx}`);
+    const addr_node = hdk.derivePath(`m/44'/${coinTypeSlip44 || '60'}'/0'/0/${accountNdx}`);
     const addr = addr_node.getWallet().getAddressString();
     const privKeyBytes = addr_node.getWallet().getPrivateKey();
     const privKeyHex = privKeyBytes.toString('hex');
-    return { addr, privKey: privKeyHex };
-}
-
-async function getAccountAndKeyHelper(accountNdx, mnemonic) {
-    const seed = await bip39.mnemonicToSeed(mnemonic);
-    const hdk = hdkey.fromMasterSeed(seed);
-    const addr_node = hdk.derivePath(`m/44'/60'/0'/0/${accountNdx}`);
-    const addr = addr_node.getWallet().getAddressString();
-    const privKeyBytes = addr_node.getWallet().getPrivateKey();
-    const privKeyHex = privKeyBytes.toString('hex');
-    return { addr, privKey: privKeyHex };
+    return { addr, privKey: privKeyHex, };
 }
 
 async function web3_call(methodName, methodArgs, nameOverride, addrOverride, fromAddr) {

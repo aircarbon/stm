@@ -39,7 +39,11 @@ Migration script `2_deploy_contract.js` will pickup this env var and deploy a te
 - `export INSTANCE_ID=DEV && truffle migrate --network ropsten_ac --reset` (Deploy AWS DEV instance using AirCarbon's Ropsten Geth node)
 - `export INSTANCE_ID=UAT && truffle migrate --network ropsten_infura --reset` (Deploy AWS UAT instance using Infura Ropsten)
 - `export INSTANCE_ID=DEMO && truffle migrate --network test_ac --reset` (Deploy AWS DEMO instance on AirCarbon's privnet)
-- `export INSTANCE_ID=PROD && truffle migrate --network mainnet_ac --reset` (Deploy AWS PROD instance on AirCarbon's Mainnet Geth node)
+
+PROD: WIP/TESTING...
+- `export INSTANCE_ID=PROD_1 && truffle migrate --network mainnet_ac --reset` (Deploy AWS PROD instance on ETH Mainnet)
+- `export INSTANCE_ID=PROD_52101 && truffle migrate --network prodnet_ac --reset` (Deploy AWS PROD instance on AC Private Prodnet Chain)
+- `export INSTANCE_ID=PROD_56 && truffle migrate --network bsc_mainnet_ac --reset` (Deploy AWS PROD instance on BSC Mainnet)
 
 ## Whitelist & seal Deployed Contract
 

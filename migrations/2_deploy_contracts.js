@@ -15,7 +15,8 @@ const { db } = require('../../utils-server/dist');
 // Prefixes the contract name in const.contractProps with (process.env.INSTANCE_ID || 'local'), e.g.
 //    `export INSTANCE_ID=local && truffle migrate --network ropsten_ac -f 2 --to 2 --reset`
 //    `export INSTANCE_ID=DEMO && truffle migrate --network test_ac -f 2 --to 2 --reset`
-//    `export INSTANCE_ID=PROD && truffle migrate --network prodnet_ac -f 2 --to 2 --reset`
+//    `export INSTANCE_ID=PROD_52101 && truffle migrate --network prodnet_ac -f 2 --to 2 --reset`
+//    `export INSTANCE_ID=PROD_56 && truffle migrate --network bsc_mainnet_ac -f 2 --to 2 --reset`
 //
 
 module.exports = async function (deployer) {
@@ -27,8 +28,10 @@ module.exports = async function (deployer) {
         case 'DEV': console.log(chalk.inverse(`Deploying (AWS DEV / DEV) instance, saving to DB: ${process.env.sql_server}`)); break;
         case 'DEMO': console.log(chalk.inverse(`Deploying (AWS DEV / DEMO) instance, saving to DB: ${process.env.sql_server}`)); break;
         case 'UAT': console.log(chalk.inverse(`Deploying (AWS DEV / UAT) instance, saving to DB: ${process.env.sql_server}`)); break;
-        //case 'TEST_AC_1': console.log(chalk.inverse(`Deploying (TEST / ACPRIVNET) instance, saving to DB: ${process.env.sql_server}`)); break;
-        case 'PROD': console.log(chalk.inverse(`Deploying (AWS PROD / MAINNET) instance, saving to DB: ${process.env.sql_server}`)); break;
+        
+        case 'PROD_1': console.log(chalk.inverse(`Deploying (AWS PROD / ETH 1 MAINNET) instance, saving to DB: ${process.env.sql_server}`)); break;
+        case 'PROD_52101': console.log(chalk.inverse(`Deploying (AWS PROD / AC 52101 PRODNET) instance, saving to DB: ${process.env.sql_server}`)); break;
+        case 'PROD_56': console.log(chalk.inverse(`Deploying (AWS PROD / BSC 56 MAINNET) instance, saving to DB: ${process.env.sql_server}`)); break;
         default: console.log(chalk.red.bold.inverse(`Unknown INSTANCE_ID (${process.env.INSTANCE_ID})`)); process.exit(1);
     }
     console.log(chalk.red('INSTANCE_ID'.padEnd(30, '.')), process.env.INSTANCE_ID);
