@@ -4,9 +4,12 @@ const chalk = require('chalk');
 
 process.env.WEB3_NETWORK_ID = Number(process.env.NETWORK_ID || 42101);
 
+// MUST SET THE NAME OF THE TOKEN HERE. Make it a param?
+const tokenName = 'American Nature Token';
+
 async function addSecTokenType() {
     const nameOverride = undefined;
-    console.log(chalk.inverse('addSecTokenType [American Nature Token] >> start...'));
+    console.log(chalk.inverse(`addSecTokenType [${tokenName}] >> start...`));
     console.group();
     const O = await CONST.getAccountAndKey(0);
 
@@ -15,7 +18,7 @@ async function addSecTokenType() {
         // add spot types
         const spotTypes = (await CONST.web3_call('getSecTokenTypes', [], nameOverride)).tokenTypes.filter(p => p.settlementType == CONST.settlementType.SPOT);
         //console.log('spotTypes', spotTypes.map(p => { return { id: p.id, name: p.name } }));
-        await addSecTokenIfNotPresent(spotTypes, 'CORSIA Eligible Token', O, nameOverride);
+        await addSecTokenIfNotPresent(spotTypes, tokenName, O, nameOverride);
     }
     
     console.groupEnd();
