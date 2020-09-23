@@ -215,6 +215,7 @@ library LedgerLib {
         }
         ledgerHash = keccak256(abi.encodePacked(ledgerHash, erc20d._nextWhitelistNdx));
 
+        // FIXME: it may be exceeding gas price when it has more dataset
         // hash batches
         for (uint256 batchId = 1; batchId <= ld._batches_currentMax_id; batchId++) {
             StructLib.SecTokenBatch storage batch = ld._batches[batchId];
@@ -224,8 +225,10 @@ library LedgerLib {
                     batch.id,
                     batch.mintedTimestamp, batch.tokTypeId,
                     batch.mintedQty, batch.burnedQty,
-                    hashStringArray(batch.metaKeys),
-                    hashStringArray(batch.metaValues),
+                    // NOTE: comment out hash string due to exceeding block gas
+                    // ref: https://aircarbon.slack.com/archives/G0112BRQ0TG/p1600831061023700
+                    // hashStringArray(batch.metaKeys),
+                    // hashStringArray(batch.metaValues),
                     hashSetFeeArgs(batch.origTokFee),
                     batch.origCcyFee_percBips_ExFee,
                     batch.originator
@@ -244,8 +247,8 @@ library LedgerLib {
 
             // hash ledger token types: ID list, custom spot fees & FT type data
             for (uint256 stTypeId = 1; stTypeId <= std._tt_Count; stTypeId++) {
-                
-                // ### TODO? ## switch -- delegate-base types for CFT-C... ## 
+
+                // ### TODO? ## switch -- delegate-base types for CFT-C... ##
                 // ### ??? IDs themselves are not material, can skip this hashing?
                 uint256[] storage stIds = entry.tokenType_stIds[stTypeId];
                 ledgerHash = keccak256(abi.encodePacked(ledgerHash, stIds));
@@ -276,7 +279,7 @@ library LedgerLib {
 
         // walk all tokens (including those fully deleted from the ledger by burn()), hash
         ConsistencyCheck memory chk;
-        if (ld.contractType == StructLib.ContractType.CASHFLOW_CONTROLLER) { 
+        if (ld.contractType == StructLib.ContractType.CASHFLOW_CONTROLLER) {
             // controller - passthrough delegate-base call to getLedgerHashcode() to each base type
             for (uint256 tokTypeId = 1; tokTypeId <= std._tt_Count; tokTypeId++) {
                 StMaster base = StMaster(std._tt_addr[tokTypeId]);
