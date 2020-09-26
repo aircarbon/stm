@@ -41,6 +41,8 @@ contract StMaster
     StMintable, StBurnable, Collateralizable, StTransferable, DataLoadable, StFutures
 {
     // === STM (AC COMMODITY) ===
+    // TODO: getLedgerHashcode() segmented...
+    // TODO: type-rename...
     // TODO: SafeMath
     // TODO: ERC20 authorize + re-entrancy guards, and .call instead of .transfer
     // todo: drop fee_fixed completely (it's == fee_min)

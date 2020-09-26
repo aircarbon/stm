@@ -39,6 +39,11 @@ module.exports = {
         shortIds.sort().reverse();
         longIds.sort().reverse();
         closedIds.sort().reverse();
+        
+        //
+        // ### TODO -- should be ordering by OTM (all) first, followed by ITM
+        //  TEST_0 => "Central insufficient for settlement" becuase not ordering TP2 by OTM first...
+        //  ...
 
         // settle shorts
         for (shortId of shortIds) {

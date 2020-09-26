@@ -117,7 +117,7 @@ module.exports = {
             btcUsd: '0x0000000000000000000000000000000000000000',
             ethUsd: '0x0000000000000000000000000000000000000000'
         },
-        "56": { // BSC mainnet - TODO: BSC has ChainLinks...?
+        "56": { // BSC mainnet - TODO: BSC has ChainLinks...? https://docs.binance.org/smart-chain/developer/link.html
             btcUsd: '0x0000000000000000000000000000000000000000',
             ethUsd: '0x0000000000000000000000000000000000000000'
         },
@@ -267,7 +267,11 @@ EXCHANGE_FEE: 1,
         const weiCost = web3Tx.gasPrice * truffleTx.receipt.gasUsed;
         const usdCost = actualGasPriceEth * truffleTx.receipt.gasUsed * GAS_USD;
 
-        console.log(`>>> gasUsed - [${process.env.INSTANCE_ID}] ${desc}: ${truffleTx.receipt.gasUsed} gas * ${web3.utils.fromWei(web3Tx.gasPrice, 'gwei')}gwei = Ξ${(actualGasPriceEth * truffleTx.receipt.gasUsed).toFixed(4)} ~= $${(usdCost).toFixed(4)} (@ $${GAS_USD} ETH[||BNB]/USD)`);
+        console.log(`>>> gasUsed - [${process.env.INSTANCE_ID}] ${chalk.inverse(desc)}: \
+${truffleTx.receipt.gasUsed} gas * ${web3.utils.fromWei(web3Tx.gasPrice, 'gwei')}\
+gwei = Ξ${(actualGasPriceEth * truffleTx.receipt.gasUsed).toFixed(4)} ~= \
+${chalk.inverse(`$${(usdCost).toFixed(4)}`)} (@ $${GAS_USD} ETH[||BNB]/USD)`);
+
         return { usdCost, weiCost };
     }
 };

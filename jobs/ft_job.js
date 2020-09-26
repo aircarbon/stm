@@ -227,7 +227,28 @@ async function initTestMode(testMode) {
 
     // init - define test data series, and test FTs
     var i=0, ret;
-    if (testMode == "TEST_1") { // single position
+    if (testMode == "TEST_0") { // single position - desc price
+        ret = [ { ftId: fts.find(p => p.name == TEST_FT_1).id.toString(), data: { // ## TODO: fails w/ "Central insufficient for settlement" becuase not ordering TP2 joib by OTM first?!
+price:
+               [ 100,               99,                98,                97,                96,                95,                94,                 93,                 92 ],
+TEST_PARTICIPANTS: [ {
+           id: 1, account: freshAccounts[i++],
+ ccy_deposits: [ {a:+20300},        {},                {},                {},                {},                {},                {},                 {},                 {} ],
+ccy_withdraws: [ {a:+0000},         {},                {},                {},                {},                {},                {},                 {},                 {} ],
+     ft_longs: [ {q:1,cid:2,p:100}, {},                {},                {},                {},                {},                {},                 {},                 {} ],
+  //ft_shorts: [ {},                {},                {},                {},                {},                {},                {},                 {},                 {} ],
+},
+{
+           id: 2, account: freshAccounts[i++],
+ ccy_deposits: [ {a:+20300},        {},                {},                {},                {},                {},                {},                 {},                 {} ],
+ccy_withdraws: [ {a:+0000},         {},                {},                {},                {},                {},                {},                 {},                 {} ],
+     ft_longs: [ {},                {},                {},                {},                {},                {},                {},                 {},                 {} ],
+}
+]
+        }
+    }];    
+}
+    else if (testMode == "TEST_1") { // single position - asc price
         ret = [ { ftId: fts.find(p => p.name == TEST_FT_1).id.toString(), data: {
 price:
                [ 100,               101,               102,               103,               104,               105,               106,                107,                108 ],

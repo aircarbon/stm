@@ -17,8 +17,8 @@ contract("StMaster", accounts => {
     before(async function () {
         stm = await st.deployed();
         if (await stm.getContractType() != CONST.contractType.COMMODITY) this.skip();
-        await stm.sealContract();
-        await setupHelper.setDefaults({ stm, accounts });
+        //await stm.sealContract();
+        //await setupHelper.setDefaults({ stm, accounts });
         if (!global.TaddrNdx) global.TaddrNdx = 0;
     });
 
@@ -50,15 +50,15 @@ contract("StMaster", accounts => {
     //     }
     // });
 
-    it(`misc - bip39 - should be able to generate Binace Smart Chain (BSC) (eth-compat) address from BIP39 mnemonic (BIP44 HD)`, async () => {
-        for (let i=0 ; i < 10 ; i++) {
-            const x = await CONST.getAccountAndKey(i,
-                '...',
-                );
+    // it(`misc - bip39 - should be able to generate Binace Smart Chain (BSC) (eth-compat) address from BIP39 mnemonic (BIP44 HD)`, async () => {
+    //     for (let i=0 ; i < 10 ; i++) {
+    //         const x = await CONST.getAccountAndKey(i,
+    //             '...',
+    //             );
 
-            console.log(`${i} addr: ${x.addr} privKey: ${x.privKey}`);
-        }
-    });
+    //         console.log(`${i} addr: ${x.addr} privKey: ${x.privKey}`);
+    //     }
+    // });
 
     // it(`misc - contract owner should have default ledger entry`, async () => {
     //     const ownerLedgerEntry = await stm.getLedgerEntry(accounts[0]);
