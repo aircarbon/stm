@@ -24,8 +24,13 @@ const path = require('path'), fs = require('fs'), readline = require('readline')
     await recursePath('./', '.sol', async (filePath) => {
         const writeFilePath = filePath + '_OUT';
         
+        // scan source file; skip if possible
         const readFileName = path.parse(filePath).base;
         if (!(processFileNames.length === 0 || processFileNames.includes(readFileName))) return;
+        if (readFileName.includes('_OUT')) return;
+        const readFileContent = fs.readFileSync(filePath);
+        if (!readFileContent.includes(`//#if`)) { console.log(`${chalk.blue.bgWhite('PSOL')} ` + chalk.dim(`${filePath}; nop...`)); return; }
+        
         const writeFileName = path.parse(writeFilePath).base;
         console.log(`${chalk.blue.bgWhite('PSOL')} ` + chalk.inverse(`${filePath}...`));
         console.group();
@@ -40,7 +45,7 @@ const path = require('path'), fs = require('fs'), readline = require('readline')
 
         // read source lines
         for await (var line of rl) {
-            if (line.startsWith`//#if `) { // apply conditions
+            if (line.startsWith(`//#if `)) { // apply conditions
                 const expr = line.substr(6);
                 const evalResult = eval(expr);
                 writing = evalResult;
@@ -48,7 +53,7 @@ const path = require('path'), fs = require('fs'), readline = require('readline')
                 fs.appendFileSync(writeFilePath, `${line}\r\n`);
             }
             else { // conditionally write dest file
-                if (line.startsWith`//#endif`) { // clear conditions
+                if (line.startsWith(`//#endif`)) { // clear conditions
                     writing = true;
                     console.log(`${chalk.blue.bgWhite('PSOL')} R [${readFileName}] ${chalk.magenta(line)} ` + chalk.dim('writing'), writing);
                 }
