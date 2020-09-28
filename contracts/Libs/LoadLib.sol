@@ -1,12 +1,11 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // Author: https://github.com/7-of-9
-pragma solidity >=0.4.21 <=0.6.10;
+pragma solidity >=0.4.21 <=0.7.1;
 pragma experimental ABIEncoderV2;
 
 import "../Interfaces/StructLib.sol";
 
 library LoadLib {
-
 
     function loadSecTokenBatch(
         StructLib.LedgerStruct storage ld,
@@ -35,12 +34,17 @@ library LoadLib {
             ld._ledgerOwners.push(ledgerEntryOwner);
         }
 
-        ld._ledger[ledgerEntryOwner] = StructLib.Ledger({
-                         exists: true,
-                spot_customFees: StructLib.FeeStruct(),
-              spot_sumQtyMinted: spot_sumQtyMinted,
-              spot_sumQtyBurned: spot_sumQtyBurned
-        });
+        // solc 0.7
+        StructLib.Ledger storage entry = ld._ledger[ledgerEntryOwner];
+        entry.exists = true;
+        entry.spot_sumQtyMinted = spot_sumQtyMinted;
+        entry.spot_sumQtyBurned = spot_sumQtyBurned;
+        // ld._ledger[ledgerEntryOwner] = StructLib.Ledger({
+        //                  exists: true,
+        //         spot_customFees: StructLib.FeeStruct(),
+        //       spot_sumQtyMinted: spot_sumQtyMinted,
+        //       spot_sumQtyBurned: spot_sumQtyBurned
+        // });
 
         for (uint256 i = 0 ; i < ccys.length ; i++) {
             ld._ledger[ledgerEntryOwner].ccyType_balance[ccys[i].ccyTypeId] = ccys[i].balance;

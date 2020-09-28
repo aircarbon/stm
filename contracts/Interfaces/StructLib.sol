@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // Author: https://github.com/7-of-9
-pragma solidity >=0.4.21 <=0.6.10;
+pragma solidity >=0.4.21 <=0.7.1;
 pragma experimental ABIEncoderV2;
 
 import "../StMaster/StMaster.sol";
@@ -361,12 +361,19 @@ library StructLib {
     )
     public {
         if (!ld._ledger[addr].exists) {
-            ld._ledger[addr] = StructLib.Ledger({
-                 exists: true,
-        spot_customFees: StructLib.FeeStruct(),
-      spot_sumQtyMinted: 0,
-      spot_sumQtyBurned: 0
-            });
+
+        // solc 0.7
+        StructLib.Ledger storage entry = ld._ledger[addr];
+        entry.exists = true;
+        entry.spot_sumQtyMinted = 0;
+        entry.spot_sumQtyBurned = 0;
+//      ld._ledger[addr] = StructLib.Ledger({
+//              exists: true,
+//     spot_customFees: StructLib.FeeStruct(),
+//   spot_sumQtyMinted: 0,
+//   spot_sumQtyBurned: 0
+//         });
+
             ld._ledgerOwners.push(addr);
         }
     }

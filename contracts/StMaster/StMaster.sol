@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // Author: https://github.com/7-of-9
-pragma solidity >=0.4.21 <=0.6.10;
+pragma solidity >=0.4.21 <=0.7.1;
 pragma experimental ABIEncoderV2;
 
 import "./CcyCollateralizable.sol";
@@ -23,7 +23,7 @@ https://diligence.consensys.net/blog/2019/09/how-to-prepare-for-a-smart-contract
 // bytecode limit (24576): https://github.com/trufflesuite/ganache/issues/960
 // https://github.com/ethereum/EIPs/issues/1662
 //
-//  truffle compile --reset --all && grep \"bytecode\" build/contracts/* | awk '{print $1 " " length($3)/2}'
+// node process_sol_js && truffle compile --reset --all && grep \"bytecode\" build/contracts/* | awk '{print $1 " " length($3)/2}'
 //
 // 22123: ... [upgrade sol 0.6.6: removed ctor setup, removed WL deprecated, removed payable unused]
 // 23576: ... FTs v0 (paused) - baseline
@@ -124,14 +124,20 @@ contract StMaster
         string memory                 _contractVer,
         string memory                 _contractUnit,
         string memory                 _contractSymbol,
-        uint8                         _contractDecimals,
-        //address                       _chainlinkAggregator_btcUsd,
-        address                       _chainlinkAggregator_ethUsd
+        uint8                         _contractDecimals
+//#if process.env.CONTRACT_TYPE === 'CASHFLxOW_CONTROLLER' || process.env.CONTRACT_TYPE === 'CASHFLOW_BASE'
+//#         ,
+//#       //address                       _chainlinkAggregator_btcUsd,
+//#         address                       _chainlinkAggregator_ethUsd
+//#endif
     ) StErc20(_contractSymbol, _contractDecimals)
     public {
-        //chainlinkAggregator_btcUsd = _chainlinkAggregator_btcUsd;
-        chainlinkAggregator_ethUsd = _chainlinkAggregator_ethUsd;
-        cashflowData.args = _cashflowArgs;
+
+//#if process.env.CONTRACT_TYPE === 'CASHFLOW_CONTROLLER' || process.env.CONTRACT_TYPE === 'CASHFLOW_BASE'
+//#         //chainlinkAggregator_btcUsd = _chainlinkAggregator_btcUsd;
+//#         chainlinkAggregator_ethUsd = _chainlinkAggregator_ethUsd;
+//#         cashflowData.args = _cashflowArgs;
+//#endif
 
         // set common properties
         name = _contractName;
@@ -140,55 +146,6 @@ contract StMaster
 
         // contract type
         ld.contractType = _contractType;
-
-        // 24k bytecode limit - can be setup manually post-deployment
-
-        // set token & ccy types
-    //     if (_contractType == StructLib.ContractType.COMMODITY) {
-    //         std._tt_name[1] = 'AirCarbon CORSIA Token';     std._tt_settle[1] = StructLib.SettlementType.SPOT;
-    //         std._tt_name[2] = 'AirCarbon Nature Token';     std._tt_settle[2] = StructLib.SettlementType.SPOT;
-    //         std._tt_name[3] = 'AirCarbon Premium Token';    std._tt_settle[3] = StructLib.SettlementType.SPOT;
-    //         std._tt_Count = 3;
-    //         ctd._ct_Ccy[1] = StructLib.Ccy({ id: 1, name: 'USD', unit: 'cents',      decimals: 2 });
-    //         ctd._ct_Ccy[2] = StructLib.Ccy({ id: 2, name: 'ETH', unit: 'Wei',        decimals: 18 });
-    //         ctd._ct_Ccy[3] = StructLib.Ccy({ id: 3, name: 'BTC', unit: 'Satoshi',    decimals: 8 });
-    //       //ctd._ct_Ccy[4] = StructLib.Ccy({ id: 4, name: 'SGD', unit: 'cents',      decimals: 2 });
-    //       //ctd._ct_Ccy[5] = StructLib.Ccy({ id: 5, name: 'EUR', unit: 'euro cents', decimals: 2 });
-    //       //ctd._ct_Ccy[6] = StructLib.Ccy({ id: 6, name: 'HKD', unit: 'cents',      decimals: 2 });
-    //       //ctd._ct_Ccy[7] = StructLib.Ccy({ id: 7, name: 'GBP', unit: 'pence',      decimals: 2 });
-    //         ctd._ct_Count = 3;
-
-    //         // set default ccy fee USD: $3/1000 mirrored
-    //         StructLib.SetFeeArgs memory feeArgsGlobalUsd = StructLib.SetFeeArgs({
-    //                fee_fixed: 0,
-    //             fee_percBips: 0,
-    //                  fee_min: 300,      // min $3.00
-    //                  fee_max: 0,
-    //           ccy_perMillion: 300,      // $3.00 per Million tokens received
-    //            ccy_mirrorFee: true      // mirrored - token sender pays, too
-    //         });
-    //         SpotFeeLib.setFee_CcyType(ld, ctd, globalFees,
-    //             1,            // USD
-    //             address(0x0), // global fee
-    //             feeArgsGlobalUsd
-    //         );
-    //     }
-    //     else if (_contractType == StructLib.ContractType.CASHFLOW_BASE) {
-    //         std._tt_name[1] = 'UNI_TOKEN'; //contractName;
-    //         std._tt_Count = 1;
-    //         ctd._ct_Ccy[1] = StructLib.Ccy({ id: 1, name: 'ETH', unit: 'Wei',        decimals: 18 });
-    //         ctd._ct_Count = 1;
-    //     }
-    //     else revert('Bad contract type');
-
-    //     // create ledger entry for contract owner - transfer fees are paid to this ledger entry
-    //     ld._ledger[owner] = StructLib.Ledger({
-    //              exists: true,
-    //     spot_customFees: StructLib.FeeStruct(),
-    //   spot_sumQtyMinted: 0,
-    //   spot_sumQtyBurned: 0
-    //     });
-    //     ld._ledgerOwners.push(owner);
     }
 
     // todo: for updateable libs - proxy dispatcher
