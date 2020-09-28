@@ -8,35 +8,67 @@ const path = require('path'), fs = require('fs'), readline = require('readline')
 // Pre-processes Solidity source files
 //      e.g. `node process_sol`                                  => recurse all .sol files and process
 //      e.g. `node process_sol StTransferable.sol`               => find & process StTransferable.sol
-//      e.g. `node process_sol StTransferable.sol StPayable.sol` => find & process StTransferable.sol, StPayable.sol
+//      e.g. `node process_sol StTransferable.sol StPayable.sol` => find & process StTransferable.sol, StPayable.sol, etc.
 //
 (async function () {
     console.log(`${chalk.blue.bgWhite("PROCESS_SOL")}`, chalk.dim(process.argv.join(',')));
     const processFileNames = process.argv.slice(2);
     switch (process.env.CONTRACT_TYPE) {
         case 'COMMODITY':
-        case 'CASHFLOW_CONTROLLER': console.log(`${chalk.blue.bgWhite('PS')} ` + chalk.inverse(`Processing Solidity files for CONTRACT_TYPE=Commodity`)); break;
-        default: console.log(`${chalk.blue.bgWhite('PS')} ` + chalk.red.bold.inverse(`Unknown or unsupported CONTRACT_TYPE (${process.env.CONTRACT_TYPE})`)); process.exit(1);
+        case 'CASHFLOW_CONTROLLER': console.log(`${chalk.blue.bgWhite('PSOL')} ` + `Processing Solidity files for ` + chalk.inverse(`CONTRACT_TYPE=${process.env.CONTRACT_TYPE}`)); break;
+        default: console.log(`${chalk.blue.bgWhite('PSOL')} ` + chalk.red.bold.inverse(`Unknown or unsupported CONTRACT_TYPE (${process.env.CONTRACT_TYPE})`)); process.exit(1);
     }
-    if (processFileNames.length > 0) console.log(`${chalk.blue.bgWhite('PS')} ` + chalk.inverse('processFileNames: '), processFileNames.join(','));
+    if (processFileNames.length > 0) console.log(`${chalk.blue.bgWhite('PSOL')} ` + chalk.inverse('processFileNames: '), processFileNames.join(','));
     
+    // find .sol files
     await recursePath('./', '.sol', async (filePath) => {
-        const fileName = path.parse(filePath).base;
-        if (!(processFileNames.length === 0 || processFileNames.includes(fileName))) return;
-
-        console.log(`${chalk.blue.bgWhite('PS')} ` + chalk.inverse(`${filePath}...`));
+        const writeFilePath = filePath + '_OUT';
+        
+        const readFileName = path.parse(filePath).base;
+        if (!(processFileNames.length === 0 || processFileNames.includes(readFileName))) return;
+        const writeFileName = path.parse(writeFilePath).base;
+        console.log(`${chalk.blue.bgWhite('PSOL')} ` + chalk.inverse(`${filePath}...`));
         console.group();
+
+        // open read stream, nuke dest file
         const readStream = fs.createReadStream(filePath);
-        const rl = readline.createInterface({
-            input: readStream,
-            crlfDelay: Infinity
-        });
-        for await (const line of rl) {
-            //console.log(`${chalk.blue.bgWhite('PS')} [${fileName}] ${line}`);
+        const rl = readline.createInterface({input: readStream, crlfDelay: Infinity });
+        var writing = true;
+        if (fs.existsSync(writeFilePath)) {
+            fs.unlinkSync(writeFilePath);
         }
+
+        // read source lines
+        for await (var line of rl) {
+            if (line.startsWith`//#if `) { // apply conditions
+                const expr = line.substr(6);
+                const evalResult = eval(expr);
+                writing = evalResult;
+                console.log(`${chalk.blue.bgWhite('PSOL')} R [${readFileName}] ${chalk.magenta(line)} ` + chalk.dim('writing'), writing);
+                fs.appendFileSync(writeFilePath, `${line}\r\n`);
+            }
+            else { // conditionally write dest file
+                if (line.startsWith`//#endif`) { // clear conditions
+                    writing = true;
+                    console.log(`${chalk.blue.bgWhite('PSOL')} R [${readFileName}] ${chalk.magenta(line)} ` + chalk.dim('writing'), writing);
+                }
+
+                if (writing) {
+                    if (line.startsWith('//# ')) line = line.substring(4);
+                    fs.appendFileSync(writeFilePath, `${line}\r\n`);
+                }
+                else {
+                    fs.appendFileSync(writeFilePath, `//# ${line}\r\n`);
+                }
+            }
+        }
+
+        // replace source w/ dest file
+        fs.copyFileSync(writeFilePath, filePath);
+        fs.unlinkSync(writeFilePath);
         console.groupEnd();
     });
-    console.log(`${chalk.blue.bgWhite('PS')} done processing .sol files`);
+    console.log(`${chalk.blue.bgWhite('PSOL')} done processing .sol files`);
 
     process.exit();
 })();

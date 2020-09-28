@@ -68,7 +68,7 @@ contract StPayable is
     //     return ref.latestAnswer();
     // }
 
-    //#if(CASHFLOW_CONTROLLER)...
+//#if process.env.CONTRACT_TYPE === 'COMMODITY'
     function get_ethUsd() public view returns(int256) {
         return PayableLib.get_ethUsd(chainlinkAggregator_ethUsd);
         // if (chainlinkAggregator_ethUsd == address(0x0)) return 100000000; // $1 - cents*satoshis
@@ -96,5 +96,5 @@ contract StPayable is
             qty_saleAllocation
         );
     }
-    //#endif
+//#endif
 }
