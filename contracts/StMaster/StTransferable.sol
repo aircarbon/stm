@@ -18,8 +18,8 @@ abstract // solc 0.6
 contract StTransferable is Owned,
     StLedger, StFees, StErc20, StPayable {
 
-    function getLedgerHashcode() external view returns (bytes32) {
-        return LedgerLib.getLedgerHashcode(ld, std, ctd, erc20d, /*cashflowData,*/ globalFees);
+    function getLedgerHashcode(uint n, uint mod) external view returns (bytes32) {
+        return LedgerLib.getLedgerHashcode(ld, std, ctd, erc20d, /*cashflowData,*/ globalFees, n, mod);
     }
 
     function transferOrTrade(StructLib.TransferArgs memory a)

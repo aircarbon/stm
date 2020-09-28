@@ -19,8 +19,6 @@ abstract // solc 0.6
 contract StPayable is
     StErc20 {
 
-    // SPLIT LEDGER WIP ...
-
     // === CFT === V1 ** =>>> MVP -- CFT SPLIT LEDGER (central WL, central collateral, central spot transferOrTrade...)
     //  Cashflow type is fundamentally way less fungible than Commodity type, i.e. loan A != loan B
     //  Therefore, the only way to preserve ERC20 semanitcs for CFTs, is for each CFT *to have its own contract address*
@@ -70,6 +68,7 @@ contract StPayable is
     //     return ref.latestAnswer();
     // }
 
+    //#if(CASHFLOW_CONTROLLER)...
     function get_ethUsd() public view returns(int256) {
         return PayableLib.get_ethUsd(chainlinkAggregator_ethUsd);
         // if (chainlinkAggregator_ethUsd == address(0x0)) return 100000000; // $1 - cents*satoshis
@@ -97,4 +96,5 @@ contract StPayable is
             qty_saleAllocation
         );
     }
+    //#endif
 }

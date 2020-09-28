@@ -56,6 +56,14 @@ module.exports = async function (deployer) {
     }
 
     switch (process.env.CONTRACT_TYPE) {
+        case 'COMMODITY':
+            // deploy a singleton COMMODITY contract
+            await deploymentHelper.Deploy({ deployer, artifacts, contractType: 'COMMODITY' });
+            if (!deployer.network.includes("-fork")) {
+                await setup.setDefaults();
+            }
+            break;
+
         case 'CASHFLOW_CONTROLLER':
             // deploy two base types
             const addrBase1 = await deploymentHelper.Deploy({ deployer, artifacts, contractType: 'CASHFLOW_BASE', nameOverride: "SDax_Base1" });
@@ -87,19 +95,10 @@ module.exports = async function (deployer) {
             }
             break;
 
+        // todo/not currently used...
         case 'CASHFLOW_BASE':
             // deploy an unattached base CASHFLOW contract
             await deploymentHelper.Deploy({ deployer, artifacts, contractType: 'CASHFLOW_BASE' });
-
-            if (!deployer.network.includes("-fork")) {
-                await setup.setDefaults();
-            }
-            break;
-
-        case 'COMMODITY':
-            // deploy a singleton COMMODITY contract
-            await deploymentHelper.Deploy({ deployer, artifacts, contractType: 'COMMODITY' });
-
             if (!deployer.network.includes("-fork")) {
                 await setup.setDefaults();
             }

@@ -157,7 +157,8 @@ library LedgerLib {
         StructLib.CcyTypesStruct storage ctd,
         StructLib.Erc20Struct storage erc20d,
         //StructLib.CashflowStruct storage cashflowData,
-        StructLib.FeeStruct storage globalFees
+        StructLib.FeeStruct storage globalFees,
+        uint n, uint mod
     )
     public view returns (bytes32) {
         bytes32 ledgerHash;
@@ -280,7 +281,7 @@ library LedgerLib {
             // controller - passthrough delegate-base call to getLedgerHashcode() to each base type
             for (uint256 tokTypeId = 1; tokTypeId <= std._tt_Count; tokTypeId++) {
                 StMaster base = StMaster(std._tt_addr[tokTypeId]);
-                bytes32 baseTypeHashcode = base.getLedgerHashcode();
+                bytes32 baseTypeHashcode = base.getLedgerHashcode(n, mod);
                 ledgerHash = keccak256(abi.encodePacked(ledgerHash, baseTypeHashcode));
             }
         }
