@@ -30,7 +30,7 @@ contract StErc20 is StFees
 
         // this index is used for allocating whitelist addresses to users (getWhitelistNext()))
         // we skip/reserve the first ten whitelisted address (0 = owner, 1-9 for expansion)
-        erc20d._nextWhitelistNdx = 10;
+        //erc20d._nextWhitelistNdx = 10;
     }
 
     // todo: move WL stuff out of erc20

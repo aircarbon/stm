@@ -21,7 +21,6 @@ const { db } = require('../../utils-server/dist');
 
 module.exports = async function (deployer) {
     const O = await CONST.getAccountAndKey(0);
-    console.log(chalk.red.bold.inverse(`deployer...`));
     switch (process.env.INSTANCE_ID) {
         case undefined:
         case 'local': console.log(chalk.inverse(`Deploying localhost contract instance, saving to DB: ${process.env.sql_server}`)); break;

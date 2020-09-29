@@ -211,18 +211,22 @@ library LedgerLib {
         }
 
         // hash whitelist
-        for (uint256 whitelistNdx = 0; whitelistNdx < erc20d._whitelist.length; whitelistNdx++) {
+        for (uint256 whitelistNdx = 1; // exclude contract owner @ndx 0
+            whitelistNdx < erc20d._whitelist.length; whitelistNdx++) {
+
             if (whitelistNdx % mod != n) continue;
 
-            if (erc20d._whitelist[whitelistNdx] != msg.sender && // exclude contract owner
-                whitelistNdx > 0 // this allows tests to simulate new contact owner - whitelist entry 0 is contract owner, by convention
+            if (erc20d._whitelist[whitelistNdx] != msg.sender // exclude caller, contract owner
+                //&& whitelistNdx > 0 
             ) {
+                //if (whitelistNdx % mod != n) continue; // ## why?
+                //if (whitelistNdx == 3) continue; // ## why??
+
                 ledgerHash = keccak256(abi.encodePacked(ledgerHash, erc20d._whitelist[whitelistNdx]));
             }
         }
-        ledgerHash = keccak256(abi.encodePacked(ledgerHash, erc20d._nextWhitelistNdx));
+        //ledgerHash = keccak256(abi.encodePacked(ledgerHash, erc20d._nextWhitelistNdx));
 
-        // FIXME: it may be exceeding gas price when it has more dataset
         // hash batches
         for (uint256 batchId = 1; batchId <= ld._batches_currentMax_id; batchId++) {
             if (batchId % mod != n) continue;

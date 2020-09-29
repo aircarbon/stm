@@ -1,5 +1,6 @@
 const st = artifacts.require('StMaster');
 const truffleAssert = require('truffle-assertions');
+const chalk = require('chalk');
 const _ = require('lodash');
 const { DateTime } = require('luxon');
 
@@ -22,7 +23,7 @@ contract("StMaster", accounts => {
         stm_new = await st.new(
             await stm_cur.getContractType(),
 //#if process.env.CONTRACT_TYPE === 'CASHFLOW_CONTROLLER' || process.env.CONTRACT_TYPE === 'CASHFLOW_BASE'
-            (await stm_cur.getCashflowData()).args,
+//#             (await stm_cur.getCashflowData()).args,
 //#endif
             `${await stm_cur.name()}_V++`,
             `${await stm_cur.version()}_V++`,
@@ -30,9 +31,9 @@ contract("StMaster", accounts => {
             await stm_cur.symbol(),
             await stm_cur.decimals()
 //#if process.env.CONTRACT_TYPE === 'CASHFLOW_CONTROLLER' || process.env.CONTRACT_TYPE === 'CASHFLOW_BASE'
-            ,
-            //await stm_cur.chainlinkAggregator_btcUsd(),
-            await stm_cur.chainlinkAggregator_ethUsd()
+//#             ,
+//#             //await stm_cur.chainlinkAggregator_btcUsd(),
+//#             await stm_cur.chainlinkAggregator_ethUsd()
 //#endif
         );
         console.log(`stm_new: @${stm_new.address} ledgerHash=${await CONST.getLedgerHashcode(stm_new)} / ${await stm_new.name()} ${await stm_new.version()}`);
@@ -46,7 +47,7 @@ contract("StMaster", accounts => {
         const allLedgerOwners = await stm_cur.getLedgerOwners();
         const ledgerEntry = await stm_cur.getLedgerEntry(accounts[0]);
 //#if process.env.CONTRACT_TYPE === 'CASHFLOW_CONTROLLER' || process.env.CONTRACT_TYPE === 'CASHFLOW_BASE'
-        const cashflowData = await stm_cur.getCashflowData();
+//#         const cashflowData = await stm_cur.getCashflowData();
 //#endif
     });
 
@@ -335,7 +336,7 @@ contract("StMaster", accounts => {
         stm_new.whitelistMany([accounts[555]]); // simulate a new contract owner (first whitelist entry, by convention) -- i.e. we can upgrade contract with a new privkey
         const curWL = (await stm_cur.getWhitelist()), newWL = (await stm_new.getWhitelist()), loadWL = _.differenceWith(curWL.slice(1), newWL.slice(1), _.isEqual);
         //_.forEach(loadWL, async (p) => await stm_new.whitelist(p));
-        await stm_new.whitelistMany(curWL);
+        await stm_new.whitelistMany(loadWL);
 
         // set whitelist index
         //stm_new.setWhitelistNextNdx(await stm_cur.getWhitelistNextNdx());
@@ -422,8 +423,14 @@ contract("StMaster", accounts => {
             curSecTokenMintedCount, curSecTokenMintedQty, curSecTokenBurnedQty
         );
 
-        console.log('stm_cur.getLedgerHashcode: ', await CONST.getLedgerHashcode(stm_cur));
-        console.log('stm_new.getLedgerHashcode: ', await CONST.getLedgerHashcode(stm_new));
+        const whitelist_cur = await stm_cur.getWhitelist();
+        const whitelist_new = await stm_new.getWhitelist();
+
+        //console.log('whitelist_cur', whitelist_cur);
+        //console.log('whitelist_new', whitelist_new);
+
+        console.log(chalk.inverse('stm_cur.getLedgerHashcode') + '\n\t', await CONST.getLedgerHashcode(stm_cur));
+        console.log(chalk.inverse('stm_new.getLedgerHashcode') + '\n\t', await CONST.getLedgerHashcode(stm_new));
         
         stm_new.sealContract();
         assert(await CONST.getLedgerHashcode(stm_cur) == await CONST.getLedgerHashcode(stm_new), 'ledger hashcode mismatch');

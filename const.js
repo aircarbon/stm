@@ -17,6 +17,7 @@ const bip39 = require('bip39');
 const hdkey = require('ethereumjs-wallet/hdkey');
 const EthereumJsTx = require('ethereumjs-tx');
 const EthereumJsCommon = require('ethereumjs-common').default;
+const sha3_512 = require('js-sha3').sha3_512;
 //let r = new EthereumJsCommon('ropsten');
 //console.log(r.hardforks());
 
@@ -88,6 +89,7 @@ const contractProps = {
 
 var consoleOutput = true;
 
+
 module.exports = {
     contractProps: contractProps,
 
@@ -154,13 +156,22 @@ module.exports = {
 
     getLedgerHashcode: (sc, mod, n) => {
         if (mod === undefined && n === undefined) { 
-            //console.log(`getLedgerHashcode(1,0), sc=${sc}`);
-            return sc.getLedgerHashcode(1, 0);
-            // TODO: use a static, e.g. mod 3 and hash together here the 3 outputs -- i.e. test that the mod split is deterministic
-            //       actually, do it in the second else branch below, i.e. drop the "n" param and do the "n" loop right in here up to mod-1
+            // use a static (test/arbitrary) segmentation, and locally hash the segment hashes
+            const hashes = [];
+            return new Promise(async(resolve) => {
+                const MOD = 10;
+                for (let n=0 ; n < MOD ; n++) {
+                    hashes.push(await sc.getLedgerHashcode(MOD, n));
+                }
+                //hashCode = s => s.split('').reduce((a,b)=>{a=((a<<5)-a)+b.charCodeAt(0);return a&a},0); // https://stackoverflow.com/questions/7616461/generate-a-hash-from-string-in-javascript
+                //console.log('getLedgerHashcode - hashes', hashes);
+                //console.log('getLedgerHashcode - h[0].hashCode()', hashCode(hashes[0]));
+                const ret = hashes.sort().join(',');
+                //console.log('getLedgerHashcode - ret', ret);
+                resolve(ret);
+            });
         }
         else { 
-            //console.log(`getLedgerHashcode(${mod},${n}), sc=${sc}`);
             return sc.getLedgerHashcode(mod, n);
         }
     },
