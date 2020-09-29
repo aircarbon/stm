@@ -76,16 +76,18 @@ module.exports = {
                 contractType == 'CASHFLOW_BASE'       ? CONST.contractType.CASHFLOW_BASE :
                 contractType == 'CASHFLOW_CONTROLLER' ? CONST.contractType.CASHFLOW_CONTROLLER :
                                                         CONST.contractType.COMMODITY,
-                CONST.contractProps[contractType].cashflowArgs,
+//#if process.env.CONTRACT_TYPE === 'CASHFLOW_CONTROLLER' || process.env.CONTRACT_TYPE === 'CASHFLOW_BASE'
+//#                 CONST.contractProps[contractType].cashflowArgs,
+//#endif
                 contractName,
                 CONST.contractProps[contractType].contractVer,
                 CONST.contractProps[contractType].contractUnit,
                 CONST.contractProps[contractType].contractSymbol,
                 CONST.contractProps[contractType].contractDecimals
 //#if process.env.CONTRACT_TYPE === 'CASHFLOW_CONTROLLER' || process.env.CONTRACT_TYPE === 'CASHFLOW_BASE'
-//# //# //# //#                 ,
-//# //# //# //#               //CONST.chainlinkAggregators[process.env.NETWORK_ID].btcUsd,    // 24k
-//# //# //# //#                 CONST.chainlinkAggregators[process.env.NETWORK_ID].ethUsd
+//#                ,
+//#              //CONST.chainlinkAggregators[process.env.NETWORK_ID].btcUsd,    // 24k
+//#                CONST.chainlinkAggregators[process.env.NETWORK_ID].ethUsd
 //#endif
             ).then(async stm => {
                 //console.dir(stm);

@@ -152,6 +152,19 @@ module.exports = {
 
     consoleOutput: (enabled) => { consoleOutput = enabled; },
 
+    getLedgerHashcode: (sc, mod, n) => {
+        if (mod === undefined && n === undefined) { 
+            //console.log(`getLedgerHashcode(1,0), sc=${sc}`);
+            return sc.getLedgerHashcode(1, 0);
+            // TODO: use a static, e.g. mod 3 and hash together here the 3 outputs -- i.e. test that the mod split is deterministic
+            //       actually, do it in the second else branch below, i.e. drop the "n" param and do the "n" loop right in here up to mod-1
+        }
+        else { 
+            //console.log(`getLedgerHashcode(${mod},${n}), sc=${sc}`);
+            return sc.getLedgerHashcode(mod, n);
+        }
+    },
+
     nullFees: {
          ccy_mirrorFee: false,
         ccy_perMillion: 0,
@@ -419,7 +432,7 @@ async function web3_tx(methodName, methodArgs, fromAddr, fromPrivKey, nameOverri
     const nonce = WEB3_NONCE_REPLACE || await web3.eth.getTransactionCount(fromAddr, "pending");
     if (consoleOutput) console.log(
             chalk.dim(` >   TX: [${chalk.greenBright(contractDb.contract_enum)} nonce=${nonce} ${contractDb.contract_ver} @${contractDb.addr}] ${chalk.reset.red.bgWhiteBright(methodName + '(' + methodArgs.map(p => JSON.stringify(p)).join() + ')')}\n` +
-            chalk.dim(`     ... (from: ${fromAddr} / gwei: ${WEB3_GWEI_GAS_BID} / networkId: ${process.env.WEB3_NETWORK_ID} / node: ${web3.currentProvider.host} db: ${process.env.sql_server})`))
+            chalk.dim(`     ... (from: ${fromAddr} / gwei: ${WEB3_GWEI_GAS_BID} / networkId: ${process.env.WEB3_NETWORK_ID} / node: ${web3.currentProvider.host} / db: ${process.env.sql_server})`))
     );
     var paramsData = contract.methods
         [methodName](...methodArgs)

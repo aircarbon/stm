@@ -158,7 +158,7 @@ library LedgerLib {
         StructLib.Erc20Struct storage erc20d,
         //StructLib.CashflowStruct storage cashflowData,
         StructLib.FeeStruct storage globalFees,
-        uint n, uint mod
+        uint mod, uint n
     )
     public view returns (bytes32) {
         bytes32 ledgerHash;
@@ -176,6 +176,7 @@ library LedgerLib {
 
         // hash currency types & exchange currency fees
         for (uint256 ccyTypeId = 1; ccyTypeId <= ctd._ct_Count; ccyTypeId++) {
+            if (ccyTypeId % mod != n) continue;
             StructLib.Ccy storage ccy = ctd._ct_Ccy[ccyTypeId];
             ledgerHash = keccak256(abi.encodePacked(ledgerHash,
                 ccy.id, ccy.name, ccy.unit, ccy.decimals
@@ -188,6 +189,8 @@ library LedgerLib {
 
         // hash token types & exchange token fees
         for (uint256 stTypeId = 1; stTypeId <= std._tt_Count; stTypeId++) {
+            if (stTypeId % mod != n) continue;
+
             ledgerHash = keccak256(abi.encodePacked(ledgerHash, std._tt_name[stTypeId]));
             ledgerHash = keccak256(abi.encodePacked(ledgerHash, std._tt_settle[stTypeId]));
 
@@ -208,6 +211,8 @@ library LedgerLib {
 
         // hash whitelist
         for (uint256 whitelistNdx = 0; whitelistNdx < erc20d._whitelist.length; whitelistNdx++) {
+            if (whitelistNdx % mod != n) continue;
+
             if (erc20d._whitelist[whitelistNdx] != msg.sender && // exclude contract owner
                 whitelistNdx > 0 // this allows tests to simulate new contact owner - whitelist entry 0 is contract owner, by convention
             ) {
@@ -219,6 +224,8 @@ library LedgerLib {
         // FIXME: it may be exceeding gas price when it has more dataset
         // hash batches
         for (uint256 batchId = 1; batchId <= ld._batches_currentMax_id; batchId++) {
+            if (batchId % mod != n) continue;
+
             StructLib.SecTokenBatch storage batch = ld._batches[batchId];
 
             if (batch.originator != msg.sender) { // exclude contract owner
@@ -226,10 +233,11 @@ library LedgerLib {
                     batch.id,
                     batch.mintedTimestamp, batch.tokTypeId,
                     batch.mintedQty, batch.burnedQty,
-                    // NOTE: comment out hash string due to exceeding block gas
-                    // ref: https://aircarbon.slack.com/archives/G0112BRQ0TG/p1600831061023700
-                    // hashStringArray(batch.metaKeys),
-                    // hashStringArray(batch.metaValues),
+                    // NOTE: string hashes are quickly exceeding block/view gas limits - ref: https://aircarbon.slack.com/archives/G0112BRQ0TG/p1600831061023700
+                    // re-instating; scaleable solution is segmenting GLH() w/ {mod,n}
+                    hashStringArray(batch.metaKeys),
+                    hashStringArray(batch.metaValues),
+
                     hashSetFeeArgs(batch.origTokFee),
                     batch.origCcyFee_percBips_ExFee,
                     batch.originator
@@ -239,6 +247,8 @@ library LedgerLib {
 
         // walk ledger -- exclude contract owner from hashes
         for (uint256 ledgerNdx = 0; ledgerNdx < ld._ledgerOwners.length; ledgerNdx++) {
+            if (ledgerNdx % mod != n) continue;
+
             address entryOwner = ld._ledgerOwners[ledgerNdx];
             StructLib.Ledger storage entry = ld._ledger[entryOwner];
 
@@ -293,6 +303,11 @@ library LedgerLib {
             //for (uint256 stId = 1; stId <= ld._tokens_currentMax_id; stId++) {
             for (uint256 stId = ld._tokens_base_id; stId <= ld._tokens_currentMax_id; stId++) {
                 StructLib.PackedSt memory st = ld._sts[stId];
+                chk.totalCur += uint256(st.currentQty); // consistency check (base & commodity)
+                chk.totalMinted += uint256(st.mintedQty);
+
+                if (stId % mod != n) continue;
+
                 ledgerHash = keccak256(abi.encodePacked(ledgerHash,
                     st.batchId,
                     st.mintedQty,
@@ -302,8 +317,6 @@ library LedgerLib {
                     st.ft_lastMarkPrice,
                     st.ft_PL
                 ));
-                chk.totalCur += uint256(st.currentQty); // consistency check (base & commodity)
-                chk.totalMinted += uint256(st.mintedQty);
             }
         }
 

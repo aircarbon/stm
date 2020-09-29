@@ -119,7 +119,9 @@ contract StMaster
 
     constructor(
         StructLib.ContractType        _contractType,
-        StructLib.CashflowArgs memory _cashflowArgs,
+//#if process.env.CONTRACT_TYPE === 'CASHFLxOW_CONTROLLER' || process.env.CONTRACT_TYPE === 'CASHFLOW_BASE'
+//#         StructLib.CashflowArgs memory _cashflowArgs,
+//#endif
         string memory                 _contractName,
         string memory                 _contractVer,
         string memory                 _contractUnit,
