@@ -177,6 +177,7 @@ library LedgerLib {
         // hash currency types & exchange currency fees
         for (uint256 ccyTypeId = 1; ccyTypeId <= ctd._ct_Count; ccyTypeId++) {
             if (ccyTypeId % mod != n) continue;
+            
             StructLib.Ccy storage ccy = ctd._ct_Ccy[ccyTypeId];
             ledgerHash = keccak256(abi.encodePacked(ledgerHash,
                 ccy.id, ccy.name, ccy.unit, ccy.decimals
@@ -233,6 +234,7 @@ library LedgerLib {
                     batch.id,
                     batch.mintedTimestamp, batch.tokTypeId,
                     batch.mintedQty, batch.burnedQty,
+
                     // NOTE: string hashes are quickly exceeding block/view gas limits - ref: https://aircarbon.slack.com/archives/G0112BRQ0TG/p1600831061023700
                     // re-instating; scaleable solution is segmenting GLH() w/ {mod,n}
                     hashStringArray(batch.metaKeys),
@@ -294,7 +296,7 @@ library LedgerLib {
             // controller - passthrough delegate-base call to getLedgerHashcode() to each base type
             for (uint256 tokTypeId = 1; tokTypeId <= std._tt_Count; tokTypeId++) {
                 StMaster base = StMaster(std._tt_addr[tokTypeId]);
-                bytes32 baseTypeHashcode = base.getLedgerHashcode(n, mod);
+                bytes32 baseTypeHashcode = base.getLedgerHashcode(mod, n);
                 ledgerHash = keccak256(abi.encodePacked(ledgerHash, baseTypeHashcode));
             }
         }
@@ -306,7 +308,7 @@ library LedgerLib {
                 chk.totalCur += uint256(st.currentQty); // consistency check (base & commodity)
                 chk.totalMinted += uint256(st.mintedQty);
 
-                if (stId % mod != n) continue;
+                /if (stId % mod != n) continue;
 
                 ledgerHash = keccak256(abi.encodePacked(ledgerHash,
                     st.batchId,

@@ -130,80 +130,84 @@ abstract // solc 0.6
 contract StFutures is Owned,
     StLedger, StFees, StErc20, StPayable {
 
-    //senum OverrideType { INIT_MARGIN, FEE_PER_CONTRACT }
-    function setLedgerOverride(uint256 overrideType, uint256 tokTypeId, address ledgerOwner, uint128 value)
-    public onlyOwner() onlyWhenReadWrite() {
-        FuturesLib.setLedgerOverride(overrideType, ld, std, tokTypeId, ledgerOwner, value);
-        // if (overrideType == OverrideType.INIT_MARGIN) {
-        //     FuturesLib.initMarginOverride(ld, std, tokTypeId, ledgerOwner, uint16(value));
-        // }
-        // else if (overrideType == OverrideType.FEE_PER_CONTRACT) {
-        //     FuturesLib.feePerContractOverride(ld, std, tokTypeId, ledgerOwner, value);
-        // }
-    }
-    // // set initial margin - ledger override
-    // function initMarginOverride(
-    //     uint256 tokTypeId,
-    //     address ledgerOwner,
-    //     uint16  initMarginBips)
-    // public onlyOwner() onlyWhenReadWrite() {
-    //     FuturesLib.initMarginOverride(ld, std, tokTypeId, ledgerOwner, initMarginBips);
-    // }
-    // // set fee per contract - ledger override
-    // function feePerContractOverride(
-    //     uint256 tokTypeId,
-    //     address ledgerOwner,
-    //     uint128 feePerContract)
-    // public onlyOwner() onlyWhenReadWrite() {
-    //     FuturesLib.feePerContractOverride(ld, std, tokTypeId, ledgerOwner, feePerContract);
-    // }
-
-    function openFtPos(StructLib.FuturesPositionArgs memory a)
-    public onlyOwner() onlyWhenReadWrite() {
-        // abort if opening position on a non-whitelist account
-        require(erc20d._whitelisted[a.ledger_A], "Not whitelisted (A)"); 
-        require(erc20d._whitelisted[a.ledger_B], "Not whitelisted (B)");
-
-        FuturesLib.openFtPos(ld, std, ctd, a, owner);
-    }
-
-    // ##### set var margin - per product   // ALREADY EXISTS! setFuture_VariationMargin()....
-    // function updateVarMargin(  
-    //     uint256 tokTypeId,
-    //     uint16  varMarginBips)
-    // public onlyOwner() {
-    //     // TODO: needs to *re-calc* any open position reserves...
-    //     //...
-    // }
-
-    function takePay2(
-        uint256 tokTypeId,
-        uint256 stId,
-        int128  markPrice,
-        int256  feePerSide
-    ) public onlyOwner() {
-        FuturesLib.takePay2(ld, std,
-          StructLib.TakePayArgs2({
-             tokTypeId: tokTypeId,
-                  stId: stId,
-             markPrice: markPrice,
-            feePerSide: feePerSide,
-          feeAddrOwner: owner
-          }));
-    }
-
-    function combineFtPos(StructLib.CombinePositionArgs memory a)
-    public onlyOwner() {
-        FuturesLib.combineFtPos(ld, std, a);
-    }
-
-    // VIEWS
-    function getInitMarginOverride(uint256 tokTypeId, address ledgerOwner)
-    external view returns (uint16) {
-        return ld._ledger[ledgerOwner].ft_initMarginBips[tokTypeId];
-    }
-    function getFeePerContractOverride(uint256 tokTypeId, address ledgerOwner)
-    external view returns (uint128) {
-        return ld._ledger[ledgerOwner].ft_feePerContract[tokTypeId];
-    }
+//#if process.env.CONTRACT_TYPE === 'COMMODITY'
+//# 
+//#     //senum OverrideType { INIT_MARGIN, FEE_PER_CONTRACT }
+//#     function setLedgerOverride(uint256 overrideType, uint256 tokTypeId, address ledgerOwner, uint128 value)
+//#     public onlyOwner() onlyWhenReadWrite() {
+//#         FuturesLib.setLedgerOverride(overrideType, ld, std, tokTypeId, ledgerOwner, value);
+//#         // if (overrideType == OverrideType.INIT_MARGIN) {
+//#         //     FuturesLib.initMarginOverride(ld, std, tokTypeId, ledgerOwner, uint16(value));
+//#         // }
+//#         // else if (overrideType == OverrideType.FEE_PER_CONTRACT) {
+//#         //     FuturesLib.feePerContractOverride(ld, std, tokTypeId, ledgerOwner, value);
+//#         // }
+//#     }
+//#     // // set initial margin - ledger override
+//#     // function initMarginOverride(
+//#     //     uint256 tokTypeId,
+//#     //     address ledgerOwner,
+//#     //     uint16  initMarginBips)
+//#     // public onlyOwner() onlyWhenReadWrite() {
+//#     //     FuturesLib.initMarginOverride(ld, std, tokTypeId, ledgerOwner, initMarginBips);
+//#     // }
+//#     // // set fee per contract - ledger override
+//#     // function feePerContractOverride(
+//#     //     uint256 tokTypeId,
+//#     //     address ledgerOwner,
+//#     //     uint128 feePerContract)
+//#     // public onlyOwner() onlyWhenReadWrite() {
+//#     //     FuturesLib.feePerContractOverride(ld, std, tokTypeId, ledgerOwner, feePerContract);
+//#     // }
+//# 
+//#     function openFtPos(StructLib.FuturesPositionArgs memory a)
+//#     public onlyOwner() onlyWhenReadWrite() {
+//#         // abort if opening position on a non-whitelist account
+//#         require(erc20d._whitelisted[a.ledger_A], "Not whitelisted (A)"); 
+//#         require(erc20d._whitelisted[a.ledger_B], "Not whitelisted (B)");
+//# 
+//#         FuturesLib.openFtPos(ld, std, ctd, a, owner);
+//#     }
+//# 
+//#     // ##### set var margin - per product   // ALREADY EXISTS! setFuture_VariationMargin()....
+//#     // function updateVarMargin(  
+//#     //     uint256 tokTypeId,
+//#     //     uint16  varMarginBips)
+//#     // public onlyOwner() {
+//#     //     // TODO: needs to *re-calc* any open position reserves...
+//#     //     //...
+//#     // }
+//# 
+//#     function takePay2(
+//#         uint256 tokTypeId,
+//#         uint256 stId,
+//#         int128  markPrice,
+//#         int256  feePerSide
+//#     ) public onlyOwner() {
+//#         FuturesLib.takePay2(ld, std,
+//#           StructLib.TakePayArgs2({
+//#              tokTypeId: tokTypeId,
+//#                   stId: stId,
+//#              markPrice: markPrice,
+//#             feePerSide: feePerSide,
+//#           feeAddrOwner: owner
+//#           }));
+//#     }
+//# 
+//#     function combineFtPos(StructLib.CombinePositionArgs memory a)
+//#     public onlyOwner() {
+//#         FuturesLib.combineFtPos(ld, std, a);
+//#     }
+//# 
+//#     // VIEWS
+//#     function getInitMarginOverride(uint256 tokTypeId, address ledgerOwner)
+//#     external view returns (uint16) {
+//#         return ld._ledger[ledgerOwner].ft_initMarginBips[tokTypeId];
+//#     }
+//#     function getFeePerContractOverride(uint256 tokTypeId, address ledgerOwner)
+//#     external view returns (uint128) {
+//#         return ld._ledger[ledgerOwner].ft_feePerContract[tokTypeId];
+//#     }
+//# 
+//#endif
 }

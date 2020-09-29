@@ -44,7 +44,7 @@ contract("StMaster", accounts => {
     });
 
     it(`minting metadata - mint/burn/chk`, async () => {
-        console.log('hash0', await stm.getLedgerHashcode())
+        console.log('hash0', await stm.getLedgerHashcode(1,0));
 
         const M = accounts[global.TaddrNdx];
         const batchId = await mintBatchWithMetadata( 
@@ -53,10 +53,10 @@ contract("StMaster", accounts => {
            metaValues: []
         }, { from: accounts[0] } );
         //console.log('getSecToken_totalMintedQty', await getSecToken_totalMintedQty())
-        console.log('hash1', await stm.getLedgerHashcode())
+        console.log('hash1', await stm.getLedgerHashcode(1,0));
 
         const burnTx = await stm.burnTokens(M, CONST.tokenType.TOK_T1, 1000, []);
-        console.log('hash2', await stm.getLedgerHashcode())
+        console.log('hash2', await stm.getLedgerHashcode(1,0));
     });
 
     it(`minting metadata - should allow metadata no KVP minting`, async () => {

@@ -19,8 +19,8 @@ describe(`Contract Web3 Interface`, async () => {
     before(async function () {
     });
 
-    it(`web3 direct - getLedgerHashcode()`, async () => {
-        console.log('getLedgerHashcode', await CONST.web3_call('getLedgerHashcode', []));
+    it(`web3 direct - getLedgerHashcode(1,0)`, async () => {
+        console.log('getLedgerHashcode', await CONST.web3_call('getLedgerHashcode', [1,0]));
     });
 });
 

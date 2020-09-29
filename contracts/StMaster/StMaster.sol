@@ -119,26 +119,26 @@ contract StMaster
 
     constructor(
         StructLib.ContractType        _contractType,
-//#if process.env.CONTRACT_TYPE === 'CASHFLxOW_CONTROLLER' || process.env.CONTRACT_TYPE === 'CASHFLOW_BASE'
-//#         StructLib.CashflowArgs memory _cashflowArgs,
+//#if process.env.CONTRACT_TYPE === 'CASHFLOW_CONTROLLER' || process.env.CONTRACT_TYPE === 'CASHFLOW_BASE'
+        StructLib.CashflowArgs memory _cashflowArgs,
 //#endif
         string memory                 _contractName,
         string memory                 _contractVer,
         string memory                 _contractUnit,
         string memory                 _contractSymbol,
         uint8                         _contractDecimals
-//#if process.env.CONTRACT_TYPE === 'CASHFLxOW_CONTROLLER' || process.env.CONTRACT_TYPE === 'CASHFLOW_BASE'
-//#         ,
-//#       //address                       _chainlinkAggregator_btcUsd,
-//#         address                       _chainlinkAggregator_ethUsd
+//#if process.env.CONTRACT_TYPE === 'CASHFLOW_CONTROLLER' || process.env.CONTRACT_TYPE === 'CASHFLOW_BASE'
+        ,
+      //address                       _chainlinkAggregator_btcUsd,
+        address                       _chainlinkAggregator_ethUsd
 //#endif
     ) StErc20(_contractSymbol, _contractDecimals)
     public {
 
 //#if process.env.CONTRACT_TYPE === 'CASHFLOW_CONTROLLER' || process.env.CONTRACT_TYPE === 'CASHFLOW_BASE'
-//#         //chainlinkAggregator_btcUsd = _chainlinkAggregator_btcUsd;
-//#         chainlinkAggregator_ethUsd = _chainlinkAggregator_ethUsd;
-//#         cashflowData.args = _cashflowArgs;
+        //chainlinkAggregator_btcUsd = _chainlinkAggregator_btcUsd;
+        chainlinkAggregator_ethUsd = _chainlinkAggregator_ethUsd;
+        cashflowData.args = _cashflowArgs;
 //#endif
 
         // set common properties
