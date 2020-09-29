@@ -1,3 +1,5 @@
+const CONST = require('./const.js');
+
 const envFile = require('path').resolve(__dirname, "./.env." + (process.env.INSTANCE_ID !== undefined ? (process.env.INSTANCE_ID) : ''));
 require('dotenv').config( { path: envFile });
 

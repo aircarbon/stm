@@ -8,7 +8,8 @@ if (!require('fs').existsSync(envFile)) {
     process.exit(1);
 }
 require('dotenv').config( { path: envFile });
-console.log(chalk.red('envFile'), envFile);
+console.log(chalk.red('envFile'.padEnd(30, '.')), envFile);
+console.log(chalk.red('INSTANCE_ID'.padEnd(30, '.')), process.env.INSTANCE_ID);
 
 const Big = require('big.js');
 const Web3 = require('web3');

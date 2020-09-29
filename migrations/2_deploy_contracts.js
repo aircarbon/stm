@@ -33,7 +33,6 @@ module.exports = async function (deployer) {
         case 'PROD_56': console.log(chalk.inverse(`Deploying (AWS PROD / BSC 56 MAINNET) instance, saving to DB: ${process.env.sql_server}`)); break;
         default: console.log(chalk.red.bold.inverse(`Unknown INSTANCE_ID (${process.env.INSTANCE_ID})`)); process.exit(1);
     }
-    console.log(chalk.red('INSTANCE_ID'.padEnd(30, '.')), process.env.INSTANCE_ID);
     console.log(chalk.red('process.env.NETWORK_ID'.padEnd(30, '.')), process.env.NETWORK_ID);
     console.log(chalk.red('process.env.CONTRACT_TYPE'.padEnd(30, '.')), process.env.CONTRACT_TYPE);
     const contractPrefix = (process.env.INSTANCE_ID || 'local').padEnd(30, '.') + '_';
