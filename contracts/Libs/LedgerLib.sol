@@ -308,7 +308,7 @@ library LedgerLib {
                 chk.totalCur += uint256(st.currentQty); // consistency check (base & commodity)
                 chk.totalMinted += uint256(st.mintedQty);
 
-                /if (stId % mod != n) continue;
+                if (stId % mod != n) continue;
 
                 ledgerHash = keccak256(abi.encodePacked(ledgerHash,
                     st.batchId,
