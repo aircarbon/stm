@@ -85,4 +85,25 @@ library Erc20Lib {
         emit Transfer(msg.sender, a.recipient, a.amount);
         return true;
     }
+
+    // APPROVE    
+    function approve(
+        StructLib.LedgerStruct storage ld,
+        address spender, uint256 amount) public returns (bool) { 
+        require(ld._contractSealed, "Contract is not sealed");
+        return false;
+    }
+
+    function allowance(
+        StructLib.LedgerStruct storage ld,
+        address owner, address spender) public view returns (uint256) { 
+        require(ld._contractSealed, "Contract is not sealed");
+        return 0;
+    }
+    function transferFrom(
+        StructLib.LedgerStruct storage ld,
+        address sender, address recipient, uint256 amount) public returns (bool) { 
+        require(ld._contractSealed, "Contract is not sealed");
+        return false;
+    }
 }

@@ -53,7 +53,7 @@ contract("StMaster", accounts => {
     // it(`misc - bip39 - should be able to generate Binace Smart Chain (BSC) (eth-compat) address from BIP39 mnemonic (BIP44 HD)`, async () => {
     //     for (let i=0 ; i < 10 ; i++) {
     //         const x = await CONST.getAccountAndKey(i,
-    //             '...',
+    //             '',
     //             );
 
     //         console.log(`${i} addr: ${x.addr} privKey: ${x.privKey}`);

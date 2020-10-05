@@ -52,7 +52,7 @@ describe(`Contract Web3 Interface`, async () => {
     //         AWS Dev: ("export INSTANCE_ID=DEV && mocha test_web3 --timeout 10000000 --exit")
     //         AWS UAT: ("export INSTANCE_ID=UAT && mocha test_web3 --timeout 10000000 --exit")
     //        AWS DEMO: ("export INSTANCE_ID=DEMO && mocha test_web3 --timeout 10000000 --exit")
-    //        AWS PROD: ("export INSTANCE_ID=PROD && mocha test_web3 --timeout 10000000 --exit")
+    //        AWS PROD: ("export INSTANCE_ID=PROD_56 && mocha test_web3 --timeout 10000000 --exit")
     //
 
     before(async function () {
@@ -64,7 +64,9 @@ describe(`Contract Web3 Interface`, async () => {
 
         x = await CONST.getAccountAndKey(GRAY_NDX);
         GRAY = x.addr; GRAY_privKey = x.privKey;
-        const sendEthTx = await CONST.web3_sendEthTestAddr(0, GRAY, "0.01"); // setup - fund GRAY eth
+        if (process.env.INSTANCE_ID === 'local') {
+            const sendEthTx = await CONST.web3_sendEthTestAddr(0, GRAY, "0.01"); // setup - fund GRAY eth
+        }
 
         await whitelistAndSeal();
 

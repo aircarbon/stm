@@ -65,7 +65,7 @@ contract StErc20 is StFees
     // function getWhitelistNextNdx() external view returns (uint256) { return erc20d._nextWhitelistNdx; }
     // function setWhitelistNextNdx(uint256 v) public onlyOwner() { erc20d._nextWhitelistNdx = v; }
 
-    // ERC20 - CORE
+    // ERC20 - core
     function totalSupply() public view returns (uint256) {
         return ld._spot_totalMintedQty - ld._spot_totalBurnedQty;
     }
@@ -76,11 +76,7 @@ contract StErc20 is StFees
     function transfer(address recipient, uint256 amount) public returns (bool) {
         require(balanceOf(msg.sender) >= amount, "Insufficient tokens");
 
-        return Erc20Lib.transfer(
-            ld,
-            std,
-            ctd,
-            globalFees,
+        return Erc20Lib.transfer(ld, std, ctd, globalFees,
             Erc20Lib.transferErc20Args({
                      owner: owner,
                  recipient: recipient,
@@ -89,9 +85,8 @@ contract StErc20 is StFees
         );
     }
 
-    // ERC20 - APPROVALS: NOP for now
-    // would be needed for bonding curve implementation?
-    // function allowance(address owner, address spender) public view returns (uint256) { return 0; }
-    // function approve(address spender, uint256 amount) public returns (bool) { return false; }
-    // function transferFrom(address sender, address recipient, uint256 amount) public returns (bool) { return false; }
+    // ERC20 - approvals
+    function approve(address spender, uint256 amount) public returns (bool) { return Erc20Lib.approve(ld, spender, amount); }
+    function allowance(address owner, address spender) public view returns (uint256) { return Erc20Lib.allowance(ld, owner, spender); }
+    function transferFrom(address sender, address recipient, uint256 amount) public returns (bool) { return Erc20Lib.transferFrom(ld, sender, recipient, amount); }
 }
