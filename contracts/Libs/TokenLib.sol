@@ -330,7 +330,7 @@ library TokenLib {
         // base / commodity: validate, burn & emit events
         require(a.tokTypeId >= 1 && a.tokTypeId <= std._tt_Count, "Bad tokTypeId");
         if (a.k_stIds.length == 0) { // burn by qty
-            require(StructLib.sufficientTokens(ld, std, a.ledgerOwner, a.tokTypeId, int256(a.burnQty), 0) == true, "Insufficient tokens");
+            require(StructLib.sufficientTokens(ld, a.ledgerOwner, a.tokTypeId, int256(a.burnQty), 0) == true, "Insufficient tokens");
         }
         // else { // burn by ID(s)
         //     int256 stQty;

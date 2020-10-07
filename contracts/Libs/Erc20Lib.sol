@@ -6,6 +6,10 @@ pragma experimental ABIEncoderV2;
 import "../Interfaces/StructLib.sol";
 import "./TransferLib.sol";
 
+// ######
+// TODO: below/refactor, re. non-commodity erc20 behaviour...
+// ######
+
 library Erc20Lib {
     event Transfer(address indexed from, address indexed to, uint256 value);
     event Approval(address indexed owner, address indexed spender, uint256 value);
@@ -17,17 +21,6 @@ library Erc20Lib {
         erc20d._whitelist.push(addr);
         erc20d._whitelisted[addr] = true;
     }
-    // WHITELIST - get next, and advance current index [single]
-    // function getWhitelistNext(StructLib.LedgerStruct storage ld, StructLib.Erc20Struct storage erc20d) public view returns (address) {
-    //     require(ld._contractSealed, "Contract is not sealed");
-    //     require(erc20d._nextWhitelistNdx < erc20d._whitelist.length, "Insufficient whitelist entries");
-    //     return erc20d._whitelist[erc20d._nextWhitelistNdx];
-    // }
-    // function incWhitelistNext(StructLib.LedgerStruct storage ld, StructLib.Erc20Struct storage erc20d) public {
-    //     require(ld._contractSealed, "Contract is not sealed");
-    //     require(erc20d._nextWhitelistNdx < erc20d._whitelist.length, "Insufficient whitelist entries");
-    //     erc20d._nextWhitelistNdx++;
-    // }
 
     // TRANSFER
     struct transferErc20Args {
@@ -43,14 +36,65 @@ library Erc20Lib {
         transferErc20Args memory a
     ) public returns (bool) {
         require(ld._contractSealed, "Contract is not sealed");
+        transferInternal(ld, std, ctd, globalFees, msg.sender, a);
+        return true;
+    }
 
+    // #### TODO!!! TESTS... ####
+    // vvv
+
+    // APPROVE
+    function approve(
+        StructLib.LedgerStruct storage ld,
+        StructLib.Erc20Struct storage erc20d, 
+        address spender, uint256 amount
+    ) public returns (bool) { // not in spec, but IMO should not allow approvals > balance
+        require(ld._contractSealed, "Contract is not sealed");
+        erc20d._allowances[msg.sender][spender] = amount;
+        emit Approval(msg.sender, spender, amount);
+        return true;
+    }
+
+    // TRANSFER-FROM
+    function transferFrom(
+        StructLib.LedgerStruct storage ld,
+        StructLib.StTypesStruct storage std,
+        StructLib.CcyTypesStruct storage ctd,
+        StructLib.FeeStruct storage globalFees,
+        StructLib.Erc20Struct storage erc20d, 
+        address sender,
+        transferErc20Args memory a
+    ) public returns (bool) { 
+        require(ld._contractSealed, "Contract is not sealed");
+
+        require(erc20d._allowances[sender][msg.sender] >= a.amount); //**
+
+        transferInternal(ld, std, ctd, globalFees, sender, a);
+
+        return false;
+    }
+
+    //
+    // (internal) transfer: across types
+    //
+    // ### TODO: limit cross-types to commodity only
+    //            i.e. CFT erc20 transfers need to be called only on the base-types directly...????
+    //
+    function transferInternal(
+        StructLib.LedgerStruct storage ld,
+        StructLib.StTypesStruct storage std,
+        StructLib.CcyTypesStruct storage ctd,
+        StructLib.FeeStruct storage globalFees,
+        address sender,
+        transferErc20Args memory a
+    ) private {
         uint256 remainingToTransfer = a.amount;
         while (remainingToTransfer > 0) {
             // iterate ST types
             for (uint256 tokTypeId = 1; tokTypeId <= std._tt_Count; tokTypeId++) {
 
                 // sum qty tokens of this type
-                uint256[] memory tokenType_stIds = ld._ledger[msg.sender].tokenType_stIds[tokTypeId];
+                uint256[] memory tokenType_stIds = ld._ledger[sender].tokenType_stIds[tokTypeId];
                 uint256 qtyType;
                 for (uint256 ndx = 0; ndx < tokenType_stIds.length; ndx++) {
                     require(ld._sts[tokenType_stIds[ndx]].currentQty > 0, "Unexpected token quantity");
@@ -62,7 +106,7 @@ library Erc20Lib {
 
                 if (qtyTransfer > 0) {
                     StructLib.TransferArgs memory transferOrTradeArgs = StructLib.TransferArgs({
-                            ledger_A: msg.sender,
+                            ledger_A: sender,
                             ledger_B: a.recipient,
                                qty_A: qtyTransfer,
                            k_stIds_A: new uint256[](0),
@@ -82,28 +126,6 @@ library Erc20Lib {
                 }
             }
         }
-        emit Transfer(msg.sender, a.recipient, a.amount);
-        return true;
-    }
-
-    // APPROVE    
-    function approve(
-        StructLib.LedgerStruct storage ld,
-        address spender, uint256 amount) public returns (bool) { 
-        require(ld._contractSealed, "Contract is not sealed");
-        return false;
-    }
-
-    function allowance(
-        StructLib.LedgerStruct storage ld,
-        address owner, address spender) public view returns (uint256) { 
-        require(ld._contractSealed, "Contract is not sealed");
-        return 0;
-    }
-    function transferFrom(
-        StructLib.LedgerStruct storage ld,
-        address sender, address recipient, uint256 amount) public returns (bool) { 
-        require(ld._contractSealed, "Contract is not sealed");
-        return false;
+        emit Transfer(sender, a.recipient, a.amount);
     }
 }

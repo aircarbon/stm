@@ -76,17 +76,25 @@ contract StErc20 is StFees
     function transfer(address recipient, uint256 amount) public returns (bool) {
         require(balanceOf(msg.sender) >= amount, "Insufficient tokens");
 
-        return Erc20Lib.transfer(ld, std, ctd, globalFees,
-            Erc20Lib.transferErc20Args({
-                     owner: owner,
-                 recipient: recipient,
-                    amount: amount
-            })
-        );
+        return Erc20Lib.transfer(ld, std, ctd, globalFees, Erc20Lib.transferErc20Args({
+                owner: owner,
+            recipient: recipient,
+               amount: amount
+        }));
     }
 
     // ERC20 - approvals
-    function approve(address spender, uint256 amount) public returns (bool) { return Erc20Lib.approve(ld, spender, amount); }
-    function allowance(address owner, address spender) public view returns (uint256) { return Erc20Lib.allowance(ld, owner, spender); }
-    function transferFrom(address sender, address recipient, uint256 amount) public returns (bool) { return Erc20Lib.transferFrom(ld, sender, recipient, amount); }
+    function allowance(address account, address spender) public view returns (uint256) { 
+        return erc20d._allowances[account][spender];
+    }
+    function approve(address spender, uint256 amount) public returns (bool) { 
+        return Erc20Lib.approve(ld, erc20d, spender, amount);
+    }
+    function transferFrom(address sender, address recipient, uint256 amount) public returns (bool) { 
+        return Erc20Lib.transferFrom(ld, std, ctd, globalFees, erc20d, sender, Erc20Lib.transferErc20Args({
+                owner: owner,
+            recipient: recipient,
+               amount: amount
+        }));
+    }
 }

@@ -133,7 +133,7 @@ contract StMaster
 //#         address                       _chainlinkAggregator_ethUsd
 //#endif
     ) StErc20(_contractSymbol, _contractDecimals)
-    public {
+    {
 
 //#if process.env.CONTRACT_TYPE === 'CASHFLOW_CONTROLLER' || process.env.CONTRACT_TYPE === 'CASHFLOW_BASE'
 //#         //chainlinkAggregator_btcUsd = _chainlinkAggregator_btcUsd;

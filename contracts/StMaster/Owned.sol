@@ -9,7 +9,7 @@ contract Owned
     bool readOnlyState;
     function readOnly() external view returns (bool) { return readOnlyState; }
 
-    constructor() public {
+    constructor() {
         owner = msg.sender;
         readOnlyState = false;
     }

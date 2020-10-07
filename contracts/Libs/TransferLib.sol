@@ -191,8 +191,8 @@ library TransferLib {
 
         // validate token balances - sum exchange token fee + originator token fee(s)
         if (ld.contractType != StructLib.ContractType.CASHFLOW_CONTROLLER) { //**
-            require(StructLib.sufficientTokens(ld, std, a.ledger_A, a.tokTypeId_A, int256(a.qty_A), int256((exFees.fee_tok_A + v.totalOrigFee[0]) * (a.applyFees && a.qty_A > 0 ? 1 : 0))), "Insufficient tokens A");
-            require(StructLib.sufficientTokens(ld, std, a.ledger_B, a.tokTypeId_B, int256(a.qty_B), int256((exFees.fee_tok_B + v.totalOrigFee[1]) * (a.applyFees && a.qty_B > 0 ? 1 : 0))), "Insufficient tokens B");
+            require(StructLib.sufficientTokens(ld, a.ledger_A, a.tokTypeId_A, int256(a.qty_A), int256((exFees.fee_tok_A + v.totalOrigFee[0]) * (a.applyFees && a.qty_A > 0 ? 1 : 0))), "Insufficient tokens A");
+            require(StructLib.sufficientTokens(ld, a.ledger_B, a.tokTypeId_B, int256(a.qty_B), int256((exFees.fee_tok_B + v.totalOrigFee[1]) * (a.applyFees && a.qty_B > 0 ? 1 : 0))), "Insufficient tokens B");
         }
 
         //
@@ -590,7 +590,7 @@ library TransferLib {
         StructLib.TransferType transferType;
         uint256                maxStId;
         uint256[]              k_stIds_take; // IFF len>0: only use these specific tokens (skip any others)
-        //uint256[]              k_stIds_skip; // IFF len>0: don't use these specific tokens (use any others) -- UNUSED, CAN REMOVE
+      //uint256[]              k_stIds_skip; // IFF len>0: don't use these specific tokens (use any others) -- UNUSED, CAN REMOVE
     }
     struct TransferSpltVars {
         uint256 ndx;
