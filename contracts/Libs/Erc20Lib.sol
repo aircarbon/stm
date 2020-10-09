@@ -11,6 +11,8 @@ import "./TransferLib.sol";
 // ######
 
 library Erc20Lib {
+    uint256 constant private MAX_UINT256 = 2**256 - 1; // for infinite approval
+
     event Transfer(address indexed from, address indexed to, uint256 value);
     event Approval(address indexed owner, address indexed spender, uint256 value);
 
@@ -40,16 +42,21 @@ library Erc20Lib {
         return true;
     }
 
+    //
     // #### TODO!!! TESTS... ####
     // vvv
+    //
 
     // APPROVE
     function approve(
         StructLib.LedgerStruct storage ld,
         StructLib.Erc20Struct storage erc20d, 
         address spender, uint256 amount
-    ) public returns (bool) { // not in spec, but IMO should not allow approvals > balance
+    ) public returns (bool) { // amount = MAX_UINT256: infinite approval
         require(ld._contractSealed, "Contract is not sealed");
+        require(!erc20d._whitelisted[spender], "Spender is whitelisted");
+        require(!erc20d._whitelisted[msg.sender], "Approver is whitelisted");
+
         erc20d._allowances[msg.sender][spender] = amount;
         emit Approval(msg.sender, spender, amount);
         return true;
@@ -65,13 +72,15 @@ library Erc20Lib {
         address sender,
         transferErc20Args memory a
     ) public returns (bool) { 
+        uint256 allowance = erc20d._allowances[sender][msg.sender];
         require(ld._contractSealed, "Contract is not sealed");
-
-        require(erc20d._allowances[sender][msg.sender] >= a.amount); //**
+        require(allowance >= a.amount); //**
 
         transferInternal(ld, std, ctd, globalFees, sender, a);
-
-        return false;
+        if (allowance < MAX_UINT256) {
+            erc20d._allowances[sender][msg.sender] -= a.amount;
+        }
+        return true;
     }
 
     //

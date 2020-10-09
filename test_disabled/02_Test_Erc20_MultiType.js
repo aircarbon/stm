@@ -4,6 +4,13 @@ const CONST = require('../const.js');
 const transferHelper = require('../test/transferHelper.js');
 const setupHelper = require('../test/testSetupContract.js');
 
+//
+// tests erc20 transfers spanning multiple token-types
+//  (only CONTACT_TYPE=COMMODITY supports this fungibility)
+// 
+
+// TODO: extend to test 3rd-party approve...
+
 contract("StMaster", accounts => {
     var stm;
 
@@ -55,11 +62,11 @@ contract("StMaster", accounts => {
     });
 
     //
-    // ordered tests: these need to run in this order; they assume contract state from previous test(s)
+    // ORDERED
     //
 
     it(`erc20 multi-type - should be able to send 2 types / 3 batches from whitelist addr to graylist addr (WITHDRAW: exchange => erc20)`, async () => {
-        await white_to_gray_1();
+        await white_to_gray_1(); // withdraw
     });
     async function white_to_gray_1() {
         await transferHelper.transferLedger({ stm, accounts, 
@@ -81,7 +88,7 @@ contract("StMaster", accounts => {
     }
 
     it(`erc20 multi-type - should be able to send 2 types / 3 batches from graylist addr to whitelist addr (DEPOSIT: erc20 => exchange)`, async () => {
-        await gray_1_to_white();
+        await gray_1_to_white(); // deposit
     });
     async function gray_1_to_white() {
         const fundTx = await CONST.web3_sendEthTestAddr(0, GRAY_1, "0.1"); // fund GRAY_1 for erc20 op
@@ -95,9 +102,9 @@ contract("StMaster", accounts => {
         assert(WHITE_after.spot_sumQty == CONST.KT_CARBON * 6, 'unexpected whitelist ledger WHITE quantity after');     
     }
 
-    it(`erc20 multi-type - should be able to send 2 types / 3 batches from graylist addr to graylist addr (erc20 => erc20)`, async () => {
-        await white_to_gray_1(); 
-        await gray_1_to_gray_2();
+    it(`erc20 multi-type - should be able to send 2 types / 3 batches from graylist addr to graylist addr (TRANSFER: erc20 => erc20)`, async () => {
+        await white_to_gray_1();  // withdraw
+        await gray_1_to_gray_2(); // erc20: send to other
     });
     async function gray_1_to_gray_2() {
         const fundTx = await CONST.web3_sendEthTestAddr(0, GRAY_1, "0.01"); // fund GRAY_1 for erc20 op

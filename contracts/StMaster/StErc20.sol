@@ -84,8 +84,8 @@ contract StErc20 is StFees
     }
 
     // ERC20 - approvals
-    function allowance(address account, address spender) public view returns (uint256) { 
-        return erc20d._allowances[account][spender];
+    function allowance(address sender, address spender) public view returns (uint256) { 
+        return erc20d._allowances[sender][spender];
     }
     function approve(address spender, uint256 amount) public returns (bool) { 
         return Erc20Lib.approve(ld, erc20d, spender, amount);

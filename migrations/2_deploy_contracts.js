@@ -36,7 +36,7 @@ module.exports = async function (deployer) {
     console.log(chalk.red('process.env.NETWORK_ID'.padEnd(30, '.')), process.env.NETWORK_ID);
     console.log(chalk.red('process.env.CONTRACT_TYPE'.padEnd(30, '.')), process.env.CONTRACT_TYPE);
     const contractPrefix = (process.env.INSTANCE_ID || 'local').padEnd(30, '.') + '_';
-    console.log(chalk.red('CONTRACT_PREFIX'.padEnd(30, '.')), process.env.CONTRACT_PREFIX);
+    console.log(chalk.red('process.env.CONTRACT_PREFIX'.padEnd(30, '.')), process.env.CONTRACT_PREFIX);
     console.log(chalk.red('deployer.gasPrice (gwei)'.padEnd(30, '.')), web3.utils.fromWei(deployer.networks[deployer.network].gasPrice.toString(), "gwei"));
 
     // require the supplied env network_id (via INSTANCE_ID) to match the supplied deployer's network_id

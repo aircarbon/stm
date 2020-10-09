@@ -13,6 +13,10 @@ const setupHelper = require('../test/testSetupContract.js');
 const transferHelper = require('./transferHelper.js');
 
 //
+// tests CASHFLOW_CONTROLLER flow
+//
+
+//
 // TODO: CFT upgrades... > multiple upgrade cases: 
 //    (1) controller upgraded, bases remain in-place
 //    (2) bases upgraded, controller remains

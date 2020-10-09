@@ -428,17 +428,11 @@ contract("StMaster", accounts => {
 
         //console.log('whitelist_cur', whitelist_cur);
         //console.log('whitelist_new', whitelist_new);
-
         console.log(chalk.inverse('stm_cur.getLedgerHashcode') + '\n\t', await CONST.getLedgerHashcode(stm_cur));
         console.log(chalk.inverse('stm_new.getLedgerHashcode') + '\n\t', await CONST.getLedgerHashcode(stm_new));
         
         stm_new.sealContract();
         assert(await CONST.getLedgerHashcode(stm_cur) == await CONST.getLedgerHashcode(stm_new), 'ledger hashcode mismatch');
-
-        // ~7.49m     for 1x { 2 batches, 2 transfers }
-        // 34,157,603 for 10x { 2 batches, 2 transfers }
-        // ~2.9m per { 2 batches, 2 trades }
-        // ~0.75m per trade/batch @ 10 gwei ~= $1.00 per trade
     });
 
     async function checkHashUpdate(curHash) {
