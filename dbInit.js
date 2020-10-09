@@ -10,10 +10,10 @@ const { web3_call } = require('./const.js');
 const { db } = require('../utils-server/dist');
 
 // Copy whitelist address to DB and init whitelist & oracle price settings
-//           Local: ("export INSTANCE_ID=local node dbInit.js")
-//           DEV: ("export INSTANCE_ID=DEV node dbInit.js")
-//           UAT: ("export INSTANCE_ID=UAT node dbInit.js")
-//           PROD: ("export INSTANCE_ID=PROD node dbInit.js")
+//           Local: ("INSTANCE_ID=local node dbInit.js")
+//           DEV: ("INSTANCE_ID=DEV node dbInit.js")
+//           UAT: ("INSTANCE_ID=UAT node dbInit.js")
+//           PROD: ("INSTANCE_ID=PROD node dbInit.js")
 process.env.WEB3_NETWORK_ID = Number(process.env.NETWORK_ID || 888);
 
 (async function () {
