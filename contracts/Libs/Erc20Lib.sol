@@ -42,11 +42,6 @@ library Erc20Lib {
         return true;
     }
 
-    //
-    // #### TODO!!! TESTS... ####
-    // vvv
-    //
-
     // APPROVE
     function approve(
         StructLib.LedgerStruct storage ld,
@@ -74,7 +69,7 @@ library Erc20Lib {
     ) public returns (bool) { 
         uint256 allowance = erc20d._allowances[sender][msg.sender];
         require(ld._contractSealed, "Contract is not sealed");
-        require(allowance >= a.amount); //**
+        require(allowance >= a.amount, "No allowance"); //**
 
         transferInternal(ld, std, ctd, globalFees, sender, a);
         if (allowance < MAX_UINT256) {

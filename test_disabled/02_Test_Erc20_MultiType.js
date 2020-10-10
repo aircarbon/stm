@@ -9,8 +9,6 @@ const setupHelper = require('../test/testSetupContract.js');
 //  (only CONTACT_TYPE=COMMODITY supports this fungibility)
 // 
 
-// TODO: extend to test 3rd-party approve...
-
 contract("StMaster", accounts => {
     var stm;
 
