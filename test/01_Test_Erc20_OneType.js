@@ -7,7 +7,12 @@ const setupHelper = require('../test/testSetupContract.js');
 //
 // tests erc20 transfers on a single token-type
 //  supported by: CONTACT_TYPE=CASHFLOW_BASE || COMMODITY (i.e. not by CASHFLOW_CONTROLLER)
-//  ### TODO:... (see: CFT_B_Test_FlowErc20.js for equivalent CASHFLOW_BASE tests) 
+//
+//  ### TODO:... (see: CFT_B_Test_FlowErc20.js for equivalent CASHFLOW_BASE tests)
+//   (1) disallow erc20 on CFT-C
+//   (2) erc20 ops on CFT-BASE types should "just work"? WL is embedded into each base, can't see any reason why not...
+// ==
+//   (3) add configurable token fees on erc20-transfer[From]()...
 //
 
 contract("StMaster", accounts => {

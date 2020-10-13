@@ -6,10 +6,6 @@ pragma experimental ABIEncoderV2;
 import "../Interfaces/StructLib.sol";
 import "./TransferLib.sol";
 
-// ######
-// TODO: below/refactor, re. non-commodity erc20 behaviour...
-// ######
-
 library Erc20Lib {
     uint256 constant private MAX_UINT256 = 2**256 - 1; // for infinite approval
 
@@ -81,8 +77,10 @@ library Erc20Lib {
     //
     // (internal) transfer: across types
     //
-    // ### TODO: limit cross-types to commodity only
-    //            i.e. CFT erc20 transfers need to be called only on the base-types directly...????
+    // ### TODO: limit cross-types to commodity only; disallow (all) erc20 entry points on CFT-C should be sufficient
+    //            > i.e. totalSupply()... (+?) should just throw on CFT-C...
+    //             
+    //            i.e. CFT erc20 transfers and properties valid only on the base-types directly
     //
     function transferInternal(
         StructLib.LedgerStruct storage ld,

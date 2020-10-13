@@ -78,7 +78,8 @@ describe(`Contract Web3 Interface`, async () => {
                 ccy_amount_A: 0,                                ccyTypeId_A: 0,
                 ccy_amount_B: 0,                                ccyTypeId_B: 0,
                    applyFees: false,
-                feeAddrOwner: CONST.nullAddr
+                feeAddrOwner: CONST.nullAddr,
+                   k_stIds_A: [], k_stIds_B: [],
             }], OWNER, OWNER_privKey);
             //await CONST.logGas(CONST.getTestContextWeb3().web3, { receipt: withdrawTx }, 'exchange => erc20 (withdraw): 1 type, 1 batch');
         //}

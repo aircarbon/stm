@@ -14,7 +14,7 @@ process.env.WEB3_NETWORK_ID = Number(process.env.NETWORK_ID || 888);
 
 // if false, will produce an empty state: only whitelisted accounts + sealed
 // if true, will perform a number of test actions: setting fees, minting, trading, etc.
-const EXEC_TEST_ACTIONS = false;
+const EXEC_TEST_ACTIONS = true;
 
 // owner
 const OWNER_NDX = 0;
@@ -101,7 +101,7 @@ describe(`Contract Web3 Interface`, async () => {
             var allWhitelisted = await CONST.web3_call('getWhitelist', [], undefined/*nameOverride*/, addrOverride);
             console.log(`(${addrOverride}) allWhitelisted`, allWhitelisted);
             console.log(`(${addrOverride}) sealedStatus`, sealedStatus);
-            if (sealedStatus == false) {
+            //if (sealedStatus == false) {
 
                 // setup whitelist: reserved/internal
                 var whiteNdx = 0;
@@ -115,11 +115,11 @@ describe(`Contract Web3 Interface`, async () => {
                     WHITE_RESERVED.push({ndx: whiteNdx, addr: x.addr, privKey: x.privKey});
                 }
                 console.log(chalk.inverse(`(${addrOverride}) SETUP RESERVED WL (count=${wlMany.length}) last whiteNdx=${whiteNdx}...`));
-                try {
+                if (sealedStatus == false) { try {
                     if (wlMany.length > 0) {
                         await CONST.web3_tx('whitelistMany', [ wlMany ], OWNER, OWNER_privKey, undefined/*nameOverride*/, addrOverride);
                     }
-                } catch(ex) { console.warn(ex); }
+                } catch(ex) { console.warn(ex); } }
                 //whitelistChunked(wlMany, OWNER, OWNER_privKey);
                 submittedToWhitelist.concat(wlMany);
 
@@ -133,11 +133,11 @@ describe(`Contract Web3 Interface`, async () => {
                     WHITE_MINTERS.push({ndx: whiteNdx, addr: x.addr, privKey: x.privKey});
                 }
                 console.log(chalk.inverse(`(${addrOverride}) SETUP MINTERS WL (count=${wlMany.length}) last whiteNdx=${whiteNdx}...`));
-                try {
+                if (sealedStatus == false) { try {
                     if (wlMany.length > 0) {
                         await CONST.web3_tx('whitelistMany', [ wlMany ], OWNER, OWNER_privKey, undefined/*nameOverride*/, addrOverride);
                     }
-                } catch(ex) { console.warn(ex); }
+                } catch(ex) { console.warn(ex); } }
                 //await whitelistChunked(wlMany, OWNER, OWNER_privKey);
                 submittedToWhitelist.concat(wlMany);
 
@@ -151,11 +151,11 @@ describe(`Contract Web3 Interface`, async () => {
                     WHITE_BUYERS.push({ndx: whiteNdx, addr: x.addr, privKey: x.privKey});
                 }
                 console.log(chalk.inverse(`(${addrOverride}) SETUP BUYERS WL (count=${wlMany.length}) last whiteNdx=${whiteNdx}...`));
-                try {
+                if (sealedStatus == false) { try {
                     if (wlMany.length > 0) {
                         await CONST.web3_tx('whitelistMany', [ wlMany ], OWNER, OWNER_privKey, undefined/*nameOverride*/, addrOverride);
                     }
-                } catch(ex) { console.warn(ex); }
+                } catch(ex) { console.warn(ex); } }
                 //await whitelistChunked(wlMany, OWNER, OWNER_privKey);
                 submittedToWhitelist.concat(wlMany);
 
@@ -171,7 +171,7 @@ describe(`Contract Web3 Interface`, async () => {
                     TEST_ACCOUNTS.push({ndx: whiteNdx, addr: x.addr, privKey: x.privKey});
                 }
                 console.log(chalk.inverse(`(${addrOverride}) SETUP TEST ACCOUNTS WL (count=${wlMany.length}) last whiteNdx=${whiteNdx}...`));
-                await whitelistChunked(wlMany, OWNER, OWNER_privKey);
+                if (sealedStatus == false) { await whitelistChunked(wlMany, OWNER, OWNER_privKey); }
                 submittedToWhitelist.concat(wlMany);
 
                     async function whitelistChunked(wlMany, OWNER, OWNER_privKey) {
@@ -199,13 +199,13 @@ describe(`Contract Web3 Interface`, async () => {
                 assert(allSubmittedPresent == true, '!!!');
 
                 // seal
-                if (!sealedStatus) {
+                if (sealedStatus == false) {
                     await CONST.web3_tx('sealContract', [], OWNER, OWNER_privKey, undefined/*nameOverride*/, addrOverride);
                 }
-            }
-            else {
-                console.log(`(${addrOverride}) already sealed: WL - NOP (WL count=${allWhitelisted.length}).`);
-            }
+            //}
+            // else {
+            //     console.log(`(${addrOverride}) already sealed: WL - NOP (WL count=${allWhitelisted.length}).`);
+            // }
         }
 
     it(`web3 direct - multi - should be able to mint multiple batches for all whitelist minters`, async () => {
@@ -271,7 +271,8 @@ describe(`Contract Web3 Interface`, async () => {
                 ccy_amount_A: 0,                                           ccyTypeId_A: 0,
                 ccy_amount_B: 5000,                                        ccyTypeId_B: ccyTypeIdFunded,
                    applyFees: true,
-                feeAddrOwner: CONST.nullAddr
+                feeAddrOwner: CONST.nullAddr,
+                   k_stIds_A: [], k_stIds_B: [],
             }], OWNER, OWNER_privKey);
             }
             console.groupEnd();
@@ -290,7 +291,8 @@ describe(`Contract Web3 Interface`, async () => {
                 ccy_amount_A: 0,                                  ccyTypeId_A: 0,
                 ccy_amount_B: 0,                                  ccyTypeId_B: 0,
                    applyFees: false,
-                feeAddrOwner: CONST.nullAddr
+                feeAddrOwner: CONST.nullAddr,
+                   k_stIds_A: [], k_stIds_B: [],
             }], OWNER, OWNER_privKey);
             }
             console.groupEnd();
