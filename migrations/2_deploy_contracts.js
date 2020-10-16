@@ -84,7 +84,7 @@ module.exports = async function (deployer) {
 
                 const { evs: evsBase2 } = await CONST.web3_tx('addSecTokenType', [ 'CFT-Base2',  CONST.settlementType.SPOT, CONST.nullFutureArgs, addrBase2 ], O.addr, O.privKey);
 
-                // set & seal base types
+                // init base types
                 process.env.CONTRACT_TYPE = 'CASHFLOW_BASE'; await setup.setDefaults({ nameOverride: "SDax_Base1" });
                 process.env.CONTRACT_TYPE = 'CASHFLOW_BASE'; await setup.setDefaults({ nameOverride: "SDax_Base2" });
             }
@@ -101,19 +101,32 @@ module.exports = async function (deployer) {
                 process.exit(1);
             }
 
+            //
             // deploy a new base type (unattached to any controller)
+            //
+            // TODO: move this (all configurablility) to WebAdmin
+            //       i.e. so can pick new type name, its CashflowArgs, and deploy it from WebAdmin... (web3 deploy?)
+            //
             const addrBase = await deploymentHelper.Deploy({ deployer, artifacts, contractType: 'CASHFLOW_BASE', nameOverride: nameBase });
             if (!deployer.network.includes("-fork")) {
                 console.log(chalk.inverse('nameBase'), nameBase);
                 console.log(chalk.inverse('addrBase'), addrBase);
 
-                // link new base type to the controller
+                // get whitelist from controller (will set new base type's whitelist to match)
                 process.env.CONTRACT_TYPE = 'CASHFLOW_CONTROLLER'; 
+                const controllerWhitelist = await CONST.web3_call('getWhitelist', []);
+
+                // link new base type to the controller (disabled: we do this manually through AdminWeb...)
                 const { evs: evsBase } = await CONST.web3_tx('addSecTokenType', [ process.env.ADD_TYPE__TYPE_NAME, CONST.settlementType.SPOT, CONST.nullFutureArgs, addrBase ], O.addr, O.privKey);
 
-                // set & seal base type
+                // init new base type, set whitelist to match controller
                 process.env.CONTRACT_TYPE = 'CASHFLOW_BASE';
                 await setup.setDefaults({ nameOverride: nameBase });
+                await CONST.web3_tx('whitelistMany', [controllerWhitelist], O.addr, O.privKey, /*nameOverride*/undefined, /*addrOverride*/addrBase);
+                const baseWhitelist = await CONST.web3_call('getWhitelist', [], /*nameOverride*/undefined, /*addrOverride*/addrBase);
+                console.log('      baseWhitelist.length', baseWhitelist.length);
+                console.log('controllerWhitelist.length', controllerWhitelist.length);
+                await CONST.web3_tx('sealContract', [], O.addr, O.privKey, /*nameOverride*/undefined, /*addrOverride*/addrBase);
 
                 // list types in the controller
                 process.env.CONTRACT_TYPE = 'CASHFLOW_CONTROLLER'; 
