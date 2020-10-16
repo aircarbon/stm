@@ -13,7 +13,7 @@ const { db } = require('../../utils-server/dist');
 //
 // Deploys a contract of type process.env.CONTRACT_TYPE according to defaults in const.js
 // Prefixes the contract name in const.contractProps with (process.env.INSTANCE_ID || 'local'), e.g.
-//    `export INSTANCE_ID=local && truffle migrate --network ropsten_ac -f 2 --to 2 --reset`
+//    `export INSTANCE_ID=local && truffle migrate --network development -f 2 --to 2 --reset`
 //    `export INSTANCE_ID=DEMO && truffle migrate --network test_ac -f 2 --to 2 --reset`
 //    `export INSTANCE_ID=PROD_52101 && truffle migrate --network prodnet_ac -f 2 --to 2 --reset`
 //    `export INSTANCE_ID=PROD_56 && truffle migrate --network bsc_mainnet_ac -f 2 --to 2 --reset`
@@ -69,10 +69,10 @@ module.exports = async function (deployer) {
 
             // deploy controller
             const addrController = await deploymentHelper.Deploy({ deployer, artifacts, contractType: 'CASHFLOW_CONTROLLER' });
-                process.env.CONTRACT_TYPE = 'CASHFLOW_CONTROLLER'; await setup.setDefaults();
+            process.env.CONTRACT_TYPE = 'CASHFLOW_CONTROLLER'; await setup.setDefaults();
 
             if (!deployer.network.includes("-fork")) {
-                // link base types
+                // link base types into the controller
                 console.log(chalk.inverse('addrBase1'), addrBase1);
                 console.log(chalk.inverse('addrBase2'), addrBase2);
                 console.log(chalk.inverse('addrController'), addrController);
@@ -83,9 +83,6 @@ module.exports = async function (deployer) {
                 // console.log(chalk.bgBlue.white(`evDbg1 - id: ${evDbg1.id} / 0x${id1.toString(16, 64)} / typeId: ${evDbg1.typeId}`));
 
                 const { evs: evsBase2 } = await CONST.web3_tx('addSecTokenType', [ 'CFT-Base2',  CONST.settlementType.SPOT, CONST.nullFutureArgs, addrBase2 ], O.addr, O.privKey);
-                // const evDbg2 = evsBase2.find(p => p.event == 'dbg1').returnValues;
-                // const id2 = new BN(evDbg2.id.toString());
-                // console.log(chalk.bgBlue.white(`evDbg2 - id: ${evDbg2.id} / 0x${id2.toString(16, 64)} / typeId: ${evDbg2.typeId}`));
 
                 // set & seal base types
                 process.env.CONTRACT_TYPE = 'CASHFLOW_BASE'; await setup.setDefaults({ nameOverride: "SDax_Base1" });
@@ -93,12 +90,30 @@ module.exports = async function (deployer) {
             }
             break;
 
-        // todo/not currently used...
-        case 'CASHFLOW_BASE':
-            // deploy an unattached base CASHFLOW contract
-            await deploymentHelper.Deploy({ deployer, artifacts, contractType: 'CASHFLOW_BASE' });
+        case 'CASHFLOW_BASE':   
+            const nameBase = process.env.ADD_TYPE__CONTRACT_NAME;
+            if (nameBase === undefined || nameBase.length == 0) {
+                console.log(chalk.red.bold.inverse(`Bad process.env.ADD_TYPE__CONTRACT_NAME (${nameBase}); supply a valid new base contract name.`));
+                process.exit(1);
+            }
+            if (process.env.ADD_TYPE__TYPE_NAME === undefined || process.env.ADD_TYPE__TYPE_NAME.length == 0) {
+                console.log(chalk.red.bold.inverse(`Bad process.env.ADD_TYPE__TYPE_NAME (${process.env.ADD_TYPE__TYPE_NAME}); supply a valid new base type name.`));
+                process.exit(1);
+            }
+
+            // deploy a new base type (unattached to any controller)
+            const addrBase = await deploymentHelper.Deploy({ deployer, artifacts, contractType: 'CASHFLOW_BASE', nameOverride: nameBase });
             if (!deployer.network.includes("-fork")) {
-                await setup.setDefaults();
+                console.log(chalk.inverse('nameBase'), nameBase);
+                console.log(chalk.inverse('addrBase'), addrBase);
+
+                // link new base type to the controller
+                process.env.CONTRACT_TYPE = 'CASHFLOW_CONTROLLER'; 
+                const { evs: evsBase } = await CONST.web3_tx('addSecTokenType', [ process.env.ADD_TYPE__TYPE_NAME, CONST.settlementType.SPOT, CONST.nullFutureArgs, addrBase ], O.addr, O.privKey);
+
+                // set & seal base type
+                process.env.CONTRACT_TYPE = 'CASHFLOW_BASE';
+                await setup.setDefaults({ nameOverride: nameBase });
             }
             break;
 

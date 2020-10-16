@@ -14,29 +14,6 @@ module.exports = {
         console.group();
         const O = await CONST.getAccountAndKey(0);
 
-        //
-        // FIXME?!/todo - retrieve bad batch id (triggers revert)...
-        //    ## ropsten_infura: FAILS (Error: overflow (operation="setValue", fault="overflow", details="Number can only safely store up to 53 bits", version=4.0.41)
-        //    ##     ropsten_ac: FAILS (Error: overflow (operation="setValue", fault="overflow", details="Number can only safely store up to 53 bits", version=4.0.41)
-        //    ##        test_ac: FAILS (Error: overflow (operation="setValue", fault="overflow", details="Number can only safely store up to 53 bits", version=4.0.41)
-        //    ganache - ok! ("revert bad batchId")
-        //
-        //const getSecTokenBatch0 = await CONST.web3_call('getSecTokenBatch', [0]);
-        //console.log('getSecTokenBatch0', getSecTokenBatch0);
-
-        //const name = await CONST.web3_call('name', []);
-        //console.log('name', name);
-
-        //const getSecToken0 = await CONST.web3_call('getSecToken', [0]);
-        //console.log('getSecToken0', getSecToken0);
-
-        //const getContractType = await CONST.web3_call('getContractType', []);
-        //console.log('getContractType', getContractType);
-
-        //const getSecTokenTypes = await CONST.web3_call('getSecTokenTypes', []);
-        //console.log('getSecTokenTypes', getSecTokenTypes);
-        //return;
-
         if ((await CONST.web3_call('getContractType', [], nameOverride)) == CONST.contractType.COMMODITY) {
             console.log(chalk.inverse('devSetupContract >> commodity contract...'));
 
