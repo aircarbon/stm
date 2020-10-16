@@ -114,6 +114,11 @@ module.exports = async function (deployer) {
                 // set & seal base type
                 process.env.CONTRACT_TYPE = 'CASHFLOW_BASE';
                 await setup.setDefaults({ nameOverride: nameBase });
+
+                // list types in the controller
+                process.env.CONTRACT_TYPE = 'CASHFLOW_CONTROLLER'; 
+                const spotTypes = (await CONST.web3_call('getSecTokenTypes', [])).tokenTypes.filter(p => p.settlementType == CONST.settlementType.SPOT);
+                console.log('spotTypes', spotTypes);
             }
             break;
 
