@@ -27,7 +27,7 @@ module.exports = async function (deployer) {
         case 'DEV': console.log(chalk.inverse(`Deploying (AWS DEV / DEV) instance, saving to DB: ${process.env.sql_server}`)); break;
         case 'DEMO': console.log(chalk.inverse(`Deploying (AWS DEV / DEMO) instance, saving to DB: ${process.env.sql_server}`)); break;
         case 'UAT': console.log(chalk.inverse(`Deploying (AWS DEV / UAT) instance, saving to DB: ${process.env.sql_server}`)); break;
-        
+
         case 'PROD_1': console.log(chalk.inverse(`Deploying (AWS PROD / ETH 1 MAINNET) instance, saving to DB: ${process.env.sql_server}`)); break;
         case 'PROD_52101': console.log(chalk.inverse(`Deploying (AWS PROD / AC 52101 PRODNET) instance, saving to DB: ${process.env.sql_server}`)); break;
         case 'PROD_56': console.log(chalk.inverse(`Deploying (AWS PROD / BSC 56 MAINNET) instance, saving to DB: ${process.env.sql_server}`)); break;
@@ -90,7 +90,7 @@ module.exports = async function (deployer) {
             }
             break;
 
-        case 'CASHFLOW_BASE':   
+        case 'CASHFLOW_BASE':
             const nameBase = process.env.ADD_TYPE__CONTRACT_NAME;
             if (nameBase === undefined || nameBase.length == 0) {
                 console.log(chalk.red.bold.inverse(`Bad process.env.ADD_TYPE__CONTRACT_NAME (${nameBase}); supply a valid new base contract name.`));
@@ -108,17 +108,17 @@ module.exports = async function (deployer) {
                 console.log(chalk.inverse('addrBase'), addrBase);
 
                 // link new base type to the controller
-                process.env.CONTRACT_TYPE = 'CASHFLOW_CONTROLLER'; 
-                const { evs: evsBase } = await CONST.web3_tx('addSecTokenType', [ process.env.ADD_TYPE__TYPE_NAME, CONST.settlementType.SPOT, CONST.nullFutureArgs, addrBase ], O.addr, O.privKey);
+                // process.env.CONTRACT_TYPE = 'CASHFLOW_CONTROLLER';
+                // const { evs: evsBase } = await CONST.web3_tx('addSecTokenType', [ process.env.ADD_TYPE__TYPE_NAME, CONST.settlementType.SPOT, CONST.nullFutureArgs, addrBase ], O.addr, O.privKey);
 
                 // set & seal base type
                 process.env.CONTRACT_TYPE = 'CASHFLOW_BASE';
                 await setup.setDefaults({ nameOverride: nameBase });
 
                 // list types in the controller
-                process.env.CONTRACT_TYPE = 'CASHFLOW_CONTROLLER'; 
-                const spotTypes = (await CONST.web3_call('getSecTokenTypes', [])).tokenTypes.filter(p => p.settlementType == CONST.settlementType.SPOT);
-                console.log('spotTypes', spotTypes);
+                // process.env.CONTRACT_TYPE = 'CASHFLOW_CONTROLLER';
+                // const spotTypes = (await CONST.web3_call('getSecTokenTypes', [])).tokenTypes.filter(p => p.settlementType == CONST.settlementType.SPOT);
+                // console.log('spotTypes', spotTypes);
             }
             break;
 
