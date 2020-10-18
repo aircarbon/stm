@@ -20,7 +20,8 @@ const thisScriptFile = path.basename(__filename);
     processFileNames = process.argv.slice(2);
     switch (process.env.CONTRACT_TYPE) {
         case 'COMMODITY':
-        case 'CASHFLOW_CONTROLLER': console.log(`${chalk.blue.bgWhite('PSJS')} ` + `Processing .sol & .js files for ` + chalk.inverse(`CONTRACT_TYPE=${process.env.CONTRACT_TYPE}`)); break;
+        case 'CASHFLOW_CONTROLLER':
+        case 'CASHFLOW_BASE': console.log(`${chalk.blue.bgWhite('PSJS')} ` + `Processing .sol & .js files for ` + chalk.inverse(`CONTRACT_TYPE=${process.env.CONTRACT_TYPE}`)); break;
         default: console.log(`${chalk.blue.bgWhite('PSJS')} ` + chalk.red.bold.inverse(`Unknown or unsupported CONTRACT_TYPE (${process.env.CONTRACT_TYPE})`)); process.exit(1);
     }
     if (processFileNames.length > 0) console.log(`${chalk.blue.bgWhite('PSJS')} ` + chalk.inverse('processFileNames: '), processFileNames.join(','));
@@ -44,7 +45,7 @@ async function processFile(filePath) {
     if (readFileName === thisScriptFile) return;
     
     const readFileContent = fs.readFileSync(filePath);
-    if (!readFileContent.includes(`//#if`)) { /*console.log(`${chalk.blue.bgWhite('PSJS')} ` + chalk.dim(`${filePath}; nop...`));*/ return; }
+    if (!readFileContent.includes(`//#if`)) { /*console.log(`${chalk.blue.bgWhite('PSJS')} ` + chalk.dim(`${filePasolth}; nop...`));*/ return; }
     
     const writeFileName = path.parse(writeFilePath).base;
     console.log(`${chalk.blue.bgWhite('PSJS')} ` + chalk.inverse(`${filePath}...`));

@@ -26,19 +26,19 @@ module.exports = async function (deployer) {
     const O = await CONST.getAccountAndKey(0);
     switch (process.env.INSTANCE_ID) {
         case undefined:
-        case 'local': console.log(chalk.inverse(`Deploying localhost contract instance, saving to DB: ${process.env.sql_server}`)); break;
+        case 'local': console.log((`Deploying localhost contract instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`)); break;
 
         // AC
-        case 'DEV': console.log(chalk.inverse(`Deploying (AWS DEV / DEV) instance, saving to DB: ${process.env.sql_server}`)); break;
-        case 'DEMO': console.log(chalk.inverse(`Deploying (AWS DEV / DEMO) instance, saving to DB: ${process.env.sql_server}`)); break;
-        case 'UAT': console.log(chalk.inverse(`Deploying (AWS DEV / UAT) instance, saving to DB: ${process.env.sql_server}`)); break;
-        case 'PROD_1': console.log(chalk.inverse(`Deploying (AWS PROD / ETH 1 MAINNET) instance, saving to DB: ${process.env.sql_server}`)); break;
-        case 'PROD_52101': console.log(chalk.inverse(`Deploying (AWS PROD / AC 52101 PRODNET) instance, saving to DB: ${process.env.sql_server}`)); break;
-        case 'PROD_56': console.log(chalk.inverse(`Deploying (AWS PROD / BSC 56 MAINNET) instance, saving to DB: ${process.env.sql_server}`)); break;
+        case 'DEV': console.log((`Deploying (AWS DEV / DEV) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`)); break;
+        case 'DEMO': console.log((`Deploying (AWS DEV / DEMO) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`)); break;
+        case 'UAT': console.log((`Deploying (AWS DEV / UAT) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`)); break;
+        case 'PROD_1': console.log((`Deploying (AWS PROD / ETH 1 MAINNET) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`)); break;
+        case 'PROD_52101': console.log((`Deploying (AWS PROD / AC 52101 PRODNET) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`)); break;
+        case 'PROD_56': console.log((`Deploying (AWS PROD / BSC 56 MAINNET) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`)); break;
 
         // SD
-        case 'DEV_SD': console.log(chalk.inverse(`Deploying (AWS DEV / DEV for SDAX) instance, saving to DB: ${process.env.sql_server}`)); break;
-        case 'UAT_SD': console.log(chalk.inverse(`Deploying (AWS DEV / UAT for SDAX) instance, saving to DB: ${process.env.sql_server}`)); break;
+        case 'DEV_SD': console.log((`Deploying (AWS DEV / DEV for SDAX) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`)); break;
+        case 'UAT_SD': console.log((`Deploying (AWS DEV / UAT for SDAX) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`)); break;
 
         default: console.log(chalk.red.bold.inverse(`Unknown INSTANCE_ID (${process.env.INSTANCE_ID})`)); process.exit(1);
     }
@@ -126,8 +126,8 @@ module.exports = async function (deployer) {
                 process.env.CONTRACT_TYPE = 'CASHFLOW_CONTROLLER'; 
                 const controllerWhitelist = await CONST.web3_call('getWhitelist', []);
 
-                // link new base type to the controller (disabled: we do this manually through AdminWeb...)
-                //const { evs: evsBase } = await CONST.web3_tx('addSecTokenType', [ process.env.ADD_TYPE__TYPE_NAME, CONST.settlementType.SPOT, CONST.nullFutureArgs, addrBase ], O.addr, O.privKey);
+                // link new base type to the controller (can also be disabled: we can do this manually through AdminWeb...)
+                const { evs: evsBase } = await CONST.web3_tx('addSecTokenType', [ process.env.ADD_TYPE__TYPE_NAME, CONST.settlementType.SPOT, CONST.nullFutureArgs, addrBase ], O.addr, O.privKey);
 
                 // init new base type, set whitelist to match controller
                 process.env.CONTRACT_TYPE = 'CASHFLOW_BASE';
