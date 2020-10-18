@@ -13,10 +13,13 @@ const { db } = require('../../utils-server/dist');
 //
 // Deploys a contract of type process.env.CONTRACT_TYPE according to defaults in const.js
 // Prefixes the contract name in const.contractProps with (process.env.INSTANCE_ID || 'local'), e.g.
-//    `export INSTANCE_ID=local && truffle migrate --network development -f 2 --to 2 --reset`
-//    `export INSTANCE_ID=DEMO && truffle migrate --network test_ac -f 2 --to 2 --reset`
-//    `export INSTANCE_ID=PROD_52101 && truffle migrate --network prodnet_ac -f 2 --to 2 --reset`
-//    `export INSTANCE_ID=PROD_56 && truffle migrate --network bsc_mainnet_ac -f 2 --to 2 --reset`
+//
+//    `export INSTANCE_ID=local && node process_sol_js && truffle migrate --network development -f 2 --to 2 --reset`
+//    `export INSTANCE_ID=DEMO && node process_sol_js && truffle migrate --network test_ac -f 2 --to 2 --reset`
+//    `export INSTANCE_ID=PROD_52101 && node process_sol_js && truffle migrate --network prodnet_ac -f 2 --to 2 --reset`
+//    `export INSTANCE_ID=PROD_56 && node process_sol_js && truffle migrate --network bsc_mainnet_ac -f 2 --to 2 --reset`
+//
+//    `export INSTANCE_ID=UAT_SD && node process_sol_js && truffle migrate --network ropsten_ac -f 2 --to 2 --reset`
 //
 
 module.exports = async function (deployer) {
@@ -24,13 +27,19 @@ module.exports = async function (deployer) {
     switch (process.env.INSTANCE_ID) {
         case undefined:
         case 'local': console.log(chalk.inverse(`Deploying localhost contract instance, saving to DB: ${process.env.sql_server}`)); break;
+
+        // AC
         case 'DEV': console.log(chalk.inverse(`Deploying (AWS DEV / DEV) instance, saving to DB: ${process.env.sql_server}`)); break;
         case 'DEMO': console.log(chalk.inverse(`Deploying (AWS DEV / DEMO) instance, saving to DB: ${process.env.sql_server}`)); break;
         case 'UAT': console.log(chalk.inverse(`Deploying (AWS DEV / UAT) instance, saving to DB: ${process.env.sql_server}`)); break;
-
         case 'PROD_1': console.log(chalk.inverse(`Deploying (AWS PROD / ETH 1 MAINNET) instance, saving to DB: ${process.env.sql_server}`)); break;
         case 'PROD_52101': console.log(chalk.inverse(`Deploying (AWS PROD / AC 52101 PRODNET) instance, saving to DB: ${process.env.sql_server}`)); break;
         case 'PROD_56': console.log(chalk.inverse(`Deploying (AWS PROD / BSC 56 MAINNET) instance, saving to DB: ${process.env.sql_server}`)); break;
+
+        // SD
+        case 'DEV_SD': console.log(chalk.inverse(`Deploying (AWS DEV / DEV for SDAX) instance, saving to DB: ${process.env.sql_server}`)); break;
+        case 'UAT_SD': console.log(chalk.inverse(`Deploying (AWS DEV / UAT for SDAX) instance, saving to DB: ${process.env.sql_server}`)); break;
+
         default: console.log(chalk.red.bold.inverse(`Unknown INSTANCE_ID (${process.env.INSTANCE_ID})`)); process.exit(1);
     }
     console.log(chalk.red('process.env.NETWORK_ID'.padEnd(30, '.')), process.env.NETWORK_ID);
@@ -64,8 +73,8 @@ module.exports = async function (deployer) {
 
         case 'CASHFLOW_CONTROLLER':
             // deploy two base types
-            const addrBase1 = await deploymentHelper.Deploy({ deployer, artifacts, contractType: 'CASHFLOW_BASE', nameOverride: "SDax_Base1" });
-            const addrBase2 = await deploymentHelper.Deploy({ deployer, artifacts, contractType: 'CASHFLOW_BASE', nameOverride: "SDax_Base2" });
+            const addrBase1 = await deploymentHelper.Deploy({ deployer, artifacts, contractType: 'CASHFLOW_BASE', nameOverride: "SDax_Base1", symbolOverride: "SDi1" });
+            const addrBase2 = await deploymentHelper.Deploy({ deployer, artifacts, contractType: 'CASHFLOW_BASE', nameOverride: "SDax_Base2", symbolOverride: "SDi2" });
 
             // deploy controller
             const addrController = await deploymentHelper.Deploy({ deployer, artifacts, contractType: 'CASHFLOW_CONTROLLER' });
@@ -92,6 +101,7 @@ module.exports = async function (deployer) {
 
         case 'CASHFLOW_BASE':
             const nameBase = process.env.ADD_TYPE__CONTRACT_NAME;
+            const symbolBase = process.env.ADD_TYPE__CONTRACT_SYMBOL;
             if (nameBase === undefined || nameBase.length == 0) {
                 console.log(chalk.red.bold.inverse(`Bad process.env.ADD_TYPE__CONTRACT_NAME (${nameBase}); supply a valid new base contract name.`));
                 process.exit(1);
@@ -107,7 +117,7 @@ module.exports = async function (deployer) {
             // TODO: move this (all configurablility) to WebAdmin
             //       i.e. so can pick new type name, its CashflowArgs, and deploy it from WebAdmin... (web3 deploy?)
             //
-            const addrBase = await deploymentHelper.Deploy({ deployer, artifacts, contractType: 'CASHFLOW_BASE', nameOverride: nameBase });
+            const addrBase = await deploymentHelper.Deploy({ deployer, artifacts, contractType: 'CASHFLOW_BASE', nameOverride: nameBase, symbolOverride: symbolBase });
             if (!deployer.network.includes("-fork")) {
                 console.log(chalk.inverse('nameBase'), nameBase);
                 console.log(chalk.inverse('addrBase'), addrBase);
@@ -129,9 +139,9 @@ module.exports = async function (deployer) {
                 await CONST.web3_tx('sealContract', [], O.addr, O.privKey, /*nameOverride*/undefined, /*addrOverride*/addrBase);
 
                 // list types in the controller
-                // process.env.CONTRACT_TYPE = 'CASHFLOW_CONTROLLER';
-                // const spotTypes = (await CONST.web3_call('getSecTokenTypes', [])).tokenTypes.filter(p => p.settlementType == CONST.settlementType.SPOT);
-                // console.log('spotTypes', spotTypes);
+                process.env.CONTRACT_TYPE = 'CASHFLOW_CONTROLLER';
+                const spotTypes = (await CONST.web3_call('getSecTokenTypes', [])).tokenTypes.filter(p => p.settlementType == CONST.settlementType.SPOT);
+                console.log('spotTypes', spotTypes);
             }
             break;
 

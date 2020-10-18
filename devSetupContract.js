@@ -24,7 +24,7 @@ module.exports = {
             await addSecTokenIfNotPresent(spotTypes, 'AirCarbon Nature Token', O, nameOverride);
             await addSecTokenIfNotPresent(spotTypes, 'AirCarbon Premium Token', O, nameOverride);
 
-            // ad ccy types
+            // add ccy types
             const ccyTypes = (await CONST.web3_call('getCcyTypes', [], nameOverride)).ccyTypes;
             //console.log('ccyTypes', ccyTypes.map(p => { return { id: p.id, name: p.name } }));
             await addCcyIfNotPresent(ccyTypes, 'USD', 'cents', 2, O, nameOverride);

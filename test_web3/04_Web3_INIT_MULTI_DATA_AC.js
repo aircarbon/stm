@@ -14,7 +14,7 @@ process.env.WEB3_NETWORK_ID = Number(process.env.NETWORK_ID || 888);
 
 // if false, will produce an empty state: only whitelisted accounts + sealed
 // if true, will perform a number of test actions: setting fees, minting, trading, etc.
-const EXEC_TEST_ACTIONS = true;
+const EXEC_TEST_ACTIONS = false;
 
 // owner
 const OWNER_NDX = 0;
@@ -53,6 +53,8 @@ describe(`Contract Web3 Interface`, async () => {
     //         AWS UAT: ("export INSTANCE_ID=UAT && mocha test_web3 --timeout 10000000 --exit")
     //        AWS DEMO: ("export INSTANCE_ID=DEMO && mocha test_web3 --timeout 10000000 --exit")
     //        AWS PROD: ("export INSTANCE_ID=PROD_56 && mocha test_web3 --timeout 10000000 --exit")
+    //
+    //      AWS UAT_SD: ("export INSTANCE_ID=UAT_SD && mocha test_web3 --timeout 10000000 --exit")
     //
 
     before(async function () {

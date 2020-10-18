@@ -55,7 +55,7 @@ const blocksFromMonths = (months) => Math.ceil(blocksFromDays(months * 30.42));
 //
 // MAIN: deployer definitions -- contract ctor() params
 //
-const contractVer = process.env.CONTRACT_VERSION || "0.99a";
+const contractVer = process.env.CONTRACT_VERSION || "0.99b";
 const contractProps = {
     COMMODITY: {
         contractVer: contractVer,
@@ -67,15 +67,15 @@ const contractProps = {
     },
     CASHFLOW_BASE: {
         contractVer: contractVer,
-        contractName: `SDax_CFT`,
+        contractName: `SDax_BaseBond`,
         contractUnit: "Token(s)",
         contractSymbol: "SD1A",
         contractDecimals: 0,
         cashflowArgs: {
               cashflowType: cashflowType.BOND,
-                 term_Blks: blocksFromDays(1),
+                 term_Blks: blocksFromDays(365),
                   bond_bps: 1000, // 10%
-        bond_int_EveryBlks: blocksFromHours(1)
+        bond_int_EveryBlks: blocksFromDays(30)
         }
     },
     CASHFLOW_CONTROLLER: {
