@@ -37,8 +37,9 @@ module.exports = async function (deployer) {
         case 'PROD_56': console.log((`Deploying (AWS PROD / BSC 56 MAINNET) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`)); break;
 
         // SD
-        case 'DEV_SD': console.log((`Deploying (AWS DEV / DEV for SDAX) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`)); break;
-        case 'UAT_SD': console.log((`Deploying (AWS DEV / UAT for SDAX) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`)); break;
+        case 'DEV_SD': console.log((`Deploying (AWS DEV / DEV [controller + 2 default base types] for SDAX) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`)); break;
+        case 'UAT_SD': console.log((`Deploying (AWS DEV / UAT [controller + 2 default base types] for SDAX) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`)); break;
+        case 'UAT_SD_x3': console.log((`Deploying (AWS DEV / UAT [additional base type #3] for SDAX) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`)); break;
 
         default: console.log(chalk.red.bold.inverse(`Unknown INSTANCE_ID (${process.env.INSTANCE_ID})`)); process.exit(1);
     }
