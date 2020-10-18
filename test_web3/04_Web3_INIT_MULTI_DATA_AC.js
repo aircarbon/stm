@@ -58,7 +58,8 @@ describe(`Contract Web3 Interface`, async () => {
     //
 
     before(async function () {
-        await require('../devSetupContract.js').setDefaults();
+        const nameOverride = process.env.ADD_TYPE__CONTRACT_NAME;
+        await require('../devSetupContract.js').setDefaults({ nameOverride });
 
         var x;
         x = await CONST.getAccountAndKey(OWNER_NDX);
@@ -70,38 +71,40 @@ describe(`Contract Web3 Interface`, async () => {
             const sendEthTx = await CONST.web3_sendEthTestAddr(0, GRAY, "0.01"); // setup - fund GRAY eth
         }
 
-        await whitelistAndSeal();
+        await whitelistAndSeal({ nameOverride });
 
         // cashflow controller - need to whitelist & seal each base type (mirror base cashflow, i.e. WL set will be identical in base types)
-        if ((await CONST.web3_call('getContractType', [])) == CONST.contractType.CASHFLOW_CONTROLLER) {
-            const baseTypes = (await CONST.web3_call('getSecTokenTypes', [])).tokenTypes;
+        if ((await CONST.web3_call('getContractType', [], nameOverride)) == CONST.contractType.CASHFLOW_CONTROLLER) {
+            const baseTypes = (await CONST.web3_call('getSecTokenTypes', [], nameOverride)).tokenTypes;
             console.log('baseTypes', baseTypes);
             for (var baseType of baseTypes) {
                 console.log(`calling whitelistAndSeal for `, baseType);
-                await whitelistAndSeal(baseType.cashflowBaseAddr);
+                await whitelistAndSeal({ addrOverride: baseType.cashflowBaseAddr });
             }
         }
 
         if (EXEC_TEST_ACTIONS) {
             // add sec token type
-            if (!(await CONST.web3_call('getSecTokenTypes',[])).tokenTypes.some(p => p.name == 'NEW_TOK_TYPE_A')) {
-                await CONST.web3_tx('addSecTokenType', [ 'NEW_TOK_TYPE_A', CONST.settlementType.SPOT, CONST.nullFutureArgs, CONST.nullAddr ], OWNER, OWNER_privKey);
+            if (!(await CONST.web3_call('getSecTokenTypes', [], nameOverride)).tokenTypes.some(p => p.name == 'NEW_TOK_TYPE_A')) {
+                await CONST.web3_tx('addSecTokenType', [ 'NEW_TOK_TYPE_A', CONST.settlementType.SPOT, CONST.nullFutureArgs, CONST.nullAddr ], OWNER, OWNER_privKey, nameOverride);
             }
 
             // add ccy type
-            if (!(await CONST.web3_call('getCcyTypes',[])).ccyTypes.some(p => p.name == 'NEW_CCY_TYPE_A')) {
-                await CONST.web3_tx('addCcyType', [ 'NEW_CCY_TYPE_A', 'cents', 2 ], OWNER, OWNER_privKey);
+            if (!(await CONST.web3_call('getCcyTypes', [], nameOverride)).ccyTypes.some(p => p.name == 'NEW_CCY_TYPE_A')) {
+                await CONST.web3_tx('addCcyType', [ 'NEW_CCY_TYPE_A', 'cents', 2 ], OWNER, OWNER_privKey, nameOverride);
             }
         }
     });
 
-        async function whitelistAndSeal(addrOverride) {
+        async function whitelistAndSeal(p) {
+            const nameOverride = p ? p.nameOverride : undefined;
+            const addrOverride = p ? p.addrOverride : undefined;
             var x;
 
             // WL & seal
-            const sealedStatus = await CONST.web3_call('getContractSeal', [], undefined/*nameOverride*/, addrOverride);
-            var allWhitelisted = await CONST.web3_call('getWhitelist', [], undefined/*nameOverride*/, addrOverride);
-            console.log(`(${addrOverride}) allWhitelisted`, allWhitelisted);
+            const sealedStatus = await CONST.web3_call('getContractSeal', [], nameOverride, addrOverride);
+            var allWhitelisted = await CONST.web3_call('getWhitelist', [], nameOverride, addrOverride);
+            console.log(`(${addrOverride}) allWhitelisted.length`, allWhitelisted.length);
             console.log(`(${addrOverride}) sealedStatus`, sealedStatus);
             //if (sealedStatus == false) {
 
@@ -119,7 +122,7 @@ describe(`Contract Web3 Interface`, async () => {
                 console.log(chalk.inverse(`(${addrOverride}) SETUP RESERVED WL (count=${wlMany.length}) last whiteNdx=${whiteNdx}...`));
                 if (sealedStatus == false) { try {
                     if (wlMany.length > 0) {
-                        await CONST.web3_tx('whitelistMany', [ wlMany ], OWNER, OWNER_privKey, undefined/*nameOverride*/, addrOverride);
+                        await CONST.web3_tx('whitelistMany', [ wlMany ], OWNER, OWNER_privKey, nameOverride, addrOverride);
                     }
                 } catch(ex) { console.warn(ex); } }
                 //whitelistChunked(wlMany, OWNER, OWNER_privKey);
@@ -137,7 +140,7 @@ describe(`Contract Web3 Interface`, async () => {
                 console.log(chalk.inverse(`(${addrOverride}) SETUP MINTERS WL (count=${wlMany.length}) last whiteNdx=${whiteNdx}...`));
                 if (sealedStatus == false) { try {
                     if (wlMany.length > 0) {
-                        await CONST.web3_tx('whitelistMany', [ wlMany ], OWNER, OWNER_privKey, undefined/*nameOverride*/, addrOverride);
+                        await CONST.web3_tx('whitelistMany', [ wlMany ], OWNER, OWNER_privKey, nameOverride, addrOverride);
                     }
                 } catch(ex) { console.warn(ex); } }
                 //await whitelistChunked(wlMany, OWNER, OWNER_privKey);
@@ -155,7 +158,7 @@ describe(`Contract Web3 Interface`, async () => {
                 console.log(chalk.inverse(`(${addrOverride}) SETUP BUYERS WL (count=${wlMany.length}) last whiteNdx=${whiteNdx}...`));
                 if (sealedStatus == false) { try {
                     if (wlMany.length > 0) {
-                        await CONST.web3_tx('whitelistMany', [ wlMany ], OWNER, OWNER_privKey, undefined/*nameOverride*/, addrOverride);
+                        await CONST.web3_tx('whitelistMany', [ wlMany ], OWNER, OWNER_privKey, nameOverride, addrOverride);
                     }
                 } catch(ex) { console.warn(ex); } }
                 //await whitelistChunked(wlMany, OWNER, OWNER_privKey);
@@ -184,14 +187,14 @@ describe(`Contract Web3 Interface`, async () => {
                             for (let chunk of wlChunked) {
                                 //console.log('chunk', chunk);
                                 try {
-                                    await CONST.web3_tx('whitelistMany', [ chunk ], OWNER, OWNER_privKey, undefined/*nameOverride*/, addrOverride);
+                                    await CONST.web3_tx('whitelistMany', [ chunk ], OWNER, OWNER_privKey, nameOverride, addrOverride);
                                 } catch(ex) { console.warn(ex); }
                             }
                         }
                     }
 
                 // dbg - get counts & whitelist
-                allWhitelisted = await CONST.web3_call('getWhitelist', [], undefined/*nameOverride*/, addrOverride);
+                allWhitelisted = await CONST.web3_call('getWhitelist', [], nameOverride, addrOverride);
                 console.log(chalk.inverse(`(${addrOverride}) DONE WHITELISTING...`));
                 console.log(`(${addrOverride}) allWhitelisted.length: `, allWhitelisted.length);
                 //console.dir(allWhitelisted);
@@ -202,7 +205,7 @@ describe(`Contract Web3 Interface`, async () => {
 
                 // seal
                 if (sealedStatus == false) {
-                    await CONST.web3_tx('sealContract', [], OWNER, OWNER_privKey, undefined/*nameOverride*/, addrOverride);
+                    await CONST.web3_tx('sealContract', [], OWNER, OWNER_privKey, nameOverride, addrOverride);
                 }
             //}
             // else {

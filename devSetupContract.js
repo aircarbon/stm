@@ -39,7 +39,6 @@ module.exports = {
 
             // create owner ledger entry
             const ownerLedger = (await CONST.web3_call('getLedgerEntry', [O.addr], nameOverride));
-            //console.log('ownerLedger', ownerLedger);
             if (!ownerLedger.exists) {
                 await CONST.web3_tx('fundOrWithdraw', [ CONST.fundWithdrawType.FUND, CONST.ccyType.USD, 0, O.addr, 'DEV_INIT' ], O.addr, O.privKey); 
             } else console.log(chalk.gray(`owner ledger already set; nop.`));
@@ -58,7 +57,10 @@ module.exports = {
             ;
             
             // create owner ledger entry
-            await CONST.web3_tx('setFee_TokType', [ 1, O.addr, CONST.nullFees ], O.addr, O.privKey, nameOverride);
+            const ownerLedger = (await CONST.web3_call('getLedgerEntry', [O.addr], nameOverride));
+            if (!ownerLedger.exists) {
+                await CONST.web3_tx('setFee_TokType', [ 1, O.addr, CONST.nullFees ], O.addr, O.privKey, nameOverride);
+            }
         }
         else if (await CONST.web3_call('getContractType', [], nameOverride) == CONST.contractType.CASHFLOW_CONTROLLER) {
             console.log(chalk.inverse('devSetupContract >> cashflow controller contract...'));
@@ -72,7 +74,10 @@ module.exports = {
             await addCcyIfNotPresent(ccyTypes, 'ETH', 'Wei', 18, O, nameOverride);
 
             // create owner ledger entry
-            await CONST.web3_tx('setFee_CcyType', [ CONST.ccyType.USD, O.addr, CONST.nullFees ], O.addr, O.privKey, nameOverride);
+            const ownerLedger = (await CONST.web3_call('getLedgerEntry', [O.addr], nameOverride));
+            if (!ownerLedger.exists) {
+                await CONST.web3_tx('setFee_CcyType', [ CONST.ccyType.USD, O.addr, CONST.nullFees ], O.addr, O.privKey, nameOverride);
+            }
         }
         
         console.groupEnd();
