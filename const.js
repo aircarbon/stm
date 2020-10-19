@@ -56,37 +56,35 @@ const blocksFromMonths = (months) => Math.ceil(blocksFromDays(months * 30.42));
 //
 // MAIN: deployer definitions -- contract ctor() params
 //
-const contractVer = process.env.CONTRACT_VERSION || "0.99e";
+const contractVer = process.env.CONTRACT_VERSION || "0.99f";
 const contractProps = {
     COMMODITY: {
         contractVer: contractVer,
+        contractDecimals: 0,
         contractName: `AirCarbon`,
         contractUnit: "KG", //"Ton(s)",
         contractSymbol: "ACC",
-        contractDecimals: 0,
         cashflowArgs: nullCashflowArgs,
     },
     CASHFLOW_BASE: {
         contractVer: contractVer,
-        contractName: `SDax_BaseBond`,
-        contractUnit: "Token(s)",
-        contractSymbol: "SD1A",
         contractDecimals: 0,
-        cashflowArgs: {
+        contractName: `SDax_BaseBond`, // overriden by config; see 2_deploy_contracts.js
+        contractUnit: "Token(s)",      // "
+        contractSymbol: "SD1A",        // "
+        cashflowArgs: {                // "
               cashflowType: cashflowType.BOND,
-                 term_Days: 365,
-        bond_int_EveryDays: 30,
-               //term_Blks: module.exports.blocksFromDays(365),
-      //bond_int_EveryBlks: module.exports.blocksFromDays(30),
-                  bond_bps: 1000, // 10%
+                 term_Days: 365,       // ==> term_Blks
+        bond_int_EveryDays: 30,        // ==> bond_int_EveryBlks
+                  bond_bps: 1000,
         }
     },
     CASHFLOW_CONTROLLER: {
         contractVer: contractVer,
+        contractDecimals: 0,
         contractName: `SDax_CFT-C`,
         contractUnit: "N/A",
         contractSymbol: "SDCFTC",
-        contractDecimals: 0,
         cashflowArgs: nullCashflowArgs
     },
 };
