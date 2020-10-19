@@ -46,6 +46,7 @@ const cashflowType = Object.freeze({
     BOND: 0,
     EQUITY: 1,
 });
+
 const blocksFromSecs = (secs) => Math.ceil(secs / 15); // 15 secs per block avg assumed
 const blocksFromMins = (mins) => Math.ceil(blocksFromSecs(mins * 60));
 const blocksFromHours = (hours) => Math.ceil(blocksFromMins(hours * 60));
@@ -55,7 +56,7 @@ const blocksFromMonths = (months) => Math.ceil(blocksFromDays(months * 30.42));
 //
 // MAIN: deployer definitions -- contract ctor() params
 //
-const contractVer = process.env.CONTRACT_VERSION || "0.99b";
+const contractVer = process.env.CONTRACT_VERSION || "0.99e";
 const contractProps = {
     COMMODITY: {
         contractVer: contractVer,
@@ -73,9 +74,11 @@ const contractProps = {
         contractDecimals: 0,
         cashflowArgs: {
               cashflowType: cashflowType.BOND,
-                 term_Blks: blocksFromDays(365),
+                 term_Days: 365,
+        bond_int_EveryDays: 30,
+               //term_Blks: module.exports.blocksFromDays(365),
+      //bond_int_EveryBlks: module.exports.blocksFromDays(30),
                   bond_bps: 1000, // 10%
-        bond_int_EveryBlks: blocksFromDays(30)
         }
     },
     CASHFLOW_CONTROLLER: {
@@ -96,6 +99,12 @@ module.exports = {
     logTestAccountUsage: false,
 
     nullAddr: "0x0000000000000000000000000000000000000000",
+
+    blocksFromSecs: (secs) => blocksFromSecs(secs),
+    blocksFromMins: (mins) => blocksFromMins(mins),
+    blocksFromHours: (hours) => blocksFromHours(hours),
+    blocksFromDays: (days) => blocksFromDays(days),
+    blocksFromMonths: (months) => blocksFromMonths(months),
 
     // https://docs.chain.link/docs/using-chainlink-reference-contracts
     chainlinkAggregators: {

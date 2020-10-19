@@ -1,3 +1,5 @@
+const _ = require('lodash');
+
 const CONST = require('../const.js');
 
 const chalk = require('chalk');
@@ -20,6 +22,7 @@ const { db } = require('../../utils-server/dist');
 //    `export INSTANCE_ID=PROD_56 && node process_sol_js && truffle migrate --network bsc_mainnet_ac -f 2 --to 2 --reset`
 //
 //    `export INSTANCE_ID=UAT_SD && node process_sol_js && truffle migrate --network ropsten_ac -f 2 --to 2 --reset`
+//    `export INSTANCE_ID=UAT_SD_x3 && node process_sol_js && truffle migrate --network ropsten_ac -f 2 --to 2 --reset`
 //
 
 module.exports = async function (deployer) {
@@ -72,34 +75,48 @@ module.exports = async function (deployer) {
             }
             break;
 
+        // v2: deploys *just* the contoller... (too complicated to be doing pre-processing and recompiles in the middle of this flow)
         case 'CASHFLOW_CONTROLLER':
             // deploy two base types
-            const addrBase1 = await deploymentHelper.Deploy({ deployer, artifacts, contractType: 'CASHFLOW_BASE', nameOverride: "SDax_Base1", symbolOverride: "SDi1" });
-            const addrBase2 = await deploymentHelper.Deploy({ deployer, artifacts, contractType: 'CASHFLOW_BASE', nameOverride: "SDax_Base2", symbolOverride: "SDi2" });
+            // const execSync = require("child_process").execSync;
+            // process.env.CONTRACT_TYPE = 'CASHFLOW_BASE'; 
+            // console.log(chalk.inverse('run pre-processor: set source files & compile for base-type deployments...'));
+            // const childResult1 = execSync(`node process_sol_js && truffle compile --reset`);
+            // console.group('Child Output');
+            // console.log(chalk.dim(childResult1.toString("utf8")));
+            // console.groupEnd();
+            // const dh2 = require('./deploymentHelper'); // reload processed script
+            // const addrBase1 = await dh2.Deploy({ deployer, artifacts, contractType: 'CASHFLOW_BASE', nameOverride: "SDax_Base1", symbolOverride: "SDi1" });
+            // const addrBase2 = await dh2.Deploy({ deployer, artifacts, contractType: 'CASHFLOW_BASE', nameOverride: "SDax_Base2", symbolOverride: "SDi2" });
 
             // deploy controller
+            process.env.CONTRACT_TYPE = 'CASHFLOW_CONTROLLER';
+            // console.log(chalk.inverse('set source files & compile for controller deployment...'));
+            // execSync(`node process_sol_js && truffle compile --reset`);
+            // const childResult2 = execSync(`node process_sol_js && truffle compile --reset`);
+            // console.group('Child Output');
+            // console.log(chalk.dim(childResult2.toString("utf8")));
+            // console.groupEnd();            
+            // const dh3 = require('./deploymentHelper'); // reload processed script
             const addrController = await deploymentHelper.Deploy({ deployer, artifacts, contractType: 'CASHFLOW_CONTROLLER' });
-            process.env.CONTRACT_TYPE = 'CASHFLOW_CONTROLLER'; await setup.setDefaults();
+            await setup.setDefaults();
 
             if (!deployer.network.includes("-fork")) {
                 // link base types into the controller
-                console.log(chalk.inverse('addrBase1'), addrBase1);
-                console.log(chalk.inverse('addrBase2'), addrBase2);
-                console.log(chalk.inverse('addrController'), addrController);
+                //console.log(chalk.inverse('addrBase1'), addrBase1);
+                //console.log(chalk.inverse('addrBase2'), addrBase2);
+                //console.log(chalk.inverse('addrController'), addrController);
 
-                const { evs: evsBase1 } = await CONST.web3_tx('addSecTokenType', [ 'CFT-Base1',  CONST.settlementType.SPOT, CONST.nullFutureArgs, addrBase1 ], O.addr, O.privKey);
-                // const evDbg1 = evsBase1.find(p => p.event == 'dbg1').returnValues;
-                // const id1 = new BN(evDbg1.id.toString());
-                // console.log(chalk.bgBlue.white(`evDbg1 - id: ${evDbg1.id} / 0x${id1.toString(16, 64)} / typeId: ${evDbg1.typeId}`));
-
-                const { evs: evsBase2 } = await CONST.web3_tx('addSecTokenType', [ 'CFT-Base2',  CONST.settlementType.SPOT, CONST.nullFutureArgs, addrBase2 ], O.addr, O.privKey);
+                //const { evs: evsBase1 } = await CONST.web3_tx('addSecTokenType', [ 'CFT-Base1',  CONST.settlementType.SPOT, CONST.nullFutureArgs, addrBase1 ], O.addr, O.privKey);
+                //const { evs: evsBase2 } = await CONST.web3_tx('addSecTokenType', [ 'CFT-Base2',  CONST.settlementType.SPOT, CONST.nullFutureArgs, addrBase2 ], O.addr, O.privKey);
 
                 // init base types
-                process.env.CONTRACT_TYPE = 'CASHFLOW_BASE'; await setup.setDefaults({ nameOverride: "SDax_Base1" });
-                process.env.CONTRACT_TYPE = 'CASHFLOW_BASE'; await setup.setDefaults({ nameOverride: "SDax_Base2" });
+                //process.env.CONTRACT_TYPE = 'CASHFLOW_BASE'; await setup.setDefaults({ nameOverride: "SDax_Base1" });
+                //process.env.CONTRACT_TYPE = 'CASHFLOW_BASE'; await setup.setDefaults({ nameOverride: "SDax_Base2" });
             }
             break;
 
+        // v2: we're *required* to run this after the controller deployment (i.e. no default base types deployed alongside the controller)
         case 'CASHFLOW_BASE':
             const nameBase = process.env.ADD_TYPE__CONTRACT_NAME;
             const symbolBase = process.env.ADD_TYPE__CONTRACT_SYMBOL;
@@ -112,28 +129,36 @@ module.exports = async function (deployer) {
                 process.exit(1);
             }
 
-            //
-            // deploy a new base type (unattached to any controller)
-            //
+            // get whitelist from controller (wwe will set new the base type's whitelist to match)
+            process.env.CONTRACT_TYPE = 'CASHFLOW_CONTROLLER'; 
+            const controllerWhitelist = await CONST.web3_call('getWhitelist', []);
+            if (controllerWhitelist.length == 0) {
+                throw(`Cannot deploy new base type; controller whitelist is not set. Run 04_Web3_INIT_MULTI_DATA_AC.js...`);
+            }
+
+            // deploy a new base type
             // TODO: move this (all configurablility) to WebAdmin
             //       i.e. so can pick new type name, its CashflowArgs, and deploy it from WebAdmin... (web3 deploy?)
-            //
+            process.env.CONTRACT_TYPE = 'CASHFLOW_BASE'; 
             const addrBase = await deploymentHelper.Deploy({ deployer, artifacts, contractType: 'CASHFLOW_BASE', nameOverride: nameBase, symbolOverride: symbolBase });
             if (!deployer.network.includes("-fork")) {
                 console.log(chalk.inverse('nameBase'), nameBase);
                 console.log(chalk.inverse('addrBase'), addrBase);
 
-                // get whitelist from controller (will set new base type's whitelist to match)
-                process.env.CONTRACT_TYPE = 'CASHFLOW_CONTROLLER'; 
-                const controllerWhitelist = await CONST.web3_call('getWhitelist', []);
-
                 // link new base type to the controller (can also be disabled: we can do this manually through AdminWeb...)
+                process.env.CONTRACT_TYPE = 'CASHFLOW_CONTROLLER';
                 const { evs: evsBase } = await CONST.web3_tx('addSecTokenType', [ process.env.ADD_TYPE__TYPE_NAME, CONST.settlementType.SPOT, CONST.nullFutureArgs, addrBase ], O.addr, O.privKey);
 
                 // init new base type, set whitelist to match controller
-                process.env.CONTRACT_TYPE = 'CASHFLOW_BASE';
                 await setup.setDefaults({ nameOverride: nameBase });
-                await CONST.web3_tx('whitelistMany', [controllerWhitelist], O.addr, O.privKey, /*nameOverride*/undefined, /*addrOverride*/addrBase);
+                const wlChunked = _.chunk(controllerWhitelist, 50);
+                for (let chunk of wlChunked) {
+                    //try {
+                        await CONST.web3_tx('whitelistMany', [ chunk ], O.addr, O.privKey, /*nameOverride*/undefined, /*addrOverride*/addrBase);
+                    //} catch(ex) { console.warn(ex); }
+                }
+                //await CONST.web3_tx('whitelistMany', [controllerWhitelist], O.addr, O.privKey, /*nameOverride*/undefined, /*addrOverride*/addrBase);
+                
                 const baseWhitelist = await CONST.web3_call('getWhitelist', [], /*nameOverride*/undefined, /*addrOverride*/addrBase);
                 console.log('      baseWhitelist.length', baseWhitelist.length);
                 console.log('controllerWhitelist.length', controllerWhitelist.length);

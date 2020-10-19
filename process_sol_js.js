@@ -8,9 +8,9 @@ const path = require('path'), fs = require('fs'), readline = require('readline')
 
 //
 // Pre-processes Solidity source files
-//      e.g. `node process_sol`                                  => recurse all .sol files and process
-//      e.g. `node process_sol StTransferable.sol`               => find & process StTransferable.sol
-//      e.g. `node process_sol StTransferable.sol StPayable.sol` => find & process StTransferable.sol, StPayable.sol, etc.
+//      e.g. `node process_sol_js`                                  => recurse all .sol files and process
+//      e.g. `node process_sol_js StTransferable.sol`               => find & process StTransferable.sol
+//      e.g. `node process_sol_js StTransferable.sol StPayable.sol` => find & process StTransferable.sol, StPayable.sol, etc.
 //
 var processFileNames;
 const thisScriptFile = path.basename(__filename);

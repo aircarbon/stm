@@ -14,8 +14,7 @@ import "../Libs/PayableLib.sol";
 abstract // solc 0.6
 contract StPayable is
     StErc20 {
-//#if process.env.CONTRACT_TYPE === 'CASHFLOW_CONTROLLER' || process.env.CONTRACT_TYPE === 'CASHFLOW_BASE'
-
+        
     // === CFT === V1 ** =>>> MVP -- CFT SPLIT LEDGER (central WL, central collateral, central spot transferOrTrade...)
     //  Cashflow type is fundamentally way less fungible than Commodity type, i.e. loan A != loan B
     //  Therefore, the only way to preserve ERC20 semanitcs for CFTs, is for each CFT *to have its own contract address*
@@ -51,14 +50,16 @@ contract StPayable is
     //      TODO: pri2 - PE: issuance fee on subscriptions
     //      TODO: pri3 - wallet auto-converts
 
+//#if process.env.CONTRACT_TYPE === 'CASHFLOW_BASE'
     StructLib.CashflowStruct cashflowData;
-    address public chainlinkAggregator_ethUsd;
-    //address public chainlinkAggregator_btcUsd;
 
     function getCashflowData() public view returns(StructLib.CashflowStruct memory) {
         return PayableLib.getCashflowData(ld, cashflowData);
     }
     
+    address public chainlinkAggregator_ethUsd;
+    //address public chainlinkAggregator_btcUsd;
+
     // function get_btcUsd() public view returns(int256) {
     //     if (chainlinkAggregator_btcUsd == address(0x0)) return 100000000; // $1 - cents*satoshis
     //     IChainlinkAggregator ref = IChainlinkAggregator(chainlinkAggregator_btcUsd);

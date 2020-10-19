@@ -68,23 +68,33 @@ module.exports = {
 
         await deployer.deploy(FuturesLib).then(async futuresLib => {
             deployer.link(FuturesLib, StMaster);
-            //console.log('cashflowArgs', CONST.contractProps[type].cashflowArgs);
-
-            //return
             const contractName = `${process.env.CONTRACT_PREFIX}${nameOverride || CONST.contractProps[contractType].contractName}`;
+
+//#if process.env.CONTRACT_TYPE === 'CASHFLOW_BASE'
+            const cfa = process.env.ADD_TYPE__CASHFLOW_ARGS !== undefined 
+                        ? JSON.parse(process.env.ADD_TYPE__CASHFLOW_ARGS)
+                        : CONST.contractProps[contractType].cashflowArgs;
+            console.log('cfa(pre)', cfa);
+            cfa.term_Blks = CONST.blocksFromDays(cfa.term_Days);
+            cfa.bond_int_EveryBlks = CONST.blocksFromDays(cfa.bond_int_EveryDays);
+            delete cfa.term_Days;
+            delete cfa.bond_int_EveryDays;
+            console.log('cfa(post)', cfa);
+//#endif
+
             stmAddr = await deployer.deploy(StMaster,
                 contractType == 'CASHFLOW_BASE'       ? CONST.contractType.CASHFLOW_BASE :
                 contractType == 'CASHFLOW_CONTROLLER' ? CONST.contractType.CASHFLOW_CONTROLLER :
                                                         CONST.contractType.COMMODITY,
-//#if process.env.CONTRACT_TYPE === 'CASHFLOW_CONTROLLER' || process.env.CONTRACT_TYPE === 'CASHFLOW_BASE'
-                CONST.contractProps[contractType].cashflowArgs,
+//#if process.env.CONTRACT_TYPE === 'CASHFLOW_BASE'
+                cfa,
 //#endif
                 contractName,
                 CONST.contractProps[contractType].contractVer,
                 CONST.contractProps[contractType].contractUnit,
                 symbolOverride || CONST.contractProps[contractType].contractSymbol,
                 CONST.contractProps[contractType].contractDecimals
-//#if process.env.CONTRACT_TYPE === 'CASHFLOW_CONTROLLER' || process.env.CONTRACT_TYPE === 'CASHFLOW_BASE'
+//#if process.env.CONTRACT_TYPE === 'CASHFLOW_BASE'
                ,
              //CONST.chainlinkAggregators[process.env.NETWORK_ID].btcUsd,    // 24k
                CONST.chainlinkAggregators[process.env.NETWORK_ID].ethUsd

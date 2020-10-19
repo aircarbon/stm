@@ -27,7 +27,7 @@ const DEV_MNEMONIC = require('./DEV_MNEMONIC.js').MNEMONIC;
 
 const GWEI_MAINNET_1  = "80";
 const GWEI_MAINNET_56 = "20"; // 20 gwei minimum [PoA validator cartel!]?! trial & error - not clear at all; <20 gwei seems to never mine...
-const GWEI_TESTNET    = "5";
+const GWEI_TESTNET    = "20";
 
 //
 // https://chainid.network/chains/
