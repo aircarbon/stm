@@ -270,6 +270,7 @@ library StructLib {
         uint256      qty_issuanceRemaining; // the amount remaining unsold of the issuance uni-batch
         uint256      qty_issuanceSold;      // the amount sold of the issuance uni-batch
         uint256      qty_saleAllocation;    // the amount of the issuance uni-batch that is available for sale
+        address      issuer;                // the uni-batch originator ("minter"), i.e. the issuer (or null address, if not yet minted)
 
         //uint256      issued_Blk;         // issuance (start) block no
         // --> wei_totIssued

@@ -14,7 +14,7 @@ process.env.WEB3_NETWORK_ID = Number(process.env.NETWORK_ID || 888);
 
 // if false, will produce an empty state: only whitelisted accounts + sealed
 // if true, will perform a number of test actions: setting fees, minting, trading, etc.
-const EXEC_TEST_ACTIONS = false;
+const EXEC_TEST_ACTIONS = true;
 
 // owner
 const OWNER_NDX = 0;
@@ -48,17 +48,26 @@ var GRAY, GRAY_privKey;
 describe(`Contract Web3 Interface`, async () => {
 
     //
-    //           Local: ("export INSTANCE_ID=local && mocha test_web3 --timeout 10000000 --exit")
-    //         AWS Dev: ("export INSTANCE_ID=DEV && mocha test_web3 --timeout 10000000 --exit")
-    //         AWS UAT: ("export INSTANCE_ID=UAT && mocha test_web3 --timeout 10000000 --exit")
-    //        AWS DEMO: ("export INSTANCE_ID=DEMO && mocha test_web3 --timeout 10000000 --exit")
-    //        AWS PROD: ("export INSTANCE_ID=PROD_56 && mocha test_web3 --timeout 10000000 --exit")
+    //      Local: ("export INSTANCE_ID=local && mocha test_web3 --timeout 10000000 --exit")
+    //    AWS Dev: ("export INSTANCE_ID=DEV && mocha test_web3 --timeout 10000000 --exit")
+    //    AWS UAT: ("export INSTANCE_ID=UAT && mocha test_web3 --timeout 10000000 --exit")
+    //   AWS DEMO: ("export INSTANCE_ID=DEMO && mocha test_web3 --timeout 10000000 --exit")
+    //   AWS PROD: ("export INSTANCE_ID=PROD_56 && mocha test_web3 --timeout 10000000 --exit")
     //
-    //      AWS UAT_SD: ("export INSTANCE_ID=UAT_SD && mocha test_web3 --timeout 10000000 --exit")      // WL & seal controller + default base types
-    //                  ("export INSTANCE_ID=UAT_SD_x3 && mocha test_web3 --timeout 10000000 --exit")   // WL & seal additional base type
+    // AWS UAT_SD: ("export INSTANCE_ID=UAT_SD && mocha test_web3 --timeout 10000000 --exit")                 // WL & seal controller + default base types
+    //             ("export INSTANCE_ID=UAT_SD_x3 && mocha test_web3 --timeout 10000000 --exit")              // WL & seal additional base type, uni-mint & setIssuerValues
+    //             ("export INSTANCE_ID=UAT_SD_SBGLand && mocha test_web3 --timeout 10000000 --exit")         // "
+    //             ("export INSTANCE_ID=UAT_SD_WilsonAndCo && mocha test_web3 --timeout 10000000 --exit")     // "
+    //             ("export INSTANCE_ID=UAT_SD_WorldbridgeLand && mocha test_web3 --timeout 10000000 --exit") // "
     //
 
+    CONST.consoleOutput(false);
+
+    // TODO: add action(s) for CFT-B types -- minting uni-batch if not already present... (for testing flow...)
+
+    // setup
     before(async function () {
+        
         const nameOverride = process.env.ADD_TYPE__CONTRACT_NAME;
         await require('../devSetupContract.js').setDefaults({ nameOverride });
 
@@ -72,31 +81,44 @@ describe(`Contract Web3 Interface`, async () => {
             const sendEthTx = await CONST.web3_sendEthTestAddr(0, GRAY, "0.01"); // setup - fund GRAY eth
         }
 
+        console.log(`Whitelisting & sealing: `, nameOverride || '(no named override)');
         await whitelistAndSeal({ nameOverride });
 
         // cashflow controller - need to whitelist & seal each base type (mirror base cashflow, i.e. WL set will be identical in base types)
         if ((await CONST.web3_call('getContractType', [], nameOverride)) == CONST.contractType.CASHFLOW_CONTROLLER) {
             const baseTypes = (await CONST.web3_call('getSecTokenTypes', [], nameOverride)).tokenTypes;
-            console.log('baseTypes', baseTypes);
+            //console.log('baseTypes', baseTypes);
+            console.group();
             for (var baseType of baseTypes) {
-                console.log(`calling whitelistAndSeal for `, baseType);
+                console.log(`Whitelisting & sealing (base-type @${baseType.cashflowBaseAddr}): `, baseType.name);
                 await whitelistAndSeal({ addrOverride: baseType.cashflowBaseAddr });
             }
+            console.groupEnd();
         }
 
         if (EXEC_TEST_ACTIONS) {
-            // add sec token type
-            if (!(await CONST.web3_call('getSecTokenTypes', [], nameOverride)).tokenTypes.some(p => p.name == 'NEW_TOK_TYPE_A')) {
-                await CONST.web3_tx('addSecTokenType', [ 'NEW_TOK_TYPE_A', CONST.settlementType.SPOT, CONST.nullFutureArgs, CONST.nullAddr ], OWNER, OWNER_privKey, nameOverride);
+            const contractType = (await CONST.web3_call('getContractType', [], nameOverride));
+            if (contractType == CONST.contractType.COMMODITY) { 
+                //console.log(chalk.dim('beforeAll: COMMODITY...'));
+            
+                // add test types & ccy if not present
+                if (!(await CONST.web3_call('getSecTokenTypes', [], nameOverride)).tokenTypes.some(p => p.name == 'NEW_TOK_TYPE_A')) {
+                    await CONST.web3_tx('addSecTokenType', [ 'NEW_TOK_TYPE_A', CONST.settlementType.SPOT, CONST.nullFutureArgs, CONST.nullAddr ], OWNER, OWNER_privKey, nameOverride);
+                }
+                if (!(await CONST.web3_call('getCcyTypes', [], nameOverride)).ccyTypes.some(p => p.name == 'NEW_CCY_TYPE_A')) {
+                    await CONST.web3_tx('addCcyType', [ 'NEW_CCY_TYPE_A', 'cents', 2 ], OWNER, OWNER_privKey, nameOverride);
+                }
             }
-
-            // add ccy type
-            if (!(await CONST.web3_call('getCcyTypes', [], nameOverride)).ccyTypes.some(p => p.name == 'NEW_CCY_TYPE_A')) {
-                await CONST.web3_tx('addCcyType', [ 'NEW_CCY_TYPE_A', 'cents', 2 ], OWNER, OWNER_privKey, nameOverride);
+            else if (contractType == CONST.contractType.CASHFLOW_CONTROLLER) { 
+                //console.log(chalk.dim('beforeAll: CASHFLOW_CONTROLLER...'));
+                //...
+            }
+            else if (contractType == CONST.contractType.CASHFLOW_BASE) { 
+                //console.log(chalk.dim('beforeAll: CASHFLOW_BASE...'));
+                //...
             }
         }
     });
-
         async function whitelistAndSeal(p) {
             const nameOverride = p ? p.nameOverride : undefined;
             const addrOverride = p ? p.addrOverride : undefined;
@@ -105,8 +127,8 @@ describe(`Contract Web3 Interface`, async () => {
             // WL & seal
             const sealedStatus = await CONST.web3_call('getContractSeal', [], nameOverride, addrOverride);
             var allWhitelisted = await CONST.web3_call('getWhitelist', [], nameOverride, addrOverride);
-            console.log(`(${addrOverride}) allWhitelisted.length`, allWhitelisted.length);
-            console.log(`(${addrOverride}) sealedStatus`, sealedStatus);
+            //console.log(`(${addrOverride}) allWhitelisted.length`, allWhitelisted.length);
+            //console.log(`(${addrOverride}) sealedStatus`, sealedStatus);
             //if (sealedStatus == false) {
 
                 // setup whitelist: reserved/internal
@@ -120,9 +142,9 @@ describe(`Contract Web3 Interface`, async () => {
                     }
                     WHITE_RESERVED.push({ndx: whiteNdx, addr: x.addr, privKey: x.privKey});
                 }
-                console.log(chalk.inverse(`(${addrOverride}) SETUP RESERVED WL (count=${wlMany.length}) last whiteNdx=${whiteNdx}...`));
                 if (sealedStatus == false) { try {
                     if (wlMany.length > 0) {
+                        console.log(chalk.inverse(`(${addrOverride}) SETUP RESERVED WL (count=${wlMany.length}) last whiteNdx=${whiteNdx}...`));
                         await CONST.web3_tx('whitelistMany', [ wlMany ], OWNER, OWNER_privKey, nameOverride, addrOverride);
                     }
                 } catch(ex) { console.warn(ex); } }
@@ -138,9 +160,9 @@ describe(`Contract Web3 Interface`, async () => {
                     }
                     WHITE_MINTERS.push({ndx: whiteNdx, addr: x.addr, privKey: x.privKey});
                 }
-                console.log(chalk.inverse(`(${addrOverride}) SETUP MINTERS WL (count=${wlMany.length}) last whiteNdx=${whiteNdx}...`));
                 if (sealedStatus == false) { try {
                     if (wlMany.length > 0) {
+                        console.log(chalk.inverse(`(${addrOverride}) SETUP MINTERS WL (count=${wlMany.length}) last whiteNdx=${whiteNdx}...`));
                         await CONST.web3_tx('whitelistMany', [ wlMany ], OWNER, OWNER_privKey, nameOverride, addrOverride);
                     }
                 } catch(ex) { console.warn(ex); } }
@@ -156,9 +178,9 @@ describe(`Contract Web3 Interface`, async () => {
                     }
                     WHITE_BUYERS.push({ndx: whiteNdx, addr: x.addr, privKey: x.privKey});
                 }
-                console.log(chalk.inverse(`(${addrOverride}) SETUP BUYERS WL (count=${wlMany.length}) last whiteNdx=${whiteNdx}...`));
                 if (sealedStatus == false) { try {
                     if (wlMany.length > 0) {
+                        console.log(chalk.inverse(`(${addrOverride}) SETUP BUYERS WL (count=${wlMany.length}) last whiteNdx=${whiteNdx}...`));
                         await CONST.web3_tx('whitelistMany', [ wlMany ], OWNER, OWNER_privKey, nameOverride, addrOverride);
                     }
                 } catch(ex) { console.warn(ex); } }
@@ -176,17 +198,15 @@ describe(`Contract Web3 Interface`, async () => {
                     }
                     TEST_ACCOUNTS.push({ndx: whiteNdx, addr: x.addr, privKey: x.privKey});
                 }
-                console.log(chalk.inverse(`(${addrOverride}) SETUP TEST ACCOUNTS WL (count=${wlMany.length}) last whiteNdx=${whiteNdx}...`));
-                if (sealedStatus == false) { await whitelistChunked(wlMany, OWNER, OWNER_privKey); }
+                if (sealedStatus == false && wlMany.length > 0) { 
+                    console.log(chalk.inverse(`(${addrOverride}) SETUP TEST ACCOUNTS WL (count=${wlMany.length}) last whiteNdx=${whiteNdx}...`));
+                    await whitelistChunked(wlMany, OWNER, OWNER_privKey);
+                }
                 submittedToWhitelist.concat(wlMany);
-
                     async function whitelistChunked(wlMany, OWNER, OWNER_privKey) {
                         if (wlMany.length > 0) {
                             const wlChunked = _.chunk(wlMany, 50);
-                            //console.log('wlMany', wlMany);
-                            //console.log('wlChunked', wlChunked);
                             for (let chunk of wlChunked) {
-                                //console.log('chunk', chunk);
                                 try {
                                     await CONST.web3_tx('whitelistMany', [ chunk ], OWNER, OWNER_privKey, nameOverride, addrOverride);
                                 } catch(ex) { console.warn(ex); }
@@ -196,12 +216,12 @@ describe(`Contract Web3 Interface`, async () => {
 
                 // dbg - get counts & whitelist
                 allWhitelisted = await CONST.web3_call('getWhitelist', [], nameOverride, addrOverride);
-                console.log(chalk.inverse(`(${addrOverride}) DONE WHITELISTING...`));
-                console.log(`(${addrOverride}) allWhitelisted.length: `, allWhitelisted.length);
+                //console.log(chalk.inverse(`(${addrOverride}) DONE WHITELISTING...`));
+                //console.log(`(${addrOverride}) allWhitelisted.length: `, allWhitelisted.length);
                 //console.dir(allWhitelisted);
                 //console.dir(submittedToWhitelist);
                 const allSubmittedPresent = _.every(submittedToWhitelist, p => allWhitelisted.includes(p));
-                console.log(`(${addrOverride}) allSubmittedPresent: `, allSubmittedPresent);
+                //console.log(`(${addrOverride}) allSubmittedPresent: `, allSubmittedPresent);
                 assert(allSubmittedPresent == true, '!!!');
 
                 // seal
@@ -214,8 +234,58 @@ describe(`Contract Web3 Interface`, async () => {
             // }
         }
 
-    it(`web3 direct - multi - should be able to mint multiple batches for all whitelist minters`, async () => {
-        if (!EXEC_TEST_ACTIONS) { console.log('skipping (!EXEC_TEST_ACTIONS)'); return; }
+    it(`web3 direct - UNI (CFT-B) - should be able to mint a uni-batch for an issuer`, async function() {
+        const nameOverride = process.env.ADD_TYPE__CONTRACT_NAME;
+        if (!EXEC_TEST_ACTIONS) { this.skip(); return; }
+        if ((await CONST.web3_call('getContractType', [], nameOverride)) != CONST.contractType.CASHFLOW_BASE) { this.skip(); return; }
+
+        // (test data) get the test issuer/minter account that corresponds with the base type
+        const contractSymbol = (await CONST.web3_call('symbol', [], nameOverride));
+        console.log('contractSymbol', contractSymbol);
+        var issuerAddr;
+        switch (contractSymbol) {
+            case 'WCO1': issuerAddr = '0xB40Fa157cd1BC446bF8EC834354eC7db5bEd9603'; break;
+            case 'SBG1': issuerAddr = '0xBA9e2F4653657DdC9F3d5721bf6B785Cdb6B52bc'; break;
+            case 'WBL1': issuerAddr = '0x28F4D53563aC6adBC670Ef5Ad00f47375f87841C'; break;
+            default: throw (`Unknown contract symbol ${contractSymbol}`);
+        }
+        console.log('issuerAddr', issuerAddr);
+
+        // check not already minted for this type - query cashflowData's issuer field
+        const cfd = (await CONST.web3_call('getCashflowData', [], nameOverride));
+        console.log('cfd.issuer', cfd.issuer);
+
+        // mint through controller, with sample test data
+        //process.env.CONTRACT_TYPE = 'CASHFLOW_CONTROLLER';
+        //const batches = (await CONST.web3_call('', []));
+        //...
+
+        //const curTokTypes = (await CONST.web3_call('getSecTokenTypes', [])).tokenTypes;
+        // for (var whiteNdx = 0; whiteNdx < WHITE_MINTERS.length ; whiteNdx++) {
+        //     const WM = WHITE_MINTERS[whiteNdx];
+        //     console.group(chalk.inverse(`MINTING FOR ${WM.addr}...`));
+        //     for (var batchNdx = 0; batchNdx < BATCHES_PER_WHITE_MINTER ; batchNdx++) {
+        //         const batchFees = {
+        //             ccy_mirrorFee: false,
+        //             ccy_perMillion: 0,
+        //             fee_fixed: batchNdx * 10,
+        //             fee_percBips: batchNdx * 5,
+        //             fee_min: batchNdx * 10,
+        //             fee_max: batchNdx * 50,
+        //         };
+        //         const origCcyFee_percBips_ExFee = batchFees.fee_percBips;
+        //         await CONST.web3_tx('mintSecTokenBatch', [
+        //             (batchNdx % curTokTypes.length) + 1, ((batchNdx+1) * 1000000), 1, WM.addr, batchFees, origCcyFee_percBips_ExFee, [], [],
+        //         ], OWNER, OWNER_privKey);
+        //     }
+        //     console.groupEnd();
+        // }
+    });
+
+    it(`web3 direct - multi - should be able to mint multiple batches for all whitelist minters`, async function() {
+        const nameOverride = process.env.ADD_TYPE__CONTRACT_NAME;
+        if (!EXEC_TEST_ACTIONS) { this.skip(); return; }
+        if ((await CONST.web3_call('getContractType', [], nameOverride)) != CONST.contractType.COMMODITY) { this.skip(); return; }
 
         const curTokTypes = (await CONST.web3_call('getSecTokenTypes', [])).tokenTypes;
         for (var whiteNdx = 0; whiteNdx < WHITE_MINTERS.length ; whiteNdx++) {
@@ -240,8 +310,10 @@ describe(`Contract Web3 Interface`, async () => {
         }
     });
 
-    it(`web3 direct - multi - should be able to fund (tokens & ccy), trade & withdraw (tokens & ccy) for all whitelist buyers`, async () => {
-        if (!EXEC_TEST_ACTIONS) { console.log('skipping (!EXEC_TEST_ACTIONS)'); return; }
+    it(`web3 direct - multi - should be able to fund (tokens & ccy), trade & withdraw (tokens & ccy) for all whitelist buyers`, async function () {
+        const nameOverride = process.env.ADD_TYPE__CONTRACT_NAME;
+        if (!EXEC_TEST_ACTIONS) { this.skip(); return; }
+        if ((await CONST.web3_call('getContractType', [], nameOverride)) != CONST.contractType.COMMODITY) { this.skip(); return; }
 
         const curTokTypes = (await CONST.web3_call('getSecTokenTypes', [])).tokenTypes;
         const ccyTypes = (await CONST.web3_call('getCcyTypes', [])).ccyTypes;

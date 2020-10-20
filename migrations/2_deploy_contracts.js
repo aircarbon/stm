@@ -23,6 +23,9 @@ const { db } = require('../../utils-server/dist');
 //
 //    `export INSTANCE_ID=UAT_SD && node process_sol_js && truffle migrate --network ropsten_ac -f 2 --to 2 --reset`
 //    `export INSTANCE_ID=UAT_SD_x3 && node process_sol_js && truffle migrate --network ropsten_ac -f 2 --to 2 --reset`
+//    `export INSTANCE_ID=UAT_SD_SBGLand && node process_sol_js && truffle migrate --network ropsten_ac -f 2 --to 2 --reset`
+//    `export INSTANCE_ID=UAT_SD_WilsonAndCo && node process_sol_js && truffle migrate --network ropsten_ac -f 2 --to 2 --reset`
+//    `export INSTANCE_ID=UAT_SD_WorldbridgeLand && node process_sol_js && truffle migrate --network ropsten_ac -f 2 --to 2 --reset`
 //
 
 module.exports = async function (deployer) {
@@ -40,11 +43,17 @@ module.exports = async function (deployer) {
         case 'PROD_56': console.log((`Deploying (AWS PROD / BSC 56 MAINNET) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`)); break;
 
         // SD
-        case 'DEV_SD': console.log((`Deploying (AWS DEV / DEV [controller + 2 default base types] for SDAX) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`)); break;
-        case 'UAT_SD': console.log((`Deploying (AWS DEV / UAT [controller + 2 default base types] for SDAX) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`)); break;
-        case 'UAT_SD_x3': console.log((`Deploying (AWS DEV / UAT [additional base type #3] for SDAX) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`)); break;
-
-        default: console.log(chalk.red.bold.inverse(`Unknown INSTANCE_ID (${process.env.INSTANCE_ID})`)); process.exit(1);
+        case 'DEV_SD': console.log((`Deploying (AWS DEV / DEV [controller w/ 0 default base types] for SDAX) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`)); break;
+        case 'UAT_SD': console.log((`Deploying (AWS DEV / UAT [controller w/ 0 default base types] for SDAX) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`)); break;
+        //case 'UAT_SD_x3': console.log((`Deploying (AWS DEV / UAT [additional base type #3] for SDAX) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`)); break;
+        default: 
+            if (process.env.INSTANCE_ID.startsWith('UAT_SD_')) {
+                console.log((`Deploying (AWS DEV / UAT [additional base type] for SDAX) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`));
+            }
+            else {
+                console.log(chalk.red.bold.inverse(`Unknown INSTANCE_ID (${process.env.INSTANCE_ID})`));
+                process.exit(1);
+            }
     }
     console.log(chalk.red('process.env.NETWORK_ID'.padEnd(30, '.')), process.env.NETWORK_ID);
     console.log(chalk.red('process.env.CONTRACT_TYPE'.padEnd(30, '.')), process.env.CONTRACT_TYPE);

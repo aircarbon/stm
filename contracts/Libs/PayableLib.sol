@@ -270,6 +270,7 @@ library PayableLib {
                 ret.qty_issuanceMax = issueBatch.mintedQty;
                 ret.qty_issuanceRemaining = uint256(issuerSt.currentQty);
                 ret.qty_issuanceSold = uint256(issueBatch.mintedQty) - uint256(issuerSt.currentQty);
+                ret.issuer = issueBatch.originator;
             }
         }
         return ret;
