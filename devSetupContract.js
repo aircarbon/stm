@@ -15,7 +15,7 @@ module.exports = {
         const O = await CONST.getAccountAndKey(0);
 
         if ((await CONST.web3_call('getContractType', [], nameOverride)) == CONST.contractType.COMMODITY) {
-            console.log(chalk.inverse('devSetupContract >> commodity contract...'));
+            console.log(chalk.italic('devSetupContract >> commodity contract...'));
 
             // add spot types
             const spotTypes = (await CONST.web3_call('getSecTokenTypes', [], nameOverride)).tokenTypes.filter(p => p.settlementType == CONST.settlementType.SPOT);
@@ -44,7 +44,7 @@ module.exports = {
             } else console.log(chalk.gray(`owner ledger already set; nop.`));
         }
         else if (await CONST.web3_call('getContractType', [], nameOverride) == CONST.contractType.CASHFLOW_BASE) {
-            console.log(chalk.inverse('devSetupContract >> base cashflow contract...'));
+            console.log(chalk.italic('devSetupContract >> base cashflow contract...'));
 
             // base cashflow - unitype
             const spotTypes = (await CONST.web3_call('getSecTokenTypes', [], nameOverride)).tokenTypes.filter(p => p.settlementType == CONST.settlementType.SPOT);
@@ -63,7 +63,7 @@ module.exports = {
             }
         }
         else if (await CONST.web3_call('getContractType', [], nameOverride) == CONST.contractType.CASHFLOW_CONTROLLER) {
-            console.log(chalk.inverse('devSetupContract >> cashflow controller contract...'));
+            console.log(chalk.italic('devSetupContract >> cashflow controller contract...'));
 
             // cashflow controller - aggregates/exposes linked base cashflows as token-types - no direct token-types
             ;

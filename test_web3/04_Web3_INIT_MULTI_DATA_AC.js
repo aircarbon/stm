@@ -61,7 +61,7 @@ describe(`Contract Web3 Interface`, async () => {
     //             ("export INSTANCE_ID=UAT_SD_x3 && mocha test_web3 --timeout 10000000 --exit")              // "
     //
 
-    CONST.consoleOutput(false);
+    //CONST.consoleOutput(false);
 
     // TODO: add action(s) for CFT-B types -- minting uni-batch if not already present... (for testing flow...)
 
@@ -236,10 +236,19 @@ describe(`Contract Web3 Interface`, async () => {
 
     it(`web3 direct - UNI (CFT-B) - should be able to mint a uni-batch for an issuer`, async function() {
         const nameOverride = process.env.ADD_TYPE__CONTRACT_NAME;
-        const testTypeName = process.env.ADD_TYPE__TYPE_NAME;
         if (!EXEC_TEST_ACTIONS) { this.skip(); return; }
         if ((await CONST.web3_call('getContractType', [], nameOverride)) != CONST.contractType.CASHFLOW_BASE) { this.skip(); return; }
+        
+        const testTypeName = process.env.ADD_TYPE__TYPE_NAME;
+        const mintQty = process.env.ADD_TYPE__UNIMINT_qty;
+        const wei_currentPrice = process.env.ADD_TYPE__ISSUER_wei_currentPrice;
+        const cents_currentPrice = process.env.ADD_TYPE__ISSUER_cents_currentPrice;
+        const qty_saleAllocation = process.env.ADD_TYPE__ISSUER_qty_saleAllocation;
         if (testTypeName === undefined) throw('Undefined ADD_TYPE__TYPE_NAME');
+        if (mintQty === undefined) throw('Undefined ADD_TYPE__UNIMINT_qty');
+        if (wei_currentPrice === undefined) throw('Undefined ADD_TYPE__ISSUER_wei_currentPrice');
+        if (cents_currentPrice === undefined) throw('Undefined ADD_TYPE__ISSUER_cents_currentPrice');
+        if (qty_saleAllocation === undefined) throw('Undefined ADD_TYPE__ISSUER_qty_saleAllocation');
 
         // (test data) get the test issuer/minter account that corresponds with the base type
         const contractSymbol = (await CONST.web3_call('symbol', [], nameOverride));
@@ -282,7 +291,6 @@ describe(`Contract Web3 Interface`, async () => {
         //console.log('cfd.issuer', cfd.issuer);
         if (cfd.issuer == CONST.nullAddr) { // not yet issued
             console.log(chalk.inverse(`Minting uni-batch of ${contractSymbol} for issuer ${issuerAddr}...`));
-            CONST.consoleOutput(true);
 
             // mint through controller, with sample test data
             process.env.CONTRACT_TYPE = 'CASHFLOW_CONTROLLER';
@@ -292,7 +300,7 @@ describe(`Contract Web3 Interface`, async () => {
             console.log('testType', testType);
             await CONST.web3_tx('mintSecTokenBatch', [
                 testType.id,
-                1000000,
+                mintQty,
                 1, //mintSecTokenCount
                 issuerAddr,
                 CONST.nullFees,
@@ -312,29 +320,28 @@ describe(`Contract Web3 Interface`, async () => {
             console.log('issuerLedger', issuerLedger);
         }
         else {
-            console.log(chalk.dim(`${contractSymbol} already has uni-batch minted for ${cfd.issuer}; nop.`));
+            console.log(chalk.gray.dim(`${contractSymbol} already has uni-batch minted for ${cfd.issuer}; nop.`));
         }
 
-        //const curTokTypes = (await CONST.web3_call('getSecTokenTypes', [])).tokenTypes;
-        // for (var whiteNdx = 0; whiteNdx < WHITE_MINTERS.length ; whiteNdx++) {
-        //     const WM = WHITE_MINTERS[whiteNdx];
-        //     console.group(chalk.inverse(`MINTING FOR ${WM.addr}...`));
-        //     for (var batchNdx = 0; batchNdx < BATCHES_PER_WHITE_MINTER ; batchNdx++) {
-        //         const batchFees = {
-        //             ccy_mirrorFee: false,
-        //             ccy_perMillion: 0,
-        //             fee_fixed: batchNdx * 10,
-        //             fee_percBips: batchNdx * 5,
-        //             fee_min: batchNdx * 10,
-        //             fee_max: batchNdx * 50,
-        //         };
-        //         const origCcyFee_percBips_ExFee = batchFees.fee_percBips;
-        //         await CONST.web3_tx('mintSecTokenBatch', [
-        //             (batchNdx % curTokTypes.length) + 1, ((batchNdx+1) * 1000000), 1, WM.addr, batchFees, origCcyFee_percBips_ExFee, [], [],
-        //         ], OWNER, OWNER_privKey);
-        //     }
-        //     console.groupEnd();
-        // }
+        // set issuer values: price, and sale quantity
+        console.log(chalk.inverse(`Setting uni-batch issuer values for issuer ${issuerAddr}...`));
+        process.env.CONTRACT_TYPE = 'CASHFLOW_BASE';
+        var issuerPrivKey;
+        for (let ndx=0; ndx < 100 ; ndx++) {
+            const x = await CONST.getAccountAndKey(ndx);
+            //console.log(`${x.addr} ${issuerAddr}`);
+            if (x.addr.toLowerCase() == issuerAddr.toLowerCase()) { 
+                issuerPrivKey = x.privKey;
+                break;
+            }
+        }
+        if (issuerPrivKey === undefined) throw(`Failed to lookup privkey for issuer ${issuerAddr}`);
+        const fundTx = await CONST.web3_sendEthTestAddr(0, issuerAddr, "0.02"); // fund issuer: to pay for setIssuerValues TX
+        await CONST.web3_tx('setIssuerValues', [
+            wei_currentPrice,
+            cents_currentPrice,
+            qty_saleAllocation
+        ], issuerAddr, issuerPrivKey, nameOverride);
     });
 
     it(`web3 direct - multi - should be able to mint multiple batches for all whitelist minters`, async function() {

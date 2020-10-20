@@ -14,7 +14,7 @@ async function addSecTokenType() {
     const O = await CONST.getAccountAndKey(0);
 
     if ((await CONST.web3_call('getContractType', [], nameOverride)) == CONST.contractType.COMMODITY) {
-        console.log(chalk.inverse('devSetupContract >> commodity contract...'));
+        //console.log(chalk.inverse('devSetupContract >> commodity contract...'));
         // add spot types
         const spotTypes = (await CONST.web3_call('getSecTokenTypes', [], nameOverride)).tokenTypes.filter(p => p.settlementType == CONST.settlementType.SPOT);
         //console.log('spotTypes', spotTypes.map(p => { return { id: p.id, name: p.name } }));
