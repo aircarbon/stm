@@ -101,7 +101,7 @@ module.exports = {
             return wallet;
         },
         network_id: "*", // 3
-        gas: 7800000,
+        gas: 6500000,
         gasPrice: web3.utils.toWei(GWEI_TESTNET, "gwei"),
         networkCheckTimeout: 30000,
         //confirmations: 1,    // # of confs to wait between deployments. (default: 0)
@@ -118,7 +118,7 @@ module.exports = {
             return wallet;
         },
         network_id: "*", // 3
-        gas: 7800000,
+        gas: 6500000,
         gasPrice: web3.utils.toWei(GWEI_TESTNET, "gwei"),
         confirmations: 1,
         skipDryRun: true,
@@ -146,7 +146,7 @@ module.exports = {
             return wallet;
         },
         network_id: "42101",
-        gas: 7800000,
+        gas: 6500000,
         gasPrice: web3.utils.toWei("1", "kwei")
     },
 

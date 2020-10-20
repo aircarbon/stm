@@ -54,11 +54,11 @@ describe(`Contract Web3 Interface`, async () => {
     //   AWS DEMO: ("export INSTANCE_ID=DEMO && mocha test_web3 --timeout 10000000 --exit")
     //   AWS PROD: ("export INSTANCE_ID=PROD_56 && mocha test_web3 --timeout 10000000 --exit")
     //
-    // AWS UAT_SD: ("export INSTANCE_ID=UAT_SD && mocha test_web3 --timeout 10000000 --exit")                 // WL & seal controller + default base types
-    //             ("export INSTANCE_ID=UAT_SD_x3 && mocha test_web3 --timeout 10000000 --exit")              // WL & seal additional base type, uni-mint & setIssuerValues
-    //             ("export INSTANCE_ID=UAT_SD_SBGLand && mocha test_web3 --timeout 10000000 --exit")         // "
+    // AWS UAT_SD: ("export INSTANCE_ID=UAT_SD && mocha test_web3 --timeout 10000000 --exit")                 // WL & seal controller (+ any attached base types)
+    //             ("export INSTANCE_ID=UAT_SD_SBGLand && mocha test_web3 --timeout 10000000 --exit")         // WL & seal additional base type, uni-mint & setIssuerValues
     //             ("export INSTANCE_ID=UAT_SD_WilsonAndCo && mocha test_web3 --timeout 10000000 --exit")     // "
     //             ("export INSTANCE_ID=UAT_SD_WorldbridgeLand && mocha test_web3 --timeout 10000000 --exit") // "
+    //             ("export INSTANCE_ID=UAT_SD_x3 && mocha test_web3 --timeout 10000000 --exit")              // "
     //
 
     CONST.consoleOutput(false);

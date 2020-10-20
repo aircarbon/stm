@@ -51,47 +51,47 @@ contract StPayable is
     //      TODO: pri3 - wallet auto-converts
 
 //#if process.env.CONTRACT_TYPE === 'CASHFLOW_BASE'
-//#     StructLib.CashflowStruct cashflowData;
-//# 
-//#     function getCashflowData() public view returns(StructLib.CashflowStruct memory) {
-//#         return PayableLib.getCashflowData(ld, cashflowData);
-//#     }
-//#     
-//#     address public chainlinkAggregator_ethUsd;
-//#     //address public chainlinkAggregator_btcUsd;
-//# 
-//#     // function get_btcUsd() public view returns(int256) {
-//#     //     if (chainlinkAggregator_btcUsd == address(0x0)) return 100000000; // $1 - cents*satoshis
-//#     //     IChainlinkAggregator ref = IChainlinkAggregator(chainlinkAggregator_btcUsd);
-//#     //     return ref.latestAnswer();
-//#     // }
-//# 
-//#     function get_ethUsd() public view returns(int256) {
-//#         return PayableLib.get_ethUsd(chainlinkAggregator_ethUsd);
-//#         // if (chainlinkAggregator_ethUsd == address(0x0)) return 100000000; // $1 - cents*satoshis
-//#         // IChainlinkAggregator ref = IChainlinkAggregator(chainlinkAggregator_ethUsd);
-//#         // return ref.latestAnswer();
-//#     }
-//# 
-//#     //function() external  payable  onlyWhenReadWrite() {
-//#     receive() external payable onlyWhenReadWrite() {
-//#         PayableLib.pay(ld, std, ctd, cashflowData, globalFees, owner, get_ethUsd());
-//#     }
-//# 
-//#     function setIssuerValues(
-//#         // address issuer,
-//#         // StructLib.SetFeeArgs memory originatorFee,
-//#         uint256 wei_currentPrice,
-//#         uint256 cents_currentPrice,
-//#         uint256 qty_saleAllocation
-//#     ) external onlyWhenReadWrite() {
-//#         PayableLib.setIssuerValues(
-//#             ld,
-//#             cashflowData,
-//#             wei_currentPrice,
-//#             cents_currentPrice,
-//#             qty_saleAllocation
-//#         );
-//#     }
+    StructLib.CashflowStruct cashflowData;
+
+    function getCashflowData() public view returns(StructLib.CashflowStruct memory) {
+        return PayableLib.getCashflowData(ld, cashflowData);
+    }
+    
+    address public chainlinkAggregator_ethUsd;
+    //address public chainlinkAggregator_btcUsd;
+
+    // function get_btcUsd() public view returns(int256) {
+    //     if (chainlinkAggregator_btcUsd == address(0x0)) return 100000000; // $1 - cents*satoshis
+    //     IChainlinkAggregator ref = IChainlinkAggregator(chainlinkAggregator_btcUsd);
+    //     return ref.latestAnswer();
+    // }
+
+    function get_ethUsd() public view returns(int256) {
+        return PayableLib.get_ethUsd(chainlinkAggregator_ethUsd);
+        // if (chainlinkAggregator_ethUsd == address(0x0)) return 100000000; // $1 - cents*satoshis
+        // IChainlinkAggregator ref = IChainlinkAggregator(chainlinkAggregator_ethUsd);
+        // return ref.latestAnswer();
+    }
+
+    //function() external  payable  onlyWhenReadWrite() {
+    receive() external payable onlyWhenReadWrite() {
+        PayableLib.pay(ld, std, ctd, cashflowData, globalFees, owner, get_ethUsd());
+    }
+
+    function setIssuerValues(
+        // address issuer,
+        // StructLib.SetFeeArgs memory originatorFee,
+        uint256 wei_currentPrice,
+        uint256 cents_currentPrice,
+        uint256 qty_saleAllocation
+    ) external onlyWhenReadWrite() {
+        PayableLib.setIssuerValues(
+            ld,
+            cashflowData,
+            wei_currentPrice,
+            cents_currentPrice,
+            qty_saleAllocation
+        );
+    }
 //#endif
 }
