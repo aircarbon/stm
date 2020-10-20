@@ -236,29 +236,84 @@ describe(`Contract Web3 Interface`, async () => {
 
     it(`web3 direct - UNI (CFT-B) - should be able to mint a uni-batch for an issuer`, async function() {
         const nameOverride = process.env.ADD_TYPE__CONTRACT_NAME;
+        const testTypeName = process.env.ADD_TYPE__TYPE_NAME;
         if (!EXEC_TEST_ACTIONS) { this.skip(); return; }
         if ((await CONST.web3_call('getContractType', [], nameOverride)) != CONST.contractType.CASHFLOW_BASE) { this.skip(); return; }
+        if (testTypeName === undefined) throw('Undefined ADD_TYPE__TYPE_NAME');
 
         // (test data) get the test issuer/minter account that corresponds with the base type
         const contractSymbol = (await CONST.web3_call('symbol', [], nameOverride));
-        console.log('contractSymbol', contractSymbol);
+        //console.log('contractSymbol', contractSymbol);
         var issuerAddr;
+        const testMeta = [
+            {
+                "TXT_PROJECT_NAME": "Worldbridge Land",
+                "LIST_COUNTRY": "KH",
+                "URL_PROJECT": "https://oxleyworldbridge.com.kh/",
+                "IPFS_PROJECT_DOCUMENT": "QmUwY1VfL5kMxUUdFjmKnbVdaiMYi7UwYVBRWX4A2wom9g",
+                "URL_PROJECT_IMG": "http://worldbridgeland.com.kh/img/logo.jpg"
+            },
+            {
+                "TXT_PROJECT_NAME": "SBG Land",
+                "LIST_COUNTRY": "MY",
+                "URL_PROJECT": "http://www.sbgland.com/index.html",
+                "IPFS_PROJECT_DOCUMENT": "QmSeQNDt9rRCeusrnAsW4m7uTDXjso3KtAsw9aBA4bRCnh",
+                "URL_PROJECT_IMG": "http://www.sbgland.com/images/logo.jpg"
+            },
+            {
+                "TXT_PROJECT_NAME": "Wilson and Company",
+                "LIST_COUNTRY": "US",
+                "URL_PROJECT": "https://www.wilsonco.com/service/land-development",
+                "IPFS_PROJECT_DOCUMENT": "QmV5AVmqTyCj2Mx1B83N2VggEJVF6jDuq2fJysCCPKSAFk",
+                "URL_PROJECT_IMG": "https://www.wilsonco.com/sites/default/files/wilson_final.png"
+            }
+        ];
+        var meta;
         switch (contractSymbol) {
-            case 'WCO1': issuerAddr = '0xB40Fa157cd1BC446bF8EC834354eC7db5bEd9603'; break;
-            case 'SBG1': issuerAddr = '0xBA9e2F4653657DdC9F3d5721bf6B785Cdb6B52bc'; break;
-            case 'WBL1': issuerAddr = '0x28F4D53563aC6adBC670Ef5Ad00f47375f87841C'; break;
+            case 'WBL1': issuerAddr = '0x28F4D53563aC6adBC670Ef5Ad00f47375f87841C'; meta = testMeta[0]; break;
+            case 'SBG1': issuerAddr = '0xBA9e2F4653657DdC9F3d5721bf6B785Cdb6B52bc'; meta = testMeta[1]; break;
+            case 'WCO1': issuerAddr = '0xB40Fa157cd1BC446bF8EC834354eC7db5bEd9603'; meta = testMeta[2]; break;
             default: throw (`Unknown contract symbol ${contractSymbol}`);
         }
-        console.log('issuerAddr', issuerAddr);
+        //console.log('issuerAddr', issuerAddr);
 
         // check not already minted for this type - query cashflowData's issuer field
         const cfd = (await CONST.web3_call('getCashflowData', [], nameOverride));
-        console.log('cfd.issuer', cfd.issuer);
+        //console.log('cfd.issuer', cfd.issuer);
+        if (cfd.issuer == CONST.nullAddr) { // not yet issued
+            console.log(chalk.inverse(`Minting uni-batch of ${contractSymbol} for issuer ${issuerAddr}...`));
+            CONST.consoleOutput(true);
 
-        // mint through controller, with sample test data
-        //process.env.CONTRACT_TYPE = 'CASHFLOW_CONTROLLER';
-        //const batches = (await CONST.web3_call('', []));
-        //...
+            // mint through controller, with sample test data
+            process.env.CONTRACT_TYPE = 'CASHFLOW_CONTROLLER';
+            const spotTypes = (await CONST.web3_call('getSecTokenTypes', [])).tokenTypes.filter(p => p.settlementType == CONST.settlementType.SPOT);
+            const testType = spotTypes.find(p => p.name == testTypeName);
+            if (testType === undefined) throw(`Failed to find type '${testTypeName}' in controller`);
+            console.log('testType', testType);
+            await CONST.web3_tx('mintSecTokenBatch', [
+                testType.id,
+                1000000,
+                1, //mintSecTokenCount
+                issuerAddr,
+                CONST.nullFees,
+                0, //origCcyFee_percBips_ExFee,
+                Object.keys(meta),
+                Object.values(meta)
+            ], OWNER, OWNER_privKey);
+
+            // read back uni-batch
+            const maxBatchId = await CONST.web3_call('getSecTokenBatch_MaxId', []);
+            console.log('maxBatchId', maxBatchId);
+            const lastBatch = await CONST.web3_call('getSecTokenBatch', [maxBatchId]);
+            console.log('lastBatch', lastBatch);
+
+            // read issuer's ledger entry
+            const issuerLedger = await CONST.web3_call('getLedgerEntry', [issuerAddr]);
+            console.log('issuerLedger', issuerLedger);
+        }
+        else {
+            console.log(chalk.dim(`${contractSymbol} already has uni-batch minted for ${cfd.issuer}; nop.`));
+        }
 
         //const curTokTypes = (await CONST.web3_call('getSecTokenTypes', [])).tokenTypes;
         // for (var whiteNdx = 0; whiteNdx < WHITE_MINTERS.length ; whiteNdx++) {
