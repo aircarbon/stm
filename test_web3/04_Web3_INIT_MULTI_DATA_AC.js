@@ -320,7 +320,7 @@ describe(`Contract Web3 Interface`, async () => {
             console.log('issuerLedger', issuerLedger);
         }
         else {
-            console.log(chalk.gray.dim(`${contractSymbol} already has uni-batch minted for ${cfd.issuer}; nop.`));
+            console.log(chalk.gray(`${contractSymbol} already has uni-batch minted for ${cfd.issuer}; nop.`));
         }
 
         // set issuer values: price, and sale quantity
