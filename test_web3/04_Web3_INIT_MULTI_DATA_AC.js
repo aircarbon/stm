@@ -326,24 +326,22 @@ describe(`Contract Web3 Interface`, async () => {
         // set issuer values: price, and sale quantity
         console.log(chalk.inverse(`Setting uni-batch issuer values for issuer ${issuerAddr}...`));
         process.env.CONTRACT_TYPE = 'CASHFLOW_BASE';
-        var issuerPrivKey;
-        for (let ndx=0; ndx < 100 ; ndx++) {
-            const x = await CONST.getAccountAndKey(ndx);
-            //console.log(`${x.addr} ${issuerAddr}`);
-            if (x.addr.toLowerCase() == issuerAddr.toLowerCase()) { 
-                issuerPrivKey = x.privKey;
-                break;
-            }
-        }
-        if (issuerPrivKey === undefined) throw(`Failed to lookup privkey for issuer ${issuerAddr}`);
-        const fundTx = await CONST.web3_sendEthTestAddr(0, issuerAddr, "0.02"); // fund issuer: to pay for setIssuerValues TX
+        // var issuerPrivKey;
+        // for (let ndx=0; ndx < 100 ; ndx++) {
+        //     const x = await CONST.getAccountAndKey(ndx);
+        //     //console.log(`${x.addr} ${issuerAddr}`);
+        //     if (x.addr.toLowerCase() == issuerAddr.toLowerCase()) { 
+        //         issuerPrivKey = x.privKey;
+        //         break;
+        //     }
+        // }
+        // if (issuerPrivKey === undefined) throw(`Failed to lookup privkey for issuer ${issuerAddr}`);
+        //const fundTx = await CONST.web3_sendEthTestAddr(0, issuerAddr, "0.02"); // fund issuer: to pay for setIssuerValues TX
         await CONST.web3_tx('setIssuerValues', [
             wei_currentPrice,
             cents_currentPrice,
             qty_saleAllocation
-        ], issuerAddr, issuerPrivKey, nameOverride);
-
-        //       (2) make setCfd callable by owner
+        ], OWNER, OWNER_privKey, nameOverride); //issuerAddr, issuerPrivKey, nameOverride);
     });
 
     it(`web3 direct - multi - should be able to mint multiple batches for all whitelist minters`, async function() {
