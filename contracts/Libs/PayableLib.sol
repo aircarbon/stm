@@ -30,14 +30,15 @@ library PayableLib {
         StructLib.CashflowStruct storage cashflowData,
         uint256 wei_currentPrice,
         uint256 cents_currentPrice,
-        uint256 qty_saleAllocation
+        uint256 qty_saleAllocation,
+        address owner
     ) public {
         require(ld._contractSealed, "Contract is not sealed");
 
         require(ld._batches_currentMax_id == 1, "Bad cashflow request: no minted batch");
         StructLib.SecTokenBatch storage issueBatch = ld._batches[1];
 
-        require(msg.sender == issueBatch.originator, "Bad cashflow request: access denied");
+        require(msg.sender == issueBatch.originator || msg.sender == owner, "Bad cashflow request: access denied");
 
         // qty_saleAllocation is the *cummulative* amount allowable for sale;
         // i.e. it can't be set < the currently sold amount, and it can't be set > the total issuance uni-batch size

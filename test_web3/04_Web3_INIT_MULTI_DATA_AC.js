@@ -306,7 +306,7 @@ describe(`Contract Web3 Interface`, async () => {
                 CONST.nullFees,
                 0, //origCcyFee_percBips_ExFee,
                 Object.keys(meta),
-                Object.values(meta)
+                Object.values(meta) 
             ], OWNER, OWNER_privKey);
 
             // read back uni-batch
@@ -342,6 +342,8 @@ describe(`Contract Web3 Interface`, async () => {
             cents_currentPrice,
             qty_saleAllocation
         ], issuerAddr, issuerPrivKey, nameOverride);
+
+        //       (2) make setCfd callable by owner
     });
 
     it(`web3 direct - multi - should be able to mint multiple batches for all whitelist minters`, async function() {
