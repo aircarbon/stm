@@ -23,7 +23,7 @@ contract("StMaster", accounts => {
         stm_new = await st.new(
             await stm_cur.getContractType(),
 //#if process.env.CONTRACT_TYPE === 'CASHFLOW_CONTROLLER' || process.env.CONTRACT_TYPE === 'CASHFLOW_BASE'
-            (await stm_cur.getCashflowData()).args,
+//#             (await stm_cur.getCashflowData()).args,
 //#endif
             `${await stm_cur.name()}_V++`,
             `${await stm_cur.version()}_V++`,
@@ -31,9 +31,9 @@ contract("StMaster", accounts => {
             await stm_cur.symbol(),
             await stm_cur.decimals()
 //#if process.env.CONTRACT_TYPE === 'CASHFLOW_CONTROLLER' || process.env.CONTRACT_TYPE === 'CASHFLOW_BASE'
-            ,
-            //await stm_cur.chainlinkAggregator_btcUsd(),
-            await stm_cur.chainlinkAggregator_ethUsd()
+//#             ,
+//#             //await stm_cur.chainlinkAggregator_btcUsd(),
+//#             await stm_cur.chainlinkAggregator_ethUsd()
 //#endif
         );
         console.log(`stm_new: @${stm_new.address} ledgerHash=${await CONST.getLedgerHashcode(stm_new)} / ${await stm_new.name()} ${await stm_new.version()}`);
@@ -47,7 +47,7 @@ contract("StMaster", accounts => {
         const allLedgerOwners = await stm_cur.getLedgerOwners();
         const ledgerEntry = await stm_cur.getLedgerEntry(accounts[0]);
 //#if process.env.CONTRACT_TYPE === 'CASHFLOW_CONTROLLER' || process.env.CONTRACT_TYPE === 'CASHFLOW_BASE'
-        const cashflowData = await stm_cur.getCashflowData();
+//#         const cashflowData = await stm_cur.getCashflowData();
 //#endif
     });
 
