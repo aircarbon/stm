@@ -10,7 +10,7 @@ library StructLib {
     // EVENTS - SHARED (FuturesLib & TransferLib)
     enum TransferType { User, ExchangeFee, OriginatorFee, TakePay, TakePayFee, SettleTake, SettlePay }
     event TransferedLedgerCcy(address indexed from, address indexed to, uint256 ccyTypeId, uint256 amount, TransferType transferType);
-    event ReervedLedgerCcy(address indexed ledgerOwner, uint256 ccyTypeId, uint256 amount);
+    event ReservedLedgerCcy(address indexed ledgerOwner, uint256 ccyTypeId, uint256 amount);
 
     /**
      * @notice Transfers currency across ledger entries
@@ -69,7 +69,7 @@ library StructLib {
 
         if (ld._ledger[ledger].ccyType_reserved[ccyTypeId] != reservedAmount) {
             ld._ledger[ledger].ccyType_reserved[ccyTypeId] = reservedAmount;
-            emit ReervedLedgerCcy(ledger, ccyTypeId, uint256(reservedAmount));
+            emit ReservedLedgerCcy(ledger, ccyTypeId, uint256(reservedAmount));
         }
     }
 
