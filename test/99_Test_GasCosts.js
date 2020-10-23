@@ -8,6 +8,36 @@ const transferHelper = require('../test/transferHelper.js');
 const futuresHelper = require('../test/futuresHelper.js');
 const setupHelper = require('../test/testSetupContract.js');
 
+const sampleMintingKeys = [
+    'TXT_REGISTRY',
+    'TXT_ISSUANCE_SERIAL_BLOCK',
+    'TXT_PROJECT_ID',
+    'TXT_PROJECT_NAME',
+    'URL_PROJECT_IMG',
+    'LIST_COUNTRY',
+    'TXT_PROJECT_TYPE',
+    'INT_UN_SECTORAL_SCOPE_ID',
+    'LIST_ASSOCIATED_SDG_GOALS',
+    'LIST_VERIFIED_SDG_GOALS',
+    'TXT_CO_BENEFIT',
+    'TXT_PROJECT_LOCATION',
+    'TXT_PROJECT_CREDITING_PERIOD',
+    'TXT_PROJECT_AMOUNT_OF_REDUCTIONS',
+    'URL_PROJECT',
+    'INT_UNIT_COUNT',
+    'TXT_VCS_ISSUANCE_SERIAL_RANGE',
+    'TXT_ISSUANCE_SERIAL_START',
+    'TXT_ISSUANCE_SERIAL_END',
+    'DATE_VINTAGE_START',
+    'DATE_VINTAGE_END',
+    'IPFS_PROJECT_FILE',
+    'URL_ISSUANCE',
+    'ISSUANCE_SERIAL_RANGE',
+    'IPFS_PROJECT_DOCUMENT',
+    'IPFS_ISSUANCE_DOCUMENT'
+];
+const sampleMintingValues = [];
+
 contract("StMaster", accounts => {
     var stm;
     var usdFT, usdFT_underlyer, usdFT_refCcy; // usd FT
@@ -19,6 +49,10 @@ contract("StMaster", accounts => {
         
         await setupHelper.whitelistAndSeal({ stm, accounts });
         await setupHelper.setDefaults({ stm, accounts });
+
+        for (let i=0 ; i < sampleMintingKeys.length; i++) {
+            sampleMintingValues.push('TESTMINTING_VALUE_zzzzzzzzzzzzzzzzzzzzz00000000000000000000000_______________LARGE_______')
+        }
 
         // add test FT type - USD
         ccyTypes = (await stm.getCcyTypes()).ccyTypes;
@@ -41,15 +75,20 @@ contract("StMaster", accounts => {
             console.log(`TaddrNdx: ${global.TaddrNdx} - contract @ ${stm.address} (owner: ${accounts[0]})`);
     });
 
-    it(`minting - should have reasonable gas cost for minting of multi-vST batches`, async () => {
-        mintTx = await stm.mintSecTokenBatch(CONST.tokenType.TOK_T1, CONST.GT_CARBON, 1, accounts[global.TaddrNdx], CONST.nullFees, 0, [], [], { from: accounts[0], });
-        await CONST.logGas(web3, mintTx, `Mint  1 vST`);
+    it(`minting - should have reasonable gas cost for minting of vST batches`, async () => {
+        mintTx = await stm.mintSecTokenBatch(CONST.tokenType.TOK_T1, CONST.GT_CARBON, 1, accounts[global.TaddrNdx], CONST.nullFees, 0, sampleMintingKeys, sampleMintingValues, { from: accounts[0], });
+        await CONST.logGas(web3, mintTx, `Mint 1 vST`);
 
         // mintTx = await stm.mintSecTokenBatch(CONST.tokenType.TOK_T1, CONST.GT_CARBON, 5, accounts[global.TaddrNdx], { from: accounts[0], });
         //await CONST.logGas(web3, mintTx, `Mint  5 vST`);
-
         // var mintTx = await stm.mintSecTokenBatch(CONST.tokenType.TOK_T1, CONST.GT_CARBON, 10, accounts[global.TaddrNdx], { from: accounts[0] });
         //await CONST.logGas(web3, mintTx, `Mint 10 vST`);
+    });
+
+    it(`burning - should have reasonable gas cost for burning a partial vST`, async () => {
+        await stm.mintSecTokenBatch(CONST.tokenType.TOK_T1, CONST.GT_CARBON, 1, accounts[global.TaddrNdx], CONST.nullFees, 0, sampleMintingKeys, sampleMintingValues, { from: accounts[0], });
+        const burnTX = await stm.burnTokens(accounts[global.TaddrNdx], CONST.tokenType.TOK_T1, CONST.MT_CARBON, []);
+        await CONST.logGas(web3, burnTX, `Burn partial vST`);
     });
 
     it(`funding - should have reasonable gas cost for funding`, async () => {
@@ -77,7 +116,7 @@ contract("StMaster", accounts => {
     });
 
     it(`transferring tok - should have reasonable gas cost for one-sided 0.5 vST transfer (A -> B), aka. carbon movement`, async () => {
-        await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2,    CONST.KT_CARBON, 1,      accounts[global.TaddrNdx + 0], CONST.nullFees, 0, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2,    CONST.KT_CARBON, 1,      accounts[global.TaddrNdx + 0], CONST.nullFees, 0, sampleMintingKeys, sampleMintingValues, { from: accounts[0] });
         await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, CONST.ccyType.ETH,                      0,                       accounts[global.TaddrNdx + 1], 'TEST');
         const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: accounts[global.TaddrNdx + 0],         ledger_B: accounts[global.TaddrNdx + 1],
@@ -90,7 +129,7 @@ contract("StMaster", accounts => {
     });
 
     it(`trading - should have reasonable gas cost for two-sided transfer`, async () => {
-        await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2,    CONST.KT_CARBON, 1,      accounts[global.TaddrNdx + 0], CONST.nullFees, 0, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2,    CONST.KT_CARBON, 1,      accounts[global.TaddrNdx + 0], CONST.nullFees, 0, sampleMintingKeys, sampleMintingValues, { from: accounts[0] });
         await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, CONST.ccyType.ETH,                      CONST.oneEth_wei,        accounts[global.TaddrNdx + 1], 'TEST');
         const data = await transferHelper.transferLedger({ stm, accounts, 
                  ledger_A: accounts[global.TaddrNdx + 0],         ledger_B: accounts[global.TaddrNdx + 1],
@@ -104,7 +143,7 @@ contract("StMaster", accounts => {
 
     it(`fees (fixed) - should have reasonable gas cost for two-sided transfer (eeu/ccy) (fees on both sides)`, async () => {
         await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, CONST.ccyType.USD,                   CONST.millionCcy_cents,  accounts[global.TaddrNdx + 0], 'TEST');
-        await stm.mintSecTokenBatch(CONST.tokenType.TOK_T1, CONST.KT_CARBON, 1,      accounts[global.TaddrNdx + 1], CONST.nullFees, 0, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.TOK_T1, CONST.KT_CARBON, 1,      accounts[global.TaddrNdx + 1], CONST.nullFees, 0, sampleMintingKeys, sampleMintingValues, { from: accounts[0] });
 
         // set fee structure USD: 100 cents
         const usdFeeFixed_cents = CONST.oneCcy_cents;
@@ -136,7 +175,7 @@ contract("StMaster", accounts => {
 
     it(`fees (fixed) - should have reasonable gas cost for two-sided transfer (eeu/ccy) (fee on ccy)`, async () => {
         await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, CONST.ccyType.USD,                   CONST.millionCcy_cents,  accounts[global.TaddrNdx + 0], 'TEST');
-        await stm.mintSecTokenBatch(CONST.tokenType.TOK_T1, CONST.KT_CARBON, 1,      accounts[global.TaddrNdx + 1], CONST.nullFees, 0, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.TOK_T1, CONST.KT_CARBON, 1,      accounts[global.TaddrNdx + 1], CONST.nullFees, 0, sampleMintingKeys, sampleMintingValues, { from: accounts[0] });
 
         // set fee structure USD: 100 cents
         const usdFeeFixed_cents = CONST.oneCcy_cents;
@@ -165,7 +204,7 @@ contract("StMaster", accounts => {
 
     it(`fees (fixed) - should have reasonable gas cost for two-sided transfer (eeu/ccy) (fee on eeu)`, async () => {
         await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, CONST.ccyType.USD,                   CONST.millionCcy_cents,  accounts[global.TaddrNdx + 0], 'TEST');
-        await stm.mintSecTokenBatch(CONST.tokenType.TOK_T1, CONST.KT_CARBON, 1,      accounts[global.TaddrNdx + 1], CONST.nullFees, 0, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.TOK_T1, CONST.KT_CARBON, 1,      accounts[global.TaddrNdx + 1], CONST.nullFees, 0, sampleMintingKeys, sampleMintingValues, { from: accounts[0] });
 
         // set fee structure USD: 0 cents
         const usdFeeFixed_cents = CONST.oneCcy_cents;
@@ -196,7 +235,7 @@ contract("StMaster", accounts => {
 
     it(`fees (fixed) - should have reasonable gas cost for two-sided transfer (eeu/ccy) (base gas cost: no fees)`, async () => {
         await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, CONST.ccyType.USD,                   CONST.millionCcy_cents,  accounts[global.TaddrNdx + 0], 'TEST');
-        await stm.mintSecTokenBatch(CONST.tokenType.TOK_T1, CONST.KT_CARBON, 1,      accounts[global.TaddrNdx + 1], CONST.nullFees, 0, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.TOK_T1, CONST.KT_CARBON, 1,      accounts[global.TaddrNdx + 1], CONST.nullFees, 0, sampleMintingKeys, sampleMintingValues, { from: accounts[0] });
 
         // set fee structure USD: 0 cents
         const usdFeeFixed_cents = CONST.oneCcy_cents;
@@ -227,7 +266,7 @@ contract("StMaster", accounts => {
 
     it(`fees (percentage) - should have reasonable gas cost for two-sided USD ccy & CORSIA ST transfer (fees on both sides)`, async () => {
         await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, CONST.ccyType.USD,                   CONST.millionCcy_cents,  accounts[global.TaddrNdx + 0], 'TEST');
-        await stm.mintSecTokenBatch(CONST.tokenType.TOK_T1, CONST.KT_CARBON, 1,      accounts[global.TaddrNdx + 1], CONST.nullFees, 0, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.TOK_T1, CONST.KT_CARBON, 1,      accounts[global.TaddrNdx + 1], CONST.nullFees, 0, sampleMintingKeys, sampleMintingValues, { from: accounts[0] });
 
         // set fee structure USD: 100 bp (1%)
         const ccyFeeBips = 100;
@@ -272,7 +311,7 @@ contract("StMaster", accounts => {
 
     it(`fees (percentage) - should have reasonable gas cost for two-sided transfer (eeu/ccy) (fee on ccy)`, async () => {
         await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, CONST.ccyType.USD,                   CONST.millionCcy_cents,  accounts[global.TaddrNdx + 0], 'TEST');
-        await stm.mintSecTokenBatch(CONST.tokenType.TOK_T1, CONST.KT_CARBON, 1,      accounts[global.TaddrNdx + 1], CONST.nullFees, 0, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.TOK_T1, CONST.KT_CARBON, 1,      accounts[global.TaddrNdx + 1], CONST.nullFees, 0, sampleMintingKeys, sampleMintingValues, { from: accounts[0] });
 
         // set fee structure USD: 100 bp (1%)
         const ccyFeeBips = 100;
@@ -317,7 +356,7 @@ contract("StMaster", accounts => {
 
     it(`fees (percentage) - should have reasonable gas cost for two-sided transfer (eeu/ccy) (fee on eeu)`, async () => {
         await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, CONST.ccyType.USD,                   CONST.millionCcy_cents,  accounts[global.TaddrNdx + 0], 'TEST');
-        await stm.mintSecTokenBatch(CONST.tokenType.TOK_T1, CONST.KT_CARBON, 1,      accounts[global.TaddrNdx + 1], CONST.nullFees, 0, [], [], { from: accounts[0] });
+        await stm.mintSecTokenBatch(CONST.tokenType.TOK_T1, CONST.KT_CARBON, 1,      accounts[global.TaddrNdx + 1], CONST.nullFees, 0, sampleMintingKeys, sampleMintingValues, { from: accounts[0] });
 
         // set fee structure USD: 0%
         const ccyFeeBips = 0;

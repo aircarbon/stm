@@ -55,12 +55,12 @@ Then need to populate the whitelist addresses and oracle price setting to our DB
 
 ```sh
 # More usages on dbInit.js
-INSTANCE_ID=local node dbInit.js
+INSTANCE_ID=local && node dbInit.js
 ```
 
 ## Run Tests
-- `truffle compile` or (undocumented) `truffle compile --reset` if it keeps recompiling when there aren't any changes in the Solidity
-- `truffle test --network development`
+- `export INSTANCE_ID=local && node process_sol_js && truffle compile` or (undocumented) `... truffle compile --reset` if it keeps recompiling when there aren't any changes in the Solidity
+- `export INSTANCE_ID=local && node process_sol_js && truffle test --network development`
 
 ## Docs
 - `npx soldoc --output html ./contracts/interfaces/docs/soldoc ./contracts/Interfaces`
