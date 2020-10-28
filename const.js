@@ -56,7 +56,7 @@ const blocksFromMonths = (months) => Math.ceil(blocksFromDays(months * 30.42));
 //
 // MAIN: deployer definitions -- contract ctor() params
 //
-const contractVer = process.env.CONTRACT_VERSION || "0.99i";
+const contractVer = process.env.CONTRACT_VERSION || "0.99k";
 const contractProps = {
     COMMODITY: {
         contractVer: contractVer,

@@ -16,16 +16,18 @@ const { db } = require('../../utils-server/dist');
 // Deploys a contract of type process.env.CONTRACT_TYPE according to defaults in const.js
 // Prefixes the contract name in const.contractProps with (process.env.INSTANCE_ID || 'local'), e.g.
 //
+//   AC various
 //    `export INSTANCE_ID=local && node process_sol_js && truffle migrate --network development -f 2 --to 2 --reset`
 //    `export INSTANCE_ID=DEMO && node process_sol_js && truffle migrate --network test_ac -f 2 --to 2 --reset`
 //    `export INSTANCE_ID=PROD_52101 && node process_sol_js && truffle migrate --network prodnet_ac -f 2 --to 2 --reset`
 //    `export INSTANCE_ID=PROD_56 && node process_sol_js && truffle migrate --network bsc_mainnet_ac -f 2 --to 2 --reset`
 //
-//    `export INSTANCE_ID=UAT_SD && node process_sol_js && truffle migrate --network ropsten_ac -f 2 --to 2 --reset`
-//    `export INSTANCE_ID=UAT_SD_SBGLand && node process_sol_js && truffle migrate --network ropsten_ac -f 2 --to 2 --reset`
-//    `export INSTANCE_ID=UAT_SD_WilsonAndCo && node process_sol_js && truffle migrate --network ropsten_ac -f 2 --to 2 --reset`
-//    `export INSTANCE_ID=UAT_SD_WorldbridgeLand && node process_sol_js && truffle migrate --network ropsten_ac -f 2 --to 2 --reset`
-//    `export INSTANCE_ID=UAT_SD_x3 && node process_sol_js && truffle migrate --network ropsten_ac -f 2 --to 2 --reset`
+//   SD Ropsten 3 (UAT_97... for BSC Testnet)
+//    `export INSTANCE_ID=UAT_3_SD && node process_sol_js && truffle migrate --network ropsten_ac -f 2 --to 2 --reset`
+//    `export INSTANCE_ID=UAT_3_SD_RichGlory && node process_sol_js && truffle migrate --network ropsten_ac -f 2 --to 2 --reset`
+//    `export INSTANCE_ID=UAT_3_SD_SBGLand && node process_sol_js && truffle migrate --network ropsten_ac -f 2 --to 2 --reset`
+//    `export INSTANCE_ID=UAT_3_SD_WilsonAndCo && node process_sol_js && truffle migrate --network ropsten_ac -f 2 --to 2 --reset`
+//    `export INSTANCE_ID=UAT_3_SD_WorldbridgeLand && node process_sol_js && truffle migrate --network ropsten_ac -f 2 --to 2 --reset`
 //
 
 module.exports = async function (deployer) {
@@ -47,7 +49,7 @@ module.exports = async function (deployer) {
         case 'UAT_SD': console.log((`Deploying (AWS DEV / UAT [controller w/ 0 default base types] for SDAX) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`)); break;
         //case 'UAT_SD_x3': console.log((`Deploying (AWS DEV / UAT [additional base type #3] for SDAX) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`)); break;
         default: 
-            if (process.env.INSTANCE_ID.startsWith('UAT_SD_')) {
+            if (process.env.INSTANCE_ID.startsWith('UAT_3_SD_')) {
                 console.log((`Deploying (AWS DEV / UAT [additional base type] for SDAX) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`));
             }
             else {

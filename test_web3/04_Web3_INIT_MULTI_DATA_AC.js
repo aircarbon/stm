@@ -48,17 +48,18 @@ var GRAY, GRAY_privKey;
 describe(`Contract Web3 Interface`, async () => {
 
     //
-    //      Local: ("export INSTANCE_ID=local && mocha test_web3 --timeout 10000000 --exit")
-    //    AWS Dev: ("export INSTANCE_ID=DEV && mocha test_web3 --timeout 10000000 --exit")
-    //    AWS UAT: ("export INSTANCE_ID=UAT && mocha test_web3 --timeout 10000000 --exit")
-    //   AWS DEMO: ("export INSTANCE_ID=DEMO && mocha test_web3 --timeout 10000000 --exit")
-    //   AWS PROD: ("export INSTANCE_ID=PROD_56 && mocha test_web3 --timeout 10000000 --exit")
+    //  AC various
+    //       ("export INSTANCE_ID=local && mocha test_web3 --timeout 10000000 --exit")
+    //       ("export INSTANCE_ID=DEV && mocha test_web3 --timeout 10000000 --exit")
+    //       ("export INSTANCE_ID=UAT && mocha test_web3 --timeout 10000000 --exit")
+    //       ("export INSTANCE_ID=DEMO && mocha test_web3 --timeout 10000000 --exit")
+    //       ("export INSTANCE_ID=PROD_56 && mocha test_web3 --timeout 10000000 --exit")
     //
-    // AWS UAT_SD: ("export INSTANCE_ID=UAT_SD && mocha test_web3 --timeout 10000000 --exit")                 // WL & seal controller (+ any attached base types)
-    //             ("export INSTANCE_ID=UAT_SD_SBGLand && mocha test_web3 --timeout 10000000 --exit")         // WL & seal additional base type, uni-mint & setIssuerValues
-    //             ("export INSTANCE_ID=UAT_SD_WilsonAndCo && mocha test_web3 --timeout 10000000 --exit")     // "
-    //             ("export INSTANCE_ID=UAT_SD_WorldbridgeLand && mocha test_web3 --timeout 10000000 --exit") // "
-    //             ("export INSTANCE_ID=UAT_SD_x3 && mocha test_web3 --timeout 10000000 --exit")              // "
+    //   SD Ropsten 3 (UAT_97... for BSC Testnet)
+    //       ("export INSTANCE_ID=UAT_3_SD && mocha test_web3 --timeout 10000000 --exit")                 // WL & seal controller (+ any attached base types)
+    //       ("export INSTANCE_ID=UAT_3_SD_SBGLand && mocha test_web3 --timeout 10000000 --exit")         // WL & seal additional base type, uni-mint & setIssuerValues
+    //       ("export INSTANCE_ID=UAT_3_SD_WilsonAndCo && mocha test_web3 --timeout 10000000 --exit")     // "
+    //       ("export INSTANCE_ID=UAT_3_SD_WorldbridgeLand && mocha test_web3 --timeout 10000000 --exit") // "
     //
 
     //CONST.consoleOutput(false);
@@ -259,22 +260,37 @@ describe(`Contract Web3 Interface`, async () => {
                 "TXT_PROJECT_NAME": "Worldbridge Land",
                 "LIST_COUNTRY": "KH",
                 "URL_PROJECT": "https://oxleyworldbridge.com.kh/",
-                "IPFS_PROJECT_DOCUMENT": "QmUwY1VfL5kMxUUdFjmKnbVdaiMYi7UwYVBRWX4A2wom9g",
+                "IPFS_PROJECT_DOCUMENT_SALES": "QmUwY1VfL5kMxUUdFjmKnbVdaiMYi7UwYVBRWX4A2wom9g",
+                "IPFS_PROJECT_DOCUMENT_LEGAL": "QmWume2gdUoKs3Z8xyDQfPQcZwJHgaKmW9z5ZWDaR4BXNQ",
+                "IPFS_PROJECT_DOCUMENT_PROSPECTUS": "Qmcpmej7yYxoFQ9SGVG6UXP2WU2FHTn9i6sigSdZvsGsLm",
                 "URL_PROJECT_IMG": "http://worldbridgeland.com.kh/img/logo.jpg"
             },
             {
                 "TXT_PROJECT_NAME": "SBG Land",
                 "LIST_COUNTRY": "MY",
                 "URL_PROJECT": "http://www.sbgland.com/index.html",
-                "IPFS_PROJECT_DOCUMENT": "QmSeQNDt9rRCeusrnAsW4m7uTDXjso3KtAsw9aBA4bRCnh",
+                "IPFS_PROJECT_DOCUMENT_SALES": "QmSeQNDt9rRCeusrnAsW4m7uTDXjso3KtAsw9aBA4bRCnh",
+                "IPFS_PROJECT_DOCUMENT_LEGAL": "QmWume2gdUoKs3Z8xyDQfPQcZwJHgaKmW9z5ZWDaR4BXNQ",
+                "IPFS_PROJECT_DOCUMENT_PROSPECTUS": "Qmcpmej7yYxoFQ9SGVG6UXP2WU2FHTn9i6sigSdZvsGsLm",
                 "URL_PROJECT_IMG": "http://www.sbgland.com/images/logo.jpg"
             },
             {
                 "TXT_PROJECT_NAME": "Wilson and Company",
                 "LIST_COUNTRY": "US",
                 "URL_PROJECT": "https://www.wilsonco.com/service/land-development",
-                "IPFS_PROJECT_DOCUMENT": "QmV5AVmqTyCj2Mx1B83N2VggEJVF6jDuq2fJysCCPKSAFk",
+                "IPFS_PROJECT_DOCUMENT_SALES": "QmV5AVmqTyCj2Mx1B83N2VggEJVF6jDuq2fJysCCPKSAFk",
+                "IPFS_PROJECT_DOCUMENT_LEGAL": "QmWume2gdUoKs3Z8xyDQfPQcZwJHgaKmW9z5ZWDaR4BXNQ",
+                "IPFS_PROJECT_DOCUMENT_PROSPECTUS": "Qmcpmej7yYxoFQ9SGVG6UXP2WU2FHTn9i6sigSdZvsGsLm",
                 "URL_PROJECT_IMG": "https://www.wilsonco.com/sites/default/files/wilson_final.png"
+            },
+            {
+                "TXT_PROJECT_NAME": "Rich Glory Mantin Heights",
+                "LIST_COUNTRY": "HK",
+                "URL_PROJECT": "https://www.richglory.hk/index.php/home/",
+                "IPFS_PROJECT_DOCUMENT_SALES": "QmPxiP4Uz7Stmyb8Vg1UidDUZt4BfGV2LDtCk25zGbUxav",
+                "IPFS_PROJECT_DOCUMENT_LEGAL": "QmeEfjysofDp4H3PrH2fKE65eQMDYBn16Ug1jcG2zW1Ebv",
+                "IPFS_PROJECT_DOCUMENT_PROSPECTUS": "Qmcpmej7yYxoFQ9SGVG6UXP2WU2FHTn9i6sigSdZvsGsLm",
+                "URL_PROJECT_IMG": "https://www.richglory.hk/wp-content/uploads/2019/11/400dpiLogoH.png"
             }
         ];
         var meta;
@@ -282,6 +298,7 @@ describe(`Contract Web3 Interface`, async () => {
             case 'WBL1': issuerAddr = '0x28F4D53563aC6adBC670Ef5Ad00f47375f87841C'; meta = testMeta[0]; break;
             case 'SBG1': issuerAddr = '0xBA9e2F4653657DdC9F3d5721bf6B785Cdb6B52bc'; meta = testMeta[1]; break;
             case 'WCO1': issuerAddr = '0xB40Fa157cd1BC446bF8EC834354eC7db5bEd9603'; meta = testMeta[2]; break;
+            case 'RG01': issuerAddr = '0x8Ca0BdC5a17e1BdE78A000125Df93f3BDa651B30'; meta = testMeta[3]; break;
             default: throw (`Unknown contract symbol ${contractSymbol}`);
         }
         //console.log('issuerAddr', issuerAddr);
