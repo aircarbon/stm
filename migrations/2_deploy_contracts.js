@@ -59,7 +59,7 @@ module.exports = async function (deployer) {
             if (process.env.INSTANCE_ID.startsWith('UAT_3_SD') || process.env.INSTANCE_ID.startsWith('UAT_97_SD')) {
                 console.log((`Deploying (AWS DEV / UAT [additional base type] for SDAX) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`));
             }
-            if (process.env.INSTANCE_ID.startsWith('local')) {
+            else if (process.env.INSTANCE_ID.startsWith('local')) {
                 console.log((`Deploying localhost contract instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`));
             }
             else {

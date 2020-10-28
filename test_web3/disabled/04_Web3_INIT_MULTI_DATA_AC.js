@@ -70,8 +70,6 @@ describe(`Contract Web3 Interface`, async () => {
 
     //CONST.consoleOutput(false);
 
-    // TODO: add action(s) for CFT-B types -- minting uni-batch if not already present... (for testing flow...)
-
     // setup
     before(async function () {
         

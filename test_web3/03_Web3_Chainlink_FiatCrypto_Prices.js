@@ -16,7 +16,8 @@ process.env.WEB3_NETWORK_ID = Number(process.env.NETWORK_ID || 888);
 describe(`Contract Web3 Interface`, async () => {
 
     //
-    //  Local: ("export INSTANCE_ID=local && mocha test_web3 --timeout 10000000 --exit")
+    //               Local: ("export INSTANCE_ID=local && mocha test_web3 --timeout 10000000 --exit")
+    //   SD BSC Testnet 97: ("export INSTANCE_ID=UAT_97_SD_RichGlory && mocha test_web3 --timeout 10000000 --exit")
     //
 
     before(async function () {
