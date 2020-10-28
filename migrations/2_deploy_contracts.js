@@ -22,12 +22,15 @@ const { db } = require('../../utils-server/dist');
 //    `export INSTANCE_ID=PROD_52101 && node process_sol_js && truffle migrate --network prodnet_ac -f 2 --to 2 --reset`
 //    `export INSTANCE_ID=PROD_56 && node process_sol_js && truffle migrate --network bsc_mainnet_ac -f 2 --to 2 --reset`
 //
-//   SD Ropsten 3 (UAT_97... for BSC Testnet)
+//   SD Ropsten 3
 //    `export INSTANCE_ID=UAT_3_SD && node process_sol_js && truffle migrate --network ropsten_ac -f 2 --to 2 --reset`
 //    `export INSTANCE_ID=UAT_3_SD_RichGlory && node process_sol_js && truffle migrate --network ropsten_ac -f 2 --to 2 --reset`
 //    `export INSTANCE_ID=UAT_3_SD_SBGLand && node process_sol_js && truffle migrate --network ropsten_ac -f 2 --to 2 --reset`
 //    `export INSTANCE_ID=UAT_3_SD_WilsonAndCo && node process_sol_js && truffle migrate --network ropsten_ac -f 2 --to 2 --reset`
 //    `export INSTANCE_ID=UAT_3_SD_WorldbridgeLand && node process_sol_js && truffle migrate --network ropsten_ac -f 2 --to 2 --reset`
+//
+//   SD BSC Testnet 97
+//    `export INSTANCE_ID=UAT_97_SD && node process_sol_js && truffle migrate --network bsc_testnet_bn -f 2 --to 2 --reset`
 //
 
 module.exports = async function (deployer) {
@@ -49,7 +52,7 @@ module.exports = async function (deployer) {
         case 'UAT_SD': console.log((`Deploying (AWS DEV / UAT [controller w/ 0 default base types] for SDAX) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`)); break;
         //case 'UAT_SD_x3': console.log((`Deploying (AWS DEV / UAT [additional base type #3] for SDAX) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`)); break;
         default: 
-            if (process.env.INSTANCE_ID.startsWith('UAT_3_SD')) {
+            if (process.env.INSTANCE_ID.startsWith('UAT_3_SD') || process.env.INSTANCE_ID.startsWith('UAT_97_SD')) {
                 console.log((`Deploying (AWS DEV / UAT [additional base type] for SDAX) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`));
             }
             else {

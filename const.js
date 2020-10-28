@@ -31,7 +31,8 @@ const GAS_USD = 30; // ETHUSD (for ETH mainnet) or BNBUSD (for BSC mainnet)
 // misc
 const WEB3_NONCE_REPLACE = undefined; // set to replace/drop a slow mainnet TX
 const WEB3_GWEI_GAS_BID = 
-    process.env.INSTANCE_ID === 'PROD_56'    ? '20' // BSC -- see: truffle_config.js re. gas cost
+    process.env.INSTANCE_ID === 'PROD_56'    ? '20' // BSC mainnet -- see: truffle_config.js re. gas cost
+  : process.env.INSTANCE_ID === 'UAT_97_SD'  ? '20' // BSC testnet
   : process.env.INSTANCE_ID === 'PROD_52101' ? '1'  // AC privnet
   : process.env.INSTANCE_ID === 'PROD_1'     ? '80' // ETH mainnet
                                              : '5';
@@ -358,6 +359,18 @@ function getTestContextWeb3(useWs) {
                 name: 'bsc_mainnet_ac',
                 networkId: 56,
                 chainId: 56,
+            },
+            'petersburg'
+        ) } }
+
+        // BSC Testnet - Binace BSC node
+        : process.env.WEB3_NETWORK_ID == 97 ? { web3: new Web3(useWs ? '???###' : 'https://data-seed-prebsc-1-s1.binance.org:8545'),
+            ethereumTxChain: { common: EthereumJsCommon.forCustomChain(
+            'ropsten', // forCustomChain() requires a "known" name!?
+            {
+                name: 'bsc_testnet_bn',
+                networkId: 97,
+                chainId: 97,
             },
             'petersburg'
         ) } }
