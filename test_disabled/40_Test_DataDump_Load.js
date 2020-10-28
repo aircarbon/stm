@@ -22,7 +22,7 @@ contract("StMaster", accounts => {
         // explorers need unique contract names?!
         stm_new = await st.new(
             await stm_cur.getContractType(),
-//#if process.env.CONTRACT_TYPE === 'CASHFLOW_CONTROLLER' || process.env.CONTRACT_TYPE === 'CASHFLOW_BASE'
+//#if process.env.CONTRACT_TYPE === 'CASHFLOW_BASE'
             (await stm_cur.getCashflowData()).args,
 //#endif
             `${await stm_cur.name()}_V++`,
@@ -30,10 +30,11 @@ contract("StMaster", accounts => {
             await stm_cur.unit(),
             await stm_cur.symbol(),
             await stm_cur.decimals()
-//#if process.env.CONTRACT_TYPE === 'CASHFLOW_CONTROLLER' || process.env.CONTRACT_TYPE === 'CASHFLOW_BASE'
+//#if process.env.CONTRACT_TYPE === 'CASHFLOW_BASE'
             ,
             //await stm_cur.chainlinkAggregator_btcUsd(),
-            await stm_cur.chainlinkAggregator_ethUsd()
+            await stm_cur.chainlinkAggregator_ethUsd(),
+            await stm_cur.chainlinkAggregator_usdEth()
 //#endif
         );
         console.log(`stm_new: @${stm_new.address} ledgerHash=${await CONST.getLedgerHashcode(stm_new)} / ${await stm_new.name()} ${await stm_new.version()}`);

@@ -22,6 +22,10 @@ const { db } = require('../../utils-server/dist');
 //    `export INSTANCE_ID=PROD_52101 && node process_sol_js && truffle migrate --network prodnet_ac -f 2 --to 2 --reset`
 //    `export INSTANCE_ID=PROD_56 && node process_sol_js && truffle migrate --network bsc_mainnet_ac -f 2 --to 2 --reset`
 //
+//   SD local Ganache
+//    `export INSTANCE_ID=local_SD && node process_sol_js && truffle migrate --network development -f 2 --to 2 --reset`
+//    `export INSTANCE_ID=local_SD_RichGlory && node process_sol_js && truffle migrate --network development -f 2 --to 2 --reset`
+//
 //   SD Ropsten 3
 //    `export INSTANCE_ID=UAT_3_SD && node process_sol_js && truffle migrate --network ropsten_ac -f 2 --to 2 --reset`
 //    `export INSTANCE_ID=UAT_3_SD_RichGlory && node process_sol_js && truffle migrate --network ropsten_ac -f 2 --to 2 --reset`
@@ -31,13 +35,13 @@ const { db } = require('../../utils-server/dist');
 //
 //   SD BSC Testnet 97
 //    `export INSTANCE_ID=UAT_97_SD && node process_sol_js && truffle migrate --network bsc_testnet_bn -f 2 --to 2 --reset`
+//    `export INSTANCE_ID=UAT_97_SD_RichGlory && node process_sol_js && truffle migrate --network bsc_testnet_bn -f 2 --to 2 --reset`
 //
 
 module.exports = async function (deployer) {
     const O = await CONST.getAccountAndKey(0);
     switch (process.env.INSTANCE_ID) {
-        case undefined:
-        case 'local': console.log((`Deploying localhost contract instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`)); break;
+        case undefined: console.log((`Deploying localhost contract instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`)); break;
 
         // AC
         case 'DEV': console.log((`Deploying (AWS DEV / DEV) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`)); break;
@@ -54,6 +58,9 @@ module.exports = async function (deployer) {
         default: 
             if (process.env.INSTANCE_ID.startsWith('UAT_3_SD') || process.env.INSTANCE_ID.startsWith('UAT_97_SD')) {
                 console.log((`Deploying (AWS DEV / UAT [additional base type] for SDAX) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`));
+            }
+            if (process.env.INSTANCE_ID.startsWith('local')) {
+                console.log((`Deploying localhost contract instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`));
             }
             else {
                 console.log(chalk.red.bold.inverse(`Unknown INSTANCE_ID (${process.env.INSTANCE_ID})`));

@@ -31,11 +31,11 @@ const GAS_USD = 30; // ETHUSD (for ETH mainnet) or BNBUSD (for BSC mainnet)
 // misc
 const WEB3_NONCE_REPLACE = undefined; // set to replace/drop a slow mainnet TX
 const WEB3_GWEI_GAS_BID = 
-    process.env.INSTANCE_ID === 'PROD_56'    ? '20' // BSC mainnet -- see: truffle_config.js re. gas cost
-  : process.env.INSTANCE_ID === 'UAT_97_SD'  ? '20' // BSC testnet
-  : process.env.INSTANCE_ID === 'PROD_52101' ? '1'  // AC privnet
-  : process.env.INSTANCE_ID === 'PROD_1'     ? '80' // ETH mainnet
-                                             : '5';
+    process.env.INSTANCE_ID === 'PROD_56'         ? '20' // BSC mainnet -- see: truffle_config.js re. gas cost
+  : process.env.INSTANCE_ID.startsWith('UAT_97')  ? '20' // BSC testnet
+  : process.env.INSTANCE_ID === 'PROD_52101'      ? '1'  // AC privnet
+  : process.env.INSTANCE_ID === 'PROD_1'          ? '80' // ETH mainnet
+                                                  : '5';
 const WEB3_GAS_LIMIT = 5000000;
 
 // CFT helpers
@@ -109,43 +109,58 @@ module.exports = {
     chainlinkAggregators: {
         "1": { // ETH mainnet
             btcUsd: '0xF5fff180082d6017036B771bA883025c654BC935',
-            ethUsd: '0x79fEbF6B9F76853EDBcBc913e6aAE8232cFB9De9'
+            ethUsd: '0x79fEbF6B9F76853EDBcBc913e6aAE8232cFB9De9',
+            usdEth: '0x0000000000000000000000000000000000000000'
         },
         "3": { // ropsten
             btcUsd: '0x882906a758207FeA9F21e0bb7d2f24E561bd0981',
-            ethUsd: '0x8468b2bDCE073A157E560AA4D9CcF6dB1DB98507'
+            ethUsd: '0x8468b2bDCE073A157E560AA4D9CcF6dB1DB98507',
+            usdEth: '0x0000000000000000000000000000000000000000'
         },
         "4": { // rinkeby
             btcUsd: '0x5498BB86BC934c8D34FDA08E81D444153d0D06aD',
-            ethUsd: '0x0bF4e7bf3e1f6D6Dc29AA516A33134985cC3A5aA'
+            ethUsd: '0x0bF4e7bf3e1f6D6Dc29AA516A33134985cC3A5aA',
+            usdEth: '0x0000000000000000000000000000000000000000'
         },
         "42101": { // AC sidechain testnet
             btcUsd: '0x0000000000000000000000000000000000000000',
-            ethUsd: '0x0000000000000000000000000000000000000000'
+            ethUsd: '0x0000000000000000000000000000000000000000',
+            usdEth: '0x0000000000000000000000000000000000000000'
         },
         "52101": { // AC sidechain prodnet
             btcUsd: '0x0000000000000000000000000000000000000000',
-            ethUsd: '0x0000000000000000000000000000000000000000'
+            ethUsd: '0x0000000000000000000000000000000000000000',
+            usdEth: '0x0000000000000000000000000000000000000000'
         },
         "56": { // BSC mainnet - TODO: BSC has ChainLinks...? https://docs.binance.org/smart-chain/developer/link.html
             btcUsd: '0x0000000000000000000000000000000000000000',
-            ethUsd: '0x0000000000000000000000000000000000000000'
+            ethUsd: '0x0000000000000000000000000000000000000000',
+            usdEth: '0x0000000000000000000000000000000000000000'
+        },
+        "97": { // BSC testnet...? https://docs.chain.link/docs/reference-data-contracts-binance-smart-chain#price-feeds
+            btcUsd: '0x0000000000000000000000000000000000000000',
+            ethUsd: '0x0000000000000000000000000000000000000000',
+            usdEth: '0x5f466C6daFDC6f3ffAd683622Edbfe214D388B18' // TODO -- BUSD/ETH - can't find eth/usd on BSC testnet...
         },
         "888": { // dev - DM
             btcUsd: '0x0000000000000000000000000000000000000000',
-            ethUsd: '0x0000000000000000000000000000000000000000'
+            ethUsd: '0x0000000000000000000000000000000000000000',
+            usdEth: '0x0000000000000000000000000000000000000000'
         },
         "889": { // dev - Dung
             btcUsd: '0x0000000000000000000000000000000000000000',
-            ethUsd: '0x0000000000000000000000000000000000000000'
+            ethUsd: '0x0000000000000000000000000000000000000000',
+            usdEth: '0x0000000000000000000000000000000000000000'
         },
         "890": { // dev - Vince
             btcUsd: '0x0000000000000000000000000000000000000000',
-            ethUsd: '0x0000000000000000000000000000000000000000'
+            ethUsd: '0x0000000000000000000000000000000000000000',
+            usdEth: '0x0000000000000000000000000000000000000000'
         },
         "891": { // dev - Ankur
             btcUsd: '0x0000000000000000000000000000000000000000',
-            ethUsd: '0x0000000000000000000000000000000000000000'
+            ethUsd: '0x0000000000000000000000000000000000000000',
+            usdEth: '0x0000000000000000000000000000000000000000'
         },
     },
 

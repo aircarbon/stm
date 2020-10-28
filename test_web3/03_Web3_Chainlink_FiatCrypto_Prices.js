@@ -16,9 +16,7 @@ process.env.WEB3_NETWORK_ID = Number(process.env.NETWORK_ID || 888);
 describe(`Contract Web3 Interface`, async () => {
 
     //
-    //           Local: ("export INSTANCE_ID=local && mocha test_web3 --timeout 10000000 --exit")
-    //         AWS Dev: ("export INSTANCE_ID=DEV && export CONTRACT_TYPE=COMMODITY && mocha test_web3 --timeout 10000000 --exit")
-    //         AWS UAT: ("export INSTANCE_ID=UAT && export CONTRACT_TYPE=COMMODITY && mocha test_web3 --timeout 10000000 --exit")
+    //  Local: ("export INSTANCE_ID=local && mocha test_web3 --timeout 10000000 --exit")
     //
 
     before(async function () {
@@ -31,11 +29,12 @@ describe(`Contract Web3 Interface`, async () => {
     // TODO: WalletDetailSend in SCP re. SCP upgrades for auto-convert on receipt (esp. server mode)
     //
 
-    // it(`web3 direct - chainlink - should be able to get reference data contract values`, async () => {
-    //     //console.log('addr_btcUsd', await CONST.web3_call('chainlinkAggregator_btcUsd', []));
-    //     console.log('addr_ethUsd', await CONST.web3_call('chainlinkAggregator_ethUsd', []));
-    //     //console.log('get_btcUsd', (await CONST.web3_call('get_btcUsd', [])).toString());
-    //     console.log('get_ethUsd', (await CONST.web3_call('get_ethUsd', [])).toString());
-    // });
+    it(`web3 direct - chainlink - should be able to get reference data contract values`, async () => {
+        console.log('addr_ethUsd', await CONST.web3_call('chainlinkAggregator_ethUsd', [], process.env.ADD_TYPE__CONTRACT_NAME));
+        console.log('get_ethUsd', (await CONST.web3_call('get_ethUsd', [], process.env.ADD_TYPE__CONTRACT_NAME)).toString());
+
+        console.log('addr_usdEth', await CONST.web3_call('chainlinkAggregator_usdEth', [], process.env.ADD_TYPE__CONTRACT_NAME));
+        console.log('get_usdEth', (await CONST.web3_call('get_usdEth', [], process.env.ADD_TYPE__CONTRACT_NAME)).toString());
+    });
 });
 

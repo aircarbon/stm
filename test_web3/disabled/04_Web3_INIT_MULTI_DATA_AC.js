@@ -55,6 +55,10 @@ describe(`Contract Web3 Interface`, async () => {
     //       ("export INSTANCE_ID=DEMO && mocha test_web3 --timeout 10000000 --exit")
     //       ("export INSTANCE_ID=PROD_56 && mocha test_web3 --timeout 10000000 --exit")
     //
+    //   SD local Ganache
+    //       ("export INSTANCE_ID=local_SD && mocha test_web3 --timeout 10000000 --exit")                 // WL & seal controller (+ any attached base types)
+    //       ("export INSTANCE_ID=local_SD_SBGLand && mocha test_web3 --timeout 10000000 --exit")         // WL & seal additional base type, uni-mint & setIssuerValues
+    //
     //   SD Ropsten 3
     //       ("export INSTANCE_ID=UAT_3_SD && mocha test_web3 --timeout 10000000 --exit")                 // WL & seal controller (+ any attached base types)
     //       ("export INSTANCE_ID=UAT_3_SD_SBGLand && mocha test_web3 --timeout 10000000 --exit")         // WL & seal additional base type, uni-mint & setIssuerValues
