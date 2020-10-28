@@ -49,7 +49,7 @@ module.exports = async function (deployer) {
         case 'UAT_SD': console.log((`Deploying (AWS DEV / UAT [controller w/ 0 default base types] for SDAX) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`)); break;
         //case 'UAT_SD_x3': console.log((`Deploying (AWS DEV / UAT [additional base type #3] for SDAX) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`)); break;
         default: 
-            if (process.env.INSTANCE_ID.startsWith('UAT_3_SD_')) {
+            if (process.env.INSTANCE_ID.startsWith('UAT_3_SD')) {
                 console.log((`Deploying (AWS DEV / UAT [additional base type] for SDAX) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`));
             }
             else {
