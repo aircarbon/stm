@@ -59,6 +59,7 @@ contract StPayable is
     
     address public chainlinkAggregator_ethUsd;
     address public chainlinkAggregator_usdEth;
+    address public chainlinkAggregator_bnbUsd;
     //address public chainlinkAggregator_btcUsd;
 
     // function get_btcUsd() public view returns(int256) {
@@ -68,15 +69,18 @@ contract StPayable is
     // }
 
     function get_ethUsd() public view returns(int256) {
-        return PayableLib.get_ethUsd(chainlinkAggregator_ethUsd);
+        return PayableLib.get_chainlinkRefPrice(chainlinkAggregator_ethUsd);
     }
     function get_usdEth() public view returns(int256) {
-        return PayableLib.get_ethUsd(chainlinkAggregator_usdEth);
+        return PayableLib.get_chainlinkRefPrice(chainlinkAggregator_usdEth);
+    }
+    function get_bnbUsd() public view returns(int256) {
+        return PayableLib.get_chainlinkRefPrice(chainlinkAggregator_bnbUsd);
     }
 
     //function() external  payable  onlyWhenReadWrite() {
     receive() external payable onlyWhenReadWrite() {
-        PayableLib.pay(ld, std, ctd, cashflowData, globalFees, owner, get_ethUsd());
+        PayableLib.pay(ld, std, ctd, cashflowData, globalFees, owner, get_ethUsd(), get_usdEth(), get_bnbUsd());
     }
 
     function setIssuerValues(

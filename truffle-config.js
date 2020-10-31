@@ -195,7 +195,7 @@ module.exports = {
     bsc_testnet_bn: {
         provider: function() {
             var wallet = new HDWalletProvider(DEV_MNEMONIC,
-                'https://data-seed-prebsc-1-s1.binance.org:8545', 
+                'https://ac-prod1.aircarbon.co:8545', //'https://data-seed-prebsc-1-s1.binance.org:8545', 
                 0, 1000);
             var nonceTracker = new NonceTrackerSubprovider();
             wallet.engine._providers.unshift(nonceTracker);

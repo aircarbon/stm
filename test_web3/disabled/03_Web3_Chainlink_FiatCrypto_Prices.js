@@ -36,6 +36,9 @@ describe(`Contract Web3 Interface`, async () => {
 
         console.log('addr_usdEth', await CONST.web3_call('chainlinkAggregator_usdEth', [], process.env.ADD_TYPE__CONTRACT_NAME));
         console.log('get_usdEth', (await CONST.web3_call('get_usdEth', [], process.env.ADD_TYPE__CONTRACT_NAME)).toString());
+        
+        console.log('addr_bnbUsd', await CONST.web3_call('chainlinkAggregator_bnbUsd', [], process.env.ADD_TYPE__CONTRACT_NAME));
+        console.log('get_bnbUsd', (await CONST.web3_call('get_bnbUsd', [], process.env.ADD_TYPE__CONTRACT_NAME)).toString());
     });
 });
 

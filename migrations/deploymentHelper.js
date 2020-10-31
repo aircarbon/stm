@@ -98,7 +98,8 @@ module.exports = {
                ,
              //CONST.chainlinkAggregators[process.env.NETWORK_ID].btcUsd,    // 24k
                CONST.chainlinkAggregators[process.env.NETWORK_ID].ethUsd,
-               CONST.chainlinkAggregators[process.env.NETWORK_ID].usdEth
+               CONST.chainlinkAggregators[process.env.NETWORK_ID].usdEth,
+               CONST.chainlinkAggregators[process.env.NETWORK_ID].bnbUsd,
 //#endif
             ).then(async stm => {
                 //console.dir(stm);

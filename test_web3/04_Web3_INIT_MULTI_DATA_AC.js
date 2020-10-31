@@ -67,6 +67,7 @@ describe(`Contract Web3 Interface`, async () => {
     //
     //   SD BSC Testnet 97
     //       ("export INSTANCE_ID=UAT_97_SD && mocha test_web3 --timeout 10000000 --exit") 
+    //       ("export INSTANCE_ID=UAT_97_SD_SBGLand && mocha test_web3 --timeout 10000000 --exit")
 
     //CONST.consoleOutput(false);
 

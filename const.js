@@ -57,7 +57,7 @@ const blocksFromMonths = (months) => Math.ceil(blocksFromDays(months * 30.42));
 //
 // MAIN: deployer definitions -- contract ctor() params
 //
-const contractVer = process.env.CONTRACT_VERSION || "0.99l";
+const contractVer = process.env.CONTRACT_VERSION || "0.99n";
 const contractProps = {
     COMMODITY: {
         contractVer: contractVer,
@@ -110,57 +110,68 @@ module.exports = {
         "1": { // ETH mainnet
             btcUsd: '0xF5fff180082d6017036B771bA883025c654BC935',
             ethUsd: '0x79fEbF6B9F76853EDBcBc913e6aAE8232cFB9De9',
-            usdEth: '0x0000000000000000000000000000000000000000'
+            usdEth: '0x0000000000000000000000000000000000000000',
+            bnbUsd: '0x0000000000000000000000000000000000000000',
         },
         "3": { // ropsten
             btcUsd: '0x882906a758207FeA9F21e0bb7d2f24E561bd0981',
             ethUsd: '0x8468b2bDCE073A157E560AA4D9CcF6dB1DB98507',
-            usdEth: '0x0000000000000000000000000000000000000000'
+            usdEth: '0x0000000000000000000000000000000000000000',
+            bnbUsd: '0x0000000000000000000000000000000000000000',
         },
         "4": { // rinkeby
             btcUsd: '0x5498BB86BC934c8D34FDA08E81D444153d0D06aD',
             ethUsd: '0x0bF4e7bf3e1f6D6Dc29AA516A33134985cC3A5aA',
-            usdEth: '0x0000000000000000000000000000000000000000'
+            usdEth: '0x0000000000000000000000000000000000000000',
+            bnbUsd: '0x0000000000000000000000000000000000000000',
         },
         "42101": { // AC sidechain testnet
             btcUsd: '0x0000000000000000000000000000000000000000',
             ethUsd: '0x0000000000000000000000000000000000000000',
-            usdEth: '0x0000000000000000000000000000000000000000'
+            usdEth: '0x0000000000000000000000000000000000000000',
+            bnbUsd: '0x0000000000000000000000000000000000000000',
         },
         "52101": { // AC sidechain prodnet
             btcUsd: '0x0000000000000000000000000000000000000000',
             ethUsd: '0x0000000000000000000000000000000000000000',
-            usdEth: '0x0000000000000000000000000000000000000000'
+            usdEth: '0x0000000000000000000000000000000000000000',
+            bnbUsd: '0x0000000000000000000000000000000000000000',
         },
         "56": { // BSC mainnet - TODO: BSC has ChainLinks...? https://docs.binance.org/smart-chain/developer/link.html
             btcUsd: '0x0000000000000000000000000000000000000000',
             ethUsd: '0x0000000000000000000000000000000000000000',
-            usdEth: '0x0000000000000000000000000000000000000000'
+            usdEth: '0x0000000000000000000000000000000000000000',
+            bnbUsd: '0x0000000000000000000000000000000000000000',
         },
         "97": { // BSC testnet...? https://docs.chain.link/docs/reference-data-contracts-binance-smart-chain#price-feeds
             btcUsd: '0x0000000000000000000000000000000000000000',
             ethUsd: '0x0000000000000000000000000000000000000000',
-            usdEth: '0x5f466C6daFDC6f3ffAd683622Edbfe214D388B18' // TODO -- BUSD/ETH - can't find eth/usd on BSC testnet...
+            usdEth: '0x5f466C6daFDC6f3ffAd683622Edbfe214D388B18', // TODO -- BUSD/ETH - can't find eth/usd on BSC testnet...
+            bnbUsd: '0x859AAa51961284C94d970B47E82b8771942F1980',
         },
         "888": { // dev - DM
             btcUsd: '0x0000000000000000000000000000000000000000',
             ethUsd: '0x0000000000000000000000000000000000000000',
-            usdEth: '0x0000000000000000000000000000000000000000'
+            usdEth: '0x0000000000000000000000000000000000000000',
+            bnbUsd: '0x0000000000000000000000000000000000000000',
         },
         "889": { // dev - Dung
             btcUsd: '0x0000000000000000000000000000000000000000',
             ethUsd: '0x0000000000000000000000000000000000000000',
-            usdEth: '0x0000000000000000000000000000000000000000'
+            usdEth: '0x0000000000000000000000000000000000000000',
+            bnbUsd: '0x0000000000000000000000000000000000000000',
         },
         "890": { // dev - Vince
             btcUsd: '0x0000000000000000000000000000000000000000',
             ethUsd: '0x0000000000000000000000000000000000000000',
-            usdEth: '0x0000000000000000000000000000000000000000'
+            usdEth: '0x0000000000000000000000000000000000000000',
+            bnbUsd: '0x0000000000000000000000000000000000000000',
         },
         "891": { // dev - Ankur
             btcUsd: '0x0000000000000000000000000000000000000000',
             ethUsd: '0x0000000000000000000000000000000000000000',
-            usdEth: '0x0000000000000000000000000000000000000000'
+            usdEth: '0x0000000000000000000000000000000000000000',
+            bnbUsd: '0x0000000000000000000000000000000000000000',
         },
     },
 
@@ -379,7 +390,7 @@ function getTestContextWeb3(useWs) {
         ) } }
 
         // BSC Testnet - Binace BSC node
-        : process.env.WEB3_NETWORK_ID == 97 ? { web3: new Web3(useWs ? '???###' : 'https://data-seed-prebsc-1-s1.binance.org:8545'),
+        : process.env.WEB3_NETWORK_ID == 97 ? { web3: new Web3(useWs ? 'wss://ac-prod1.aircarbon.co:8546' : 'https://ac-prod1.aircarbon.co:8545'),
             ethereumTxChain: { common: EthereumJsCommon.forCustomChain(
             'ropsten', // forCustomChain() requires a "known" name!?
             {

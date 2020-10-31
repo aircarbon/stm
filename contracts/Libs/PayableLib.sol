@@ -11,15 +11,10 @@ import "./TransferLib.sol";
 library PayableLib {
     event IssuanceSubscribed(address indexed subscriber, address indexed issuer, uint256 weiSent, uint256 weiChange, uint256 tokensSubscribed, uint256 weiPrice);
 
-    function get_ethUsd(address chainlinkAggregator_ethUsd) public view returns(int256) {
-        if (chainlinkAggregator_ethUsd == address(0x0)) return 100000000; // $1 - cents*satoshis
-        IChainlinkAggregator ref = IChainlinkAggregator(chainlinkAggregator_ethUsd);
-        return ref.latestAnswer();
-    }
-
-    function get_usdEth(address chainlinkAggregator_usdEth) public view returns(int256) {
-        if (chainlinkAggregator_usdEth == address(0x0)) return 100000000; // $1 - cents*satoshis
-        IChainlinkAggregator ref = IChainlinkAggregator(chainlinkAggregator_usdEth);
+    function get_chainlinkRefPrice(address chainlinkAggAddr) public view returns(int256) {
+        //if (chainlinkAggAddr == address(0x0)) return 100000000; // $1 - cents*satoshis
+        if (chainlinkAggAddr == address(0x0)) return -1;
+        IChainlinkAggregator ref = IChainlinkAggregator(chainlinkAggAddr);
         return ref.latestAnswer();
     }
 
@@ -79,7 +74,9 @@ library PayableLib {
         StructLib.CcyTypesStruct storage ctd,
         StructLib.CashflowStruct storage cashflowData,
         StructLib.FeeStruct storage globalFees, address owner,
-        int256 ethSat_UsdCents
+        int256 ethSat_UsdCents,
+        int256 usdCents_ethSat,
+        int256 bnbSat_UsdCents
     )
     public {
         require(ld.contractType == StructLib.ContractType.CASHFLOW_BASE, "Bad commodity request");
@@ -88,7 +85,7 @@ library PayableLib {
         require(cashflowData.wei_currentPrice > 0 || cashflowData.cents_currentPrice > 0, "Bad cashflow request: no price set");
         require(cashflowData.wei_currentPrice == 0 || cashflowData.cents_currentPrice == 0, "Bad cashflow request: ambiguous price set");
         if (cashflowData.cents_currentPrice > 0) {
-            require(ethSat_UsdCents > 0, "Bad cashflow request: the end is nigh");
+            require(ethSat_UsdCents != -1 || usdCents_ethSat != -1 || bnbSat_UsdCents != -1, "Bad cashflow request: no usd/{eth|bnb} rate");
         }
 
         // get issuer
@@ -100,7 +97,7 @@ library PayableLib {
             // TODO...
         }
         else {
-            processSubscriberPayment(ld, std, ctd, cashflowData, issueBatch, globalFees, owner, ethSat_UsdCents); // all other senders
+            processSubscriberPayment(ld, std, ctd, cashflowData, issueBatch, globalFees, owner, ethSat_UsdCents, usdCents_ethSat, bnbSat_UsdCents); // all other senders
         }
     }
 
@@ -112,7 +109,9 @@ library PayableLib {
         StructLib.SecTokenBatch storage issueBatch,
         StructLib.FeeStruct storage globalFees,
         address owner,
-        int256 ethSat_UsdCents
+        int256 ethSat_UsdCents,
+        int256 usdCents_ethSat,
+        int256 bnbSat_UsdCents
     )
     private {
         require(cashflowData.qty_saleAllocation > 0, "Bad cashflow request: nothing for sale");
@@ -124,16 +123,28 @@ library PayableLib {
             weiPrice = cashflowData.wei_currentPrice;
         }
         else {
-            uint256 eth_UsdCents = uint256(ethSat_UsdCents) / 1000000;
-            weiPrice = (cashflowData.cents_currentPrice * 1000000000000000000) / eth_UsdCents;
+            require(ethSat_UsdCents != -1 || usdCents_ethSat != -1 || bnbSat_UsdCents != -1, "Bad cashflow request: no usd/{eth|bnb} rate");
+            if (ethSat_UsdCents != -1) { // use uth/usd rate (ETH Ropsten, mainnet)
+                uint256 eth_UsdCents = uint256(ethSat_UsdCents) / 1000000;
+                weiPrice = (cashflowData.cents_currentPrice * 1000000000000000000) / eth_UsdCents;
+            }
+            else if (bnbSat_UsdCents != -1) { // use bnb/usd rate (BSC Mainnet 56 & Testnet 97)
+                uint256 bnb_UsdCents = uint256(bnbSat_UsdCents) / 1000000;
+                weiPrice = (cashflowData.cents_currentPrice * 1000000000000000000) / bnb_UsdCents;
+            }
+            // ## broken ## -- revert on BSC Testnet; todo - remove...
+            else if (usdCents_ethSat != -1) { // use usd/eth (inverted?) rate (for BSC testnet - can only find ETH/BUSD chainlink)
+                uint256 eth_UsdCents = (1000000000000000000 / uint256(ethSat_UsdCents)) * 100;
+                weiPrice = (cashflowData.cents_currentPrice * 1000000000000000000) / eth_UsdCents;
+            }
         }
 
         // calculate subscription size
-        uint256 qtyTokens = msg.value / weiPrice; //cashflowData.wei_currentPrice;
+        uint256 qtyTokens = msg.value / weiPrice;
         require(cashflowData.qty_saleAllocation >= qtyTokens, "Bad cashflow request: insufficient quantity for sale");
 
         // send back the change to payer
-        uint256 weiChange = msg.value % weiPrice; //cashflowData.wei_currentPrice;
+        uint256 weiChange = msg.value % weiPrice;
         if (weiChange > 0) {
             msg.sender.transfer(weiChange);
         }
