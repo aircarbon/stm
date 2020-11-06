@@ -112,10 +112,10 @@ module.exports = {
                 //console.log('encodedArgs', encodedArgs.toString('hex'));
                 // TODO: try https://github.com/Zoltu/ethereum-abi-encoder ...
 
-                const MNEMONIC = require('../DEV_MNEMONIC.js').MNEMONIC;
+                // Use mnemonic from ENV for support PROD mode
+                const MNEMONIC = process.env.MNEMONIC || require('../dev_mnemonic.js').MNEMONIC;
                 const accountAndKey = await CONST.getAccountAndKey(0, MNEMONIC);
                 const OWNER = accountAndKey.addr;
-                const OWNER_privKey = accountAndKey.privKey;
                 // TODO: derive - an encryption key & salt [from contract name?] -> derivation code should be in a private repo (AWS lambda?)
                 // TODO: encrypt - privKey & display encrypted [for manual population of AWS secret, L1]
 
