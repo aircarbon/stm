@@ -58,8 +58,8 @@ module.exports = async function (deployer) {
         case 'DEV_SD': console.log((`Deploying (AWS DEV / DEV [controller w/ 0 default base types] for SDAX) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`)); break;
         case 'UAT_SD': console.log((`Deploying (AWS DEV / UAT [controller w/ 0 default base types] for SDAX) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`)); break;
         //case 'UAT_SD_x3': console.log((`Deploying (AWS DEV / UAT [additional base type #3] for SDAX) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`)); break;
-        default: 
-            if (process.env.INSTANCE_ID.startsWith('UAT_3_SD') || process.env.INSTANCE_ID.startsWith('UAT_97_SD')) {
+        default:
+            if (process.env.INSTANCE_ID.includes('UAT_') || process.env.INSTANCE_ID.startsWith('UAT_3_SD') ||  process.env.INSTANCE_ID.startsWith('UAT_97_SD')) {
                 console.log((`Deploying (AWS DEV / UAT [additional base type] for SDAX) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`));
             }
             else if (process.env.INSTANCE_ID.startsWith('local')) {
@@ -103,7 +103,7 @@ module.exports = async function (deployer) {
         case 'CASHFLOW_CONTROLLER':
             // deploy two base types
             // const execSync = require("child_process").execSync;
-            // process.env.CONTRACT_TYPE = 'CASHFLOW_BASE'; 
+            // process.env.CONTRACT_TYPE = 'CASHFLOW_BASE';
             // console.log(chalk.inverse('run pre-processor: set source files & compile for base-type deployments...'));
             // const childResult1 = execSync(`node process_sol_js && truffle compile --reset`);
             // console.group('Child Output');
@@ -120,7 +120,7 @@ module.exports = async function (deployer) {
             // const childResult2 = execSync(`node process_sol_js && truffle compile --reset`);
             // console.group('Child Output');
             // console.log(chalk.dim(childResult2.toString("utf8")));
-            // console.groupEnd();            
+            // console.groupEnd();
             // const dh3 = require('./deploymentHelper'); // reload processed script
             const addrController = await deploymentHelper.Deploy({ deployer, artifacts, contractType: 'CASHFLOW_CONTROLLER' });
             await setup.setDefaults();
@@ -154,7 +154,7 @@ module.exports = async function (deployer) {
             }
 
             // get whitelist from controller (wwe will set new the base type's whitelist to match)
-            process.env.CONTRACT_TYPE = 'CASHFLOW_CONTROLLER'; 
+            process.env.CONTRACT_TYPE = 'CASHFLOW_CONTROLLER';
             const controllerWhitelist = await CONST.web3_call('getWhitelist', []);
             if (controllerWhitelist.length == 0) {
                 throw(`Cannot deploy new base type; controller whitelist is not set. Run 04_Web3_INIT_MULTI_DATA_AC.js...`);
@@ -163,7 +163,7 @@ module.exports = async function (deployer) {
             // deploy a new base type
             // TODO: move this (all configurablility) to WebAdmin
             //       i.e. so can pick new type name, its CashflowArgs, and deploy it from WebAdmin... (web3 deploy?)
-            process.env.CONTRACT_TYPE = 'CASHFLOW_BASE'; 
+            process.env.CONTRACT_TYPE = 'CASHFLOW_BASE';
             const addrBase = await deploymentHelper.Deploy({ deployer, artifacts, contractType: 'CASHFLOW_BASE', nameOverride: nameBase, symbolOverride: symbolBase });
             if (!deployer.network.includes("-fork")) {
                 console.log(chalk.inverse('nameBase'), nameBase);
@@ -182,7 +182,7 @@ module.exports = async function (deployer) {
                     //} catch(ex) { console.warn(ex); }
                 }
                 //await CONST.web3_tx('whitelistMany', [controllerWhitelist], O.addr, O.privKey, /*nameOverride*/undefined, /*addrOverride*/addrBase);
-                
+
                 const baseWhitelist = await CONST.web3_call('getWhitelist', [], /*nameOverride*/undefined, /*addrOverride*/addrBase);
                 console.log('      baseWhitelist.length', baseWhitelist.length);
                 console.log('controllerWhitelist.length', controllerWhitelist.length);

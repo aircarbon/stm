@@ -30,7 +30,7 @@ const GAS_USD = 30; // ETHUSD (for ETH mainnet) or BNBUSD (for BSC mainnet)
 
 // misc
 const WEB3_NONCE_REPLACE = undefined; // set to replace/drop a slow mainnet TX
-const WEB3_GWEI_GAS_BID = 
+const WEB3_GWEI_GAS_BID =
     process.env.INSTANCE_ID === 'PROD_56'         ? '20' // BSC mainnet -- see: truffle_config.js re. gas cost
   : process.env.INSTANCE_ID.startsWith('UAT_97')  ? '20' // BSC testnet
   : process.env.INSTANCE_ID === 'PROD_52101'      ? '1'  // AC privnet
@@ -189,7 +189,7 @@ module.exports = {
     consoleOutput: (enabled) => { consoleOutput = enabled; },
 
     getLedgerHashcode: (sc, mod, n) => {
-        if (mod === undefined && n === undefined) { 
+        if (mod === undefined && n === undefined) {
             // use a static (test/arbitrary) segmentation, and locally hash the segment hashes
             const hashes = [];
             return new Promise(async(resolve) => {
@@ -205,7 +205,7 @@ module.exports = {
                 resolve(ret);
             });
         }
-        else { 
+        else {
             return sc.getLedgerHashcode(mod, n);
         }
     },

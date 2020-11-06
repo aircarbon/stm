@@ -23,7 +23,7 @@ const web3 = new Web3();
 const HDWalletProvider = require("@truffle/hdwallet-provider");
 const NonceTrackerSubprovider = require("web3-provider-engine/subproviders/nonce-tracker");
 
-const DEV_MNEMONIC = require('./DEV_MNEMONIC.js').MNEMONIC;
+const MNEMONIC = process.env.DEV_MNEMONIC || process.env.PROD_MNEMONIC ||  require('./DEV_MNEMONIC.js').MNEMONIC;
 
 const GWEI_MAINNET_1  = "80";
 const GWEI_MAINNET_56 = "20"; // 20 gwei minimum [PoA validator cartel!]?! trial & error - not clear at all; <20 gwei seems to never mine...
@@ -75,27 +75,27 @@ module.exports = {
     // aircarbon Eth mainnet (1) geth node
     mainnet_ac: {
         provider: function() {
-            var wallet = new HDWalletProvider(require('./PROD_MNEMONIC.js').MNEMONIC,
-                'https://ac-dev0.net:10545', 
+            var wallet = new HDWalletProvider(MNEMONIC || require('../PROD_MNEMONIC.js').MNEMONIC,
+                'https://ac-dev0.net:10545',
                 0, 1000);
             var nonceTracker = new NonceTrackerSubprovider();
             wallet.engine._providers.unshift(nonceTracker);
             nonceTracker.setEngine(wallet.engine);
             return wallet;
         },
-        gas: 10000000, // 10m 
+        gas: 10000000, // 10m
         gasPrice: web3.utils.toWei(GWEI_MAINNET_1, "gwei"),
         network_id: "1",
         networkCheckTimeout: 30000,
         confirmations: 1,
         skipDryRun: false,
-        timeoutBlocks: 200, 
+        timeoutBlocks: 200,
     },
 
     // aircarbon ropsten geth node -- a bit faster than infura, representative of mainnet
     ropsten_ac: {
         provider: function() { // https://ethereum.stackexchange.com/questions/44349/truffle-infura-on-mainnet-nonce-too-low-error
-            var wallet = new HDWalletProvider(DEV_MNEMONIC, 'https://ac-dev0.net:9545', 0, 1000); // # test accounts
+            var wallet = new HDWalletProvider(MNEMONIC, 'https://ac-dev0.net:9545', 0, 1000); // # test accounts
             var nonceTracker = new NonceTrackerSubprovider();
             wallet.engine._providers.unshift(nonceTracker);
             nonceTracker.setEngine(wallet.engine);
@@ -112,7 +112,7 @@ module.exports = {
     // ropsten infura -- much slower than rinkeby infura
     ropsten_infura: { // multi-client
         provider: function() {
-            var wallet = new HDWalletProvider(DEV_MNEMONIC, 'https://ropsten.infura.io/v3/05a8b81beb9a41008f74864b5b1ed544', 0, 1000); // AirCarbon-AwsDev
+            var wallet = new HDWalletProvider(MNEMONIC, 'https://ropsten.infura.io/v3/05a8b81beb9a41008f74864b5b1ed544', 0, 1000); // AirCarbon-AwsDev
             var nonceTracker = new NonceTrackerSubprovider();
             wallet.engine._providers.unshift(nonceTracker);
             nonceTracker.setEngine(wallet.engine);
@@ -128,7 +128,7 @@ module.exports = {
 
     // rinkeby infura
     rinkeby_infura: { // geth-only
-      provider: () => new HDWalletProvider(DEV_MNEMONIC, "https://rinkeby.infura.io/v3/05a8b81beb9a41008f74864b5b1ed544", 0, 1000), // AirCarbon-AwsDev
+      provider: () => new HDWalletProvider(MNEMONIC, "https://rinkeby.infura.io/v3/05a8b81beb9a41008f74864b5b1ed544", 0, 1000), // AirCarbon-AwsDev
       network_id: "*", // 4
       gas: 10000000,
       gasPrice: web3.utils.toWei(GWEI_TESTNET, "gwei"),
@@ -140,7 +140,7 @@ module.exports = {
     // AirCarbon private/sidechain (42101) TestNet Geth
     test_ac: {
         provider: function() {
-            var wallet = new HDWalletProvider(DEV_MNEMONIC, 'https://ac-dev1.net:9545', 0, 1000); // # test accounts
+            var wallet = new HDWalletProvider(MNEMONIC, 'https://ac-dev1.net:9545', 0, 1000); // # test accounts
             var nonceTracker = new NonceTrackerSubprovider();
             wallet.engine._providers.unshift(nonceTracker);
             nonceTracker.setEngine(wallet.engine);
@@ -154,8 +154,8 @@ module.exports = {
     // AirCarbon private/sidechain (52101) ProdNet Geth
     prodnet_ac: {
         provider: function() {
-            var wallet = new HDWalletProvider(require('./PROD_MNEMONIC.js').MNEMONIC,
-                'https://ac-prod0.aircarbon.co:9545', 
+            var wallet = new HDWalletProvider(MNEMONIC || require('../PROD_MNEMONIC.js').MNEMONIC,
+                'https://ac-prod0.aircarbon.co:9545',
                 0, 1000);
             var nonceTracker = new NonceTrackerSubprovider();
             wallet.engine._providers.unshift(nonceTracker);
@@ -164,18 +164,18 @@ module.exports = {
         },
         gas: 8000000, // 8m
         gasPrice: web3.utils.toWei("1", "gwei"),
-        network_id: "52101", 
+        network_id: "52101",
         networkCheckTimeout: 30000,
         confirmations: 1,
         skipDryRun: false,
-        timeoutBlocks: 200, 
+        timeoutBlocks: 200,
     },
 
     // Binance Smart Chain (BSC) Mainnet (AC Geth BSC instance)
     bsc_mainnet_ac: {
         provider: function() {
-            var wallet = new HDWalletProvider(require('./PROD_MNEMONIC.js').MNEMONIC,
-                'https://ac-prod1.aircarbon.co:9545', 
+            var wallet = new HDWalletProvider(MNEMONIC || require('../PROD_MNEMONIC.js').MNEMONIC,
+                'https://ac-prod1.aircarbon.co:9545',
                 0, 1000);
             var nonceTracker = new NonceTrackerSubprovider();
             wallet.engine._providers.unshift(nonceTracker);
@@ -184,18 +184,18 @@ module.exports = {
         },
         gas: 8000000, // 8m
         gasPrice: web3.utils.toWei(GWEI_MAINNET_56, "gwei"), // "--txpool.pricelimit 0" or similar on BCS Geth instance seems to result in no TX's being mined at all
-        network_id: "56", 
+        network_id: "56",
         networkCheckTimeout: 30000,
         confirmations: 1,
         skipDryRun: false,
-        timeoutBlocks: 200, 
+        timeoutBlocks: 200,
     },
 
     // Binance Smart Chain (BSC) Testnet (BSC instance)
     bsc_testnet_bn: {
         provider: function() {
-            var wallet = new HDWalletProvider(DEV_MNEMONIC,
-                'https://ac-prod1.aircarbon.co:8545', //'https://data-seed-prebsc-1-s1.binance.org:8545', 
+            var wallet = new HDWalletProvider(MNEMONIC,
+                'https://data-seed-prebsc-1-s1.binance.org:8545',
                 0, 1000);
             var nonceTracker = new NonceTrackerSubprovider();
             wallet.engine._providers.unshift(nonceTracker);
@@ -204,11 +204,11 @@ module.exports = {
         },
         gas: 8000000, // 8m
         gasPrice: web3.utils.toWei(GWEI_MAINNET_97, "gwei"),
-        network_id: "97", 
+        network_id: "97",
         networkCheckTimeout: 30000,
         confirmations: 1,
         skipDryRun: false,
-        timeoutBlocks: 200, 
+        timeoutBlocks: 200,
     },
 
     // Another network with more advanced options...
