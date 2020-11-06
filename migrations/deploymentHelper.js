@@ -71,7 +71,7 @@ module.exports = {
             const contractName = `${process.env.CONTRACT_PREFIX}${nameOverride || CONST.contractProps[contractType].contractName}`;
 
 //#if process.env.CONTRACT_TYPE === 'CASHFLOW_BASE'
-            const cfa = process.env.ADD_TYPE__CASHFLOW_ARGS !== undefined 
+            const cfa = process.env.ADD_TYPE__CASHFLOW_ARGS !== undefined
                         ? JSON.parse(process.env.ADD_TYPE__CASHFLOW_ARGS)
                         : CONST.contractProps[contractType].cashflowArgs;
             console.log('cfa(pre)', cfa);
@@ -121,7 +121,7 @@ module.exports = {
 
                 // save to DB
                 if (!deployer.network.includes("-fork")) {
-                    logEnv("DEPLOYMENT COMPLETE", OWNER, OWNER_privKey, contractType, contractName);
+                    logEnv("DEPLOYMENT COMPLETE", OWNER, contractType, contractName);
 
                     var ip = "unknown";
                     publicIp.v4().then(p => ip = p).catch(e => { console.log("\tWARN: could not get IP - will write 'unknown'"); });
@@ -158,7 +158,7 @@ module.exports = {
     }
 };
 
-function logEnv(phase, owner, ownerPrivKey, contractType, contractName) {
+function logEnv(phase, owner, contractType, contractName) {
     console.log(chalk.black.bgWhite(phase));
 
     console.log(chalk.red('\t                contractName: '), contractName);
@@ -166,5 +166,4 @@ function logEnv(phase, owner, ownerPrivKey, contractType, contractName) {
     console.log(chalk.red('\t process.env.CONTRACT_PREFIX: '), process.env.CONTRACT_PREFIX);
     console.log(chalk.red('\t      process.env.NETWORK_ID: '), process.env.NETWORK_ID);
     console.log(chalk.red('\t                       owner: '), owner);
-    console.log(chalk.red('\t                ownerPrivKey: '), ownerPrivKey);
 }
