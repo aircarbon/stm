@@ -23,7 +23,7 @@ const web3 = new Web3();
 const HDWalletProvider = require("@truffle/hdwallet-provider");
 const NonceTrackerSubprovider = require("web3-provider-engine/subproviders/nonce-tracker");
 
-const MNEMONIC = process.env.DEV_MNEMONIC || process.env.PROD_MNEMONIC ||  require('../DEV_MNEMONIC.js').MNEMONIC;
+const MNEMONIC = process.env.DEV_MNEMONIC || process.env.PROD_MNEMONIC ||  require('./DEV_MNEMONIC.js').MNEMONIC;
 
 const GWEI_MAINNET_1  = "80";
 const GWEI_MAINNET_56 = "20"; // 20 gwei minimum [PoA validator cartel!]?! trial & error - not clear at all; <20 gwei seems to never mine...
