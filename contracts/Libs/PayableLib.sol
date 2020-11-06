@@ -101,6 +101,14 @@ library PayableLib {
         }
     }
 
+    struct ProcessPaymentVars {
+        uint256 weiPrice;
+        uint256 qtyTokens;
+        uint256[] issuer_stIds; //storage
+        StructLib.PackedSt issuerSt; //storage
+        uint256 qtyIssuanceSold;
+        uint256 weiChange;
+    }
     function processSubscriberPayment(
         StructLib.LedgerStruct storage ld,
         StructLib.StTypesStruct storage std,
@@ -114,50 +122,62 @@ library PayableLib {
         int256 bnbSat_UsdCents
     )
     private {
+        ProcessPaymentVars memory v;
+
         require(cashflowData.qty_saleAllocation > 0, "Bad cashflow request: nothing for sale");
 
         // TODO: restrict msg.value upper bound so no overflow?
 
-        uint256 weiPrice;
+        //uint256 weiPrice;
         if (cashflowData.wei_currentPrice > 0) {
-            weiPrice = cashflowData.wei_currentPrice;
+            v.weiPrice = cashflowData.wei_currentPrice;
         }
         else {
             require(ethSat_UsdCents != -1 || usdCents_ethSat != -1 || bnbSat_UsdCents != -1, "Bad cashflow request: no usd/{eth|bnb} rate");
             if (ethSat_UsdCents != -1) { // use uth/usd rate (ETH Ropsten, mainnet)
                 uint256 eth_UsdCents = uint256(ethSat_UsdCents) / 1000000;
-                weiPrice = (cashflowData.cents_currentPrice * 1000000000000000000) / eth_UsdCents;
+                v.weiPrice = (cashflowData.cents_currentPrice * 1000000000000000000) / eth_UsdCents;
             }
             else if (bnbSat_UsdCents != -1) { // use bnb/usd rate (BSC Mainnet 56 & Testnet 97)
                 uint256 bnb_UsdCents = uint256(bnbSat_UsdCents) / 1000000;
-                weiPrice = (cashflowData.cents_currentPrice * 1000000000000000000) / bnb_UsdCents;
+                v.weiPrice = (cashflowData.cents_currentPrice * 1000000000000000000) / bnb_UsdCents;
             }
             // ## broken ## -- revert on BSC Testnet; todo - remove...
             else if (usdCents_ethSat != -1) { // use usd/eth (inverted?) rate (for BSC testnet - can only find ETH/BUSD chainlink)
                 uint256 eth_UsdCents = (1000000000000000000 / uint256(ethSat_UsdCents)) * 100;
-                weiPrice = (cashflowData.cents_currentPrice * 1000000000000000000) / eth_UsdCents;
+                v.weiPrice = (cashflowData.cents_currentPrice * 1000000000000000000) / eth_UsdCents;
             }
         }
 
         // calculate subscription size
-        uint256 qtyTokens = msg.value / weiPrice;
-        require(cashflowData.qty_saleAllocation >= qtyTokens, "Bad cashflow request: insufficient quantity for sale");
+        //uint256 qtyTokens = msg.value / weiPrice;
+        v.qtyTokens = msg.value / v.weiPrice;
 
-        // send back the change to payer
-        uint256 weiChange = msg.value % weiPrice;
-        if (weiChange > 0) {
-            msg.sender.transfer(weiChange);
+        // check sale allowance is not exceeded
+        //uint256[] storage issuer_stIds = ld._ledger[issueBatch.originator].tokenType_stIds[1]; // CFT: uni-type
+        v.issuer_stIds = ld._ledger[issueBatch.originator].tokenType_stIds[1]; // CFT: uni-type
+        //StructLib.PackedSt storage issuerSt = ld._sts[issuer_stIds[0]];
+        v.issuerSt = ld._sts[v.issuer_stIds[0]];
+        //uint256 qtyIssuanceSold = uint256(issueBatch.mintedQty) - uint256(issuerSt.currentQty);
+        v.qtyIssuanceSold = uint256(issueBatch.mintedQty) - uint256(v.issuerSt.currentQty);
+        require(cashflowData.qty_saleAllocation >= v.qtyIssuanceSold + v.qtyTokens, "Bad cashflow request: insufficient quantity for sale");
+
+        // send change back to payer
+        //uint256 weiChange = msg.value % weiPrice;
+        v.weiChange = msg.value % v.weiPrice;
+        if (v.weiChange > 0) {
+            msg.sender.transfer(v.weiChange);
         }
 
         // fwd payment to issuer
-        issueBatch.originator.transfer(msg.value - weiChange);
+        issueBatch.originator.transfer(msg.value - v.weiChange);
 
         // transfer tokens to payer
-        if (qtyTokens > 0) {
+        if (v.qtyTokens > 0) {
             StructLib.TransferArgs memory a = StructLib.TransferArgs({
                     ledger_A: issueBatch.originator,
                     ledger_B: msg.sender,
-                       qty_A: qtyTokens,
+                       qty_A: v.qtyTokens,
                    k_stIds_A: new uint256[](0),
                  tokTypeId_A: 1,
                        qty_B: 0,
@@ -176,7 +196,7 @@ library PayableLib {
         // todo: issuance fees (set then clear ledgerFee?)
         // todo: record subscribers? or no need - only care about holders? (ledgers != issuer)
 
-        emit IssuanceSubscribed(msg.sender, issueBatch.originator, msg.value, weiChange, qtyTokens, weiPrice);
+        emit IssuanceSubscribed(msg.sender, issueBatch.originator, msg.value, v.weiChange, v.qtyTokens, v.weiPrice);
     }
 
     /*

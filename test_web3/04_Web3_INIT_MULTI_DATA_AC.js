@@ -280,7 +280,7 @@ describe(`Contract Web3 Interface`, async () => {
                 "URL_PROJECT_IMG": "http://www.sbgland.com/images/logo.jpg"
             },
             {
-                "TXT_PROJECT_NAME": "Wilson and Company",
+                "TXT_PROJECT_NAME": "Wilson and Company",   
                 "LIST_COUNTRY": "US",
                 "URL_PROJECT": "https://www.wilsonco.com/service/land-development",
                 "IPFS_PROJECT_DOCUMENT_SALES": "QmV5AVmqTyCj2Mx1B83N2VggEJVF6jDuq2fJysCCPKSAFk",

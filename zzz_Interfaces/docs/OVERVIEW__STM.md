@@ -1,4 +1,4 @@
-# SecTokMaster (STM) v0.96 - Overview
+# SecTokMaster (STM) v0.99 - Overview
 
 ## Contract Type - Commodity or Cashflow
 STM is an Ethereum contract comprising:
@@ -27,13 +27,20 @@ Features of STM include:
 * Extensibility: adding currency and token types *[permission: owner-only]*
 * Upgradability: 100% data storage coverage for batched data write functions, mapped 1-1 with public read views, for verifiable cross-contract backup/restore *[permission: owner-only]*
 * Verifiability: 100% data storage coverage of aggregated global keccak256 hash *[permission: public]*
+* WIP: multi-owner permission model (ctor to accept addr[], & onlyOwner() tweak)
+* WIP: futures
 
 ## Functionality: Cashflow (CFT)
-* WIP/out of scope
+* Type-delegation to recursed child contract instance(s) [max 1-depth recursive]
+* WIP: bond repayment/structure table
+* WIP: issuer cashflow payments (todo: admin batching, PayableLib handling)
+* WIP: ERC1400 & on-chain KYC whitelisting
 
 ## Core Design: Ledger
 * Tokens are uniquely identifiable by a uint256 ID, are associated with a unique token type uint256 ID and are minted as part of a token batch.
 * Each batch is uniquely identifiable by a uint64 ID and contains supplementary metadata in string KVP format, including IPFS document hash(es).
 * Ledger entries consist of a mapping of token types to token IDs, and a mapping of currency types to currency (collateral) balances.
+
+...
 
 
