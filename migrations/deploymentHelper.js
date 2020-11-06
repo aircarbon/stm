@@ -113,7 +113,7 @@ module.exports = {
                 // TODO: try https://github.com/Zoltu/ethereum-abi-encoder ...
 
                 // Use mnemonic from ENV for support PROD mode
-                const MNEMONIC = process.env.MNEMONIC || require('../dev_mnemonic.js').MNEMONIC;
+                const MNEMONIC = process.env.DEV_MNEMONIC || process.env.PROD_MNEMONIC ||  require('../DEV_MNEMONIC.js').MNEMONIC;
                 const accountAndKey = await CONST.getAccountAndKey(0, MNEMONIC);
                 const OWNER = accountAndKey.addr;
                 // TODO: derive - an encryption key & salt [from contract name?] -> derivation code should be in a private repo (AWS lambda?)

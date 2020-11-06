@@ -403,7 +403,7 @@ async function getAccountAndKey(accountNdx, mnemonic, coinTypeSlip44) {
     const MNEMONIC =
         process.env.INSTANCE_ID === 'PROD_1' || process.env.INSTANCE_ID === 'PROD_56' || process.env.INSTANCE_ID === 'PROD_52101'
             ? (require('./PROD_MNEMONIC.js').MNEMONIC)
-            : mnemonic || require('./dev_mnemonic.js').MNEMONIC;
+            : mnemonic || require('./DEV_MNEMONIC.js').MNEMONIC;
     const seed = await bip39.mnemonicToSeed(MNEMONIC);
     const hdk = hdkey.fromMasterSeed(seed);
     const addr_node = hdk.derivePath(`m/44'/${coinTypeSlip44 || '60'}'/0'/0/${accountNdx}`);
