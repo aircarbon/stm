@@ -150,20 +150,15 @@ library PayableLib {
         }
 
         // calculate subscription size
-        //uint256 qtyTokens = msg.value / weiPrice;
         v.qtyTokens = msg.value / v.weiPrice;
 
         // check sale allowance is not exceeded
-        //uint256[] storage issuer_stIds = ld._ledger[issueBatch.originator].tokenType_stIds[1]; // CFT: uni-type
         v.issuer_stIds = ld._ledger[issueBatch.originator].tokenType_stIds[1]; // CFT: uni-type
-        //StructLib.PackedSt storage issuerSt = ld._sts[issuer_stIds[0]];
         v.issuerSt = ld._sts[v.issuer_stIds[0]];
-        //uint256 qtyIssuanceSold = uint256(issueBatch.mintedQty) - uint256(issuerSt.currentQty);
         v.qtyIssuanceSold = uint256(issueBatch.mintedQty) - uint256(v.issuerSt.currentQty);
         require(cashflowData.qty_saleAllocation >= v.qtyIssuanceSold + v.qtyTokens, "Bad cashflow request: insufficient quantity for sale");
 
         // send change back to payer
-        //uint256 weiChange = msg.value % weiPrice;
         v.weiChange = msg.value % v.weiPrice;
         if (v.weiChange > 0) {
             msg.sender.transfer(v.weiChange);
