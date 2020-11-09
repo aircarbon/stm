@@ -27,7 +27,7 @@ const MNEMONIC = process.env.DEV_MNEMONIC || process.env.PROD_MNEMONIC ||  requi
 
 const GWEI_MAINNET_1  = "80";
 const GWEI_MAINNET_56 = "20"; // 20 gwei minimum [PoA validator cartel!]?! trial & error - not clear at all; <20 gwei seems to never mine...
-const GWEI_MAINNET_97 = "20";
+const GWEI_TESTNET_97 = "20";
 const GWEI_TESTNET    = "20";
 
 //
@@ -75,7 +75,7 @@ module.exports = {
     // aircarbon Eth mainnet (1) geth node
     mainnet_ac: {
         provider: function() {
-            var wallet = new HDWalletProvider(MNEMONIC || require('../PROD_MNEMONIC.js').MNEMONIC,
+            var wallet = new HDWalletProvider(MNEMONIC || require('./PROD_MNEMONIC.js').MNEMONIC,
                 'https://ac-dev0.net:10545',
                 0, 1000);
             var nonceTracker = new NonceTrackerSubprovider();
@@ -154,7 +154,7 @@ module.exports = {
     // AirCarbon private/sidechain (52101) ProdNet Geth
     prodnet_ac: {
         provider: function() {
-            var wallet = new HDWalletProvider(MNEMONIC || require('../PROD_MNEMONIC.js').MNEMONIC,
+            var wallet = new HDWalletProvider(MNEMONIC || require('./PROD_MNEMONIC.js').MNEMONIC,
                 'https://ac-prod0.aircarbon.co:9545',
                 0, 1000);
             var nonceTracker = new NonceTrackerSubprovider();
@@ -174,7 +174,7 @@ module.exports = {
     // Binance Smart Chain (BSC) Mainnet (AC Geth BSC instance)
     bsc_mainnet_ac: {
         provider: function() {
-            var wallet = new HDWalletProvider(MNEMONIC || require('../PROD_MNEMONIC.js').MNEMONIC,
+            var wallet = new HDWalletProvider(MNEMONIC || require('./PROD_MNEMONIC.js').MNEMONIC,
                 'https://ac-prod1.aircarbon.co:9545',
                 0, 1000);
             var nonceTracker = new NonceTrackerSubprovider();
@@ -203,7 +203,7 @@ module.exports = {
             return wallet;
         },
         gas: 8000000, // 8m
-        gasPrice: web3.utils.toWei(GWEI_MAINNET_97, "gwei"),
+        gasPrice: web3.utils.toWei(GWEI_TESTNET_97, "gwei"),
         network_id: "97",
         networkCheckTimeout: 30000,
         confirmations: 1,
