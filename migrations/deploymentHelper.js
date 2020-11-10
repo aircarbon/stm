@@ -75,6 +75,7 @@ module.exports = {
                         ? JSON.parse(process.env.ADD_TYPE__CASHFLOW_ARGS)
                         : CONST.contractProps[contractType].cashflowArgs;
             console.log('cfa(pre)', cfa);
+            if (cfa.term_Days === undefined || cfa.bond_int_EveryDays === undefined) throw('Undefined cashflow args; aborting.')
             cfa.term_Blks = CONST.blocksFromDays(cfa.term_Days);
             cfa.bond_int_EveryBlks = CONST.blocksFromDays(cfa.bond_int_EveryDays);
             delete cfa.term_Days;
