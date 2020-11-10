@@ -1,3 +1,3 @@
 module.exports = {
-  MNEMONIC: 'replace series drop sad warfare marriage cool correct glove thumb banana mix achieve confirm cable',
+  MNEMONIC: 'educate school blast ability display bleak club soon curve car oil ostrich',
 };
