@@ -10,7 +10,6 @@
   "scripts": {
     "devInitSealContract": "node devInitSealContract",
     "test": "truffle test",
-    "prepare:wa-api": "INSTANCE_ID=example CONTRACT_TYPE=CASHFLOW_BASE node process_sol_js && truffle compile",
     "solium:lint": "solium lint -d ./contracts",
     "migrate": "rimraf -rf ./build/contracts && export INSTANCE_ID=local && node process_sol_js && truffle migrate --network development -f 2 --to 2 --reset",
     "console": "truffle console",
