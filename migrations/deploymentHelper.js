@@ -69,7 +69,8 @@ module.exports = {
         await deployer.deploy(FuturesLib).then(async futuresLib => {
             deployer.link(FuturesLib, StMaster);
             const contractName = `${process.env.CONTRACT_PREFIX}${nameOverride || CONST.contractProps[contractType].contractName}`;
-
+            
+            // parse cashflow args; convert from days to blocks
 //#if process.env.CONTRACT_TYPE === 'CASHFLOW_BASE'
             const cfa = process.env.ADD_TYPE__CASHFLOW_ARGS !== undefined
                         ? JSON.parse(process.env.ADD_TYPE__CASHFLOW_ARGS)
@@ -83,6 +84,15 @@ module.exports = {
             console.log('cfa(post)', cfa);
 //#endif
 
+            // derive primary owner/deployer (&[0]), and a further n more keypairs ("backup owners");
+            // (bkp-owners are passed to contract ctor, and have identical permissions to the primary owner)
+            const MNEMONIC = process.env.DEV_MNEMONIC || process.env.PROD_MNEMONIC ||  require('../DEV_MNEMONIC.js').MNEMONIC;
+            const accountAndKey = await CONST.getAccountAndKey(0, MNEMONIC);
+            const OWNER = accountAndKey.addr;
+
+            //
+            // Deploy StMaster
+            //
             stmAddr = await deployer.deploy(StMaster,
                 contractType == 'CASHFLOW_BASE'       ? CONST.contractType.CASHFLOW_BASE :
                 contractType == 'CASHFLOW_CONTROLLER' ? CONST.contractType.CASHFLOW_CONTROLLER :
@@ -113,13 +123,6 @@ module.exports = {
                 //var encodedArgs = ejs_abi.encode(stm.abi, "balanceOf(uint256 address)", [ "0x0000000000000000000000000000000000000000" ])
                 //console.log('encodedArgs', encodedArgs.toString('hex'));
                 // TODO: try https://github.com/Zoltu/ethereum-abi-encoder ...
-
-                // Use mnemonic from ENV for support PROD mode
-                const MNEMONIC = process.env.DEV_MNEMONIC || process.env.PROD_MNEMONIC ||  require('../DEV_MNEMONIC.js').MNEMONIC;
-                const accountAndKey = await CONST.getAccountAndKey(0, MNEMONIC);
-                const OWNER = accountAndKey.addr;
-                // TODO: derive - an encryption key & salt [from contract name?] -> derivation code should be in a private repo (AWS lambda?)
-                // TODO: encrypt - privKey & display encrypted [for manual population of AWS secret, L1]
 
                 // save to DB
                 if (!deployer.network.includes("-fork")) {

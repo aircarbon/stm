@@ -39,16 +39,21 @@ const WEB3_GWEI_GAS_BID =
 const WEB3_GAS_LIMIT = 5000000;
 
 // CFT helpers
-const nullCashflowArgs = { cashflowType: 0,
+const nullCashflowArgs = { 
+    cashflowType: 0,
     //wei_maxIssuance: 0,
     //wei_currentPrice: 0,
-    term_Blks: 0, bond_bps: 0, bond_int_EveryBlks: 0 };
+    bond_bps: 0,
+    term_Days: 0,
+    bond_int_EveryDays: 0,
+};
 const cashflowType = Object.freeze({
     BOND: 0,
     EQUITY: 1,
 });
 
-const blocksFromSecs = (secs) => Math.ceil(secs / 15); // 15 secs per block avg assumed
+// assumed: 15 secs per block, unless BSC (5 secs)
+const blocksFromSecs = (secs) => Math.ceil(secs / (process.env.NETWORK_ID == 97 || process.env.NETWORK_ID == 56 ? 5 : 15)); 
 const blocksFromMins = (mins) => Math.ceil(blocksFromSecs(mins * 60));
 const blocksFromHours = (hours) => Math.ceil(blocksFromMins(hours * 60));
 const blocksFromDays = (days) => Math.ceil(blocksFromHours(days * 24));

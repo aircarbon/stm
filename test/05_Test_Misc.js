@@ -38,17 +38,17 @@ contract("StMaster", accounts => {
     // });
 
     // // https://iancoleman.io/bip39/#english
-    // it(`misc - bip39 - should be able to use a maximum entropy (24 word = 512-bit) BIP39 mnemonic (BIP44 HD)`, async () => {
-    //     for (let i=0 ; i < 10 ; i++) {
-    //         const x = await CONST.getAccountAndKey(i,
-    //             '...'
-    //             );
-    //         console.log(`${i} addr: ${x.addr} privKey: ${x.privKey}`);
-    //         // if (i==0) {
-    //         //     assert(x.privKey == '...', 'unexpected key')
-    //         // }
-    //     }
-    // });
+    it(`misc - bip39 - should be able to use a maximum entropy (24 word = 512-bit) BIP39 mnemonic (BIP44 HD)`, async () => {
+        for (let i=0 ; i < 10 ; i++) {
+            const x = await CONST.getAccountAndKey(i,
+                'fortune nurse warfare wool ankle sail mammal excite other black claw imitate'
+                );
+            console.log(`#${i} addr: ${x.addr}`); //privKey: ${x.privKey}`);
+            // if (i==0) {
+            //     assert(x.privKey == '...', 'unexpected key')
+            // }
+        }
+    });
 
     // it(`misc - bip39 - should be able to generate Binace Smart Chain (BSC) (eth-compat) address from BIP39 mnemonic (BIP44 HD)`, async () => {
     //     for (let i=0 ; i < 10 ; i++) {

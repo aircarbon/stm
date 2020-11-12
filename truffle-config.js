@@ -186,7 +186,7 @@ module.exports = {
         gasPrice: web3.utils.toWei(GWEI_MAINNET_56, "gwei"), // "--txpool.pricelimit 0" or similar on BCS Geth instance seems to result in no TX's being mined at all
         network_id: "56",
         networkCheckTimeout: 30000,
-        confirmations: 1,
+        confirmations: 1,       
         skipDryRun: false,
         timeoutBlocks: 200,
     },

@@ -156,13 +156,11 @@ module.exports = async function (deployer) {
             // get whitelist from controller (wwe will set new the base type's whitelist to match)
             process.env.CONTRACT_TYPE = 'CASHFLOW_CONTROLLER';
             const controllerWhitelist = await CONST.web3_call('getWhitelist', []);
-            console.log('controllerWhitelist', controllerWhitelist);
+            //console.log('controllerWhitelist', controllerWhitelist);
             if (!controllerWhitelist) throw(`Cannot fetch controller whitelist.`);
             if (controllerWhitelist.length == 0) throw(`Cannot deploy new base type; controller whitelist is not set. Run 04_Web3_INIT_MULTI_DATA_AC.js...`);
 
             // deploy a new base type
-            // TODO: move this (all configurablility) to WebAdmin
-            //       i.e. so can pick new type name, its CashflowArgs, and deploy it from WebAdmin... (web3 deploy?)
             process.env.CONTRACT_TYPE = 'CASHFLOW_BASE';
             const addrBase = await deploymentHelper.Deploy({ deployer, artifacts, contractType: 'CASHFLOW_BASE', nameOverride: nameBase, symbolOverride: symbolBase });
             if (!deployer.network.includes("-fork")) {
