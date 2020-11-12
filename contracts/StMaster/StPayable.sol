@@ -57,10 +57,9 @@ contract StPayable is
         return PayableLib.getCashflowData(ld, cashflowData);
     }
     
-    address public chainlinkAggregator_ethUsd;
-    address public chainlinkAggregator_usdEth;
-    address public chainlinkAggregator_bnbUsd;
     //address public chainlinkAggregator_btcUsd;
+    address public chainlinkAggregator_ethUsd;
+    address public chainlinkAggregator_bnbUsd;
 
     // function get_btcUsd() public view returns(int256) {
     //     if (chainlinkAggregator_btcUsd == address(0x0)) return 100000000; // $1 - cents*satoshis
@@ -70,9 +69,6 @@ contract StPayable is
 
     function get_ethUsd() public view returns(int256) {
         return PayableLib.get_chainlinkRefPrice(chainlinkAggregator_ethUsd);
-    }
-    function get_usdEth() public view returns(int256) {
-        return PayableLib.get_chainlinkRefPrice(chainlinkAggregator_usdEth);
     }
     function get_bnbUsd() public view returns(int256) {
         return PayableLib.get_chainlinkRefPrice(chainlinkAggregator_bnbUsd);

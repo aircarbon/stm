@@ -131,7 +131,6 @@ contract StMaster
         ,
       //address                       _chainlinkAggregator_btcUsd,
         address                       _chainlinkAggregator_ethUsd,
-        address                       _chainlinkAggregator_usdEth, // ## failing on BSC testnet
         address                       _chainlinkAggregator_bnbUsd
 //#endif
     ) StErc20(_contractSymbol, _contractDecimals)
@@ -141,7 +140,6 @@ contract StMaster
         cashflowData.args = _cashflowArgs;
         //chainlinkAggregator_btcUsd = _chainlinkAggregator_btcUsd;
         chainlinkAggregator_ethUsd = _chainlinkAggregator_ethUsd;
-        chainlinkAggregator_usdEth = _chainlinkAggregator_usdEth;
         chainlinkAggregator_bnbUsd = _chainlinkAggregator_bnbUsd;
 //#endif
 

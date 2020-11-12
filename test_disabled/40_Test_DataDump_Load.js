@@ -34,7 +34,6 @@ contract("StMaster", accounts => {
             ,
             //await stm_cur.chainlinkAggregator_btcUsd(),
             await stm_cur.chainlinkAggregator_ethUsd(),
-            await stm_cur.chainlinkAggregator_usdEth(),
             await stm_cur.chainlinkAggregator_bnbUsd(),
 //#endif
         );
