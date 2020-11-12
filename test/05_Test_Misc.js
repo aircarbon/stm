@@ -11,6 +11,12 @@ const transferHelper = require('../test/transferHelper.js');
 const setupHelper = require('../test/testSetupContract.js');
 const CONST = require('../const.js');
 
+const readline = require("readline");
+const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+});
+
 contract("StMaster", accounts => {
     var stm;
 
@@ -39,14 +45,19 @@ contract("StMaster", accounts => {
 
     // // https://iancoleman.io/bip39/#english
     it(`misc - bip39 - should be able to use a maximum entropy (24 word = 512-bit) BIP39 mnemonic (BIP44 HD)`, async () => {
-        for (let i=0 ; i < 10 ; i++) {
-            const x = await CONST.getAccountAndKey(i,
-                'fortune nurse warfare wool ankle sail mammal excite other black claw imitate'
-                );
-            console.log(`#${i} addr: ${x.addr}`); //privKey: ${x.privKey}`);
-            // if (i==0) {
-            //     assert(x.privKey == '...', 'unexpected key')
-            // }
+        console.log('> Enter mnemonic:');
+        for await (const mnemonic of rl) {
+            console.log('Mnemonic: ', mnemonic);
+            for (let i=0 ; i < 10 ; i++) {
+                const x = await CONST.getAccountAndKey(i,
+                    mnemonic
+                    );
+                console.log(`#${i} addr: ${x.addr}`); //privKey: ${x.privKey}`);
+                // if (i==0) {
+                //     assert(x.privKey == '...', 'unexpected key')
+                // }
+            }
+            break;
         }
     });
 
