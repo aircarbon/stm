@@ -84,7 +84,7 @@ library PayableLib {
         require(cashflowData.wei_currentPrice > 0 || cashflowData.cents_currentPrice > 0, "Bad cashflow request: no price set");
         require(cashflowData.wei_currentPrice == 0 || cashflowData.cents_currentPrice == 0, "Bad cashflow request: ambiguous price set");
         if (cashflowData.cents_currentPrice > 0) {
-            require(ethSat_UsdCents != -1 || usdCents_ethSat != -1 || bnbSat_UsdCents != -1, "Bad cashflow request: no usd/{eth|bnb} rate");
+            require(ethSat_UsdCents != -1 || bnbSat_UsdCents != -1, "Bad cashflow request: no usd/{eth|bnb} rate");
         }
 
         // get issuer
