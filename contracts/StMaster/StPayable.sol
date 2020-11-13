@@ -76,7 +76,7 @@ contract StPayable is
 //# 
 //#     //function() external  payable  onlyWhenReadWrite() {
 //#     receive() external payable onlyWhenReadWrite() {
-//#         PayableLib.pay(ld, std, ctd, cashflowData, globalFees, owner, get_ethUsd(), get_usdEth(), get_bnbUsd());
+//#         PayableLib.pay(ld, std, ctd, cashflowData, globalFees, owner, get_ethUsd(), get_bnbUsd());
 //#     }
 //# 
 //#     function setIssuerValues(
