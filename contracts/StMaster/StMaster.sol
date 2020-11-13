@@ -34,7 +34,7 @@ https://diligence.consensys.net/blog/2019/09/how-to-prepare-for-a-smart-contract
 // 24560: ... [split ledger - wip; at limit]
 // 24241: ... [refactor/remove SecTokenReturn in favour of LedgerSecTokenReturn]
 // 24478: ... [+ _tokens_base_id, getSecToken_BaseId()]
-// TODO: fork/conditional compile -- StPayable || StFutures
+// 23275: ... [+ _owners[], getOwners] 
 
 contract StMaster
     is
@@ -118,9 +118,10 @@ contract StMaster
     //event dbg2(uint256 postIdShifted);
 
     constructor(
+        address[] memory              _owners,
         StructLib.ContractType        _contractType,
 //#if process.env.CONTRACT_TYPE === 'CASHFLOW_BASE'
-        StructLib.CashflowArgs memory _cashflowArgs,
+//#         StructLib.CashflowArgs memory _cashflowArgs,
 //#endif
         string memory                 _contractName,
         string memory                 _contractVer,
@@ -128,19 +129,19 @@ contract StMaster
         string memory                 _contractSymbol,
         uint8                         _contractDecimals
 //#if process.env.CONTRACT_TYPE === 'CASHFLOW_BASE'
-        ,
-      //address                       _chainlinkAggregator_btcUsd,
-        address                       _chainlinkAggregator_ethUsd,
-        address                       _chainlinkAggregator_bnbUsd
+//#         ,
+//#       //address                       _chainlinkAggregator_btcUsd,
+//#         address                       _chainlinkAggregator_ethUsd,
+//#         address                       _chainlinkAggregator_bnbUsd
 //#endif
     ) StErc20(_contractSymbol, _contractDecimals)
     {
 
 //#if process.env.CONTRACT_TYPE === 'CASHFLOW_BASE'
-        cashflowData.args = _cashflowArgs;
-        //chainlinkAggregator_btcUsd = _chainlinkAggregator_btcUsd;
-        chainlinkAggregator_ethUsd = _chainlinkAggregator_ethUsd;
-        chainlinkAggregator_bnbUsd = _chainlinkAggregator_bnbUsd;
+//#         cashflowData.args = _cashflowArgs;
+//#         //chainlinkAggregator_btcUsd = _chainlinkAggregator_btcUsd;
+//#         chainlinkAggregator_ethUsd = _chainlinkAggregator_ethUsd;
+//#         chainlinkAggregator_bnbUsd = _chainlinkAggregator_bnbUsd;
 //#endif
 
         // set common properties
@@ -150,6 +151,9 @@ contract StMaster
 
         // contract type
         ld.contractType = _contractType;
+
+        // set supplied owners (these function identically to the traditional deployment owner)
+        owners = _owners;
     }
 
     // todo: for updateable libs - proxy dispatcher

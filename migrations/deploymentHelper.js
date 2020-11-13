@@ -6,6 +6,7 @@ const publicIp = require('public-ip');
 
 const CONST = require('../const.js');
 const { db } = require('../../utils-server/dist');
+const { assert } = require('console');
 
 module.exports = {
 
@@ -72,33 +73,37 @@ module.exports = {
             
             // parse cashflow args; convert from days to blocks
 //#if process.env.CONTRACT_TYPE === 'CASHFLOW_BASE'
-            const cfa = process.env.ADD_TYPE__CASHFLOW_ARGS !== undefined
-                        ? JSON.parse(process.env.ADD_TYPE__CASHFLOW_ARGS)
-                        : CONST.contractProps[contractType].cashflowArgs;
-            console.log('cfa(pre)', cfa);
-            if (cfa.term_Days === undefined || cfa.bond_int_EveryDays === undefined) throw('Undefined cashflow args; aborting.')
-            cfa.term_Blks = CONST.blocksFromDays(cfa.term_Days);
-            cfa.bond_int_EveryBlks = CONST.blocksFromDays(cfa.bond_int_EveryDays);
-            delete cfa.term_Days;
-            delete cfa.bond_int_EveryDays;
-            console.log('cfa(post)', cfa);
+//#             const cfa = process.env.ADD_TYPE__CASHFLOW_ARGS !== undefined
+//#                         ? JSON.parse(process.env.ADD_TYPE__CASHFLOW_ARGS)
+//#                         : CONST.contractProps[contractType].cashflowArgs;
+//#             console.log('cfa(pre)', cfa);
+//#             if (cfa.term_Days === undefined || cfa.bond_int_EveryDays === undefined) throw('Undefined cashflow args; aborting.')
+//#             cfa.term_Blks = CONST.blocksFromDays(cfa.term_Days);
+//#             cfa.bond_int_EveryBlks = CONST.blocksFromDays(cfa.bond_int_EveryDays);
+//#             delete cfa.term_Days;
+//#             delete cfa.bond_int_EveryDays;
+//#             console.log('cfa(post)', cfa);
 //#endif
 
             // derive primary owner/deployer (&[0]), and a further n more keypairs ("backup owners");
             // (bkp-owners are passed to contract ctor, and have identical permissions to the primary owner)
             const MNEMONIC = process.env.DEV_MNEMONIC || process.env.PROD_MNEMONIC ||  require('../DEV_MNEMONIC.js').MNEMONIC;
-            const accountAndKey = await CONST.getAccountAndKey(0, MNEMONIC);
-            const OWNER = accountAndKey.addr;
+            const accountAndKeys = [];
+            for (let i=0 ; i < CONST.RESERVED_ADDRESSES_COUNT ; i++) {
+                accountAndKeys.push(await CONST.getAccountAndKey(i, MNEMONIC))
+            }
+            const owners = accountAndKeys.map(p => p.addr);
 
             //
             // Deploy StMaster
             //
             stmAddr = await deployer.deploy(StMaster,
+                owners,
                 contractType == 'CASHFLOW_BASE'       ? CONST.contractType.CASHFLOW_BASE :
                 contractType == 'CASHFLOW_CONTROLLER' ? CONST.contractType.CASHFLOW_CONTROLLER :
                                                         CONST.contractType.COMMODITY,
 //#if process.env.CONTRACT_TYPE === 'CASHFLOW_BASE'
-                cfa,
+//#                 cfa,
 //#endif
                 contractName,
                 CONST.contractProps[contractType].contractVer,
@@ -106,11 +111,11 @@ module.exports = {
                 symbolOverride || CONST.contractProps[contractType].contractSymbol,
                 CONST.contractProps[contractType].contractDecimals
 //#if process.env.CONTRACT_TYPE === 'CASHFLOW_BASE'
-               ,
-             //CONST.chainlinkAggregators[process.env.NETWORK_ID].btcUsd,    // 24k
-               CONST.chainlinkAggregators[process.env.NETWORK_ID].ethUsd,
-               CONST.chainlinkAggregators[process.env.NETWORK_ID].usdEth,
-               CONST.chainlinkAggregators[process.env.NETWORK_ID].bnbUsd,
+//#                ,
+//#              //CONST.chainlinkAggregators[process.env.NETWORK_ID].btcUsd,    // 24k
+//#                CONST.chainlinkAggregators[process.env.NETWORK_ID].ethUsd,
+//#                CONST.chainlinkAggregators[process.env.NETWORK_ID].usdEth,
+//#                CONST.chainlinkAggregators[process.env.NETWORK_ID].bnbUsd,
 //#endif
             ).then(async stm => {
                 //console.dir(stm);
@@ -124,13 +129,10 @@ module.exports = {
                 //console.log('encodedArgs', encodedArgs.toString('hex'));
                 // TODO: try https://github.com/Zoltu/ethereum-abi-encoder ...
 
-                // save to DB
                 if (!deployer.network.includes("-fork")) {
-                    logEnv("DEPLOYMENT COMPLETE", OWNER, contractType, contractName);
-
+                    // save to DB
                     var ip = "unknown";
                     publicIp.v4().then(p => ip = p).catch(e => { console.log("\tWARN: could not get IP - will write 'unknown'"); });
-
                     console.log(`>>> SAVING DEPLOYMENT: ${contractName} ${CONST.contractProps[contractType].contractVer} to ${process.env.sql_server}`);
                     await db.SaveDeployment({
                         contractName: contractName,
@@ -143,10 +145,15 @@ module.exports = {
                         contractType,
                               txHash: stm.transactionHash
                     });
+
+                    // log & validate deployment
+                    logEnv("DEPLOYMENT COMPLETE", owners, contractType, contractName);
+                    const contractOwners = await CONST.web3_call('getOwners', []);
+                    if (contractOwners.length != CONST.RESERVED_ADDRESSES_COUNT) { 
+                        console.log(chalk.red.bold.inverse(`Deployment failed: unexpected owners data`), contractOwners);
+                        process.exit(1);
+                    }
                 }
-                // if (ok) {
-                //     ok(stm.address);
-                // }
                 return stm.address;
             }).catch(err => { console.error('failed deployment: StMaster', err); });
         }).catch(err => { console.error('failed deployment: FuturesLib', err); });
@@ -163,12 +170,13 @@ module.exports = {
     }
 };
 
-function logEnv(phase, owner, contractType, contractName) {
+function logEnv(phase, owners, contractType, contractName) {
     console.log(chalk.black.bgWhite(phase));
 
     console.log(chalk.red('\t                contractName: '), contractName);
     console.log(chalk.red('\t                contractType: '), contractType);
     console.log(chalk.red('\t process.env.CONTRACT_PREFIX: '), process.env.CONTRACT_PREFIX);
     console.log(chalk.red('\t      process.env.NETWORK_ID: '), process.env.NETWORK_ID);
-    console.log(chalk.red('\t                       owner: '), owner);
+    console.log(chalk.red('\t                      owners: '), owners);
+
 }
