@@ -75,7 +75,6 @@ library PayableLib {
         StructLib.CashflowStruct storage cashflowData,
         StructLib.FeeStruct storage globalFees, address owner,
         int256 ethSat_UsdCents,
-        int256 usdCents_ethSat,
         int256 bnbSat_UsdCents
     )
     public {
@@ -97,7 +96,7 @@ library PayableLib {
             // TODO...
         }
         else {
-            processSubscriberPayment(ld, std, ctd, cashflowData, issueBatch, globalFees, owner, ethSat_UsdCents, usdCents_ethSat, bnbSat_UsdCents); // all other senders
+            processSubscriberPayment(ld, std, ctd, cashflowData, issueBatch, globalFees, owner, ethSat_UsdCents, bnbSat_UsdCents); // all other senders
         }
     }
 
@@ -118,7 +117,6 @@ library PayableLib {
         StructLib.FeeStruct storage globalFees,
         address owner,
         int256 ethSat_UsdCents,
-        int256 usdCents_ethSat,
         int256 bnbSat_UsdCents
     )
     private {
@@ -133,7 +131,7 @@ library PayableLib {
             v.weiPrice = cashflowData.wei_currentPrice;
         }
         else {
-            require(ethSat_UsdCents != -1 || usdCents_ethSat != -1 || bnbSat_UsdCents != -1, "Bad cashflow request: no usd/{eth|bnb} rate");
+            require(ethSat_UsdCents != -1 || bnbSat_UsdCents != -1, "Bad cashflow request: no usd/{eth|bnb} rate");
             if (ethSat_UsdCents != -1) { // use uth/usd rate (ETH Ropsten, mainnet)
                 uint256 eth_UsdCents = uint256(ethSat_UsdCents) / 1000000;
                 v.weiPrice = (cashflowData.cents_currentPrice * 1000000000000000000) / eth_UsdCents;
@@ -141,11 +139,6 @@ library PayableLib {
             else if (bnbSat_UsdCents != -1) { // use bnb/usd rate (BSC Mainnet 56 & Testnet 97)
                 uint256 bnb_UsdCents = uint256(bnbSat_UsdCents) / 1000000;
                 v.weiPrice = (cashflowData.cents_currentPrice * 1000000000000000000) / bnb_UsdCents;
-            }
-            // ## broken ## -- revert on BSC Testnet; todo - remove...
-            else if (usdCents_ethSat != -1) { // use usd/eth (inverted?) rate (for BSC testnet - can only find ETH/BUSD chainlink)
-                uint256 eth_UsdCents = (1000000000000000000 / uint256(ethSat_UsdCents)) * 100;
-                v.weiPrice = (cashflowData.cents_currentPrice * 1000000000000000000) / eth_UsdCents;
             }
         }
 
