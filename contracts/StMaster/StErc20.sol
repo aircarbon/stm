@@ -77,7 +77,7 @@ contract StErc20 is StFees
         require(balanceOf(msg.sender) >= amount, "Insufficient tokens");
 
         return Erc20Lib.transfer(ld, std, ctd, globalFees, Erc20Lib.transferErc20Args({
-                owner: owner,
+      deploymentOwner: deploymentOwner,
             recipient: recipient,
                amount: amount
         }));
@@ -92,7 +92,7 @@ contract StErc20 is StFees
     }
     function transferFrom(address sender, address recipient, uint256 amount) public returns (bool) { 
         return Erc20Lib.transferFrom(ld, std, ctd, globalFees, erc20d, sender, Erc20Lib.transferErc20Args({
-                owner: owner,
+      deploymentOwner: deploymentOwner,
             recipient: recipient,
                amount: amount
         }));

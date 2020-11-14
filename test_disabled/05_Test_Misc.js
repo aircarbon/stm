@@ -78,7 +78,7 @@ contract("StMaster", accounts => {
 
     // it(`misc - only contract owner should be able to set read only state`, async () => {
     //     try {
-    //         await stm.setReadOnly(true, { from: accounts[1] });
+    //         await stm.setReadOnly(true, { from: accounts[10] });
     //     } catch (ex) {
     //         assert(ex.reason == 'Restricted', `unexpected: ${ex.reason}`);
     //         return;

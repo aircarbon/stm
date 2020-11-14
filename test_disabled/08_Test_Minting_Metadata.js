@@ -219,7 +219,7 @@ contract("StMaster", accounts => {
 
         try {
             const testKey = 'TEST_NEW_KEY', testValue = 'TEST_NEW_VALUE';
-            const addKvpTx = await stm.addMetaSecTokenBatch(batchId, 'testKey', testValue, {from: accounts[1] });
+            const addKvpTx = await stm.addMetaSecTokenBatch(batchId, 'testKey', testValue, {from: accounts[10] });
         } catch (ex) { 
             assert(ex.reason == 'Restricted', `unexpected: ${ex.reason}`);
             return;

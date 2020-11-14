@@ -59,7 +59,7 @@ contract("StMaster", accounts => {
     it(`FT reserved ccy - should not allow non-owner to set reserved ammount for a ledger entry`, async () => {
         const A = accounts[global.TaddrNdx];
         try {
-            const x = await stm.setReservedCcy(usdCcy.id, 100, A, { from: accounts[1] });
+            const x = await stm.setReservedCcy(usdCcy.id, 100, A, { from: accounts[10] });
         }
         catch (ex) { assert(ex.reason == 'Restricted', `unexpected: ${ex.reason}`); return; }
         assert.fail('expected contract exception');

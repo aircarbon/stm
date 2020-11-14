@@ -28,14 +28,14 @@ contract StTransferable is Owned,
         require(!(a.qty_A > 0 && !erc20d._whitelisted[a.ledger_A]), "Not whitelisted (A)"); 
         require(!(a.qty_B > 0 && !erc20d._whitelisted[a.ledger_B]), "Not whitelisted (B)");
 
-        a.feeAddrOwner = owner;
+        a.feeAddrOwner = deploymentOwner;
         TransferLib.transferOrTrade(ld, std, ctd, globalFees, a);
     }
 
     // FAST - fee preview exchange fee only
     function transfer_feePreview_ExchangeOnly(StructLib.TransferArgs calldata a)
     external view returns (StructLib.FeesCalc[1] memory feesAll) {
-        return TransferLib.transfer_feePreview_ExchangeOnly(ld, globalFees, owner, a);
+        return TransferLib.transfer_feePreview_ExchangeOnly(ld, globalFees, deploymentOwner, a);
     }
 
     // SLOW - fee preview, with batch originator token fees (full, slow) - old/deprecate
@@ -43,7 +43,7 @@ contract StTransferable is Owned,
     uint256 constant MAX_BATCHES_PREVIEW = 128; // library constants not accessible in contract; must duplicate TransferLib value
     function transfer_feePreview(StructLib.TransferArgs calldata a)
     external view returns (StructLib.FeesCalc[1 + MAX_BATCHES_PREVIEW * 2] memory feesAll) {
-        return TransferLib.transfer_feePreview(ld, std, globalFees, owner, a);
+        return TransferLib.transfer_feePreview(ld, std, globalFees, deploymentOwner, a);
     }
 
     // 24k

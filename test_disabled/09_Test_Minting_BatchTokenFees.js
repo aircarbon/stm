@@ -121,7 +121,7 @@ contract("StMaster", accounts => {
         
         const origFee2 = { ccy_mirrorFee: false, ccy_perMillion: 0, fee_fixed: 0, fee_percBips: 10, fee_min: 1, fee_max: 10 };
         try {
-            await stm.setOriginatorFeeTokenBatch(batchId, origFee2, { from: accounts[1] })
+            await stm.setOriginatorFeeTokenBatch(batchId, origFee2, { from: accounts[10] })
         } catch (ex) { assert(ex.reason == 'Restricted', `unexpected: ${ex.reason}`); return; }
         assert.fail('expected contract exception');
     });

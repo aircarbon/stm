@@ -4,15 +4,14 @@ pragma solidity >=0.4.21 <=0.7.1;
 
 contract Owned
 {
-    address payable owner;
+    address payable deploymentOwner;
     address[] owners;
 
     bool readOnlyState;
     function readOnly() external view returns (bool) { return readOnlyState; }
 
     constructor() {
-        owner = msg.sender;
-        owners.push(owner);
+        deploymentOwner = msg.sender;
         readOnlyState = false;
     }
 
@@ -20,16 +19,21 @@ contract Owned
 
     modifier onlyOwner() {
         // CFT: tx.origin (not msg.sender) -- we want the TX origin to be checked, not the calling cashflow controller
-        require(tx.origin == owner, "Restricted"); 
-        _; // required magic
+        //require(tx.origin == deploymentOwner, "Restricted"); 
+        //require(found, "Restricted"); 
+        
+        for (uint i = 0; i < owners.length; i++) {
+            if (owners[i] == tx.origin) {  _; return; }
+        }
+        revert("Restricted");
+        _;
     }
     modifier onlyWhenReadWrite() {
         require(readOnlyState == false, "Read-only");
         _;
     }
 
-    function setReadOnly(bool readOnlyNewState)
-    external onlyOwner() {
+    function setReadOnly(bool readOnlyNewState) external onlyOwner() {
         readOnlyState = readOnlyNewState;
     }
 }

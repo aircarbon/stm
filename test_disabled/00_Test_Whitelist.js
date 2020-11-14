@@ -19,11 +19,6 @@ contract("StMaster", accounts => {
     it(`whitelist - should be able to add whitelist addresses`, async () => {
         // whitelist (exchange-controlled accounts) all accounts up to graylist test start
         var totalCostUsd = 0;
-        // for (var i=0 ; i < WHITELIST_COUNT ; i++) { // note - we include account[0] owner account in the whitelist
-        //     const addr = accounts[i];
-        //     const whitelistTx = await stm.whitelist(addr);
-        //     //totalCostUsd += (await CONST.logGas(web3, whitelistTx, `whitelist account ndx #${i} ${addr}`)).usdCost;
-        // }
         await stm.whitelistMany(accounts.slice(0,WHITELIST_COUNT));
         global.TaddrNdx += WHITELIST_COUNT;
         //console.log('TOTAL COST USD $: ', totalCostUsd.toFixed(2)); // 50 = $10 one by one
@@ -34,13 +29,13 @@ contract("StMaster", accounts => {
 
     // whitelist & retrieve-next: owner-only & read-only 
     it(`whitelist - should not allow non-owner to add a whitelist address`, async () => {
-        try { await stm.whitelistMany([accounts[WHITELIST_COUNT]], { from: accounts[1] }); } catch (ex) {
+        try { await stm.whitelistMany([accounts[WHITELIST_COUNT]], { from: accounts[10] }); } catch (ex) {
             assert(ex.reason == 'Restricted', `unexpected: ${ex.reason}`); return;
         }
         assert.fail('expected contract exception');
     });
     // it(`whitelist - retrieve next - should not allow non-owner to increment next whitelist address`, async () => {
-    //     try { await stm.incWhitelistNext({ from: accounts[1] }); } catch (ex) {
+    //     try { await stm.incWhitelistNext({ from: accounts[10] }); } catch (ex) {
     //         assert(ex.reason == 'Restricted', `unexpected: ${ex.reason}`); return;
     //     }
     //     assert.fail('expected contract exception');

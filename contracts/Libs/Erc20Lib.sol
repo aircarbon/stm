@@ -22,7 +22,7 @@ library Erc20Lib {
 
     // TRANSFER
     struct transferErc20Args {
-        address owner;
+        address deploymentOwner;
         address recipient;
         uint256 amount;
     }
@@ -121,7 +121,7 @@ library Erc20Lib {
                         ccy_amount_B: 0,
                          ccyTypeId_B: 0,
                            applyFees: false,
-                        feeAddrOwner: a.owner //address(0x0) // fees: disabled for erc20 - not used
+                        feeAddrOwner: a.deploymentOwner //address(0x0) // fees: disabled for erc20 - not used
                     });
                     TransferLib.transferOrTrade(ld, std, ctd, globalFees, transferOrTradeArgs);
                     remainingToTransfer -= qtyTransfer;

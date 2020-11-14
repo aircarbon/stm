@@ -76,7 +76,7 @@ contract("StMaster", accounts => {
 
     it(`token types - should not allow non-owner to add an ST type`, async () => {
         try {
-            await stm.addSecTokenType(`NEW_TYPE_NAME_${new Date().getTime()}`, CONST.settlementType.SPOT, CONST.nullFutureArgs, CONST.nullAddr, { from: accounts[1] });
+            await stm.addSecTokenType(`NEW_TYPE_NAME_${new Date().getTime()}`, CONST.settlementType.SPOT, CONST.nullFutureArgs, CONST.nullAddr, { from: accounts[10] });
         } catch (ex) { 
             assert(ex.reason == 'Restricted', `unexpected: ${ex.reason}`);
             return; 

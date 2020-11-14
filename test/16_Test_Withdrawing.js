@@ -95,7 +95,7 @@ contract("StMaster", accounts => {
 
     it(`withdrawing - should not allow non-owner to withdrawing from a ledger entry`, async () => {
         try {
-            await stm.fundOrWithdraw(CONST.fundWithdrawType.WITHDRAW, CONST.ccyType.USD, 100, accounts[global.TaddrNdx], 'TEST', { from: accounts[1] });
+            await stm.fundOrWithdraw(CONST.fundWithdrawType.WITHDRAW, CONST.ccyType.USD, 100, accounts[global.TaddrNdx], 'TEST', { from: accounts[10] });
         } catch (ex) { 
             assert(ex.reason == 'Restricted', `unexpected: ${ex.reason}`);
             return;

@@ -71,7 +71,7 @@ contract("StMaster", accounts => {
 
     it(`ccy types - should not allow non-owner to add a currency type`, async () => {
         try {
-            await stm.addCcyType('NEW_TYPE_ID_3', 'test_unit', 2, { from: accounts[1] });
+            await stm.addCcyType('NEW_TYPE_ID_3', 'test_unit', 2, { from: accounts[10] });
         } catch (ex) { 
             assert(ex.reason == 'Restricted', `unexpected: ${ex.reason}`);
             return;

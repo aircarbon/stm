@@ -54,7 +54,7 @@ contract("StMaster", accounts => {
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2, CONST.KT_CARBON, 1, M, CONST.nullFees, 100, [], [], { from: accounts[0] });
         const batchId = await stm.getSecTokenBatch_MaxId.call();
         try {
-            await stm.setOriginatorFeeCurrencyBatch(batchId, 101, { from: accounts[1] })
+            await stm.setOriginatorFeeCurrencyBatch(batchId, 101, { from: accounts[10] })
         } catch (ex) { assert(ex.reason == 'Restricted', `unexpected: ${ex.reason}`); return; }
         assert.fail('expected contract exception');
     });

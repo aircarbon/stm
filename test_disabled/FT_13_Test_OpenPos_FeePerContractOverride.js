@@ -121,7 +121,7 @@ contract("StMaster", accounts => {
     it(`FT fee per contract override - should not allow non-owner to override fee per contract`, async () => {
         const A = accounts[global.TaddrNdx];
         try {
-            const x = await stm.setLedgerOverride(2, usdFT.id, A, 100, { from: accounts[1] }); //await stm.feePerContractOverride(usdFT.id, A, 100, { from: accounts[1] });
+            const x = await stm.setLedgerOverride(2, usdFT.id, A, 100, { from: accounts[10] });
         }
         catch (ex) { assert(ex.reason == 'Restricted', `unexpected: ${ex.reason}`); return; }
         assert.fail('expected contract exception');

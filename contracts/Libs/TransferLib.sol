@@ -52,7 +52,7 @@ library TransferLib {
         // disallow currency swaps - we need single consistent ccy type on each side for ccy-fee mirroring
         require(a.ccyTypeId_A == 0 || a.ccyTypeId_B == 0, "Bad ccy swap");
 
-        if (ld.contractType == StructLib.ContractType.CASHFLOW_CONTROLLER) {
+        if (ld.contractType != StructLib.ContractType.CASHFLOW_BASE) {
             if (a.ccy_amount_A > 0) require(a.ccyTypeId_A > 0 && a.ccyTypeId_A <= ctd._ct_Count, "Bad ccyTypeId A");
             if (a.ccy_amount_B > 0) require(a.ccyTypeId_B > 0 && a.ccyTypeId_B <= ctd._ct_Count, "Bad ccyTypeId B");
         }

@@ -98,7 +98,7 @@ contract("StMaster", accounts => {
     it(`FT positions - should not allow non-owner to open a futures position`, async () => {
         const A = accounts[global.TaddrNdx], B = accounts[global.TaddrNdx + 1];
         try {
-            const x = await stm.openFtPos({ tokTypeId: usdFT.id, ledger_A: A, ledger_B: B, qty_A: +10, qty_B: -10, price: 100 }, { from: accounts[1] });
+            const x = await stm.openFtPos({ tokTypeId: usdFT.id, ledger_A: A, ledger_B: B, qty_A: +10, qty_B: -10, price: 100 }, { from: accounts[10] });
         }
         catch (ex) { assert(ex.reason == 'Restricted', `unexpected: ${ex.reason}`); return; }
         assert.fail('expected contract exception');

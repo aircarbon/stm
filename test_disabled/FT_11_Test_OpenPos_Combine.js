@@ -186,7 +186,7 @@ contract("StMaster", accounts => {
     });
 
     it(`FT pos-combine - should not allow non-owner to combine futures positions`, async () => {
-        try { await stm.combineFtPos({ tokTypeId: usdFT.id, master_StId: 1, child_StIds: [2] }, { from: accounts[1] }); } catch (ex) {
+        try { await stm.combineFtPos({ tokTypeId: usdFT.id, master_StId: 1, child_StIds: [2] }, { from: accounts[10] }); } catch (ex) {
             assert(ex.reason == 'Restricted', `unexpected: ${ex.reason}`); return;
         }
         assert.fail('expected contract exception');

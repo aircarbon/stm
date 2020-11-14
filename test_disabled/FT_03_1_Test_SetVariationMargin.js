@@ -56,7 +56,7 @@ contract("StMaster", accounts => {
 
     it(`FT var margin - should not allow non-owner to set variation margin on a futures token type`, async () => {
         try {
-            const x = await stm.setFuture_VariationMargin(usdFT.id, 43, { from: accounts[1] });
+            const x = await stm.setFuture_VariationMargin(usdFT.id, 43, { from: accounts[10] });
         }
         catch (ex) { assert(ex.reason == 'Restricted', `unexpected: ${ex.reason}`); return; }
         assert.fail('expected contract exception');

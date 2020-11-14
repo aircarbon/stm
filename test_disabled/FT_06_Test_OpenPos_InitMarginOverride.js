@@ -147,7 +147,7 @@ contract("StMaster", accounts => {
     it(`FT init margin override - should not allow non-owner to override initial margin`, async () => {
         const A = accounts[global.TaddrNdx];
         try {
-            const x = await stm.setLedgerOverride(1, usdFT.id, A, 1000, { from: accounts[1] }); //await stm.initMarginOverride(usdFT.id, A, 1000, { from: accounts[1] });
+            const x = await stm.setLedgerOverride(1, usdFT.id, A, 1000, { from: accounts[10] });
         }
         catch (ex) { assert(ex.reason == 'Restricted', `unexpected: ${ex.reason}`); return; }
         assert.fail('expected contract exception');
