@@ -147,7 +147,7 @@ module.exports = {
 
                     // log & validate deployment
                     logEnv("DEPLOYMENT COMPLETE", owners, contractType, contractName);
-                    const contractOwners = await CONST.web3_call('getOwners', []);
+                    const contractOwners = await CONST.web3_call('getOwners', [], undefined/*nameOverride*/, stm.address/*addrOverride*/);
                     if (contractOwners.length != CONST.RESERVED_ADDRESSES_COUNT) { 
                         console.log(chalk.red.bold.inverse(`Deployment failed: unexpected owners data`), contractOwners);
                         process.exit(1);
