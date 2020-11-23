@@ -24,6 +24,7 @@ const HDWalletProvider = require("@truffle/hdwallet-provider");
 const NonceTrackerSubprovider = require("web3-provider-engine/subproviders/nonce-tracker");
 
 const DEV_MNEMONIC = process.env.DEV_MNEMONIC || require('./DEV_MNEMONIC.js').MNEMONIC;
+const PROD_MNEMONIC = process.env.PROD_MNEMONIC || require('./PROD_MNEMONIC.js').MNEMONIC;
 
 const GWEI_MAINNET_1  = "80";
 const GWEI_MAINNET_56 = "20"; // 20 gwei minimum [PoA validator cartel!]?! trial & error - not clear at all; <20 gwei seems to never mine...
@@ -75,7 +76,7 @@ module.exports = {
     // aircarbon Eth mainnet (1) geth node
     mainnet_ac: {
         provider: function() {
-            var wallet = new HDWalletProvider(require('./PROD_MNEMONIC.js').MNEMONIC,
+            var wallet = new HDWalletProvider(PROD_MNEMONIC,
                 'https://ac-dev0.net:10545',
                 0, 1000);
             var nonceTracker = new NonceTrackerSubprovider();
@@ -154,7 +155,7 @@ module.exports = {
     // AirCarbon private/sidechain (52101) ProdNet Geth
     prodnet_ac: {
         provider: function() {
-            var wallet = new HDWalletProvider(require('./PROD_MNEMONIC.js').MNEMONIC,
+            var wallet = new HDWalletProvider(PROD_MNEMONIC,
                 'https://ac-prod0.aircarbon.co:9545',
                 0, 1000);
             var nonceTracker = new NonceTrackerSubprovider();
@@ -174,7 +175,7 @@ module.exports = {
     // Binance Smart Chain (BSC) Mainnet (AC Geth BSC instance)
     bsc_mainnet_ac: {
         provider: function() {
-            var wallet = new HDWalletProvider(require('./PROD_MNEMONIC.js').MNEMONIC,
+            var wallet = new HDWalletProvider(PROD_MNEMONIC,
                 'https://ac-prod1.aircarbon.co:9545',
                 0, 1000);
             var nonceTracker = new NonceTrackerSubprovider();
@@ -186,7 +187,7 @@ module.exports = {
         gasPrice: web3.utils.toWei(GWEI_MAINNET_56, "gwei"), // "--txpool.pricelimit 0" or similar on BCS Geth instance seems to result in no TX's being mined at all
         network_id: "56",
         networkCheckTimeout: 30000,
-        confirmations: 1,       
+        confirmations: 1,
         skipDryRun: false,
         timeoutBlocks: 200,
     },
