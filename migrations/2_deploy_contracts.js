@@ -66,7 +66,7 @@ module.exports = async function (deployer) {
             else if (process.env.INSTANCE_ID.startsWith('UAT_97_SD_')) {
                 console.log((`Deploying (AWS DEV / UAT BSC Testnet [additional base type] for SDAX) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`));
             }
-            else if (process.env.INSTANCE_ID.includes('PROD_56_SD_')) {
+            else if (process.env.INSTANCE_ID.startsWith('PROD_56_SD_')) {
                 console.log((`Deploying (AWS PROD / BSC Mainnet [additional base type] for SDAX) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`));
             }
             else if (process.env.INSTANCE_ID.startsWith('local')) {
