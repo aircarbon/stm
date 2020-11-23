@@ -60,8 +60,14 @@ module.exports = async function (deployer) {
         case 'PROD_3_SD': console.log((`Deploying (AWS PROD / Ropsten 3 [controller w/ 0 default base types] for SDAX) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`)); break;
         case 'PROD_56_SD': console.log((`Deploying (AWS PROD / BSC Mainnet [controller w/ 0 default base types] for SDAX) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`)); break;
         default:
-            if (process.env.INSTANCE_ID.includes('UAT_') || process.env.INSTANCE_ID.startsWith('UAT_3_SD') ||  process.env.INSTANCE_ID.startsWith('UAT_97_SD')) {
-                console.log((`Deploying (AWS DEV / UAT [additional base type] for SDAX) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`));
+            if (process.env.INSTANCE_ID.startsWith('UAT_3_SD_')) {
+                console.log((`Deploying (AWS DEV / UAT Ropsten [additional base type] for SDAX) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`));
+            }
+            else if (process.env.INSTANCE_ID.startsWith('UAT_97_SD_')) {
+                console.log((`Deploying (AWS DEV / UAT BSC Testnet [additional base type] for SDAX) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`));
+            }
+            else if (process.env.INSTANCE_ID.includes('PROD_56_SD_')) {
+                console.log((`Deploying (AWS PROD / BSC Mainnet [additional base type] for SDAX) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`));
             }
             else if (process.env.INSTANCE_ID.startsWith('local')) {
                 console.log((`Deploying localhost contract instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`));
