@@ -121,7 +121,7 @@ contract StMaster
         address[] memory              _owners,
         StructLib.ContractType        _contractType,
 //#if process.env.CONTRACT_TYPE === 'CASHFLOW_BASE'
-        StructLib.CashflowArgs memory _cashflowArgs,
+//#         StructLib.CashflowArgs memory _cashflowArgs,
 //#endif
         string memory                 _contractName,
         string memory                 _contractVer,
@@ -129,19 +129,19 @@ contract StMaster
         string memory                 _contractSymbol,
         uint8                         _contractDecimals
 //#if process.env.CONTRACT_TYPE === 'CASHFLOW_BASE'
-        ,
-      //address                       _chainlinkAggregator_btcUsd,
-        address                       _chainlinkAggregator_ethUsd,
-        address                       _chainlinkAggregator_bnbUsd
+//#         ,
+//#       //address                       _chainlinkAggregator_btcUsd,
+//#         address                       _chainlinkAggregator_ethUsd,
+//#         address                       _chainlinkAggregator_bnbUsd
 //#endif
     ) StErc20(_contractSymbol, _contractDecimals)
     {
 
 //#if process.env.CONTRACT_TYPE === 'CASHFLOW_BASE'
-        cashflowData.args = _cashflowArgs;
-        //chainlinkAggregator_btcUsd = _chainlinkAggregator_btcUsd;
-        chainlinkAggregator_ethUsd = _chainlinkAggregator_ethUsd;
-        chainlinkAggregator_bnbUsd = _chainlinkAggregator_bnbUsd;
+//#         cashflowData.args = _cashflowArgs;
+//#         //chainlinkAggregator_btcUsd = _chainlinkAggregator_btcUsd;
+//#         chainlinkAggregator_ethUsd = _chainlinkAggregator_ethUsd;
+//#         chainlinkAggregator_bnbUsd = _chainlinkAggregator_bnbUsd;
 //#endif
 
         // set common properties

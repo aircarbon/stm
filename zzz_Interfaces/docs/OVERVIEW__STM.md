@@ -1,17 +1,21 @@
 # SecTokMaster (STM) v0.99 - Overview
 
 ## Contract Type - Commodity or Cashflow
-STM is an Ethereum contract comprising:
+STM is configured at deployment time to one of:
+* Commodity token (CT): a semi-fungible (multi-batch), multi-type & single-version commodity underlying; or
+* Cashflow token (CFT): a fully-fungible, multi-type & multi-version (recursive/linked contract deployments) cashflow-generating underlyings.
 
-    (a) an asset-backed, multi-type token/collateral atomic trading & settlement engine,
-    
-    (b) ERC20 (partial) implementation (exc. transferFrom, transferFrom, approve) and permission semantics on withdrawn tokens, and
-    
-    (c) WIP: ETH subscriber cashflow processing of (USD-priced or ETH-priced) token issuances, and (d) ETH issuer cashflow processing of CFT-equity or CFT-loan payments. 
+It is an EVM-compatible (Solidity language) set of smart contracts, comprising:
 
-STM is configured at deployment time to one of the following two types:
-* Commodity token (CT): a semi-fungible (multi-batch), multi-type commodity underlying; or
-* Cashflow token (CFT): a fully-fungible (single-batch), single-type cashflow-generating underlying.
+    (a) asset-backed, multi token/collateral-type atomic spot trading & settlement engine;
+    (b) scalable, semi-fungible & asset metadata-backed types: extendible type-system, and extendible token tagging with batch metadata;
+    (c) upgradable contracts: cryptographic checksumming of v+0 and v+1 contract data fields;
+    (d) full ERC20 implementation (inc. transferFrom, allowance, approve) for self-custody;
+    (e) multiple (10 reserved) contract owner/operator addresses, for concurrent parallel/batched operations, via independent account-nonce sequencing;
+    (f) segmented ledger: hybrid permission semantics - owner-controller ("whitelisted") addresses for spot trade execution, and third-party controller ("graylisted") addresses for self-custody;
+    (g) generic metadata batch minting, e.g. for commodity (carbon offset) tokens, modelled on World Bank's IETA Climate Warehouse initiative data dictionary schema;
+    (h) hybrid on/off chain futures settlement engine (take & pay period processing, via central clearing account), with on-chain position management & position-level P&L;
+    (i) WIP: CFT - subscriber cashflow (e.g. ETH/BNB) processing of (USD-priced or ETH/BNB-priced) token issuances, and (inversely) issuer cashflow processing of CFT-equity or CFT-loan payments. 
 
 ## Functionality: Core (CT)
 Features of STM include:
@@ -27,7 +31,7 @@ Features of STM include:
 * Extensibility: adding currency and token types *[permission: owner-only]*
 * Upgradability: 100% data storage coverage for batched data write functions, mapped 1-1 with public read views, for verifiable cross-contract backup/restore *[permission: owner-only]*
 * Verifiability: 100% data storage coverage of aggregated global keccak256 hash *[permission: public]*
-* WIP: multi-owner permission model (ctor to accept addr[], & onlyOwner() tweak)
+* Operations: multi-owner permission model (ctor to accept addr[], & onlyOwner() tweak)
 * WIP: futures
 
 ## Functionality: Cashflow (CFT)

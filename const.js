@@ -25,17 +25,17 @@ const sha3_512 = require('js-sha3').sha3_512;
 const truffleAssert = require('truffle-assertions');
 const { db } = require('../utils-server/dist');
 
-//const GAS_USD = 322; // ETHUSD (for ETH mainnet) or BNBUSD (for BSC mainnet)
-const GAS_USD = 30; // ETHUSD (for ETH mainnet) or BNBUSD (for BSC mainnet)
+//const GAS_USD = 550; // ETH{||BNB}-USD fiat rate
+const GAS_USD = 30; // ETH{||BNB}-USD fiat rate
 
 // misc
 const WEB3_NONCE_REPLACE = undefined; // set to replace/drop a slow mainnet TX
 const WEB3_GWEI_GAS_BID =
-    process.env.INSTANCE_ID === 'PROD_56'         ? '20' // BSC mainnet -- see: truffle_config.js re. gas cost
-  : process.env.INSTANCE_ID.startsWith('UAT_97')  ? '20' // BSC testnet
-  : process.env.INSTANCE_ID === 'PROD_52101'      ? '1'  // AC privnet
-  : process.env.INSTANCE_ID === 'PROD_1'          ? '80' // ETH mainnet
-                                                  : '5';
+    process.env.INSTANCE_ID.includes('_56')  ? '20' // BSC mainnet
+  : process.env.INSTANCE_ID.includes('_97')  ? '20' // BSC testnet
+  : process.env.INSTANCE_ID === 'PROD_52101' ? '1'  // AC privnet
+  : process.env.INSTANCE_ID === 'PROD_1'     ? '80' // ETH mainnet
+                                             : '5';
 const WEB3_GAS_LIMIT = 5000000;
 
 // CFT helpers
@@ -62,7 +62,7 @@ const blocksFromMonths = (months) => Math.ceil(blocksFromDays(months * 30.42));
 //
 // MAIN: deployer definitions -- contract ctor() params
 //
-const contractVer = process.env.CONTRACT_VERSION || "0.99s";
+const contractVer = process.env.CONTRACT_VERSION || "0.99t";
 const contractProps = {
     COMMODITY: {
         contractVer: contractVer,
@@ -406,10 +406,13 @@ function getTestContextWeb3(useWs) {
 }
 
 async function getAccountAndKey(accountNdx, mnemonic, coinTypeSlip44) {
-    const MNEMONIC =
-        process.env.INSTANCE_ID === 'PROD_1' || process.env.INSTANCE_ID === 'PROD_56' || process.env.INSTANCE_ID === 'PROD_52101'
-            ? (require('./PROD_MNEMONIC.js').MNEMONIC)
-            : mnemonic || require('./DEV_MNEMONIC.js').MNEMONIC;
+    const MNEMONIC = 
+        process.env.PROD_MNEMONIC !== undefined
+            ? process.env.PROD_MNEMONIC
+            : process.env.INSTANCE_ID.includes('PROD')
+                ? (require('./PROD_MNEMONIC.js').MNEMONIC)
+                : mnemonic || require('./DEV_MNEMONIC.js').MNEMONIC;
+
     const seed = await bip39.mnemonicToSeed(MNEMONIC);
     const hdk = hdkey.fromMasterSeed(seed);
     const addr_node = hdk.derivePath(`m/44'/${coinTypeSlip44 || '60'}'/0'/0/${accountNdx}`);

@@ -52,7 +52,7 @@ contract("StMaster", accounts => {
                 const x = await CONST.getAccountAndKey(i,
                     mnemonic
                     );
-                console.log(`#${i} addr: ${x.addr} privKey: ${x.privKey}`);
+                console.log(`#${i} addr: ${x.addr}`);// privKey: ${x.privKey}`);
                 // if (i==0) {
                 //     assert(x.privKey == '...', 'unexpected key')
                 // }

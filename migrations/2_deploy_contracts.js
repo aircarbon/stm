@@ -57,7 +57,8 @@ module.exports = async function (deployer) {
         // SD
         case 'DEV_SD': console.log((`Deploying (AWS DEV / DEV [controller w/ 0 default base types] for SDAX) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`)); break;
         case 'UAT_SD': console.log((`Deploying (AWS DEV / UAT [controller w/ 0 default base types] for SDAX) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`)); break;
-        //case 'UAT_SD_x3': console.log((`Deploying (AWS DEV / UAT [additional base type #3] for SDAX) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`)); break;
+        case 'PROD_3_SD': console.log((`Deploying (AWS PROD / Ropsten 3 [controller w/ 0 default base types] for SDAX) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`)); break;
+        case 'PROD_56_SD': console.log((`Deploying (AWS PROD / BSC Mainnet [controller w/ 0 default base types] for SDAX) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`)); break;
         default:
             if (process.env.INSTANCE_ID.includes('UAT_') || process.env.INSTANCE_ID.startsWith('UAT_3_SD') ||  process.env.INSTANCE_ID.startsWith('UAT_97_SD')) {
                 console.log((`Deploying (AWS DEV / UAT [additional base type] for SDAX) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`));
@@ -74,7 +75,6 @@ module.exports = async function (deployer) {
     console.log(chalk.red('process.env.CONTRACT_TYPE'.padEnd(30, '.')), process.env.CONTRACT_TYPE);
     const contractPrefix = (process.env.INSTANCE_ID || 'local').padEnd(30, '.') + '_';
     console.log(chalk.red('process.env.CONTRACT_PREFIX'.padEnd(30, '.')), process.env.CONTRACT_PREFIX);
-    console.log(chalk.red('deployer.gasPrice (gwei)'.padEnd(30, '.')), web3.utils.fromWei(deployer.networks[deployer.network].gasPrice.toString(), "gwei"));
 
     // require the supplied env network_id (via INSTANCE_ID) to match the supplied deployer's network_id
     if (process.env.NETWORK_ID != deployer.network_id) {
@@ -82,6 +82,13 @@ module.exports = async function (deployer) {
         process.exit(1);
     }
     process.env.WEB3_NETWORK_ID = deployer.network_id;
+    
+    // check deployer account balance
+    console.log(chalk.red('O.addr'.padEnd(30, '.')), O.addr);
+    const { web3, ethereumTxChain } = await CONST.getTestContextWeb3();
+    const bal = await web3.eth.getBalance(O.addr);
+    console.log(chalk.red('O.addr(bal)'.padEnd(30, '.')), web3.utils.fromWei(bal));
+    console.log(chalk.red('deployer.gasPrice (gwei)'.padEnd(30, '.')), web3.utils.fromWei(deployer.networks[deployer.network].gasPrice.toString(), "gwei"));
 
     // test DB connection
     const dbData = (await db.GetDeployment(3, `dummy_contractName`, `dummy_contractVer`));
