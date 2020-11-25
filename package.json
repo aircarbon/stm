@@ -48,7 +48,7 @@
     "ethereumjs-common": "^1.5.1",
     "ethereumjs-tx": "^2.1.1",
     "ethereumjs-wallet": "^0.6.3",
-    "highlight.js": "^9.18.0",
+    "highlight.js": "^9.18.5",
     "markdown-it": "^10.0.0",
     "markdown-it-emoji": "^1.4.0",
     "meow": "^6.0.0",
