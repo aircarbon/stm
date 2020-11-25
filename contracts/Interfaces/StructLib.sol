@@ -8,7 +8,25 @@ import "../StMaster/StMaster.sol";
 library StructLib {
 
     // EVENTS - SHARED (FuturesLib & TransferLib)
-    enum TransferType { User, ExchangeFee, OriginatorFee, TakePay, TakePayFee, SettleTake, SettlePay }
+    enum TransferType { 
+        User,                                         // SPOT trade
+        ExchangeFee,                                  // SPOT exchange fee
+        OriginatorFee,                                // SPOT originator fee
+        
+        TakePay, TakePayFee, SettleTake, SettlePay,   // FUTURES OPS
+        
+        // TODO: must pass into transferOrTrade for one-sided ccy xfer...
+        ExchangeFee_MintingTokens,                    // FEES: creation of tokens
+        ExchangeFee_BurningTokens,                    // FEES: retirement of tokens
+        ExchangeFee_WithdrawingTokens,                // FEES: erc20 transfer out
+        ExchangeFee_DepositTokens,                    // FEES: erc20 transfer in
+        ExchangeFee_Data,                             // FEES: data-related fees
+        ExchangeFee_Other1, 
+        ExchangeFee_Other2, 
+        ExchangeFee_Other3, 
+        ExchangeFee_Other4,
+        ExchangeFee_Other5
+    }
     event TransferedLedgerCcy(address indexed from, address indexed to, uint256 ccyTypeId, uint256 amount, TransferType transferType);
     event ReservedLedgerCcy(address indexed ledgerOwner, uint256 ccyTypeId, uint256 amount);
 
