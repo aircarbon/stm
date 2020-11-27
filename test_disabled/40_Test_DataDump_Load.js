@@ -186,6 +186,7 @@ contract("StMaster", accounts => {
                     ccy_amount_B: 0,                         ccyTypeId_B: 0, 
                        applyFees: false,
                     feeAddrOwner: CONST.nullAddr,
+                    transferType: CONST.transferType.UNDEFINED,
                 },
             );
             curHash = await checkHashUpdate(curHash);
@@ -201,6 +202,7 @@ contract("StMaster", accounts => {
                      ccy_amount_B: 0,                         ccyTypeId_B: 0, 
                         applyFees: true,
                      feeAddrOwner: CONST.nullAddr,
+                     transferType: CONST.transferType.UNDEFINED,
                     },
                 );
                 curHash = await checkHashUpdate(curHash);
@@ -266,6 +268,7 @@ contract("StMaster", accounts => {
                     ccy_amount_B: CONST.ccyType.USD,         ccyTypeId_B: 1,
                        applyFees: true,
                     feeAddrOwner: CONST.nullAddr,
+                    transferType: CONST.transferType.UNDEFINED,
                 });
                 //truffleAssert.prettyPrintEmittedEvents(tradeTx);
                 curHash = await checkHashUpdate(curHash);

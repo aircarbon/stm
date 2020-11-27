@@ -88,6 +88,7 @@ describe(`Contract Web3 Interface`, async () => {
                    applyFees: false,
                 feeAddrOwner: CONST.nullAddr,
                    k_stIds_A: [], k_stIds_B: [],
+                transferType: CONST.transferType.UNDEFINED,
             }], OWNER, OWNER_privKey);
 
             // setup - transferOrTrade type 2: A -> GRAY_1
@@ -100,6 +101,7 @@ describe(`Contract Web3 Interface`, async () => {
                    applyFees: false,
                 feeAddrOwner: CONST.nullAddr,
                    k_stIds_A: [], k_stIds_B: [],
+                transferType: CONST.transferType.UNDEFINED,
             }], OWNER, OWNER_privKey);
         //}
 

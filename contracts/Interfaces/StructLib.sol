@@ -9,23 +9,42 @@ library StructLib {
 
     // EVENTS - SHARED (FuturesLib & TransferLib)
     enum TransferType { 
-        User,                                         // SPOT trade
-        ExchangeFee,                                  // SPOT exchange fee
-        OriginatorFee,                                // SPOT originator fee
+        Undefined,
+
+        // spot trades: user-requested trade transfers, and automated fees
+        User,
+        ExchangeFee,
+        OriginatorFee,
         
-        TakePay, TakePayFee, SettleTake, SettlePay,   // FUTURES OPS
+        // futures: settlement transfers
+        //TakePay, 
+        TakePayFee, SettleTake, SettlePay,
         
-        // TODO: must pass into transferOrTrade for one-sided ccy xfer...
-        ExchangeFee_MintingTokens,                    // FEES: creation of tokens
-        ExchangeFee_BurningTokens,                    // FEES: retirement of tokens
-        ExchangeFee_WithdrawingTokens,                // FEES: erc20 transfer out
-        ExchangeFee_DepositTokens,                    // FEES: erc20 transfer in
-        ExchangeFee_Data,                             // FEES: data-related fees
-        ExchangeFee_Other1, 
-        ExchangeFee_Other2, 
-        ExchangeFee_Other3, 
-        ExchangeFee_Other4,
-        ExchangeFee_Other5
+        // manual transfers: ccy fees
+        MintFee,
+        BurnFee,
+        WithdrawFee,
+        DepositFee,
+        DataFee,
+        OtherFee1, 
+        OtherFee2,
+        OtherFee3,
+        OtherFee4,
+        OtherFee5,
+
+        // generic: accounting adjustment
+        Adjustment,
+
+        // ERC20: token transfer
+        ERC20,
+
+        // CFT: token issuance/subscription
+        Subscription
+
+        //
+        // TODO: retest, no breaks... 
+        // TODO: for one-sided (ccy && token) transfers, output the supplied transferType in event... (space for this, for token events?!)
+        //
     }
     event TransferedLedgerCcy(address indexed from, address indexed to, uint256 ccyTypeId, uint256 amount, TransferType transferType);
     event ReservedLedgerCcy(address indexed ledgerOwner, uint256 ccyTypeId, uint256 amount);
@@ -325,6 +344,7 @@ library StructLib {
         bool    applyFees;       // apply global fee structure to the transfer (both legs)
         address feeAddrOwner;    // exchange fees: receive address
 
+        TransferType transferType; // reason/type code: applies only to one-sided transfers (not two-sided trades, which are coded automatically)
     }
     struct FeesCalc {
         uint256    fee_ccy_A;          // currency fee paid by A

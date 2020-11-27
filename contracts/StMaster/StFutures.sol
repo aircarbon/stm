@@ -199,6 +199,21 @@ contract StFutures is Owned,
         FuturesLib.combineFtPos(ld, std, a);
     }
 
+    function setFuture_VariationMargin(uint256 tokTypeId, uint16 varMarginBips)
+    public onlyOwner() onlyWhenReadWrite() {
+        TokenLib.setFuture_VariationMargin(std, tokTypeId, varMarginBips); // ### recalc all open pos margin/reserve; needs to be batched (job) - re. gas limits
+    }
+
+    function setFuture_FeePerContract(uint256 tokTypeId, uint128 feePerContract)
+    public onlyOwner() onlyWhenReadWrite() {
+        TokenLib.setFuture_FeePerContract(std, tokTypeId, feePerContract);
+    }
+    
+    function setReservedCcy(uint256 ccyTypeId, int256 reservedAmount, address ledger)
+        public onlyOwner() onlyWhenReadWrite() {
+            StructLib.setReservedCcy(ld, ctd, ledger, ccyTypeId, reservedAmount);
+    }
+
     // VIEWS
     function getInitMarginOverride(uint256 tokTypeId, address ledgerOwner)
     external view returns (uint16) {

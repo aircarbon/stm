@@ -176,7 +176,8 @@ library PayableLib {
                 ccy_amount_B: 0,
                  ccyTypeId_B: 0,
                    applyFees: false,
-                feeAddrOwner: owner
+                feeAddrOwner: owner,
+                transferType: StructLib.TransferType.Subscription
             });
             TransferLib.transferOrTrade(ld, std, ctd, globalFees, a);
         }

@@ -450,6 +450,7 @@ library TokenLib {
     }
 
     // POST-MINTING: add KVP metadata
+    // TODO: must pass-through to base?!
     function addMetaSecTokenBatch(
         StructLib.LedgerStruct storage ld,
         uint256                        batchId,
@@ -470,6 +471,7 @@ library TokenLib {
     }
 
     // POST-MINTING: set batch TOKEN fee
+    // TODO: must pass-through to base?!
     function setOriginatorFeeTokenBatch(
         StructLib.LedgerStruct storage ld,
         uint256 batchId,
@@ -493,6 +495,7 @@ library TokenLib {
     }
 
     // POST-MINTING: set batch CURRENCY fee
+    // TODO: must pass-through to base?!
     function setOriginatorFeeCurrencyBatch(
         StructLib.LedgerStruct storage ld,
         uint64                         batchId,

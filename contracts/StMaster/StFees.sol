@@ -42,23 +42,10 @@ contract StFees is
         SpotFeeLib.setFee_TokType(ld, std, globalFees, tokTypeId, ledgerOwner, feeArgs);
     }
 
+//#if process.env.CONTRACT_TYPE !== 'CASHFLOW_BASE'
     function setFee_CcyType(uint256 ccyTypeId, address ledgerOwner, StructLib.SetFeeArgs memory feeArgs)
     public onlyOwner() onlyWhenReadWrite() {
         SpotFeeLib.setFee_CcyType(ld, ctd, globalFees, ccyTypeId, ledgerOwner, feeArgs);
     }
-
-    // 24k
-    // function getSecToken_totalExchangeFeesPaidQty()
-    // external view returns (uint256) {
-    //     return ld._spot_total.exchangeFeesPaidQty;
-    // }
-    // function getSecToken_totalOriginatorFeesPaidQty()
-    // external view returns (uint256) {
-    //     return ld._spot_total.originatorFeesPaidQty;
-    // }
-    // function getCcy_totalExchangeFeesPaid(uint256 ccyTypeId)
-    // external view returns (uint256) {
-    //     return ld._ccyType_totalFeesPaid[ccyTypeId];
-    // }
-
+//#endif
 }

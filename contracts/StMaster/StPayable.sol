@@ -15,11 +15,11 @@ abstract // solc 0.6
 contract StPayable is
     StErc20 {
         
-    // === CFT === V1 ** =>>> MVP -- CFT SPLIT LEDGER (central WL, central collateral, central spot transferOrTrade...)
+    // === CFT === V0 ** =>>> MVP -- CFT SPLIT LEDGER (central WL, central collateral, central spot transferOrTrade...)
+    //
     //  Cashflow type is fundamentally way less fungible than Commodity type, i.e. loan A != loan B
     //  Therefore, the only way to preserve ERC20 semanitcs for CFTs, is for each CFT *to have its own contract address*
     //    (i.e. we can't use token-types (or batch metadata) to separate different CFTs in a single contract ledger)
-    //      TODO: pri0 - ledger combine/abstract (centralised collateral)
     //
     //          (1) CASHFLOW_CONTROLLER: new contract type
     //                  (a) its n tokTypes wrap n CASHFLOW-type contracts
@@ -30,12 +30,9 @@ contract StPayable is
     //                  > getSecToken: DONE (passthrough to bases)
     //                  > getLedgerEntry: DONE (return (a) n ccy's from CFT-C ... UNION ... (b) n tok's from n CFT's)
     //                  > burn: DONE (passthrough to base)
-    //                  > TODO: transferOrTrade: update 1 ccy in CFT-C ... update 1 tok in CFT
-    //                  > TODO: transfer_feePreview[_ExchangeOnly] ... >> combine/merge base output (orig tok fees w/ ccy fees...)
-    //
-    //                  > TODO: ledgerhashcode: ...???
-    //
-    //                  PROOF OF CONCEPT (READ AND WRITE ACROSS CONTRACTS...)
+    //                  > DONE: transferOrTrade: update 1 ccy in CFT-C ... update 1 tok in CFT
+    //                  > DONE: transfer_feePreview[_ExchangeOnly] ... >> combine/merge base output (orig tok fees w/ ccy fees...)
+    //                  > DONE: ledgerhashcode (delegations to base)
     //
     //          (3) CASHFLOW_CONTROLLER === (interface compatible) with COMMODITY (base) EXCEPT:
     //                  > can only add indirect (CASHFLOW_BASE) types
@@ -43,12 +40,11 @@ contract StPayable is
     //                  > no ERC20 support (not fungible, meaningless) -- but ERC20 should work on CASHFLOW_BASE
     //
  
-    // === CFT === V0 ** =>>> MVP -- CFT CORE (*no whitelisting*, i.e. all external control ERC20 accounts, no collateral: aka private equity/ledger - no exchange)
+    // === CFT === V0.1 ** =>>> MVP -- CFT CORE (w/ WL, w/ trade intercace via CFT-C, w/ full ERC20 on delegated types...)
+    //  >>> TODO: PoC data load/compare JS tests for CFT-C and CFT-B is TODO...
     //      TODO: pri1 - issuerPayments (EQ)   v0.1 -- MVP (any amount ok, no validations) -- test pack: changing issuancePrice mid-issuance
-    //      TODO: pri1 - issuerPayments (BOND) v0.1 -- MVP basic (no validations, i.e. eq-path only -- revisit loan/interest etc. later)
-
+    //      TODO: pri1 - issuerPayments (BOND) v0.1 -- MVP basic (no validations, i.e. eq-path only / simple term-structure table -- revisit loan/interest etc. later)
     //      TODO: pri2 - PE: issuance fee on subscriptions
-    //      TODO: pri3 - wallet auto-converts
 
 //#if process.env.CONTRACT_TYPE === 'CASHFLOW_BASE'
 //#     StructLib.CashflowStruct cashflowData;

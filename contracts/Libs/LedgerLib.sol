@@ -262,7 +262,7 @@ library LedgerLib {
             if (ledgerNdx != 0)
                 ledgerHash = keccak256(abi.encodePacked(ledgerHash, entryOwner));
 
-            // hash ledger token types: ID list, custom spot fees & FT type data
+            // hash ledger token types: token IDs, custom spot fees & FT type data
             for (uint256 stTypeId = 1; stTypeId <= std._tt_Count; stTypeId++) {
 
                 // ### TODO? ## switch -- delegate-base types for CFT-C... ##

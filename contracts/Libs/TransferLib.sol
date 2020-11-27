@@ -77,7 +77,8 @@ library TransferLib {
                  ccy_amount_B: a.ccy_amount_B,
                   ccyTypeId_B: a.ccyTypeId_B,
                     applyFees: a.applyFees,
-                 feeAddrOwner: a.feeAddrOwner
+                 feeAddrOwner: a.feeAddrOwner,
+                 transferType: a.transferType
                 }));
             }
             if (a.qty_B > 0) {
@@ -96,7 +97,8 @@ library TransferLib {
                  ccy_amount_B: a.ccy_amount_B,
                   ccyTypeId_B: a.ccyTypeId_B,
                     applyFees: a.applyFees,
-                 feeAddrOwner: a.feeAddrOwner
+                 feeAddrOwner: a.feeAddrOwner,
+                 transferType: a.transferType
                 }));
             }
         }
@@ -444,7 +446,8 @@ library TransferLib {
                  ccy_amount_B: a.ccy_amount_B,
                   ccyTypeId_B: a.ccyTypeId_B,
                     applyFees: a.applyFees,
-                 feeAddrOwner: a.feeAddrOwner
+                 feeAddrOwner: a.feeAddrOwner,
+                 transferType: a.transferType
                 }));
                 for (uint i = 1 ; i < feesBase.length ; i++) {
                     if (feesBase[i].fee_tok_A > 0) {
@@ -468,7 +471,8 @@ library TransferLib {
                  ccy_amount_B: a.ccy_amount_B,
                   ccyTypeId_B: a.ccyTypeId_B,
                     applyFees: a.applyFees,
-                 feeAddrOwner: a.feeAddrOwner
+                 feeAddrOwner: a.feeAddrOwner,
+                 transferType: a.transferType
                 }));
                 for (uint i = 1 ; i < feesBase.length ; i++) {
                     if (feesBase[i].fee_tok_B > 0) {

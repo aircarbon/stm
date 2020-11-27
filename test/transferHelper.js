@@ -101,6 +101,7 @@ module.exports = {
             feeAddrOwner: accounts[0],
                k_stIds_A: k_stIds_A || [],
                k_stIds_B: k_stIds_B || [],
+            transferType: CONST.transferType.UNDEFINED,
         });
         for (let i = 0; i < feesPreview.length; i++) {
             const x = feesPreview[i];
@@ -692,6 +693,7 @@ async function transferWrapped({
             feeAddrOwner: CONST.nullAddr,
                k_stIds_A: k_stIds_A || [],
                k_stIds_B: k_stIds_B || [],
+            transferType: CONST.transferType.UNDEFINED,
         },
         from //{ from: accounts[0] }
     );

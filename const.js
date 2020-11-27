@@ -245,11 +245,33 @@ module.exports = {
 
     // transfer types (event data)
     transferType: Object.freeze({
-        USER: 0,
-EXCHANGE_FEE: 1,
-    ORIG_FEE: 2,
-     TAKEPAY: 3,
- TAKEPAY_FEE: 4
+    UNDEFINED: 0,
+
+         USER: 1,
+ EXCHANGE_FEE: 2,
+     ORIG_FEE: 3,
+
+    //TAKEPAY: 4,
+  TAKEPAY_FEE: 4,
+  SETTLE_TAKE: 5,
+   SETTLE_PAY: 6,
+
+     MINT_FEE: 7,
+     BURN_FEE: 8,
+ WITHDRAW_FEE: 9,
+  DEPOSIT_FEE: 10,
+     DATA_FEE: 11,
+   OTHER_FEE1: 12,
+   OTHER_FEE2: 13,
+   OTHER_FEE3: 14,
+   OTHER_FEE4: 15,
+   OTHER_FEE5: 16,
+
+   ADJUSTMENT: 17,
+
+        ERC20: 18,
+ CFT_ISSUANCE: 19,
+ 
     }),
 
     // token types (contract data)

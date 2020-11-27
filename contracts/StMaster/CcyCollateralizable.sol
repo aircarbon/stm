@@ -12,6 +12,7 @@ import "../Libs/CcyLib.sol";
 contract Collateralizable is
     Owned, StLedger {
 
+//#if process.env.CONTRACT_TYPE !== 'CASHFLOW_BASE'
     function addCcyType(string memory name, string memory unit, uint16 decimals)
     public onlyOwner() onlyWhenReadWrite() {
         CcyLib.addCcyType(ld, ctd, name, unit, decimals);
@@ -30,18 +31,6 @@ contract Collateralizable is
     public onlyOwner() onlyWhenReadWrite() {
         CcyLib.fundOrWithdraw(ld, ctd, direction, ccyTypeId, amount, ledgerOwner, desc);
     }
-    // function fund(uint256 ccyTypeId,
-    //               int256  amount,
-    //               address ledgerOwner)
-    // public onlyOwner() onlyWhenReadWrite() {
-    //     CcyLib.fund(ld, ctd, ccyTypeId, amount, ledgerOwner);
-    // }
-    // function withdraw(uint256 ccyTypeId,
-    //                   int256  amount,
-    //                   address ledgerOwner)
-    // public onlyOwner() onlyWhenReadWrite() {
-    //     CcyLib.withdraw(ld, ctd, ccyTypeId, amount, ledgerOwner);
-    // }
 
     // 24k
     // function getTotalCcyFunded(uint256 ccyTypeId)
@@ -52,4 +41,5 @@ contract Collateralizable is
     // external view returns (uint256) {
     //     return ld._ccyType_totalWithdrawn[ccyTypeId];
     // }
+//#endif
 }

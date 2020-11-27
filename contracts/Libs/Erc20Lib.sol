@@ -121,7 +121,8 @@ library Erc20Lib {
                         ccy_amount_B: 0,
                          ccyTypeId_B: 0,
                            applyFees: false,
-                        feeAddrOwner: a.deploymentOwner //address(0x0) // fees: disabled for erc20 - not used
+                        feeAddrOwner: a.deploymentOwner, //address(0x0) // fees: disabled for erc20 - not used
+                        transferType: StructLib.TransferType.ERC20
                     });
                     TransferLib.transferOrTrade(ld, std, ctd, globalFees, transferOrTradeArgs);
                     remainingToTransfer -= qtyTransfer;
