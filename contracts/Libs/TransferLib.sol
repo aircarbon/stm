@@ -64,7 +64,7 @@ library TransferLib {
 
         // require a transferType for one-sided transfers, disallow it on two-sided trades (both ccy-tok trades, and [edgecase] tok-tok trades)
         if ((a.ccyTypeId_A > 0 && a.tokTypeId_B == 0) || (a.ccyTypeId_B > 0 && a.tokTypeId_A == 0) ||
-            (a.tokTypeId_A > 0 && a.ccyTypeId_B == 0 && a.tokType_B == 0) || (a.tokTypeId_B > 0 && a.ccyTypeId_A == 0 && a.tokTypeId_A == 0)
+            (a.tokTypeId_A > 0 && a.ccyTypeId_B == 0 && a.tokTypeId_B == 0) || (a.tokTypeId_B > 0 && a.ccyTypeId_A == 0 && a.tokTypeId_A == 0)
         ) {
              require(a.transferType >= StructLib.TransferType.MintFee && a.transferType <= StructLib.TransferType.Adjustment, "Bad transferType");
         }
