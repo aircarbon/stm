@@ -268,16 +268,16 @@ describe(`Contract Web3 Interface`, async () => {
                 "IPFS_PROJECT_DOCUMENT_SALES": "QmUwY1VfL5kMxUUdFjmKnbVdaiMYi7UwYVBRWX4A2wom9g",
                 "IPFS_PROJECT_DOCUMENT_LEGAL": "QmWume2gdUoKs3Z8xyDQfPQcZwJHgaKmW9z5ZWDaR4BXNQ",
                 "IPFS_PROJECT_DOCUMENT_PROSPECTUS": "Qmcpmej7yYxoFQ9SGVG6UXP2WU2FHTn9i6sigSdZvsGsLm",
-                "URL_PROJECT_IMG": "http://worldbridgeland.com.kh/img/logo.jpg"
+                "URL_PROJECT_IMG": "https://worldbridgeland.com.kh/img/logo.jpg"
             },
             {
                 "TXT_PROJECT_NAME": "SBG Land",
                 "LIST_COUNTRY": "MY",
-                "URL_PROJECT": "http://www.sbgland.com/index.html",
+                "URL_PROJECT": "https://www.sbgland.com/index.html",
                 "IPFS_PROJECT_DOCUMENT_SALES": "QmSeQNDt9rRCeusrnAsW4m7uTDXjso3KtAsw9aBA4bRCnh",
                 "IPFS_PROJECT_DOCUMENT_LEGAL": "QmWume2gdUoKs3Z8xyDQfPQcZwJHgaKmW9z5ZWDaR4BXNQ",
                 "IPFS_PROJECT_DOCUMENT_PROSPECTUS": "Qmcpmej7yYxoFQ9SGVG6UXP2WU2FHTn9i6sigSdZvsGsLm",
-                "URL_PROJECT_IMG": "http://www.sbgland.com/images/logo.jpg"
+                "URL_PROJECT_IMG": "https://www.sbgland.com/images/logo.jpg"
             },
             {
                 "TXT_PROJECT_NAME": "Wilson and Company",   

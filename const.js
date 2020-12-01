@@ -141,7 +141,7 @@ module.exports = {
         "56": { // BSC mainnet - TODO: BSC has ChainLinks...? https://docs.binance.org/smart-chain/developer/link.html
             btcUsd: '0x0000000000000000000000000000000000000000',
             ethUsd: '0x0000000000000000000000000000000000000000',
-            bnbUsd: '0x0000000000000000000000000000000000000000',
+            bnbUsd: '0x0567F2323251f0Aab15c8dFb1967E4e8A7D42aeE',
         },
         "97": { // BSC testnet...? https://docs.chain.link/docs/reference-data-contracts-binance-smart-chain#price-feeds
             btcUsd: '0x0000000000000000000000000000000000000000',
