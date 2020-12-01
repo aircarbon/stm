@@ -266,12 +266,11 @@ module.exports = {
    OTHER_FEE3: 14,
    OTHER_FEE4: 15,
    OTHER_FEE5: 16,
-
    ADJUSTMENT: 17,
 
         ERC20: 18,
  CFT_ISSUANCE: 19,
- 
+
     }),
 
     // token types (contract data)

@@ -40,11 +40,6 @@ library StructLib {
 
         // CFT: token issuance/subscription
         Subscription
-
-        //
-        // TODO: retest, no breaks... 
-        // TODO: for one-sided (ccy && token) transfers, output the supplied transferType in event... (space for this, for token events?!)
-        //
     }
     event TransferedLedgerCcy(address indexed from, address indexed to, uint256 ccyTypeId, uint256 amount, TransferType transferType);
     event ReservedLedgerCcy(address indexed ledgerOwner, uint256 ccyTypeId, uint256 amount);

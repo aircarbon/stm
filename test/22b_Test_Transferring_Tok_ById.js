@@ -57,6 +57,7 @@ contract("StMaster", accounts => {
                k_stIds_A: stIds_A,                              k_stIds_B: [],
             ccy_amount_A: 0,                                  ccyTypeId_A: 0,
             ccy_amount_B: 0,                                  ccyTypeId_B: 0,
+           transferType: CONST.transferType.ADJUSTMENT,
         });
         await CONST.logGas(web3, data.transferTx, `Transfer STs of type ${tokType} IDs: [${stIds_A.join(',')}]`);
 
@@ -96,6 +97,7 @@ contract("StMaster", accounts => {
                k_stIds_A: [],                                   k_stIds_B: stIds_B,
             ccy_amount_A: 0,                                  ccyTypeId_A: 0,
             ccy_amount_B: 0,                                  ccyTypeId_B: 0,
+            transferType: CONST.transferType.ADJUSTMENT,
         });
         await CONST.logGas(web3, data.transferTx, `Transfer STs of type ${tokType} IDs: [${stIds_B.join(',')}]`);
         const le_after_B = await stm.getLedgerEntry(B);
@@ -147,6 +149,7 @@ contract("StMaster", accounts => {
             ccy_amount_A: 0,                                  ccyTypeId_A: 0,
             ccy_amount_B: 100 * 1000,                         ccyTypeId_B: CONST.ccyType.USD,
                applyFees: true,
+            transferType: CONST.transferType.UNDEFINED,
         });
         await CONST.logGas(web3, data.transferTx, `Transfer STs of type ${tokType} IDs: [${stIds_A.join(',')}]`);
         //truffleAssert.prettyPrintEmittedEvents(data.transferTx);
@@ -196,6 +199,7 @@ contract("StMaster", accounts => {
             ccy_amount_A: 100 * 1000,                         ccyTypeId_A: CONST.ccyType.USD,
             ccy_amount_B: 0,                                  ccyTypeId_B: 0,
                applyFees: true,
+            transferType: CONST.transferType.UNDEFINED,
         });
         await CONST.logGas(web3, data.transferTx, `Transfer STs of type ${tokType} IDs: [${stIds_B.join(',')}]`);
         //truffleAssert.prettyPrintEmittedEvents(data.transferTx);
@@ -244,6 +248,7 @@ contract("StMaster", accounts => {
             ccy_amount_A: 0,                                  ccyTypeId_A: 0,
             ccy_amount_B: 0,                                  ccyTypeId_B: 0,
                applyFees: true,
+            transferType: CONST.transferType.UNDEFINED,
         });
         await CONST.logGas(web3, data.transferTx, `Swap STs A:(Type ${tokTypeId_A} / [${stIds_A.join(',')}]) / B:(Type ${tokTypeId_B} [${stIds_B.join(',')}])`);
         //truffleAssert.prettyPrintEmittedEvents(data.transferTx);
@@ -286,6 +291,7 @@ contract("StMaster", accounts => {
         ccy_amount_A: 0,                                  ccyTypeId_A: 0,
         ccy_amount_B: 0,                                  ccyTypeId_B: 0,
            applyFees: false,
+        transferType: CONST.transferType.ADJUSTMENT,
         });
         const le_before_A = await stm.getLedgerEntry(A);
 
@@ -307,6 +313,7 @@ contract("StMaster", accounts => {
         ccy_amount_A: 0,                                  ccyTypeId_A: 0,
         ccy_amount_B: 0,                                  ccyTypeId_B: 0,
            applyFees: false,
+        transferType: CONST.transferType.ADJUSTMENT,
         });
         const le_before_B = await stm.getLedgerEntry(B);
 
@@ -321,6 +328,7 @@ contract("StMaster", accounts => {
             ccy_amount_A: 0,                                  ccyTypeId_A: 0,
             ccy_amount_B: 0,                                  ccyTypeId_B: 0,
                applyFees: true,
+            transferType: CONST.transferType.UNDEFINED,
         });
         await CONST.logGas(web3, data.transferTx, `Swap STs A:(Type ${tokTypeId_A} / [${stIds_A.join(',')}]) / B:(Type ${tokTypeId_B} [${stIds_B.join(',')}])`);
         truffleAssert.prettyPrintEmittedEvents(data.transferTx);

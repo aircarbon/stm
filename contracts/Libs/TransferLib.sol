@@ -38,6 +38,8 @@ library TransferLib {
         //                  >> controller only updates/reads/validates ccy
         //                  >> base only updates/reads/validates tok's
 
+        // TODO: for one-sided (ccy && token) transfers, output the supplied transferType in event... (space for this, for token events?!)
+
         TransferVars memory v;
         uint256 maxStId = ld._tokens_currentMax_id;
 
@@ -52,12 +54,21 @@ library TransferLib {
         // disallow currency swaps - we need single consistent ccy type on each side for ccy-fee mirroring
         require(a.ccyTypeId_A == 0 || a.ccyTypeId_B == 0, "Bad ccy swap");
 
+        // validate currency/token types
         if (ld.contractType != StructLib.ContractType.CASHFLOW_BASE) {
             if (a.ccy_amount_A > 0) require(a.ccyTypeId_A > 0 && a.ccyTypeId_A <= ctd._ct_Count, "Bad ccyTypeId A");
             if (a.ccy_amount_B > 0) require(a.ccyTypeId_B > 0 && a.ccyTypeId_B <= ctd._ct_Count, "Bad ccyTypeId B");
         }
         if (a.qty_A > 0) require(a.tokTypeId_A > 0, "Bad tokTypeId_A");
         if (a.qty_B > 0) require(a.tokTypeId_B > 0, "Bad tokTypeId_B");
+
+        // require a transferType for one-sided transfers, disallow it on two-sided trades (both ccy-tok trades, and [edgecase] tok-tok trades)
+        if ((a.ccyTypeId_A > 0 && a.tokTypeId_B == 0) || (a.ccyTypeId_B > 0 && a.tokTypeId_A == 0) ||
+            (a.tokTypeId_A > 0 && a.ccyTypeId_B == 0 && a.tokType_B == 0) || (a.tokTypeId_B > 0 && a.ccyTypeId_A == 0 && a.tokTypeId_A == 0)
+        ) {
+             require(a.transferType >= StructLib.TransferType.MintFee && a.transferType <= StructLib.TransferType.Adjustment, "Bad transferType");
+        }
+        else require(a.transferType == StructLib.TransferType.Undefined, "Invalid transfer type");
 
         // cashflow controller: delegate token actions to base type
         if (ld.contractType == StructLib.ContractType.CASHFLOW_CONTROLLER) { //**

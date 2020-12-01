@@ -33,6 +33,7 @@ contract("StMaster", accounts => {
                    qty_B: 0,                                  tokTypeId_B: 0,
             ccy_amount_A: CONST.thousandCcy_cents / 2,        ccyTypeId_A: CONST.ccyType.USD,
             ccy_amount_B: 0,                                  ccyTypeId_B: 0,
+            transferType: CONST.transferType.MINT_FEE,
         });
     });
 
@@ -45,6 +46,7 @@ contract("StMaster", accounts => {
                    qty_B: 0,                                  tokTypeId_B: 0,
             ccy_amount_A: 0,                                  ccyTypeId_A: 0,
             ccy_amount_B: CONST.oneEth_wei,                   ccyTypeId_B: CONST.ccyType.ETH,
+            transferType: CONST.transferType.ADJUSTMENT,
         });
     });
 
@@ -60,7 +62,6 @@ contract("StMaster", accounts => {
     //         ccy_amount_B: CONST.thousandCcy_cents / 4,       ccyTypeId_B: CONST.ccyType.USD,
     //     });
     // });
-
     // ccy-swaps - deprecated (to support exchange ccy fee mirroring)
     // it(`transferring ccy - should allow two-sided transfer (A <-> B) of different currencies across ledger entries`, async () => {
     //     await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, CONST.ccyType.USD, CONST.billionCcy_cents,        accounts[global.TaddrNdx + 0], 'TEST', );
@@ -85,7 +86,7 @@ contract("StMaster", accounts => {
                 CONST.ccyType.USD,           // ccyTypeId_A
                 0,                           // ccy_amount_B
                 0,                           // ccyTypeId_B
-                false,                       // applyFees
+                false, CONST.transferType.UNDEFINED, 
                 { from: accounts[0] });
         } catch (ex) {
             assert(ex.reason == 'Bad null transfer', `unexpected: ${ex.reason}`);
@@ -105,7 +106,7 @@ contract("StMaster", accounts => {
                 0,                           // ccyTypeId_A
                 -1,                          // ccy_amount_B
                 CONST.ccyType.USD,           // ccyTypeId_B
-                false,                       // applyFees
+                false, CONST.transferType.UNDEFINED, 
                 { from: accounts[0] });
         } catch (ex) { 
             assert(ex.reason == 'Bad null transfer', `unexpected: ${ex.reason}`);
@@ -125,7 +126,7 @@ contract("StMaster", accounts => {
                 CONST.ccyType.USD,           // ccyTypeId_A
                 -1,                          // ccy_amount_B
                 CONST.ccyType.USD,           // ccyTypeId_B
-                false,                       // applyFees
+                false, CONST.transferType.UNDEFINED, 
                 { from: accounts[0] });
         } catch (ex) { 
             assert(ex.reason == 'Bad null transfer', `unexpected: ${ex.reason}`);
@@ -145,7 +146,7 @@ contract("StMaster", accounts => {
                 CONST.ccyType.USD,           // ccyTypeId_A
                 0,                           // ccy_amount_B
                 0,                           // ccyTypeId_B
-                false,                       // applyFees
+                false, CONST.transferType.BURN_FEE, 
                 { from: accounts[0] });
         } catch (ex) { 
             assert(ex.reason == 'Insufficient currency A', `unexpected: ${ex.reason}`);
@@ -165,7 +166,7 @@ contract("StMaster", accounts => {
                 0,                           // ccyTypeId_A
                 CONST.thousandEth_wei,       // ccy_amount_B
                 CONST.ccyType.ETH,           // ccyTypeId_B
-                false,                       // applyFees
+                false, CONST.transferType.OTHER_FEE5, 
                 { from: accounts[0] });
         } catch (ex) { 
             assert(ex.reason == 'Insufficient currency B', `unexpected: ${ex.reason}`);
@@ -186,7 +187,7 @@ contract("StMaster", accounts => {
     //             CONST.ccyType.USD,           // ccyTypeId_A
     //             CONST.thousandEth_wei,       // ccy_amount_B
     //             CONST.ccyType.ETH,           // ccyTypeId_B
-    //             false,                       // applyFees
+    //             false, CONST.transferType.UNDEFINED, 
     //             { from: accounts[0] });
     //     } catch (ex) { 
     //         assert(ex.reason == 'Insufficient currency A', `unexpected: ${ex.reason}`);

@@ -12,7 +12,7 @@ contract("StMaster", accounts => {
         if (await stm.getContractType() != CONST.contractType.COMMODITY) this.skip();
         if (!global.TaddrNdx) global.TaddrNdx = 0;
         
-        await stm.whitelistMany(accounts.slice(global.TaddrNdx, global.TaddrNdx + 30));
+        await stm.whitelistMany(accounts.slice(global.TaddrNdx, global.TaddrNdx + 40));
         await stm.sealContract();
         await setupHelper.setDefaults({ stm, accounts });
     });
@@ -33,7 +33,7 @@ contract("StMaster", accounts => {
                 0, 0,                      // qty_B, tokTypeId_B, 
                 0, 0,                      // ccy_amount_A, ccyTypeId_A, 
                 1, CONST.ccyType.USD,      // ccy_amount_B, ccyTypeId_B, 
-            false, { from: accounts[0] });
+            false, CONST.transferType.UNDEFINED, { from: accounts[0] });
         } catch (ex) { 
             assert(ex.reason == 'Not whitelisted (A)', `unexpected: ${ex.reason}`);
             return;
@@ -50,7 +50,7 @@ contract("StMaster", accounts => {
                 1, CONST.tokenType.TOK_T2, // qty_B, tokTypeId_B, 
                 1, CONST.ccyType.USD,      // ccy_amount_A, ccyTypeId_A, 
                 0, 0,                      // ccy_amount_B, ccyTypeId_B, 
-            false, { from: accounts[0] });
+            false, CONST.transferType.UNDEFINED, { from: accounts[0] });
         } catch (ex) { 
             assert(ex.reason == 'Not whitelisted (B)', `unexpected: ${ex.reason}`);
             return;
@@ -60,7 +60,7 @@ contract("StMaster", accounts => {
 
     it(`transferring - should not allow non-owner to transfer across ledger entries`, async () => {
         try {
-            await transferHelper.transferWrapper(stm, accounts, accounts[global.TaddrNdx + 0], accounts[global.TaddrNdx + 1], 0, 0, 0, 0, 0, 0, 0, 0, false, { from: accounts[10] });
+            await transferHelper.transferWrapper(stm, accounts, accounts[global.TaddrNdx + 0], accounts[global.TaddrNdx + 1], 0, 0, 0, 0, 0, 0, 0, 0, false, CONST.transferType.UNDEFINED, { from: accounts[10] });
         } catch (ex) { 
             assert(ex.reason == 'Restricted', `unexpected: ${ex.reason}`);
             return;
@@ -72,7 +72,7 @@ contract("StMaster", accounts => {
         await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, CONST.ccyType.USD, CONST.thousandCcy_cents, accounts[global.TaddrNdx + 0], 'TEST', );
         await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, CONST.ccyType.USD, CONST.thousandCcy_cents, accounts[global.TaddrNdx + 1], 'TEST', );
         try {
-            await transferHelper.transferWrapper(stm, accounts, accounts[global.TaddrNdx + 0], accounts[global.TaddrNdx + 1], 0, 0, 0, 0, 0, 0, 0, 0, false, { from: accounts[0] });
+            await transferHelper.transferWrapper(stm, accounts, accounts[global.TaddrNdx + 0], accounts[global.TaddrNdx + 1], 0, 0, 0, 0, 0, 0, 0, 0, false, CONST.transferType.UNDEFINED, { from: accounts[0] });
         } catch (ex) {
             assert(ex.reason == 'Bad null transfer', `unexpected: ${ex.reason}`);
             return;
@@ -94,7 +94,7 @@ contract("StMaster", accounts => {
                 0,                           // ccyTypeId_A
                 CONST.thousandCcy_cents,     // ccy_amount_B
                 CONST.ccyType.USD,           // ccyTypeId_B
-                false,
+                false, CONST.transferType.UNDEFINED, 
                 { from: accounts[0] });
         } catch (ex) { 
             assert(ex.reason == 'Bad qty_A', `unexpected: ${ex.reason}`);
@@ -117,7 +117,7 @@ contract("StMaster", accounts => {
                 CONST.ccyType.USD,           // ccyTypeId_A
                 0,                           // ccy_amount_B
                 0,                           // ccyTypeId_B
-                false,
+                false, CONST.transferType.UNDEFINED, 
                 { from: accounts[0] });
         } catch (ex) { 
             assert(ex.reason == 'Bad qty_B', `unexpected: ${ex.reason}`);
@@ -141,7 +141,7 @@ contract("StMaster", accounts => {
                 CONST.ccyType.USD,           // ccyTypeId_A
                 0,                           // ccy_amount_B
                 0,                           // ccyTypeId_B
-                false,
+                false, CONST.transferType.UNDEFINED, 
                 { from: accounts[0] });
         } catch (ex) { 
             assert(ex.reason == 'Bad transfer types', `unexpected: ${ex.reason}`);
@@ -165,7 +165,7 @@ contract("StMaster", accounts => {
                 0,                           // ccyTypeId_A
                 CONST.thousandCcy_cents,     // ccy_amount_B
                 CONST.ccyType.USD,           // ccyTypeId_B
-                false,                       // applyFees
+                false, CONST.transferType.UNDEFINED, 
                 { from: accounts[0] });
         } catch (ex) { 
             assert(ex.reason == 'Bad transfer types', `unexpected: ${ex.reason}`);
@@ -189,7 +189,7 @@ contract("StMaster", accounts => {
                 CONST.ccyType.USD,           // ccyTypeId_A
                 CONST.thousandCcy_cents,     // ccy_amount_B
                 CONST.ccyType.USD,           // ccyTypeId_B
-                false,                       // applyFees
+                false, CONST.transferType.UNDEFINED, 
                 { from: accounts[0] });
         } catch (ex) { 
             assert(ex.reason == 'Bad transfer types', `unexpected: ${ex.reason}`);
@@ -197,26 +197,6 @@ contract("StMaster", accounts => {
         }
         assert.fail('expected contract exception');
     });
-
-    // DEPRECATED: allowing this, for support of ERC20 semantics (+ scp wallet uses send-to-self for estimateGas)
-    // it(`transferring - should not allow transfer to self`, async () => {
-    //     await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, CONST.ccyType.USD, CONST.thousandCcy_cents, accounts[global.TaddrNdx + 0], { from: accounts[0] });
-    //     await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, CONST.ccyType.USD, CONST.thousandCcy_cents, accounts[global.TaddrNdx + 1], { from: accounts[0] });
-    //     try {
-    //         await transferHelper.transferWrapper(stm, accounts, accounts[global.TaddrNdx + 0], accounts[global.TaddrNdx + 0], 
-    //             0, 0, 0, 0, 
-    //             CONST.thousandCcy_cents,     // ccy_amount_A
-    //             CONST.ccyType.USD,           // ccyTypeId_A
-    //             0,                           // ccy_amount_B
-    //             0,                           // ccyTypeId_B
-    //             false,                       // applyFees
-    //             { from: accounts[0] });
-    //     } catch (ex) { 
-    //         assert(ex.reason == 'Bad transfer', `unexpected: ${ex.reason}`);
-    //         return; 
-    //     }
-    //     assert.fail('expected contract exception');
-    // });
 
     it(`transferring - should not allow transfers when contract is read only`, async () => {
         await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, CONST.ccyType.USD, CONST.thousandCcy_cents, accounts[global.TaddrNdx + 0], 'TEST', );
@@ -229,7 +209,7 @@ contract("StMaster", accounts => {
                 CONST.ccyType.USD,           // ccyTypeId_A
                 CONST.oneEth_wei,            // ccy_amount_B
                 CONST.ccyType.ETH,           // ccyTypeId_B
-                false,                       // applyFees
+                false, CONST.transferType.UNDEFINED, 
                 { from: accounts[0] });
         } catch (ex) { 
             await stm.setReadOnly(false, { from: accounts[0] });
@@ -239,6 +219,76 @@ contract("StMaster", accounts => {
         await stm.setReadOnly(false, { from: accounts[0] });
         assert.fail('expected contract exception');
     });
+
+    it(`transferring - should not allow missing transfer type on one-sided transfers (ccy A)`, async () => {
+        await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, CONST.ccyType.USD, CONST.thousandCcy_cents, accounts[global.TaddrNdx + 0], 'TEST', );
+        try {
+            await transferHelper.transferWrapper(stm, accounts, accounts[global.TaddrNdx + 0], accounts[global.TaddrNdx + 1], 
+                0, 0, 0, 0, 
+                CONST.thousandCcy_cents,     // ccy_amount_A
+                CONST.ccyType.USD,           // ccyTypeId_A
+                0,                           // ccy_amount_B
+                0,                           // ccyTypeId_B
+                false, CONST.transferType.UNDEFINED, 
+                { from: accounts[0] });
+        } catch (ex) { 
+            assert(ex.reason == 'Bad transferType', `unexpected: ${ex.reason}`);
+            return; 
+        }
+        assert.fail('expected contract exception');
+    });
+    it(`transferring - should not allow missing transfer type on one-sided transfers (ccy B)`, async () => {
+        await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, CONST.ccyType.USD, CONST.thousandCcy_cents, accounts[global.TaddrNdx + 0], 'TEST', );
+        await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, CONST.ccyType.ETH, CONST.oneEth_wei,        accounts[global.TaddrNdx + 1], 'TEST', );
+        try {
+            await transferHelper.transferWrapper(stm, accounts, accounts[global.TaddrNdx + 0], accounts[global.TaddrNdx + 1], 
+                0, 0, 0, 0, 
+                0,                           // ccy_amount_A
+                0,                           // ccyTypeId_A
+                CONST.oneEth_wei,            // ccy_amount_B
+                CONST.ccyType.ETH,           // ccyTypeId_B
+                false, CONST.transferType.UNDEFINED, 
+                { from: accounts[0] });
+        } catch (ex) { 
+            assert(ex.reason == 'Bad transferType', `unexpected: ${ex.reason}`);
+            return; 
+        }
+        assert.fail('expected contract exception');
+    });
+    it(`transferring - should not allow missing transfer type on one-sided transfers (tok A)`, async () => {
+        await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2, CONST.GT_CARBON, 1, accounts[global.TaddrNdx + 0], CONST.nullFees, 0, [], [], { from: accounts[0] });
+        try {
+            await transferHelper.transferWrapper(stm, accounts, accounts[global.TaddrNdx + 0], accounts[global.TaddrNdx + 1], 
+                CONST.GT_CARBON,             // qty_A
+                CONST.tokenType.TOK_T2,      // tokTypeId_A 
+                0,                           // qty_B
+                0,                           // tokTypeId_B
+                0, 0, 0, 0, 
+                false, CONST.transferType.UNDEFINED,
+                { from: accounts[0] });
+        } catch (ex) { 
+            assert(ex.reason == 'Bad transferType', `unexpected: ${ex.reason}`);
+            return; 
+        }
+        assert.fail('expected contract exception');
+    });    
+    it(`transferring - should not allow missing transfer type on one-sided transfers (tok B)`, async () => {
+        await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2, CONST.GT_CARBON, 1, accounts[global.TaddrNdx + 1], CONST.nullFees, 0, [], [], { from: accounts[0] });
+        try {
+            await transferHelper.transferWrapper(stm, accounts, accounts[global.TaddrNdx + 0], accounts[global.TaddrNdx + 1], 
+                0,                           // qty_A
+                0,                           // tokTypeId_A
+                CONST.GT_CARBON,             // qty_B
+                CONST.tokenType.TOK_T2,      // tokTypeId_B
+                0, 0, 0, 0, 
+                false, CONST.transferType.UNDEFINED,
+                { from: accounts[0] });
+        } catch (ex) { 
+            assert(ex.reason == 'Bad transferType', `unexpected: ${ex.reason}`);
+            return; 
+        }
+        assert.fail('expected contract exception');
+    });   
 
     it(`transferring - should not allow mismatched ccy type/amount transfers (ccy A)`, async () => {
         await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, CONST.ccyType.USD, CONST.thousandCcy_cents, accounts[global.TaddrNdx + 0], 'TEST', );
@@ -250,7 +300,7 @@ contract("StMaster", accounts => {
                 0,                           // ccyTypeId_A --> ###
                 CONST.oneEth_wei,            // ccy_amount_B
                 CONST.ccyType.ETH,           // ccyTypeId_B
-                false,                       // applyFees
+                false, CONST.transferType.UNDEFINED, 
                 { from: accounts[0] });
         } catch (ex) { 
             assert(ex.reason == 'Bad ccyTypeId A', `unexpected: ${ex.reason}`);
@@ -258,7 +308,6 @@ contract("StMaster", accounts => {
         }
         assert.fail('expected contract exception');
     });
-
     it(`transferring - should not allow mismatched ccy type/amount transfers (ccy B)`, async () => {
         await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, CONST.ccyType.USD, CONST.thousandCcy_cents, accounts[global.TaddrNdx + 0], 'TEST', );
         await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, CONST.ccyType.ETH, CONST.oneEth_wei,        accounts[global.TaddrNdx + 1], 'TEST', );
@@ -269,7 +318,7 @@ contract("StMaster", accounts => {
                 CONST.ccyType.USD,           // ccyTypeId_A
                 CONST.oneEth_wei,            // ccy_amount_B
                 0,                           // ccyTypeId_B --> ###
-                false,                       // applyFees
+                false, CONST.transferType.UNDEFINED, 
                 { from: accounts[0] });
         } catch (ex) { 
             assert(ex.reason == 'Bad ccyTypeId B', `unexpected: ${ex.reason}`);
@@ -288,7 +337,7 @@ contract("StMaster", accounts => {
                 CONST.GT_CARBON,             // qty_B
                 CONST.tokenType.TOK_T2,      // tokTypeId_B
                 0, 0, 0, 0,
-                false,                       // applyFees
+                false, CONST.transferType.UNDEFINED, 
                 { from: accounts[0] });
         } catch (ex) { 
             assert(ex.reason == 'Bad tokTypeId_A', `unexpected: ${ex.reason}`);
@@ -296,7 +345,6 @@ contract("StMaster", accounts => {
         }
         assert.fail('expected contract exception');
     });
-
     it(`transferring - should not allow mismatched ccy type/amount transfers (tok B)`, async () => {
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T2, CONST.GT_CARBON, 1, accounts[global.TaddrNdx + 0], CONST.nullFees, 0, [], [], { from: accounts[0] });
         await stm.mintSecTokenBatch(CONST.tokenType.TOK_T1, CONST.GT_CARBON, 1, accounts[global.TaddrNdx + 1], CONST.nullFees, 0, [], [], { from: accounts[0] });
@@ -307,7 +355,7 @@ contract("StMaster", accounts => {
                 CONST.GT_CARBON,             // qty_B
                 0,                           // tokTypeId_B --> ###
                 0, 0, 0, 0,
-                false,                       // applyFees
+                false, CONST.transferType.UNDEFINED, 
                 { from: accounts[0] });
         } catch (ex) { 
             assert(ex.reason == 'Bad tokTypeId_B', `unexpected: ${ex.reason}`);
@@ -315,40 +363,4 @@ contract("StMaster", accounts => {
         }
         assert.fail('expected contract exception');
     });
-
-    // covered by erc20 tests
-    // it(`transferring - should allow a transfer to an unkown ledger entry (erc20 support) (B)`, async () => {
-    //     await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, CONST.ccyType.USD, CONST.thousandCcy_cents,       accounts[global.TaddrNdx + 0], 'TEST', );
-    //     //try {
-    //         await transferHelper.transferWrapper(stm, accounts, accounts[global.TaddrNdx + 0], accounts[global.TaddrNdx + 1], 
-    //             0, 0, 0, 0, 
-    //             CONST.thousandCcy_cents,     // ccy_amount_A
-    //             CONST.ccyType.USD,           // ccyTypeId_A
-    //             0,                           // ccy_amount_B
-    //             0,                           // ccyTypeId_B
-    //             false,
-    //             { from: accounts[0] });
-    //     // } catch (ex) { 
-    //     //     assert(ex.reason == 'Bad ledger_B', `unexpected: ${ex.reason}`);
-    //     //     return; 
-    //     // }
-    //     //assert.fail('expected contract exception');
-    // });
-    // it(`transferring - should allow a transfer from an unkown ledger entry (erc20 support) (A)`, async () => {
-    //     await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, CONST.ccyType.USD, CONST.thousandCcy_cents,       accounts[global.TaddrNdx + 0], 'TEST', );
-    //     //try {
-    //         await transferHelper.transferWrapper(stm, accounts, accounts[global.TaddrNdx + 0], accounts[global.TaddrNdx + 1], 
-    //             0, 0, 0, 0, 
-    //             CONST.thousandCcy_cents,     // ccy_amount_A
-    //             CONST.ccyType.USD,           // ccyTypeId_A
-    //             0,                           // ccy_amount_B
-    //             0,                           // ccyTypeId_B
-    //             false,                       // applyFees
-    //             { from: accounts[0] });
-    //     // } catch (ex) {  
-    //     //     assert(ex.reason == 'Bad ledger_A', `unexpected: ${ex.reason}`);
-    //     //     return;
-    //     // }
-    //     // assert.fail('expected contract exception');
-    // });
 });

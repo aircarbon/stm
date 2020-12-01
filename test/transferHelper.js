@@ -14,6 +14,7 @@ module.exports = {
             ccy_amount_A, ccyTypeId_A,
             ccy_amount_B, ccyTypeId_B,
             applyFees,
+            transferType,
         } = a;
         // console.dir(a);
         //console.log('ccyTypeId_A', ccyTypeId_A);
@@ -101,7 +102,7 @@ module.exports = {
             feeAddrOwner: accounts[0],
                k_stIds_A: k_stIds_A || [],
                k_stIds_B: k_stIds_B || [],
-            transferType: CONST.transferType.UNDEFINED,
+            transferType: transferType || CONST.transferType.UNDEFINED,
         });
         for (let i = 0; i < feesPreview.length; i++) {
             const x = feesPreview[i];
@@ -144,6 +145,7 @@ module.exports = {
                    applyFees,
                    k_stIds_A: k_stIds_A || [],
                    k_stIds_B: k_stIds_B || [],
+                transferType: transferType || CONST.transferType.UNDEFINED,
             }, { from: accounts[0] }
         );
         //truffleAssert.prettyPrintEmittedEvents(transferTx);
@@ -631,6 +633,7 @@ module.exports = {
     ccy_amount_A, ccyTypeId_A, 
     ccy_amount_B, ccyTypeId_B, 
        applyFees,
+    transferType,   
             from,
         ) => {
         return transferWrapped({ stm, accounts,
@@ -640,7 +643,8 @@ module.exports = {
     ccy_amount_A, ccyTypeId_A, 
     ccy_amount_B, ccyTypeId_B, 
        applyFees,
-        }, from);
+    transferType,
+    }, from);
     },
 
     assert_nFull_1Partial: ({ 
@@ -682,7 +686,9 @@ async function transferWrapped({
     applyFees,
     k_stIds_A,
     k_stIds_B,
+    transferType,
 }, from) {
+    //console.log(``);
     const tx = await stm.transferOrTrade({ 
                 ledger_A,                          ledger_B, 
                    qty_A: qty_A.toString(),        tokTypeId_A, 
@@ -693,7 +699,7 @@ async function transferWrapped({
             feeAddrOwner: CONST.nullAddr,
                k_stIds_A: k_stIds_A || [],
                k_stIds_B: k_stIds_B || [],
-            transferType: CONST.transferType.UNDEFINED,
+            transferType: transferType || CONST.transferType.UNDEFINED,
         },
         from //{ from: accounts[0] }
     );

@@ -30,10 +30,11 @@ contract("StMaster", accounts => {
         
         const data = await transferHelper.transferLedger({ stm, accounts, 
                 ledger_A: accounts[global.TaddrNdx + 0],         ledger_B: accounts[global.TaddrNdx + 1],
-                    qty_A: CONST.GT_CARBON,                   tokTypeId_A: CONST.tokenType.TOK_T2,
-                    qty_B: 0,                                 tokTypeId_B: 0,
+                   qty_A: CONST.GT_CARBON,                    tokTypeId_A: CONST.tokenType.TOK_T2,
+                   qty_B: 0,                                  tokTypeId_B: 0,
             ccy_amount_A: 0,                                  ccyTypeId_A: 0,
             ccy_amount_B: 0,                                  ccyTypeId_B: 0,
+            transferType: CONST.transferType.MINT_FEE,
         });
         assert(data.tokFullEvents.length == 1 && data.tokPartialEvents == 0, 'unexpected event composition');
         assert(data.tokFullEvents[0].stId == data.ledgerA_before.tokens[0].stId, 'unexpected event eeu id vs. ledger A before');
@@ -52,6 +53,7 @@ contract("StMaster", accounts => {
                    qty_B: CONST.GT_CARBON,                    tokTypeId_B: CONST.tokenType.TOK_T1,
             ccy_amount_A: 0,                                  ccyTypeId_A: 0,
             ccy_amount_B: 0,                                  ccyTypeId_B: 0,
+            transferType: CONST.transferType.BURN_FEE,
         });
         assert(data.tokFullEvents.length == 1 && data.tokPartialEvents == 0, 'unexpected event composition');
         assert(data.tokFullEvents[0].stId == data.ledgerB_before.tokens[0].stId, 'unexpected event eeu id vs. ledger B before');
@@ -71,6 +73,7 @@ contract("StMaster", accounts => {
                    qty_B: 0,                                  tokTypeId_B: 0,
             ccy_amount_A: 0,                                  ccyTypeId_A: 0,
             ccy_amount_B: 0,                                  ccyTypeId_B: 0,
+            transferType: CONST.transferType.WITHDRAW_FEE,
         });
         assert(data.tokFullEvents.length == 0 && data.tokPartialEvents.length == 1, 'unexpected event composition');
         assert(data.tokPartialEvents[0].splitFromSecTokenId == data.ledgerA_before.tokens[0].stId, 'unexpected event parent eeu id vs. ledger A before');
@@ -90,6 +93,7 @@ contract("StMaster", accounts => {
                    qty_B: CONST.GT_CARBON / 2,                tokTypeId_B: CONST.tokenType.TOK_T2,
             ccy_amount_A: 0,                                  ccyTypeId_A: 0,
             ccy_amount_B: 0,                                  ccyTypeId_B: 0,
+            transferType: CONST.transferType.DEPOSIT_FEE,
         });
         assert(data.tokFullEvents.length == 0 && data.tokPartialEvents.length == 1, 'unexpected event composition');
         assert(data.tokPartialEvents[0].splitFromSecTokenId == data.ledgerB_before.tokens[0].stId, 'unexpected event parent eeu id vs. ledger B before');
@@ -149,6 +153,7 @@ contract("StMaster", accounts => {
                    qty_B: 0,                                  tokTypeId_B: 0,
             ccy_amount_A: 0,                                  ccyTypeId_A: 0,
             ccy_amount_B: 0,                                  ccyTypeId_B: 0,
+            transferType: CONST.transferType.DATA_FEE,
         });
         transferHelper.assert_nFull_1Partial({
                        fullEvents: data.tokFullEvents,
@@ -171,6 +176,7 @@ contract("StMaster", accounts => {
                    qty_B: 0,                                  tokTypeId_B: 0,
             ccy_amount_A: 0,                                  ccyTypeId_A: 0,
             ccy_amount_B: 0,                                  ccyTypeId_B: 0,
+            transferType: CONST.transferType.OTHER_FEE1,
         });
         transferHelper.assert_nFull_1Partial({
                        fullEvents: data.tokFullEvents,
@@ -192,6 +198,7 @@ contract("StMaster", accounts => {
                    qty_B: 0,                                  tokTypeId_B: 0,
             ccy_amount_A: 0,                                  ccyTypeId_A: 0,
             ccy_amount_B: 0,                                  ccyTypeId_B: 0,
+            transferType: CONST.transferType.OTHER_FEE2,
         });
         //console.log('data.tokFullEvents', data.tokFullEvents);
         //console.log('data.tokPartialEvents', data.tokPartialEvents);
@@ -215,6 +222,7 @@ contract("StMaster", accounts => {
                    qty_B: 250,                                tokTypeId_B: CONST.tokenType.TOK_T2,
             ccy_amount_A: 0,                                  ccyTypeId_A: 0,
             ccy_amount_B: 0,                                  ccyTypeId_B: 0,
+            transferType: CONST.transferType.UNDEFINED,
         });
     });
 
@@ -230,6 +238,7 @@ contract("StMaster", accounts => {
                    qty_B: 250,                                tokTypeId_B: CONST.tokenType.TOK_T1,
             ccy_amount_A: 0,                                  ccyTypeId_A: 0,
             ccy_amount_B: 0,                                  ccyTypeId_B: 0,
+            transferType: CONST.transferType.UNDEFINED,
         });
     });
 
@@ -246,6 +255,7 @@ contract("StMaster", accounts => {
                    qty_B: 0,                                  tokTypeId_B: 0,
             ccy_amount_A: 0,                                  ccyTypeId_A: 0,
             ccy_amount_B: 0,                                  ccyTypeId_B: 0,
+            transferType: CONST.transferType.OTHER_FEE4,
         });
 
         // transfer 0.25, also from batch 1 -- expect merge on existing destination eeu of same batch
@@ -255,6 +265,7 @@ contract("StMaster", accounts => {
                    qty_B: 0,                                  tokTypeId_B: 0,
             ccy_amount_A: 0,                                  ccyTypeId_A: 0,
             ccy_amount_B: 0,                                  ccyTypeId_B: 0,
+            transferType: CONST.transferType.OTHER_FEE5,
         });
         assert(data.ledgerB_after.tokens.length == 1, 'ledger B was not merged');
         assert(data.tokPartialEvents.some(p => p.mergedToSecTokenId == data.ledgerB_before.tokens[0].stId), 'unexpected merge event data');
@@ -273,6 +284,7 @@ contract("StMaster", accounts => {
                    qty_B: 0,                                  tokTypeId_B: 0,
             ccy_amount_A: 0,                                  ccyTypeId_A: 0,
             ccy_amount_B: 0,                                  ccyTypeId_B: 0,
+            transferType: CONST.transferType.ADJUSTMENT,
         });
 
         // repeated transfers -- expect consistent merge of existing destination eeu of the same batch
@@ -283,6 +295,7 @@ contract("StMaster", accounts => {
                    qty_B: 0,                             tokTypeId_B: 0,
             ccy_amount_A: 0,                             ccyTypeId_A: 0,
             ccy_amount_B: 0,                             ccyTypeId_B: 0,
+            transferType: CONST.transferType.ADJUSTMENT,
             });
             assert(data.ledgerB_after.tokens.length == data.ledgerB_before.tokens.length, 'ledger B was not merged');
             assert(data.tokPartialEvents.some(p => data.ledgerB_before.tokens.some(p2 => p2.stId == p.mergedToSecTokenId)), 'unexpected merge event data');
@@ -303,6 +316,7 @@ contract("StMaster", accounts => {
                    qty_B: 100,                                tokTypeId_B: CONST.tokenType.TOK_T2,
             ccy_amount_A: 0,                                  ccyTypeId_A: 0,
             ccy_amount_B: 0,                                  ccyTypeId_B: 0,
+            transferType: CONST.transferType.UNDEFINED,
         });
 
         // repeated transfers -- expect consistent merge of existing destination eeu of the same batch
@@ -313,7 +327,8 @@ contract("StMaster", accounts => {
                    qty_B: 1,                                  tokTypeId_B: CONST.tokenType.TOK_T2,
             ccy_amount_A: 0,                                  ccyTypeId_A: 0,
             ccy_amount_B: 0,                                  ccyTypeId_B: 0,
-            });
+            transferType: CONST.transferType.UNDEFINED,
+        });
             assert(data.ledgerB_after.tokens.length == data.ledgerB_before.tokens.length, 'ledger B was not merged');
             assert(data.tokPartialEvents.some(p => data.ledgerB_before.tokens.some(p2 => p2.stId == p.mergedToSecTokenId)), 'unexpected merge event data for ledger B');
 
@@ -333,7 +348,7 @@ contract("StMaster", accounts => {
                 0,                           // qty_B
                 0,                           // tokTypeId_B
                 0, 0, 0, 0, 
-                false,                       // applyFees
+                false, CONST.transferType.ADJUSTMENT, 
                 { from: accounts[0] });
         } catch (ex) { 
             assert(ex.reason == 'Bad qty_A', `unexpected: ${ex.reason}`);
@@ -353,7 +368,7 @@ contract("StMaster", accounts => {
                 -1,                          // qty_B 
                 CONST.tokenType.TOK_T2,      // tokTypeId_B
                 0, 0, 0, 0, 
-                false,                       // applyFees
+                false, CONST.transferType.ADJUSTMENT, 
                 { from: accounts[0] });
         } catch (ex) { 
             assert(ex.reason == 'Bad qty_B', `unexpected: ${ex.reason}`);
@@ -373,7 +388,7 @@ contract("StMaster", accounts => {
                 0,                           // qty_B
                 0,                           // tokTypeId_B
                 0, 0, 0, 0, 
-                false,                       // applyFees
+                false, CONST.transferType.ADJUSTMENT, 
                 { from: accounts[0] });
         } catch (ex) { 
             assert(ex.reason == 'Insufficient tokens', `unexpected: ${ex.reason}`);
@@ -393,7 +408,7 @@ contract("StMaster", accounts => {
                 0,                           // qty_B
                 0,                           // tokTypeId_B
                 0, 0, 0, 0, 
-                false,                       // applyFees
+                false, CONST.transferType.ADJUSTMENT, 
                 { from: accounts[0] });
         } catch (ex) { 
             assert(ex.reason == 'No tokens', `unexpected: ${ex.reason}`);
@@ -413,7 +428,7 @@ contract("StMaster", accounts => {
                 CONST.KT_CARBON + 1,         // qty_B
                 CONST.tokenType.TOK_T2,      // tokTypeId_B
                 0, 0, 0, 0, 
-                false,                       // applyFees
+                false, CONST.transferType.ADJUSTMENT, 
                 { from: accounts[0] });
         } catch (ex) { 
             assert(ex.reason == 'Insufficient tokens', `unexpected: ${ex.reason}`);
@@ -433,7 +448,7 @@ contract("StMaster", accounts => {
                 CONST.KT_CARBON,             // qty_B
                 CONST.tokenType.TOK_T1,      // tokTypeId_B
                 0, 0, 0, 0, 
-                false,                       // applyFees
+                false, CONST.transferType.ADJUSTMENT, 
                 { from: accounts[0] });
         } catch (ex) { 
             assert(ex.reason == 'No tokens', `unexpected: ${ex.reason}`);
