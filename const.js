@@ -62,7 +62,7 @@ const blocksFromMonths = (months) => Math.ceil(blocksFromDays(months * 30.42));
 //
 // MAIN: deployer definitions -- contract ctor() params
 //
-const contractVer = process.env.CONTRACT_VERSION || "0.99t";
+const contractVer = process.env.CONTRACT_VERSION || "0.99u";
 const contractProps = {
     COMMODITY: {
         contractVer: contractVer,
@@ -245,31 +245,32 @@ module.exports = {
 
     // transfer types (event data)
     transferType: Object.freeze({
-    UNDEFINED: 0,
+          UNDEFINED: 0,
 
-         USER: 1,
- EXCHANGE_FEE: 2,
-     ORIG_FEE: 3,
+               USER: 1,
+       EXCHANGE_FEE: 2,
+           ORIG_FEE: 3,
 
-    //TAKEPAY: 4,
-  TAKEPAY_FEE: 4,
-  SETTLE_TAKE: 5,
-   SETTLE_PAY: 6,
+          //TAKEPAY: 4,
+        TAKEPAY_FEE: 4,
+        SETTLE_TAKE: 5,
+         SETTLE_PAY: 6,
 
-     MINT_FEE: 7,
-     BURN_FEE: 8,
- WITHDRAW_FEE: 9,
-  DEPOSIT_FEE: 10,
-     DATA_FEE: 11,
-   OTHER_FEE1: 12,
-   OTHER_FEE2: 13,
-   OTHER_FEE3: 14,
-   OTHER_FEE4: 15,
-   OTHER_FEE5: 16,
-   ADJUSTMENT: 17,
+           MINT_FEE: 7,
+           BURN_FEE: 8,
+       WITHDRAW_FEE: 9,
+        DEPOSIT_FEE: 10,
+           DATA_FEE: 11,
+         OTHER_FEE1: 12,
+         OTHER_FEE2: 13,
+         OTHER_FEE3: 14,
+         OTHER_FEE4: 15,
+         OTHER_FEE5: 16,
+   RELATED_TRANSFER: 17,
+         ADJUSTMENT: 18,
 
-        ERC20: 18,
- CFT_ISSUANCE: 19,
+              ERC20: 19,
+       CFT_ISSUANCE: 20,
 
     }),
 

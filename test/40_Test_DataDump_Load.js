@@ -49,7 +49,7 @@ contract("StMaster", accounts => {
         const allLedgerOwners = await stm_cur.getLedgerOwners();
         const ledgerEntry = await stm_cur.getLedgerEntry(accounts[0]);
 //#if process.env.CONTRACT_TYPE === 'CASHFLOW_CONTROLLER' || process.env.CONTRACT_TYPE === 'CASHFLOW_BASE'
-//#         const cashflowData = await stm_cur.getCashflowData();
+        const cashflowData = await stm_cur.getCashflowData();
 //#endif
     });
 
@@ -176,7 +176,7 @@ contract("StMaster", accounts => {
             const modifyBatchCcyFeeTx = await stm_cur.setOriginatorFeeCurrencyBatch(batchId, 50);
             curHash = await checkHashUpdate(curHash);
 
-            // transfer to owner - batch 1 CORSIA, no fees
+            // transfer tokens to owner - batch 1 CORSIA, no fees
             const send_tx_B1 = await stm_cur.transferOrTrade({ 
                         ledger_A: M,                            ledger_B: accounts[0], 
                            qty_A: 200,                       tokTypeId_A: CONST.tokenType.TOK_T1, 
@@ -186,12 +186,12 @@ contract("StMaster", accounts => {
                     ccy_amount_B: 0,                         ccyTypeId_B: 0, 
                        applyFees: false,
                     feeAddrOwner: CONST.nullAddr,
-                    transferType: CONST.transferType.UNDEFINED,
+                    transferType: CONST.transferType.OTHER_FEE1,
                 },
             );
             curHash = await checkHashUpdate(curHash);
 
-            // transfer to owner - batch 2 NATURE, with fees
+            // transfer tokens to owner - batch 2 NATURE, with fees
             if (await stm_cur.getContractType() == CONST.contractType.COMMODITY) {
                     const send_tx_B2 = await stm_cur.transferOrTrade({ 
                          ledger_A: M,                            ledger_B: accounts[0], 
@@ -202,7 +202,7 @@ contract("StMaster", accounts => {
                      ccy_amount_B: 0,                         ccyTypeId_B: 0, 
                         applyFees: true,
                      feeAddrOwner: CONST.nullAddr,
-                     transferType: CONST.transferType.UNDEFINED,
+                     transferType: CONST.transferType.OTHER_FEE2,
                     },
                 );
                 curHash = await checkHashUpdate(curHash);

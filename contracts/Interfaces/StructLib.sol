@@ -7,7 +7,7 @@ import "../StMaster/StMaster.sol";
 
 library StructLib {
 
-    // EVENTS - SHARED (FuturesLib & TransferLib)
+    // TRANSFER (one-sided ccy/tok) TYPES
     enum TransferType { 
         Undefined,
 
@@ -32,6 +32,9 @@ library StructLib {
         OtherFee4,
         OtherFee5,
 
+        // transfer across related accounts (e.g. corp-admin transfer to corp-trader)
+        RelatedTransfer,
+
         // generic: accounting adjustment
         Adjustment,
 
@@ -41,6 +44,8 @@ library StructLib {
         // CFT: token issuance/subscription
         Subscription
     }
+
+    // EVENTS - SHARED (FuturesLib & TransferLib)
     event TransferedLedgerCcy(address indexed from, address indexed to, uint256 ccyTypeId, uint256 amount, TransferType transferType);
     event ReservedLedgerCcy(address indexed ledgerOwner, uint256 ccyTypeId, uint256 amount);
 
