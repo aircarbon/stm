@@ -66,7 +66,8 @@ library TransferLib {
         if ((a.ccyTypeId_A > 0 && a.tokTypeId_B == 0) || (a.ccyTypeId_B > 0 && a.tokTypeId_A == 0) ||
             (a.tokTypeId_A > 0 && a.ccyTypeId_B == 0 && a.tokTypeId_B == 0) || (a.tokTypeId_B > 0 && a.ccyTypeId_A == 0 && a.tokTypeId_A == 0)
         ) {
-             require(a.transferType >= StructLib.TransferType.MintFee && a.transferType <= StructLib.TransferType.Adjustment, "Bad transferType");
+             //require(a.transferType >= StructLib.TransferType.MintFee && a.transferType <= StructLib.TransferType.Adjustment, "Bad transferType");
+            require(a.transferType >= StructLib.TransferType.SettlePay, "Bad transferType");
         }
         else require(a.transferType == StructLib.TransferType.Undefined, "Invalid transfer type");
 
