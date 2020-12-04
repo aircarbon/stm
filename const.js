@@ -62,7 +62,7 @@ const blocksFromMonths = (months) => Math.ceil(blocksFromDays(months * 30.42));
 //
 // MAIN: deployer definitions -- contract ctor() params
 //
-const contractVer = process.env.CONTRACT_VERSION || "0.99v";
+const contractVer = process.env.CONTRACT_VERSION || "0.99x";
 const contractProps = {
     COMMODITY: {
         contractVer: contractVer,
@@ -138,7 +138,7 @@ module.exports = {
             ethUsd: '0x0000000000000000000000000000000000000000',
             bnbUsd: '0x0000000000000000000000000000000000000000',
         },
-        "56": { // BSC mainnet - TODO: BSC has ChainLinks...? https://docs.binance.org/smart-chain/developer/link.html
+        "56": { // BSC mainnet - https://docs.binance.org/smart-chain/developer/link.html
             btcUsd: '0x0000000000000000000000000000000000000000',
             ethUsd: '0x0000000000000000000000000000000000000000',
             bnbUsd: '0x0567F2323251f0Aab15c8dFb1967E4e8A7D42aeE',

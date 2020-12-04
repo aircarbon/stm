@@ -49,7 +49,7 @@ contract("StMaster", accounts => {
         const allLedgerOwners = await stm_cur.getLedgerOwners();
         const ledgerEntry = await stm_cur.getLedgerEntry(accounts[0]);
 //#if process.env.CONTRACT_TYPE === 'CASHFLOW_CONTROLLER' || process.env.CONTRACT_TYPE === 'CASHFLOW_BASE'
-        const cashflowData = await stm_cur.getCashflowData();
+//#         const cashflowData = await stm_cur.getCashflowData();
 //#endif
     });
 

@@ -68,6 +68,11 @@ describe(`Contract Web3 Interface`, async () => {
     //   SD BSC Testnet 97
     //       ("export INSTANCE_ID=UAT_97_SD && mocha test_web3 --timeout 10000000 --exit") 
     //       ("export INSTANCE_ID=UAT_97_SD_SBGLand && mocha test_web3 --timeout 10000000 --exit")
+    //
+    //   SD BSC Mainnet 56
+    //       ("export INSTANCE_ID=PROD_56_SD && mocha test_web3 --timeout 10000000 --exit") 
+    //       ("export INSTANCE_ID=PROD_56_SD_RichGlory && mocha test_web3 --timeout 10000000 --exit") 
+    //
 
     //CONST.consoleOutput(false);
 
@@ -300,10 +305,10 @@ describe(`Contract Web3 Interface`, async () => {
         ];
         var meta;
         switch (contractSymbol) {
-            case 'WBL1': issuerAddr = '0x28F4D53563aC6adBC670Ef5Ad00f47375f87841C'; meta = testMeta[0]; break;
-            case 'SBG1': issuerAddr = '0xBA9e2F4653657DdC9F3d5721bf6B785Cdb6B52bc'; meta = testMeta[1]; break;
-            case 'WCO1': issuerAddr = '0xB40Fa157cd1BC446bF8EC834354eC7db5bEd9603'; meta = testMeta[2]; break;
-            case 'RG01': issuerAddr = '0x8Ca0BdC5a17e1BdE78A000125Df93f3BDa651B30'; meta = testMeta[3]; break;
+            case 'WBL1': issuerAddr = process.env.WEB3_NETWORK_ID == 56 ? '0xA6F98d2c0e11583877FBc5E06824728E1028400A' : '...'; meta = testMeta[0]; break;
+            case 'SBG1': issuerAddr = process.env.WEB3_NETWORK_ID == 56 ? '0x8A56e0C6801B27DB86e111e3Cb652F4494Cb09b5' : '...'; meta = testMeta[1]; break;
+            case 'WCO1': issuerAddr = process.env.WEB3_NETWORK_ID == 56 ? '0x89ba82d2A05027fF05222C51550590F4df46577F' : '...'; meta = testMeta[2]; break;
+            case 'RG01': issuerAddr = process.env.WEB3_NETWORK_ID == 56 ? '0x859C881C1C1D8062Bd0ac46b7a41Fa51140d9f5c' : '...'; meta = testMeta[3]; break;
             default: throw (`Unknown contract symbol ${contractSymbol}`);
         }
         //console.log('issuerAddr', issuerAddr);

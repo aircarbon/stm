@@ -40,6 +40,10 @@ const { db } = require('../../utils-server/dist');
 //    `export INSTANCE_ID=UAT_97_SD_WilsonAndCo && node process_sol_js && truffle migrate --network bsc_testnet_bn -f 2 --to 2 --reset`
 //    `export INSTANCE_ID=UAT_97_SD_WorldbridgeLand && node process_sol_js && truffle migrate --network bsc_testnet_bn -f 2 --to 2 --reset`
 //
+//   SD BSC Mainnet 56
+//    `export INSTANCE_ID=PROD_56_SD && node process_sol_js && truffle migrate --network bsc_mainnet_ac -f 2 --to 2 --reset`
+//    `export INSTANCE_ID=PROD_56_SD_RichGlory && node process_sol_js && truffle migrate --network bsc_mainnet_ac -f 2 --to 2 --reset`
+//
 
 module.exports = async function (deployer) {
     const O = await CONST.getAccountAndKey(0);

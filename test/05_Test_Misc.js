@@ -48,11 +48,11 @@ contract("StMaster", accounts => {
         console.log('> Enter mnemonic:');
         for await (const mnemonic of rl) {
             console.log('Mnemonic: ', mnemonic);
-            for (let i=0 ; i < 10 ; i++) {
+            for (let i=0 ; i < 20 ; i++) {
                 const x = await CONST.getAccountAndKey(i,
                     mnemonic
                     );
-                console.log(`#${i} addr: ${x.addr}`);// privKey: ${x.privKey}`);
+                console.log(`#${i} addr: ${x.addr} privKey: ${x.privKey}`);
                 // if (i==0) {
                 //     assert(x.privKey == '...', 'unexpected key')
                 // }
