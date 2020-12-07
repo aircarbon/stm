@@ -6,8 +6,8 @@ pragma experimental ABIEncoderV2;
 import "./Owned.sol";
 import "./StLedger.sol";
 
-import "../Libs/LedgerLib.sol";
 import "../Interfaces/StructLib.sol";
+import "../Libs/LedgerLib.sol";
 import "../Libs/SpotFeeLib.sol";
 
 contract StMintable is

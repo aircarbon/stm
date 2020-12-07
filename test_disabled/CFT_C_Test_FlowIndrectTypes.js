@@ -1,3 +1,4 @@
+// Re: (CASHFLOW_CONTROLLER) (all)
 const st = artifacts.require('StMaster');
 const truffleAssert = require('truffle-assertions');
 
@@ -11,10 +12,6 @@ const chalk = require('chalk');
 const CONST = require('../const.js');
 const setupHelper = require('../test/testSetupContract.js');
 const transferHelper = require('./transferHelper.js');
-
-//
-// tests CASHFLOW_CONTROLLER flow
-//
 
 //
 // TODO: CFT upgrades... > multiple upgrade cases: 

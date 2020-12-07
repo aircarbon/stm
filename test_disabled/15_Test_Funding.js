@@ -1,3 +1,4 @@
+// Re: CcyCollateralizable.sol => CcyLib.sol
 const BigNumber = require('big-number');
 const st = artifacts.require('StMaster');
 const truffleAssert = require('truffle-assertions');

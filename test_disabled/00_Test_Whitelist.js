@@ -1,3 +1,4 @@
+// Re: StErc20.sol => Erc20Lib.sol
 const st = artifacts.require('StMaster');
 const truffleAssert = require('truffle-assertions');
 const CONST = require('../const.js');

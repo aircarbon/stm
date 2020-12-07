@@ -1,3 +1,4 @@
+// Re: StTransferable.sol => TransferLib.sol
 const truffleAssert = require('truffle-assertions');
 const st = artifacts.require('StMaster');
 const CONST = require('../const.js');

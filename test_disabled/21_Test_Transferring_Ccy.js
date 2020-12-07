@@ -1,3 +1,4 @@
+// Re: StTransferable.sol => TransferLib.sol
 const st = artifacts.require('StMaster');
 const CONST = require('../const.js');
 const transferHelper = require('../test/transferHelper.js');

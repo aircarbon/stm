@@ -1,3 +1,4 @@
+// Re: StMintable.sol => LedgerLib.sol, SpotFeeLib.sol
 const st = artifacts.require('StMaster');
 const truffleAssert = require('truffle-assertions');
 //const _ = require('lodash');

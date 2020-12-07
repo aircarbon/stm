@@ -1,3 +1,4 @@
+// Re: N/A
 const st = artifacts.require('StMaster');
 const truffleAssert = require('truffle-assertions');
 const { DateTime } = require('luxon');
