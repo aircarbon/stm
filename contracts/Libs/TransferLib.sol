@@ -178,7 +178,7 @@ library TransferLib {
         //
         if (ld.contractType != StructLib.ContractType.CASHFLOW_CONTROLLER) { //**
             if (a.qty_A > 0) {
-                v.ts_args[0] = TransferSplitArgs({ from: a.ledger_A, to: a.ledger_B, tokTypeId: a.tokTypeId_A, qtyUnit: a.qty_A, transferType: StructLib.TransferType.User, maxStId: maxStId, k_stIds_take: a.k_stIds_A/*, k_stIds_skip: new uint256[](0)*/ });
+                v.ts_args[0] = TransferSplitArgs({ from: a.ledger_A, to: a.ledger_B, tokTypeId: a.tokTypeId_A, qtyUnit: a.qty_A, transferType: a.transferType == StructLib.TransferType.Undefined ? StructLib.TransferType.User : a.transferType, maxStId: maxStId, k_stIds_take: a.k_stIds_A/*, k_stIds_skip: new uint256[](0)*/ });
                 v.ts_previews[0] = transferSplitSecTokens_Preview(ld, v.ts_args[0]);
                 for (uint i = 0; i < v.ts_previews[0].batchCount ; i++) {
                     StructLib.SecTokenBatch storage batch = ld._batches[v.ts_previews[0].batchIds[i]];
@@ -187,7 +187,7 @@ library TransferLib {
                 }
             }
             if (a.qty_B > 0) {
-                v.ts_args[1] = TransferSplitArgs({ from: a.ledger_B, to: a.ledger_A, tokTypeId: a.tokTypeId_B, qtyUnit: a.qty_B, transferType: StructLib.TransferType.User, maxStId: maxStId, k_stIds_take: a.k_stIds_B/*, k_stIds_skip: new uint256[](0)*/ });
+                v.ts_args[1] = TransferSplitArgs({ from: a.ledger_B, to: a.ledger_A, tokTypeId: a.tokTypeId_B, qtyUnit: a.qty_B, transferType: a.transferType == StructLib.TransferType.Undefined ? StructLib.TransferType.User : a.transferType, maxStId: maxStId, k_stIds_take: a.k_stIds_B/*, k_stIds_skip: new uint256[](0)*/ });
                 v.ts_previews[1] = transferSplitSecTokens_Preview(ld, v.ts_args[1]);
                 for (uint i = 0; i < v.ts_previews[1].batchCount ; i++) {
                     StructLib.SecTokenBatch storage batch = ld._batches[v.ts_previews[1].batchIds[i]];
@@ -214,14 +214,14 @@ library TransferLib {
         //
         if (ld.contractType != StructLib.ContractType.CASHFLOW_BASE) { //**
             if (a.ccy_amount_A > 0) { // user transfer from A
-                StructLib.transferCcy(ld, StructLib.TransferCcyArgs({ from: a.ledger_A, to: a.ledger_B, ccyTypeId: a.ccyTypeId_A, amount: uint256(a.ccy_amount_A), transferType: StructLib.TransferType.User }));
+                StructLib.transferCcy(ld, StructLib.TransferCcyArgs({ from: a.ledger_A, to: a.ledger_B, ccyTypeId: a.ccyTypeId_A, amount: uint256(a.ccy_amount_A), transferType: a.transferType == StructLib.TransferType.Undefined ? StructLib.TransferType.User : a.transferType }));
             }
             if (a.applyFees && exFees.fee_ccy_A > 0) { // exchange fee transfer from A
                 StructLib.transferCcy(ld, StructLib.TransferCcyArgs({ from: a.ledger_A, to: a.feeAddrOwner, ccyTypeId: a.ccyTypeId_A, amount: exFees.fee_ccy_A, transferType: StructLib.TransferType.ExchangeFee }));
             }
 
             if (a.ccy_amount_B > 0) { // user transfer from B
-                StructLib.transferCcy(ld, StructLib.TransferCcyArgs({ from: a.ledger_B, to: a.ledger_A, ccyTypeId: a.ccyTypeId_B, amount: uint256(a.ccy_amount_B), transferType: StructLib.TransferType.User }));
+                StructLib.transferCcy(ld, StructLib.TransferCcyArgs({ from: a.ledger_B, to: a.ledger_A, ccyTypeId: a.ccyTypeId_B, amount: uint256(a.ccy_amount_B), transferType: a.transferType == StructLib.TransferType.Undefined ? StructLib.TransferType.User : a.transferType }));
             }
             if (a.applyFees && exFees.fee_ccy_B > 0) { // exchange fee transfer from B
                 StructLib.transferCcy(ld, StructLib.TransferCcyArgs({ from: a.ledger_B, to: a.feeAddrOwner, ccyTypeId: a.ccyTypeId_B, amount: exFees.fee_ccy_B, transferType: StructLib.TransferType.ExchangeFee }));
