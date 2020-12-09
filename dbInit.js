@@ -88,6 +88,8 @@ process.env.WEB3_NETWORK_ID = Number(process.env.NETWORK_ID || 888);
       console.error(error);
     }
 
+    // TODO: sync countries from Cynopsis to DB https://developer.cynopsis.co/#/records/records_countries
+
     // insert all whitelist addresses
     const allWhitelisted = await web3_call('getWhitelist', []);
     const totalAddresses = await db.GetTotalWhitelistAddress();
