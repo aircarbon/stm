@@ -62,7 +62,7 @@ const blocksFromMonths = (months) => Math.ceil(blocksFromDays(months * 30.42));
 //
 // MAIN: deployer definitions -- contract ctor() params
 //
-const contractVer = process.env.CONTRACT_VERSION || "0.99y";
+const contractVer = process.env.CONTRACT_VERSION || "0.99z";
 const contractProps = {
     COMMODITY: {
         contractVer: contractVer,
@@ -449,8 +449,9 @@ async function web3_call(methodName, methodArgs, nameOverride, addrOverride, fro
     var contractDb;
     if (addrOverride == undefined) {
         const contractName = process.env.CONTRACT_PREFIX + (nameOverride || contractProps[process.env.CONTRACT_TYPE].contractName);
-        contractDb = (await db.GetDeployment(process.env.WEB3_NETWORK_ID, contractName, contractProps[process.env.CONTRACT_TYPE].contractVer)).recordset[0];
-        if (!contractDb) throw(Error(`Failed to lookup contract deployment for (nameOverride=[${nameOverride}]): networkId=${process.env.WEB3_NETWORK_ID}, contractName=${contractName}, contractVer=${contractProps[process.env.CONTRACT_TYPE].contractVer} from ${process.env.sql_server}`));
+        const contractVer = process.env.CONTRACT_VER || contractProps[process.env.CONTRACT_TYPE].contractVer;
+        contractDb = (await db.GetDeployment(process.env.WEB3_NETWORK_ID, contractName, contractVer)).recordset[0];
+        if (!contractDb) throw(Error(`Failed to lookup contract deployment for (nameOverride=[${nameOverride}]): networkId=${process.env.WEB3_NETWORK_ID}, contractName=${contractName}, contractVer=${contractVer} from ${process.env.sql_server}`));
     }
     else {
         contractDb = (await db.GetDeploymentByAddress(process.env.WEB3_NETWORK_ID, addrOverride)).recordset[0];
@@ -472,8 +473,9 @@ async function web3_tx(methodName, methodArgs, fromAddr, fromPrivKey, nameOverri
     var contractDb;
     if (addrOverride == undefined) {
         const contractName = process.env.CONTRACT_PREFIX + (nameOverride || contractProps[process.env.CONTRACT_TYPE].contractName);
-        contractDb = (await db.GetDeployment(process.env.WEB3_NETWORK_ID, contractName, contractProps[process.env.CONTRACT_TYPE].contractVer)).recordset[0];
-        if (!contractDb) throw(Error(`Failed to lookup contract deployment for (nameOverride=[${nameOverride}]): networkId=${process.env.WEB3_NETWORK_ID}, contractName=${contractName}, contractVer=${contractProps[process.env.CONTRACT_TYPE].contractVer} from ${process.env.sql_server}`));
+        const contractVer = process.env.CONTRACT_VER || contractProps[process.env.CONTRACT_TYPE].contractVer;
+        contractDb = (await db.GetDeployment(process.env.WEB3_NETWORK_ID, contractName, contractVer)).recordset[0];
+        if (!contractDb) throw(Error(`Failed to lookup contract deployment for (nameOverride=[${nameOverride}]): networkId=${process.env.WEB3_NETWORK_ID}, contractName=${contractName}, contractVer=${contractVer} from ${process.env.sql_server}`));
     }
     else {
         contractDb = (await db.GetDeploymentByAddress(process.env.WEB3_NETWORK_ID, addrOverride)).recordset[0];

@@ -58,17 +58,17 @@ contract StPayable is
 //#     address public chainlinkAggregator_bnbUsd;
 //# 
 //#     // function get_btcUsd() public view returns(int256) {
-//#     //     if (chainlinkAggregator_btcUsd == address(0x0)) return 100000000; // $1 - cents*satoshis
+//#     //     if (chainlinkAggregator_btcUsd == address(0x0)) return -1;
 //#     //     IChainlinkAggregator ref = IChainlinkAggregator(chainlinkAggregator_btcUsd);
 //#     //     return ref.latestAnswer();
 //#     // }
 //# 
 //#     function get_ethUsd() public view returns(int256) {
-//#         if (chainlinkAggregator_ethUsd == address(0x0)) return 100000000; // $1 - cents*satoshis
+//#         if (chainlinkAggregator_ethUsd == address(0x0)) return -1;
 //#         return PayableLib.get_chainlinkRefPrice(chainlinkAggregator_ethUsd);
 //#     }
 //#     function get_bnbUsd() public view returns(int256) {
-//#         if (chainlinkAggregator_bnbUsd == address(0x0)) return 100000000; // $1 - cents*satoshis
+//#         if (chainlinkAggregator_bnbUsd == address(0x0)) return -1;
 //#         return PayableLib.get_chainlinkRefPrice(chainlinkAggregator_bnbUsd);
 //#     }
 //# 
