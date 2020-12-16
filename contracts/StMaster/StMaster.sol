@@ -125,16 +125,22 @@ contract StMaster
 //#endif
         string memory                 _contractName,
         string memory                 _contractVer,
-        string memory                 _contractUnit,
+        string memory                 _contractUnit
+//#if process.env.CONTRACT_TYPE === 'CASHFLOW_BASE' || process.env.CONTRACT_TYPE === 'COMMODITY'
+        ,
         string memory                 _contractSymbol,
         uint8                         _contractDecimals
-//#if process.env.CONTRACT_TYPE === 'CASHFLOW_BASE'
-//#         ,
-//#       //address                       _chainlinkAggregator_btcUsd,
-//#         address                       _chainlinkAggregator_ethUsd,
-//#         address                       _chainlinkAggregator_bnbUsd
 //#endif
-    ) StErc20(_contractSymbol, _contractDecimals)
+//#if process.env.CONTRACT_TYPE === 'CASHFLOW_BASE'
+//#     ,
+//#   //address                       _chainlinkAggregator_btcUsd,
+//#     address                       _chainlinkAggregator_ethUsd,
+//#     address                       _chainlinkAggregator_bnbUsd
+//#endif
+    ) 
+//#if process.env.CONTRACT_TYPE === 'CASHFLOW_BASE' || process.env.CONTRACT_TYPE === 'COMMODITY'
+        StErc20(_contractSymbol, _contractDecimals)
+//#endif
     {
 
 //#if process.env.CONTRACT_TYPE === 'CASHFLOW_BASE'

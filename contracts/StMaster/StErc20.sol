@@ -18,9 +18,8 @@ import "../Libs/Erc20Lib.sol";
 contract StErc20 is StFees
 {
     StructLib.Erc20Struct erc20d;
-
-    // ERC20 - OPTIONAL
-    // StMaster: string public name();
+ 
+//#if process.env.CONTRACT_TYPE === 'CASHFLOW_BASE' || process.env.CONTRACT_TYPE === 'COMMODITY'
     string public symbol;
     uint8 public decimals;
 
@@ -46,7 +45,6 @@ contract StErc20 is StFees
     function getWhitelist() external view returns (address[] memory) {
         return erc20d._whitelist;
     }
-
     // 24k
     // function getWhitelistCount() external view returns (uint256) {
     //     return erc20d._whitelist.length;
@@ -54,7 +52,6 @@ contract StErc20 is StFees
     // function isWhitelisted(address addr) external view returns (bool) {
     //     return erc20d._whitelisted[addr];
     // }
-
     // WHITELIST - get next entry and advance ndx
     // function getWhitelistNext() external view returns (address) {
     //     return Erc20Lib.getWhitelistNext(ld, erc20d);
@@ -97,4 +94,5 @@ contract StErc20 is StFees
                amount: amount
         }));
     }
+//#endif
 }

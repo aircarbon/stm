@@ -77,11 +77,6 @@ library Erc20Lib {
     //
     // (internal) transfer: across types
     //
-    // ### TODO: limit cross-types to commodity only; disallow (all) erc20 entry points on CFT-C should be sufficient
-    //            > i.e. totalSupply()... (+?) should just throw on CFT-C...
-    //             
-    //            i.e. CFT erc20 transfers and properties valid only on the base-types directly
-    //
     function transferInternal(
         StructLib.LedgerStruct storage ld,
         StructLib.StTypesStruct storage std,

@@ -29,14 +29,17 @@ contract("StMaster", accounts => {
 //#endif
             `${await stm_cur.name()}_V++`,
             `${await stm_cur.version()}_V++`,
-            await stm_cur.unit(),
-            await stm_cur.symbol(),
-            await stm_cur.decimals()
+            await stm_cur.unit()
+//#if process.env.CONTRACT_TYPE === 'CASHFLOW_BASE' || process.env.CONTRACT_TYPE === 'COMMODITY'
+        ,
+        await stm_cur.symbol(),
+        await stm_cur.decimals()
+//#endif
 //#if process.env.CONTRACT_TYPE === 'CASHFLOW_BASE'
-//#             ,
-//#             //await stm_cur.chainlinkAggregator_btcUsd(),
-//#             await stm_cur.chainlinkAggregator_ethUsd(),
-//#             await stm_cur.chainlinkAggregator_bnbUsd(),
+//#         ,
+//#         //await stm_cur.chainlinkAggregator_btcUsd(),
+//#         await stm_cur.chainlinkAggregator_ethUsd(),
+//#         await stm_cur.chainlinkAggregator_bnbUsd(),
 //#endif
         );
         console.log(`stm_new: @${stm_new.address} ledgerHash=${await CONST.getLedgerHashcode(stm_new)} / ${await stm_new.name()} ${await stm_new.version()}`);

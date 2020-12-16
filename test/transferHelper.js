@@ -410,19 +410,19 @@ module.exports = {
 
             // user token events (non-fees)
             if (qty_A > 0) {
-                assert(tokFullEvents.filter(p => p.from == ledger_A && p.transferType == CONST.transferType.USER).length > 0 ||
-                       tokPartialEvents.filter(p => p.from == ledger_A && p.transferType == CONST.transferType.USER).length == 1,
+                assert(tokFullEvents.filter(p => p.from == ledger_A && (p.transferType == transferType || p.transferType == CONST.transferType.USER)).length > 0 ||
+                       tokPartialEvents.filter(p => p.from == ledger_A && (p.transferType == transferType || p.transferType == CONST.transferType.USER)).length == 1,
                        'unexpected transfer full vs. partial event count after transfer for ledger A');
             }
             if (qty_B > 0) {
-                assert(tokFullEvents.filter(p => p.from == ledger_B && p.transferType == CONST.transferType.USER).length > 0 ||
-                       tokPartialEvents.filter(p => p.from == ledger_B && p.transferType == CONST.transferType.USER).length == 1,
+                assert(tokFullEvents.filter(p => p.from == ledger_B && (p.transferType == transferType || p.transferType == CONST.transferType.USER)).length > 0 ||
+                       tokPartialEvents.filter(p => p.from == ledger_B && (p.transferType == transferType || p.transferType == CONST.transferType.USER)).length == 1,
                        'unexpected transfer full vs. partial event count after transfer for ledger B');
             }
-            if ((qty_A > 0 && qty_B == 0) || (qty_B > 0 && qty_A == 0)) {
-                assert(tokPartialEvents.filter(p => p.transferType == CONST.transferType.USER).length <= (!applyFees ? 1 : 2), 'unexpected transfer partial event count after single-sided eeu transfer');
+            if ((qty_A > 0 && qty_B == 0) || (qty_B > 0 && qty_A == 0)) { // one-sided xfer
+                assert(tokPartialEvents.filter(p => p.transferType == transferType).length <= (!applyFees ? 1 : 2), 'unexpected transfer partial event count after single-sided eeu transfer');
             }
-            else {
+            else { // two-sided tok swap
                 assert(tokPartialEvents.filter(p => p.transferType == CONST.transferType.USER).length <= (!applyFees ? 2 : 3), 'unexpected transfer partial event count after two-sided eeu transfer');
             }
 

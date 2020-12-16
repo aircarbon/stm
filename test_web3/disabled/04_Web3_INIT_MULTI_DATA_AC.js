@@ -263,7 +263,7 @@ describe(`Contract Web3 Interface`, async () => {
 
         // (test data) get the test issuer/minter account that corresponds with the base type
         const contractSymbol = (await CONST.web3_call('symbol', [], nameOverride));
-        //console.log('contractSymbol', contractSymbol);
+        console.log('contractSymbol', contractSymbol);
         var issuerAddr;
         const testMeta = [
             {
@@ -309,19 +309,23 @@ describe(`Contract Web3 Interface`, async () => {
             case 'SBG1': issuerAddr = process.env.WEB3_NETWORK_ID == 56 ? '0x8A56e0C6801B27DB86e111e3Cb652F4494Cb09b5' : '...'; meta = testMeta[1]; break;
             case 'WCO1': issuerAddr = process.env.WEB3_NETWORK_ID == 56 ? '0x89ba82d2A05027fF05222C51550590F4df46577F' : '...'; meta = testMeta[2]; break;
             case 'RG01': issuerAddr = process.env.WEB3_NETWORK_ID == 56 ? '0x859C881C1C1D8062Bd0ac46b7a41Fa51140d9f5c' : '...'; meta = testMeta[3]; break;
+            case 'RG01B': issuerAddr = process.env.WEB3_NETWORK_ID == 56 ? '0x859C881C1C1D8062Bd0ac46b7a41Fa51140d9f5c' : '...'; meta = testMeta[3]; break;
+            case 'RG01C': issuerAddr = process.env.WEB3_NETWORK_ID == 56 ? '0x859C881C1C1D8062Bd0ac46b7a41Fa51140d9f5c' : '...'; meta = testMeta[3]; break;
+            case 'RG01D': issuerAddr = process.env.WEB3_NETWORK_ID == 56 ? '0x859C881C1C1D8062Bd0ac46b7a41Fa51140d9f5c' : '...'; meta = testMeta[3]; break;
             default: throw (`Unknown contract symbol ${contractSymbol}`);
         }
         //console.log('issuerAddr', issuerAddr);
 
         // check not already minted for this type - query cashflowData's issuer field
         const cfd = (await CONST.web3_call('getCashflowData', [], nameOverride));
-        //console.log('cfd.issuer', cfd.issuer);
+        console.log('cfd', cfd);
         if (cfd.issuer == CONST.nullAddr) { // not yet issued
             console.log(chalk.inverse(`Minting uni-batch of ${contractSymbol} for issuer ${issuerAddr}...`));
 
             // mint through controller, with sample test data
             process.env.CONTRACT_TYPE = 'CASHFLOW_CONTROLLER';
             const spotTypes = (await CONST.web3_call('getSecTokenTypes', [])).tokenTypes.filter(p => p.settlementType == CONST.settlementType.SPOT);
+            console.log('controller spot types', spotTypes);
             const testType = spotTypes.find(p => p.name == testTypeName);
             if (testType === undefined) throw(`Failed to find type '${testTypeName}' in controller`);
             console.log('testType', testType);

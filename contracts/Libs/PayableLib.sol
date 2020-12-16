@@ -8,7 +8,11 @@ import "../Interfaces/IChainlinkAggregator.sol";
 
 import "./TransferLib.sol";
 
+import "./SafeMath.sol";
+
 library PayableLib {
+    using SafeMath for uint256;
+
     event IssuanceSubscribed(address indexed subscriber, address indexed issuer, uint256 weiSent, uint256 weiChange, uint256 tokensSubscribed, uint256 weiPrice);
 
     function get_chainlinkRefPrice(address chainlinkAggAddr) public view returns(int256) {
@@ -84,7 +88,7 @@ library PayableLib {
         require(cashflowData.wei_currentPrice > 0 || cashflowData.cents_currentPrice > 0, "Bad cashflow request: no price set");
         require(cashflowData.wei_currentPrice == 0 || cashflowData.cents_currentPrice == 0, "Bad cashflow request: ambiguous price set");
         if (cashflowData.cents_currentPrice > 0) {
-            require(ethSat_UsdCents != -1 || bnbSat_UsdCents != -1, "Bad cashflow request: no usd/{eth|bnb} rate");
+            require(ethSat_UsdCents != -1 || bnbSat_UsdCents != -1, "Bad usd/{eth|bnb} rate");
         }
 
         // get issuer
@@ -122,7 +126,7 @@ library PayableLib {
     private {
         ProcessPaymentVars memory v;
 
-        require(cashflowData.qty_saleAllocation > 0, "Bad cashflow request: nothing for sale");
+        require(cashflowData.qty_saleAllocation > 0, "Nothing for sale");
 
         // TODO: restrict msg.value upper bound so no overflow?
 
@@ -131,34 +135,40 @@ library PayableLib {
             v.weiPrice = cashflowData.wei_currentPrice;
         }
         else {
-            require(ethSat_UsdCents != -1 || bnbSat_UsdCents != -1, "Bad cashflow request: no usd/{eth|bnb} rate");
+            require(ethSat_UsdCents != -1 || bnbSat_UsdCents != -1, "Bad usd/{eth|bnb} rate");
             if (ethSat_UsdCents != -1) { // use uth/usd rate (ETH Ropsten, mainnet)
-                uint256 eth_UsdCents = uint256(ethSat_UsdCents) / 1000000;
-                v.weiPrice = (cashflowData.cents_currentPrice * 1000000000000000000) / eth_UsdCents;
+                //uint256 eth_UsdCents = uint256(ethSat_UsdCents).div(1000000);
+                v.weiPrice = (cashflowData.cents_currentPrice.mul(1000000000000000000)).mul(1000000).div(uint256(ethSat_UsdCents));
             }
             else if (bnbSat_UsdCents != -1) { // use bnb/usd rate (BSC Mainnet 56 & Testnet 97)
-                uint256 bnb_UsdCents = uint256(bnbSat_UsdCents) / 1000000;
-                v.weiPrice = (cashflowData.cents_currentPrice * 1000000000000000000) / bnb_UsdCents;
+                //uint256 bnb_UsdCents = uint256(bnbSat_UsdCents).div(1000000);
+                v.weiPrice = (cashflowData.cents_currentPrice.mul(1000000000000000000)).mul(1000000).div(uint256(bnbSat_UsdCents));
             }
         }
+        require(msg.value > 0, "Bad msg.value");
+        require(v.weiPrice > 0, "Bad computed v.weiPrice");
 
         // calculate subscription size
-        v.qtyTokens = msg.value / v.weiPrice;
+        //v.qtyTokens = msg.value / v.weiPrice; // ## explicit round DOWN
+        v.qtyTokens = msg.value.div(v.weiPrice); // ## explicit round DOWN
 
         // check sale allowance is not exceeded
         v.issuer_stIds = ld._ledger[issueBatch.originator].tokenType_stIds[1]; // CFT: uni-type
         v.issuerSt = ld._sts[v.issuer_stIds[0]];
-        v.qtyIssuanceSold = uint256(issueBatch.mintedQty) - uint256(v.issuerSt.currentQty);
+        //v.qtyIssuanceSold = uint256(issueBatch.mintedQty) - uint256(v.issuerSt.currentQty);
+        v.qtyIssuanceSold = uint256(issueBatch.mintedQty).sub(uint256(v.issuerSt.currentQty));
         require(cashflowData.qty_saleAllocation >= v.qtyIssuanceSold + v.qtyTokens, "Bad cashflow request: insufficient quantity for sale");
 
         // send change back to payer
-        v.weiChange = msg.value % v.weiPrice;
+        //v.weiChange = (msg.value % v.weiPrice); // explicit remainder -- keep 10 Wei in the contract, tryfix...
+        v.weiChange = (msg.value.mod(v.weiPrice)); // explicit remainder -- keep 10 Wei in the contract, tryfix...
         if (v.weiChange > 0) {
             msg.sender.transfer(v.weiChange);
         }
 
         // fwd payment to issuer
-        issueBatch.originator.transfer(msg.value - v.weiChange);
+        //issueBatch.originator.transfer(msg.value - v.weiChange);
+        issueBatch.originator.transfer(msg.value.sub(v.weiChange));
 
         // transfer tokens to payer
         if (v.qtyTokens > 0) {

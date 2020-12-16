@@ -661,30 +661,32 @@ library TransferLib {
 
                     //ld._ledger[from].tokenType_sumQty[a.tokTypeId] -= stQty;            //* gas - DROP DONE - only used internally, validation params
 
+                    // TODO -- reinstate this!? seems **needed** for combining of erc20's -- but *why* wasn't it needed for commodity transfers...?!
+
                     // assign to destination
                     //  IFF minting >1 ST is disallowed AND
                     //  IFF validation of available qty's is already performed,
                     //  THEN the merge condition below *** wrt. batchId can *never* be true:
-                        // MERGE - if any existing destination ST is from same batch
-                        // bool mergedExisting = false;
-                        // for (uint i = 0; i < to_stIds.length; i++) {
-                        //     if (_sts_batchId[to_stIds[i]] == batchId) { // ***
-                        //         // resize (grow) the destination ST
-                        //         _sts_currentQty[to_stIds[i]] += stQty;                // TODO gas - pack/combine
-                        //         _sts_mintedQty[to_stIds[i]] += stQty;                 // TODO gas - pack/combine
-                        //         // retire the old ST from the main list
-                        //         _sts_currentQty[stId] = 0;
-                        //         _sts_mintedQty[stId] = 0;
-                        //         mergedExisting = true;
-                        //         emit TransferedFullSecToken(a.from, a.to, stId, to_stIds[i], stQty, StructLib.TransferType);
-                        //         break;
-                        //     }
-                        // }
-                        // TRANSFER - if no existing destination ST from same batch
-                        //if (!mergedExisting) {
-                            to_stIds.push(stId);
-                            emit TransferedFullSecToken(a.from, a.to, stId, 0, uint256(v.stQty), a.transferType);
-                        //}
+                        
+                    // MERGE - if any existing destination ST is from same batch
+                    v.mergedExisting = false;
+                    for (uint i = 0; i < to_stIds.length; i++) {
+                        if (ld._sts[to_stIds[i]].batchId == ld._sts[stId].batchId) {
+                            // resize (grow) the destination ST
+                            ld._sts[to_stIds[i]].currentQty += v.stQty; // PACKED
+                            ld._sts[to_stIds[i]].mintedQty += v.stQty; // PACKED
+                            
+                            v.mergedExisting = true;
+                            emit TransferedFullSecToken(a.from, a.to, stId, to_stIds[i], uint256(v.stQty), a.transferType);
+                            break;
+                        }
+                    }
+                    // TRANSFER - if no existing destination ST from same batch
+                    if (!v.mergedExisting) {
+                        to_stIds.push(stId);
+                        emit TransferedFullSecToken(a.from, a.to, stId, 0, uint256(v.stQty), a.transferType);
+                    }
+
                     //ld._ledger[to].tokenType_sumQty[tokTypeId] += stQty;                //* gas - DROP DONE - only used internally, validation params
 
                     v.remainingToTransfer -= v.stQty;
@@ -696,7 +698,7 @@ library TransferLib {
                     // split the ST across the ledger entries, soft-minting a new ST in the destination
                     // note: the parent (origin) ST's minted qty also gets split across the two ST;
                     //         this is so the total minted in the system is unchanged,
-                    //         and also so the total burned amount in the ST can still be calculated by _sts_mintedQty[x] - _sts_currentQty[x]
+                    //         and also so the total burned amount in the ST can still be calculated by mintedQty[x] - currentQty[x]
                     // note: both parent and child ST point to each other (double-linked list)
 
                     // assign new ST to destination
@@ -704,8 +706,6 @@ library TransferLib {
                         // MERGE - if any existing destination ST is from same batch
                         v.mergedExisting = false;
                         for (uint i = 0; i < to_stIds.length; i++) {
-
-                            //if (ld._sts_batchId[to_stIds[i]] == ld._sts_batchId[stId]) {
                             if (ld._sts[to_stIds[i]].batchId == ld._sts[stId].batchId) {
 
                                 // resize (grow) the destination ST
