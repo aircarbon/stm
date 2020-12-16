@@ -35,7 +35,7 @@
     "luxon": "^1.22.2",
     "psol": "^1.0.9",
     "tcharts.js": "0.0.4",
-    "web3-provider-engine": "^15.0.12"
+    "web3-provider-engine": "^16.0.0"
   },
   "devDependencies": {
     "@digix/doxity": "^0.5.2",
