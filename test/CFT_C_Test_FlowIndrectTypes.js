@@ -57,6 +57,10 @@ contract("StMaster", accounts => {
     // ORDERED
     //
 
+    //...
+    // ## TODO -- need a new 2_deploy... mode that deploys & links the base-types... see commented/removed code in 2_deploy / case 'CASHFLOW_CONTROLLER':
+    //...
+
     // indirect types & minting
     it(`cashflow controller - should be able to query controller's indirect types`, async () => {
         const types = (await stm.getSecTokenTypes()).tokenTypes;

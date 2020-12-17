@@ -20,9 +20,9 @@ module.exports = {
             // add spot types
             const spotTypes = (await CONST.web3_call('getSecTokenTypes', [], nameOverride)).tokenTypes.filter(p => p.settlementType == CONST.settlementType.SPOT);
             //console.log('spotTypes', spotTypes.map(p => { return { id: p.id, name: p.name } }));
-            await addSecTokenIfNotPresent(spotTypes, 'AirCarbon CORSIA Token', O, nameOverride);
-            await addSecTokenIfNotPresent(spotTypes, 'AirCarbon Nature Token', O, nameOverride);
-            await addSecTokenIfNotPresent(spotTypes, 'AirCarbon Premium Token', O, nameOverride);
+            await addSecTokenIfNotPresent(spotTypes, 'ACT', O, nameOverride); // AirCarbon CORSIA Token
+            await addSecTokenIfNotPresent(spotTypes, 'ANT', O, nameOverride); // AirCarbon Nature Token
+            await addSecTokenIfNotPresent(spotTypes, 'GPT', O, nameOverride); // AirCarbon Premium Token
 
             // add ccy types
             const ccyTypes = (await CONST.web3_call('getCcyTypes', [], nameOverride)).ccyTypes;
