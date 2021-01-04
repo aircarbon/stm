@@ -73,16 +73,16 @@ module.exports = {
             
             // parse cashflow args; convert from days to blocks
 //#if process.env.CONTRACT_TYPE === 'CASHFLOW_BASE'
-            const cfa = process.env.ADD_TYPE__CASHFLOW_ARGS !== undefined
-                        ? JSON.parse(process.env.ADD_TYPE__CASHFLOW_ARGS)
-                        : CONST.contractProps[contractType].cashflowArgs;
-            console.log('cfa(pre)', cfa);
-            if (cfa.term_Days === undefined || cfa.bond_int_EveryDays === undefined) throw('Undefined cashflow args; aborting.')
-            cfa.term_Blks = CONST.blocksFromDays(cfa.term_Days);
-            cfa.bond_int_EveryBlks = CONST.blocksFromDays(cfa.bond_int_EveryDays);
-            delete cfa.term_Days;
-            delete cfa.bond_int_EveryDays;
-            console.log('cfa(post)', cfa);
+//#             const cfa = process.env.ADD_TYPE__CASHFLOW_ARGS !== undefined
+//#                         ? JSON.parse(process.env.ADD_TYPE__CASHFLOW_ARGS)
+//#                         : CONST.contractProps[contractType].cashflowArgs;
+//#             console.log('cfa(pre)', cfa);
+//#             if (cfa.term_Days === undefined || cfa.bond_int_EveryDays === undefined) throw('Undefined cashflow args; aborting.')
+//#             cfa.term_Blks = CONST.blocksFromDays(cfa.term_Days);
+//#             cfa.bond_int_EveryBlks = CONST.blocksFromDays(cfa.bond_int_EveryDays);
+//#             delete cfa.term_Days;
+//#             delete cfa.bond_int_EveryDays;
+//#             console.log('cfa(post)', cfa);
 //#endif
 
             // derive primary owner/deployer (&[0]), and a further n more keypairs ("backup owners");
@@ -103,7 +103,7 @@ module.exports = {
                 contractType == 'CASHFLOW_CONTROLLER' ? CONST.contractType.CASHFLOW_CONTROLLER :
                                                         CONST.contractType.COMMODITY,
 //#if process.env.CONTRACT_TYPE === 'CASHFLOW_BASE'
-                cfa,
+//#                 cfa,
 //#endif
                 contractName,
                 CONST.contractProps[contractType].contractVer,
@@ -114,10 +114,10 @@ module.exports = {
                 CONST.contractProps[contractType].contractDecimals
 //#endif
 //#if process.env.CONTRACT_TYPE === 'CASHFLOW_BASE'
-            ,
-          //CONST.chainlinkAggregators[process.env.NETWORK_ID].btcUsd,    // 24k
-            CONST.chainlinkAggregators[process.env.NETWORK_ID].ethUsd,
-            CONST.chainlinkAggregators[process.env.NETWORK_ID].bnbUsd,
+//#             ,
+//#           //CONST.chainlinkAggregators[process.env.NETWORK_ID].btcUsd,    // 24k
+//#             CONST.chainlinkAggregators[process.env.NETWORK_ID].ethUsd,
+//#             CONST.chainlinkAggregators[process.env.NETWORK_ID].bnbUsd,
 //#endif
             ).then(async stm => {
                 //console.dir(stm);
