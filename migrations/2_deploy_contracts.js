@@ -54,6 +54,8 @@ module.exports = async function (deployer) {
         // AC
         case 'DEV': console.log((`Deploying (AWS DEV / DEV) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`)); break;
         case 'DEMO': console.log((`Deploying (AWS DEV / DEMO) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`)); break;
+        case 'DEMO_97_AC': console.log((`Deploying (AWS DEV / DEMO) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`)); break;
+        case 'UAT_97_AC': console.log((`Deploying (AWS DEV / DEMO) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`)); break;
         case 'UAT': console.log((`Deploying (AWS DEV / UAT) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`)); break;
         case 'PROD_1': console.log((`Deploying (AWS PROD / ETH 1 MAINNET) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`)); break;
         case 'PROD_52101': console.log((`Deploying (AWS PROD / AC 52101 PRODNET) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`)); break;

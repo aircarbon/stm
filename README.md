@@ -40,8 +40,8 @@ Pre-process, compile & output bytecode sizes (see `StMaster.sol` re. 24k bytecod
 ## (2) Pro-process, compile & migrate (Deploy) Contracts
 - `export INSTANCE_ID=local && node process_sol_js && truffle migrate --network development --reset` (ganache-cli local node)
 - `export INSTANCE_ID=DEV && node process_sol_js && truffle migrate --network ropsten_ac --reset` (Deploy AWS DEV instance using AirCarbon's Ropsten Geth node)
-- `export INSTANCE_ID=UAT && node process_sol_js && truffle migrate --network ropsten_infura --reset` (Deploy AWS UAT instance using Infura Ropsten)
-- `export INSTANCE_ID=DEMO && node process_sol_js && truffle migrate --network test_ac --reset` (Deploy AWS DEMO instance on AirCarbon's privnet)
+- `export INSTANCE_ID=UAT && node process_sol_js && truffle migrate --network bsc_testnet_bn --reset` (Deploy AWS UAT instance using Infura Ropsten)
+- `export INSTANCE_ID=DEMO && node process_sol_js && truffle migrate --network bsc_testnet_bn --reset` (Deploy AWS DEMO instance on AirCarbon's privnet)
 
 PROD: WIP/TESTING...
 - `export INSTANCE_ID=PROD_1 && node process_sol_js && truffle migrate --network mainnet_ac --reset` (Deploy AWS PROD instance on ETH Mainnet)
