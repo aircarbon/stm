@@ -127,9 +127,9 @@ contract StMaster
         string memory                 _contractVer,
         string memory                 _contractUnit
 //#if process.env.CONTRACT_TYPE === 'CASHFLOW_BASE' || process.env.CONTRACT_TYPE === 'COMMODITY'
-//#         ,
-//#         string memory                 _contractSymbol,
-//#         uint8                         _contractDecimals
+        ,
+        string memory                 _contractSymbol,
+        uint8                         _contractDecimals
 //#endif
 //#if process.env.CONTRACT_TYPE === 'CASHFLOW_BASE'
 //#     ,
@@ -139,7 +139,7 @@ contract StMaster
 //#endif
     ) 
 //#if process.env.CONTRACT_TYPE === 'CASHFLOW_BASE' || process.env.CONTRACT_TYPE === 'COMMODITY'
-//#         StErc20(_contractSymbol, _contractDecimals)
+        StErc20(_contractSymbol, _contractDecimals)
 //#endif
     {
 

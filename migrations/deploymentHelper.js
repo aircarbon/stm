@@ -109,9 +109,9 @@ module.exports = {
                 CONST.contractProps[contractType].contractVer,
                 CONST.contractProps[contractType].contractUnit
 //#if process.env.CONTRACT_TYPE === 'CASHFLOW_BASE' || process.env.CONTRACT_TYPE === 'COMMODITY'
-//#                 ,
-//#                 symbolOverride || CONST.contractProps[contractType].contractSymbol,
-//#                 CONST.contractProps[contractType].contractDecimals
+                ,
+                symbolOverride || CONST.contractProps[contractType].contractSymbol,
+                CONST.contractProps[contractType].contractDecimals
 //#endif
 //#if process.env.CONTRACT_TYPE === 'CASHFLOW_BASE'
 //#             ,

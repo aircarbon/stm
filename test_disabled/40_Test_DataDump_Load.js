@@ -31,9 +31,9 @@ contract("StMaster", accounts => {
             `${await stm_cur.version()}_V++`,
             await stm_cur.unit()
 //#if process.env.CONTRACT_TYPE === 'CASHFLOW_BASE' || process.env.CONTRACT_TYPE === 'COMMODITY'
-//#         ,
-//#         await stm_cur.symbol(),
-//#         await stm_cur.decimals()
+        ,
+        await stm_cur.symbol(),
+        await stm_cur.decimals()
 //#endif
 //#if process.env.CONTRACT_TYPE === 'CASHFLOW_BASE'
 //#         ,
@@ -53,7 +53,7 @@ contract("StMaster", accounts => {
         const allLedgerOwners = await stm_cur.getLedgerOwners();
         const ledgerEntry = await stm_cur.getLedgerEntry(accounts[0]);
 //#if process.env.CONTRACT_TYPE === 'CASHFLOW_CONTROLLER' || process.env.CONTRACT_TYPE === 'CASHFLOW_BASE'
-        const cashflowData = await stm_cur.getCashflowData();
+//#         const cashflowData = await stm_cur.getCashflowData();
 //#endif
     });
 

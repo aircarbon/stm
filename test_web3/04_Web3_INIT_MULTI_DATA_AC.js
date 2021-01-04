@@ -72,6 +72,7 @@ describe(`Contract Web3 Interface`, async () => {
     //   SD BSC Mainnet 56
     //       ("export INSTANCE_ID=PROD_56_SD && mocha test_web3 --timeout 10000000 --exit") 
     //       ("export INSTANCE_ID=PROD_56_SD_RichGlory && mocha test_web3 --timeout 10000000 --exit") 
+    //       ("export INSTANCE_ID=PROD_56_SD_SBGLand && mocha test_web3 --timeout 10000000 --exit") 
     //
 
     //CONST.consoleOutput(false);

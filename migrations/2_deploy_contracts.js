@@ -43,6 +43,7 @@ const { db } = require('../../utils-server/dist');
 //   SD BSC Mainnet 56
 //    `export INSTANCE_ID=PROD_56_SD && node process_sol_js && truffle migrate --network bsc_mainnet_ac -f 2 --to 2 --reset`
 //    `export INSTANCE_ID=PROD_56_SD_RichGlory && node process_sol_js && truffle migrate --network bsc_mainnet_ac -f 2 --to 2 --reset`
+//    `export INSTANCE_ID=PROD_56_SD_SBGLand && node process_sol_js && truffle migrate --network bsc_mainnet_ac -f 2 --to 2 --reset`
 //
 
 module.exports = async function (deployer) {
