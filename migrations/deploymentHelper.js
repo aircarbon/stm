@@ -145,7 +145,8 @@ module.exports = {
                         deployerIpv4: ip,
                          deployedAbi: JSON.stringify(stm.abi),
                         contractType,
-                              txHash: stm.transactionHash
+                              txHash: stm.transactionHash,
+                              symbol: symbolOverride || ''
                     });
 
                     // log & validate deployment
