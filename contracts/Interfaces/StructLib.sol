@@ -30,7 +30,7 @@ library StructLib {
         OtherFee2,
         OtherFee3,
         OtherFee4,
-        OtherFee5,
+        OtherFee5, // PHYSICAL_DELIVERY
 
         // transfer across related accounts (e.g. corp-admin transfer to corp-trader)
         RelatedTransfer,
