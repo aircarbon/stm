@@ -265,7 +265,7 @@ module.exports = {
          OTHER_FEE2: 13,
          OTHER_FEE3: 14,
          OTHER_FEE4: 15,
-         OTHER_FEE5: 16,
+         OTHER_FEE5: 16, // Physical Delivery
    RELATED_TRANSFER: 17,
          ADJUSTMENT: 18,
 
