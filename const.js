@@ -264,8 +264,9 @@ module.exports = {
          OTHER_FEE1: 12,
          OTHER_FEE2: 13,
          OTHER_FEE3: 14,
-         OTHER_FEE4: 15,
+         OTHER_FEE4: 15, // REBATE
          OTHER_FEE5: 16, // PHYSICAL_DELIVERY
+
    RELATED_TRANSFER: 17,
          ADJUSTMENT: 18,
 
