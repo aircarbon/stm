@@ -62,7 +62,7 @@ const blocksFromMonths = (months) => Math.ceil(blocksFromDays(months * 30.42));
 //
 // MAIN: deployer definitions -- contract ctor() params
 //
-const contractVer = process.env.CONTRACT_VERSION || "1.0b";
+const contractVer = process.env.CONTRACT_VERSION || "1.0c";
 const contractProps = {
     COMMODITY: {
         contractVer: contractVer,
@@ -178,8 +178,8 @@ module.exports = {
     web3_call: (methodName, methodArgs, nameOverride, addrOverride, fromAddr) =>
         web3_call(methodName, methodArgs, nameOverride, addrOverride, fromAddr),
 
-    web3_tx: (methodName, methodArgs, fromAddr, fromPrivKey, nameOverride, addrOverride) =>
-        web3_tx(methodName, methodArgs, fromAddr, fromPrivKey, nameOverride, addrOverride),
+    web3_tx: (methodName, methodArgs, fromAddr, fromPrivKey, nameOverride, addrOverride, value) =>
+        web3_tx(methodName, methodArgs, fromAddr, fromPrivKey, nameOverride, addrOverride, value),
 
     consoleOutput: (enabled) => { consoleOutput = enabled; },
 
@@ -469,7 +469,7 @@ async function web3_call(methodName, methodArgs, nameOverride, addrOverride, fro
     }
 }
 
-async function web3_tx(methodName, methodArgs, fromAddr, fromPrivKey, nameOverride, addrOverride) {
+async function web3_tx(methodName, methodArgs, fromAddr, fromPrivKey, nameOverride, addrOverride, value = 0) {
     const { web3, ethereumTxChain } = getTestContextWeb3();
     var contractDb;
     if (addrOverride == undefined) {
@@ -524,7 +524,7 @@ async function web3_tx(methodName, methodArgs, fromAddr, fromPrivKey, nameOverri
          from: fromAddr,
            to: contractDb.addr,
          data: paramsData,
-        value: 0
+        value: value
      }
 
     // estimate gas

@@ -320,6 +320,17 @@ library StructLib {
         // TODO: getCashflowStatus() ==> returns in default or not, based on block.number # and issuer payment history...
     }
 
+    // Issuer Payment - Payment struct for each payment
+    struct IssuerPaymentBatchStruct { // ** DATA_DUMP: TODO
+        uint256 paymentTotalAmount;                   // total payment from issuer
+        uint256 paymentProcessedAmount;               // current processed payment amount
+        uint256 curNdx;                               // current 0-based index into the ledger owners list for payment processing        
+    }
+
+    struct IssuerPaymentsStruct {
+        mapping(uint256 => StructLib.IssuerPaymentBatchStruct) issuerPayments;   //  Payment ID [must be consistent across all batches, 1-based] , PaymentStruct 
+    }
+
     // SPOT TRANSFER ARGS
     struct TransferArgs {
         address ledger_A;

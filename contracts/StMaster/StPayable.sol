@@ -52,6 +52,12 @@ contract StPayable is
     function getCashflowData() public view returns(StructLib.CashflowStruct memory) {
         return PayableLib.getCashflowData(ld, cashflowData);
     }
+
+    StructLib.IssuerPaymentsStruct ipd;   //  Payment ID [must be consistent across all batches, 1-based] , PaymentStruct mapping 
+
+    function getIssuerPaymentByPaymentId(uint256 paymentId) public view returns(StructLib.IssuerPaymentBatchStruct memory) {
+        return PayableLib.getIssuerPayments(ipd.issuerPayments[paymentId]);
+    }
     
     //address public chainlinkAggregator_btcUsd;
     address public chainlinkAggregator_ethUsd;
@@ -75,6 +81,11 @@ contract StPayable is
     //function() external  payable  onlyWhenReadWrite() {
     receive() external payable onlyWhenReadWrite() {
         PayableLib.pay(ld, std, ctd, cashflowData, globalFees, deploymentOwner, get_ethUsd(), get_bnbUsd());
+    }
+    
+    //function() external  payable  onlyWhenReadWrite() {
+    function receiveIssuerPaymentBatch(uint256 paymentId, uint64 count) external payable onlyWhenReadWrite() {
+        PayableLib.issuerPay(paymentId, count, ipd, ld, cashflowData);
     }
 
     function setIssuerValues(
