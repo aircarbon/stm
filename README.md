@@ -65,7 +65,15 @@ INSTANCE_ID=local && node dbInit.js
 ## Docs
 - `npx soldoc --output html ./contracts/interfaces/docs/soldoc ./contracts/Interfaces`
 - `npx solidity-docgen -i ./contracts/interfaces -o ./contracts/interfaces/docs/solidity-docgen --contract-pages`
+- `solidoc ./contracts ./docs ./ true`
 
+## Diagrams
+VS Code Extensions
+- [Solidity Visual Developer] (https://marketplace.visualstudio.com/items?itemName=tintinweb.solidity-visual-auditor)
+- Flatten /contracts/StMaster/StMaster.sol
+- Generate graph, contract interaction graph, inheritance graph
+- Export UML; or
+- [draw.io] (https://app.diagrams.net/) Menu --> Arrange --> Insert --> Advanced CSV
 ## Dbg - misc
 If you see `Error: invalid reporter "eth-gas-reporter"` -- try running `npm i` in ./packages/erc20
 

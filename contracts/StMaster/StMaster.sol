@@ -106,6 +106,12 @@ contract StMaster
     event Approval(address indexed owner, address indexed spender, uint256 value);
     // PayableLib events
     event IssuanceSubscribed(address indexed subscriber, address indexed issuer, uint256 weiSent, uint256 weiChange, uint256 tokensSubscribed, uint256 weiPrice);
+    event IssuerPaymentBatchProcessed(uint256 indexed paymentId, address indexed issuer, uint256 weiSent, uint256 weiChange, uint256 batchProcessedAmount, uint256 tokTypeId);
+    // Debug Issuer Payments
+    event IssuerPaymentProcessed(uint256 paymentId, address indexed issuer, address indexed subscriber, uint256 sharePercentage, uint256 shareWei);
+    event dbg1(uint256 paymentId, address indexed issuer, string cashflowType, uint256 totalOwners, uint64 count);
+    event dbg2(address indexed issuer, address indexed subscriber, string debugMsg, uint256 currentIndex, uint256 stIdCount);
+    event dbg3(uint256 paymentId, address indexed issuer, address indexed subscriber, uint256 sharePercentage, uint256 shareWei);
     // FuturesLib events
     event FutureOpenInterest(address indexed long, address indexed short, uint256 shortStId, uint256 tokTypeId, uint256 qty, uint256 price, uint256 feeLong, uint256 feeShort);
     event SetInitialMarginOverride(uint256 tokTypeId, address indexed ledgerOwner, uint16 initMarginBips);
@@ -114,14 +120,14 @@ contract StMaster
     event Combine(address indexed to, uint256 masterStId, uint256 countTokensCombined);
 
     // DBG
-    //event dbg1(uint256 id, uint256 typeId);
-    //event dbg2(uint256 postIdShifted);
+    // event dbg1(uint256 id, uint256 typeId);
+    // event dbg2(uint256 postIdShifted);
 
     constructor(
         address[] memory              _owners,
         StructLib.ContractType        _contractType,
 //#if process.env.CONTRACT_TYPE === 'CASHFLOW_BASE'
-//#         StructLib.CashflowArgs memory _cashflowArgs,
+        StructLib.CashflowArgs memory _cashflowArgs,
 //#endif
         string memory                 _contractName,
         string memory                 _contractVer,
@@ -132,10 +138,10 @@ contract StMaster
         uint8                         _contractDecimals
 //#endif
 //#if process.env.CONTRACT_TYPE === 'CASHFLOW_BASE'
-//#     ,
-//#   //address                       _chainlinkAggregator_btcUsd,
-//#     address                       _chainlinkAggregator_ethUsd,
-//#     address                       _chainlinkAggregator_bnbUsd
+    ,
+  //address                       _chainlinkAggregator_btcUsd,
+    address                       _chainlinkAggregator_ethUsd,
+    address                       _chainlinkAggregator_bnbUsd
 //#endif
     ) 
 //#if process.env.CONTRACT_TYPE === 'CASHFLOW_BASE' || process.env.CONTRACT_TYPE === 'COMMODITY'
@@ -144,10 +150,10 @@ contract StMaster
     {
 
 //#if process.env.CONTRACT_TYPE === 'CASHFLOW_BASE'
-//#         cashflowData.args = _cashflowArgs;
-//#         //chainlinkAggregator_btcUsd = _chainlinkAggregator_btcUsd;
-//#         chainlinkAggregator_ethUsd = _chainlinkAggregator_ethUsd;
-//#         chainlinkAggregator_bnbUsd = _chainlinkAggregator_bnbUsd;
+        cashflowData.args = _cashflowArgs;
+        //chainlinkAggregator_btcUsd = _chainlinkAggregator_btcUsd;
+        chainlinkAggregator_ethUsd = _chainlinkAggregator_ethUsd;
+        chainlinkAggregator_bnbUsd = _chainlinkAggregator_bnbUsd;
 //#endif
 
         // set common properties

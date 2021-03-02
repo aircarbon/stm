@@ -8,29 +8,29 @@ import "../StMaster/StMaster.sol";
 library StructLib {
 
     // TRANSFER (one-sided ccy/tok) TYPES
-    enum TransferType { 
+    enum TransferType {
         Undefined,
 
         // spot trades: user-requested trade transfers, and automated fees
         User,
         ExchangeFee,
         OriginatorFee,
-        
+
         // futures: settlement transfers
-        //TakePay, 
+        //TakePay,
         TakePayFee, SettleTake, SettlePay,
-        
+
         // manual transfers: ccy fees
         MintFee,
         BurnFee,
         WithdrawFee,
         DepositFee,
         DataFee,
-        OtherFee1, 
+        OtherFee1,
         OtherFee2,
         OtherFee3,
-        OtherFee4,
-        OtherFee5, // Physical Delivery
+        OtherFee4, // REBATE
+        OtherFee5, // PHYSICAL_DELIVERY
 
         // transfer across related accounts (e.g. corp-admin transfer to corp-trader)
         RelatedTransfer,
@@ -318,6 +318,17 @@ library StructLib {
         //uint256 bond_int_lastPaidBlk;    // rates: last paid interest block no
 
         // TODO: getCashflowStatus() ==> returns in default or not, based on block.number # and issuer payment history...
+    }
+
+    // Issuer Payment - Payment struct for each payment
+    struct IssuerPaymentBatchStruct { // ** DATA_DUMP: TODO
+        uint256 paymentTotalAmount;                   // total payment from issuer
+        uint256 paymentProcessedAmount;               // current processed payment amount
+        uint256 curNdx;                               // current 0-based index into the ledger owners list for payment processing        
+    }
+
+    struct IssuerPaymentsStruct {
+        mapping(uint256 => StructLib.IssuerPaymentBatchStruct) issuerPayments;   //  Payment ID [must be consistent across all batches, 1-based] , PaymentStruct 
     }
 
     // SPOT TRANSFER ARGS

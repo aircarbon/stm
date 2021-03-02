@@ -22,25 +22,32 @@ const { db } = require('../../utils-server/dist');
 //    `export INSTANCE_ID=PROD_52101 && node process_sol_js && truffle migrate --network prodnet_ac -f 2 --to 2 --reset`
 //    `export INSTANCE_ID=PROD_56 && node process_sol_js && truffle migrate --network bsc_mainnet_ac -f 2 --to 2 --reset`
 //
-//   SD local Ganache
+//   SD local Ganache / Dev DB (ordered)
 //    `export INSTANCE_ID=local_SD && node process_sol_js && truffle migrate --network development -f 2 --to 2 --reset`
 //    `export INSTANCE_ID=local_SD_RichGlory && node process_sol_js && truffle migrate --network development -f 2 --to 2 --reset`
 //
-//   SD Ropsten 3
+//   SD Ropsten 3 (ordered)
 //    `export INSTANCE_ID=UAT_3_SD && node process_sol_js && truffle migrate --network ropsten_ac -f 2 --to 2 --reset`
 //    `export INSTANCE_ID=UAT_3_SD_RichGlory && node process_sol_js && truffle migrate --network ropsten_ac -f 2 --to 2 --reset`
 //    `export INSTANCE_ID=UAT_3_SD_SBGLand && node process_sol_js && truffle migrate --network ropsten_ac -f 2 --to 2 --reset`
 //    `export INSTANCE_ID=UAT_3_SD_WilsonAndCo && node process_sol_js && truffle migrate --network ropsten_ac -f 2 --to 2 --reset`
 //    `export INSTANCE_ID=UAT_3_SD_WorldbridgeLand && node process_sol_js && truffle migrate --network ropsten_ac -f 2 --to 2 --reset`
 //
-//   SD BSC Testnet 97
+//   SD BSC Testnet 97 (ordered)
 //    `export INSTANCE_ID=UAT_97_SD && node process_sol_js && truffle migrate --network bsc_testnet_bn -f 2 --to 2 --reset`
 //    `export INSTANCE_ID=UAT_97_SD_RichGlory && node process_sol_js && truffle migrate --network bsc_testnet_bn -f 2 --to 2 --reset`
 //    `export INSTANCE_ID=UAT_97_SD_SBGLand && node process_sol_js && truffle migrate --network bsc_testnet_bn -f 2 --to 2 --reset`
 //    `export INSTANCE_ID=UAT_97_SD_WilsonAndCo && node process_sol_js && truffle migrate --network bsc_testnet_bn -f 2 --to 2 --reset`
 //    `export INSTANCE_ID=UAT_97_SD_WorldbridgeLand && node process_sol_js && truffle migrate --network bsc_testnet_bn -f 2 --to 2 --reset`
+//    
+//   SD BSC Testnet 97 (DEMO)
+//    `export INSTANCE_ID=DEMO_97_SD && node process_sol_js && truffle migrate --network bsc_testnet_bn -f 2 --to 2 --reset`
+//    `export INSTANCE_ID=DEMO_97_SD_RichGlory && node process_sol_js && truffle migrate --network bsc_testnet_bn -f 2 --to 2 --reset`
+//    `export INSTANCE_ID=DEMO_97_SD_SBGLand && node process_sol_js && truffle migrate --network bsc_testnet_bn -f 2 --to 2 --reset`
+//    `export INSTANCE_ID=DEMO_97_SD_WilsonAndCo && node process_sol_js && truffle migrate --network bsc_testnet_bn -f 2 --to 2 --reset`
+//    `export INSTANCE_ID=DEMO_97_SD_WorldbridgeLand && node process_sol_js && truffle migrate --network bsc_testnet_bn -f 2 --to 2 --reset`
 //
-//   SD BSC Mainnet 56
+//   SD BSC Mainnet 56 (ordered)
 //    `export INSTANCE_ID=PROD_56_SD && node process_sol_js && truffle migrate --network bsc_mainnet_ac -f 2 --to 2 --reset`
 //    `export INSTANCE_ID=PROD_56_SD_RichGlory && node process_sol_js && truffle migrate --network bsc_mainnet_ac -f 2 --to 2 --reset`
 //    `export INSTANCE_ID=PROD_56_SD_SBGLand && node process_sol_js && truffle migrate --network bsc_mainnet_ac -f 2 --to 2 --reset`
@@ -65,6 +72,7 @@ module.exports = async function (deployer) {
         case 'DEV_SD': console.log((`Deploying (AWS DEV / DEV [controller w/ 0 default base types] for SDAX) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`)); break;
         case 'UAT_SD': console.log((`Deploying (AWS DEV / UAT [controller w/ 0 default base types] for SDAX) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`)); break;
         case 'UAT_97_SD': console.log((`Deploying (AWS UAT / BSC Testnet [controller w/ 0 default base types] for SDAX) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`)); break;
+        case 'DEMO_97_SD': console.log((`Deploying (AWS DEMO / BSC Testnet [controller w/ 0 default base types] for SDAX) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`)); break;
         case 'PROD_3_SD': console.log((`Deploying (AWS PROD / Ropsten 3 [controller w/ 0 default base types] for SDAX) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`)); break;
         case 'PROD_56_SD': console.log((`Deploying (AWS PROD / BSC Mainnet [controller w/ 0 default base types] for SDAX) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`)); break;
         default:
@@ -73,6 +81,9 @@ module.exports = async function (deployer) {
             }
             else if (process.env.INSTANCE_ID.startsWith('UAT_97_SD_')) {
                 console.log((`Deploying (AWS DEV / UAT BSC Testnet [additional base type] for SDAX) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`));
+            }
+            else if (process.env.INSTANCE_ID.startsWith('DEMO_97_SD_')) {
+                console.log((`Deploying (AWS DEV / DEMO BSC Testnet [additional base type] for SDAX) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`));
             }
             else if (process.env.INSTANCE_ID.startsWith('PROD_56_SD_')) {
                 console.log((`Deploying (AWS PROD / BSC Mainnet [additional base type] for SDAX) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`));
@@ -113,6 +124,7 @@ module.exports = async function (deployer) {
 
     switch (process.env.CONTRACT_TYPE) {
         case 'COMMODITY':
+            console.log('COMMODITY...');
             // deploy a singleton COMMODITY contract
             await deploymentHelper.Deploy({ deployer, artifacts, contractType: 'COMMODITY' });
             if (!deployer.network.includes("-fork")) {
@@ -122,6 +134,7 @@ module.exports = async function (deployer) {
 
         // v2: deploys *just* the contoller... (too complicated to be doing pre-processing and recompiles in the middle of this flow)
         case 'CASHFLOW_CONTROLLER':
+            console.log('CASHFLOW_CONTROLLER...');
             // deploy two base types
             // const execSync = require("child_process").execSync;
             // process.env.CONTRACT_TYPE = 'CASHFLOW_BASE';
@@ -163,6 +176,7 @@ module.exports = async function (deployer) {
 
         // v2: we're *required* to run this after the controller deployment (i.e. no default base types deployed alongside the controller)
         case 'CASHFLOW_BASE':
+            console.log('CASHFLOW_BASE...');
             const nameBase = process.env.ADD_TYPE__CONTRACT_NAME;
             const symbolBase = process.env.ADD_TYPE__CONTRACT_SYMBOL;
             if (nameBase === undefined || nameBase.length == 0) {
@@ -176,6 +190,7 @@ module.exports = async function (deployer) {
 
             // get whitelist from controller (wwe will set new the base type's whitelist to match)
             process.env.CONTRACT_TYPE = 'CASHFLOW_CONTROLLER';
+            console.log('getting whitelist...');
             const controllerWhitelist = await CONST.web3_call('getWhitelist', []);
             //console.log('controllerWhitelist', controllerWhitelist);
             if (!controllerWhitelist) throw(`Cannot fetch controller whitelist.`);

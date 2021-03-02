@@ -15,6 +15,13 @@ library PayableLib {
 
     event IssuanceSubscribed(address indexed subscriber, address indexed issuer, uint256 weiSent, uint256 weiChange, uint256 tokensSubscribed, uint256 weiPrice);
 
+    event IssuerPaymentBatchProcessed(uint256 indexed paymentId, address indexed issuer, uint256 weiSent, uint256 weiChange, uint256 batchProcessedAmount, uint256 tokTypeId);
+
+    event IssuerPaymentProcessed(uint256 paymentId, address indexed issuer, address indexed subscriber, uint256 sharePercentage, uint256 shareWei);
+    event dbg1(uint256 paymentId, address indexed issuer, string cashflowType, uint256 totalOwners, uint64 count);
+    event dbg2(address indexed issuer, address indexed subscriber, string debugMsg, uint256 currentIndex, uint256 stIdCount);
+    event dbg3(uint256 paymentId, address indexed issuer, address indexed subscriber, uint256 sharePercentage, uint256 shareWei);
+
     function get_chainlinkRefPrice(address chainlinkAggAddr) public view returns(int256) {
         //if (chainlinkAggAddr == address(0x0)) return 100000000; // $1 - cents*satoshis
         if (chainlinkAggAddr == address(0x0)) return -1;
@@ -38,7 +45,7 @@ library PayableLib {
         require(ld._contractSealed, "Contract is not sealed");
 
         require(ld._batches_currentMax_id == 1, "Bad cashflow request: no minted batch");
-        StructLib.SecTokenBatch storage issueBatch = ld._batches[1];
+        StructLib.SecTokenBatch storage issueBatch = ld._batches[1]; // CFT: uni-batch
 
         require(msg.sender == issueBatch.originator || msg.sender == owner, "Bad cashflow request: access denied");
 
@@ -90,18 +97,11 @@ library PayableLib {
         if (cashflowData.cents_currentPrice > 0) {
             require(ethSat_UsdCents != -1 || bnbSat_UsdCents != -1, "Bad usd/{eth|bnb} rate");
         }
-
         // get issuer
         StructLib.SecTokenBatch storage issueBatch = ld._batches[1];
-
-        // process payment
-        if (msg.sender == issueBatch.originator) {
-            //processIssuerPayment(ld, cashflowData, issueBatch, globalFees, owner); // sender is issuer
-            // TODO...
-        }
-        else {
-            processSubscriberPayment(ld, std, ctd, cashflowData, issueBatch, globalFees, owner, ethSat_UsdCents, bnbSat_UsdCents); // all other senders
-        }
+        require(msg.sender != issueBatch.originator, "Issuer cannot subscribe");
+        
+        processSubscriberPayment(ld, std, ctd, cashflowData, issueBatch, globalFees, owner, ethSat_UsdCents, bnbSat_UsdCents);
     }
 
     struct ProcessPaymentVars {
@@ -109,7 +109,7 @@ library PayableLib {
         uint256 qtyTokens;
         uint256[] issuer_stIds; //storage
         StructLib.PackedSt issuerSt; //storage
-        uint256 qtyIssuanceSold;
+        //uint256 qtyIssuanceSold;
         uint256 weiChange;
     }
     function processSubscriberPayment(
@@ -155,9 +155,10 @@ library PayableLib {
         // check sale allowance is not exceeded
         v.issuer_stIds = ld._ledger[issueBatch.originator].tokenType_stIds[1]; // CFT: uni-type
         v.issuerSt = ld._sts[v.issuer_stIds[0]];
-        //v.qtyIssuanceSold = uint256(issueBatch.mintedQty) - uint256(v.issuerSt.currentQty);
-        v.qtyIssuanceSold = uint256(issueBatch.mintedQty).sub(uint256(v.issuerSt.currentQty));
-        require(cashflowData.qty_saleAllocation >= v.qtyIssuanceSold + v.qtyTokens, "Bad cashflow request: insufficient quantity for sale");
+        //v.qtyIssuanceSold = uint256(issueBatch.mintedQty).sub(uint256(v.issuerSt.currentQty)); // ##
+        require(cashflowData.qty_saleAllocation >= 
+            cashflowData.qty_issuanceSold //v.qtyIssuanceSold 
+            + v.qtyTokens, "Bad cashflow request: insufficient quantity for sale");
 
         // send change back to payer
         //v.weiChange = (msg.value % v.weiPrice); // explicit remainder -- keep 10 Wei in the contract, tryfix...
@@ -190,6 +191,7 @@ library PayableLib {
                 transferType: StructLib.TransferType.Subscription
             });
             TransferLib.transferOrTrade(ld, std, ctd, globalFees, a);
+            cashflowData.qty_issuanceSold += v.qtyTokens;
         }
 
         // todo: issuance fees (set then clear ledgerFee?)
@@ -225,63 +227,121 @@ library PayableLib {
         }
     */
 
-    //
+    struct ProcessIssuerPaymentBatchVars {
+        uint256 amountSubscribed;
+        uint256 initAddrNdx;
+        uint256 addrNdx;
+        uint256 stNdx;
+        uint256 sharePercentage;
+        uint256 shareWei;
+        uint256 batchProcessedAmount;
+        uint256 weiChange;
+    }
+
     // TODO: ### caller needs to be able to specify a batch / offset (~5m gas / ~23k transfer per holder ~= 250 max holders!!)
-    //
-    // function processIssuerPayment(
-    //     StructLib.LedgerStruct storage ld,
-    //     StructLib.CashflowStruct storage cashflowData,
-    //     StructLib.SecTokenBatch storage issueBatch,
-    //     StructLib.FeeStruct storage globalFees,
-    //     address owner
+
+    function issuerPay(
+        uint256 paymentId,
+        uint64 count,
+        StructLib.IssuerPaymentsStruct storage ipd,
+        StructLib.LedgerStruct storage ld,
+        StructLib.CashflowStruct storage cashflowData
+    )
+    public {
+        // TODO: restrict msg.value upper bound so no overflow -- esp. wrt. precision hack below!!
+
+        require(ld.contractType == StructLib.ContractType.CASHFLOW_BASE, "Bad commodity request");
+        require(ld._contractSealed, "Contract is not sealed");
+        require(ld._batches_currentMax_id == 1, "Bad cashflow request: no minted batch");
+        require(msg.value <= (2 ** 128), 'Amount must be less than 2^128'); // stop any overflows
+        require(paymentId > 0, "Invalid paymentId");
+        require(count > 0, "Invalid count");
+        // require(cashflowData.wei_currentPrice > 0 || cashflowData.cents_currentPrice > 0, "Bad cashflow request: no price set");
+        // require(cashflowData.wei_currentPrice == 0 || cashflowData.cents_currentPrice == 0, "Bad cashflow request: ambiguous price set");
+        
+        // get issuer
+        StructLib.SecTokenBatch storage issueBatch = ld._batches[1];  // CFT: uni-batch
+        require(msg.sender == issueBatch.originator, "Issuer payments: only by issuer");
+
+        // validate count
+        require(count + ipd.issuerPayments[paymentId].curNdx <= ld._ledgerOwners.length, 'Count must be < remaining token holders in the payment batch');
+
+        // disallow extra payments
+        require(ipd.issuerPayments[paymentId].paymentProcessedAmount <= ipd.issuerPayments[paymentId].paymentTotalAmount, 'Extra payment(s) have been processed');
+        
+        // validate current payments
+        if (ipd.issuerPayments[paymentId].paymentTotalAmount > 0 && ipd.issuerPayments[paymentId].curNdx > 0 && (ipd.issuerPayments[paymentId].paymentProcessedAmount == ipd.issuerPayments[paymentId].paymentTotalAmount)) { // if existing payment
+            revert('All payments for this payment ID have been processed');
+        }
+
+        // initialize new payment
+        if (ipd.issuerPayments[paymentId].curNdx == 0) { // if new payment
+            require(ipd.issuerPayments[paymentId].paymentTotalAmount == 0, 'Duplicate payment ID found');
+            ipd.issuerPayments[paymentId].paymentTotalAmount = msg.value; // caller should pass the entire payment amount on the first batch of a new payment
+        }
+
+        ProcessIssuerPaymentBatchVars memory ipv;
+
+        uint256[] storage issuer_stIds = ld._ledger[issueBatch.originator].tokenType_stIds[1];
+        StructLib.PackedSt storage issuerSt = ld._sts[issuer_stIds[0]];
+
+        ipv.amountSubscribed = uint256(issueBatch.mintedQty) - uint256(issuerSt.currentQty); // ## breaks when we do transfers from the issuer ??
+
+        if (cashflowData.args.cashflowType == StructLib.CashflowType.BOND) {
+            // TODO: calc/switch interest vs. principal repayment...?
+            // TODO: calc requiredQty; require qty >= required: need a concept of last paid block, and interest due per block? i.e. per ~15s interest interval!
+            // walk all ST IDs except issuerSt...
+            // pay (ST qty / S) * (msg.value - fee)...
+
+            // Example: Count
+
+            emit dbg1(paymentId, issueBatch.originator, "BOND", ld._ledgerOwners.length, count);
+
+            ipv.initAddrNdx = ipd.issuerPayments[paymentId].curNdx;
+
+            for (ipv.addrNdx = ipv.initAddrNdx; ipv.addrNdx < ipv.initAddrNdx + count ; ipv.addrNdx++) {
+                address payable addr = address(uint160(ld._ledgerOwners[ipv.addrNdx]));  
+                
+                if (addr != issueBatch.originator) { // exclude issuer from payments
+                    uint256[] storage stIds = ld._ledger[addr].tokenType_stIds[1];
+
+                    emit dbg2(issueBatch.originator, addr, "holder is not originator", ipd.issuerPayments[paymentId].curNdx, stIds.length);
+
+                    for (ipv.stNdx = 0; ipv.stNdx < stIds.length; ipv.stNdx++) {
+                        ipv.sharePercentage = ipv.amountSubscribed * 1000000 /*precision*/ / uint256(ld._sts[stIds[ipv.stNdx]].currentQty);
+                        ipv.shareWei = ipd.issuerPayments[paymentId].paymentTotalAmount * 1000000 /*precision*/ / ipv.sharePercentage;
+
+                        // TODO: re-entrancy guards, and .call instead of .transfer
+                        addr.transfer(ipv.shareWei);
+
+                        // save payment history
+                        ipv.batchProcessedAmount += ipv.shareWei;
+                        ipd.issuerPayments[paymentId].paymentProcessedAmount += ipv.shareWei; 
+                        emit IssuerPaymentProcessed(paymentId, issueBatch.originator, addr, ipv.sharePercentage, ipv.shareWei);
+                    }
+                }
+                ipd.issuerPayments[paymentId].curNdx++;
+            }
+            ipv.weiChange = (msg.value.sub(uint256(ipv.batchProcessedAmount)));
+            if (ipv.weiChange > 0) {
+                msg.sender.transfer(ipv.weiChange);
+            }
+            emit IssuerPaymentBatchProcessed(paymentId, msg.sender, msg.value, ipv.weiChange, ipv.batchProcessedAmount, issueBatch.tokTypeId);
+        }
+        else if (cashflowData.args.cashflowType == StructLib.CashflowType.EQUITY) {
+            // TODO: Dividend Payments
+        }
+        else revert("Unexpected cashflow type");
+    }
+
+    // Method to retrieve Issuer Payments History
+
+    // function getIssuerPayments(
+    //     StructLib.IssuerPayments storage issuerPaymentsData
     // )
-    // private {
-    //     // TODO: restrict msg.value upper bound so no overflow -- esp. wrt. precision hack below!!
-
-    //     uint256[] storage issuer_stIds = ld._ledger[issueBatch.originator].tokenType_stIds[1];
-    //     StructLib.PackedSt storage issuerSt = ld._sts[issuer_stIds[0]];
-
-    //     //address payable I = issueBatch.originator;
-    //     uint256 B = issueBatch.mintedQty;
-    //     uint256 I = uint256(issuerSt.currentQty);
-    //     uint256 S = B - I;
-    //     //uint256 r = cashflowData.args.bond_bps;
-    //     //uint256 p = cashflowData.wei_currentPrice;
-
-    //     // TODO: fees
-    //     // uint256 fee = ...
-    //     // owner.transfer(msg.fee);
-    //     // uint256 msgValueExFees = msg.value - fee
-    //     //...
-
-    //     // TODO: events...
-
-    //     if (cashflowData.args.cashflowType == StructLib.CashflowType.BOND) {
-    //         // TODO: calc/switch interest vs. principal repayment...?
-    //         // TODO: calc requiredQty; require qty >= required: need a concept of last paid block, and interest due per block? i.e. per ~15s interest interval!
-
-    //         // walk all ST IDs except issuerSt...
-    //         // pay (ST qty / S) * (msg.value - fee)...
-    //         for (uint256 addrNdx = 0; addrNdx < ld._ledgerOwners.length; addrNdx++) {
-    //             address payable addr = address(uint160(ld._ledgerOwners[addrNdx]));
-    //             if (addr != issueBatch.originator) {
-    //                 StructLib.Ledger storage ledger = ld._ledger[addr];
-    //                 uint256[] storage stIds = ledger.tokenType_stIds[1];
-    //                 for (uint256 stNdx = 0; stNdx < stIds.length; stNdx++) {
-    //                     StructLib.PackedSt storage st = ld._sts[stIds[stNdx]];
-
-    //                     uint256 sharePerc = S * 1000000/*precision*/ / uint256(st.currentQty);
-    //                     uint256 shareWei = msg.value * 1000000/*precision*/ / sharePerc;
-
-    //                     addr.transfer(shareWei);
-    //                 }
-    //             }
-    //         }
-    //     }
-    //     else if (cashflowData.args.cashflowType == StructLib.CashflowType.EQUITY) {
-    //         // TODO: ...
-    //     }
-    //     else revert("Unexpected cashflow type");
+    // public view returns(StructLib.IssuerPayments memory) {
+    //     StructLib.IssuerPayments memory ret = issuerPaymentsData;
+    //     return ret;
     // }
 
     //
@@ -302,11 +362,24 @@ library PayableLib {
                 uint256[] storage issuer_stIds = ld._ledger[issueBatch.originator].tokenType_stIds[1]; // CFT: uni-type
                 StructLib.PackedSt storage issuerSt = ld._sts[issuer_stIds[0]];
                 ret.qty_issuanceMax = issueBatch.mintedQty;
-                ret.qty_issuanceRemaining = uint256(issuerSt.currentQty);
-                ret.qty_issuanceSold = uint256(issueBatch.mintedQty) - uint256(issuerSt.currentQty);
+
+                ret.qty_issuanceRemaining = uint256(issuerSt.currentQty); 
+
+                // ## this fails if tokens are transferred out from the issuer (demo flow)
+                // instead, we udpate this field directly on each issuance sale
+                //ret.qty_issuanceSold = uint256(issueBatch.mintedQty) - uint256(issuerSt.currentQty); 
+
                 ret.issuer = issueBatch.originator;
             }
         }
+        return ret;
+    }
+
+    function getIssuerPayments(
+        StructLib.IssuerPaymentBatchStruct storage issuerPaymentBatchData
+    )
+    public pure returns(StructLib.IssuerPaymentBatchStruct memory) {
+        StructLib.IssuerPaymentBatchStruct memory ret = issuerPaymentBatchData;
         return ret;
     }
 }
