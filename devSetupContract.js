@@ -20,16 +20,16 @@ module.exports = {
             // add spot types
             const spotTypes = (await CONST.web3_call('getSecTokenTypes', [], nameOverride)).tokenTypes.filter(p => p.settlementType == CONST.settlementType.SPOT);
             //console.log('spotTypes', spotTypes.map(p => { return { id: p.id, name: p.name } }));
-            await addSecTokenIfNotPresent(spotTypes, 'ACT', O, nameOverride); // AirCarbon CORSIA Token
-            await addSecTokenIfNotPresent(spotTypes, 'ANT', O, nameOverride); // AirCarbon Nature Token
-            await addSecTokenIfNotPresent(spotTypes, 'GPT', O, nameOverride); // AirCarbon Premium Token
+            await addSecTokenIfNotPresent(spotTypes, 'CET', O, nameOverride); // AirCarbon CORSIA Eligible Token
+          //await addSecTokenIfNotPresent(spotTypes, 'ANT', O, nameOverride); // AirCarbon Nature Token
+          //await addSecTokenIfNotPresent(spotTypes, 'GPT', O, nameOverride); // AirCarbon Premium Token
 
             // add ccy types
             const ccyTypes = (await CONST.web3_call('getCcyTypes', [], nameOverride)).ccyTypes;
             //console.log('ccyTypes', ccyTypes.map(p => { return { id: p.id, name: p.name } }));
             await addCcyIfNotPresent(ccyTypes, 'USD', 'cents', 2, O, nameOverride);
-            await addCcyIfNotPresent(ccyTypes, 'ETH', 'Wei', 18, O, nameOverride);
-            await addCcyIfNotPresent(ccyTypes, 'BTC', 'Satoshi', 8, O, nameOverride);
+          //await addCcyIfNotPresent(ccyTypes, 'ETH', 'Wei', 18, O, nameOverride);
+          //await addCcyIfNotPresent(ccyTypes, 'BTC', 'Satoshi', 8, O, nameOverride);
 
             const usdFee = (await CONST.web3_call('getFee', [CONST.getFeeType.CCY, CONST.ccyType.USD, CONST.nullAddr], nameOverride, undefined/*addrOverride*/, O.addr));
             //console.log('usdFee', usdFee);
@@ -71,7 +71,9 @@ module.exports = {
             // cashflow controller - holds ledger collateral, so ccy types only here
             const ccyTypes = (await CONST.web3_call('getCcyTypes', [], nameOverride)).ccyTypes;
             await addCcyIfNotPresent(ccyTypes, 'USD', 'cents', 2, O, nameOverride);
-            await addCcyIfNotPresent(ccyTypes, 'ETH', 'Wei', 18, O, nameOverride);
+            await addCcyIfNotPresent(ccyTypes, 'HKD', 'cents', 2, O, nameOverride);
+            await addCcyIfNotPresent(ccyTypes, 'BTC', 'Satoshi', 8, O, nameOverride);
+            //await addCcyIfNotPresent(ccyTypes, 'ETH', 'Wei', 18, O, nameOverride);
 
             // create owner ledger entry
             const ownerLedger = (await CONST.web3_call('getLedgerEntry', [O.addr], nameOverride));

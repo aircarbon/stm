@@ -39,7 +39,7 @@ const WEB3_GWEI_GAS_BID =
 const WEB3_GAS_LIMIT = 5000000;
 
 // CFT helpers
-const nullCashflowArgs = { 
+const nullCashflowArgs = {
     cashflowType: 0,
     //wei_maxIssuance: 0,
     //wei_currentPrice: 0,
@@ -53,7 +53,7 @@ const cashflowType = Object.freeze({
 });
 
 // assumed: 15 secs per block, unless BSC (5 secs)
-const blocksFromSecs = (secs) => Math.ceil(secs / (process.env.NETWORK_ID == 97 || process.env.NETWORK_ID == 56 ? 5 : 15)); 
+const blocksFromSecs = (secs) => Math.ceil(secs / (process.env.NETWORK_ID == 97 || process.env.NETWORK_ID == 56 ? 5 : 15));
 const blocksFromMins = (mins) => Math.ceil(blocksFromSecs(mins * 60));
 const blocksFromHours = (hours) => Math.ceil(blocksFromMins(hours * 60));
 const blocksFromDays = (days) => Math.ceil(blocksFromHours(days * 24));
@@ -62,7 +62,7 @@ const blocksFromMonths = (months) => Math.ceil(blocksFromDays(months * 30.42));
 //
 // MAIN: deployer definitions -- contract ctor() params
 //
-const contractVer = process.env.CONTRACT_VERSION || "1.0a";
+const contractVer = process.env.CONTRACT_VERSION || "1.0b";
 const contractProps = {
     COMMODITY: {
         contractVer: contractVer,
@@ -264,8 +264,9 @@ module.exports = {
          OTHER_FEE1: 12,
          OTHER_FEE2: 13,
          OTHER_FEE3: 14,
-         OTHER_FEE4: 15, // Rebate
-         OTHER_FEE5: 16, // Physical Delivery
+         OTHER_FEE4: 15, // REBATE
+         OTHER_FEE5: 16, // PHYSICAL_DELIVERY
+
    RELATED_TRANSFER: 17,
          ADJUSTMENT: 18,
 
@@ -428,7 +429,7 @@ function getTestContextWeb3(useWs) {
 }
 
 async function getAccountAndKey(accountNdx, mnemonic, coinTypeSlip44) {
-    const MNEMONIC = 
+    const MNEMONIC =
         process.env.PROD_MNEMONIC !== undefined
             ? process.env.PROD_MNEMONIC
             : process.env.INSTANCE_ID.includes('PROD')

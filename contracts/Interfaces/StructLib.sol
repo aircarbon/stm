@@ -8,29 +8,29 @@ import "../StMaster/StMaster.sol";
 library StructLib {
 
     // TRANSFER (one-sided ccy/tok) TYPES
-    enum TransferType { 
+    enum TransferType {
         Undefined,
 
         // spot trades: user-requested trade transfers, and automated fees
         User,
         ExchangeFee,
         OriginatorFee,
-        
+
         // futures: settlement transfers
-        //TakePay, 
+        //TakePay,
         TakePayFee, SettleTake, SettlePay,
-        
+
         // manual transfers: ccy fees
         MintFee,
         BurnFee,
         WithdrawFee,
         DepositFee,
         DataFee,
-        OtherFee1, 
+        OtherFee1,
         OtherFee2,
         OtherFee3,
-        OtherFee4,
-        OtherFee5, // Physical Delivery
+        OtherFee4, // REBATE
+        OtherFee5, // PHYSICAL_DELIVERY
 
         // transfer across related accounts (e.g. corp-admin transfer to corp-trader)
         RelatedTransfer,

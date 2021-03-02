@@ -109,7 +109,7 @@ library PayableLib {
         uint256 qtyTokens;
         uint256[] issuer_stIds; //storage
         StructLib.PackedSt issuerSt; //storage
-        uint256 qtyIssuanceSold;
+        //uint256 qtyIssuanceSold;
         uint256 weiChange;
     }
     function processSubscriberPayment(
@@ -155,9 +155,10 @@ library PayableLib {
         // check sale allowance is not exceeded
         v.issuer_stIds = ld._ledger[issueBatch.originator].tokenType_stIds[1]; // CFT: uni-type
         v.issuerSt = ld._sts[v.issuer_stIds[0]];
-        //v.qtyIssuanceSold = uint256(issueBatch.mintedQty) - uint256(v.issuerSt.currentQty);
-        v.qtyIssuanceSold = uint256(issueBatch.mintedQty).sub(uint256(v.issuerSt.currentQty));
-        require(cashflowData.qty_saleAllocation >= v.qtyIssuanceSold + v.qtyTokens, "Bad cashflow request: insufficient quantity for sale");
+        //v.qtyIssuanceSold = uint256(issueBatch.mintedQty).sub(uint256(v.issuerSt.currentQty)); // ##
+        require(cashflowData.qty_saleAllocation >= 
+            cashflowData.qty_issuanceSold //v.qtyIssuanceSold 
+            + v.qtyTokens, "Bad cashflow request: insufficient quantity for sale");
 
         // send change back to payer
         //v.weiChange = (msg.value % v.weiPrice); // explicit remainder -- keep 10 Wei in the contract, tryfix...
@@ -190,6 +191,7 @@ library PayableLib {
                 transferType: StructLib.TransferType.Subscription
             });
             TransferLib.transferOrTrade(ld, std, ctd, globalFees, a);
+            cashflowData.qty_issuanceSold += v.qtyTokens;
         }
 
         // todo: issuance fees (set then clear ledgerFee?)
@@ -302,8 +304,13 @@ library PayableLib {
                 uint256[] storage issuer_stIds = ld._ledger[issueBatch.originator].tokenType_stIds[1]; // CFT: uni-type
                 StructLib.PackedSt storage issuerSt = ld._sts[issuer_stIds[0]];
                 ret.qty_issuanceMax = issueBatch.mintedQty;
-                ret.qty_issuanceRemaining = uint256(issuerSt.currentQty);
-                ret.qty_issuanceSold = uint256(issueBatch.mintedQty) - uint256(issuerSt.currentQty);
+
+                ret.qty_issuanceRemaining = uint256(issuerSt.currentQty); 
+
+                // ## this fails if tokens are transferred out from the issuer (demo flow)
+                // instead, we udpate this field directly on each issuance sale
+                //ret.qty_issuanceSold = uint256(issueBatch.mintedQty) - uint256(issuerSt.currentQty); 
+
                 ret.issuer = issueBatch.originator;
             }
         }

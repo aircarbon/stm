@@ -9,22 +9,15 @@ const { db } = require('../../utils-server/dist');
 const CONST = require('../const.js');
 process.env.WEB3_NETWORK_ID = Number(process.env.NETWORK_ID || 888);
 
-//const Web3 = require('web3');
-//const web3 = new Web3();
-
 const OWNER_NDX = 0;
 var OWNER, OWNER_privKey;
 
 describe(`Contract Web3 Interface`, async () => {
 
     //
-    //  AC various
-    //      ("export INSTANCE_ID=local && mocha test_web3 --timeout 10000000 --exit")
-    //      ("export INSTANCE_ID=DEV && export CONTRACT_TYPE=COMMODITY && mocha test_web3 --timeout 10000000 --exit")
-    //      ("export INSTANCE_ID=UAT && export CONTRACT_TYPE=COMMODITY && mocha test_web3 --timeout 10000000 --exit")
-    //
-    //   SD BSC Mainnet 56
-    //      ("export INSTANCE_ID=PROD_56_SD && mocha test_web3 --timeout 10000000 --exit") 
+    //   SD local Ganache / Dev DB
+    //       ("export INSTANCE_ID=local_SD && mocha test_web3 --timeout 10000000 --exit")                 // should fail missing erc20 methods...
+    //       ("export INSTANCE_ID=local_SD_RichGlory && mocha test_web3 --timeout 10000000 --exit")       // ...
     //
 
     // it(`web3 direct - CFT - seal & set issuer values`, async () => {
@@ -69,24 +62,35 @@ describe(`Contract Web3 Interface`, async () => {
     //     }
     // });
 
-    // it(`web3 direct - cashflow - balanceOf`, async () => {
-    //     var x;
-    //     x = await CONST.getAccountAndKey(OWNER_NDX);
-    //     OWNER = x.addr; OWNER_privKey = x.privKey;
-    //     const data = await CONST.web3_call('balanceOf', [ '0xda482E8AFbDE4eE45197A1402a0E1Fd1DD175710' ], OWNER, OWNER_privKey);
-    //     console.log('data', data);
-    // });
-
-    // it(`web3 direct - cashflow - totalSupply`, async () => {
-    //     var x;
-    //     x = await CONST.getAccountAndKey(OWNER_NDX);
-    //     OWNER = x.addr; OWNER_privKey = x.privKey;
-    //     const data = await CONST.web3_call('totalSupply', [], OWNER, OWNER_privKey);
-    //     console.log('data', data);
-    // });
+    // erc20 fields - present on basetypes, not on controller
+    it(`web3 direct - cashflow - balanceOf`, async () => {
+        try {
+            const data = await CONST.web3_call('balanceOf', [ '0xda482E8AFbDE4eE45197A1402a0E1Fd1DD175710' ]);
+            console.log('balanceOf', data);
+        }
+        catch(ex) {
+            if ((await CONST.web3_call('getContractType', [])) == CONST.contractType.CASHFLOW_CONTROLLER) {
+                if (ex.toString().includes('is not a function')) return; // expected: erc20 methods not present on controller, by design
+                assert.fail('expected contract exception');
+            }
+            else throw ex;
+        }
+    });
+    it(`web3 direct - cashflow - totalSupply`, async () => {
+        try {
+            const data = await CONST.web3_call('totalSupply', []);
+            console.log('totalSupply', data);
+            }
+        catch(ex) {
+            if ((await CONST.web3_call('getContractType', [])) == CONST.contractType.CASHFLOW_CONTROLLER) {
+                if (ex.toString().includes('is not a function')) return; // expected: erc20 methods not present on controller, by design
+                assert.fail('expected contract exception');
+            }
+            else throw ex;
+        }
+    });
 
     // iterate over all CFT-C base types, and query base ledgers directly
-    // ## combine fails (sometimees) e.g RG01... why???
     it(`web3 direct - cashflow base types - view direct ledger data of base-types`, async () => {
         CONST.consoleOutput(false);
         if ((await CONST.web3_call('getContractType', [])) != CONST.contractType.CASHFLOW_CONTROLLER) { this.skip(); return; }

@@ -14,7 +14,8 @@ process.env.WEB3_NETWORK_ID = Number(process.env.NETWORK_ID || 888);
 
 // if false, will produce an empty state: only whitelisted accounts + sealed
 // if true, will perform a number of test actions: setting fees, minting, trading, etc.
-const EXEC_TEST_ACTIONS = true;
+const EXEC_TEST_ACTIONS = process.env.NETWORK_ID != 56 && process.env.NETWORK_ID != 1;
+console.log(chalk.red('EXEC_TEST_ACTIONS'.padEnd(30, '.')), EXEC_TEST_ACTIONS);
 
 // owner
 const OWNER_NDX = 0;
@@ -38,6 +39,7 @@ const WHITE_BUYERS = [];
 
 // whitelisted manual test accounts
 const TEST_ACCOUNT_START_NDX = WHITE_BUYER_START_NDX + WHITE_BUYER_COUNT;
+console.log(chalk.red('process.env.WHITELIST_COUNT'.padEnd(30, '.')), process.env.WHITELIST_COUNT);
 const TEST_ACCOUNT_COUNT = process.env.WHITELIST_COUNT || 100;
 const TEST_ACCOUNTS = [];
 
@@ -55,9 +57,9 @@ describe(`Contract Web3 Interface`, async () => {
     //       ("export INSTANCE_ID=DEMO && mocha test_web3 --timeout 10000000 --exit")
     //       ("export INSTANCE_ID=PROD_56 && mocha test_web3 --timeout 10000000 --exit")
     //
-    //   SD local Ganache
+    //   SD local Ganache / Dev DB
     //       ("export INSTANCE_ID=local_SD && mocha test_web3 --timeout 10000000 --exit")                 // WL & seal controller (+ any attached base types)
-    //       ("export INSTANCE_ID=local_SD_SBGLand && mocha test_web3 --timeout 10000000 --exit")         // WL & seal additional base type, uni-mint & setIssuerValues
+    //       ("export INSTANCE_ID=local_SD_RichGlory && mocha test_web3 --timeout 10000000 --exit")       // WL & seal additional base type, uni-mint & setIssuerValues
     //
     //   SD Ropsten 3
     //       ("export INSTANCE_ID=UAT_3_SD && mocha test_web3 --timeout 10000000 --exit")                 // WL & seal controller (+ any attached base types)
@@ -68,6 +70,10 @@ describe(`Contract Web3 Interface`, async () => {
     //   SD BSC Testnet 97
     //       ("export INSTANCE_ID=UAT_97_SD && mocha test_web3 --timeout 10000000 --exit") 
     //       ("export INSTANCE_ID=UAT_97_SD_SBGLand && mocha test_web3 --timeout 10000000 --exit")
+    //
+    //   SD BSC Testnet 97 (DEMO)
+    //       ("export INSTANCE_ID=DEMO_97_SD && mocha test_web3 --timeout 10000000 --exit") 
+    //       ("export INSTANCE_ID=DEMO_97_SD_SBGLand && mocha test_web3 --timeout 10000000 --exit")
     //
     //   SD BSC Mainnet 56
     //       ("export INSTANCE_ID=PROD_56_SD && mocha test_web3 --timeout 10000000 --exit") 
@@ -306,15 +312,16 @@ describe(`Contract Web3 Interface`, async () => {
         ];
         var meta;
         switch (contractSymbol) {
-            case 'WBL1': issuerAddr = process.env.WEB3_NETWORK_ID == 56 ? '0xA6F98d2c0e11583877FBc5E06824728E1028400A' : '...'; meta = testMeta[0]; break;
-            case 'SBG1': issuerAddr = process.env.WEB3_NETWORK_ID == 56 ? '0x8A56e0C6801B27DB86e111e3Cb652F4494Cb09b5' : '...'; meta = testMeta[1]; break;
-            case 'WCO1': issuerAddr = process.env.WEB3_NETWORK_ID == 56 ? '0x89ba82d2A05027fF05222C51550590F4df46577F' : '...'; meta = testMeta[2]; break;
-            case 'RG01': issuerAddr = process.env.WEB3_NETWORK_ID == 56 ? '0x859C881C1C1D8062Bd0ac46b7a41Fa51140d9f5c' : '...'; meta = testMeta[3]; break;
-            case 'RG01B': issuerAddr = process.env.WEB3_NETWORK_ID == 56 ? '0x859C881C1C1D8062Bd0ac46b7a41Fa51140d9f5c' : '...'; meta = testMeta[3]; break;
-            case 'RG01C': issuerAddr = process.env.WEB3_NETWORK_ID == 56 ? '0x859C881C1C1D8062Bd0ac46b7a41Fa51140d9f5c' : '...'; meta = testMeta[3]; break;
-            case 'RG01D': issuerAddr = process.env.WEB3_NETWORK_ID == 56 ? '0x859C881C1C1D8062Bd0ac46b7a41Fa51140d9f5c' : '...'; meta = testMeta[3]; break;
+            case 'WBL1': issuerAddr = process.env.WEB3_NETWORK_ID == 56 ? '0xA6F98d2c0e11583877FBc5E06824728E1028400A' : '0x07C48Cedb64C4BC0E67191aE26A687BC3EDf2a28'; meta = testMeta[0]; break;
+            case 'SBG1': issuerAddr = process.env.WEB3_NETWORK_ID == 56 ? '0x8A56e0C6801B27DB86e111e3Cb652F4494Cb09b5' : '0xe59193C3a8c93aA4D17A8cd83fb826F6214B2f77'; meta = testMeta[1]; break;
+            case 'WCO1': issuerAddr = process.env.WEB3_NETWORK_ID == 56 ? '0x89ba82d2A05027fF05222C51550590F4df46577F' : '0x27a92Bb90CdC9dCFDDf9B4E7FfC80BCF77a43746'; meta = testMeta[2]; break;
+            case 'RG01': issuerAddr = process.env.WEB3_NETWORK_ID == 56 ? '0x859C881C1C1D8062Bd0ac46b7a41Fa51140d9f5c' : '0xE6b292e9A4d691C17150C8F70046681a3F2B6060'; meta = testMeta[3]; break;
+            case 'RG01B': issuerAddr = process.env.WEB3_NETWORK_ID == 56 ? '0x859C881C1C1D8062Bd0ac46b7a41Fa51140d9f5c' : '0xE6b292e9A4d691C17150C8F70046681a3F2B6060'; meta = testMeta[3]; break;
+            case 'RG01C': issuerAddr = process.env.WEB3_NETWORK_ID == 56 ? '0x859C881C1C1D8062Bd0ac46b7a41Fa51140d9f5c' : '0xE6b292e9A4d691C17150C8F70046681a3F2B6060'; meta = testMeta[3]; break;
+            case 'RG01D': issuerAddr = process.env.WEB3_NETWORK_ID == 56 ? '0x859C881C1C1D8062Bd0ac46b7a41Fa51140d9f5c' : '0xE6b292e9A4d691C17150C8F70046681a3F2B6060'; meta = testMeta[3]; break;
             default: throw (`Unknown contract symbol ${contractSymbol}`);
         }
+        if (issuerAddr === undefined) throw('Undefined issuerAddr');
         //console.log('issuerAddr', issuerAddr);
 
         // check not already minted for this type - query cashflowData's issuer field

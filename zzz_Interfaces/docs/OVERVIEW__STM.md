@@ -1,4 +1,4 @@
-# SecTokMaster (STM) v0.99 - Overview
+# SecTokMaster (STM) v1.0 - Overview
 
 ## Contract Type - Commodity or Cashflow
 STM is configured at deployment time to one of:
@@ -7,19 +7,19 @@ STM is configured at deployment time to one of:
 
 It is an EVM-compatible (Solidity language) set of smart contracts, comprising:
 
-    (a) asset-backed, multi token/collateral-type atomic spot trading & settlement engine;
-    (b) scalable, semi-fungible & asset metadata-backed types: extendible type-system, and extendible token tagging with batch metadata;
+    (a) asset-backed, multi token/collateral-type atomic spot cash collateral trading & on-chain settlement;
+    (b) scalable, semi-fungible & metadata-backed extendible type-system;
     (c) upgradable contracts: cryptographic checksumming of v+0 and v+1 contract data fields;
     (d) full ERC20 implementation (inc. transferFrom, allowance, approve) for self-custody;
-    (e) multiple (10 reserved) contract owner/operator addresses, for concurrent parallel/batched operations, via independent account-nonce sequencing;
-    (f) segmented ledger: hybrid permission semantics - owner-controller ("whitelisted") addresses for spot trade execution, and third-party controller ("graylisted") addresses for self-custody;
-    (g) generic metadata batch minting, e.g. for commodity (carbon offset) tokens, modelled on World Bank's IETA Climate Warehouse initiative data dictionary schema;
+    (e) multiple reserved contract owner/operator addresses, for concurrent parallel/batched operations via independent account-nonce sequencing;
+    (f) split ledger: hybrid permission semantics - owner-controller ("whitelisted") addresses for centralised spot trade execution, alongside third-party controlled ("graylisted") addresses for self-custody;
+    (g) generic metadata batch minting via extendible (append-only, immutable) KVP collection;
     (h) hybrid on/off chain futures settlement engine (take & pay period processing, via central clearing account), with on-chain position management & position-level P&L;
-    (i) WIP: CFT - subscriber cashflow (e.g. ETH/BNB) processing of (USD-priced or ETH/BNB-priced) token issuances, and (inversely) issuer cashflow processing of CFT-equity or CFT-loan payments. 
+    (i) WIP: CFT - decentralized issuance & corporate actions: subscriber cashflow (e.g. ETH/BNB) processing of (USD-priced or ETH/BNB-priced) token issuances, and (inversely) issuer cashflow processing of CFT-equity or CFT-loan payments. 
 
 ## Functionality: Core (CT)
 Features of STM include:
-* Multi-type token & multi-currency (collateral) ledger
+* Multi-type token & multi-collateral currency split ledger
 * Minting of tokens in batch(es) *[permission: owner-only]*
 * Funding and withdrawing of collateralized ledger fiat and crypto currency *[permission: owner-only]*
 * Whitelisting addresses: marks ledger accounts as accessible by owner for internal exchange transfers and trades *[permission: owner-only, pre-sealed only]*
@@ -35,10 +35,10 @@ Features of STM include:
 * WIP: futures
 
 ## Functionality: Cashflow (CFT)
-* Type-delegation to recursed child contract instance(s) [max 1-depth recursive]
+* Type-delegation to nested child contract instance(s) [max 1-depth recursive]
 * WIP: bond repayment/structure table
 * WIP: issuer cashflow payments (todo: admin batching, PayableLib handling)
-* WIP: ERC1400 & on-chain KYC whitelisting
+* WIP: ERC1404 & on-chain KYC whitelisting
 
 ## Core Design: Ledger
 * Tokens are uniquely identifiable by a uint256 ID, are associated with a unique token type uint256 ID and are minted as part of a token batch.
