@@ -14,6 +14,30 @@ const paymentId = 111;
 const amount = new BN("1000000000000000000");                             // 1 ETH
 const count = 3;                                                          // pay the next 3 token holders
 
+/* * * * * * * * * * * * * * * *
+ * Issuer Payments Test Cases:
+ * 
+ *      0) Subscribe tokens for an asset type
+ *      1) Check issuer payment batch for a {paymentId} (Sanity test)
+ *      2) Make issuer payments for {count} token holders
+ *      3) Validate issuer payment batch processed amount for {paymentId}
+ *          3a) Make next issuer payment for {count} token holders
+ *          3b) Validate issuer payment batch processed amount for {paymentId}
+ *      4) Optional: Validate Cashflow Data
+ * 
+ *      New Tests -
+ *      1) Mint tokens for a new token type > 2 ^ 128 (Should Fail)
+ *      2) Mint tokens for a new token type = 2 ^ 128 -1
+ *          2a) Set sale allocation as 100%
+ *          2b) Subscription model: 
+ *              Token Holder 1 subscribes to {all tokens - 1}
+ *              Token Holder 2: subscribes to 1 token
+ *      3) Make issuer payment of 100 ETH
+ *          3a) Token Holder 1 should receive : 99.999999999999999 ETH
+ *          3b) Token Holder 2 should receive : 00.000000000000001 ETH
+ * 
+ */
+
 describe(`CFT - Base: Issuer Payments Unit Tests`, async () => {
     
     //  Local: ("export INSTANCE_ID=local && mocha test_web3 --timeout 10000000 --exit")
