@@ -52,7 +52,7 @@ contract("StMaster", accounts => {
             { tokenType: CONST.tokenType.TOK_T1, qtyUnit: 1000, qtySecTokens: 1, receiver: M,
              metaKeys: [],
            metaValues: []
-        }, { from: accounts[0] } );
+        });
         //console.log('getSecToken_totalMintedQty', await getSecToken_totalMintedQty())
         console.log('hash1', await stm.getLedgerHashcode(1,0));
 
@@ -65,7 +65,7 @@ contract("StMaster", accounts => {
             { tokenType: CONST.tokenType.TOK_T1, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.TaddrNdx],
              metaKeys: [],
            metaValues: []
-        }, { from: accounts[0] } );
+        });
     });
 
     it(`minting metadata - should allow metadata single KVP minting`, async () => {
@@ -73,7 +73,7 @@ contract("StMaster", accounts => {
             { tokenType: CONST.tokenType.TOK_T1, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.TaddrNdx],
              metaKeys: ['testKey_A'],
            metaValues: ['testValue_A']
-        }, { from: accounts[0] } );
+        });
     });
 
     it(`minting metadata - should allow metadata 10 KVP minting, small strings`, async () => {
@@ -86,7 +86,7 @@ contract("StMaster", accounts => {
         const batchId = await mintBatchWithMetadata( 
             { tokenType: CONST.tokenType.TOK_T1, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.TaddrNdx],
              metaKeys, metaValues
-        }, { from: accounts[0] } );
+        });
     });
 
     it(`minting metadata - should allow metadata 10 KVP minting, large strings`, async () => {
@@ -99,7 +99,7 @@ contract("StMaster", accounts => {
         const batchId = await mintBatchWithMetadata( 
             { tokenType: CONST.tokenType.TOK_T1, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.TaddrNdx],
              metaKeys, metaValues
-        }, { from: accounts[0] } );
+        });
     });
 
     it(`minting metadata - should allow multiple metadata KVP minting, with null value`, async () => {
@@ -107,7 +107,7 @@ contract("StMaster", accounts => {
             { tokenType: CONST.tokenType.TOK_T1, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.TaddrNdx],
              metaKeys: ['testKey_A', 'testKey_B'],
            metaValues: ['', 'b']
-        }, { from: accounts[0] } );
+        });
     });
 
     it(`minting metadata - should allow multiple metadata KVP minting, with null key`, async () => {
@@ -115,7 +115,7 @@ contract("StMaster", accounts => {
             { tokenType: CONST.tokenType.TOK_T1, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.TaddrNdx],
              metaKeys: ['', 'testKey_B'],
            metaValues: ['a', 'b']
-        }, { from: accounts[0] } );
+        });
     });
 
     it(`minting metadata - should allow multiple metadata KVP minting, with mismatched key/value lengths (implied null values)`, async () => {
@@ -123,7 +123,7 @@ contract("StMaster", accounts => {
             { tokenType: CONST.tokenType.TOK_T1, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.TaddrNdx],
              metaKeys: ['testKey_A', 'testKey_B', 'testKey_C'],
            metaValues: ['a', 'b']
-        }, { from: accounts[0] } );
+        });
     });
 
     it(`minting metadata - should allow metadata KVP minting for example NATURE VCUs`, async () => {
@@ -131,7 +131,7 @@ contract("StMaster", accounts => {
             { tokenType: CONST.tokenType.TOK_T2, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.TaddrNdx],
              metaKeys: nature_ExampleKvps.map(p => p.k),
            metaValues: nature_ExampleKvps.map(p => p.v),
-        }, { from: accounts[0] } );
+        });
     });
 
     it(`minting metadata - should allow metadata KVP minting for example CORSIA CERs`, async () => {
@@ -139,7 +139,7 @@ contract("StMaster", accounts => {
             { tokenType: CONST.tokenType.TOK_T1, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.TaddrNdx],
              metaKeys: corsia_ExampleKvps.map(p => p.k),
            metaValues: corsia_ExampleKvps.map(p => p.v),
-        }, { from: accounts[0] } );
+        });
     });
 
     // ###
@@ -150,7 +150,7 @@ contract("StMaster", accounts => {
     //         await mintBatchWithMetadata( { tokenType: CONST.tokenType.TOK_T1, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.TaddrNdx], 
     //             metaKeys: [],
     //           metaValues: [],
-    //         }, { from: accounts[0] } );
+    //         });
     //     } catch (ex) { return; }
     //     assert.fail('expected contract exception');
     // });
@@ -160,7 +160,7 @@ contract("StMaster", accounts => {
     //         await mintBatchWithMetadata( { tokenType: CONST.tokenType.TOK_T1, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.TaddrNdx], 
     //             metaKeys: [''],
     //           metaValues: ['testValue'],
-    //         }, { from: accounts[0] } );
+    //         });
     //     } catch (ex) { return; }
     //     assert.fail('expected contract exception');
     // });
@@ -170,7 +170,7 @@ contract("StMaster", accounts => {
     //         await mintBatchWithMetadata( { tokenType: CONST.tokenType.TOK_T1, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.TaddrNdx], 
     //             metaKeys: ['testKey'],
     //           metaValues: [],
-    //         }, { from: accounts[0] } );
+    //         });
     //     } catch (ex) { return; }
     //     assert.fail('expected contract exception');
     // });
@@ -184,7 +184,7 @@ contract("StMaster", accounts => {
     //     try {
     //         await mintBatchWithMetadata( { tokenType: CONST.tokenType.TOK_T1, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.TaddrNdx], 
     //             metaKeys, metaValues
-    //         }, { from: accounts[0] } );
+    //         });
     //     } catch (ex) { return; }
     //     assert.fail('expected contract exception');
     // });
@@ -194,7 +194,7 @@ contract("StMaster", accounts => {
             { tokenType: CONST.tokenType.TOK_T1, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.TaddrNdx],
              metaKeys: corsia_ExampleKvps.map(p => p.k),
            metaValues: corsia_ExampleKvps.map(p => p.v),
-        }, { from: accounts[0] } );
+        });
 
         const batchBefore = await stm.getSecTokenBatch(batchId);
 
@@ -216,7 +216,7 @@ contract("StMaster", accounts => {
             { tokenType: CONST.tokenType.TOK_T1, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.TaddrNdx],
              metaKeys: corsia_ExampleKvps.map(p => p.k),
            metaValues: corsia_ExampleKvps.map(p => p.v),
-        }, { from: accounts[0] } );
+        });
 
         try {
             const testKey = 'TEST_NEW_KEY', testValue = 'TEST_NEW_VALUE';
@@ -233,7 +233,7 @@ contract("StMaster", accounts => {
             { tokenType: CONST.tokenType.TOK_T1, qtyUnit: 1000, qtySecTokens: 1, receiver: accounts[global.TaddrNdx],
              metaKeys: corsia_ExampleKvps.map(p => p.k),
            metaValues: corsia_ExampleKvps.map(p => p.v),
-        }, { from: accounts[0] } );
+        });
 
         const batchBefore = await stm.getSecTokenBatch(batchId);
 

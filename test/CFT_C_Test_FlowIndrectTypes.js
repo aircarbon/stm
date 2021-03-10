@@ -70,7 +70,7 @@ contract("StMaster", accounts => {
         const origFee = { ccy_mirrorFee: false, ccy_perMillion: 0, fee_fixed: 1, fee_percBips: 0, fee_min: 1, fee_max: 0 };
         const { batchId, mintTx } = await mintBatchWithMetadata( 
             { tokenType: CONST.tokenType.TOK_T1, qtyUnit: 1000, qtySecTokens: 1, receiver: M1, origTokFees: origFee, origCcyFee_percBips_ExFee: 0, metaKeys: [ 'key1', 'key2' ],  metaValues: [ 'val1', 'val2' ],
-        }, );
+        });
         //console.log('totalSupply', (await stm.totalSupply()).toString());
         //truffleAssert.prettyPrintEmittedEvents(mintTx);
         curHash = await checkHashUpdate(curHash);
@@ -91,7 +91,7 @@ contract("StMaster", accounts => {
                 { tokenType: CONST.tokenType.TOK_T1, qtyUnit: 100, qtySecTokens: 1, receiver: M1, origCcyFee_percBips_ExFee: 0, origTokFees: CONST.nullFees,
                    metaKeys: [ 'key3', 'key4' ],
                  metaValues: [ 'val4', 'val4' ],
-            }, { from: accounts[0] } );
+            });
         } catch (ex) { assert(ex.reason == 'Bad cashflow request', `unexpected: ${ex.reason}`); return; }
     });
     it(`cashflow controller - should allow an initial unibatch mint on a different indirect passed-through cashflow base (type 2)`, async () => {
@@ -100,7 +100,7 @@ contract("StMaster", accounts => {
                 qtySecTokens: 1, receiver: M1, origTokFees: CONST.nullFees,
                 origCcyFee_percBips_ExFee: 5000, // orginator ccy fee share: 50%
                 metaKeys: [ 'key5', 'key6' ], metaValues: [ 'val5', 'val6' ],
-        }, );
+        });
         truffleAssert.eventEmitted(mintTx, 'Minted', ev => ev.batchId == 2 && ev.tokTypeId == CONST.tokenType.TOK_T2 && ev.mintQty == 2000);
         truffleAssert.eventEmitted(mintTx, 'MintedSecToken', ev => { 
             return ev.stId.eq(new BN('12554203470773361527671578846415332832204710888928069025793')) // 0x0000000000000002000000000000000000000000000000000000000000000001

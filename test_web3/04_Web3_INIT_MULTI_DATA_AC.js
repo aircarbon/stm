@@ -151,7 +151,7 @@ describe(`Contract Web3 Interface`, async () => {
 
                 // setup whitelist: reserved/internal
                 var whiteNdx = 0;
-                const submittedToWhitelist = []
+                let submittedToWhitelist = []
                 var wlMany = []
                 for (whiteNdx = 0; whiteNdx < WHITELIST_RESERVED_COUNT; whiteNdx++) {
                     x = await CONST.getAccountAndKey(whiteNdx);
@@ -167,7 +167,7 @@ describe(`Contract Web3 Interface`, async () => {
                     }
                 } catch(ex) { console.warn(ex); } }
                 //whitelistChunked(wlMany, OWNER, OWNER_privKey);
-                submittedToWhitelist.concat(wlMany);
+                submittedToWhitelist = submittedToWhitelist.concat(wlMany);
 
                 // setup whitelist: test minters
                 wlMany = []
@@ -185,7 +185,7 @@ describe(`Contract Web3 Interface`, async () => {
                     }
                 } catch(ex) { console.warn(ex); } }
                 //await whitelistChunked(wlMany, OWNER, OWNER_privKey);
-                submittedToWhitelist.concat(wlMany);
+                submittedToWhitelist = submittedToWhitelist.concat(wlMany);
 
                 // setup whitelist: test buyers
                 wlMany = []
@@ -203,7 +203,7 @@ describe(`Contract Web3 Interface`, async () => {
                     }
                 } catch(ex) { console.warn(ex); } }
                 //await whitelistChunked(wlMany, OWNER, OWNER_privKey);
-                submittedToWhitelist.concat(wlMany);
+                submittedToWhitelist = submittedToWhitelist.concat(wlMany);
 
                 //
                 // setup whitelist: manual testing exchange accounts -- BATCHED/CHUNKED --
@@ -220,7 +220,7 @@ describe(`Contract Web3 Interface`, async () => {
                     console.log(chalk.inverse(`(${addrOverride}) SETUP TEST ACCOUNTS WL (count=${wlMany.length}) last whiteNdx=${whiteNdx}...`));
                     await whitelistChunked(wlMany, OWNER, OWNER_privKey);
                 }
-                submittedToWhitelist.concat(wlMany);
+                submittedToWhitelist = submittedToWhitelist.concat(wlMany);
                     async function whitelistChunked(wlMany, OWNER, OWNER_privKey) {
                         if (wlMany.length > 0) {
                             const wlChunked = _.chunk(wlMany, 50);

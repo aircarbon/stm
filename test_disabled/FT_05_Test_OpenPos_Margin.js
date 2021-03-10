@@ -159,7 +159,7 @@ contract("StMaster", accounts => {
         //truffleAssert.prettyPrintEmittedEvents(y.tx);
         assert(new BN(y.ledger_A.ccys.find(p => p.ccyTypeId == usdFT.ft.refCcyId).reserved).isZero(), 'unexpected reserve ledger A (closed position)');
         assert(new BN(y.ledger_B.ccys.find(p => p.ccyTypeId == usdFT.ft.refCcyId).reserved).isZero(), 'unexpected reserve ledger B (new position)');
-    }),
+    });
     it(`FT position fees & margin - should reduce margin reserve to zero on open-to-close (A*/B/C)`, async () => {
         const A = accounts[global.TaddrNdx], B = accounts[global.TaddrNdx + 1], C = accounts[global.TaddrNdx + 2]; global.TaddrNdx++;
 
@@ -189,7 +189,7 @@ contract("StMaster", accounts => {
         //truffleAssert.prettyPrintEmittedEvents(y.tx);
         assert(new BN(y.ledger_A.ccys.find(p => p.ccyTypeId == usdFT.ft.refCcyId).reserved).isZero(), 'unexpected reserve ledger A (closed position)');
         assert(new BN(y.ledger_B.ccys.find(p => p.ccyTypeId == usdFT.ft.refCcyId).reserved).eq(POS_MARGIN.mul(new BN(3))), 'unexpected reserve ledger B (new position)');
-    }),
+    });
     it(`FT position fees & margin - should reduce margin reserve to zero on open-to-close (A/B*/C)`, async () => {
         const A = accounts[global.TaddrNdx], B = accounts[global.TaddrNdx + 1], C = accounts[global.TaddrNdx + 2]; global.TaddrNdx++;
 
