@@ -7,22 +7,22 @@ const { formatter } = require('@aircarbon/utils-common')
 const CONST = require('../const.js');
 process.env.WEB3_NETWORK_ID = Number(process.env.NETWORK_ID || 888);
 
-const nameOverride = process.env.ADD_TYPE__CONTRACT_NAME;
-const addrOverride = '0x593E32A0D31269c12CFe8dB560EfcFc78AA8f3E4';        // NOTE: update Base Contract address before running test
-
-const paymentId = 111;
-const amount = new BN("1000000000000000000");                             // 1 ETH
-const count = 3;                                                          // pay the next 3 token holders
+const NAME_OVERRIDE = process.env.ADD_TYPE__CONTRACT_NAME;
+const ADDR_OVERRIDE = '0x33E47B950077b573323456156d2e85F6E17F9AcE';  // NOTE: update Base Contract address before running test
+const PAYMENT_ID = 1;
+const ISSUER_PAYMENT_AMOUNT = new BN("10000000000000000000");       // 10 ETH
+const BATCH_COUNT = 3;                                              // pay the next 3 token holders
+const NEXT_ISSUER_PAYMENT_AMOUNT = new BN("1000000000000000000");   // 9 ETH paid ; Next payment 1 ETH
 
 /* * * * * * * * * * * * * * * *
  * Issuer Payments Test Cases:
  * 
  *      0) Subscribe tokens for an asset type
- *      1) Check issuer payment batch for a {paymentId} (Sanity test)
- *      2) Make issuer payments for {count} token holders
- *      3) Validate issuer payment batch processed amount for {paymentId}
- *          3a) Make next issuer payment for {count} token holders
- *          3b) Validate issuer payment batch processed amount for {paymentId}
+ *      1) Check issuer payment batch for a {PAYMENT_ID} (Sanity test)
+ *      2) Make issuer payments for {BATCH_COUNT} token holders
+ *      3) Validate issuer payment batch processed amount for {PAYMENT_ID}
+ *          3a) Make next issuer payment for {BATCH_COUNT} token holders
+ *          3b) Validate issuer payment batch processed amount for {PAYMENT_ID}
  *      4) Optional: Validate Cashflow Data
  * 
  *      New Tests -
@@ -44,9 +44,11 @@ describe(`CFT - Base: Issuer Payments Unit Tests`, async () => {
     //  BSC Testnet: ("export INSTANCE_ID=UAT_97_SD && mocha test_web3 --timeout 10000000 --exit")
     
     before(async function () {
+        const cfd = await CONST.web3_call('getCashflowData', [], NAME_OVERRIDE);
+        console.log('getCashflowData: ', cfd);
     });
 
-    it(`Issuer Payments Test 0 (Prep) - Subscribe tokens for CFT from 4 accounts - Base ${nameOverride}`, async () => {
+    it(`Issuer Payments Test 0 (Prep) - Subscribe tokens for CFT from 4 accounts - Base ${NAME_OVERRIDE}`, async () => {
 
         const Owner1 = await CONST.getAccountAndKey(1);                    // 0xda482E8AFbDE4eE45197A1402a0E1Fd1DD175710
         const subscriptionAmount1 = '9.0';                                 // 9.0 ETH = 90%
@@ -59,27 +61,27 @@ describe(`CFT - Base: Issuer Payments Unit Tests`, async () => {
 
         try {
 
-            // const cfd = await CONST.web3_call('getCashflowData', [], nameOverride);
+            // const cfd = await CONST.web3_call('getCashflowData', [], NAME_OVERRIDE);
             // console.log('getCashflowData: ', cfd);
             
             // Owner 1 subscription
-            console.log(`Owner 1 (${Owner1.addr}) is now subscribing to ${nameOverride} and paying ${subscriptionAmount1} ETH`);
-            const subscriptionResponse1 = await CONST.web3_sendEthTestAddr(1, addrOverride, subscriptionAmount1);
+            console.log(`Owner 1 (${Owner1.addr}) is now subscribing to ${NAME_OVERRIDE} and paying ${subscriptionAmount1} ETH`);
+            const subscriptionResponse1 = await CONST.web3_sendEthTestAddr(1, ADDR_OVERRIDE, subscriptionAmount1);
             console.log('Owner 1 subscription response: ', subscriptionResponse1);
 
             // Owner 2 subscription
-            console.log(`Owner 2 (${Owner2.addr}) is now subscribing to ${nameOverride} and paying ${subscriptionAmount2} ETH`);
-            const subscriptionResponse2 = await CONST.web3_sendEthTestAddr(2, addrOverride, subscriptionAmount2);
+            console.log(`Owner 2 (${Owner2.addr}) is now subscribing to ${NAME_OVERRIDE} and paying ${subscriptionAmount2} ETH`);
+            const subscriptionResponse2 = await CONST.web3_sendEthTestAddr(2, ADDR_OVERRIDE, subscriptionAmount2);
             console.log('Owner 2 subscription response: ', subscriptionResponse2);
 
             // Owner 3 subscription
-            console.log(`Owner 3 (${Owner3.addr}) is now subscribing to ${nameOverride} and paying ${subscriptionAmount3} ETH`);
-            const subscriptionResponse3 = await CONST.web3_sendEthTestAddr(3, addrOverride, subscriptionAmount3);
+            console.log(`Owner 3 (${Owner3.addr}) is now subscribing to ${NAME_OVERRIDE} and paying ${subscriptionAmount3} ETH`);
+            const subscriptionResponse3 = await CONST.web3_sendEthTestAddr(3, ADDR_OVERRIDE, subscriptionAmount3);
             console.log('Owner 3 subscription response: ', subscriptionResponse3);
         
             // Owner 4 subscription
-            console.log(`Owner 4 (${Owner4.addr}) is now subscribing to ${nameOverride} and paying ${subscriptionAmount4} ETH`);
-            const subscriptionResponse4 = await CONST.web3_sendEthTestAddr(4, addrOverride, subscriptionAmount4);
+            console.log(`Owner 4 (${Owner4.addr}) is now subscribing to ${NAME_OVERRIDE} and paying ${subscriptionAmount4} ETH`);
+            const subscriptionResponse4 = await CONST.web3_sendEthTestAddr(4, ADDR_OVERRIDE, subscriptionAmount4);
             console.log('Owner 4 subscription response: ', subscriptionResponse4);
         }
         catch(ex) {
@@ -92,8 +94,8 @@ describe(`CFT - Base: Issuer Payments Unit Tests`, async () => {
         const Issuer_RG = await CONST.getAccountAndKey(13);                 // Rich Glory '0xE6b292e9A4d691C17150C8F70046681a3F2B6060'
         const getIssuerPaymentByPaymentIdResponse = await CONST.web3_call(
             'getIssuerPaymentByPaymentId',                                  // method to get issuerPayment data
-            [paymentId],                                                    // paymentId arg
-            nameOverride,                                                   // cashflow base contract name override
+            [PAYMENT_ID],                                                    // paymentId arg
+            NAME_OVERRIDE,                                                   // cashflow base contract name override
         );
         console.log('Received issuer payment batch: ', getIssuerPaymentByPaymentIdResponse);
     });
@@ -102,16 +104,16 @@ describe(`CFT - Base: Issuer Payments Unit Tests`, async () => {
 
         const Issuer_RG = await CONST.getAccountAndKey(13);                 // Rich Glory '0xE6b292e9A4d691C17150C8F70046681a3F2B6060'
 
-        console.log(`Processing ${amount} issuer payment batch (${count}) for Payment ID: #${paymentId}`);
+        console.log(`Processing ${ISSUER_PAYMENT_AMOUNT} issuer payment batch (${BATCH_COUNT}) for Payment ID: #${PAYMENT_ID}`);
         try {
             const receiveIssuerPaymentResponse = await CONST.web3_tx(
                 'receiveIssuerPaymentBatch',                                // method to receive payments
-                [paymentId, count],                                         // issuer payment args
+                [PAYMENT_ID, BATCH_COUNT],                                  // issuer payment args
                 Issuer_RG.addr,                                             // fromAddr
                 Issuer_RG.privKey,                                          // fromPrivKey
-                nameOverride,                                               // nameOverride
-                addrOverride,                                               // addrOverride
-                amount                                                      // tx amount in Wei
+                NAME_OVERRIDE,                                              // nameOverride
+                ADDR_OVERRIDE,                                              // addrOverride
+                ISSUER_PAYMENT_AMOUNT                                       // tx amount in Wei
             );
             console.log('Issuer Payment process response: ', receiveIssuerPaymentResponse);
         }
@@ -124,26 +126,21 @@ describe(`CFT - Base: Issuer Payments Unit Tests`, async () => {
         const Issuer_RG = await CONST.getAccountAndKey(13);                 // Rich Glory '0xE6b292e9A4d691C17150C8F70046681a3F2B6060'
         const getIssuerPaymentByPaymentIdResponse = await CONST.web3_call(
             'getIssuerPaymentByPaymentId',                                  // method to get issuerPayment data
-            [paymentId],                                                    // paymentId arg
-            nameOverride,                                                   // cashflow base contract name override
+            [PAYMENT_ID],                                                    // paymentId arg
+            NAME_OVERRIDE,                                                   // cashflow base contract name override
         );
         console.log('Received issuer payment batch: ', getIssuerPaymentByPaymentIdResponse);
-
-        // const processedAmount = new BN(formatter.hex2int(getIssuerPaymentByPaymentIdResponse[1]?._hex));
-
-        // TOFIX : Next payment amount fails if equal to (amount - processedAmount)
-        const nextPaymentAmount = new BN("110000000000000000"); // 0.9 paid ; 0.1 remaining ; 0.01 added because of error
             
-        console.log(`Processing ${nextPaymentAmount} issuer payment batch (${count}) for Payment ID: #${paymentId}`);
+        console.log(`Processing ${NEXT_ISSUER_PAYMENT_AMOUNT} issuer payment batch (${BATCH_COUNT}) for Payment ID: #${PAYMENT_ID}`);
         try {
             const receiveIssuerPaymentResponse = await CONST.web3_tx(
                 'receiveIssuerPaymentBatch',                                // method to receive payments
-                [paymentId, count],                                         // issuer payment args
+                [PAYMENT_ID, BATCH_COUNT],                                  // issuer payment args
                 Issuer_RG.addr,                                             // fromAddr
                 Issuer_RG.privKey,                                          // fromPrivKey
-                nameOverride,                                               // nameOverride
-                addrOverride,                                               // addrOverride
-                nextPaymentAmount                                           // tx amount in Wei
+                NAME_OVERRIDE,                                              // nameOverride
+                ADDR_OVERRIDE,                                              // addrOverride
+                NEXT_ISSUER_PAYMENT_AMOUNT                                  // tx amount in Wei
             );
             console.log('Issuer Payment process response: ', receiveIssuerPaymentResponse);
         }
@@ -153,15 +150,10 @@ describe(`CFT - Base: Issuer Payments Unit Tests`, async () => {
 
         const getIssuerPaymentSanity = await CONST.web3_call(
             'getIssuerPaymentByPaymentId',                                  // method to get issuerPayment data
-            [paymentId],                                                    // paymentId arg
-            nameOverride,                                                   // cashflow base contract name override
+            [PAYMENT_ID],                                                   // paymentId arg
+            NAME_OVERRIDE,                                                  // cashflow base contract name override
         );
         console.log('Received issuer payment batch (Sanity Check): ', getIssuerPaymentSanity);
-    });
-
-    it.skip(`Should validate cashflow data`, async() => {
-        const cfd = await CONST.web3_call('getCashflowData', [], nameOverride);
-        console.log('getCashflowData: ', cfd);
     });
     
 });

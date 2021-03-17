@@ -106,9 +106,9 @@ contract StMaster
     event Approval(address indexed owner, address indexed spender, uint256 value);
     // PayableLib events
     event IssuanceSubscribed(address indexed subscriber, address indexed issuer, uint256 weiSent, uint256 weiChange, uint256 tokensSubscribed, uint256 weiPrice);
+    // Issuer Payment events
     event IssuerPaymentBatchProcessed(uint256 indexed paymentId, address indexed issuer, uint256 weiSent, uint256 weiChange, uint256 batchProcessedAmount, uint256 tokTypeId);
-    // Debug Issuer Payments
-    event IssuerPaymentProcessed(uint256 paymentId, address indexed issuer, address indexed subscriber, uint256 sharePercentage, uint256 shareWei);
+    event IssuerPaymentProcessed(uint256 paymentId, address indexed issuer, address indexed subscriber, uint256 sharePercentage, uint256 shareWei, uint256 batchProcessedAmount);
     event dbg1(uint256 paymentId, address indexed issuer, string cashflowType, uint256 totalOwners, uint64 count);
     event dbg2(address indexed issuer, address indexed subscriber, string debugMsg, uint256 currentIndex, uint256 stIdCount);
     event dbg3(uint256 paymentId, address indexed issuer, address indexed subscriber, uint256 sharePercentage, uint256 shareWei);

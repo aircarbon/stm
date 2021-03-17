@@ -17,7 +17,7 @@ library PayableLib {
 
     event IssuerPaymentBatchProcessed(uint256 indexed paymentId, address indexed issuer, uint256 weiSent, uint256 weiChange, uint256 batchProcessedAmount, uint256 tokTypeId);
 
-    event IssuerPaymentProcessed(uint256 paymentId, address indexed issuer, address indexed subscriber, uint256 sharePercentage, uint256 shareWei);
+    event IssuerPaymentProcessed(uint256 paymentId, address indexed issuer, address indexed subscriber, uint256 sharePercentage, uint256 shareWei, uint256 batchProcessedAmount);
     event dbg1(uint256 paymentId, address indexed issuer, string cashflowType, uint256 totalOwners, uint64 count);
     event dbg2(address indexed issuer, address indexed subscriber, string debugMsg, uint256 currentIndex, uint256 stIdCount);
     event dbg3(uint256 paymentId, address indexed issuer, address indexed subscriber, uint256 sharePercentage, uint256 shareWei);
@@ -235,6 +235,7 @@ library PayableLib {
         uint256 sharePercentage;
         uint256 shareWei;
         uint256 batchProcessedAmount;
+        uint256 contractBalance;
         uint256 weiChange;
     }
 
@@ -258,6 +259,11 @@ library PayableLib {
         require(count > 0, "Invalid count");
         // require(cashflowData.wei_currentPrice > 0 || cashflowData.cents_currentPrice > 0, "Bad cashflow request: no price set");
         // require(cashflowData.wei_currentPrice == 0 || cashflowData.cents_currentPrice == 0, "Bad cashflow request: ambiguous price set");
+
+        // validate active payment Id
+        if(ipd.issuerPayments[paymentId].paymentProcessedAmount < ipd.issuerPayments[paymentId].paymentTotalAmount){
+            require(paymentId == ipd.maxPaymentId, 'Pending payments on the current PaymentId (GET: maxPaymentId)');
+        }
         
         // get issuer
         StructLib.SecTokenBatch storage issueBatch = ld._batches[1];  // CFT: uni-batch
@@ -272,6 +278,12 @@ library PayableLib {
         // validate current payments
         if (ipd.issuerPayments[paymentId].paymentTotalAmount > 0 && ipd.issuerPayments[paymentId].curNdx > 0 && (ipd.issuerPayments[paymentId].paymentProcessedAmount == ipd.issuerPayments[paymentId].paymentTotalAmount)) { // if existing payment
             revert('All payments for this payment ID have been processed');
+        }
+
+        // initialize first payment
+        if (ipd.maxPaymentId == 0){
+            require(paymentId == 1, 'First payment ID should be 1');
+            ipd.maxPaymentId = 1;
         }
 
         // initialize new payment
@@ -308,16 +320,15 @@ library PayableLib {
                     emit dbg2(issueBatch.originator, addr, "holder is not originator", ipd.issuerPayments[paymentId].curNdx, stIds.length);
 
                     for (ipv.stNdx = 0; ipv.stNdx < stIds.length; ipv.stNdx++) {
-                        ipv.sharePercentage = ipv.amountSubscribed * 1000000 /*precision*/ / uint256(ld._sts[stIds[ipv.stNdx]].currentQty);
-                        ipv.shareWei = ipd.issuerPayments[paymentId].paymentTotalAmount * 1000000 /*precision*/ / ipv.sharePercentage;
+                        ipv.sharePercentage = ipv.amountSubscribed * 10**18 /*precision*/ / uint256(ld._sts[stIds[ipv.stNdx]].currentQty);
+                        ipv.shareWei = ipd.issuerPayments[paymentId].paymentTotalAmount * 10**18 /*precision*/ / ipv.sharePercentage;
 
                         // TODO: re-entrancy guards, and .call instead of .transfer
                         addr.transfer(ipv.shareWei);
-
                         // save payment history
                         ipv.batchProcessedAmount += ipv.shareWei;
-                        ipd.issuerPayments[paymentId].paymentProcessedAmount += ipv.shareWei; 
-                        emit IssuerPaymentProcessed(paymentId, issueBatch.originator, addr, ipv.sharePercentage, ipv.shareWei);
+                        ipd.issuerPayments[paymentId].paymentProcessedAmount += ipv.shareWei;
+                        emit IssuerPaymentProcessed(paymentId, issueBatch.originator, addr, ipv.sharePercentage, ipv.shareWei, ipv.batchProcessedAmount);
                     }
                 }
                 ipd.issuerPayments[paymentId].curNdx++;
@@ -325,6 +336,9 @@ library PayableLib {
             ipv.weiChange = (msg.value.sub(uint256(ipv.batchProcessedAmount)));
             if (ipv.weiChange > 0) {
                 msg.sender.transfer(ipv.weiChange);
+            }
+            if (ipd.issuerPayments[paymentId].paymentProcessedAmount == ipd.issuerPayments[paymentId].paymentTotalAmount){
+                ipd.maxPaymentId++;
             }
             emit IssuerPaymentBatchProcessed(paymentId, msg.sender, msg.value, ipv.weiChange, ipv.batchProcessedAmount, issueBatch.tokTypeId);
         }
