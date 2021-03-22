@@ -390,10 +390,14 @@ library PayableLib {
     }
 
     function getIssuerPayments(
+        uint256 maxPaymentId,
         StructLib.IssuerPaymentBatchStruct storage issuerPaymentBatchData
     )
-    public pure returns(StructLib.IssuerPaymentBatchStruct memory) {
-        StructLib.IssuerPaymentBatchStruct memory ret = issuerPaymentBatchData;
+    public pure returns(StructLib.IssuerPaymentsReturnStruct memory) {
+        StructLib.IssuerPaymentBatchStruct memory ipbd = issuerPaymentBatchData;
+        StructLib.IssuerPaymentsReturnStruct memory ret;
+        ret.maxPaymentId = maxPaymentId;
+        ret.issuerPaymentBatch = ipbd;
         return ret;
     }
 }

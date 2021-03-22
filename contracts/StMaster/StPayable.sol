@@ -55,8 +55,8 @@ contract StPayable is
 
     StructLib.IssuerPaymentsStruct ipd;   //  Payment ID [must be consistent across all batches, 1-based] , PaymentStruct mapping 
 
-    function getIssuerPaymentByPaymentId(uint256 paymentId) public view returns(StructLib.IssuerPaymentBatchStruct memory) {
-        return PayableLib.getIssuerPayments(ipd.issuerPayments[paymentId]);
+    function getIssuerPaymentByPaymentId(uint256 paymentId) public view returns(StructLib.IssuerPaymentsReturnStruct memory) {
+        return PayableLib.getIssuerPayments(ipd.maxPaymentId, ipd.issuerPayments[paymentId]);
     }
     
     //address public chainlinkAggregator_btcUsd;
