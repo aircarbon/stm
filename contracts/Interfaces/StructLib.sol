@@ -328,7 +328,7 @@ library StructLib {
      *  0 < curNdx < 4294967295
     */
     struct IssuerPaymentBatchStruct { // ** DATA_DUMP: TODO
-        uint16 curPaymentId;               // 1-based payment ID for each issuer payment: indicates current issuer payment
+        uint32 curPaymentId;               // 1-based payment ID for each issuer payment: indicates current issuer payment
         uint32 curBatchNdx;                // 1-based batch index for the current issuer payment
         uint32 curNdx;                     // 0-based index into the ledger owners list for current issuer payment batch processing
         uint256 curPaymentTotalAmount;     // total payment due from issuer for the current issuer payment

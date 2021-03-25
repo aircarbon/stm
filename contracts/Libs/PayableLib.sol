@@ -17,11 +17,11 @@ library PayableLib {
     event IssuanceSubscribed(address indexed subscriber, address indexed issuer, uint256 weiSent, uint256 weiChange, uint256 tokensSubscribed, uint256 weiPrice);
 
     // Payment Summary: INDEXER API /api/issuer-payment?address=<address> fetches payment summary
-    event IssuerPaymentProcessed(uint16 paymentId, address indexed issuer, uint256 totalAmount, uint32 totalBatchCount);
+    event IssuerPaymentProcessed(uint32 paymentId, address indexed issuer, uint256 totalAmount, uint32 totalBatchCount);
     // Payment Batch Summary: INDEXER API /api/issuer-payment-batch?paymentId=<paymentId> fetches payments batches
-    event IssuerPaymentBatchProcessed(uint16 paymentId, uint32 paymentBatchId, address indexed issuer, uint256 weiSent, uint256 weiChange);
+    event IssuerPaymentBatchProcessed(uint32 paymentId, uint32 paymentBatchId, address indexed issuer, uint256 weiSent, uint256 weiChange);
     // Payment Batch Detail: INDEXER API /api/issuer-payment-batch-detail?paymentBatchId=<paymentBatchId> fetches payment batch detail
-    event SubscriberPaid(uint16 paymentId, uint32 paymentBatchId, address indexed issuer, address indexed subscriber, uint256 amount);
+    event SubscriberPaid(uint32 paymentId, uint32 paymentBatchId, address indexed issuer, address indexed subscriber, uint256 amount);
     
     function get_chainlinkRefPrice(address chainlinkAggAddr) public view returns(int256) {
         //if (chainlinkAggAddr == address(0x0)) return 100000000; // $1 - cents*satoshis
