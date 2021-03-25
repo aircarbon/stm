@@ -107,11 +107,9 @@ contract StMaster
     // PayableLib events
     event IssuanceSubscribed(address indexed subscriber, address indexed issuer, uint256 weiSent, uint256 weiChange, uint256 tokensSubscribed, uint256 weiPrice);
     // Issuer Payment events
-    event IssuerPaymentBatchProcessed(uint256 indexed paymentId, address indexed issuer, uint256 weiSent, uint256 weiChange, uint256 batchProcessedAmount, uint256 tokTypeId);
-    event IssuerPaymentProcessed(uint256 paymentId, address indexed issuer, address indexed subscriber, uint256 sharePercentage, uint256 shareWei, uint256 batchProcessedAmount);
-    event dbg1(uint256 paymentId, address indexed issuer, string cashflowType, uint256 totalOwners, uint64 count);
-    event dbg2(address indexed issuer, address indexed subscriber, string debugMsg, uint256 currentIndex, uint256 stIdCount);
-    event dbg3(uint256 paymentId, address indexed issuer, address indexed subscriber, uint256 sharePercentage, uint256 shareWei);
+    event IssuerPaymentProcessed(uint16 paymentId, address indexed issuer, uint256 totalAmount, uint32 totalBatchCount);
+    event IssuerPaymentBatchProcessed(uint16 paymentId, uint32 paymentBatchId, address indexed issuer, uint256 weiSent, uint256 weiChange);
+    event SubscriberPaid(uint16 paymentId, address indexed issuer, address indexed subscriber, uint256 amount);
     // FuturesLib events
     event FutureOpenInterest(address indexed long, address indexed short, uint256 shortStId, uint256 tokTypeId, uint256 qty, uint256 price, uint256 feeLong, uint256 feeShort);
     event SetInitialMarginOverride(uint256 tokTypeId, address indexed ledgerOwner, uint16 initMarginBips);

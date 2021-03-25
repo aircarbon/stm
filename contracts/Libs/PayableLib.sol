@@ -13,15 +13,16 @@ import "./SafeMath.sol";
 library PayableLib {
     using SafeMath for uint256;
 
+
     event IssuanceSubscribed(address indexed subscriber, address indexed issuer, uint256 weiSent, uint256 weiChange, uint256 tokensSubscribed, uint256 weiPrice);
 
-    event IssuerPaymentBatchProcessed(uint256 indexed paymentId, address indexed issuer, uint256 weiSent, uint256 weiChange, uint256 batchProcessedAmount, uint256 tokTypeId);
-
-    event IssuerPaymentProcessed(uint256 paymentId, address indexed issuer, address indexed subscriber, uint256 sharePercentage, uint256 shareWei, uint256 batchProcessedAmount);
-    event dbg1(uint256 paymentId, address indexed issuer, string cashflowType, uint256 totalOwners, uint64 count);
-    event dbg2(address indexed issuer, address indexed subscriber, string debugMsg, uint256 currentIndex, uint256 stIdCount);
-    event dbg3(uint256 paymentId, address indexed issuer, address indexed subscriber, uint256 sharePercentage, uint256 shareWei);
-
+    // Payment Summary: INDEXER API /api/issuer-payment?address=<address> fetches payment summary
+    event IssuerPaymentProcessed(uint16 paymentId, address indexed issuer, uint256 totalAmount, uint32 totalBatchCount);
+    // Payment Batch Summary: INDEXER API /api/issuer-payment-batch?paymentId=<paymentId> fetches payments batches
+    event IssuerPaymentBatchProcessed(uint16 paymentId, uint32 paymentBatchId, address indexed issuer, uint256 weiSent, uint256 weiChange);
+    // Payment Batch Detail: INDEXER API /api/issuer-payment-batch-detail?paymentBatchId=<paymentBatchId> fetches payment batch detail
+    event SubscriberPaid(uint16 paymentId, uint32 paymentBatchId, address indexed issuer, address indexed subscriber, uint256 amount);
+    
     function get_chainlinkRefPrice(address chainlinkAggAddr) public view returns(int256) {
         //if (chainlinkAggAddr == address(0x0)) return 100000000; // $1 - cents*satoshis
         if (chainlinkAggAddr == address(0x0)) return -1;
@@ -229,67 +230,53 @@ library PayableLib {
 
     struct ProcessIssuerPaymentBatchVars {
         uint256 amountSubscribed;
-        uint256 initAddrNdx;
-        uint256 addrNdx;
-        uint256 stNdx;
+        uint32 initAddrNdx;
+        uint32 addrNdx;
+        uint32 stNdx;
         uint256 sharePercentage;
         uint256 shareWei;
         uint256 batchProcessedAmount;
-        uint256 contractBalance;
         uint256 weiChange;
     }
 
     // TODO: ### caller needs to be able to specify a batch / offset (~5m gas / ~23k transfer per holder ~= 250 max holders!!)
 
     function issuerPay(
-        uint256 paymentId,
-        uint64 count,
-        StructLib.IssuerPaymentsStruct storage ipd,
+        uint32 count,
+        StructLib.IssuerPaymentBatchStruct storage ipbd,
         StructLib.LedgerStruct storage ld,
         StructLib.CashflowStruct storage cashflowData
     )
     public {
         // TODO: restrict msg.value upper bound so no overflow -- esp. wrt. precision hack below!!
 
-        require(ld.contractType == StructLib.ContractType.CASHFLOW_BASE, "Bad commodity request");
-        require(ld._contractSealed, "Contract is not sealed");
-        require(ld._batches_currentMax_id == 1, "Bad cashflow request: no minted batch");
+        require(ld.contractType == StructLib.ContractType.CASHFLOW_BASE, 'Bad commodity request');
+        require(ld._contractSealed, 'Contract is not sealed');
+        require(ld._batches_currentMax_id == 1, 'Bad cashflow request: no minted batch');
         require(msg.value <= (2 ** 128), 'Amount must be less than 2^128'); // stop any overflows
-        require(paymentId > 0, "Invalid paymentId");
-        require(count > 0, "Invalid count");
+        require(count > 0, 'Invalid count');
         // require(cashflowData.wei_currentPrice > 0 || cashflowData.cents_currentPrice > 0, "Bad cashflow request: no price set");
         // require(cashflowData.wei_currentPrice == 0 || cashflowData.cents_currentPrice == 0, "Bad cashflow request: ambiguous price set");
-
-        // validate active payment Id
-        if(ipd.issuerPayments[paymentId].paymentProcessedAmount < ipd.issuerPayments[paymentId].paymentTotalAmount){
-            require(paymentId == ipd.maxPaymentId, 'Pending payments on the current PaymentId (GET: maxPaymentId)');
-        }
         
         // get issuer
         StructLib.SecTokenBatch storage issueBatch = ld._batches[1];  // CFT: uni-batch
-        require(msg.sender == issueBatch.originator, "Issuer payments: only by issuer");
+        require(msg.sender == issueBatch.originator, 'Issuer payments: only by issuer');
+
+        // validate subscribers
+        require(ld._ledgerOwners.length > 1, 'No Subscribers found for the Cashflow Token'); // > 1 to exclude issuer
 
         // validate count
-        require(count + ipd.issuerPayments[paymentId].curNdx <= ld._ledgerOwners.length, 'Count must be < remaining token holders in the payment batch');
+        require(ipbd.curNdx + count <= ld._ledgerOwners.length, 'Count must be < remaining token holders in the payment batch');
 
         // disallow extra payments
-        require(ipd.issuerPayments[paymentId].paymentProcessedAmount <= ipd.issuerPayments[paymentId].paymentTotalAmount, 'Extra payment(s) have been processed');
-        
-        // validate current payments
-        if (ipd.issuerPayments[paymentId].paymentTotalAmount > 0 && ipd.issuerPayments[paymentId].curNdx > 0 && (ipd.issuerPayments[paymentId].paymentProcessedAmount == ipd.issuerPayments[paymentId].paymentTotalAmount)) { // if existing payment
-            revert('All payments for this payment ID have been processed');
-        }
-
-        // initialize first payment
-        if (ipd.maxPaymentId == 0){
-            require(paymentId == 1, 'First payment ID should be 1');
-            ipd.maxPaymentId = 1;
-        }
+        require(ipbd.curPaymentProcessedAmount <= ipbd.curPaymentTotalAmount, 'Extra payment(s) have been processed');
 
         // initialize new payment
-        if (ipd.issuerPayments[paymentId].curNdx == 0) { // if new payment
-            require(ipd.issuerPayments[paymentId].paymentTotalAmount == 0, 'Duplicate payment ID found');
-            ipd.issuerPayments[paymentId].paymentTotalAmount = msg.value; // caller should pass the entire payment amount on the first batch of a new payment
+        if (ipbd.curNdx == 0) {
+            require(ipbd.curPaymentTotalAmount == 0, 'New payment initialization error: Reset Payment Total Amount');
+            ipbd.curPaymentId++;                    // initiate paymentId for a new payment (1-based)
+            ipbd.curBatchNdx++;                     // initiate batch index for a new payment (1-based)
+            ipbd.curPaymentTotalAmount = msg.value; // caller should pass the entire payment amount on the first batch of a new payment
         }
 
         ProcessIssuerPaymentBatchVars memory ipv;
@@ -307,9 +294,7 @@ library PayableLib {
 
             // Example: Count
 
-            emit dbg1(paymentId, issueBatch.originator, "BOND", ld._ledgerOwners.length, count);
-
-            ipv.initAddrNdx = ipd.issuerPayments[paymentId].curNdx;
+            ipv.initAddrNdx = ipbd.curNdx;
 
             for (ipv.addrNdx = ipv.initAddrNdx; ipv.addrNdx < ipv.initAddrNdx + count ; ipv.addrNdx++) {
                 address payable addr = address(uint160(ld._ledgerOwners[ipv.addrNdx]));  
@@ -317,35 +302,42 @@ library PayableLib {
                 if (addr != issueBatch.originator) { // exclude issuer from payments
                     uint256[] storage stIds = ld._ledger[addr].tokenType_stIds[1];
 
-                    emit dbg2(issueBatch.originator, addr, "holder is not originator", ipd.issuerPayments[paymentId].curNdx, stIds.length);
-
                     for (ipv.stNdx = 0; ipv.stNdx < stIds.length; ipv.stNdx++) {
                         ipv.sharePercentage = ipv.amountSubscribed * 10**18 /*precision*/ / uint256(ld._sts[stIds[ipv.stNdx]].currentQty);
-                        ipv.shareWei = ipd.issuerPayments[paymentId].paymentTotalAmount * 10**18 /*precision*/ / ipv.sharePercentage;
+                        ipv.shareWei = ipbd.curPaymentTotalAmount * 10**18 /*precision*/ / ipv.sharePercentage;
 
                         // TODO: re-entrancy guards, and .call instead of .transfer
                         addr.transfer(ipv.shareWei);
                         // save payment history
                         ipv.batchProcessedAmount += ipv.shareWei;
-                        ipd.issuerPayments[paymentId].paymentProcessedAmount += ipv.shareWei;
-                        emit IssuerPaymentProcessed(paymentId, issueBatch.originator, addr, ipv.sharePercentage, ipv.shareWei, ipv.batchProcessedAmount);
+                        ipbd.curPaymentProcessedAmount += ipv.shareWei;
+                        emit SubscriberPaid(ipbd.curPaymentId, ipbd.curBatchNdx, issueBatch.originator, addr, ipv.shareWei);
                     }
                 }
-                ipd.issuerPayments[paymentId].curNdx++;
+                ipbd.curNdx++;
             }
             ipv.weiChange = (msg.value.sub(uint256(ipv.batchProcessedAmount)));
             if (ipv.weiChange > 0) {
                 msg.sender.transfer(ipv.weiChange);
             }
-            if (ipd.issuerPayments[paymentId].paymentProcessedAmount == ipd.issuerPayments[paymentId].paymentTotalAmount){
-                ipd.maxPaymentId++;
+            ipbd.curBatchNdx++;
+            emit IssuerPaymentBatchProcessed(ipbd.curPaymentId, ipbd.curBatchNdx, msg.sender, msg.value, ipv.weiChange);
+            if (ipbd.curPaymentProcessedAmount == ipbd.curPaymentTotalAmount){
+                emit IssuerPaymentProcessed(ipbd.curPaymentId, msg.sender, ipbd.curPaymentTotalAmount, ipbd.curBatchNdx);
+                resetIssuerPaymentBatch(ipbd);
             }
-            emit IssuerPaymentBatchProcessed(paymentId, msg.sender, msg.value, ipv.weiChange, ipv.batchProcessedAmount, issueBatch.tokTypeId);
         }
         else if (cashflowData.args.cashflowType == StructLib.CashflowType.EQUITY) {
             // TODO: Dividend Payments
         }
         else revert("Unexpected cashflow type");
+    }
+
+    function resetIssuerPaymentBatch(StructLib.IssuerPaymentBatchStruct storage ipbd) internal {
+        ipbd.curBatchNdx = 0;
+        ipbd.curNdx = 0;
+        ipbd.curPaymentTotalAmount = 0;
+        ipbd.curPaymentProcessedAmount = 0;
     }
 
     // Method to retrieve Issuer Payments History
@@ -389,15 +381,11 @@ library PayableLib {
         return ret;
     }
 
-    function getIssuerPayments(
-        uint256 maxPaymentId,
+    function getIssuerPaymentBatch(
         StructLib.IssuerPaymentBatchStruct storage issuerPaymentBatchData
     )
-    public pure returns(StructLib.IssuerPaymentsReturnStruct memory) {
+    public pure returns(StructLib.IssuerPaymentBatchStruct memory) {
         StructLib.IssuerPaymentBatchStruct memory ipbd = issuerPaymentBatchData;
-        StructLib.IssuerPaymentsReturnStruct memory ret;
-        ret.maxPaymentId = maxPaymentId;
-        ret.issuerPaymentBatch = ipbd;
-        return ret;
+        return ipbd;
     }
 }

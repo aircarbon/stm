@@ -320,21 +320,19 @@ library StructLib {
         // TODO: getCashflowStatus() ==> returns in default or not, based on block.number # and issuer payment history...
     }
 
-    // Issuer Payment - Payment struct for each payment
+    /**
+     *  Issuer Payment - Struct for current issuer payment
+     *  Reset all except curPaymentId after full payment cycle (i.e. after last batch payment)
+     *  0 < curPaymentId < 65535
+     *  0 < curBatchNdx < 4294967295
+     *  0 < curNdx < 4294967295
+    */
     struct IssuerPaymentBatchStruct { // ** DATA_DUMP: TODO
-        uint256 paymentTotalAmount;                   // total payment from issuer
-        uint256 paymentProcessedAmount;               // current processed payment amount
-        uint256 curNdx;                               // current 0-based index into the ledger owners list for payment processing        
-    }
-
-    struct IssuerPaymentsStruct {
-        uint256 maxPaymentId;                         // max payment ID [latest] 
-        mapping(uint256 => StructLib.IssuerPaymentBatchStruct) issuerPayments;   //  payment ID [must be consistent across all batches, 1-based] , PaymentStruct
-    }
-
-    struct IssuerPaymentsReturnStruct {
-        uint256 maxPaymentId;                         // max payment ID [latest] 
-        IssuerPaymentBatchStruct issuerPaymentBatch; // payment batch for a payment ID
+        uint16 curPaymentId;               // 1-based payment ID for each issuer payment: indicates current issuer payment
+        uint32 curBatchNdx;                // 1-based batch index for the current issuer payment
+        uint32 curNdx;                     // 0-based index into the ledger owners list for current issuer payment batch processing
+        uint256 curPaymentTotalAmount;     // total payment due from issuer for the current issuer payment
+        uint256 curPaymentProcessedAmount; // current processed payment amount
     }
 
     // SPOT TRANSFER ARGS

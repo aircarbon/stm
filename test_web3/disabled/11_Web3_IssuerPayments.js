@@ -8,8 +8,7 @@ const CONST = require('../const.js');
 process.env.WEB3_NETWORK_ID = Number(process.env.NETWORK_ID || 888);
 
 const NAME_OVERRIDE = process.env.ADD_TYPE__CONTRACT_NAME;
-const ADDR_OVERRIDE = '0x33E47B950077b573323456156d2e85F6E17F9AcE';  // NOTE: update Base Contract address before running test
-const PAYMENT_ID = 1;
+const ADDR_OVERRIDE = '0x57C70113c77162Da15f2D5F2838F880e9f80ad6B';  // NOTE: update Base Contract address before running test
 const ISSUER_PAYMENT_AMOUNT = new BN("10000000000000000000");       // 10 ETH
 const BATCH_COUNT = 3;                                              // pay the next 3 token holders
 const NEXT_ISSUER_PAYMENT_AMOUNT = new BN("1000000000000000000");   // 9 ETH paid ; Next payment 1 ETH
@@ -92,23 +91,23 @@ describe(`CFT - Base: Issuer Payments Unit Tests`, async () => {
     
     it(`Issuer Payments Test 1 (Pre-processing Test) - should have initial issuer payment values as 0x00`, async () => {
         const Issuer_RG = await CONST.getAccountAndKey(13);                 // Rich Glory '0xE6b292e9A4d691C17150C8F70046681a3F2B6060'
-        const getIssuerPaymentByPaymentIdResponse = await CONST.web3_call(
-            'getIssuerPaymentByPaymentId',                                  // method to get issuerPayment data
-            [PAYMENT_ID],                                                    // paymentId arg
-            NAME_OVERRIDE,                                                   // cashflow base contract name override
+        const getIssuerPaymentBatchResponse = await CONST.web3_call(
+            'getIssuerPaymentBatch',                                        // method to get issuerPayment data
+            [],                                                             // paymentId arg
+            NAME_OVERRIDE,                                                  // cashflow base contract name override
         );
-        console.log('Received issuer payment batch: ', getIssuerPaymentByPaymentIdResponse);
+        console.log('Received issuer payment batch: ', getIssuerPaymentBatchResponse);
     });
 
     it(`Issuer Payments Test 2 - should pay first 3 holders from issuer Rich Glory`, async () => {
 
         const Issuer_RG = await CONST.getAccountAndKey(13);                 // Rich Glory '0xE6b292e9A4d691C17150C8F70046681a3F2B6060'
 
-        console.log(`Processing ${ISSUER_PAYMENT_AMOUNT} issuer payment batch (${BATCH_COUNT}) for Payment ID: #${PAYMENT_ID}`);
+        console.log(`Processing ${ISSUER_PAYMENT_AMOUNT} issuer payment batch (${BATCH_COUNT})`);
         try {
             const receiveIssuerPaymentResponse = await CONST.web3_tx(
                 'receiveIssuerPaymentBatch',                                // method to receive payments
-                [PAYMENT_ID, BATCH_COUNT],                                  // issuer payment args
+                [BATCH_COUNT],                                              // issuer payment args
                 Issuer_RG.addr,                                             // fromAddr
                 Issuer_RG.privKey,                                          // fromPrivKey
                 NAME_OVERRIDE,                                              // nameOverride
@@ -124,18 +123,18 @@ describe(`CFT - Base: Issuer Payments Unit Tests`, async () => {
     
     it(`Issuer Payments Test 3 - should validate previous payment and make the next payment to remaining 3 token holders - `, async () => {
         const Issuer_RG = await CONST.getAccountAndKey(13);                 // Rich Glory '0xE6b292e9A4d691C17150C8F70046681a3F2B6060'
-        const getIssuerPaymentByPaymentIdResponse = await CONST.web3_call(
-            'getIssuerPaymentByPaymentId',                                  // method to get issuerPayment data
-            [PAYMENT_ID],                                                    // paymentId arg
-            NAME_OVERRIDE,                                                   // cashflow base contract name override
+        const getIssuerPaymentBatchResponse = await CONST.web3_call(
+            'getIssuerPaymentBatch',                                        // method to get issuerPayment data
+            [],                                                             // paymentId arg
+            NAME_OVERRIDE,                                                  // cashflow base contract name override
         );
-        console.log('Received issuer payment batch: ', getIssuerPaymentByPaymentIdResponse);
+        console.log('Received issuer payment batch: ', getIssuerPaymentBatchResponse);
             
-        console.log(`Processing ${NEXT_ISSUER_PAYMENT_AMOUNT} issuer payment batch (${BATCH_COUNT}) for Payment ID: #${PAYMENT_ID}`);
+        console.log(`Processing ${NEXT_ISSUER_PAYMENT_AMOUNT} issuer payment batch (${BATCH_COUNT})`);
         try {
             const receiveIssuerPaymentResponse = await CONST.web3_tx(
                 'receiveIssuerPaymentBatch',                                // method to receive payments
-                [PAYMENT_ID, BATCH_COUNT],                                  // issuer payment args
+                [BATCH_COUNT],                                              // issuer payment args
                 Issuer_RG.addr,                                             // fromAddr
                 Issuer_RG.privKey,                                          // fromPrivKey
                 NAME_OVERRIDE,                                              // nameOverride
@@ -148,12 +147,12 @@ describe(`CFT - Base: Issuer Payments Unit Tests`, async () => {
             console.error(ex);
         }
 
-        const getIssuerPaymentSanity = await CONST.web3_call(
-            'getIssuerPaymentByPaymentId',                                  // method to get issuerPayment data
-            [PAYMENT_ID],                                                   // paymentId arg
+        const getIssuerPaymentBatchForSanity = await CONST.web3_call(
+            'getIssuerPaymentBatch',                                        // method to get issuerPayment data
+            [],                                                             // paymentId arg
             NAME_OVERRIDE,                                                  // cashflow base contract name override
         );
-        console.log('Received issuer payment batch (Sanity Check): ', getIssuerPaymentSanity);
+        console.log('Received issuer payment batch: ', getIssuerPaymentBatchForSanity);
     });
     
 });
