@@ -328,8 +328,13 @@ library StructLib {
     }
 
     struct IssuerPaymentsStruct {
-        mapping(uint256 => StructLib.IssuerPaymentBatchStruct) issuerPayments;   //  Payment ID [must be consistent across all batches, 1-based] , PaymentStruct
-        uint256 maxPaymentId;                         // Max Payment ID [current] 
+        uint256 maxPaymentId;                         // max payment ID [latest] 
+        mapping(uint256 => StructLib.IssuerPaymentBatchStruct) issuerPayments;   //  payment ID [must be consistent across all batches, 1-based] , PaymentStruct
+    }
+
+    struct IssuerPaymentsReturnStruct {
+        uint256 maxPaymentId;                         // max payment ID [latest] 
+        IssuerPaymentBatchStruct issuerPaymentBatch; // payment batch for a payment ID
     }
 
     // SPOT TRANSFER ARGS
