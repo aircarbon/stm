@@ -44,7 +44,7 @@ contract("StMaster", accounts => {
     // });
 
     // // https://iancoleman.io/bip39/#english
-    it(`misc - bip39 - should be able to use a maximum entropy (24 word = 512-bit) BIP39 mnemonic (BIP44 HD)`, async () => {
+    it(`misc - bip39 - should be able to use a maximum entropy (24 word = 256-bit) BIP39 mnemonic (BIP44 HD)`, async () => {
         console.log('> Enter mnemonic:');
         for await (const mnemonic of rl) {
             console.log('Mnemonic: ', mnemonic);
