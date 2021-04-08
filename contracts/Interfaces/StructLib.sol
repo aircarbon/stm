@@ -27,7 +27,7 @@ library StructLib {
         DepositFee,
         DataFee,
         OtherFee1,
-        OtherFee2,
+        OtherFee2, // AC: FIAT/TOKEN WITHDRAW
         OtherFee3, // AC: RETIREMENT
         OtherFee4, // AC: REBATE
         OtherFee5, // AC: PHYSICAL_DELIVERY

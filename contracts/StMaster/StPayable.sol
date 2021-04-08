@@ -47,62 +47,62 @@ contract StPayable is
     //      TODO: pri2 - PE: issuance fee on subscriptions
 
 //#if process.env.CONTRACT_TYPE === 'CASHFLOW_BASE'
-    StructLib.CashflowStruct cashflowData;
-
-    function getCashflowData() public view returns(StructLib.CashflowStruct memory) {
-        return PayableLib.getCashflowData(ld, cashflowData);
-    }
-
-    StructLib.IssuerPaymentsStruct ipd;   //  Payment ID [must be consistent across all batches, 1-based] , PaymentStruct mapping 
-
-    function getIssuerPaymentByPaymentId(uint256 paymentId) public view returns(StructLib.IssuerPaymentsReturnStruct memory) {
-        return PayableLib.getIssuerPayments(ipd.maxPaymentId, ipd.issuerPayments[paymentId]);
-    }
-    
-    //address public chainlinkAggregator_btcUsd;
-    address public chainlinkAggregator_ethUsd;
-    address public chainlinkAggregator_bnbUsd;
-
-    // function get_btcUsd() public view returns(int256) {
-    //     if (chainlinkAggregator_btcUsd == address(0x0)) return -1;
-    //     IChainlinkAggregator ref = IChainlinkAggregator(chainlinkAggregator_btcUsd);
-    //     return ref.latestAnswer();
-    // }
-
-    function get_ethUsd() public view returns(int256) {
-        if (chainlinkAggregator_ethUsd == address(0x0)) return -1;
-        return PayableLib.get_chainlinkRefPrice(chainlinkAggregator_ethUsd);
-    }
-    function get_bnbUsd() public view returns(int256) {
-        if (chainlinkAggregator_bnbUsd == address(0x0)) return -1;
-        return PayableLib.get_chainlinkRefPrice(chainlinkAggregator_bnbUsd);
-    }
-
-    //function() external  payable  onlyWhenReadWrite() {
-    receive() external payable onlyWhenReadWrite() {
-        PayableLib.pay(ld, std, ctd, cashflowData, globalFees, deploymentOwner, get_ethUsd(), get_bnbUsd());
-    }
-    
-    //function() external  payable  onlyWhenReadWrite() {
-    function receiveIssuerPaymentBatch(uint256 paymentId, uint64 count) external payable onlyWhenReadWrite() {
-        PayableLib.issuerPay(paymentId, count, ipd, ld, cashflowData);
-    }
-
-    function setIssuerValues(
-        // address issuer,
-        // StructLib.SetFeeArgs memory originatorFee,
-        uint256 wei_currentPrice,
-        uint256 cents_currentPrice,
-        uint256 qty_saleAllocation
-    ) external onlyWhenReadWrite() {
-        PayableLib.setIssuerValues(
-            ld,
-            cashflowData,
-            wei_currentPrice,
-            cents_currentPrice,
-            qty_saleAllocation,
-            deploymentOwner
-        );
-    }
+//#     StructLib.CashflowStruct cashflowData;
+//# 
+//#     function getCashflowData() public view returns(StructLib.CashflowStruct memory) {
+//#         return PayableLib.getCashflowData(ld, cashflowData);
+//#     }
+//# 
+//#     StructLib.IssuerPaymentsStruct ipd;   //  Payment ID [must be consistent across all batches, 1-based] , PaymentStruct mapping 
+//# 
+//#     function getIssuerPaymentByPaymentId(uint256 paymentId) public view returns(StructLib.IssuerPaymentsReturnStruct memory) {
+//#         return PayableLib.getIssuerPayments(ipd.maxPaymentId, ipd.issuerPayments[paymentId]);
+//#     }
+//#     
+//#     //address public chainlinkAggregator_btcUsd;
+//#     address public chainlinkAggregator_ethUsd;
+//#     address public chainlinkAggregator_bnbUsd;
+//# 
+//#     // function get_btcUsd() public view returns(int256) {
+//#     //     if (chainlinkAggregator_btcUsd == address(0x0)) return -1;
+//#     //     IChainlinkAggregator ref = IChainlinkAggregator(chainlinkAggregator_btcUsd);
+//#     //     return ref.latestAnswer();
+//#     // }
+//# 
+//#     function get_ethUsd() public view returns(int256) {
+//#         if (chainlinkAggregator_ethUsd == address(0x0)) return -1;
+//#         return PayableLib.get_chainlinkRefPrice(chainlinkAggregator_ethUsd);
+//#     }
+//#     function get_bnbUsd() public view returns(int256) {
+//#         if (chainlinkAggregator_bnbUsd == address(0x0)) return -1;
+//#         return PayableLib.get_chainlinkRefPrice(chainlinkAggregator_bnbUsd);
+//#     }
+//# 
+//#     //function() external  payable  onlyWhenReadWrite() {
+//#     receive() external payable onlyWhenReadWrite() {
+//#         PayableLib.pay(ld, std, ctd, cashflowData, globalFees, deploymentOwner, get_ethUsd(), get_bnbUsd());
+//#     }
+//#     
+//#     //function() external  payable  onlyWhenReadWrite() {
+//#     function receiveIssuerPaymentBatch(uint256 paymentId, uint64 count) external payable onlyWhenReadWrite() {
+//#         PayableLib.issuerPay(paymentId, count, ipd, ld, cashflowData);
+//#     }
+//# 
+//#     function setIssuerValues(
+//#         // address issuer,
+//#         // StructLib.SetFeeArgs memory originatorFee,
+//#         uint256 wei_currentPrice,
+//#         uint256 cents_currentPrice,
+//#         uint256 qty_saleAllocation
+//#     ) external onlyWhenReadWrite() {
+//#         PayableLib.setIssuerValues(
+//#             ld,
+//#             cashflowData,
+//#             wei_currentPrice,
+//#             cents_currentPrice,
+//#             qty_saleAllocation,
+//#             deploymentOwner
+//#         );
+//#     }
 //#endif
 }

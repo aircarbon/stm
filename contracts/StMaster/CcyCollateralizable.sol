@@ -13,33 +13,33 @@ contract Collateralizable is
     Owned, StLedger {
 
 //#if process.env.CONTRACT_TYPE !== 'CASHFLOW_BASE'
-//#     function addCcyType(string memory name, string memory unit, uint16 decimals)
-//#     public onlyOwner() onlyWhenReadWrite() {
-//#         CcyLib.addCcyType(ld, ctd, name, unit, decimals);
-//#     }
-//# 
-//#     function getCcyTypes() external view returns (StructLib.GetCcyTypesReturn memory) {
-//#         return CcyLib.getCcyTypes(ctd);
-//#     }
-//# 
-//#     function fundOrWithdraw(
-//#         StructLib.FundWithdrawType direction,
-//#         uint256 ccyTypeId,
-//#         int256  amount,
-//#         address ledgerOwner,
-//#         string  calldata desc)
-//#     public onlyOwner() onlyWhenReadWrite() {
-//#         CcyLib.fundOrWithdraw(ld, ctd, direction, ccyTypeId, amount, ledgerOwner, desc);
-//#     }
-//# 
-//#     // 24k
-//#     // function getTotalCcyFunded(uint256 ccyTypeId)
-//#     // external view returns (uint256) {
-//#     //     return ld._ccyType_totalFunded[ccyTypeId];
-//#     // }
-//#     // function getTotalCcyWithdrawn(uint256 ccyTypeId)
-//#     // external view returns (uint256) {
-//#     //     return ld._ccyType_totalWithdrawn[ccyTypeId];
-//#     // }
+    function addCcyType(string memory name, string memory unit, uint16 decimals)
+    public onlyOwner() onlyWhenReadWrite() {
+        CcyLib.addCcyType(ld, ctd, name, unit, decimals);
+    }
+
+    function getCcyTypes() external view returns (StructLib.GetCcyTypesReturn memory) {
+        return CcyLib.getCcyTypes(ctd);
+    }
+
+    function fundOrWithdraw(
+        StructLib.FundWithdrawType direction,
+        uint256 ccyTypeId,
+        int256  amount,
+        address ledgerOwner,
+        string  calldata desc)
+    public onlyOwner() onlyWhenReadWrite() {
+        CcyLib.fundOrWithdraw(ld, ctd, direction, ccyTypeId, amount, ledgerOwner, desc);
+    }
+
+    // 24k
+    // function getTotalCcyFunded(uint256 ccyTypeId)
+    // external view returns (uint256) {
+    //     return ld._ccyType_totalFunded[ccyTypeId];
+    // }
+    // function getTotalCcyWithdrawn(uint256 ccyTypeId)
+    // external view returns (uint256) {
+    //     return ld._ccyType_totalWithdrawn[ccyTypeId];
+    // }
 //#endif
 }

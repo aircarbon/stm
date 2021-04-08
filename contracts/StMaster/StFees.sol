@@ -43,9 +43,9 @@ contract StFees is
     }
 
 //#if process.env.CONTRACT_TYPE !== 'CASHFLOW_BASE'
-//#     function setFee_CcyType(uint256 ccyTypeId, address ledgerOwner, StructLib.SetFeeArgs memory feeArgs)
-//#     public onlyOwner() onlyWhenReadWrite() {
-//#         SpotFeeLib.setFee_CcyType(ld, ctd, globalFees, ccyTypeId, ledgerOwner, feeArgs);
-//#     }
+    function setFee_CcyType(uint256 ccyTypeId, address ledgerOwner, StructLib.SetFeeArgs memory feeArgs)
+    public onlyOwner() onlyWhenReadWrite() {
+        SpotFeeLib.setFee_CcyType(ld, ctd, globalFees, ccyTypeId, ledgerOwner, feeArgs);
+    }
 //#endif
 }
