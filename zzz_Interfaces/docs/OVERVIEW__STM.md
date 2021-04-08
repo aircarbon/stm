@@ -1,4 +1,4 @@
-# SecTokMaster (STM) v1.0 - Overview
+# StMaster (STM) v1.0 - Overview
 
 ## Contract Type - Commodity or Cashflow
 STM is configured at deployment time to one of:

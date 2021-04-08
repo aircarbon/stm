@@ -28,9 +28,9 @@ library StructLib {
         DataFee,
         OtherFee1,
         OtherFee2,
-        OtherFee3,
-        OtherFee4, // REBATE
-        OtherFee5, // PHYSICAL_DELIVERY
+        OtherFee3, // AC: RETIREMENT
+        OtherFee4, // AC: REBATE
+        OtherFee5, // AC: PHYSICAL_DELIVERY
 
         // transfer across related accounts (e.g. corp-admin transfer to corp-trader)
         RelatedTransfer,
