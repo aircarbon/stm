@@ -302,8 +302,8 @@ library PayableLib {
                     uint256[] storage stIds = ld._ledger[addr].tokenType_stIds[1];
 
                     for (ipv.stNdx = 0; ipv.stNdx < stIds.length; ipv.stNdx++) {
-                        ipv.sharePercentage = ipv.amountSubscribed * 10**22 /*precision*/ / uint256(ld._sts[stIds[ipv.stNdx]].currentQty);
-                        ipv.shareWei = ipbd.curPaymentTotalAmount * 10**22 /*precision*/ / ipv.sharePercentage;
+                        ipv.sharePercentage = ipv.amountSubscribed * 10**36 /*precision*/ / uint256(ld._sts[stIds[ipv.stNdx]].currentQty);
+                        ipv.shareWei = ipbd.curPaymentTotalAmount * 10**36  /*precision*/ / ipv.sharePercentage;
 
                         // TODO: re-entrancy guards, and .call instead of .transfer
                         if (ipv.shareWei > 0) {
@@ -321,8 +321,8 @@ library PayableLib {
             if (ipv.weiChange > 0) {
                 msg.sender.transfer(ipv.weiChange);
             }
-            ipbd.curBatchNdx++;
             emit IssuerPaymentBatchProcessed(ipbd.curPaymentId, ipbd.curBatchNdx, msg.sender, msg.value, ipv.weiChange);
+            ipbd.curBatchNdx++;
             if (ipbd.curPaymentProcessedAmount == ipbd.curPaymentTotalAmount){
                 emit IssuerPaymentProcessed(ipbd.curPaymentId, msg.sender, ipbd.curPaymentTotalAmount, ipbd.curBatchNdx);
                 resetIssuerPaymentBatch(ipbd);
