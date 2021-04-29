@@ -21,7 +21,7 @@ module.exports = {
             const spotTypes = (await CONST.web3_call('getSecTokenTypes', [], nameOverride)).tokenTypes.filter(p => p.settlementType == CONST.settlementType.SPOT);
             //console.log('spotTypes', spotTypes.map(p => { return { id: p.id, name: p.name } }));
             await addSecTokenIfNotPresent(spotTypes, 'CET', O, nameOverride); // AirCarbon CORSIA Eligible Token
-          //await addSecTokenIfNotPresent(spotTypes, 'ANT', O, nameOverride); // AirCarbon Nature Token
+            await addSecTokenIfNotPresent(spotTypes, 'ANT', O, nameOverride); // AirCarbon Nature Token
           //await addSecTokenIfNotPresent(spotTypes, 'GPT', O, nameOverride); // AirCarbon Premium Token
 
             // add ccy types
