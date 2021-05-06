@@ -26,7 +26,7 @@ library StructLib {
         WithdrawFee,
         DepositFee,
         DataFee,
-        OtherFee1,
+        OtherFee1, // AC: ONBOARDING FEE
         OtherFee2, // AC: FIAT/TOKEN WITHDRAW
         OtherFee3, // AC: RETIREMENT
         OtherFee4, // AC: REBATE
@@ -35,7 +35,7 @@ library StructLib {
         // transfer across related accounts (e.g. corp-admin transfer to corp-trader)
         RelatedTransfer,
 
-        // generic: accounting adjustment
+        // generic adjustment
         Adjustment,
 
         // ERC20: token transfer
