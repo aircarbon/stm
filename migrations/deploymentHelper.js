@@ -5,7 +5,7 @@ const os = require('os');
 const publicIp = require('public-ip');
 
 const CONST = require('../const.js');
-const { db } = require('../../utils-server/dist');
+const  db  = require('../../utils-server/db/dist');
 const { assert } = require('console');
 
 module.exports = {
@@ -70,7 +70,7 @@ module.exports = {
         await deployer.deploy(FuturesLib).then(async futuresLib => {
             deployer.link(FuturesLib, StMaster);
             const contractName = `${process.env.CONTRACT_PREFIX}${nameOverride || CONST.contractProps[contractType].contractName}`;
-            
+
             // parse cashflow args; convert from days to blocks
 //#if process.env.CONTRACT_TYPE === 'CASHFLOW_BASE'
 //#             const cfa = process.env.ADD_TYPE__CASHFLOW_ARGS !== undefined
@@ -152,7 +152,7 @@ module.exports = {
                     // log & validate deployment
                     logEnv("DEPLOYMENT COMPLETE", owners, contractType, contractName);
                     const contractOwners = await CONST.web3_call('getOwners', [], undefined/*nameOverride*/, stm.address/*addrOverride*/);
-                    if (contractOwners.length != CONST.RESERVED_ADDRESSES_COUNT) { 
+                    if (contractOwners.length != CONST.RESERVED_ADDRESSES_COUNT) {
                         console.log(chalk.red.bold.inverse(`Deployment failed: unexpected owners data`), contractOwners);
                         process.exit(1);
                     }

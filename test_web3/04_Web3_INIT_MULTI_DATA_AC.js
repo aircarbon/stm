@@ -1,7 +1,7 @@
 const assert = require('assert');
 const EthereumJsTx = require('ethereumjs-tx');
 const BN = require('bn.js');
-const { db } = require('../../utils-server/dist');
+const  db  = require('../../utils-server/db/dist');
 const _ = require('lodash');
 const chalk = require('chalk');
 
@@ -68,24 +68,24 @@ describe(`Contract Web3 Interface`, async () => {
     //       ("export INSTANCE_ID=UAT_3_SD_WorldbridgeLand && mocha test_web3 --timeout 10000000 --exit") // "
     //
     //   SD BSC Testnet 97
-    //       ("export INSTANCE_ID=UAT_97_SD && mocha test_web3 --timeout 10000000 --exit") 
+    //       ("export INSTANCE_ID=UAT_97_SD && mocha test_web3 --timeout 10000000 --exit")
     //       ("export INSTANCE_ID=UAT_97_SD_SBGLand && mocha test_web3 --timeout 10000000 --exit")
     //
     //   SD BSC Testnet 97 (DEMO)
-    //       ("export INSTANCE_ID=DEMO_97_SD && mocha test_web3 --timeout 10000000 --exit") 
+    //       ("export INSTANCE_ID=DEMO_97_SD && mocha test_web3 --timeout 10000000 --exit")
     //       ("export INSTANCE_ID=DEMO_97_SD_SBGLand && mocha test_web3 --timeout 10000000 --exit")
     //
     //   SD BSC Mainnet 56
-    //       ("export INSTANCE_ID=PROD_56_SD && mocha test_web3 --timeout 10000000 --exit") 
-    //       ("export INSTANCE_ID=PROD_56_SD_RichGlory && mocha test_web3 --timeout 10000000 --exit") 
-    //       ("export INSTANCE_ID=PROD_56_SD_SBGLand && mocha test_web3 --timeout 10000000 --exit") 
+    //       ("export INSTANCE_ID=PROD_56_SD && mocha test_web3 --timeout 10000000 --exit")
+    //       ("export INSTANCE_ID=PROD_56_SD_RichGlory && mocha test_web3 --timeout 10000000 --exit")
+    //       ("export INSTANCE_ID=PROD_56_SD_SBGLand && mocha test_web3 --timeout 10000000 --exit")
     //
 
     //CONST.consoleOutput(false);
 
     // setup
     before(async function () {
-        
+
         const nameOverride = process.env.ADD_TYPE__CONTRACT_NAME;
         await require('../devSetupContract.js').setDefaults({ nameOverride });
 
@@ -116,9 +116,9 @@ describe(`Contract Web3 Interface`, async () => {
 
         if (EXEC_TEST_ACTIONS) {
             const contractType = (await CONST.web3_call('getContractType', [], nameOverride));
-            if (contractType == CONST.contractType.COMMODITY) { 
+            if (contractType == CONST.contractType.COMMODITY) {
                 //console.log(chalk.dim('beforeAll: COMMODITY...'));
-            
+
                 // add test types & ccy if not present
                 if (!(await CONST.web3_call('getSecTokenTypes', [], nameOverride)).tokenTypes.some(p => p.name == 'NEW_TOK_TYPE_A')) {
                     await CONST.web3_tx('addSecTokenType', [ 'NEW_TOK_TYPE_A', CONST.settlementType.SPOT, CONST.nullFutureArgs, CONST.nullAddr ], OWNER, OWNER_privKey, nameOverride);
@@ -127,11 +127,11 @@ describe(`Contract Web3 Interface`, async () => {
                     await CONST.web3_tx('addCcyType', [ 'NEW_CCY_TYPE_A', 'cents', 2 ], OWNER, OWNER_privKey, nameOverride);
                 }
             }
-            else if (contractType == CONST.contractType.CASHFLOW_CONTROLLER) { 
+            else if (contractType == CONST.contractType.CASHFLOW_CONTROLLER) {
                 //console.log(chalk.dim('beforeAll: CASHFLOW_CONTROLLER...'));
                 //...
             }
-            else if (contractType == CONST.contractType.CASHFLOW_BASE) { 
+            else if (contractType == CONST.contractType.CASHFLOW_BASE) {
                 //console.log(chalk.dim('beforeAll: CASHFLOW_BASE...'));
                 //...
             }
@@ -216,7 +216,7 @@ describe(`Contract Web3 Interface`, async () => {
                     }
                     TEST_ACCOUNTS.push({ndx: whiteNdx, addr: x.addr, privKey: x.privKey});
                 }
-                if (sealedStatus == false && wlMany.length > 0) { 
+                if (sealedStatus == false && wlMany.length > 0) {
                     console.log(chalk.inverse(`(${addrOverride}) SETUP TEST ACCOUNTS WL (count=${wlMany.length}) last whiteNdx=${whiteNdx}...`));
                     await whitelistChunked(wlMany, OWNER, OWNER_privKey);
                 }
@@ -256,7 +256,7 @@ describe(`Contract Web3 Interface`, async () => {
         const nameOverride = process.env.ADD_TYPE__CONTRACT_NAME;
         if (!EXEC_TEST_ACTIONS) { this.skip(); return; }
         if ((await CONST.web3_call('getContractType', [], nameOverride)) != CONST.contractType.CASHFLOW_BASE) { this.skip(); return; }
-        
+
         const testTypeName = process.env.ADD_TYPE__TYPE_NAME;
         const mintQty = process.env.ADD_TYPE__UNIMINT_qty;
         const wei_currentPrice = process.env.ADD_TYPE__ISSUER_wei_currentPrice;
@@ -292,7 +292,7 @@ describe(`Contract Web3 Interface`, async () => {
                 "URL_PROJECT_IMG": "https://www.sbgland.com/images/logo.jpg"
             },
             {
-                "TXT_PROJECT_NAME": "Wilson and Company",   
+                "TXT_PROJECT_NAME": "Wilson and Company",
                 "LIST_COUNTRY": "US",
                 "URL_PROJECT": "https://www.wilsonco.com/service/land-development",
                 "IPFS_PROJECT_DOCUMENT_SALES": "QmV5AVmqTyCj2Mx1B83N2VggEJVF6jDuq2fJysCCPKSAFk",
@@ -345,7 +345,7 @@ describe(`Contract Web3 Interface`, async () => {
                 CONST.nullFees,
                 0, //origCcyFee_percBips_ExFee,
                 Object.keys(meta),
-                Object.values(meta) 
+                Object.values(meta)
             ], OWNER, OWNER_privKey);
 
             // read back uni-batch
@@ -369,7 +369,7 @@ describe(`Contract Web3 Interface`, async () => {
         // for (let ndx=0; ndx < 100 ; ndx++) {
         //     const x = await CONST.getAccountAndKey(ndx);
         //     //console.log(`${x.addr} ${issuerAddr}`);
-        //     if (x.addr.toLowerCase() == issuerAddr.toLowerCase()) { 
+        //     if (x.addr.toLowerCase() == issuerAddr.toLowerCase()) {
         //         issuerPrivKey = x.privKey;
         //         break;
         //     }

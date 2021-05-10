@@ -7,7 +7,7 @@ const BN = require('bn.js');
 
 const deploymentHelper = require('./deploymentHelper');
 const setup = require('../devSetupContract.js');
-const { db } = require('../../utils-server/dist');
+const  db  = require('../../utils-server/db/dist');
 
 //
 // Deploy steps: from/to, inclusive:
@@ -39,7 +39,7 @@ const { db } = require('../../utils-server/dist');
 //    `export INSTANCE_ID=UAT_97_SD_SBGLand && node process_sol_js && truffle migrate --network bsc_testnet_bn -f 2 --to 2 --reset`
 //    `export INSTANCE_ID=UAT_97_SD_WilsonAndCo && node process_sol_js && truffle migrate --network bsc_testnet_bn -f 2 --to 2 --reset`
 //    `export INSTANCE_ID=UAT_97_SD_WorldbridgeLand && node process_sol_js && truffle migrate --network bsc_testnet_bn -f 2 --to 2 --reset`
-//    
+//
 //   SD BSC Testnet 97 (DEMO)
 //    `export INSTANCE_ID=DEMO_97_SD && node process_sol_js && truffle migrate --network bsc_testnet_bn -f 2 --to 2 --reset`
 //    `export INSTANCE_ID=DEMO_97_SD_RichGlory && node process_sol_js && truffle migrate --network bsc_testnet_bn -f 2 --to 2 --reset`
@@ -107,7 +107,7 @@ module.exports = async function (deployer) {
         process.exit(1);
     }
     process.env.WEB3_NETWORK_ID = deployer.network_id;
-    
+
     // check deployer account balance
     console.log(chalk.red('O.addr'.padEnd(30, '.')), O.addr);
     const { web3, ethereumTxChain } = await CONST.getTestContextWeb3();

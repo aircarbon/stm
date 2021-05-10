@@ -4,7 +4,7 @@ const chalk = require('chalk');
 const BN = require('bn.js');
 const chart = require('ascii-horizontal-barchart');
 
-const { db } = require('../../utils-server/dist');
+const  db  = require('../../utils-server/db/dist');
 const CONST = require('../const.js');
 
 module.exports = {
@@ -39,7 +39,7 @@ module.exports = {
         shortIds.sort().reverse();
         longIds.sort().reverse();
         closedIds.sort().reverse();
-        
+
         //
         // ### TODO -- should be ordering by OTM (all) first, followed by ITM
         //  TEST_0 => "Central insufficient for settlement" becuase not ordering TP2 by OTM first...

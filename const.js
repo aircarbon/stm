@@ -23,7 +23,7 @@ const sha3_512 = require('js-sha3').sha3_512;
 //console.log(r.hardforks());
 
 const truffleAssert = require('truffle-assertions');
-const { db } = require('../utils-server/dist');
+const  db  = require('../utils-server/db/dist');
 
 //const GAS_USD = 550; // ETH{||BNB}-USD fiat rate
 const GAS_USD = 30; // ETH{||BNB}-USD fiat rate

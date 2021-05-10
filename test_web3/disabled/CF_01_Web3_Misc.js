@@ -4,7 +4,7 @@ const assert = require('assert');
 const EthereumJsTx = require('ethereumjs-tx');
 const chalk = require('chalk');
 const BN = require('bn.js');
-const { db } = require('../../utils-server/dist');
+const  db  = require('../../utils-server/db/dist');
 
 const CONST = require('../const.js');
 process.env.WEB3_NETWORK_ID = Number(process.env.NETWORK_ID || 888);
@@ -101,7 +101,7 @@ describe(`Contract Web3 Interface`, async () => {
             const ledgerOwners = await CONST.web3_call('getLedgerOwners', [], undefined/*nameOverride*/, baseType.cashflowBaseAddr/*addrOverride*/);
             for (var ledgerOwner of ledgerOwners) {
                 const ledgerEntry = await CONST.web3_call('getLedgerEntry', [ledgerOwner], undefined/*nameOverride*/, baseType.cashflowBaseAddr/*addrOverride*/);
-                
+
                 const ccyInfo = [];
                 const tokInfo = [];
                 for (var ccy of ledgerEntry.ccys) {

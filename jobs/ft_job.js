@@ -4,7 +4,7 @@ const { DateTime } = require('luxon');
 const figlet = require('figlet')
 const TCharts = require('tcharts.js'); // for tables
 
-const { db } = require('../../utils-server/dist');
+const  db  = require('../../utils-server/db/dist');
 const CONST = require('../const.js');
 process.env.WEB3_NETWORK_ID = Number(process.env.NETWORK_ID || 888);
 
@@ -246,7 +246,7 @@ ccy_withdraws: [ {a:+0000},         {},                {},                {},   
 }
 ]
         }
-    }];    
+    }];
 }
     else if (testMode == "TEST_1") { // single position - asc price
         ret = [ { ftId: fts.find(p => p.name == TEST_FT_1).id.toString(), data: {
