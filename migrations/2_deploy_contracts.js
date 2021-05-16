@@ -52,6 +52,12 @@ const  db  = require('../../utils-server/db/dist');
 //    `export INSTANCE_ID=PROD_56_SD_RichGlory && node process_sol_js && truffle migrate --network bsc_mainnet_ac -f 2 --to 2 --reset`
 //    `export INSTANCE_ID=PROD_56_SD_SBGLand && node process_sol_js && truffle migrate --network bsc_mainnet_ac -f 2 --to 2 --reset`
 //
+//   SD Matic Mainnet 137
+//    `export INSTANCE_ID=PROD_137_SD && node process_sol_js && truffle migrate --network matic_mainnet -f 2 --to 2 --reset`
+//
+//   SD Matic (Mumbai) Testnet 80001
+//    `export INSTANCE_ID=UAT_80001_SD && node process_sol_js && truffle migrate --network matic_testnet -f 2 --to 2 --reset`
+
 
 module.exports = async function (deployer) {
     const O = await CONST.getAccountAndKey(0);

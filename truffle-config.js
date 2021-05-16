@@ -29,6 +29,7 @@ const GWEI_MAINNET_1  = "80";
 const GWEI_MAINNET_56 = "20"; // 20 gwei minimum [PoA validator cartel!]?! trial & error - not clear at all; <20 gwei seems to never mine...
 const GWEI_TESTNET_97 = "20";
 const GWEI_TESTNET    = "20";
+const GWEI_MATIC = "1"; // https://www.polygongasstation.com/
 
 //
 // https://chainid.network/chains/
@@ -210,6 +211,46 @@ module.exports = {
         skipDryRun: false,
         timeoutBlocks: 200,
     },
+
+    // Matic (Mumbai) Testnet
+    matic_testnet: {
+      provider: function() {
+        var wallet = new HDWalletProvider(DEV_MNEMONIC,
+            'https://rpc-mumbai.maticvigil.com/v1/a04433ccf5f940476e6741f6f277eaa74989755e',
+            0, 1000);
+        var nonceTracker = new NonceTrackerSubprovider();
+        wallet.engine._providers.unshift(nonceTracker);
+        nonceTracker.setEngine(wallet.engine);
+        return wallet;
+      },
+      gas: 8000000, // 8m
+      gasPrice: web3.utils.toWei(GWEI_MATIC, "gwei"),
+      network_id: "80001",
+      networkCheckTimeout: 30000,
+      confirmations: 1,
+      skipDryRun: false,
+      timeoutBlocks: 200,
+    },
+
+    // Matic Mainnet
+    matic_mainnet: {
+      provider: function() {
+        var wallet = new HDWalletProvider(DEV_MNEMONIC,
+            'https://rpc-mainnet.maticvigil.com/v1/a04433ccf5f940476e6741f6f277eaa74989755e',
+            0, 1000);
+        var nonceTracker = new NonceTrackerSubprovider();
+        wallet.engine._providers.unshift(nonceTracker);
+        nonceTracker.setEngine(wallet.engine);
+        return wallet;
+      },
+      gas: 8000000, // 8m
+      gasPrice: web3.utils.toWei(GWEI_MATIC, "gwei"),
+      network_id: "137",
+      networkCheckTimeout: 30000,
+      confirmations: 1,
+      skipDryRun: false,
+      timeoutBlocks: 200,
+    }
 
     // Another network with more advanced options...
     // advanced: {
