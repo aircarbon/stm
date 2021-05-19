@@ -395,7 +395,7 @@ function getTestContextWeb3(useWs) {
             'petersburg'
         ) } }
 
-        // BSC Mainnet - AC BSC Geth
+        // BSC Mainnet - Binance Smart Chain
         : process.env.WEB3_NETWORK_ID == 56 ? { web3: new Web3(useWs ? 'wss://ac-prod1.aircarbon.co:9546' : 'https://ac-prod1.aircarbon.co:9545'),
             ethereumTxChain: { common: EthereumJsCommon.forCustomChain(
             'ropsten', // forCustomChain() requires a "known" name!?
@@ -407,7 +407,7 @@ function getTestContextWeb3(useWs) {
             'petersburg'
         ) } }
 
-        // BSC Testnet - Binace BSC node
+        // BSC Testnet - Binance Smart Chain
         : process.env.WEB3_NETWORK_ID == 97 ? { web3: new Web3(useWs ? 'wss://ac-prod1.aircarbon.co:8546' : 'https://ac-prod1.aircarbon.co:8545'),
             ethereumTxChain: { common: EthereumJsCommon.forCustomChain(
             'ropsten', // forCustomChain() requires a "known" name!?
@@ -415,6 +415,38 @@ function getTestContextWeb3(useWs) {
                 name: 'bsc_testnet_bn',
                 networkId: 97,
                 chainId: 97,
+            },
+            'petersburg'
+        ) } }
+
+        // Matic Mainnet
+        : process.env.WEB3_NETWORK_ID == 137 ? { web3: new Web3(
+                useWs ? 
+                'wss://rpc-mainnet.maticvigil.com/ws/v1/a04433ccf5f940476e6741f6f277eaa74989755e' : 
+                'https://rpc-mainnet.maticvigil.com/v1/a04433ccf5f940476e6741f6f277eaa74989755e'
+            ),
+            ethereumTxChain: { common: EthereumJsCommon.forCustomChain(
+            'ropsten', // forCustomChain() requires a "known" name!?
+            {
+                name: 'matic_mainnet',
+                networkId: 137,
+                chainId: 137,
+            },
+            'petersburg'
+        ) } }
+
+        // Matic (Mumbai) Testnet
+        : process.env.WEB3_NETWORK_ID == 80001 ? { web3: new Web3(
+                useWs ? 
+                'wss://rpc-mumbai.maticvigil.com/ws/v1/a04433ccf5f940476e6741f6f277eaa74989755e' : 
+                'https://rpc-mumbai.maticvigil.com/v1/a04433ccf5f940476e6741f6f277eaa74989755e'
+            ),
+            ethereumTxChain: { common: EthereumJsCommon.forCustomChain(
+            'ropsten', // forCustomChain() requires a "known" name!?
+            {
+                name: 'matic_testnet',
+                networkId: 80001,
+                chainId: 80001,
             },
             'petersburg'
         ) } }
@@ -518,6 +550,7 @@ async function web3_tx(methodName, methodArgs, fromAddr, fromPrivKey, nameOverri
         [methodName](...methodArgs)
         .encodeABI();
     const txData = {
+      chainId: web3.utils.toHex(process.env.WEB3_NETWORK_ID),
         nonce: nonce,
      gasPrice: web3.utils.toHex(web3.utils.toWei(WEB3_GWEI_GAS_BID, 'gwei')),
      gasLimit: WEB3_GAS_LIMIT,
@@ -584,6 +617,7 @@ async function web3_sendEthTestAddr(sendFromNdx, sendToAddr, ethValue) {
     const nonce = await web3.eth.getTransactionCount(fromAddr, "pending");
     const EthereumTx = EthereumJsTx.Transaction
     var tx = new EthereumTx({
+         chainId: web3.utils.toHex(process.env.WEB3_NETWORK_ID),
            nonce: nonce,
         gasPrice: web3.utils.toHex(web3.utils.toWei(WEB3_GWEI_GAS_BID, 'gwei')),
         gasLimit: WEB3_GAS_LIMIT,
