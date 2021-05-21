@@ -67,6 +67,10 @@ INSTANCE_ID=local && node dbInit.js
 - `npx soldoc --output html ./contracts/interfaces/docs/soldoc ./contracts/Interfaces`
 - `npx solidity-docgen -i ./contracts/interfaces -o ./contracts/interfaces/docs/solidity-docgen --contract-pages`
 - `solidoc ./contracts ./docs ./ true`
+- EthDoc
+
+## Remix Code Import
+- 
 
 ## Diagrams
 VS Code Extensions
