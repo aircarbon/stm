@@ -1,6 +1,7 @@
 # SecTokMaster - Security Token Master (ERC20 [partial] Compatible Commodity or Cashflow Token)
 
 [Overview](./contracts/Interfaces/docs/OVERVIEW__STM.md)
+[Documentation] (https://ipfs.io/ipfs/QmcqWhtmjUDbHfzk3Be4Sudu12foeWM3jGiDWSMHZZVps6)
 
 ## Setup
 - `npm install`
