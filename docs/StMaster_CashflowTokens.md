@@ -1,4 +1,4 @@
-# SekTokenMaster - Cashflow Token - WIP
+# SecurityTokenMaster - Cashflow Token - WIP
 
 ## Overview
 

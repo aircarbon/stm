@@ -67,18 +67,21 @@ INSTANCE_ID=local && node dbInit.js
 - `npx soldoc --output html ./contracts/interfaces/docs/soldoc ./contracts/Interfaces`
 - `npx solidity-docgen -i ./contracts/interfaces -o ./contracts/interfaces/docs/solidity-docgen --contract-pages`
 - `solidoc ./contracts ./docs ./ true`
-- EthDoc
+- Remix Plugins: `EthDoc Generator` and `EthDoc Viewer`
 
 ## Remix Code Import
-- 
+- `remixd -s` <AbsolutePathToSmartContractFolder> `--remix-ide 'https://remix.ethereum.org/#optimize\=false\&runs\=200\&evmVersion\=byzantium\&version\=soljson-v0.7.1+commit.f4a555be.js'\`
+- On Remix: `Connect to Localhost`
 
 ## Diagrams
-VS Code Extensions
-- [Solidity Visual Developer] (https://marketplace.visualstudio.com/items?itemName=tintinweb.solidity-visual-auditor)
-- Flatten /contracts/StMaster/StMaster.sol
-- Generate graph, contract interaction graph, inheritance graph
-- Export UML; or
-- [draw.io] (https://app.diagrams.net/) Menu --> Arrange --> Insert --> Advanced CSV
+# VS Code Extensions
+[Solidity Visual Developer] (https://marketplace.visualstudio.com/items?itemName=tintinweb.solidity-visual-auditor)
+- `Flatten` /contracts/StMaster/StMaster.sol
+- Generate (class) `graph`, 
+- Generate `contract interaction graph`
+- Generate `inheritance graph`
+- Export as UML; or
+- Import to [draw.io] (https://app.diagrams.net/) Menu --> Arrange --> Insert --> Advanced CSV
 ## Dbg - misc
 If you see `Error: invalid reporter "eth-gas-reporter"` -- try running `npm i` in ./packages/erc20
 
