@@ -127,12 +127,37 @@ older:
 */
 
 abstract // solc 0.6
+
+ /**
+  * @title Security Token Futures Trading
+  * @author Dominic Morris (7-of-9)
+  * @notice contract for on-chain futures trading
+  * <pre>   - inherits Owned ownership smart contract</pre>
+  * <pre>   - inherits StLedger security token ledger contract</pre>
+  * <pre>   - inherits StFees security token ledger contract</pre>
+  * <pre>   - inherits StErc20 security token ledger contract</pre>
+  * <pre>   - inherits StPayable security token ledger contract</pre>
+  * <pre>   - uses StrudddddctLib interface library</pre>
+  * <pre>   - uses FuturesLib runtime library</pre>
+  * <pre>   - uses Erc20Lib runtime library</pre>
+  * <pre>   - uses LedgerLib runtime library</pre>
+  */
+  
 contract StFutures is Owned,
     StLedger, StFees, StErc20, StPayable {
 
 //#if process.env.CONTRACT_TYPE === 'COMMODITY'
 
     //senum OverrideType { INIT_MARGIN, FEE_PER_CONTRACT }
+    
+    /**
+     * @dev ledger override control
+     * @param overrideType override future type<br/> 0: initial margin<br/>1: fee per contract
+     * @param tokTypeId token type for futures trading
+     * @param ledgerOwner account address of the ledger owner
+     * @param value amount
+     */
+     
     function setLedgerOverride(uint256 overrideType, uint256 tokTypeId, address ledgerOwner, uint128 value)
     public onlyOwner() onlyWhenReadWrite() {
         FuturesLib.setLedgerOverride(overrideType, ld, std, tokTypeId, ledgerOwner, value);
@@ -160,13 +185,18 @@ contract StFutures is Owned,
     //     FuturesLib.feePerContractOverride(ld, std, tokTypeId, ledgerOwner, feePerContract);
     // }
 
-    function openFtPos(StructLib.FuturesPositionArgs memory a)
+    /**
+     * @dev open futures position
+     * @param futurePositionsArgs tokTypeId<br/>ledger_A<br/>ledger_B<br/>qty_A<br/>qty_B<br/>price
+     */
+     
+    function openFtPos(StructLib.FuturesPositionArgs memory futurePositionsArgs)
     public onlyOwner() onlyWhenReadWrite() {
         // abort if opening position on a non-whitelist account
-        require(erc20d._whitelisted[a.ledger_A], "Not whitelisted (A)"); 
-        require(erc20d._whitelisted[a.ledger_B], "Not whitelisted (B)");
+        require(erc20d._whitelisted[futurePositionsArgs.ledger_A], "Not whitelisted (A)"); 
+        require(erc20d._whitelisted[futurePositionsArgs.ledger_B], "Not whitelisted (B)");
 
-        FuturesLib.openFtPos(ld, std, ctd, a, deploymentOwner);
+        FuturesLib.openFtPos(ld, std, ctd, futurePositionsArgs, deploymentOwner);
     }
 
     // ##### set var margin - per product   // ALREADY EXISTS! setFuture_VariationMargin()....
@@ -178,6 +208,13 @@ contract StFutures is Owned,
     //     //...
     // }
 
+    /**
+     * @dev futures settlement
+     * @param tokTypeId token type for futures trade
+     * @param stId security token identifier 
+     * @param markPrice signed mark price, can be explicitly challenged offchain
+     * @param feePerSide fee per each side of the futures trade
+     */
     function takePay2(
         uint256 tokTypeId,
         uint256 stId,
@@ -194,33 +231,69 @@ contract StFutures is Owned,
           }));
     }
 
-    function combineFtPos(StructLib.CombinePositionArgs memory a)
+    /**
+     * @dev combine futures position
+     * @param combinePositionArgs tokTypeId<br/>master_stIds<br/>child_stIds
+     */
+    function combineFtPos(StructLib.CombinePositionArgs memory combinePositionArgs)
     public onlyOwner() {
-        FuturesLib.combineFtPos(ld, std, a);
+        FuturesLib.combineFtPos(ld, std, combinePositionArgs);
     }
 
+    /**
+     * @dev set margin variation
+     * @param tokTypeId token type
+     * @param varMarginBips margin variation in % (bips)
+     */
     function setFuture_VariationMargin(uint256 tokTypeId, uint16 varMarginBips)
     public onlyOwner() onlyWhenReadWrite() {
         TokenLib.setFuture_VariationMargin(std, tokTypeId, varMarginBips); // ### recalc all open pos margin/reserve; needs to be batched (job) - re. gas limits
     }
 
+    /**
+     * @dev set fee per contract
+     * @param tokTypeId token type
+     * @param feePerContract fee paid by both sides in a currency type
+     */
     function setFuture_FeePerContract(uint256 tokTypeId, uint128 feePerContract)
     public onlyOwner() onlyWhenReadWrite() {
         TokenLib.setFuture_FeePerContract(std, tokTypeId, feePerContract);
     }
-    
+
+    /**
+     * @dev set reserved currency amount
+     * @param ccyTypeId currency type
+     * @param reservedAmount amount to be reserved
+     * @param ledger account address of ledger owner
+     */    
     function setReservedCcy(uint256 ccyTypeId, int256 reservedAmount, address ledger)
         public onlyOwner() onlyWhenReadWrite() {
             StructLib.setReservedCcy(ld, ctd, ledger, ccyTypeId, reservedAmount);
     }
 
     // VIEWS
+    
+    /**
+     * @dev returns the initial margin
+     * @param tokTypeId token type
+     * @param ledgerOwner account address of ledger owner
+     * @return initMargin
+     * @param initMargin returns the initial margin % (bips)
+     */
     function getInitMarginOverride(uint256 tokTypeId, address ledgerOwner)
-    external view returns (uint16) {
+    external view returns (uint16 initMargin) {
         return ld._ledger[ledgerOwner].ft_initMarginBips[tokTypeId];
     }
+
+    /**
+     * @dev returns the fee per contract
+     * @param tokTypeId token type
+     * @param ledgerOwner account address of ledger owner
+     * @return feePerContract
+     * @param feePerContract the fee paid by both sides in currency type
+     */
     function getFeePerContractOverride(uint256 tokTypeId, address ledgerOwner)
-    external view returns (uint128) {
+    external view returns (uint128 feePerContract) {
         return ld._ledger[ledgerOwner].ft_feePerContract[tokTypeId];
     }
 

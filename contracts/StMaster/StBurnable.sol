@@ -9,8 +9,24 @@ import "./StLedger.sol";
 import "../Interfaces/StructLib.sol";
 import "../Libs/TokenLib.sol";
 
+ /**
+  * @title Burnable Security Tokens
+  * @author Dominic Morris (7-of-9)
+  * @notice retirement of security tokens
+  * <pre>   - inherits Owned ownership smart contract</pre>
+  * <pre>   - inherits StLedger security token ledger contract</pre>
+  * <pre>   - uses StructLib interface library</pre>
+  * <pre>   - uses TokenLib runtime library</pre>
+  */
 contract StBurnable is Owned, StLedger {
 
+    /**
+     * @dev burning of security tokens
+     * @param ledgerOwner account address of the ledger owner of the security token batch
+     * @param tokTypeId token type of the token batch
+     * @param burnQty amount to be burned
+     * @param stIds sum of supplied STs current qty must equal supplied burnQty
+     */
     function burnTokens(
         address          ledgerOwner,
         uint256          tokTypeId,
@@ -27,6 +43,11 @@ contract StBurnable is Owned, StLedger {
     }
 
     // 24k
+    /**
+     * @dev returns the security token total burned quantity
+     * @return totalBurnedQty
+     * @param totalBurnedQty returns the security token total burned quantity
+     */
     function getSecToken_totalBurnedQty()
-    external view returns (uint256 count) { return ld._spot_totalBurnedQty; }
+    external view returns (uint256 totalBurnedQty) { return ld._spot_totalBurnedQty; }
 }
