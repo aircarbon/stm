@@ -14,27 +14,49 @@ import "./StFutures.sol";
 
 import "../Interfaces/StructLib.sol";
 
-/*
-https://diligence.consensys.net/blog/2019/09/how-to-prepare-for-a-smart-contract-audit/
-*/
+// https://diligence.consensys.net/blog/2019/09/how-to-prepare-for-a-smart-contract-audit/
 
-//
-// truffle deploy using "infinite" gas?
-// bytecode limit (24576): https://github.com/trufflesuite/ganache/issues/960
-// https://github.com/ethereum/EIPs/issues/1662
-//
-// node process_sol_js && truffle compile --reset --all && grep \"bytecode\" build/contracts/* | awk '{print $1 " " length($3)/2}'
-//
-// 22123: ... [upgrade sol 0.6.6: removed ctor setup, removed WL deprecated, removed payable unused]
-// 23576: ... FTs v0 (paused) - baseline
-// 22830: ... [removed all global counters, except total minted & burned]
-// 22911: ... [removed isWL and getWLCount]
-// 24003: ... [restored cashflowArgs; optimizer runs down to 10]
-// 24380: ... [added stIds[] to burn & transferArgs; optimizer runs down to 1]
-// 24560: ... [split ledger - wip; at limit]
-// 24241: ... [refactor/remove SecTokenReturn in favour of LedgerSecTokenReturn]
-// 24478: ... [+ _tokens_base_id, getSecToken_BaseId()]
-// 23275: ... [+ _owners[], getOwners] 
+/** truffle deploy using "infinite" gas?
+ *  bytecode limit (24576): https://github.com/trufflesuite/ganache/issues/960
+ *  https://github.com/ethereum/EIPs/issues/1662
+ */
+
+/** 
+ * node process_sol_js && truffle compile --reset --all && grep \"bytecode\" build/contracts/* | awk '{print $1 " " length($3)/2}'
+ *  22123: ... [upgrade sol 0.6.6: removed ctor setup, removed WL deprecated, removed payable unused]
+ *  23576: ... FTs v0 (paused) - baseline
+ *  22830: ... [removed all global counters, except total minted & burned]
+ *  22911: ... [removed isWL and getWLCount]
+ *  24003: ... [restored cashflowArgs; optimizer runs down to 10]
+ *  24380: ... [added stIds[] to burn & transferArgs; optimizer runs down to 1]
+ *  24560: ... [split ledger - wip; at limit]
+ *  24241: ... [refactor/remove SecTokenReturn in favour of LedgerSecTokenReturn]
+ *  24478: ... [+ _tokens_base_id, getSecToken_BaseId()]
+ *  23275: ... [+ _owners[], getOwners] 
+ */
+
+ /**
+  * @title Security Token Master
+  * @author Dominic Morris (7-of-9) and Ankur Daharwal (ankurdaharwal)
+  * @notice STMaster is configured at the deployment time to one of:<br/>
+  * <pre>   - commodity token (CT): a semi-fungible (multi-batch), multi-type & single-version commodity underlying; or</pre>
+  * <pre>   - cashflow token (CFT): a fully-fungible, multi-type & multi-version (recursive/linked contract deployments) cashflow-generating underlyings.</pre>
+  * <pre>   - cashflow controller (CFC): singleton cashflow token governance contract; keeps track of global ledger and states across n CFTs</pre>
+  * It is an EVM-compatible set of smart contracts written in Solidity, comprising:<br/><br/>
+  * <pre>   (a) asset-backed, multi token/collateral-type atomic spot cash collateral trading & on-chain settlement;</pre>
+  * <pre>   (b) scalable, semi-fungible & metadata-backed extendible type-system;</pre>
+  * <pre>   (c) upgradable contracts: cryptographic checksumming of v+0 and v+1 contract data fields;</pre>
+  * <pre>   (d) full ERC20 implementation (inc. transferFrom, allowance, approve) for self-custody;</pre>
+  * <pre>   (e) multiple reserved contract owner/operator addresses, for concurrent parallel/batched operations via independent account-nonce sequencing;</pre>
+  * <pre>   (f) split ledger: hybrid permission semantics - owner-controller ("whitelisted") addresses for centralised spot trade execution,<br/>
+  *       alongside third-party controlled ("graylisted") addresses for self-custody;</pre>
+  * <pre>   (g) generic metadata batch minting via extendible (append-only, immutable) KVP collection;</pre>
+  * <pre>   (h) hybrid on/off chain futures settlement engine (take & pay period processing, via central clearing account),<br/>
+  *       with on-chain position management & position-level P&L;</pre>
+  * <pre>   (i) decentralized issuance of cashflow tokens & corporate actions: subscriber cashflow (e.g. ETH/BNB) <br/>
+  *       processing of (USD-priced or ETH/BNB-priced) token issuances, and (inversely) issuer cashflow processing of CFT-equity or CFT-loan payments.</pre>
+  * @dev All function calls are currently implemented without side effects
+  */
 
 contract StMaster
     is
@@ -56,14 +78,41 @@ contract StMaster
     // contract properties
     string public name;
 
-    function getContractType() external view returns(StructLib.ContractType) { return ld.contractType; }
-    function getContractSeal() external view returns (bool) { return ld._contractSealed; }
-    function sealContract() external { ld._contractSealed = true; }
+    /**
+     * @dev returns the contract type
+     * @return contractType
+     * @param contractType returns the contract type<br/>0: commodity token<br/>1: cashflow token<br/>2: cashflow controller
+     */
+    function getContractType() external view returns(StructLib.ContractType contractType) { return ld.contractType; }
+    
+    /**
+     * @dev returns the contract seal status
+     * @return isSealed
+     * @param isSealed returns the contract seal status : true or false
+     */
+    function getContractSeal() external view returns (bool isSealed) { return ld._contractSealed; }
+    
+    /**
+     * @dev permanenty seals the contract; once sealed, no further addresses can be whitelisted
+     */
+     function sealContract() external { ld._contractSealed = true; }
 
     string contractVersion;
-    string contractUnit; // the smallest (integer, non-divisible) security token unit, e.g. "TONS"
-    function version() external view returns (string memory) { return contractVersion; }
-    function unit() external view returns (string memory) { return contractUnit; }
+    string contractUnit; // the smallest (integer, non-divisible) security token unit, e.g. "KGs" or "TONS"
+
+    /**
+     * @dev returns the contract version
+     * @return deploymentVersion
+     * @param deploymentVersion returns the contract version
+     */
+    function version() external view returns (string memory deploymentVersion) { return contractVersion; }
+
+    /**
+     * @dev returns the contract unit
+     * @return deploymentUnit
+     * @param deploymentUnit returns the contract unit : kg or ton for commodity type and N/A for cashflow type
+     */
+    function unit() external view returns (string memory deploymentUnit) { return contractUnit; }
 
     // events -- (hack: see: https://ethereum.stackexchange.com/questions/11137/watching-events-defined-in-libraries)
     // need to be defined (duplicated) here - web3 can't see event signatures in libraries
@@ -101,7 +150,7 @@ contract StMaster
     event SetFeeTokMax(uint256 tokTypeId, address indexed ledgerOwner, uint256 fee_token_Max);
     event SetFeeCcyMax(uint256 ccyTypeId, address indexed ledgerOwner, uint256 fee_ccy_Max);
     event SetFeeCcyPerMillion(uint256 ccyTypeId, address indexed ledgerOwner, uint256 fee_ccy_perMillion);
-    // Erc20Lib events
+    // Erc20Lib 
     event Transfer(address indexed from, address indexed to, uint256 value);
     event Approval(address indexed owner, address indexed spender, uint256 value);
     // PayableLib events
@@ -120,7 +169,15 @@ contract StMaster
     // DBG
     // event dbg1(uint256 id, uint256 typeId);
     // event dbg2(uint256 postIdShifted);
-
+    
+    /**
+    * @dev deploys the STMaster contract as a commodity token (CT) or cashflow token (CFT)
+    * @param _owners array of addresses to identify the deployment owners
+    * @param _contractType 0: commodity token<br/>1: cashflow token<br/>2: cashflow controller
+    * @param _contractName smart contract name
+    * @param _contractVer smart contract version
+    * @param _contractUnit measuring unit for commodity types (ex: KG, tons or N/A)
+    */
     constructor(
         address[] memory              _owners,
         StructLib.ContractType        _contractType,
