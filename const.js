@@ -52,8 +52,8 @@ const cashflowType = Object.freeze({
     EQUITY: 1,
 });
 
-// assumed: 15 secs per block, unless BSC (5 secs)
-const blocksFromSecs = (secs) => Math.ceil(secs / (process.env.NETWORK_ID == 97 || process.env.NETWORK_ID == 56 ? 5 : 15));
+// assumed: 15 secs per block, unless BSC (3 secs)
+const blocksFromSecs = (secs) => Math.ceil(secs / (process.env.NETWORK_ID == 97 || process.env.NETWORK_ID == 56 ? 3 : 15));
 const blocksFromMins = (mins) => Math.ceil(blocksFromSecs(mins * 60));
 const blocksFromHours = (hours) => Math.ceil(blocksFromMins(hours * 60));
 const blocksFromDays = (days) => Math.ceil(blocksFromHours(days * 24));
