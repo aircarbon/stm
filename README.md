@@ -44,7 +44,7 @@ Pre-process, compile & output bytecode sizes (see `StMaster.sol` re. 24k bytecod
 - `export INSTANCE_ID=UAT && node process_sol_js && truffle migrate --network bsc_testnet_bn --reset` (Deploy AWS UAT instance using Infura Ropsten)
 - `export INSTANCE_ID=DEMO && node process_sol_js && truffle migrate --network bsc_testnet_bn --reset` (Deploy AWS DEMO instance on AirCarbon's privnet)
 
-PROD: WIP/TESTING...
+PROD:
 - `export INSTANCE_ID=PROD_1 && node process_sol_js && truffle migrate --network mainnet_ac --reset` (Deploy AWS PROD instance on ETH Mainnet)
 - `export INSTANCE_ID=PROD_52101 && node process_sol_js && truffle migrate --network prodnet_ac --reset` (Deploy AWS PROD instance on AC Private Prodnet Chain)
 - `export INSTANCE_ID=PROD_56 && node process_sol_js && truffle migrate --network bsc_mainnet_ac --reset` (Deploy AWS PROD instance on BSC Mainnet)
