@@ -57,6 +57,11 @@ const  db  = require('../../utils-server/db/dist');
 //
 //   SD Matic (Mumbai) Testnet 80001
 //    `export INSTANCE_ID=UAT_80001_SD && node process_sol_js && truffle migrate --network matic_testnet -f 2 --to 2 --reset`
+//
+//   AC Matic (Mumbai) Testnet 80001
+//    `export INSTANCE_ID=UAT_80001 && node process_sol_js && truffle migrate --network matic_testnet -f 2 --to 2 --reset`
+
+// Matic (Mumbai) Testnet 80001 deployments have intermittent errors (results in an non-terminating solc-js dump)
 
 
 module.exports = async function (deployer) {
@@ -78,6 +83,7 @@ module.exports = async function (deployer) {
         case 'DEV_SD': console.log((`Deploying (AWS DEV / DEV [controller w/ 0 default base types] for SDAX) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`)); break;
         case 'UAT_SD': console.log((`Deploying (AWS DEV / UAT [controller w/ 0 default base types] for SDAX) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`)); break;
         case 'UAT_97_SD': console.log((`Deploying (AWS UAT / BSC Testnet [controller w/ 0 default base types] for SDAX) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`)); break;
+        case 'UAT_80001': console.log((`Deploying (AWS UAT / Matic Testnet (Mumbai) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`)); break;
         case 'UAT_80001_SD': console.log((`Deploying (AWS UAT / Matic Testnet (Mumbai) [controller w/ 0 default base types] for SDAX) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`)); break;
         case 'DEMO_97_SD': console.log((`Deploying (AWS DEMO / BSC Testnet [controller w/ 0 default base types] for SDAX) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`)); break;
         case 'PROD_3_SD': console.log((`Deploying (AWS PROD / Ropsten 3 [controller w/ 0 default base types] for SDAX) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`)); break;

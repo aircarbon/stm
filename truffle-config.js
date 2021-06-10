@@ -26,7 +26,7 @@ const NonceTrackerSubprovider = require("web3-provider-engine/subproviders/nonce
 const DEV_MNEMONIC = process.env.DEV_MNEMONIC || require('./DEV_MNEMONIC.js').MNEMONIC;
 
 const GWEI_MAINNET_1  = "80";
-const GWEI_MAINNET_56 = "20"; // 20 gwei minimum [PoA validator cartel!]?! trial & error - not clear at all; <20 gwei seems to never mine...
+const GWEI_MAINNET_56 = "5"; // 5 gwei minimum [PoA validator cartel!]?! trial & error - not clear at all; <5 gwei seems to never mine...
 const GWEI_TESTNET_97 = "20";
 const GWEI_TESTNET    = "20";
 const GWEI_MATIC = "1"; // https://www.polygongasstation.com/
@@ -216,7 +216,7 @@ module.exports = {
     matic_testnet: {
       provider: function() {
         var wallet = new HDWalletProvider(DEV_MNEMONIC,
-            'https://rpc-mumbai.maticvigil.com/v1/a04433ccf5f940476e6741f6f277eaa74989755e',
+            'https://polygon-mumbai.infura.io/v3/564f72f3786649a9bf2145302eeeeb43', // ankur's infura endpoint for matic mumbai testnet
             0, 1000);
         var nonceTracker = new NonceTrackerSubprovider();
         wallet.engine._providers.unshift(nonceTracker);

@@ -168,6 +168,11 @@ module.exports = {
             ethUsd: '0x0000000000000000000000000000000000000000',
             bnbUsd: '0x0000000000000000000000000000000000000000',
         },
+        "80001": { // Matic Mumbai Testnet
+            btcUsd: '0x0000000000000000000000000000000000000000',
+            ethUsd: '0x58bbdbfb6fca3129b91f0dbe372098123b38b5e9',
+            bnbUsd: '0x0000000000000000000000000000000000000000',
+        },
     },
 
     getTestContextWeb3: (useWs) => getTestContextWeb3(useWs),
@@ -439,7 +444,7 @@ function getTestContextWeb3(useWs) {
         : process.env.WEB3_NETWORK_ID == 80001 ? { web3: new Web3(
                 useWs ? 
                 'wss://rpc-mumbai.maticvigil.com/ws/v1/a04433ccf5f940476e6741f6f277eaa74989755e' : 
-                'https://rpc-mumbai.maticvigil.com/v1/a04433ccf5f940476e6741f6f277eaa74989755e'
+                'https://polygon-mumbai.infura.io/v3/564f72f3786649a9bf2145302eeeeb43'
             ),
             ethereumTxChain: { common: EthereumJsCommon.forCustomChain(
             'ropsten', // forCustomChain() requires a "known" name!?
