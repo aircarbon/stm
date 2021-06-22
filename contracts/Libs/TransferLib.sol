@@ -24,7 +24,8 @@ library TransferLib {
         uint80                        exchangeFeesPaidQty;
         uint80                        originatorFeesPaidQty;
     }
-    // Certik: (Minor) TRA-01 | Equal ID Transfers The transfers of equal IDs are not prohibited in the transferOrTrade function - Check with Dom
+    // Certik: (Minor) TRA-01 | Equal ID Transfers The transfers of equal IDs are not prohibited in the transferOrTrade function
+    // TODO: (Minor) TRA-01 | Check with Dom as this might break critical transfer / trading functionality
     function transferOrTrade(
         StructLib.LedgerStruct storage   ld,
         StructLib.StTypesStruct storage  std,
@@ -689,10 +690,13 @@ library TransferLib {
 
                     //ld._ledger[to].tokenType_sumQty[tokTypeId] += stQty;                //* gas - DROP DONE - only used internally, validation params
 
-// Certik: (Minor) TRA-02 | Potentially Negative Quantity The v.stQty value may be negative within the transferSplitSecTokens function
-                    v.remainingToTransfer -= v.stQty;
-                    if (v.remainingToTransfer > 0) {
-                        require(from_stIds.length > 0, "Insufficient tokens");
+                    // Certik: (Minor) TRA-02 | Potentially Negative Quantity The v.stQty value may be negative within the transferSplitSecTokens function
+                    // Resolved: (Minor) TRA-02 | Added a check to ensure only positive values of v.stQty
+                    if (v.stQty > 0) {
+                        v.remainingToTransfer -= v.stQty;
+                        if (v.remainingToTransfer > 0) {
+                            require(from_stIds.length > 0, "Insufficient tokens");
+                        }
                     }
                 }
                 else {

@@ -63,7 +63,8 @@ library StructLib {
         StructLib.LedgerStruct storage ld,
         TransferCcyArgs memory a)
     public {
-        // Certik: (Major) SLI-05 | Unsafe Cast - Added bound evaluation for int256
+        // Certik: (Major) SLI-05 | Unsafe Cast
+        // Resolved: (Major) SLI-05 | Added bound evaluation for int256
         require(a.amount > 0 && int256(a.amount) < type(int256).max , "Bound check found overflow");
         ld._ledger[a.from].ccyType_balance[a.ccyTypeId] -= int256(a.amount);
         ld._ledger[a.to].ccyType_balance[a.ccyTypeId] += int256(a.amount);
@@ -110,11 +111,13 @@ library StructLib {
     }
 
     // CONTRACT TYPE
-// Certik: (Minor) SLI-09 | State Representation Inconsistency The enum declarations of the contract are inconsistent with regards to the default state. While the ContractType and FundWithdrawType enums have an actionable default state, the SettlementType enum has an UNDEFINED default state.
+    // Certik: (Minor) SLI-09 | State Representation Inconsistency The enum declarations of the contract are inconsistent with regards to the default state. While the ContractType and FundWithdrawType enums have an actionable default state, the SettlementType enum has an UNDEFINED default state.
+    // Resolved: (Minor) SLI-09 | Added a default UNDEFINED to ContractType
     enum ContractType { UNDEFINED, COMMODITY, CASHFLOW_BASE, CASHFLOW_CONTROLLER }
 
     // CCY TYPES
-// Certik: (Minor) SLI-09 | State Representation Inconsistency The enum declarations of the contract are inconsistent with regards to the default state. While the ContractType and FundWithdrawType enums have an actionable default state, the SettlementType enum has an UNDEFINED default state.
+    // Certik: (Minor) SLI-09 | State Representation Inconsistency The enum declarations of the contract are inconsistent with regards to the default state. While the ContractType and FundWithdrawType enums have an actionable default state, the SettlementType enum has an UNDEFINED default state.
+    // Resolved: (Minor) SLI-09 | Added a default UNDEFINED to FundWithdrawType
     enum FundWithdrawType { UNDEFINED, FUND, WITHDRAW }
     struct Ccy {
         uint256 id;
@@ -143,7 +146,8 @@ library StructLib {
         SecTokenTypeReturn[] tokenTypes;
     }
 
-// Certik: (Minor) SLI-09 | State Representation Inconsistency The enum declarations of the contract are inconsistent with regards to the default state. While the ContractType and FundWithdrawType enums have an actionable default state, the SettlementType enum has an UNDEFINED default state.
+    // Certik: (Minor) SLI-09 | State Representation Inconsistency The enum declarations of the contract are inconsistent with regards to the default state. While the ContractType and FundWithdrawType enums have an actionable default state, the SettlementType enum has an UNDEFINED default state.
+    // Resolved: (Minor) SLI-09 | SettleMentType consistent convention UPPERCASE
     enum SettlementType { UNDEFINED, SPOT, FUTURE }
     struct StTypesStruct { // ** DATA_DUMP: OK
         mapping(uint256 => string)              _tt_name;       // typeId (1-based) -> typeName
@@ -446,7 +450,8 @@ library StructLib {
         address ledger, uint256 tokTypeId, int256 qty, int256 fee
     ) public view returns (bool) {
         int256 qtyAvailable = 0;
-// Certik: (Minor) SLI-08 | Unsafe Mathematical Operations The linked statements perform unsafe mathematical operations between multiple arguments that would rely on caller sanitization, an ill-advised pattern - Safe operations are in-built in Solidity version ^0.8.0
+        // Certik: (Minor) SLI-08 | Unsafe Mathematical Operations The linked statements perform unsafe mathematical operations between multiple arguments that would rely on caller sanitization, an ill-advised pattern
+        // Resolved: (Minor) SLI-08 | Safe operations are in-built in Solidity version ^0.8.0
         require(ld._contractSealed, "Contract is not sealed");
         require(ld._ledger[ledger].exists == true, "Bad ledgerOwner");
         for (uint i = 0; i < ld._ledger[ledger].tokenType_stIds[tokTypeId].length; i++) {
@@ -467,7 +472,8 @@ library StructLib {
         StructLib.LedgerStruct storage ld,
         address ledger, uint256 ccyTypeId, int256 sending, int256 receiving, int256 fee
     ) public view returns (bool) {
-// Certik: (Minor) SLI-08 | Unsafe Mathematical Operations The linked statements perform unsafe mathematical operations between multiple arguments that would rely on caller sanitization, an ill-advised pattern - Safe operations are in-built in Solidity version ^0.8.0
+        // Certik: (Minor) SLI-08 | Unsafe Mathematical Operations The linked statements perform unsafe mathematical operations between multiple arguments that would rely on caller sanitization, an ill-advised pattern
+        // Resolved: (Minor) SLI-08 | Safe operations are in-built in Solidity version ^0.8.0
         require(ld._contractSealed, "Contract is not sealed");
         require(ld._ledger[ledger].exists == true, "Bad ledgerOwner");
         return (ld._ledger[ledger].ccyType_balance[ccyTypeId]

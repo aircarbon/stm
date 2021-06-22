@@ -57,11 +57,13 @@ library TokenLib {
             require(keccak256(abi.encodePacked(std._tt_name[tokenTypeId])) != keccak256(abi.encodePacked(name)), "Duplicate name");
         }
         if (settlementType == StructLib.SettlementType.FUTURE) {
-            // Certik: (Major) TLL-01 | Inexplicable Constant - Removed ft.expiryTimestamp > 1585699708 require statement
+            // Certik: (Major) TLL-01 | Inexplicable Constant
+            // Resolved: (Major) TLL-01 | Removed ft.expiryTimestamp > 1585699708 require statement
             require(ft.underlyerTypeId > 0 && ft.underlyerTypeId <= std._tt_Count, "Bad underlyerTypeId");
             require(std._tt_settle[ft.underlyerTypeId] == StructLib.SettlementType.SPOT, "Bad underyler settlement type");
             require(ft.refCcyId > 0 && ft.refCcyId <= ctd._ct_Count, "Bad refCcyId");
-            // Certik: (Major) TLL-02 | Unsafe Addition - Solidity v0.8.0 uses SafeMath by default, no changes required for fix
+            // Certik: (Major) TLL-02 | Unsafe Addition
+            // Resolved: (Major) TLL-02 | Solidity v0.8.0 uses SafeMath by default, no changes required for fix
             require(ft.initMarginBips + ft.varMarginBips <= 10000, "Bad total margin");
             require(ft.contractSize > 0, "Bad contractSize");
         }
@@ -344,7 +346,9 @@ library TokenLib {
         // burn (remove or resize) sufficient ST(s)
         uint256 ndx = 0;
         int64 remainingToBurn = int64(a.burnQty);
-// Certik: (Minor) TLL-03 | Potentially Negative Quantities Negative quantities should be skipped by the while loop as the adidtion in L380 will lead to the remaining to burn increasing.        
+        
+        // Certik: (Minor) TLL-03 | Potentially Negative Quantities Negative quantities should be skipped by the while loop as the addition in L380 will lead to the remaining to burn increasing.
+        // Resolved: (Minor) TLL-03 | Added a check to ensure only positive values of StQty to be considered for burning.      
         while (remainingToBurn > 0) {
             uint256[] storage tokenType_stIds = ld._ledger[a.ledgerOwner].tokenType_stIds[a.tokTypeId];
             uint256 stId = tokenType_stIds[ndx];
@@ -363,7 +367,7 @@ library TokenLib {
                 ndx++;
             }
             else {
-                if (remainingToBurn >= stQty) {
+                if (stQty >= 0 && remainingToBurn >= stQty) {
                     // burn the full ST
                     //ld._sts_currentQty[stId] = 0;
                     ld._sts[stId].currentQty = 0;

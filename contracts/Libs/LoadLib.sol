@@ -6,14 +6,16 @@ import "../Interfaces/StructLib.sol";
 
 library LoadLib {
 
-// Certik: (Minor) LOA-01 | Potentially Disjoint Variable The _batches_currentMax_id variable is set as an argument instead of calculated within the for loop that loads the tokens and is not sanitized
+    // Certik: (Minor) LOA-01 | Potentially Disjoint Variable The _batches_currentMax_id variable is set as an argument instead of calculated within the for loop that loads the tokens and is not sanitized
+    // TODO: (Minor) LOA-01 
     function loadSecTokenBatch(
         StructLib.LedgerStruct storage ld,
         StructLib.SecTokenBatch[] memory batches,
         uint64 _batches_currentMax_id
     )
     public {
-// Certik: (Minor) LOA-07 | Inexistent Entry Check The loadSecTokenBatch performs no input sanitization in the batch assignments it performs       
+        // Certik: (Minor) LOA-07 | Inexistent Entry Check The loadSecTokenBatch performs no input sanitization in the batch assignments it performs
+        // TODO: (Minor) LOA-07
         require(!ld._contractSealed, "Contract is sealed");
         for (uint256 i = 0; i < batches.length; i++) {
             ld._batches[batches[i].id] = batches[i];
@@ -35,9 +37,10 @@ library LoadLib {
             ld._ledgerOwners.push(ledgerEntryOwner);
         }
 
-        // solc 0.7
         StructLib.Ledger storage entry = ld._ledger[ledgerEntryOwner];
-// Certik: (Minor) LOA-06 | Inexistent Initializaiton Check The ledger that is initialized within createLedgerEntry isn't validated to not exist already, potentially allowing previously set spot_sumQtyMinted and spot_sumQtyBurned values to be overwritten.
+
+        // Certik: (Minor) LOA-06 | Inexistent Initializaiton Check The ledger that is initialized within createLedgerEntry isn't validated to not exist already, potentially allowing previously set spot_sumQtyMinted and spot_sumQtyBurned values to be overwritten.
+        // TODO: (Minor) LOA-06
         entry.exists = true;
         entry.spot_sumQtyMinted = spot_sumQtyMinted;
         entry.spot_sumQtyBurned = spot_sumQtyBurned;
@@ -47,13 +50,16 @@ library LoadLib {
         //       spot_sumQtyMinted: spot_sumQtyMinted,
         //       spot_sumQtyBurned: spot_sumQtyBurned
         // });
-// Certik: (Minor) LOA-03 | Inexistent Balance Sanitization The linked for loop does not sanitize the reserve member of ccys[i] to be less-than-or-equal-to the balance member.
+
+        // Certik: (Minor) LOA-03 | Inexistent Balance Sanitization The linked for loop does not sanitize the reserve member of ccys[i] to be less-than-or-equal-to the balance member.
+        // TODO: (Minor) LOA-03
         for (uint256 i = 0 ; i < ccys.length ; i++) {
             ld._ledger[ledgerEntryOwner].ccyType_balance[ccys[i].ccyTypeId] = ccys[i].balance;
             ld._ledger[ledgerEntryOwner].ccyType_reserved[ccys[i].ccyTypeId] = ccys[i].reserved;
         }
     }
-// Certik: (Minor) LOA-05 | Inexistent Duplicate Check The addSecToken can overwrite over a currently present security token ID as no sanitization is performed to ensure the security token hasn't already been added.
+    // Certik: (Minor) LOA-05 | Inexistent Duplicate Check The addSecToken can overwrite over a currently present security token ID as no sanitization is performed to ensure the security token hasn't already been added.
+    // TODO: (Minor) LOA-05
     function addSecToken(
         StructLib.LedgerStruct storage ld,
         address ledgerEntryOwner,

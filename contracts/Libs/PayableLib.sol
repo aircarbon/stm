@@ -22,7 +22,8 @@ library PayableLib {
     function get_chainlinkRefPrice(address chainlinkAggAddr) public view returns(int256) {
         //if (chainlinkAggAddr == address(0x0)) return 100000000; // $1 - cents*satoshis
         if (chainlinkAggAddr == address(0x0)) return -1;
-        // Certik: (Major) ICA-01 | Incorrect Chainlink Interface - Upgraded Chainlink Aggregator Interface to V3
+        // Certik: (Major) ICA-01 | Incorrect Chainlink Interface
+        // Resolved: (Major) ICA-01 | Upgraded Chainlink Aggregator Interface to V3
         IChainlinkAggregator ref = IChainlinkAggregator(chainlinkAggAddr);
         ( , int256 answer, , , ) = ref.latestRoundData();
         return answer;
@@ -247,7 +248,8 @@ library PayableLib {
         require(ld.contractType == StructLib.ContractType.CASHFLOW_BASE, 'Bad commodity request');
         require(ld._contractSealed, 'Contract is not sealed');
         require(ld._batches_currentMax_id == 1, 'Bad cashflow request: no minted batch');
-        // Certik: (Medium) PLL-03 | Incorrect Limit Evaluation - Corrected the overflow check
+        // Certik: (Medium) PLL-03 | Incorrect Limit Evaluation
+        // Resolved: (Medium) PLL-03 | Corrected the overflow check
         require(uint128(msg.value) < type(uint128).max, 'Amount must be less than 2^128'); // stop any overflows
         require(count > 0, 'Invalid count');
         

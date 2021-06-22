@@ -8,7 +8,8 @@ pragma solidity ^0.8.0;
  */
 // https://github.com/smartcontractkit/chainlink/blob/master/evm-contracts/src/v0.8/interfaces/AggregatorV3Interface.sol
 
-// Certik: (Major) ICA-01 | Incorrect Chainlink Interface - Upgraded Chainlink Aggregator Interface to V3
+// Certik: (Major) ICA-01 | Incorrect Chainlink Interface
+// Resolved: (Major) ICA-01 | Upgraded Chainlink Aggregator Interface to V3
 
 interface IChainlinkAggregator {
   function decimals() external view returns (uint8);
