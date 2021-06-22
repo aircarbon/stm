@@ -3,6 +3,22 @@
 // https://github.com/tokencard/contracts/blob/master/contracts/externals/strings.sol
 
 /*
+ * Copyright 2016 Nick Johnson
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/*
  * @title String & slice utility library for Solidity contracts.
  * @author Nick Johnson <arachnid@notdot.net>
  *
@@ -38,7 +54,9 @@
  *      corresponding to the left and right parts of the string.
  */
 
-pragma solidity >=0.4.21 <=0.7.1;
+// SPDX-License-Identifier: ApacheV2
+
+pragma solidity >=0.5.0;
 
 library strings {
     struct slice {
@@ -46,9 +64,9 @@ library strings {
         uint _ptr;
     }
 
-    function memcpy(uint dest, uint src, uint len) private pure {
+    function memcpy(uint dest, uint src, uint memlen) internal pure {
         // Copy word-length chunks while possible
-        for(; len >= 32; len -= 32) {
+        for(; memlen >= 32; memlen -= 32) {
             assembly {
                 mstore(dest, mload(src))
             }
@@ -57,7 +75,7 @@ library strings {
         }
 
         // Copy remaining bytes
-        uint mask = 256 ** (32 - len) - 1;
+        uint mask = 256 ** (32 - memlen) - 1;
         assembly {
             let srcpart := and(mload(src), not(mask))
             let destpart := and(mload(dest), mask)
@@ -167,13 +185,13 @@ library strings {
             assembly { b := and(mload(ptr), 0xFF) }
             if (b < 0x80) {
                 ptr += 1;
-            } else if(b < 0xE0) {
+            } else if (b < 0xE0) {
                 ptr += 2;
-            } else if(b < 0xF0) {
+            } else if (b < 0xF0) {
                 ptr += 3;
-            } else if(b < 0xF8) {
+            } else if (b < 0xF8) {
                 ptr += 4;
-            } else if(b < 0xFC) {
+            } else if (b < 0xFC) {
                 ptr += 5;
             } else {
                 ptr += 6;
@@ -215,9 +233,9 @@ library strings {
             }
             if (a != b) {
                 // Mask out irrelevant bytes and check again
-                uint256 mask = uint256(-1); // 0xffff...
-                if(shortest < 32) {
-                  mask = ~(2 ** (8 * (32 - shortest + idx)) - 1);
+                uint256 mask = type(uint256).max; // 0xffff...
+                if (shortest < 32) {
+                    mask = ~(2 ** (8 * (32 - shortest + idx)) - 1);
                 }
                 uint256 diff = (a & mask) - (b & mask);
                 if (diff != 0)
@@ -260,9 +278,9 @@ library strings {
         assembly { b := and(mload(sub(mload(add(self, 32)), 31)), 0xFF) }
         if (b < 0x80) {
             l = 1;
-        } else if(b < 0xE0) {
+        } else if (b < 0xE0) {
             l = 2;
-        } else if(b < 0xF0) {
+        } else if (b < 0xF0) {
             l = 3;
         } else {
             l = 4;
@@ -312,10 +330,10 @@ library strings {
         if (b < 0x80) {
             ret = b;
             length = 1;
-        } else if(b < 0xE0) {
+        } else if (b < 0xE0) {
             ret = b & 0x1F;
             length = 2;
-        } else if(b < 0xF0) {
+        } else if (b < 0xF0) {
             ret = b & 0x0F;
             length = 3;
         } else {
@@ -699,14 +717,15 @@ library strings {
             return "";
 
         uint length = self._len * (parts.length - 1);
-        for(uint i = 0; i < parts.length; i++)
+        for (uint i = 0; i < parts.length; i++) {
             length += parts[i]._len;
+        }
 
         string memory ret = new string(length);
         uint retptr;
         assembly { retptr := add(ret, 32) }
 
-        for(uint i = 0; i < parts.length; i++) {
+        for (uint i = 0; i < parts.length; i++) {
             memcpy(retptr, parts[i]._ptr, parts[i]._len);
             retptr += parts[i]._len;
             if (i < parts.length - 1) {

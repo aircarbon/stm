@@ -1,8 +1,7 @@
 
 // SPDX-License-Identifier: AGPL-3.0-only
 // Author: https://github.com/7-of-9
-pragma solidity >=0.4.21 <=0.7.1;
-pragma experimental ABIEncoderV2;
+pragma solidity ^0.8.0;
 
 import "./StFees.sol";
 import "./StErc20.sol";

@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // Author: https://github.com/7-of-9
-pragma solidity >=0.4.21 <=0.7.1;
-pragma experimental ABIEncoderV2;
+pragma solidity ^0.8.0;
 
 import "../StMaster/StMaster.sol";
 
@@ -64,21 +63,20 @@ library StructLib {
         StructLib.LedgerStruct storage ld,
         TransferCcyArgs memory a)
     public {
-        if (a.amount > 0) {
-            ld._ledger[a.from].ccyType_balance[a.ccyTypeId] -= int256(a.amount);
-            ld._ledger[a.to].ccyType_balance[a.ccyTypeId] += int256(a.amount);
+        require(a.amount > 0 && int256(a.amount) < type(int256).max , "Bound check found overflow");
+        ld._ledger[a.from].ccyType_balance[a.ccyTypeId] -= int256(a.amount);
+        ld._ledger[a.to].ccyType_balance[a.ccyTypeId] += int256(a.amount);
 
-            // 24k
-            //ld._ccyType_totalTransfered[a.ccyTypeId] += a.amount;
+        // 24k
+        //ld._ccyType_totalTransfered[a.ccyTypeId] += a.amount;
 
-            //emit StructLib.TransferedLedgerCcy(a.from, a.to, a.ccyTypeId, a.amount, a.transferType);
-            emitTransferedLedgerCcy(a);
+        //emit StructLib.TransferedLedgerCcy(a.from, a.to, a.ccyTypeId, a.amount, a.transferType);
+        emitTransferedLedgerCcy(a);
 
-            // 24k
-            // if (a.transferType == StructLib.TransferType.ExchangeFee) {
-            //     ld._ccyType_totalFeesPaid[a.ccyTypeId] += a.amount;
-            // }
-        }
+        // 24k
+        // if (a.transferType == StructLib.TransferType.ExchangeFee) {
+        //     ld._ccyType_totalFeesPaid[a.ccyTypeId] += a.amount;
+        // }
     }
     function emitTransferedLedgerCcy(
         TransferCcyArgs memory a)

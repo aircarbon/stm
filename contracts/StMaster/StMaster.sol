@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // Author: https://github.com/7-of-9
-pragma solidity >=0.4.21 <=0.7.1;
-pragma experimental ABIEncoderV2;
+pragma solidity ^0.8.0;
 
 import "./CcyCollateralizable.sol";
 import "./StMintable.sol";
@@ -65,7 +64,6 @@ contract StMaster
     // === STM (AC COMMODITY) ===
     // TODO: getLedgerHashcode() segmented...
     // TODO: type-rename...
-    // TODO: SafeMath
     // TODO: ERC20 authorize + re-entrancy guards, and .call instead of .transfer
     // todo: drop fee_fixed completely (it's == fee_min)
     // todo: etherscan -> verify contract interfaces? -- needs ctor bytecode

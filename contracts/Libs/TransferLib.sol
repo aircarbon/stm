@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // Author: https://github.com/7-of-9
-pragma solidity >=0.4.21 <=0.7.1;
-pragma experimental ABIEncoderV2;
+pragma solidity ^0.8.0;
 
 import "../Interfaces/StructLib.sol";
 
@@ -199,8 +198,8 @@ library TransferLib {
 
         // validate currency balances - transfer amount & fees
         if (ld.contractType != StructLib.ContractType.CASHFLOW_BASE) { //**
-            require(StructLib.sufficientCcy(ld, a.ledger_A, a.ccyTypeId_A, a.ccy_amount_A/*amount sending*/, a.ccy_amount_B/*amount receiving*/, int256(exFees.fee_ccy_A) * (a.applyFees /*&& a.ccy_amount_A > 0 */? 1 : 0)), "Insufficient currency A");
-            require(StructLib.sufficientCcy(ld, a.ledger_B, a.ccyTypeId_B, a.ccy_amount_B/*amount sending*/, a.ccy_amount_A/*amount receiving*/, int256(exFees.fee_ccy_B) * (a.applyFees /*&& a.ccy_amount_B > 0 */? 1 : 0)), "Insufficient currency B");
+            require(StructLib.sufficientCcy(ld, a.ledger_A, a.ccyTypeId_A, a.ccy_amount_A/*amount sending*/, a.ccy_amount_B/*amount receiving*/, int256(exFees.fee_ccy_A * uint256(a.applyFees /*&& a.ccy_amount_A > 0 */? 1 : 0))), "Insufficient currency A");
+            require(StructLib.sufficientCcy(ld, a.ledger_B, a.ccyTypeId_B, a.ccy_amount_B/*amount sending*/, a.ccy_amount_A/*amount receiving*/, int256(exFees.fee_ccy_B * uint256(a.applyFees /*&& a.ccy_amount_B > 0 */? 1 : 0))), "Insufficient currency B");
         }
 
         // validate token balances - sum exchange token fee + originator token fee(s)
@@ -626,7 +625,7 @@ library TransferLib {
         // walk tokens - transfer sufficient STs (last one may get split)
         TransferSpltVars memory v;
         require(a.qtyUnit >= 0 && a.qtyUnit <= 0x7FFFFFFFFFFFFFFF, "Bad qtyUnit"); // max signed int64
-        v.remainingToTransfer = int64(a.qtyUnit);
+        v.remainingToTransfer = int64(uint64(a.qtyUnit));
 
         uint256 maxStId = a.maxStId;
         while (v.remainingToTransfer > 0) {
@@ -677,14 +676,14 @@ library TransferLib {
                             ld._sts[to_stIds[i]].mintedQty += v.stQty; // PACKED
                             
                             v.mergedExisting = true;
-                            emit TransferedFullSecToken(a.from, a.to, stId, to_stIds[i], uint256(v.stQty), a.transferType);
+                            emit TransferedFullSecToken(a.from, a.to, stId, to_stIds[i], uint256(uint64(v.stQty)), a.transferType);
                             break;
                         }
                     }
                     // TRANSFER - if no existing destination ST from same batch
                     if (!v.mergedExisting) {
                         to_stIds.push(stId);
-                        emit TransferedFullSecToken(a.from, a.to, stId, 0, uint256(v.stQty), a.transferType);
+                        emit TransferedFullSecToken(a.from, a.to, stId, 0, uint256(uint64(v.stQty)), a.transferType);
                     }
 
                     //ld._ledger[to].tokenType_sumQty[tokTypeId] += stQty;                //* gas - DROP DONE - only used internally, validation params
@@ -713,7 +712,7 @@ library TransferLib {
                                 ld._sts[to_stIds[i]].mintedQty += v.remainingToTransfer; // PACKED
 
                                 v.mergedExisting = true;
-                                emit TransferedPartialSecToken(a.from, a.to, stId, 0, to_stIds[i], uint256(v.remainingToTransfer), a.transferType);
+                                emit TransferedPartialSecToken(a.from, a.to, stId, 0, to_stIds[i], uint256(uint64(v.remainingToTransfer)), a.transferType);
                                 break;
                             }
                         }
@@ -729,7 +728,7 @@ library TransferLib {
                             //ld._ledger[to].tokenType_sumQty[tokTypeId] += remainingToTransfer; // gas - DROP DONE - only used internally, validation params
 
                             to_stIds.push(maxStId + 1); // gas: 94k
-                            emit TransferedPartialSecToken(a.from, a.to, stId, maxStId + 1, 0, uint256(v.remainingToTransfer), a.transferType); // gas: 11k
+                            emit TransferedPartialSecToken(a.from, a.to, stId, maxStId + 1, 0, uint256(uint64(v.remainingToTransfer)), a.transferType); // gas: 11k
                             maxStId++;
                         }
 
@@ -788,7 +787,7 @@ library TransferLib {
         uint256 ndx = 0;
         uint256 from_stIds_length = from_stIds.length;
         require(a.qtyUnit >= 0 && a.qtyUnit <= 0x7FFFFFFFFFFFFFFF, "Bad qtyUnit"); // max signed int64
-        int64 remainingToTransfer = int64(a.qtyUnit);
+        int64 remainingToTransfer = int64(uint64(a.qtyUnit));
         while (remainingToTransfer > 0) {
             uint256 stId = from_stIds[ndx];
             int64 stQty = ld._sts[stId].currentQty;
@@ -814,7 +813,7 @@ library TransferLib {
                 bool knownBatch = false;
                 for (uint i = 0; i < ret.batchCount; i++) {
                     if (ret.batchIds[i] == fromBatchId) {
-                        ret.transferQty[i] += uint256(remainingToTransfer >= stQty ? stQty : remainingToTransfer);
+                        ret.transferQty[i] += uint256(remainingToTransfer >= stQty ? uint64(stQty) : uint64(remainingToTransfer));
                         knownBatch = true;
                         break;
                     }
@@ -822,7 +821,7 @@ library TransferLib {
                 if (!knownBatch) {
                     require(ret.batchCount < MAX_BATCHES_PREVIEW, "Too many batches: try sending a smaller amount");
                     ret.batchIds[ret.batchCount] = fromBatchId;
-                    ret.transferQty[ret.batchCount] = uint256(remainingToTransfer >= stQty ? stQty : remainingToTransfer);
+                    ret.transferQty[ret.batchCount] = uint256(remainingToTransfer >= stQty ? uint64(stQty) : uint64(remainingToTransfer));
                     ret.batchCount++;
                 }
                 if (remainingToTransfer >= stQty) { // full ST transfer, and more needed
@@ -888,7 +887,7 @@ library TransferLib {
             uint256 stQty;
             for (uint256 i = 0; i < a.k_stIds_A.length; i++) {
                 require(StructLib.tokenExistsOnLedger(ld, a.tokTypeId_A, a.ledger_A, a.k_stIds_A[i]), "Bad stId A");
-                stQty += uint256(ld._sts[a.k_stIds_A[i]].currentQty);
+                stQty += uint256(uint64(ld._sts[a.k_stIds_A[i]].currentQty));
             }
             //require(stQty == a.qty_A, "qty_A / k_stIds_A mismatch");
         }
@@ -896,7 +895,7 @@ library TransferLib {
             uint256 stQty;
             for (uint256 i = 0; i < a.k_stIds_B.length; i++) {
                 require(StructLib.tokenExistsOnLedger(ld, a.tokTypeId_B, a.ledger_B, a.k_stIds_B[i]), "Bad stId B");
-                stQty += uint256(ld._sts[a.k_stIds_B[i]].currentQty);
+                stQty += uint256(uint64(ld._sts[a.k_stIds_B[i]].currentQty));
             }
             //require(stQty == a.qty_B, "qty_B / k_stIds_B mismatch");
         }

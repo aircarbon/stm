@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // Author: https://github.com/7-of-9
-pragma solidity >=0.4.21 <=0.7.1;
-pragma experimental ABIEncoderV2;
+pragma solidity ^0.8.0;
 
 import "../Interfaces/StructLib.sol";
 
@@ -61,7 +60,7 @@ library LedgerLib {
 
                     // sum ST sizes - convenience for caller - only applicable for spot (guaranteed +ve qty) token types
                     if (std._tt_settle[tokTypeId] == StructLib.SettlementType.SPOT) {
-                        v.spot_sumQty += uint256(ld._sts[stId].currentQty);
+                        v.spot_sumQty += uint256(uint64(ld._sts[stId].currentQty));
                     }
 
                     // STs by type
@@ -90,7 +89,7 @@ library LedgerLib {
                     uint256 stId = baseLedger.tokens[i].stId;
 
                     if (std._tt_settle[tokTypeId] == StructLib.SettlementType.SPOT) {
-                        v.spot_sumQty += uint256(baseLedger.tokens[i].currentQty);
+                        v.spot_sumQty += uint256(uint64(baseLedger.tokens[i].currentQty));
                     }
 
                     v.tokens[flatSecTokenNdx] = StructLib.LedgerSecTokenReturn({
@@ -309,8 +308,8 @@ library LedgerLib {
             //for (uint256 stId = 1; stId <= ld._tokens_currentMax_id; stId++) {
             for (uint256 stId = ld._tokens_base_id; stId <= ld._tokens_currentMax_id; stId++) {
                 StructLib.PackedSt memory st = ld._sts[stId];
-                chk.totalCur += uint256(st.currentQty); // consistency check (base & commodity)
-                chk.totalMinted += uint256(st.mintedQty);
+                chk.totalCur += uint256(uint64(st.currentQty)); // consistency check (base & commodity)
+                chk.totalMinted += uint256(uint64(st.mintedQty));
 
                 if (stId % mod != n) continue;
 

@@ -1,17 +1,13 @@
 // Author: https://github.com/7-of-9
 // SPDX-License-Identifier: AGPL-3.0-only
-pragma solidity >=0.4.21 <=0.7.1;
-pragma experimental ABIEncoderV2;
+pragma solidity ^0.8.0;
 
 import "../Interfaces/StructLib.sol";
 import "../Interfaces/IChainlinkAggregator.sol";
 
 import "./TransferLib.sol";
 
-import "./SafeMath.sol";
-
 library PayableLib {
-    using SafeMath for uint256;
 
 
     event IssuanceSubscribed(address indexed subscriber, address indexed issuer, uint256 weiSent, uint256 weiChange, uint256 tokensSubscribed, uint256 weiPrice);
@@ -27,7 +23,8 @@ library PayableLib {
         //if (chainlinkAggAddr == address(0x0)) return 100000000; // $1 - cents*satoshis
         if (chainlinkAggAddr == address(0x0)) return -1;
         IChainlinkAggregator ref = IChainlinkAggregator(chainlinkAggAddr);
-        return ref.latestAnswer();
+        ( , int256 answer, , , ) = ref.latestRoundData();
+        return answer;
     }
 
     //
@@ -138,20 +135,17 @@ library PayableLib {
         else {
             require(ethSat_UsdCents != -1 || bnbSat_UsdCents != -1, "Bad usd/{eth|bnb} rate");
             if (ethSat_UsdCents != -1) { // use uth/usd rate (ETH Ropsten, mainnet)
-                //uint256 eth_UsdCents = uint256(ethSat_UsdCents).div(1000000);
-                v.weiPrice = (cashflowData.cents_currentPrice.mul(1000000000000000000)).mul(1000000).div(uint256(ethSat_UsdCents));
+                v.weiPrice = (cashflowData.cents_currentPrice * 10 ** 24) / (uint256(ethSat_UsdCents));
             }
             else if (bnbSat_UsdCents != -1) { // use bnb/usd rate (BSC Mainnet 56 & Testnet 97)
-                //uint256 bnb_UsdCents = uint256(bnbSat_UsdCents).div(1000000);
-                v.weiPrice = (cashflowData.cents_currentPrice.mul(1000000000000000000)).mul(1000000).div(uint256(bnbSat_UsdCents));
+                v.weiPrice = (cashflowData.cents_currentPrice * 10 ** 24) / (uint256(bnbSat_UsdCents));
             }
         }
         require(msg.value > 0, "Bad msg.value");
         require(v.weiPrice > 0, "Bad computed v.weiPrice");
 
         // calculate subscription size
-        //v.qtyTokens = msg.value / v.weiPrice; // ## explicit round DOWN
-        v.qtyTokens = msg.value.div(v.weiPrice); // ## explicit round DOWN
+        v.qtyTokens = msg.value / v.weiPrice; // ## explicit round DOWN
 
         // check sale allowance is not exceeded
         v.issuer_stIds = ld._ledger[issueBatch.originator].tokenType_stIds[1]; // CFT: uni-type
@@ -162,15 +156,14 @@ library PayableLib {
             + v.qtyTokens, "Bad cashflow request: insufficient quantity for sale");
 
         // send change back to payer
-        //v.weiChange = (msg.value % v.weiPrice); // explicit remainder -- keep 10 Wei in the contract, tryfix...
-        v.weiChange = (msg.value.mod(v.weiPrice)); // explicit remainder -- keep 10 Wei in the contract, tryfix...
+        v.weiChange = msg.value % v.weiPrice; // explicit remainder -- keep 10 Wei in the contract, tryfix...
         if (v.weiChange > 0) {
-            msg.sender.transfer(v.weiChange);
+            payable(msg.sender).transfer(v.weiChange);
         }
 
         // fwd payment to issuer
         //issueBatch.originator.transfer(msg.value - v.weiChange);
-        issueBatch.originator.transfer(msg.value.sub(v.weiChange));
+        issueBatch.originator.transfer(msg.value - v.weiChange);
 
         // transfer tokens to payer
         if (v.qtyTokens > 0) {
@@ -253,10 +246,8 @@ library PayableLib {
         require(ld.contractType == StructLib.ContractType.CASHFLOW_BASE, 'Bad commodity request');
         require(ld._contractSealed, 'Contract is not sealed');
         require(ld._batches_currentMax_id == 1, 'Bad cashflow request: no minted batch');
-        require(msg.value <= (2 ** 128), 'Amount must be less than 2^128'); // stop any overflows
+        require(msg.value < (2 ** 128), 'Amount must be less than 2^128'); // stop any overflows
         require(count > 0, 'Invalid count');
-        // require(cashflowData.wei_currentPrice > 0 || cashflowData.cents_currentPrice > 0, "Bad cashflow request: no price set");
-        // require(cashflowData.wei_currentPrice == 0 || cashflowData.cents_currentPrice == 0, "Bad cashflow request: ambiguous price set");
         
         // get issuer
         StructLib.SecTokenBatch storage issueBatch = ld._batches[1];  // CFT: uni-batch
@@ -283,7 +274,7 @@ library PayableLib {
         uint256[] storage issuer_stIds = ld._ledger[issueBatch.originator].tokenType_stIds[1];
         StructLib.PackedSt storage issuerSt = ld._sts[issuer_stIds[0]];
 
-        ipv.amountSubscribed = uint256(issueBatch.mintedQty) - uint256(issuerSt.currentQty); // ## breaks when we do transfers from the issuer ??
+        ipv.amountSubscribed = uint256(issueBatch.mintedQty) - uint256(uint64(issuerSt.currentQty)); // ## breaks when we do transfers from the issuer ??
 
         if (cashflowData.args.cashflowType == StructLib.CashflowType.BOND) {
             // TODO: calc/switch interest vs. principal repayment...?
@@ -296,18 +287,18 @@ library PayableLib {
             ipv.initAddrNdx = ipbd.curNdx;
 
             for (ipv.addrNdx = ipv.initAddrNdx; ipv.addrNdx < ipv.initAddrNdx + count ; ipv.addrNdx++) {
-                address payable addr = address(uint160(ld._ledgerOwners[ipv.addrNdx]));  
+                address payable addr = payable(address(uint160(ld._ledgerOwners[ipv.addrNdx])));
                 
                 if (addr != issueBatch.originator) { // exclude issuer from payments
                     uint256[] storage stIds = ld._ledger[addr].tokenType_stIds[1];
 
                     for (ipv.stNdx = 0; ipv.stNdx < stIds.length; ipv.stNdx++) {
-                        ipv.sharePercentage = ipv.amountSubscribed * 10**36 /*precision*/ / uint256(ld._sts[stIds[ipv.stNdx]].currentQty);
-                        ipv.shareWei = ipbd.curPaymentTotalAmount * 10**36  /*precision*/ / ipv.sharePercentage;
+                        ipv.sharePercentage = ipv.amountSubscribed * 10 ** 36 / uint256(uint64(ld._sts[stIds[ipv.stNdx]].currentQty));
+                        ipv.shareWei = ipbd.curPaymentTotalAmount * 10 ** 36 / ipv.sharePercentage;
 
                         // TODO: re-entrancy guards, and .call instead of .transfer
                         if (ipv.shareWei > 0) {
-                            addr.transfer(ipv.shareWei);
+                            payable(addr).transfer(ipv.shareWei);
                         }
                         // save payment history
                         ipv.batchProcessedAmount += ipv.shareWei;
@@ -317,9 +308,9 @@ library PayableLib {
                 }
                 ipbd.curNdx++;
             }
-            ipv.weiChange = (msg.value.sub(uint256(ipv.batchProcessedAmount)));
+            ipv.weiChange = msg.value - uint256(ipv.batchProcessedAmount);
             if (ipv.weiChange > 0) {
-                msg.sender.transfer(ipv.weiChange);
+                payable(msg.sender).transfer(ipv.weiChange);
             }
             emit IssuerPaymentBatchProcessed(ipbd.curPaymentId, ipbd.curBatchNdx, msg.sender, msg.value, ipv.weiChange);
             ipbd.curBatchNdx++;
@@ -370,7 +361,7 @@ library PayableLib {
                 StructLib.PackedSt storage issuerSt = ld._sts[issuer_stIds[0]];
                 ret.qty_issuanceMax = issueBatch.mintedQty;
 
-                ret.qty_issuanceRemaining = uint256(issuerSt.currentQty); 
+                ret.qty_issuanceRemaining = uint256(uint64(issuerSt.currentQty)); 
 
                 // ## this fails if tokens are transferred out from the issuer (demo flow)
                 // instead, we udpate this field directly on each issuance sale

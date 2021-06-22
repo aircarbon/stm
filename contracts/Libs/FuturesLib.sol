@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // Author: https://github.com/7-of-9
-pragma solidity >=0.4.21 <=0.7.1;
-pragma experimental ABIEncoderV2;
+pragma solidity ^0.8.0;
 
 import "../Interfaces/StructLib.sol";
 
@@ -76,16 +75,16 @@ library FuturesLib {
         OpenPosVars memory v;
         require(ld._contractSealed, "Contract is not sealed");
         require(a.ledger_A != a.ledger_B, "Bad transfer");
-        require(a.qty_A <= 0x7FFFFFFFFFFFFFFF && a.qty_B <= 0x7FFFFFFFFFFFFFFF && a.qty_A >= -0x7FFFFFFFFFFFFFFF && a.qty_B >= -0x7FFFFFFFFFFFFFFF && a.qty_A != 0 && a.qty_B != 0, "Bad quantity"); // min/max signed int64, non-zero
+        require(a.qty_A <= type(int64).max && a.qty_B <= type(int64).max && a.qty_A >= type(int64).min && a.qty_B >= type(int64).min && a.qty_A != 0 && a.qty_B != 0, "Bad quantity"); // min/max signed int64, non-zero
         require(a.qty_A + a.qty_B == 0, "Quantity mismatch");
         require(a.tokTypeId >= 0 && a.tokTypeId <= std._tt_Count, "Bad tokTypeId");
         require(std._tt_settle[a.tokTypeId] == StructLib.SettlementType.FUTURE, "Bad token settlement type");
-        require(a.price <= 0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF && a.price > 0, "Bad price"); // max signed int128, non-zero
+        require(a.price <= type(int128).max && a.price > 0, "Bad price"); // max signed int128, non-zero
 
         // apply fees
         v.posSize = (a.qty_A < 0 ? a.qty_B : a.qty_A);
-        v.fee_A = (ld._ledger[a.ledger_A].ft_feePerContract[a.tokTypeId] != 0 ? ld._ledger[a.ledger_A].ft_feePerContract[a.tokTypeId] : std._tt_ft[a.tokTypeId].feePerContract) * v.posSize;
-        v.fee_B = (ld._ledger[a.ledger_B].ft_feePerContract[a.tokTypeId] != 0 ? ld._ledger[a.ledger_B].ft_feePerContract[a.tokTypeId] : std._tt_ft[a.tokTypeId].feePerContract) * v.posSize;
+        v.fee_A = int256(int128(ld._ledger[a.ledger_A].ft_feePerContract[a.tokTypeId] != 0 ? ld._ledger[a.ledger_A].ft_feePerContract[a.tokTypeId] : std._tt_ft[a.tokTypeId].feePerContract)) * v.posSize;
+        v.fee_B = int256(int128(ld._ledger[a.ledger_B].ft_feePerContract[a.tokTypeId] != 0 ? ld._ledger[a.ledger_B].ft_feePerContract[a.tokTypeId] : std._tt_ft[a.tokTypeId].feePerContract)) * v.posSize;
         require(v.fee_A >= 0, "Unexpected fee value A");
         require(v.fee_B >= 0, "Unexpected fee value B");
         require(StructLib.sufficientCcy(ld, a.ledger_A, std._tt_ft[a.tokTypeId].refCcyId, 0, 0, v.fee_A), "Insufficient currency A");
@@ -279,14 +278,14 @@ library FuturesLib {
 
         // get delta
         int256 delta = calcTakePay(fta, st, a.markPrice, st.ft_lastMarkPrice);
-        require(delta <= 0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF && delta >= -0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF, "Delta overflow"); // max/min signed int128
+        require(delta <= type(int128).max && delta >= type(int128).min, "Delta overflow"); // max/min signed int128
 
         // set vars
         TakePayVars2 memory v;
         v = TakePayVars2({ st: st, delta: delta, bal: ld._ledger[st.ft_ledgerOwner].ccyType_balance[fta.refCcyId], fee: 0, take: 0 });
 
         // apply settlement fee
-        v.fee = v.bal >= a.feePerSide ? a.feePerSide : 0;
+        v.fee = v.bal >= a.feePerSide ? a.feePerSide : int256(0);
         v.bal -= v.fee;
 
         // update last mark price
@@ -415,9 +414,9 @@ library FuturesLib {
         int128  markPrice,
         int128  ft_lastMarkPrice
     ) private view returns(int256) {
-        int256 delta = (markPrice - (ft_lastMarkPrice == -1
+        int256 delta = int256(markPrice - (ft_lastMarkPrice == -1
                             ? st.ft_price
-                            : ft_lastMarkPrice)) * fta.contractSize * st.currentQty;
+                            : ft_lastMarkPrice)) * int256(int16(fta.contractSize)) * int256(st.currentQty);
         return delta;
     }
 
@@ -447,7 +446,7 @@ library FuturesLib {
         for (uint256 x = 0; x < ld._ledger[ledgerOwner].tokenType_stIds[tokTypeId].length ; x++) {
             uint256 ftId = ld._ledger[ledgerOwner].tokenType_stIds[tokTypeId][x];
             StructLib.PackedSt storage st = ld._sts[ftId];
-            totQty += st.currentQty;
+            totQty += int64(int256(st.currentQty));
         }
         return totQty;
     }
@@ -478,7 +477,7 @@ library FuturesLib {
                 }
 
                 // get margin requirement for the aggregate position
-                int128 avgPrice = totQtyAbs != 0 ? totPriceQtyAbs / totQtyAbs : 0;
+                int128 avgPrice = totQtyAbs != 0 ? (totPriceQtyAbs / totQtyAbs) : int128(0);
                 int256 totMargin = calcPosMargin(ld, std, ledgerOwner, tokTypeId, int256(totQtyNet), avgPrice);
                 //emit dbg1(tokTypeId, ledgerOwner, totMargin, totQtyNet, avgPrice);
 
@@ -511,10 +510,10 @@ library FuturesLib {
             totMargin = 10000;
         }
 
-        return (((int256(totMargin)
+        return (((int256(int16(totMargin))
             * 1000000/*increase precision*/)
                 / 10000/*basis points*/)
-                * (std._tt_ft[tokTypeId].contractSize * (
+                * (int256(int16(std._tt_ft[tokTypeId].contractSize)) * (
                     //abs256(posSize)
                     posSize // **** NO ABS -- WE NEED TO NET OFF MARGINS ACROSS LONG AND SHORT POSITIONS (in setReservedAllFtPos)
                 ) * price)/*notional*/

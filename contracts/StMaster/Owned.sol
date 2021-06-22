@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // Author: https://github.com/7-of-9
-pragma solidity >=0.4.21 <=0.7.1;
+pragma solidity ^0.8.0;
 
 /**
   * @title Owned
@@ -22,7 +22,7 @@ contract Owned
     function readOnly() external view returns (bool isReadOnly) { return readOnlyState; }
 
     constructor() {
-        deploymentOwner = msg.sender;
+        deploymentOwner = payable(msg.sender);
         readOnlyState = false;
     }
 

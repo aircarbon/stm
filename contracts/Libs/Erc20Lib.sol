@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // Author: https://github.com/7-of-9
-pragma solidity >=0.4.21 <=0.7.1;
-pragma experimental ABIEncoderV2;
+pragma solidity ^0.8.0;
 
 import "../Interfaces/StructLib.sol";
 import "./TransferLib.sol";
@@ -95,7 +94,7 @@ library Erc20Lib {
                 uint256 qtyType;
                 for (uint256 ndx = 0; ndx < tokenType_stIds.length; ndx++) {
                     require(ld._sts[tokenType_stIds[ndx]].currentQty > 0, "Unexpected token quantity");
-                    qtyType += uint256(ld._sts[tokenType_stIds[ndx]].currentQty);
+                    qtyType += uint256(uint64(ld._sts[tokenType_stIds[ndx]].currentQty));
                 }
 
                 // transfer this type up to required amount

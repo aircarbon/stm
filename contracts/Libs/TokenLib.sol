@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // Author: https://github.com/7-of-9
-pragma solidity >=0.4.21 <=0.7.1;
-pragma experimental ABIEncoderV2;
+pragma solidity ^0.8.0;
 
 import "../Interfaces/StructLib.sol";
 import "./SpotFeeLib.sol";
@@ -192,7 +191,7 @@ library TokenLib {
         // check for token id overflow (192 bit range is vast - really not necessary)
         if (ld.contractType == StructLib.ContractType.CASHFLOW_BASE) {
             uint256 l_id = ld._tokens_currentMax_id & ((1 << 192) - 1); // strip leading 64-bits (controller's type ID) - gets a "local id", i.e. a count
-            require(l_id + uint256(a.mintSecTokenCount) <= 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF, "Too many tokens"); // max 192-bits trailing bits
+            require(l_id + uint256(uint64(a.mintSecTokenCount)) <= 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF, "Too many tokens"); // max 192-bits trailing bits
         }
 
         // ### string[] param lengths are reported as zero!
@@ -221,7 +220,7 @@ library TokenLib {
 
         // emit batch create event (commodity & controller - not base; its batch and tok-type IDs are local)
         if (ld.contractType != StructLib.ContractType.CASHFLOW_BASE) {
-            emit Minted(newBatch.id, a.tokTypeId, a.batchOwner, uint256(a.mintQty), uint256(a.mintSecTokenCount));
+            emit Minted(newBatch.id, a.tokTypeId, a.batchOwner, uint256(a.mintQty), uint256(uint64(a.mintSecTokenCount)));
         }
 
         // create ledger entry as required
@@ -235,8 +234,8 @@ library TokenLib {
             // emit (preempt) token minted event(s) (controller - not base; its batch and tok-type IDs are local)
             for (int256 ndx = 0; ndx < a.mintSecTokenCount; ndx++) {
                 uint256 newId = base.getSecToken_MaxId() + 1 + uint256(ndx);
-                int64 stQty = int64(a.mintQty) / int64(a.mintSecTokenCount);
-                emit MintedSecToken(newId, newBatch.id, a.tokTypeId, a.batchOwner, uint256(stQty));
+                int64 stQty = int64(uint64(a.mintQty)) / int64(a.mintSecTokenCount);
+                emit MintedSecToken(newId, newBatch.id, a.tokTypeId, a.batchOwner, uint256(uint64(stQty)));
             }
 
             // mint - passthrough to base
@@ -254,14 +253,14 @@ library TokenLib {
         else {
             for (int256 ndx = 0; ndx < a.mintSecTokenCount; ndx++) {
                 uint256 newId = ld._tokens_currentMax_id + 1 + uint256(ndx);
-                int64 stQty = int64(a.mintQty) / int64(a.mintSecTokenCount);
+                int64 stQty = int64(uint64(a.mintQty)) / int64(a.mintSecTokenCount);
                 ld._sts[newId].batchId = uint64(newBatch.id);
                 ld._sts[newId].mintedQty = stQty;
                 ld._sts[newId].currentQty = stQty; // mint ST
 
                 // emit token minted event(s) (core)
                 if (ld.contractType == StructLib.ContractType.COMMODITY) {
-                    emit MintedSecToken(newId, newBatch.id, a.tokTypeId, a.batchOwner, uint256(stQty));
+                    emit MintedSecToken(newId, newBatch.id, a.tokTypeId, a.batchOwner, uint256(uint64(stQty)));
                 }
 
                 ld._ledger[a.batchOwner].tokenType_stIds[a.tokTypeId].push(newId); // assign ST to ledger
@@ -276,7 +275,7 @@ library TokenLib {
         }
 
         // core - update current/max STID
-        ld._tokens_currentMax_id += uint256(a.mintSecTokenCount); // controller: minted COUNT (not an ID), base / commodity: a true max. LOCAL ID
+        ld._tokens_currentMax_id += uint256(uint64(a.mintSecTokenCount)); // controller: minted COUNT (not an ID), base / commodity: a true max. LOCAL ID
 
         // core - update global totals; note - totals are maintained on base AND on controller/commodity
         //if (ld.contractType != StructLib.ContractType.CASHFLOW_BASE) {
@@ -375,11 +374,11 @@ library TokenLib {
                     //ld._ledger[a.ledgerOwner].tokenType_sumQty[a.tokTypeId] -= stQty;
 
                     // burn from batch
-                    ld._batches[batchId].burnedQty += uint256(stQty);
+                    ld._batches[batchId].burnedQty += uint256(uint64(stQty));
 
                     remainingToBurn -= stQty;
 
-                    emit BurnedFullSecToken(stId, ld.contractType == StructLib.ContractType.CASHFLOW_BASE ? stId >> 192 : a.tokTypeId, a.ledgerOwner, uint256(stQty));
+                    emit BurnedFullSecToken(stId, ld.contractType == StructLib.ContractType.CASHFLOW_BASE ? stId >> 192 : a.tokTypeId, a.ledgerOwner, uint256(uint64(stQty)));
                 }
                 else {
                     // resize the ST (partial burn)
@@ -390,9 +389,9 @@ library TokenLib {
                     //ld._ledger[a.ledgerOwner].tokenType_sumQty[a.tokTypeId] -= remainingToBurn;
 
                     // burn from batch
-                    ld._batches[batchId].burnedQty += uint256(remainingToBurn);
+                    ld._batches[batchId].burnedQty += uint256(uint64(remainingToBurn));
 
-                    emit BurnedPartialSecToken(stId, ld.contractType == StructLib.ContractType.CASHFLOW_BASE ? stId >> 192 : a.tokTypeId, a.ledgerOwner, uint256(remainingToBurn));
+                    emit BurnedPartialSecToken(stId, ld.contractType == StructLib.ContractType.CASHFLOW_BASE ? stId >> 192 : a.tokTypeId, a.ledgerOwner, uint256(uint64(remainingToBurn)));
                     remainingToBurn = 0;
                 }
             }
