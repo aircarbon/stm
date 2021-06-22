@@ -111,11 +111,11 @@ library StructLib {
 
     // CONTRACT TYPE
 // Certik: (Minor) SLI-09 | State Representation Inconsistency The enum declarations of the contract are inconsistent with regards to the default state. While the ContractType and FundWithdrawType enums have an actionable default state, the SettlementType enum has an UNDEFINED default state.
-    enum ContractType { COMMODITY, CASHFLOW_BASE, CASHFLOW_CONTROLLER }
+    enum ContractType { UNDEFINED, COMMODITY, CASHFLOW_BASE, CASHFLOW_CONTROLLER }
 
     // CCY TYPES
 // Certik: (Minor) SLI-09 | State Representation Inconsistency The enum declarations of the contract are inconsistent with regards to the default state. While the ContractType and FundWithdrawType enums have an actionable default state, the SettlementType enum has an UNDEFINED default state.
-    enum FundWithdrawType { Fund, Withdraw }
+    enum FundWithdrawType { UNDEFINED, FUND, WITHDRAW }
     struct Ccy {
         uint256 id;
         string  name; // e.g. "USD", "BTC"
@@ -446,7 +446,9 @@ library StructLib {
         address ledger, uint256 tokTypeId, int256 qty, int256 fee
     ) public view returns (bool) {
         int256 qtyAvailable = 0;
-// Certik: (Minor) SLI-08 | Unsafe Mathematical Operations The linked statements perform unsafe mathematical operations between multiple arguments that would rely on caller sanitization, an ill-advised pattern
+// Certik: (Minor) SLI-08 | Unsafe Mathematical Operations The linked statements perform unsafe mathematical operations between multiple arguments that would rely on caller sanitization, an ill-advised pattern - Safe operations are in-built in Solidity version ^0.8.0
+        require(ld._contractSealed, "Contract is not sealed");
+        require(ld._ledger[ledger].exists == true, "Bad ledgerOwner");
         for (uint i = 0; i < ld._ledger[ledger].tokenType_stIds[tokTypeId].length; i++) {
             qtyAvailable += ld._sts[ld._ledger[ledger].tokenType_stIds[tokTypeId][i]].currentQty;
         }
@@ -465,7 +467,9 @@ library StructLib {
         StructLib.LedgerStruct storage ld,
         address ledger, uint256 ccyTypeId, int256 sending, int256 receiving, int256 fee
     ) public view returns (bool) {
-// Certik: (Minor) SLI-08 | Unsafe Mathematical Operations The linked statements perform unsafe mathematical operations between multiple arguments that would rely on caller sanitization, an ill-advised pattern
+// Certik: (Minor) SLI-08 | Unsafe Mathematical Operations The linked statements perform unsafe mathematical operations between multiple arguments that would rely on caller sanitization, an ill-advised pattern - Safe operations are in-built in Solidity version ^0.8.0
+        require(ld._contractSealed, "Contract is not sealed");
+        require(ld._ledger[ledger].exists == true, "Bad ledgerOwner");
         return (ld._ledger[ledger].ccyType_balance[ccyTypeId]
                 + receiving - ld._ledger[ledger].ccyType_reserved[ccyTypeId]
                ) >= sending + fee;

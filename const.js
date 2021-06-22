@@ -62,7 +62,7 @@ const blocksFromMonths = (months) => Math.ceil(blocksFromDays(months * 30.42));
 //
 // MAIN: deployer definitions -- contract ctor() params
 //
-const contractVer = process.env.CONTRACT_VERSION || "1.0c";
+const contractVer = process.env.CONTRACT_VERSION || "1.0d";
 const contractProps = {
     COMMODITY: {
         contractVer: contractVer,
@@ -230,9 +230,10 @@ module.exports = {
     },
 
     contractType: Object.freeze({
-                  COMMODITY: 0,
-              CASHFLOW_BASE: 1,
-        CASHFLOW_CONTROLLER: 2,
+                  UNDEFINED: 0,
+                  COMMODITY: 1,
+              CASHFLOW_BASE: 2,
+        CASHFLOW_CONTROLLER: 3
     }),
 
     cashflowType: cashflowType,
@@ -299,8 +300,9 @@ module.exports = {
     }),
 
     fundWithdrawType: Object.freeze({
-        FUND: 0,
-        WITHDRAW: 1,
+        UNDEFINED: 0,
+        FUND: 1,
+        WITHDRAW: 2
     }),
 
     // eeu qty constants - tons

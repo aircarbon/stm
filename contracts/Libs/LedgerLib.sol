@@ -51,7 +51,7 @@ library LedgerLib {
 
         // core & base: flatten STs (and sum total spot size)
         uint256 flatSecTokenNdx = 0;
-        if (ld.contractType != StructLib.ContractType.CASHFLOW_CONTROLLER) {
+        if (ld.contractType == StructLib.ContractType.CASHFLOW_BASE || ld.contractType == StructLib.ContractType.COMMODITY ) {
             for (uint256 tokTypeId = 1; tokTypeId <= std._tt_Count; tokTypeId++) { // get ST IDs & data from local storage
                 uint256[] memory tokenType_stIds = ld._ledger[account].tokenType_stIds[tokTypeId];
 
@@ -326,7 +326,7 @@ library LedgerLib {
         }
 
         // base & commodity - apply consistency check: global totals vs. sum ST totals
-        if (ld.contractType != StructLib.ContractType.CASHFLOW_CONTROLLER) {
+        if (ld.contractType == StructLib.ContractType.CASHFLOW_BASE || ld.contractType == StructLib.ContractType.COMMODITY) {
             require(chk.totalMinted == ld._spot_totalMintedQty, "Consistency check failed (1)");
             require(chk.totalMinted - chk.totalCur == ld._spot_totalBurnedQty, "Consistency check failed (2)");
         }

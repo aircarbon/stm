@@ -220,7 +220,7 @@ library TokenLib {
         ld._batches_currentMax_id++;
 
         // emit batch create event (commodity & controller - not base; its batch and tok-type IDs are local)
-        if (ld.contractType != StructLib.ContractType.CASHFLOW_BASE) {
+        if (ld.contractType == StructLib.ContractType.CASHFLOW_CONTROLLER || ld.contractType == StructLib.ContractType.COMMODITY) {
             emit Minted(newBatch.id, a.tokTypeId, a.batchOwner, uint256(a.mintQty), uint256(uint64(a.mintSecTokenCount)));
         }
 

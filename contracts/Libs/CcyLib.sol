@@ -70,10 +70,10 @@ library CcyLib {
         address                          ledgerOwner,
         string                           calldata desc)
     public  {
-        if (direction == StructLib.FundWithdrawType.Fund) {
+        if (direction == StructLib.FundWithdrawType.FUND) {
             fund(ld, ctd, ccyTypeId, amount, ledgerOwner, desc);
         }
-        else if (direction == StructLib.FundWithdrawType.Withdraw) {
+        else if (direction == StructLib.FundWithdrawType.WITHDRAW) {
             withdraw(ld, ctd, ccyTypeId, amount, ledgerOwner, desc);
         }
         else revert("Bad direction");

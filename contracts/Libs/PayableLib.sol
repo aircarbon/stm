@@ -160,7 +160,7 @@ library PayableLib {
         // send change back to payer
         v.weiChange = msg.value % v.weiPrice; // explicit remainder -- keep 10 Wei in the contract, tryfix...
         if (v.weiChange > 0) {
-            payable(msg.sender).transfer(v.weiChange);
+            payable(msg.sender).transfer(v.weiChange); // payable used in solidity version 0.8.0 onwards
         }
 
         // fwd payment to issuer
@@ -289,7 +289,7 @@ library PayableLib {
             ipv.initAddrNdx = ipbd.curNdx;
 
             for (ipv.addrNdx = ipv.initAddrNdx; ipv.addrNdx < ipv.initAddrNdx + count ; ipv.addrNdx++) {
-                address payable addr = payable(address(uint160(ld._ledgerOwners[ipv.addrNdx])));
+                address payable addr = payable(address(uint160(ld._ledgerOwners[ipv.addrNdx]))); // payable used in solidity version 0.8.0 onwards
                 
                 if (addr != issueBatch.originator) { // exclude issuer from payments
                     uint256[] storage stIds = ld._ledger[addr].tokenType_stIds[1];
@@ -300,7 +300,7 @@ library PayableLib {
 
                         // TODO: re-entrancy guards, and .call instead of .transfer
                         if (ipv.shareWei > 0) {
-                            payable(addr).transfer(ipv.shareWei);
+                            payable(addr).transfer(ipv.shareWei); // payable used in solidity version 0.8.0 onwards
                         }
                         // save payment history
                         ipv.batchProcessedAmount += ipv.shareWei;
@@ -312,7 +312,7 @@ library PayableLib {
             }
             ipv.weiChange = msg.value - uint256(ipv.batchProcessedAmount);
             if (ipv.weiChange > 0) {
-                payable(msg.sender).transfer(ipv.weiChange);
+                payable(msg.sender).transfer(ipv.weiChange); // payable used in solidity version 0.8.0 onwards
             }
             emit IssuerPaymentBatchProcessed(ipbd.curPaymentId, ipbd.curBatchNdx, msg.sender, msg.value, ipv.weiChange);
             ipbd.curBatchNdx++;

@@ -23,7 +23,7 @@ contract Owned
     function readOnly() external view returns (bool isReadOnly) { return readOnlyState; }
 
     constructor() {
-        deploymentOwner = payable(msg.sender);
+        deploymentOwner = payable(msg.sender); // payable used in solidity version 0.8.0 onwards
         readOnlyState = false;
     }
 
