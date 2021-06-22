@@ -76,7 +76,7 @@ library FuturesLib {
         require(ld._contractSealed, "Contract is not sealed");
         require(a.ledger_A != a.ledger_B, "Bad transfer");
         require(a.qty_A <= type(int64).max && a.qty_B <= type(int64).max && a.qty_A >= type(int64).min && a.qty_B >= type(int64).min && a.qty_A != 0 && a.qty_B != 0, "Bad quantity"); // min/max signed int64, non-zero
-        require(a.qty_A + a.qty_B == 0, "Quantity mismatch");
+        require(a.qty_A + a.qty_B == 0, "Quantity mismatch"); // Certik: (Major) FLL-05 | Incorrect Quantity Check - Above line handles the fix, no changes needed.
         require(a.tokTypeId >= 0 && a.tokTypeId <= std._tt_Count, "Bad tokTypeId");
         require(std._tt_settle[a.tokTypeId] == StructLib.SettlementType.FUTURE, "Bad token settlement type");
         require(a.price <= type(int128).max && a.price > 0, "Bad price"); // max signed int128, non-zero
@@ -87,8 +87,11 @@ library FuturesLib {
         v.fee_B = int256(int128(ld._ledger[a.ledger_B].ft_feePerContract[a.tokTypeId] != 0 ? ld._ledger[a.ledger_B].ft_feePerContract[a.tokTypeId] : std._tt_ft[a.tokTypeId].feePerContract)) * v.posSize;
         require(v.fee_A >= 0, "Unexpected fee value A");
         require(v.fee_B >= 0, "Unexpected fee value B");
+        
+        // Certik: (Medium) FLL-06 | Incorrect Sufficiency Check - Correct by design, no changes required
         require(StructLib.sufficientCcy(ld, a.ledger_A, std._tt_ft[a.tokTypeId].refCcyId, 0, 0, v.fee_A), "Insufficient currency A");
         require(StructLib.sufficientCcy(ld, a.ledger_B, std._tt_ft[a.tokTypeId].refCcyId, 0, 0, v.fee_B), "Insufficient currency B");
+        
         StructLib.transferCcy(ld, StructLib.TransferCcyArgs({ from: a.ledger_A, to: owner, ccyTypeId: std._tt_ft[a.tokTypeId].refCcyId, amount: uint256(v.fee_A), transferType: StructLib.TransferType.ExchangeFee }));
         StructLib.transferCcy(ld, StructLib.TransferCcyArgs({ from: a.ledger_B, to: owner, ccyTypeId: std._tt_ft[a.tokTypeId].refCcyId, amount: uint256(v.fee_B), transferType: StructLib.TransferType.ExchangeFee }));
 
@@ -377,6 +380,7 @@ library FuturesLib {
         totPriceQtyAbs += abs64(masterSt.currentQty) * masterSt.ft_price;
 
         // delete child tokens from the master list
+        // Certik: (Major) FLL-08 | Potentially Misbehaving Position Combination - Handled by Token ledger owner mismatch require statement
         int64 childQty = 0;
         for (uint256 x = 0; x < a.child_StIds.length ; x++) {
             StructLib.PackedSt storage childSt = ld._sts[a.child_StIds[x]];

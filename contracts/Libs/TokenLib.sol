@@ -57,10 +57,11 @@ library TokenLib {
             require(keccak256(abi.encodePacked(std._tt_name[tokenTypeId])) != keccak256(abi.encodePacked(name)), "Duplicate name");
         }
         if (settlementType == StructLib.SettlementType.FUTURE) {
-            require(ft.expiryTimestamp > 1585699708, "Bad expiry");
+            // Certik: (Major) TLL-01 | Inexplicable Constant - Removed ft.expiryTimestamp > 1585699708 require statement
             require(ft.underlyerTypeId > 0 && ft.underlyerTypeId <= std._tt_Count, "Bad underlyerTypeId");
             require(std._tt_settle[ft.underlyerTypeId] == StructLib.SettlementType.SPOT, "Bad underyler settlement type");
             require(ft.refCcyId > 0 && ft.refCcyId <= ctd._ct_Count, "Bad refCcyId");
+            // Certik: (Major) TLL-02 | Unsafe Addition - Solidity v0.8.0 uses SafeMath by default, no changes required for fix
             require(ft.initMarginBips + ft.varMarginBips <= 10000, "Bad total margin");
             require(ft.contractSize > 0, "Bad contractSize");
         }

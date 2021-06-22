@@ -22,6 +22,7 @@ library PayableLib {
     function get_chainlinkRefPrice(address chainlinkAggAddr) public view returns(int256) {
         //if (chainlinkAggAddr == address(0x0)) return 100000000; // $1 - cents*satoshis
         if (chainlinkAggAddr == address(0x0)) return -1;
+        // Certik: (Major) ICA-01 | Incorrect Chainlink Interface - Upgraded Chainlink Aggregator Interface to V3
         IChainlinkAggregator ref = IChainlinkAggregator(chainlinkAggAddr);
         ( , int256 answer, , , ) = ref.latestRoundData();
         return answer;
@@ -110,6 +111,9 @@ library PayableLib {
         //uint256 qtyIssuanceSold;
         uint256 weiChange;
     }
+
+    // Certik: (Medium) PLL-02 | Inexistent Reentrancy Guard - A detailed analysis on the vulnerability required from Certik
+    // TODO: Discuss the issue with Certik in detail
     function processSubscriberPayment(
         StructLib.LedgerStruct storage ld,
         StructLib.StTypesStruct storage std,
@@ -126,9 +130,9 @@ library PayableLib {
 
         require(cashflowData.qty_saleAllocation > 0, "Nothing for sale");
 
-        // TODO: restrict msg.value upper bound so no overflow?
+        require(msg.value > 0 && msg.value < type(uint256).max, "Bad msg.value");
+        require(v.weiPrice > 0, "Bad computed v.weiPrice");
 
-        //uint256 weiPrice;
         if (cashflowData.wei_currentPrice > 0) {
             v.weiPrice = cashflowData.wei_currentPrice;
         }
@@ -141,8 +145,6 @@ library PayableLib {
                 v.weiPrice = (cashflowData.cents_currentPrice * 10 ** 24) / (uint256(bnbSat_UsdCents));
             }
         }
-        require(msg.value > 0, "Bad msg.value");
-        require(v.weiPrice > 0, "Bad computed v.weiPrice");
 
         // calculate subscription size
         v.qtyTokens = msg.value / v.weiPrice; // ## explicit round DOWN
@@ -241,12 +243,12 @@ library PayableLib {
         StructLib.CashflowStruct storage cashflowData
     )
     public {
-        // TODO: restrict msg.value upper bound so no overflow -- esp. wrt. precision hack below!!
 
         require(ld.contractType == StructLib.ContractType.CASHFLOW_BASE, 'Bad commodity request');
         require(ld._contractSealed, 'Contract is not sealed');
         require(ld._batches_currentMax_id == 1, 'Bad cashflow request: no minted batch');
-        require(msg.value < (2 ** 128), 'Amount must be less than 2^128'); // stop any overflows
+        // Certik: (Medium) PLL-03 | Incorrect Limit Evaluation - Corrected the overflow check
+        require(uint128(msg.value) < type(uint128).max, 'Amount must be less than 2^128'); // stop any overflows
         require(count > 0, 'Invalid count');
         
         // get issuer
