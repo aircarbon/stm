@@ -10,6 +10,7 @@ pragma solidity ^0.8.0;
 contract Owned
 {
     address payable deploymentOwner;
+// Certik: (Minor) OSM-07 | Inexistent Management Functionality The Owned contract implementation should be self-sufficient and possess adding and removing owners within it.    
     address[] owners;
 
     bool readOnlyState;
@@ -42,6 +43,7 @@ contract Owned
         //require(found, "Restricted"); 
         
         for (uint i = 0; i < owners.length; i++) {
+// Certik: (Minor) OSM-08 | Usage of tx.origin The use of tx.origin should be avoided for ownership-based systems given that firstly it can be tricked on-chain and secondly it will change its functionality once EIP-3074 is integrated.            
             if (owners[i] == tx.origin) {  _; return; }
         }
         revert("Restricted");

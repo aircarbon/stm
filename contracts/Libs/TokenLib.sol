@@ -343,6 +343,7 @@ library TokenLib {
         // burn (remove or resize) sufficient ST(s)
         uint256 ndx = 0;
         int64 remainingToBurn = int64(a.burnQty);
+// Certik: (Minor) TLL-03 | Potentially Negative Quantities Negative quantities should be skipped by the while loop as the adidtion in L380 will lead to the remaining to burn increasing.        
         while (remainingToBurn > 0) {
             uint256[] storage tokenType_stIds = ld._ledger[a.ledgerOwner].tokenType_stIds[a.tokTypeId];
             uint256 stId = tokenType_stIds[ndx];
