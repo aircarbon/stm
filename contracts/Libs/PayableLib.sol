@@ -114,7 +114,7 @@ library PayableLib {
     }
 
     // Certik: (Medium) PLL-02 | Inexistent Reentrancy Guard - A detailed analysis on the vulnerability required from Certik
-    // TODO: Discuss the issue with Certik in detail
+    // TODO: (Medium) PLL-02 | Discuss the issue with Certik in detail
     function processSubscriberPayment(
         StructLib.LedgerStruct storage ld,
         StructLib.StTypesStruct storage std,
