@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // Author: @7-of-9 and @ankurdaharwal
 pragma solidity ^0.8.0;
-// https://medium.com/@leonardoalt/smtchecker-toward-completeness-1a99c02e0133
-pragma experimental SMTChecker;
 
 import "../StMaster/StMaster.sol";
 
