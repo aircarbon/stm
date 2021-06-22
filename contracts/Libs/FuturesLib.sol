@@ -16,24 +16,29 @@ library FuturesLib {
     //
     // PUBLIC - ledger overrides (initial margin & fee per contract)
     //
-// Certik: (Minor) FLL-03 | Inexistent Seal Check The linked functions override sensitive ledger variables.
     function setLedgerOverride(
         uint256 overrideType,
         StructLib.LedgerStruct storage ld,
         StructLib.StTypesStruct storage std,
-        uint256 tokTypeId, address ledgerOwner, uint128 value
+        uint256 tokTypeId, address ledgerOwner, uint16 value
     ) public {
-        if (overrideType == 1) initMarginOverride(ld, std, tokTypeId, ledgerOwner, uint16(value));
-// Certik: (Minor) FLL-01 | Unsafe Cast The linked statement casts a uint128 value to a uint16 one, thereby containing a high possibility of an overflow. 
-        else if (overrideType == 2) feePerContractOverride(ld, std, tokTypeId, ledgerOwner, value);
+        // Certik: (Minor) FLL-03 | Inexistent Seal Check The linked functions override sensitive ledger variables.
+        // Resolved: (Minor) FLL-03 | Added missing Contract Seal check
+        require(ld._contractSealed, "Contract is not sealed");
+        // Certik: (Minor) FLL-01 | Unsafe Cast The linked statement casts a uint128 value to a uint16 one, thereby containing a high possibility of an overflow 
+        // Resolved: (Minor) FLL-01 | Changed setLedgerOverride argument from uint128 to uint16 to upcast instead of vulnerable downcast
+        if (overrideType == 1) initMarginOverride(ld, std, tokTypeId, ledgerOwner, value);
+        else if (overrideType == 2) feePerContractOverride(ld, std, tokTypeId, ledgerOwner, uint128(value));
     }
         function initMarginOverride(
             StructLib.LedgerStruct storage ld,
             StructLib.StTypesStruct storage std,
             uint256 tokTypeId, address ledgerOwner, uint16 initMarginBips
         ) private {
-            require(tokTypeId >= 0 && tokTypeId <= std._tt_Count, "Bad tokTypeId");
-// Certik: (Minor) FLL-02 | Improper Bound Check The TokenLib library performs a different bound check for the tokTypeId . Additionally, the first comparator is a tautology and should not be included.
+            // Certik: (Minor) FLL-02 | Improper Bound Check The TokenLib library performs a different bound check for the tokTypeId . Additionally, the first comparator is a tautology and should not be included.
+            // Resolved: (Minor) FLL-02 | Added consistent bound check for tokTypeId similar to TokenLib
+            require(tokTypeId >= 1 && tokTypeId <= std._tt_Count, "Bad tokTypeId");
+            require(initMarginBips < type(uint16).max, "Bad total margin");
             require(std._tt_settle[tokTypeId] == StructLib.SettlementType.FUTURE, "Bad token settlement type");
             require(/*std._tt_ft[tokTypeId].varMarginBips +*/initMarginBips <= 10000, "Bad total margin");
 
@@ -47,7 +52,6 @@ library FuturesLib {
             uint256 tokTypeId, address ledgerOwner, uint128 feePerContract
         ) private {
             require(tokTypeId >= 0 && tokTypeId <= std._tt_Count, "Bad tokTypeId");
-// Certik: (Minor) FLL-01 | Unsafe Cast The linked statement casts a uint128 value to a uint16 one, thereby containing a high possibility of an overflow. 
             require(std._tt_settle[tokTypeId] == StructLib.SettlementType.FUTURE, "Bad token settlement type");
 
             StructLib.initLedgerIfNew(ld, ledgerOwner);
@@ -80,10 +84,17 @@ library FuturesLib {
         require(ld._contractSealed, "Contract is not sealed");
         require(a.ledger_A != a.ledger_B, "Bad transfer");
         require(a.qty_A <= type(int64).max && a.qty_B <= type(int64).max && a.qty_A >= type(int64).min && a.qty_B >= type(int64).min && a.qty_A != 0 && a.qty_B != 0, "Bad quantity"); // min/max signed int64, non-zero
-        require(a.qty_A + a.qty_B == 0, "Quantity mismatch"); // Certik: (Major) FLL-05 | Incorrect Quantity Check - Above line handles the fix, no changes needed.
+        // Certik: (Major) FLL-05 | Incorrect Quantity Check
+        // Resolved: (Major) FLL-05 | Above line handles the fix, no changes needed.
+        require(a.qty_A + a.qty_B == 0, "Quantity mismatch");
         require(a.tokTypeId >= 0 && a.tokTypeId <= std._tt_Count, "Bad tokTypeId");
         require(std._tt_settle[a.tokTypeId] == StructLib.SettlementType.FUTURE, "Bad token settlement type");
         require(a.price <= type(int128).max && a.price > 0, "Bad price"); // max signed int128, non-zero
+
+        // Certik: (Minor) FLL-07 | Incorrect Order of Initialization The statements that precede the ledger initialization will fail if the ledgers haven't been initialized already due to the absence of a balance and a non-zero fee
+        // Resolved: (Minor) FLL-07 | Ledger initialization re-ordered before fee application
+        StructLib.initLedgerIfNew(ld, a.ledger_A);
+        StructLib.initLedgerIfNew(ld, a.ledger_B);
 
         // apply fees
         v.posSize = (a.qty_A < 0 ? a.qty_B : a.qty_A);
@@ -91,8 +102,9 @@ library FuturesLib {
         v.fee_B = int256(int128(ld._ledger[a.ledger_B].ft_feePerContract[a.tokTypeId] != 0 ? ld._ledger[a.ledger_B].ft_feePerContract[a.tokTypeId] : std._tt_ft[a.tokTypeId].feePerContract)) * v.posSize;
         require(v.fee_A >= 0, "Unexpected fee value A");
         require(v.fee_B >= 0, "Unexpected fee value B");
-        
-        // Certik: (Medium) FLL-06 | Incorrect Sufficiency Check - Correct by design, no changes required
+
+        // Certik: (Medium) FLL-06 | Incorrect Sufficiency Check
+        // Resolved: (Medium) FLL-06 | Correct by design, no changes required
         require(StructLib.sufficientCcy(ld, a.ledger_A, std._tt_ft[a.tokTypeId].refCcyId, 0, 0, v.fee_A), "Insufficient currency A");
         require(StructLib.sufficientCcy(ld, a.ledger_B, std._tt_ft[a.tokTypeId].refCcyId, 0, 0, v.fee_B), "Insufficient currency B");
         
@@ -115,9 +127,6 @@ library FuturesLib {
         // StructLib.setReservedCcy(ld, ctd, a.ledger_B, std._tt_ft[a.tokTypeId].refCcyId, v.newReserved_B);
 
         // create ledger entries as required
-// Certik: (Minor) FLL-07 | Incorrect Order of Initialization The statements that precede the ledger initialization will fail if the ledgers haven't been initialized already due to the absence of a balance and a non-zero fee. 
-        StructLib.initLedgerIfNew(ld, a.ledger_A);
-        StructLib.initLedgerIfNew(ld, a.ledger_B);
 
         // auto-mint ("batchless") a balanced ST-pair; one for each side of the position
         // (note: no global counter updates [_spot_totalMintedQty, spot_sumQtyMinted] for FT auto-mints)
@@ -385,7 +394,8 @@ library FuturesLib {
         totPriceQtyAbs += abs64(masterSt.currentQty) * masterSt.ft_price;
 
         // delete child tokens from the master list
-        // Certik: (Major) FLL-08 | Potentially Misbehaving Position Combination - Handled by Token ledger owner mismatch require statement
+        // Certik: (Major) FLL-08 | Potentially Misbehaving Position Combination
+        // Resolved: (Major) FLL-08 | Handled by Token ledger owner mismatch require statement
         int64 childQty = 0;
         for (uint256 x = 0; x < a.child_StIds.length ; x++) {
             StructLib.PackedSt storage childSt = ld._sts[a.child_StIds[x]];
