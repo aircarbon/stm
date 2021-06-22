@@ -65,6 +65,7 @@ library StructLib {
         StructLib.LedgerStruct storage ld,
         TransferCcyArgs memory a)
     public {
+        // Certik: (Major) SLI-05 | Unsafe Cast - Added bound evaluation for int256
         require(a.amount > 0 && int256(a.amount) < type(int256).max , "Bound check found overflow");
         ld._ledger[a.from].ccyType_balance[a.ccyTypeId] -= int256(a.amount);
         ld._ledger[a.to].ccyType_balance[a.ccyTypeId] += int256(a.amount);
