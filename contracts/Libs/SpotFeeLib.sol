@@ -40,31 +40,25 @@ library SpotFeeLib {
         feeStruct.tokType_Set[tokTypeId] = a.fee_fixed != 0 || a.fee_percBips != 0 || a.fee_min != 0 || a.fee_max != 0;
 
         // Certik: (Minor) SFL-01 | Potentially Incorrect Clauses The linked if clauses emit an event when the value is being set, however, they do so when the value is simply non-zero rendering the first conditional questionable.
-        // TODO: (Minor) SFL-01 | Choice between allowing 0 fees setting or replace OR with AND
-        if (feeStruct.tok[tokTypeId].fee_fixed != a.fee_fixed || a.fee_fixed != 0)
+        // The original intent here was: to emit event if a fee is SET, or UNSET, *or if it's SET repeatedly* to the same value
+        // But, maybe that's not a good idea. So instead, let's emit only if the fee value *changes*
+        // Certik TODO: re-run/refactor tests for this usage...
+        if (feeStruct.tok[tokTypeId].fee_fixed != a.fee_fixed)// || a.fee_fixed != 0)
             emit SetFeeTokFix(tokTypeId, ledgerOwner, a.fee_fixed);
         feeStruct.tok[tokTypeId].fee_fixed = a.fee_fixed;
 
-        // Certik: (Minor) SFL-01 | Potentially Incorrect Clauses The linked if clauses emit an event when the value is being set, however, they do so when the value is simply non-zero rendering the first conditional questionable.
-        // TODO: (Minor) SFL-01 | Choice between allowing 0 fees setting or replace OR with AND
-        if (feeStruct.tok[tokTypeId].fee_percBips != a.fee_percBips || a.fee_percBips != 0)
+        if (feeStruct.tok[tokTypeId].fee_percBips != a.fee_percBips)// || a.fee_percBips != 0)
             emit SetFeeTokBps(tokTypeId, ledgerOwner, a.fee_percBips);
         feeStruct.tok[tokTypeId].fee_percBips = a.fee_percBips;
 
-        // Certik: (Minor) SFL-01 | Potentially Incorrect Clauses The linked if clauses emit an event when the value is being set, however, they do so when the value is simply non-zero rendering the first conditional questionable.
-        // TODO: (Minor) SFL-01 | Choice between allowing 0 fees setting or replace OR with AND
-        if (feeStruct.tok[tokTypeId].fee_min != a.fee_min || a.fee_min != 0)
+        if (feeStruct.tok[tokTypeId].fee_min != a.fee_min)// || a.fee_min != 0)
             emit SetFeeTokMin(tokTypeId, ledgerOwner, a.fee_min);
         feeStruct.tok[tokTypeId].fee_min = a.fee_min;
 
-        // Certik: (Minor) SFL-01 | Potentially Incorrect Clauses The linked if clauses emit an event when the value is being set, however, they do so when the value is simply non-zero rendering the first conditional questionable.
-        // TODO: (Minor) SFL-01 | Choice between allowing 0 fees setting or replace OR with AND
-        if (feeStruct.tok[tokTypeId].fee_max != a.fee_max || a.fee_max != 0)
+        if (feeStruct.tok[tokTypeId].fee_max != a.fee_max)// || a.fee_max != 0)
             emit SetFeeTokMax(tokTypeId, ledgerOwner, a.fee_max);
         feeStruct.tok[tokTypeId].fee_max = a.fee_max;
 
-        // cashflow controller: delegate to base type (denormalize fee structures: they are read directly from delegated base types' storages during transferOrTrade())
-        // TODO: (Minor) SFL-01 | Choice between allowing 0 fees setting or replace OR with AND
         if (ld.contractType == StructLib.ContractType.CASHFLOW_CONTROLLER) {
             StMaster base = StMaster(std._tt_addr[tokTypeId]);
             base.setFee_TokType(tokTypeId,ledgerOwner, a);
@@ -90,32 +84,22 @@ library SpotFeeLib {
 
         feeStruct.ccyType_Set[ccyTypeId] = a.fee_fixed != 0 || a.fee_percBips != 0 || a.fee_min != 0 || a.fee_max != 0 || a.ccy_perMillion != 0;
 
-        // Certik: (Minor) SFL-01 | Potentially Incorrect Clauses The linked if clauses emit an event when the value is being set, however, they do so when the value is simply non-zero rendering the first conditional questionable.
-        // TODO: (Minor) SFL-01 | Choice between allowing 0 fees setting or replace OR with AND
-        if (feeStruct.ccy[ccyTypeId].fee_fixed != a.fee_fixed || a.fee_fixed != 0)
+        if (feeStruct.ccy[ccyTypeId].fee_fixed != a.fee_fixed)// || a.fee_fixed != 0)
             emit SetFeeCcyFix(ccyTypeId, ledgerOwner, a.fee_fixed);
         feeStruct.ccy[ccyTypeId].fee_fixed = a.fee_fixed;
 
-        // Certik: (Minor) SFL-01 | Potentially Incorrect Clauses The linked if clauses emit an event when the value is being set, however, they do so when the value is simply non-zero rendering the first conditional questionable.
-        // TODO: (Minor) SFL-01 | Choice between allowing 0 fees setting or replace OR with AND
-        if (feeStruct.ccy[ccyTypeId].fee_percBips != a.fee_percBips || a.fee_percBips != 0)
+        if (feeStruct.ccy[ccyTypeId].fee_percBips != a.fee_percBips)// || a.fee_percBips != 0)
             emit SetFeeCcyBps(ccyTypeId, ledgerOwner, a.fee_percBips);
         feeStruct.ccy[ccyTypeId].fee_percBips = a.fee_percBips;
 
-        // Certik: (Minor) SFL-01 | Potentially Incorrect Clauses The linked if clauses emit an event when the value is being set, however, they do so when the value is simply non-zero rendering the first conditional questionable.
-        // TODO: (Minor) SFL-01 | Choice between allowing 0 fees setting or replace OR with AND
-        if (feeStruct.ccy[ccyTypeId].fee_min != a.fee_min || a.fee_min != 0)
+        if (feeStruct.ccy[ccyTypeId].fee_min != a.fee_min)// || a.fee_min != 0)
             emit SetFeeCcyMin(ccyTypeId, ledgerOwner, a.fee_min);
         feeStruct.ccy[ccyTypeId].fee_min = a.fee_min;
 
-        // Certik: (Minor) SFL-01 | Potentially Incorrect Clauses The linked if clauses emit an event when the value is being set, however, they do so when the value is simply non-zero rendering the first conditional questionable.
-        // TODO: (Minor) SFL-01 | Choice between allowing 0 fees setting or replace OR with AND
-        if (feeStruct.ccy[ccyTypeId].fee_max != a.fee_max || a.fee_max != 0)
+        if (feeStruct.ccy[ccyTypeId].fee_max != a.fee_max)// || a.fee_max != 0)
             emit SetFeeCcyMax(ccyTypeId, ledgerOwner, a.fee_max);
         feeStruct.ccy[ccyTypeId].fee_max = a.fee_max;
 
-        // Certik: (Minor) SFL-01 | Potentially Incorrect Clauses The linked if clauses emit an event when the value is being set, however, they do so when the value is simply non-zero rendering the first conditional questionable.
-        // TODO: (Minor) SFL-01 | Choice between allowing 0 fees setting or replace OR with AND
         if (feeStruct.ccy[ccyTypeId].ccy_perMillion != a.ccy_perMillion || a.ccy_perMillion != 0)
             emit SetFeeCcyPerMillion(ccyTypeId, ledgerOwner, a.ccy_perMillion);
         feeStruct.ccy[ccyTypeId].ccy_perMillion = a.ccy_perMillion;
