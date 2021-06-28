@@ -222,7 +222,7 @@ contract("StMaster", accounts => {
         const ethFeeFixed_Wei = 1000;
         //const setEthFeeTx = await stm.setFee_CcyType_Fixed(CONST.ccyType.ETH, ethFeeFixed_Wei);
         const setEthFeeTx = await stm.setFee_CcyType(CONST.ccyType.ETH, CONST.nullAddr, { ccy_mirrorFee: false, ccy_perMillion: 0, fee_fixed: ethFeeFixed_Wei, fee_percBips: 0, fee_min: 0, fee_max: 0 } );
-        truffleAssert.eventEmitted(setEthFeeTx, 'SetFeeCcyFix', ev => ev.ccyTypeId == CONST.ccyType.ETH && ev.fee_ccy_Fixed == ethFeeFixed_Wei && ev.ledgerOwner == CONST.nullAddr);
+        truffleAssert.  (setEthFeeTx, 'SetFeeCcyFix', ev => ev.ccyTypeId == CONST.ccyType.ETH && ev.fee_ccy_Fixed == ethFeeFixed_Wei && ev.ledgerOwner == CONST.nullAddr);
         assert((await stm.getFee(CONST.getFeeType.CCY, CONST.ccyType.ETH, CONST.nullAddr)).fee_fixed == ethFeeFixed_Wei, 'unexpected ETH fixed Wei fee after setting ETH fee structure');
 
         // set fee structure NATURE: 10 TONS fixed
