@@ -132,7 +132,6 @@ library PayableLib {
         require(cashflowData.qty_saleAllocation > 0, "Nothing for sale");
 
         require(msg.value > 0 && msg.value <= type(uint256).max, "Bad msg.value");
-        require(v.weiPrice > 0, "Bad computed v.weiPrice");
 
         if (cashflowData.wei_currentPrice > 0) {
             v.weiPrice = cashflowData.wei_currentPrice;
@@ -146,6 +145,9 @@ library PayableLib {
                 v.weiPrice = (cashflowData.cents_currentPrice * 10 ** 24) / (uint256(bnbSat_UsdCents));
             }
         }
+
+        // check if weiPrice is set
+        require(v.weiPrice > 0, "Bad computed v.weiPrice");
 
         // calculate subscription size
         v.qtyTokens = msg.value / v.weiPrice; // ## explicit round DOWN
@@ -165,7 +167,6 @@ library PayableLib {
         }
 
         // fwd payment to issuer
-        //issueBatch.originator.transfer(msg.value - v.weiChange);
         issueBatch.originator.transfer(msg.value - v.weiChange);
 
         // transfer tokens to payer
