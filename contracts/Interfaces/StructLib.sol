@@ -112,12 +112,12 @@ library StructLib {
 
     // CONTRACT TYPE
     // Certik: (Minor) SLI-09 | State Representation Inconsistency The enum declarations of the contract are inconsistent with regards to the default state. While the ContractType and FundWithdrawType enums have an actionable default state, the SettlementType enum has an UNDEFINED default state.
-    // Resolved: (Minor) SLI-09 | Added a default UNDEFINED to ContractType
+    // Resolved: (Minor) SLI-09 | Removed UNDEFINED from ContractType for consistency
     enum ContractType { COMMODITY, CASHFLOW_BASE, CASHFLOW_CONTROLLER }
 
     // CCY TYPES
     // Certik: (Minor) SLI-09 | State Representation Inconsistency The enum declarations of the contract are inconsistent with regards to the default state. While the ContractType and FundWithdrawType enums have an actionable default state, the SettlementType enum has an UNDEFINED default state.
-    // Resolved: (Minor) SLI-09 | Added a default UNDEFINED to FundWithdrawType
+    // Resolved: (Minor) SLI-09 | Removed UNDEFINED from FundWithdrawType for consistency and capitalized Fund and Withdraw types
     enum FundWithdrawType { FUND, WITHDRAW }
     struct Ccy {
         uint256 id;
@@ -147,7 +147,7 @@ library StructLib {
     }
 
     // Certik: (Minor) SLI-09 | State Representation Inconsistency The enum declarations of the contract are inconsistent with regards to the default state. While the ContractType and FundWithdrawType enums have an actionable default state, the SettlementType enum has an UNDEFINED default state.
-    // Resolved: (Minor) SLI-09 | SettleMentType consistent convention UPPERCASE
+    // Resolved: (Minor) SLI-09 | Removed UNDEFINED from SettlementType for consistency
     enum SettlementType { SPOT, FUTURE }
     struct StTypesStruct { // ** DATA_DUMP: OK
         mapping(uint256 => string)              _tt_name;       // typeId (1-based) -> typeName
