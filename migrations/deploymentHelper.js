@@ -11,8 +11,7 @@ const { assert } = require('console');
 module.exports = {
 
     Deploy: async (p) => {
-        try {
-            const { deployer, artifacts, contractType, nameOverride, symbolOverride } = p;
+        const { deployer, artifacts, contractType, nameOverride, symbolOverride } = p;
             var stmAddr;
             //const contractType = process.env.CONTRACT_TYPE;
             if (contractType != 'CASHFLOW_BASE' && contractType != 'CASHFLOW_CONTROLLER' && contractType != 'COMMODITY') throw ('Unknown contractType');
@@ -73,18 +72,18 @@ module.exports = {
                 const contractName = `${process.env.CONTRACT_PREFIX}${nameOverride || CONST.contractProps[contractType].contractName}`;
 
                 // parse cashflow args; convert from days to blocks
-    //#if process.env.CONTRACT_TYPE === 'CASHFLOW_BASE'
-                const cfa = process.env.ADD_TYPE__CASHFLOW_ARGS !== undefined
-                            ? JSON.parse(process.env.ADD_TYPE__CASHFLOW_ARGS)
-                            : CONST.contractProps[contractType].cashflowArgs;
-                console.log('cfa(pre)', cfa);
-                if (cfa.term_Days === undefined || cfa.bond_int_EveryDays === undefined) throw('Undefined cashflow args; aborting.')
-                cfa.term_Blks = CONST.blocksFromDays(cfa.term_Days);
-                cfa.bond_int_EveryBlks = CONST.blocksFromDays(cfa.bond_int_EveryDays);
-                delete cfa.term_Days;
-                delete cfa.bond_int_EveryDays;
-                console.log('cfa(post)', cfa);
-    //#endif
+//#if process.env.CONTRACT_TYPE === 'CASHFLOW_BASE'
+//#                 const cfa = process.env.ADD_TYPE__CASHFLOW_ARGS !== undefined
+//#                             ? JSON.parse(process.env.ADD_TYPE__CASHFLOW_ARGS)
+//#                             : CONST.contractProps[contractType].cashflowArgs;
+//#                 console.log('cfa(pre)', cfa);
+//#                 if (cfa.term_Days === undefined || cfa.bond_int_EveryDays === undefined) throw('Undefined cashflow args; aborting.')
+//#                 cfa.term_Blks = CONST.blocksFromDays(cfa.term_Days);
+//#                 cfa.bond_int_EveryBlks = CONST.blocksFromDays(cfa.bond_int_EveryDays);
+//#                 delete cfa.term_Days;
+//#                 delete cfa.bond_int_EveryDays;
+//#                 console.log('cfa(post)', cfa);
+//#endif
 
                 // derive primary owner/deployer (&[0]), and a further n more keypairs ("backup owners");
                 // (bkp-owners are passed to contract ctor, and have identical permissions to the primary owner)
@@ -103,23 +102,23 @@ module.exports = {
                     contractType == 'CASHFLOW_BASE'       ? CONST.contractType.CASHFLOW_BASE :
                     contractType == 'CASHFLOW_CONTROLLER' ? CONST.contractType.CASHFLOW_CONTROLLER :
                                                             CONST.contractType.COMMODITY,
-    //#if process.env.CONTRACT_TYPE === 'CASHFLOW_BASE'
-                    cfa,
-    //#endif
+//#if process.env.CONTRACT_TYPE === 'CASHFLOW_BASE'
+//#                     cfa,
+//#endif
                     contractName,
                     CONST.contractProps[contractType].contractVer,
                     CONST.contractProps[contractType].contractUnit
-    //#if process.env.CONTRACT_TYPE === 'CASHFLOW_BASE' || process.env.CONTRACT_TYPE === 'COMMODITY'
+//#if process.env.CONTRACT_TYPE === 'CASHFLOW_BASE' || process.env.CONTRACT_TYPE === 'COMMODITY'
                     ,
                     symbolOverride || CONST.contractProps[contractType].contractSymbol,
                     CONST.contractProps[contractType].contractDecimals
-    //#endif
-    //#if process.env.CONTRACT_TYPE === 'CASHFLOW_BASE'
-                ,
-            //CONST.chainlinkAggregators[process.env.NETWORK_ID].btcUsd,    // 24k
-                CONST.chainlinkAggregators[process.env.NETWORK_ID].ethUsd,
-                CONST.chainlinkAggregators[process.env.NETWORK_ID].bnbUsd,
-    //#endif
+//#endif
+//#if process.env.CONTRACT_TYPE === 'CASHFLOW_BASE'
+//#                 ,
+//#             //CONST.chainlinkAggregators[process.env.NETWORK_ID].btcUsd,    // 24k
+//#                 CONST.chainlinkAggregators[process.env.NETWORK_ID].ethUsd,
+//#                 CONST.chainlinkAggregators[process.env.NETWORK_ID].bnbUsd,
+//#endif
                 ).then(async stm => {
                     //console.dir(stm);
                     //console.dir(stm.abi);
@@ -171,10 +170,6 @@ module.exports = {
             }).catch(err => { console.error('failed deployment: LedgerLib', err); });
             }).catch(err => { console.error('failed deployment: StructLib', err); });
             return stmAddr;
-        }
-        catch (err) {
-            console.error(err);
-        }
     }
 };
 
