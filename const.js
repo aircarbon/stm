@@ -265,9 +265,9 @@ module.exports = {
        WITHDRAW_FEE: 9,
         DEPOSIT_FEE: 10,
            DATA_FEE: 11,
-         OTHER_FEE1: 12,
-         OTHER_FEE2: 13,
-         OTHER_FEE3: 14,
+         OTHER_FEE1: 12, // ONBOARDING FEE
+         OTHER_FEE2: 13, // FIAT/TOKEN WITHDRAW
+         OTHER_FEE3: 14, // RETIREMENT
          OTHER_FEE4: 15, // REBATE
          OTHER_FEE5: 16, // PHYSICAL_DELIVERY
 

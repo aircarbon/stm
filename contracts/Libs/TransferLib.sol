@@ -63,7 +63,8 @@ library TransferLib {
         if (a.qty_A > 0) require(a.tokTypeId_A > 0, "Bad tokTypeId_A");
         if (a.qty_B > 0) require(a.tokTypeId_B > 0, "Bad tokTypeId_B");
 
-        // require a transferType for one-sided transfers, disallow it on two-sided trades (both ccy-tok trades, and [edgecase] tok-tok trades)
+        // require a transferType for one-sided transfers;
+        // disallow transferType on two-sided trades (both ccy-tok trades, and [edgecase] tok-tok trades)
         if ((a.ccyTypeId_A > 0 && a.tokTypeId_B == 0) || (a.ccyTypeId_B > 0 && a.tokTypeId_A == 0) ||
             (a.tokTypeId_A > 0 && a.ccyTypeId_B == 0 && a.tokTypeId_B == 0) || (a.tokTypeId_B > 0 && a.ccyTypeId_A == 0 && a.tokTypeId_A == 0)
         ) {
@@ -635,7 +636,7 @@ library TransferLib {
             v.stQty = ld._sts[stId].currentQty;
             // Certik: (Minor) TRA-02 | Potentially Negative Quantity The v.stQty value may be negative within the transferSplitSecTokens function
             // Resolved: (Minor) TRA-02 | Added a check to ensure only positive values of v.stQty
-            require(v.stQty >= 0, "Bad security token quantity");
+            require(v.stQty >= 0, "Unexpected stQty");
 
             // if specific avoid (skip) tokens are specified, then skip them;
             // and inverse - if specific use (take) tokens are specified, then skip over others

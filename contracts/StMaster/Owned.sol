@@ -42,10 +42,12 @@ contract Owned
         // CFT: tx.origin (not msg.sender) -- we want the TX origin to be checked, not the calling cashflow controller
         //require(tx.origin == deploymentOwner, "Restricted"); 
         //require(found, "Restricted"); 
-        
+
+        // TODO: ? could add CFT-C address into the owners[] for basetypes...
+        //  but WHY is tx.origin changing its meaning?
         for (uint i = 0; i < owners.length; i++) {
-        // Certik: (Minor) OSM-08 | Usage of tx.origin The use of tx.origin should be avoided for ownership-based systems given that firstly it can be tricked on-chain and secondly it will change its functionality once EIP-3074 is integrated.
-        // TODO: (Minor) OSM-08 | Breaks on usage of msg.sender for CFT
+            // Certik: (Minor) OSM-08 | Usage of tx.origin The use of tx.origin should be avoided for ownership-based systems given that firstly it can be tricked on-chain and secondly it will change its functionality once EIP-3074 is integrated.
+            // TODO: (Minor) OSM-08 | Breaks on usage of msg.sender for CFT
             if (owners[i] == tx.origin) {  _; return; }
         }
         revert("Restricted");

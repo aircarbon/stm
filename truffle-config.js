@@ -27,7 +27,7 @@ const DEV_MNEMONIC = process.env.DEV_MNEMONIC || require('./DEV_MNEMONIC.js').MN
 
 const GWEI_MAINNET_1  = "80";
 const GWEI_MAINNET_56 = "5"; // 5 gwei minimum [PoA validator cartel!]?! trial & error - not clear at all; <5 gwei seems to never mine...
-const GWEI_TESTNET_97 = "20";
+const GWEI_TESTNET_97 = "10";
 const GWEI_TESTNET    = "20";
 const GWEI_MATIC = "1"; // https://www.polygongasstation.com/
 

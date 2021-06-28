@@ -75,6 +75,7 @@ contract("StMaster", accounts => {
         ccy_amount_A: 0,                                ccyTypeId_A: 0,
         ccy_amount_B: 0,                                ccyTypeId_B: 0,
            applyFees: false,
+        transferType: CONST.transferType.OTHER_FEE2,
         });
         await transferHelper.transferLedger({ stm, accounts, 
             ledger_A: WHITE,                               ledger_B: GRAY_1,
@@ -83,6 +84,7 @@ contract("StMaster", accounts => {
         ccy_amount_A: 0,                                ccyTypeId_A: 0,
         ccy_amount_B: 0,                                ccyTypeId_B: 0,
            applyFees: false,
+        transferType: CONST.transferType.OTHER_FEE2,
         });
     }
 
