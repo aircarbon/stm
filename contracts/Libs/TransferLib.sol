@@ -56,7 +56,7 @@ library TransferLib {
         require(a.ccyTypeId_A == 0 || a.ccyTypeId_B == 0, "Bad ccy swap");
 
         // validate currency/token types
-        if (ld.contractType == StructLib.ContractType.CASHFLOW_CONTROLLER || ld.contractType == StructLib.ContractType.COMMODITY) {
+        if (ld.contractType != StructLib.ContractType.CASHFLOW_BASE) {
             if (a.ccy_amount_A > 0) require(a.ccyTypeId_A > 0 && a.ccyTypeId_A <= ctd._ct_Count, "Bad ccyTypeId A");
             if (a.ccy_amount_B > 0) require(a.ccyTypeId_B > 0 && a.ccyTypeId_B <= ctd._ct_Count, "Bad ccyTypeId B");
         }
@@ -117,7 +117,7 @@ library TransferLib {
         }
 
         // transfer by ST ID: check supplied STs belong to supplied owner(s), and implied quantities match supplied quantities
-        if (ld.contractType == StructLib.ContractType.CASHFLOW_BASE || ld.contractType == StructLib.ContractType.COMMODITY) { //**
+        if (ld.contractType != StructLib.ContractType.CASHFLOW_CONTROLLER) { //**
             checkStIds(ld, a);
         }
 
@@ -177,7 +177,7 @@ library TransferLib {
         // originator token fees (disabled if fee-reciever[batch originator] == fee-payer)
         // potentially multiple: up to one originator token fee per distinct token batch
         //
-        if (ld.contractType == StructLib.ContractType.CASHFLOW_BASE || ld.contractType == StructLib.ContractType.COMMODITY) { //**
+        if (ld.contractType != StructLib.ContractType.CASHFLOW_CONTROLLER) { //**
             if (a.qty_A > 0) {
                 v.ts_args[0] = TransferSplitArgs({ from: a.ledger_A, to: a.ledger_B, tokTypeId: a.tokTypeId_A, qtyUnit: a.qty_A, transferType: a.transferType == StructLib.TransferType.Undefined ? StructLib.TransferType.User : a.transferType, maxStId: maxStId, k_stIds_take: a.k_stIds_A/*, k_stIds_skip: new uint256[](0)*/ });
                 v.ts_previews[0] = transferSplitSecTokens_Preview(ld, v.ts_args[0]);
@@ -199,13 +199,13 @@ library TransferLib {
         }
 
         // validate currency balances - transfer amount & fees
-        if (ld.contractType == StructLib.ContractType.CASHFLOW_CONTROLLER || ld.contractType == StructLib.ContractType.COMMODITY) { //**
+        if (ld.contractType != StructLib.ContractType.CASHFLOW_BASE) { //**
             require(StructLib.sufficientCcy(ld, a.ledger_A, a.ccyTypeId_A, a.ccy_amount_A/*amount sending*/, a.ccy_amount_B/*amount receiving*/, int256(exFees.fee_ccy_A * uint256(a.applyFees /*&& a.ccy_amount_A > 0 */? 1 : 0))), "Insufficient currency A");
             require(StructLib.sufficientCcy(ld, a.ledger_B, a.ccyTypeId_B, a.ccy_amount_B/*amount sending*/, a.ccy_amount_A/*amount receiving*/, int256(exFees.fee_ccy_B * uint256(a.applyFees /*&& a.ccy_amount_B > 0 */? 1 : 0))), "Insufficient currency B");
         }
 
         // validate token balances - sum exchange token fee + originator token fee(s)
-        if (ld.contractType == StructLib.ContractType.CASHFLOW_BASE || ld.contractType == StructLib.ContractType.COMMODITY) { //**
+        if (ld.contractType != StructLib.ContractType.CASHFLOW_CONTROLLER) { //**
             require(StructLib.sufficientTokens(ld, a.ledger_A, a.tokTypeId_A, int256(a.qty_A), int256((exFees.fee_tok_A + v.totalOrigFee[0]) * (a.applyFees && a.qty_A > 0 ? 1 : 0))), "Insufficient tokens A");
             require(StructLib.sufficientTokens(ld, a.ledger_B, a.tokTypeId_B, int256(a.qty_B), int256((exFees.fee_tok_B + v.totalOrigFee[1]) * (a.applyFees && a.qty_B > 0 ? 1 : 0))), "Insufficient tokens B");
         }
@@ -213,7 +213,7 @@ library TransferLib {
         //
         // transfer currencies
         //
-        if (ld.contractType == StructLib.ContractType.CASHFLOW_CONTROLLER || ld.contractType == StructLib.ContractType.COMMODITY) { //**
+        if (ld.contractType != StructLib.ContractType.CASHFLOW_BASE) { //**
             if (a.ccy_amount_A > 0) { // user transfer from A
                 StructLib.transferCcy(ld, StructLib.TransferCcyArgs({ from: a.ledger_A, to: a.ledger_B, ccyTypeId: a.ccyTypeId_A, amount: uint256(a.ccy_amount_A), transferType: a.transferType == StructLib.TransferType.Undefined ? StructLib.TransferType.User : a.transferType }));
             }
@@ -232,7 +232,7 @@ library TransferLib {
         //
         // apply originator currency fees per batch (capped % of total exchange currency fee)
         //
-        if (ld.contractType == StructLib.ContractType.CASHFLOW_CONTROLLER || ld.contractType == StructLib.ContractType.COMMODITY) { //**
+        if (ld.contractType != StructLib.ContractType.CASHFLOW_BASE) { //**
             if (a.applyFees) {
                 uint256 tot_exFee_ccy = exFees.fee_ccy_A + exFees.fee_ccy_B;
 
@@ -255,7 +255,7 @@ library TransferLib {
         //
         // transfer tokens
         //
-        if (ld.contractType == StructLib.ContractType.CASHFLOW_BASE || ld.contractType == StructLib.ContractType.COMMODITY) { //**
+        if (ld.contractType != StructLib.ContractType.CASHFLOW_CONTROLLER) { //**
             if (a.qty_A > 0) {
                 if (a.applyFees) {
                     // exchange token fee transfer from A
@@ -315,7 +315,7 @@ library TransferLib {
         //ld._spot_total.transferedQty += v.transferedQty + v.exchangeFeesPaidQty + v.originatorFeesPaidQty;
 
         // emit trade events
-        if (ld.contractType == StructLib.ContractType.CASHFLOW_CONTROLLER || ld.contractType == StructLib.ContractType.COMMODITY) { //**
+        if (ld.contractType != StructLib.ContractType.CASHFLOW_BASE) { //**
             if (a.ccy_amount_A > 0 && a.qty_B > 0) {
                 emit TradedCcyTok(a.ccyTypeId_A, uint256(a.ccy_amount_A), a.tokTypeId_B, a.ledger_B, a.ledger_A, a.qty_B, a.applyFees ? exFees.fee_ccy_B : 0, a.applyFees ? exFees.fee_ccy_A : 0);
             }
@@ -353,7 +353,7 @@ library TransferLib {
         uint ndx = 0;
 
         // transfer by ST ID: check supplied STs belong to supplied owner(s), and implied quantities match supplied quantities
-        if (ld.contractType == StructLib.ContractType.CASHFLOW_BASE || ld.contractType == StructLib.ContractType.COMMODITY) { //**
+        if (ld.contractType != StructLib.ContractType.CASHFLOW_CONTROLLER) { //**
             checkStIds(ld, a);
         }
 
@@ -403,7 +403,7 @@ library TransferLib {
         }
 
         // originator token fee(s) - per batch
-        if (ld.contractType == StructLib.ContractType.CASHFLOW_BASE || ld.contractType == StructLib.ContractType.COMMODITY) { //**
+        if (ld.contractType != StructLib.ContractType.CASHFLOW_CONTROLLER) { //**
             uint256 maxStId = ld._tokens_currentMax_id;
             if (a.qty_A > 0) {
                 TransferSplitPreviewReturn memory preview = transferSplitSecTokens_Preview(ld, TransferSplitArgs({ from: a.ledger_A, to: a.ledger_B, tokTypeId: a.tokTypeId_A, qtyUnit: a.qty_A, transferType: StructLib.TransferType.User, maxStId: maxStId, k_stIds_take: a.k_stIds_A/*, k_stIds_skip: new uint256[](0)*/ }));
@@ -509,7 +509,7 @@ library TransferLib {
         uint ndx = 0;
 
         // transfer by ST ID: check supplied STs belong to supplied owner(s), and implied quantities match supplied quantities
-        if (ld.contractType == StructLib.ContractType.CASHFLOW_BASE || ld.contractType == StructLib.ContractType.COMMODITY) { //**
+        if (ld.contractType != StructLib.ContractType.CASHFLOW_CONTROLLER) { //**
             checkStIds(ld, a);
         }
 
@@ -633,6 +633,9 @@ library TransferLib {
         while (v.remainingToTransfer > 0) {
             uint256 stId = from_stIds[v.ndx];
             v.stQty = ld._sts[stId].currentQty;
+            // Certik: (Minor) TRA-02 | Potentially Negative Quantity The v.stQty value may be negative within the transferSplitSecTokens function
+            // Resolved: (Minor) TRA-02 | Added a check to ensure only positive values of v.stQty
+            require(v.stQty >= 0, "Bad security token quantity");
 
             // if specific avoid (skip) tokens are specified, then skip them;
             // and inverse - if specific use (take) tokens are specified, then skip over others
@@ -690,13 +693,9 @@ library TransferLib {
 
                     //ld._ledger[to].tokenType_sumQty[tokTypeId] += stQty;                //* gas - DROP DONE - only used internally, validation params
 
-                    // Certik: (Minor) TRA-02 | Potentially Negative Quantity The v.stQty value may be negative within the transferSplitSecTokens function
-                    // Resolved: (Minor) TRA-02 | Added a check to ensure only positive values of v.stQty
-                    if (v.stQty > 0) {
-                        v.remainingToTransfer -= v.stQty;
-                        if (v.remainingToTransfer > 0) {
-                            require(from_stIds.length > 0, "Insufficient tokens");
-                        }
+                    v.remainingToTransfer -= v.stQty;
+                    if (v.remainingToTransfer > 0) {
+                        require(from_stIds.length > 0, "Insufficient tokens");
                     }
                 }
                 else {

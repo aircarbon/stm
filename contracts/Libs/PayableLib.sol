@@ -131,7 +131,7 @@ library PayableLib {
 
         require(cashflowData.qty_saleAllocation > 0, "Nothing for sale");
 
-        require(msg.value > 0 && msg.value < type(uint256).max, "Bad msg.value");
+        require(msg.value > 0 && msg.value <= type(uint256).max, "Bad msg.value");
         require(v.weiPrice > 0, "Bad computed v.weiPrice");
 
         if (cashflowData.wei_currentPrice > 0) {
@@ -250,7 +250,7 @@ library PayableLib {
         require(ld._batches_currentMax_id == 1, 'Bad cashflow request: no minted batch');
         // Certik: (Medium) PLL-03 | Incorrect Limit Evaluation
         // Resolved: (Medium) PLL-03 | Corrected the overflow check
-        require(uint128(msg.value) < type(uint128).max, 'Amount must be less than 2^128'); // stop any overflows
+        require(msg.value <= uint256(type(uint128).max), 'Amount must be less than 2^128'); // stop any overflows
         require(count > 0, 'Invalid count');
         
         // get issuer
@@ -281,13 +281,7 @@ library PayableLib {
         ipv.amountSubscribed = uint256(issueBatch.mintedQty) - uint256(uint64(issuerSt.currentQty)); // ## breaks when we do transfers from the issuer ??
 
         if (cashflowData.args.cashflowType == StructLib.CashflowType.BOND) {
-            // TODO: calc/switch interest vs. principal repayment...?
-            // TODO: calc requiredQty; require qty >= required: need a concept of last paid block, and interest due per block? i.e. per ~15s interest interval!
-            // walk all ST IDs except issuerSt...
-            // pay (ST qty / S) * (msg.value - fee)...
-
-            // Example: Count
-
+            
             ipv.initAddrNdx = ipbd.curNdx;
 
             for (ipv.addrNdx = ipv.initAddrNdx; ipv.addrNdx < ipv.initAddrNdx + count ; ipv.addrNdx++) {
@@ -335,21 +329,6 @@ library PayableLib {
         ipbd.curPaymentTotalAmount = 0;
         ipbd.curPaymentProcessedAmount = 0;
     }
-
-    // Method to retrieve Issuer Payments History
-
-    // function getIssuerPayments(
-    //     StructLib.IssuerPayments storage issuerPaymentsData
-    // )
-    // public view returns(StructLib.IssuerPayments memory) {
-    //     StructLib.IssuerPayments memory ret = issuerPaymentsData;
-    //     return ret;
-    // }
-
-    //
-    // TODO: edit SQ, edit P
-    // issueBatch.originator only...
-    //...
 
     function getCashflowData(
         StructLib.LedgerStruct storage ld,

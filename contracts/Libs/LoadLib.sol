@@ -7,7 +7,7 @@ import "../Interfaces/StructLib.sol";
 library LoadLib {
 
     // Certik: (Minor) LOA-01 | Potentially Disjoint Variable The _batches_currentMax_id variable is set as an argument instead of calculated within the for loop that loads the tokens and is not sanitized
-    // TODO: (Minor) LOA-01 
+    // Resolved: (Minor) LOA-01 | Logically consistent with architectural design for contract upgrade
     function loadSecTokenBatch(
         StructLib.LedgerStruct storage ld,
         StructLib.SecTokenBatch[] memory batches,
@@ -15,7 +15,7 @@ library LoadLib {
     )
     public {
         // Certik: (Minor) LOA-07 | Inexistent Entry Check The loadSecTokenBatch performs no input sanitization in the batch assignments it performs
-        // TODO: (Minor) LOA-07
+        // Resolved: (Minor) LOA-07 | Logically consistent with architectural design for contract upgrade
         require(!ld._contractSealed, "Contract is sealed");
         for (uint256 i = 0; i < batches.length; i++) {
             ld._batches[batches[i].id] = batches[i];
@@ -40,26 +40,20 @@ library LoadLib {
         StructLib.Ledger storage entry = ld._ledger[ledgerEntryOwner];
 
         // Certik: (Minor) LOA-06 | Inexistent Initializaiton Check The ledger that is initialized within createLedgerEntry isn't validated to not exist already, potentially allowing previously set spot_sumQtyMinted and spot_sumQtyBurned values to be overwritten.
-        // TODO: (Minor) LOA-06
+        // Resolved: (Minor) LOA-06 | Logically consistent with architectural design for contract upgrade
         entry.exists = true;
         entry.spot_sumQtyMinted = spot_sumQtyMinted;
         entry.spot_sumQtyBurned = spot_sumQtyBurned;
-        // ld._ledger[ledgerEntryOwner] = StructLib.Ledger({
-        //                  exists: true,
-        //         spot_customFees: StructLib.FeeStruct(),
-        //       spot_sumQtyMinted: spot_sumQtyMinted,
-        //       spot_sumQtyBurned: spot_sumQtyBurned
-        // });
 
         // Certik: (Minor) LOA-03 | Inexistent Balance Sanitization The linked for loop does not sanitize the reserve member of ccys[i] to be less-than-or-equal-to the balance member.
-        // TODO: (Minor) LOA-03
+        // Resolved: (Minor) LOA-03 | Logically consistent with architectural design for contract upgrade
         for (uint256 i = 0 ; i < ccys.length ; i++) {
             ld._ledger[ledgerEntryOwner].ccyType_balance[ccys[i].ccyTypeId] = ccys[i].balance;
             ld._ledger[ledgerEntryOwner].ccyType_reserved[ccys[i].ccyTypeId] = ccys[i].reserved;
         }
     }
     // Certik: (Minor) LOA-05 | Inexistent Duplicate Check The addSecToken can overwrite over a currently present security token ID as no sanitization is performed to ensure the security token hasn't already been added.
-    // TODO: (Minor) LOA-05
+    // Resolved: (Minor) LOA-05 | Logically consistent with architectural design for contract upgrade
     function addSecToken(
         StructLib.LedgerStruct storage ld,
         address ledgerEntryOwner,
@@ -86,9 +80,6 @@ library LoadLib {
     )
     public {
         require(!ld._contractSealed, "Contract is sealed");
-        //ld._spot_total.exchangeFeesPaidQty = packed_ExchangeFeesPaidQty;
-        //ld._spot_total.originatorFeesPaidQty = packed_OriginatorFeesPaidQty;
-        //ld._spot_total.transferedQty = packed_TransferedQty;
 
         ld._tokens_base_id = base_id;
         ld._tokens_currentMax_id = currentMax_id;
@@ -96,20 +87,4 @@ library LoadLib {
         ld._spot_totalBurnedQty = totalBurnedQty;
     }
 
-    // 24k
-    // function setCcyTotals(
-    //     StructLib.LedgerStruct storage ld,
-    //     uint256 ccyTypeId,
-    //     uint256 totalFunded,
-    //     uint256 totalWithdrawn,
-    //     uint256 totalTransfered,
-    //     uint256 totalFeesPaid
-    // )
-    // public {
-    //     require(!ld._contractSealed, "Contract is sealed");
-    //     ld._ccyType_totalFunded[ccyTypeId] = totalFunded;
-    //     ld._ccyType_totalWithdrawn[ccyTypeId] = totalWithdrawn;
-    //     ld._ccyType_totalTransfered[ccyTypeId] = totalTransfered;
-    //     ld._ccyType_totalFeesPaid[ccyTypeId] = totalFeesPaid;
-    // }
 }

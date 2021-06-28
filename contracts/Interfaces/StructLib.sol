@@ -65,7 +65,7 @@ library StructLib {
     public {
         // Certik: (Major) SLI-05 | Unsafe Cast
         // Resolved: (Major) SLI-05 | Added bound evaluation for int256
-        require(a.amount > 0 && int256(a.amount) < type(int256).max , "Bound check found overflow");
+        require(a.amount > 0 && a.amount <= uint256(type(int256).max) , "Bound check found overflow");
         ld._ledger[a.from].ccyType_balance[a.ccyTypeId] -= int256(a.amount);
         ld._ledger[a.to].ccyType_balance[a.ccyTypeId] += int256(a.amount);
 
@@ -113,12 +113,12 @@ library StructLib {
     // CONTRACT TYPE
     // Certik: (Minor) SLI-09 | State Representation Inconsistency The enum declarations of the contract are inconsistent with regards to the default state. While the ContractType and FundWithdrawType enums have an actionable default state, the SettlementType enum has an UNDEFINED default state.
     // Resolved: (Minor) SLI-09 | Added a default UNDEFINED to ContractType
-    enum ContractType { UNDEFINED, COMMODITY, CASHFLOW_BASE, CASHFLOW_CONTROLLER }
+    enum ContractType { COMMODITY, CASHFLOW_BASE, CASHFLOW_CONTROLLER }
 
     // CCY TYPES
     // Certik: (Minor) SLI-09 | State Representation Inconsistency The enum declarations of the contract are inconsistent with regards to the default state. While the ContractType and FundWithdrawType enums have an actionable default state, the SettlementType enum has an UNDEFINED default state.
     // Resolved: (Minor) SLI-09 | Added a default UNDEFINED to FundWithdrawType
-    enum FundWithdrawType { UNDEFINED, FUND, WITHDRAW }
+    enum FundWithdrawType { FUND, WITHDRAW }
     struct Ccy {
         uint256 id;
         string  name; // e.g. "USD", "BTC"
@@ -148,7 +148,7 @@ library StructLib {
 
     // Certik: (Minor) SLI-09 | State Representation Inconsistency The enum declarations of the contract are inconsistent with regards to the default state. While the ContractType and FundWithdrawType enums have an actionable default state, the SettlementType enum has an UNDEFINED default state.
     // Resolved: (Minor) SLI-09 | SettleMentType consistent convention UPPERCASE
-    enum SettlementType { UNDEFINED, SPOT, FUTURE }
+    enum SettlementType { SPOT, FUTURE }
     struct StTypesStruct { // ** DATA_DUMP: OK
         mapping(uint256 => string)              _tt_name;       // typeId (1-based) -> typeName
         mapping(uint256 => SettlementType)      _tt_settle;

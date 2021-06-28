@@ -222,7 +222,7 @@ library TokenLib {
         ld._batches_currentMax_id++;
 
         // emit batch create event (commodity & controller - not base; its batch and tok-type IDs are local)
-        if (ld.contractType == StructLib.ContractType.CASHFLOW_CONTROLLER || ld.contractType == StructLib.ContractType.COMMODITY) {
+        if (ld.contractType != StructLib.ContractType.CASHFLOW_BASE) {
             emit Minted(newBatch.id, a.tokTypeId, a.batchOwner, uint256(a.mintQty), uint256(uint64(a.mintSecTokenCount)));
         }
 
@@ -347,14 +347,16 @@ library TokenLib {
         uint256 ndx = 0;
         int64 remainingToBurn = int64(a.burnQty);
         
-        // Certik: (Minor) TLL-03 | Potentially Negative Quantities Negative quantities should be skipped by the while loop as the addition in L380 will lead to the remaining to burn increasing.
-        // Resolved: (Minor) TLL-03 | Added a check to ensure only positive values of StQty to be considered for burning.      
         while (remainingToBurn > 0) {
             uint256[] storage tokenType_stIds = ld._ledger[a.ledgerOwner].tokenType_stIds[a.tokTypeId];
             uint256 stId = tokenType_stIds[ndx];
+            
+            // Certik: (Minor) TLL-03 | Potentially Negative Quantities Negative quantities should be skipped by the while loop as the addition in L380 will lead to the remaining to burn increasing.
+            // Resolved: (Minor) TLL-03 | Added a check to ensure only positive values of StQty to be considered for burning.      
             int64 stQty = ld._sts[stId].currentQty;
+            require(stQty >= 0, "Bad security token quantity");
+            
             uint64 batchId = ld._sts[stId].batchId;
-
             // if burning by specific ST IDs, skip over STs that weren't specified
             bool skip = false;
             if (a.k_stIds.length > 0) {
@@ -367,7 +369,7 @@ library TokenLib {
                 ndx++;
             }
             else {
-                if (stQty >= 0 && remainingToBurn >= stQty) {
+                if (remainingToBurn >= stQty) {
                     // burn the full ST
                     //ld._sts_currentQty[stId] = 0;
                     ld._sts[stId].currentQty = 0;

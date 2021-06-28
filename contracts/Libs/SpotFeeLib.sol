@@ -100,7 +100,7 @@ library SpotFeeLib {
             emit SetFeeCcyMax(ccyTypeId, ledgerOwner, a.fee_max);
         feeStruct.ccy[ccyTypeId].fee_max = a.fee_max;
 
-        if (feeStruct.ccy[ccyTypeId].ccy_perMillion != a.ccy_perMillion || a.ccy_perMillion != 0)
+        if (feeStruct.ccy[ccyTypeId].ccy_perMillion != a.ccy_perMillion)// || a.ccy_perMillion != 0)
             emit SetFeeCcyPerMillion(ccyTypeId, ledgerOwner, a.ccy_perMillion);
         feeStruct.ccy[ccyTypeId].ccy_perMillion = a.ccy_perMillion;
 

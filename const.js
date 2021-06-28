@@ -230,18 +230,16 @@ module.exports = {
     },
 
     contractType: Object.freeze({
-                  UNDEFINED: 0,
-                  COMMODITY: 1,
-              CASHFLOW_BASE: 2,
-        CASHFLOW_CONTROLLER: 3
+                  COMMODITY: 0,
+              CASHFLOW_BASE: 1,
+        CASHFLOW_CONTROLLER: 2
     }),
 
     cashflowType: cashflowType,
 
     settlementType: Object.freeze({
-        UNDEFINED: 0,
-             SPOT: 1,
-           FUTURE: 2,
+             SPOT: 0,
+           FUTURE: 1,
     }),
 
     getFeeType: Object.freeze({
@@ -300,9 +298,8 @@ module.exports = {
     }),
 
     fundWithdrawType: Object.freeze({
-        UNDEFINED: 0,
-        FUND: 1,
-        WITHDRAW: 2
+        FUND: 0,
+        WITHDRAW: 1
     }),
 
     // eeu qty constants - tons

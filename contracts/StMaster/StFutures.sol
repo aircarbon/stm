@@ -157,7 +157,7 @@ contract StFutures is Owned,
      * @param value amount
      */
      
-    function setLedgerOverride(uint256 overrideType, uint256 tokTypeId, address ledgerOwner, uint16 value)
+    function setLedgerOverride(uint256 overrideType, uint256 tokTypeId, address ledgerOwner, uint128 value)
     public onlyOwner() onlyWhenReadWrite() {
         FuturesLib.setLedgerOverride(overrideType, ld, std, tokTypeId, ledgerOwner, value);
         // if (overrideType == OverrideType.INIT_MARGIN) {

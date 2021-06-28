@@ -20,15 +20,18 @@ library FuturesLib {
         uint256 overrideType,
         StructLib.LedgerStruct storage ld,
         StructLib.StTypesStruct storage std,
-        uint256 tokTypeId, address ledgerOwner, uint16 value
+        uint256 tokTypeId, address ledgerOwner, uint128 value
     ) public {
         // Certik: (Minor) FLL-03 | Inexistent Seal Check The linked functions override sensitive ledger variables.
         // Resolved: (Minor) FLL-03 | Added missing Contract Seal check
         require(ld._contractSealed, "Contract is not sealed");
         // Certik: (Minor) FLL-01 | Unsafe Cast The linked statement casts a uint128 value to a uint16 one, thereby containing a high possibility of an overflow 
         // Resolved: (Minor) FLL-01 | Changed setLedgerOverride argument from uint128 to uint16 to upcast instead of vulnerable downcast
-        if (overrideType == 1) initMarginOverride(ld, std, tokTypeId, ledgerOwner, value);
-        else if (overrideType == 2) feePerContractOverride(ld, std, tokTypeId, ledgerOwner, uint128(value));
+        if (overrideType == 1) {
+            require(value <= uint128(type(uint16).max), "Bad total margin");
+            initMarginOverride(ld, std, tokTypeId, ledgerOwner, uint16(value));
+        }
+        else if (overrideType == 2) feePerContractOverride(ld, std, tokTypeId, ledgerOwner, value);
     }
         function initMarginOverride(
             StructLib.LedgerStruct storage ld,
@@ -38,7 +41,7 @@ library FuturesLib {
             // Certik: (Minor) FLL-02 | Improper Bound Check The TokenLib library performs a different bound check for the tokTypeId . Additionally, the first comparator is a tautology and should not be included.
             // Resolved: (Minor) FLL-02 | Added consistent bound check for tokTypeId similar to TokenLib
             require(tokTypeId >= 1 && tokTypeId <= std._tt_Count, "Bad tokTypeId");
-            require(initMarginBips < type(uint16).max, "Bad total margin");
+            require(initMarginBips <= type(uint16).max, "Bad total margin");
             require(std._tt_settle[tokTypeId] == StructLib.SettlementType.FUTURE, "Bad token settlement type");
             require(/*std._tt_ft[tokTypeId].varMarginBips +*/initMarginBips <= 10000, "Bad total margin");
 

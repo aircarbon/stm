@@ -44,7 +44,7 @@ contract Collateralizable is
 
     /**
     * @dev fund or withdraw currency type collaterised tokens from a ledger owner address
-    * @param direction 0: fund<br/>1: withdraw
+    * @param direction 0: FUND<br/>1: WITHDRAW
     * @param ccyTypeId currency type identifier
     * @param amount amount to be funded or withdrawn
     * @param ledgerOwner account address to be funded or withdrawn from

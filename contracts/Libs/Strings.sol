@@ -64,9 +64,9 @@ library strings {
         uint _ptr;
     }
 
-    function memcpy(uint dest, uint src, uint memlen) internal pure {
+    function memcpy(uint dest, uint src, uint length) internal pure {
         // Copy word-length chunks while possible
-        for(; memlen >= 32; memlen -= 32) {
+        for(; length >= 32; length -= 32) {
             assembly {
                 mstore(dest, mload(src))
             }
@@ -75,7 +75,7 @@ library strings {
         }
 
         // Copy remaining bytes
-        uint mask = 256 ** (32 - memlen) - 1;
+        uint mask = 256 ** (32 - length) - 1;
         assembly {
             let srcpart := and(mload(src), not(mask))
             let destpart := and(mload(dest), mask)
