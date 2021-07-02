@@ -35,7 +35,7 @@ contract("StMaster", accounts => {
 
         NDX_GRAY_2 = global.XaddrNdx + 1;
         GRAY_2 = accounts[NDX_GRAY_2];
-        
+
         await stm.whitelistMany([WHITE]);
         await stm.sealContract();
         await setupHelper.setDefaults({ stm, accounts });
@@ -55,6 +55,7 @@ contract("StMaster", accounts => {
 
         await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, CONST.ccyType.USD, 1, GRAY_2, 'TEST');
         await stm.setFee_TokType(CONST.tokenType.TOK_T2, GRAY_2, testFee );
+        
     });
 
     //

@@ -11,6 +11,7 @@ const { assert } = require('console');
 module.exports = {
 
     Deploy: async (p) => {
+        try {
         const { deployer, artifacts, contractType, nameOverride, symbolOverride } = p;
             var stmAddr;
             //const contractType = process.env.CONTRACT_TYPE;
@@ -170,6 +171,10 @@ module.exports = {
             }).catch(err => { console.error('failed deployment: LedgerLib', err); });
             }).catch(err => { console.error('failed deployment: StructLib', err); });
             return stmAddr;
+        }
+        catch(err){ assert
+            console.error(err);
+        }
     }
 };
 
