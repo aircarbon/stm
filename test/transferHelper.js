@@ -688,7 +688,18 @@ async function transferWrapped({
     k_stIds_B,
     transferType,
 }, from) {
-    //console.log(``);
+    // console.log({ 
+    //         ledger_A,                          ledger_B, 
+    //            qty_A: qty_A.toString(),        tokTypeId_A, 
+    //            qty_B: qty_B.toString(),        tokTypeId_B, 
+    //     ccy_amount_A: ccy_amount_A.toString(), ccyTypeId_A, 
+    //     ccy_amount_B: ccy_amount_B.toString(), ccyTypeId_B, 
+    //         applyFees,
+    //     feeAddrOwner: CONST.nullAddr,
+    //        k_stIds_A: k_stIds_A || [],
+    //        k_stIds_B: k_stIds_B || [],
+    //     transferType: transferType || CONST.transferType.UNDEFINED,
+    // });
     const tx = await stm.transferOrTrade({ 
                 ledger_A,                          ledger_B, 
                    qty_A: qty_A.toString(),        tokTypeId_A, 
