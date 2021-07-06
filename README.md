@@ -4,7 +4,7 @@
 [Documentation] (https://ipfs.io/ipfs/QmcqWhtmjUDbHfzk3Be4Sudu12foeWM3jGiDWSMHZZVps6)
 
 ## Setup
-- `npm install`
+- `npm i`
 - `npm i truffle -g`
 - `npm i ganache-cli -g`
 

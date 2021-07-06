@@ -1,4 +1,4 @@
-/*const Big = require('big.js');
+const Big = require('big.js');
 
 const st = artifacts.require('StMaster');
 const truffleAssert = require('truffle-assertions');
@@ -117,4 +117,3 @@ contract("StMaster", accounts => {
     }
 
 });
-*/

@@ -42,7 +42,6 @@ library SpotFeeLib {
         // Certik: (Minor) SFL-01 | Potentially Incorrect Clauses The linked if clauses emit an event when the value is being set, however, they do so when the value is simply non-zero rendering the first conditional questionable.
         // The original intent here was: to emit event if a fee is SET, or UNSET, *or if it's SET repeatedly* to the same value
         // But, maybe that's not a good idea. So instead, let's emit only if the fee value *changes*
-        // Certik TODO: re-run/refactor tests for this usage...
         if (feeStruct.tok[tokTypeId].fee_fixed != a.fee_fixed)// || a.fee_fixed != 0)
             emit SetFeeTokFix(tokTypeId, ledgerOwner, a.fee_fixed);
         feeStruct.tok[tokTypeId].fee_fixed = a.fee_fixed;
