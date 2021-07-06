@@ -123,7 +123,7 @@ contract("StMaster", accounts => {
         try {
             await mintBatch( { tokenType: CONST.tokenType.TOK_T1, qtyUnit: -1, qtySecTokens: 1, receiver: accounts[global.TaddrNdx] });
         } catch (ex) { 
-            assert(ex.reason == 'Bad mintQty', `unexpected: ${ex.reason}`);
+            assert(ex.reason == 'value out-of-bounds', `unexpected: ${ex.reason}`);
             return;
         }
         assert.fail('expected contract exception');

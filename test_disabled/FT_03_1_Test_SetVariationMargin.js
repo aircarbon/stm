@@ -102,7 +102,7 @@ contract("StMaster", accounts => {
         try {
             const x = await stm.setFuture_VariationMargin(usdFT.id, -1);
         }
-        catch (ex) { assert(ex.reason == 'Bad total margin', `unexpected: ${ex.reason}`); return; }
+        catch (ex) { assert(ex.reason == 'value out-of-bounds', `unexpected: ${ex.reason}`); return; }
         assert.fail('expected contract exception');
     });
 });

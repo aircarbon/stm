@@ -352,7 +352,7 @@ contract("StMaster", accounts => {
                 false, CONST.transferType.ADJUSTMENT, 
                 { from: accounts[0] });
         } catch (ex) { 
-            assert(ex.reason == 'Bad qty_A', `unexpected: ${ex.reason}`);
+            assert(ex.reason == 'value out-of-bounds', `unexpected: ${ex.reason}`);
             return;
         }
         assert.fail('expected contract exception');
@@ -372,7 +372,7 @@ contract("StMaster", accounts => {
                 false, CONST.transferType.ADJUSTMENT, 
                 { from: accounts[0] });
         } catch (ex) { 
-            assert(ex.reason == 'Bad qty_B', `unexpected: ${ex.reason}`);
+            assert(ex.reason == 'value out-of-bounds', `unexpected: ${ex.reason}`);
             return;
         }
         assert.fail('expected contract exception');

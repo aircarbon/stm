@@ -62,20 +62,21 @@ contract("StMaster", accounts => {
         assert(ftType.ft.varMarginBips == 1500);
     });
 
-    it(`FT types - should not be able to add a future with an invalid (unset) expiry time`, async () => {
-        const allTypes = (await stm.getSecTokenTypes()).tokenTypes;
-        const spotTypes = allTypes.filter(p => p.settlementType == CONST.settlementType.SPOT);
-        const ccyTypes = (await stm.getCcyTypes()).ccyTypes;
-        try {
-            const addFtTx = await stm.addSecTokenType(`FT_TEST2_${new Date().getTime()}`, CONST.settlementType.FUTURE, { ...CONST.nullFutureArgs,
-                underlyerTypeId: spotTypes[0].id, 
-                       refCcyId: ccyTypes[0].id,
-                   contractSize: 1000,
-            }, CONST.nullAddr);
-        }
-        catch (ex) { assert(ex.reason == 'Bad expiry', `unexpected: ${ex.reason}`); return; }
-        assert.fail('expected contract exception');
-    });
+    // Note: Invalid test | Expiry check require statement is removed from Futures.
+    // it(`FT types - should not be able to add a future with an invalid (unset) expiry time`, async () => {
+    //     const allTypes = (await stm.getSecTokenTypes()).tokenTypes;
+    //     const spotTypes = allTypes.filter(p => p.settlementType == CONST.settlementType.SPOT);
+    //     const ccyTypes = (await stm.getCcyTypes()).ccyTypes;
+    //     try {
+    //         const addFtTx = await stm.addSecTokenType(`FT_TEST2_${new Date().getTime()}`, CONST.settlementType.FUTURE, { ...CONST.nullFutureArgs,
+    //             underlyerTypeId: spotTypes[0].id, 
+    //                    refCcyId: ccyTypes[0].id,
+    //                contractSize: 1000,
+    //         }, CONST.nullAddr);
+    //     }
+    //     catch (ex) { assert(ex.reason == 'Bad expiry', `unexpected: ${ex.reason}`); return; }
+    //     assert.fail('expected contract exception');
+    // });
 
     it(`FT types - should not be able to add a future on invalid (non-existent) underlyer`, async () => {
         const ccyTypes = (await stm.getCcyTypes()).ccyTypes;
@@ -135,7 +136,7 @@ contract("StMaster", accounts => {
                 expiryTimestamp: DateTime.local().toMillis(), underlyerTypeId: spotTypes[0].id, refCcyId: ccyTypes[0].id, initMarginBips: -1, contractSize: 1000,
             }, CONST.nullAddr);
         }
-        catch (ex) { assert(ex.reason == 'Bad total margin', `unexpected: ${ex.reason}`); return; }
+        catch (ex) { assert(ex.reason == 'value out-of-bounds', `unexpected: ${ex.reason}`); return; }
         assert.fail('expected contract exception');
     });
 
@@ -158,7 +159,7 @@ contract("StMaster", accounts => {
                 expiryTimestamp: DateTime.local().toMillis(), underlyerTypeId: spotTypes[0].id, refCcyId: ccyTypes[0].id, varMarginBips: -1, contractSize: 1000,
             }, CONST.nullAddr);
         }
-        catch (ex) { assert(ex.reason == 'Bad total margin', `unexpected: ${ex.reason}`); return; }
+        catch (ex) { assert(ex.reason == 'value out-of-bounds', `unexpected: ${ex.reason}`); return; }
         assert.fail('expected contract exception');
     });
 

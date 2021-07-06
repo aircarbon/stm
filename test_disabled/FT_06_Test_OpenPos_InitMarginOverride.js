@@ -199,7 +199,7 @@ contract("StMaster", accounts => {
             const x = await stm.setLedgerOverride(1, usdFT.id, A, -1); //await stm.initMarginOverride(usdFT.id, A, -1);
             //console.log('test:', (await stm.getInitMarginOverride(usdFT.id, A)).toString());
         }
-        catch (ex) { assert(ex.reason == 'Bad total margin', `unexpected: ${ex.reason}`); return; }
+        catch (ex) { assert(ex.reason == 'value out-of-bounds', `unexpected: ${ex.reason}`); return; }
         assert.fail('expected contract exception');
     });
 });
