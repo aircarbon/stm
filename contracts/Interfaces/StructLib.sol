@@ -65,7 +65,7 @@ library StructLib {
     public {
         // Certik: (Major) SLI-05 | Unsafe Cast
         // Resolved: (Major) SLI-05 | Added bound evaluation for int256
-        require(a.amount > 0 && a.amount <= uint256(type(int256).max) , "Bound check found overflow");
+        require(a.amount >= 0 && a.amount <= uint256(type(int256).max) , "Bound check found overflow");
         ld._ledger[a.from].ccyType_balance[a.ccyTypeId] -= int256(a.amount);
         ld._ledger[a.to].ccyType_balance[a.ccyTypeId] += int256(a.amount);
 
