@@ -65,20 +65,12 @@ library StructLib {
     public {
         // Certik: (Major) SLI-05 | Unsafe Cast
         // Resolved: (Major) SLI-05 | Added bound evaluation for int256
-        require(a.amount >= 0 && a.amount <= uint256(type(int256).max) , "Bound check found overflow");
-        ld._ledger[a.from].ccyType_balance[a.ccyTypeId] -= int256(a.amount);
-        ld._ledger[a.to].ccyType_balance[a.ccyTypeId] += int256(a.amount);
-
-        // 24k
-        //ld._ccyType_totalTransfered[a.ccyTypeId] += a.amount;
-
-        //emit StructLib.TransferedLedgerCcy(a.from, a.to, a.ccyTypeId, a.amount, a.transferType);
-        emitTransferedLedgerCcy(a);
-
-        // 24k
-        // if (a.transferType == StructLib.TransferType.ExchangeFee) {
-        //     ld._ccyType_totalFeesPaid[a.ccyTypeId] += a.amount;
-        // }
+        if(a.amount > 0) {
+            require(a.amount <= uint256(type(int256).max) , "Bound check found overflow");
+            ld._ledger[a.from].ccyType_balance[a.ccyTypeId] -= int256(a.amount);
+            ld._ledger[a.to].ccyType_balance[a.ccyTypeId] += int256(a.amount);
+            emitTransferedLedgerCcy(a);
+        }
     }
     function emitTransferedLedgerCcy(
         TransferCcyArgs memory a)
