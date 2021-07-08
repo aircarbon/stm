@@ -11,7 +11,7 @@ contract Owned
 {
     address payable deploymentOwner;
     // Certik: (Minor) OSM-07 | Inexistent Management Functionality The Owned contract implementation should be self-sufficient and possess adding and removing owners within it.
-    // TODO: (Minor) OSM-07 | 
+    // Review: TODO - (Minor) OSM-07 ... pass array from parent into Owned
     address[] owners;
 
     bool readOnlyState;
@@ -23,7 +23,7 @@ contract Owned
      */
     function readOnly() external view returns (bool isReadOnly) { return readOnlyState; }
 
-    constructor() {
+    constructor() { // TODO: address[] _owners...
         deploymentOwner = payable(msg.sender); // payable used in solidity version 0.8.0 onwards
         readOnlyState = false;
     }
@@ -43,11 +43,10 @@ contract Owned
         //require(tx.origin == deploymentOwner, "Restricted"); 
         //require(found, "Restricted"); 
 
-        // TODO: ? could add CFT-C address into the owners[] for basetypes...
-        //  but WHY is tx.origin changing its meaning?
+        // TODO: Confirmed -- could add CFT-C address into the owners[] for basetypes...
         for (uint i = 0; i < owners.length; i++) {
             // Certik: (Minor) OSM-08 | Usage of tx.origin The use of tx.origin should be avoided for ownership-based systems given that firstly it can be tricked on-chain and secondly it will change its functionality once EIP-3074 is integrated.
-            // TODO: (Minor) OSM-08 | Breaks on usage of msg.sender for CFT
+            // Review: TODO HIPRI - (Minor) OSM-08 | Breaks on usage of msg.sender for CFT
             if (owners[i] == tx.origin) {  _; return; }
         }
         revert("Restricted");

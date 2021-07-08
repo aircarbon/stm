@@ -54,7 +54,8 @@ library FuturesLib {
             StructLib.StTypesStruct storage std,
             uint256 tokTypeId, address ledgerOwner, uint128 feePerContract
         ) private {
-            require(tokTypeId >= 0 && tokTypeId <= std._tt_Count, "Bad tokTypeId");
+            // Resolved: (Minor) FLL-02 | Added consistent bound check for tokTypeId similar to TokenLib
+            require(tokTypeId >= 1 && tokTypeId <= std._tt_Count, "Bad tokTypeId");
             require(std._tt_settle[tokTypeId] == StructLib.SettlementType.FUTURE, "Bad token settlement type");
 
             StructLib.initLedgerIfNew(ld, ledgerOwner);
@@ -397,8 +398,8 @@ library FuturesLib {
         totPriceQtyAbs += abs64(masterSt.currentQty) * masterSt.ft_price;
 
         // delete child tokens from the master list
-        // Certik: (Major) FLL-08 | Potentially Misbehaving Position Combination
-        // Resolved: (Major) FLL-08 | Handled by Token ledger owner mismatch require statement
+        // Certik: (Major) FLL-08 | Potentially Misbehaving Position Combination - "children might be skipped/complete"
+        // Review: TODO -- check that # of supplied child positions == 
         int64 childQty = 0;
         for (uint256 x = 0; x < a.child_StIds.length ; x++) {
             StructLib.PackedSt storage childSt = ld._sts[a.child_StIds[x]];
@@ -423,8 +424,8 @@ library FuturesLib {
         masterSt.ft_price = int128(totPriceQtyAbs / totQtyAbs); // weighted average price of combined tokens
 
         // resize: recreate ledger entry tokenType list, with a single combined token
-        delete ld._ledger[masterSt.ft_ledgerOwner].tokenType_stIds[a.tokTypeId];
-        ld._ledger[masterSt.ft_ledgerOwner].tokenType_stIds[a.tokTypeId].push(a.master_StId);
+        delete ld._ledger[masterSt.ft_ledgerOwner].tokenType_stIds[a.tokTypeId]; // TODO: delete all ## this count may != child_StIds.length ##
+        ld._ledger[masterSt.ft_ledgerOwner].tokenType_stIds[a.tokTypeId].push(a.master_StId); // push 1
 
         emit Combine(masterSt.ft_ledgerOwner, a.master_StId, a.child_StIds.length);
     }

@@ -352,7 +352,7 @@ library TokenLib {
             uint256 stId = tokenType_stIds[ndx];
             
             // Certik: (Minor) TLL-03 | Potentially Negative Quantities Negative quantities should be skipped by the while loop as the addition in L380 will lead to the remaining to burn increasing.
-            // Resolved: (Minor) TLL-03 | Added a check to ensure only positive values of StQty to be considered for burning.      
+            // Resolved: (Minor) TLL-03 | Added a check to ensure only non-negative values of StQty to be considered for burning.      
             int64 stQty = ld._sts[stId].currentQty;
             require(stQty >= 0, "Unexpected stQty");
             

@@ -25,7 +25,7 @@ library TransferLib {
         uint80                        originatorFeesPaidQty;
     }
     // Certik: (Minor) TRA-01 | Equal ID Transfers The transfers of equal IDs are not prohibited in the transferOrTrade function
-    // TODO: (Minor) TRA-01 | Check with Dom as this might break critical transfer / trading functionality
+    // Review: TODO - (Minor) TRA-01 | Check with Dom as this might break critical transfer / trading functionality
     function transferOrTrade(
         StructLib.LedgerStruct storage   ld,
         StructLib.StTypesStruct storage  std,
@@ -53,6 +53,7 @@ library TransferLib {
         require(!((a.qty_A > 0 && a.ccy_amount_A > 0) || (a.qty_B > 0 && a.ccy_amount_B > 0)), "Bad transfer types");
 
         // disallow currency swaps - we need single consistent ccy type on each side for ccy-fee mirroring
+        // i.e. disallow swaps of two different currency-types (note: do allow: swaps of two different token-types)
         require(a.ccyTypeId_A == 0 || a.ccyTypeId_B == 0, "Bad ccy swap");
 
         // validate currency/token types
@@ -635,7 +636,7 @@ library TransferLib {
             uint256 stId = from_stIds[v.ndx];
             v.stQty = ld._sts[stId].currentQty;
             // Certik: (Minor) TRA-02 | Potentially Negative Quantity The v.stQty value may be negative within the transferSplitSecTokens function
-            // Resolved: (Minor) TRA-02 | Added a check to ensure only positive values of v.stQty
+            // Resolved: (Minor) TRA-02 | Added a check to ensure only non-negative values of v.stQty
             require(v.stQty >= 0, "Unexpected stQty");
 
             // if specific avoid (skip) tokens are specified, then skip them;

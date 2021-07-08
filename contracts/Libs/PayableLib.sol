@@ -24,6 +24,7 @@ library PayableLib {
         if (chainlinkAggAddr == address(0x0)) return -1;
         // Certik: (Major) ICA-01 | Incorrect Chainlink Interface
         // Resolved: (Major) ICA-01 | Upgraded Chainlink Aggregator Interface to V3
+        // Review: TODO - should be checking staleness values coming back from latestRoundData()
         IChainlinkAggregator ref = IChainlinkAggregator(chainlinkAggAddr);
         ( , int256 answer, , , ) = ref.latestRoundData();
         return answer;
@@ -114,7 +115,7 @@ library PayableLib {
     }
 
     // Certik: (Medium) PLL-02 | Inexistent Reentrancy Guard - A detailed analysis on the vulnerability required from Certik
-    // TODO: (Medium) PLL-02 | Discuss the issue with Certik in detail
+    // Review: TODO - Use a standard modifier to prevent re-entrancy; anything at uses .transfer() native
     function processSubscriberPayment(
         StructLib.LedgerStruct storage ld,
         StructLib.StTypesStruct storage std,
