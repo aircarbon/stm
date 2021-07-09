@@ -44,10 +44,12 @@ contract Owned
         //require(found, "Restricted"); 
 
         // TODO: Confirmed -- could add CFT-C address into the owners[] for basetypes...
+        // CFT-C: owners[] = [ addr1, 2, 3, 4 ... n ]
+        // CFT-B: owners[] = [ addrCftC, addrCftC, addrCftC, addrCftC, addrCftC, addrCftC, addrCftC, addrCftC, addrCftC, ... n ]
         for (uint i = 0; i < owners.length; i++) {
             // Certik: (Minor) OSM-08 | Usage of tx.origin The use of tx.origin should be avoided for ownership-based systems given that firstly it can be tricked on-chain and secondly it will change its functionality once EIP-3074 is integrated.
             // Review: TODO HIPRI - (Minor) OSM-08 | Breaks on usage of msg.sender for CFT
-            if (owners[i] == tx.origin) {  _; return; }
+            if (owners[i] == tx.origin) {  _; return; } // TODO: change to msg.sender....
         }
         revert("Restricted");
         _;

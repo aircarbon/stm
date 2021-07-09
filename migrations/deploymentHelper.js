@@ -90,8 +90,14 @@ module.exports = {
                 // (bkp-owners are passed to contract ctor, and have identical permissions to the primary owner)
                 const MNEMONIC = process.env.DEV_MNEMONIC || process.env.PROD_MNEMONIC || require('../DEV_MNEMONIC.js').MNEMONIC;
                 const accountAndKeys = [];
-                for (let i=0 ; i < CONST.RESERVED_ADDRESSES_COUNT ; i++) {
-                    accountAndKeys.push(await CONST.getAccountAndKey(i, MNEMONIC))
+                // TODO: for basetype, pass [controllerAddr ... n RESERVED_ADDRESSES_COUNT]
+                if (type != base) { // TODO
+                    for (let i=0 ; i < CONST.RESERVED_ADDRESSES_COUNT ; i++) {
+                        accountAndKeys.push(await CONST.getAccountAndKey(i, MNEMONIC))
+                    }
+                }
+                else { // TODO
+                    accountAndKeys = [ controllerAddr * RESERVED_ADDRESSES_COUNT ];
                 }
                 const owners = accountAndKeys.map(p => p.addr);
 
@@ -99,7 +105,7 @@ module.exports = {
                 // Deploy StMaster
                 //
                 stmAddr = await deployer.deploy(StMaster,
-                    owners,
+                    owners, 
                     contractType == 'CASHFLOW_BASE'       ? CONST.contractType.CASHFLOW_BASE :
                     contractType == 'CASHFLOW_CONTROLLER' ? CONST.contractType.CASHFLOW_CONTROLLER :
                                                             CONST.contractType.COMMODITY,
@@ -139,15 +145,15 @@ module.exports = {
                         console.log(`>>> SAVING DEPLOYMENT: ${contractName} ${CONST.contractProps[contractType].contractVer} to ${process.env.sql_server}`);
                         await db.SaveDeployment({
                             contractName: contractName,
-                            contractVer: CONST.contractProps[contractType].contractVer,
-                            networkId: deployer.network_id,
-                        deployedAddress: stm.address,
+                             contractVer: CONST.contractProps[contractType].contractVer,
+                               networkId: deployer.network_id,
+                         deployedAddress: stm.address,
                         deployerHostName: os.hostname(),
                             deployerIpv4: ip,
-                            deployedAbi: JSON.stringify(stm.abi),
+                             deployedAbi: JSON.stringify(stm.abi),
                             contractType,
-                                txHash: stm.transactionHash,
-                                symbol: symbolOverride || ''
+                                  txHash: stm.transactionHash,
+                                  symbol: symbolOverride || ''
                         });
 
                         // log & validate deployment

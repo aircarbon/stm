@@ -35,7 +35,7 @@ contract("StMaster", accounts => {
 
         NDX_GRAY_2 = global.XaddrNdx + 1;
         GRAY_2 = accounts[NDX_GRAY_2];
-
+        
         await stm.whitelistMany([WHITE]);
         await stm.sealContract();
         await setupHelper.setDefaults({ stm, accounts });
@@ -55,7 +55,6 @@ contract("StMaster", accounts => {
 
         await stm.fundOrWithdraw(CONST.fundWithdrawType.FUND, CONST.ccyType.USD, 1, GRAY_2, 'TEST');
         await stm.setFee_TokType(CONST.tokenType.TOK_T2, GRAY_2, testFee );
-        
     });
 
     //
@@ -98,7 +97,6 @@ contract("StMaster", accounts => {
             ccy_amount_A: 0,                                ccyTypeId_A: 0,
             ccy_amount_B: 0,                                ccyTypeId_B: 0,
                applyFees: false,
-            transferType: CONST.transferType.OTHER_FEE2,
         });
         assert(data.ledgerB_before.spot_sumQty == 0, 'unexpected graylist ledger GRAY_1 quantity before');
         assert(data.ledgerB_after.spot_sumQty > 0, 'unexpected graylist ledger GRAY_1 quantity after');    
