@@ -65,7 +65,7 @@ contract StTransferable is Owned,
      */
      
     function transferOrTrade(StructLib.TransferArgs memory transferArgs)
-    public onlyOwner() onlyWhenReadWrite() {
+    public onlyOwner() onlyWhenReadWrite() { // TODO: onlyCustodian()
         // abort if sending tokens from a non-whitelist account
         require(!(transferArgs.qty_A > 0 && !erc20d._whitelisted[transferArgs.ledger_A]), "Not whitelisted (A)"); 
         require(!(transferArgs.qty_B > 0 && !erc20d._whitelisted[transferArgs.ledger_B]), "Not whitelisted (B)");

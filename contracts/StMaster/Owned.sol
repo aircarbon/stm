@@ -54,6 +54,21 @@ contract Owned
         revert("Restricted");
         _;
     }
+
+    // modifier onlyCustodian() {
+    //     switch(ld.CustodyMode) {
+    //         case SELF_CUSTODY: {
+    //             // as above onlyOwner() ... any one of 10 service accounts
+    //         }
+    //         case THIRD_PARTY_CUSTODY: {
+    //             if (owners[1] == msg.sender) {  _; return; } 
+    //             else {
+    //                 revert("Restricted");
+    //             }
+    //         }
+    //     }
+    //     _;
+    // }
     
     /**
      * @dev access modifier to allow read-write only when the READ-ONLY mode is off
