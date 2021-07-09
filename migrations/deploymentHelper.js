@@ -90,16 +90,13 @@ module.exports = {
                 // (bkp-owners are passed to contract ctor, and have identical permissions to the primary owner)
                 const MNEMONIC = process.env.DEV_MNEMONIC || process.env.PROD_MNEMONIC || require('../DEV_MNEMONIC.js').MNEMONIC;
                 const accountAndKeys = [];
-                // TODO: for basetype, pass [controllerAddr ... n RESERVED_ADDRESSES_COUNT]
-                if (type != base) { // TODO
-                    for (let i=0 ; i < CONST.RESERVED_ADDRESSES_COUNT ; i++) {
-                        accountAndKeys.push(await CONST.getAccountAndKey(i, MNEMONIC))
-                    }
-                }
-                else { // TODO
-                    accountAndKeys = [ controllerAddr * RESERVED_ADDRESSES_COUNT ];
+                for (let i=0 ; i < CONST.RESERVED_ADDRESSES_COUNT ; i++) {
+                    accountAndKeys.push(await CONST.getAccountAndKey(i, MNEMONIC))
                 }
                 const owners = accountAndKeys.map(p => p.addr);
+                if (type == base) {
+                    owners.push(controllerAddr) // ## TODO
+                }
 
                 //
                 // Deploy StMaster

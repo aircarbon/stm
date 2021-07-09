@@ -209,13 +209,10 @@ module.exports = async function (deployer) {
                 process.exit(1);
             }
 
-            // get whitelist from controller (wwe will set new the base type's whitelist to match)
+            // get whitelist from the latest deployed controller (we will set new the base type's whitelist to match)
             process.env.CONTRACT_TYPE = 'CASHFLOW_CONTROLLER';
             console.log('getting whitelist...');
             const controllerWhitelist = await CONST.web3_call('getWhitelist', []);
-            // TODO: (1) get owners[] from controller... new view on StMaster (hit 24k limit?) / let n = length owners[]
-            //       (2) replace first n entries in controllerWhitelist with controllerAddr (duplicated)
-            // ... v unchanged below
 
             //console.log('controllerWhitelist', controllerWhitelist);
             if (!controllerWhitelist) throw(`Cannot fetch controller whitelist.`);
