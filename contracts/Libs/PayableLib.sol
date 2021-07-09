@@ -24,6 +24,7 @@ library PayableLib {
         if (chainlinkAggAddr == address(0x0)) return -1;
         // Certik: (Major) ICA-01 | Incorrect Chainlink Interface
         // Resolved: (Major) ICA-01 | Upgraded Chainlink Aggregator Interface to V3
+        
         // Review: TODO - should be checking staleness values coming back from latestRoundData()
         IChainlinkAggregator ref = IChainlinkAggregator(chainlinkAggAddr);
         ( , int256 answer, , , ) = ref.latestRoundData();
