@@ -213,6 +213,10 @@ module.exports = async function (deployer) {
             process.env.CONTRACT_TYPE = 'CASHFLOW_CONTROLLER';
             console.log('getting whitelist...');
             const controllerWhitelist = await CONST.web3_call('getWhitelist', []);
+            // TODO: (1) get owners[] from controller... new view on StMaster (hit 24k limit?) / let n = length owners[]
+            //       (2) replace first n entries in controllerWhitelist with controllerAddr (duplicated)
+            // ... v unchanged below
+
             //console.log('controllerWhitelist', controllerWhitelist);
             if (!controllerWhitelist) throw(`Cannot fetch controller whitelist.`);
             if (controllerWhitelist.length == 0) throw(`Cannot deploy new base type; controller whitelist is not set. Run 04_Web3_INIT_MULTI_DATA_AC.js...`);
@@ -230,7 +234,9 @@ module.exports = async function (deployer) {
 
                 // init new base type, set whitelist to match controller
                 await setup.setDefaults({ nameOverride: nameBase });
-                const wlChunked = _.chunk(controllerWhitelist, 50);
+
+                // TODO: skip first n for baseclass, and instead pass in the controller address for index 0, then 0x0 for remaining n-1 reserved addresses
+                const wlChunked = _.chunk(controllerWhitelist, 50); 
                 for (let chunk of wlChunked) {
                     //try {
                         await CONST.web3_tx('whitelistMany', [ chunk ], O.addr, O.privKey, /*nameOverride*/undefined, /*addrOverride*/addrBase);
