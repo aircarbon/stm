@@ -94,8 +94,20 @@ module.exports = {
                     accountAndKeys.push(await CONST.getAccountAndKey(i, MNEMONIC))
                 }
                 const owners = accountAndKeys.map(p => p.addr);
-                if (type == base) {
-                    owners.push(controllerAddr) // ## TODO
+                if (contractType == 'CASHFLOW_BASE') {
+                    const controllerName = process.env.CONTRACT_PREFIX + (CONST.contractProps['CASHFLOW_CONTROLLER'].contractName);
+                    const baseVer = process.env.CONTRACT_VER || CONST.contractProps[process.env.CONTRACT_TYPE].contractVer;
+                    try {
+                        controllerContract = (await db.GetDeployment(process.env.WEB3_NETWORK_ID, controllerName, baseVer)).recordset[0];
+                        if (!controllerContract) {
+                            console.log(chalk.bold.red(`Failed to lookup controller contract: networkId=${process.env.WEB3_NETWORK_ID}, contractName=${controllerName}, contractVer=${baseVer} from ${process.env.sql_server}`));
+                        }
+                        // add controller address to base owners list
+                        owners.push(controllerContract.addr);
+                    }
+                    catch(err) { 
+                        console.error(`Failed to fetch controller contract address from db for network id: ${process.env.WEB3_NETWORK_ID}, contractName: ${controllerName}, version: ${baseVer}`);
+                    };
                 }
 
                 //
@@ -156,7 +168,10 @@ module.exports = {
                         // log & validate deployment
                         logEnv("DEPLOYMENT COMPLETE", owners, contractType, contractName);
                         const contractOwners = await CONST.web3_call('getOwners', [], undefined/*nameOverride*/, stm.address/*addrOverride*/);
-                        if (contractOwners.length != CONST.RESERVED_ADDRESSES_COUNT) {
+                        if (contractType != 'CASHFLOW_BASE' && contractOwners.length != CONST.RESERVED_ADDRESSES_COUNT) {
+                            console.log(chalk.red.bold.inverse(`Deployment failed: unexpected owners data`), contractOwners);
+                            process.exit(1);
+                        } else if (contractType == 'CASHFLOW_BASE' && contractOwners.length != CONST.RESERVED_ADDRESSES_COUNT + 1) {
                             console.log(chalk.red.bold.inverse(`Deployment failed: unexpected owners data`), contractOwners);
                             process.exit(1);
                         }

@@ -39,32 +39,28 @@ contract Owned
      * @dev modifier to limit access to deployment owners onlyOwner
      */
     modifier onlyOwner() {
-        // CFT: tx.origin (not msg.sender) -- we want the TX origin to be checked, not the calling cashflow controller
-        //require(tx.origin == deploymentOwner, "Restricted"); 
-        //require(found, "Restricted"); 
 
-        // TODO: Confirmed -- could add CFT-C address into the owners[] for basetypes...
-        // CFT-C: owners[] = [ addr1, 2, 3, 4 ... n ]
-        // CFT-B: owners[] = [ addrCftC, addrCftC, addrCftC, addrCftC, addrCftC, addrCftC, addrCftC, addrCftC, addrCftC, ... n ]
         for (uint i = 0; i < owners.length; i++) {
             // Certik: (Minor) OSM-08 | Usage of tx.origin The use of tx.origin should be avoided for ownership-based systems given that firstly it can be tricked on-chain and secondly it will change its functionality once EIP-3074 is integrated.
-            // Review: TODO HIPRI - (Minor) OSM-08 | Breaks on usage of msg.sender for CFT
-            if (owners[i] == tx.origin) {  _; return; } // TODO: change to msg.sender....
+            // Review: HIPRI - (Minor) OSM-08 | changed tx.origin to msg.sender - tested ok for cashflow base.
+            if (owners[i] == msg.sender) {  _; return; }
         }
         revert("Restricted");
         _;
     }
 
     // modifier onlyCustodian() {
-    //     switch(ld.CustodyMode) {
-    //         case SELF_CUSTODY: {
-    //             // as above onlyOwner() ... any one of 10 service accounts
+    //     if (ld.CustodyMode == 'SELF_CUSTODY') {
+    //         for (uint i = 0; i < owners.length; i++) {
+    //             if (owners[i] == msg.sender) {  _; return; }
     //         }
-    //         case THIRD_PARTY_CUSTODY: {
-    //             if (owners[1] == msg.sender) {  _; return; } 
-    //             else {
-    //                 revert("Restricted");
-    //             }
+    //         revert("Restricted");
+    //         _;
+    //     }
+    //     else if (ld.CustodyMode ==  'THIRD_PARTY_CUSTODY') {
+    //         if (owners[1] == msg.sender) {  _; return; } // fixed reserved addresses index for custodian address
+    //         else {
+    //             revert("Restricted");
     //         }
     //     }
     //     _;

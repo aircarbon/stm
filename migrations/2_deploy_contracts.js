@@ -11,55 +11,56 @@ const  db  = require('../../utils-server/db/dist');
 
 //
 // Deploy steps: from/to, inclusive:
-//    `truffle migrate -f 2 --to 2`
+//    `truffle compile && truffle migrate -f 2 --to 2`
 //
 // Deploys a contract of type process.env.CONTRACT_TYPE according to defaults in const.js
 // Prefixes the contract name in const.contractProps with (process.env.INSTANCE_ID || 'local'), e.g.
 //
 //   AC various
-//    `export INSTANCE_ID=local && node process_sol_js && truffle migrate --network development -f 2 --to 2 --reset`
-//    `export INSTANCE_ID=DEMO && node process_sol_js && truffle migrate --network test_ac -f 2 --to 2 --reset`
-//    `export INSTANCE_ID=PROD_52101 && node process_sol_js && truffle migrate --network prodnet_ac -f 2 --to 2 --reset`
-//    `export INSTANCE_ID=PROD_56 && node process_sol_js && truffle migrate --network bsc_mainnet_ac -f 2 --to 2 --reset`
+//    `export INSTANCE_ID=local && node process_sol_js && truffle compile && truffle migrate --network development -f 2 --to 2`
+//    `export INSTANCE_ID=UAT_97_AC && node process_sol_js && truffle compile && truffle migrate --network bsc_testnet_bn -f 2 --to 2`
+//    `export INSTANCE_ID=DEMO && node process_sol_js && truffle compile && truffle migrate --network test_ac -f 2 --to 2`
+//    `export INSTANCE_ID=PROD_52101 && node process_sol_js && truffle compile && truffle migrate --network prodnet_ac -f 2 --to 2`
+//    `export INSTANCE_ID=PROD_56 && node process_sol_js && truffle compile && truffle migrate --network bsc_mainnet_ac -f 2 --to 2`
 //
 //   SD local Ganache / Dev DB (ordered)
-//    `export INSTANCE_ID=local_SD && node process_sol_js && truffle migrate --network development -f 2 --to 2 --reset`
-//    `export INSTANCE_ID=local_SD_RichGlory && node process_sol_js && truffle migrate --network development -f 2 --to 2 --reset`
+//    `export INSTANCE_ID=local_SD && node process_sol_js && truffle compile && truffle migrate --network development -f 2 --to 2`
+//    `export INSTANCE_ID=local_SD_RichGlory && node process_sol_js && truffle compile && truffle migrate --network development -f 2 --to 2`
 //
 //   SD Ropsten 3 (ordered)
-//    `export INSTANCE_ID=UAT_3_SD && node process_sol_js && truffle migrate --network ropsten_ac -f 2 --to 2 --reset`
-//    `export INSTANCE_ID=UAT_3_SD_RichGlory && node process_sol_js && truffle migrate --network ropsten_ac -f 2 --to 2 --reset`
-//    `export INSTANCE_ID=UAT_3_SD_SBGLand && node process_sol_js && truffle migrate --network ropsten_ac -f 2 --to 2 --reset`
-//    `export INSTANCE_ID=UAT_3_SD_WilsonAndCo && node process_sol_js && truffle migrate --network ropsten_ac -f 2 --to 2 --reset`
-//    `export INSTANCE_ID=UAT_3_SD_WorldbridgeLand && node process_sol_js && truffle migrate --network ropsten_ac -f 2 --to 2 --reset`
+//    `export INSTANCE_ID=UAT_3_SD && node process_sol_js && truffle compile && truffle migrate --network ropsten_ac -f 2 --to 2`
+//    `export INSTANCE_ID=UAT_3_SD_RichGlory && node process_sol_js && truffle compile && truffle migrate --network ropsten_ac -f 2 --to 2`
+//    `export INSTANCE_ID=UAT_3_SD_SBGLand && node process_sol_js && truffle compile && truffle migrate --network ropsten_ac -f 2 --to 2`
+//    `export INSTANCE_ID=UAT_3_SD_WilsonAndCo && node process_sol_js && truffle compile && truffle migrate --network ropsten_ac -f 2 --to 2`
+//    `export INSTANCE_ID=UAT_3_SD_WorldbridgeLand && node process_sol_js && truffle compile && truffle migrate --network ropsten_ac -f 2 --to 2`
 //
 //   SD BSC Testnet 97 (ordered)
-//    `export INSTANCE_ID=UAT_97_SD && node process_sol_js && truffle migrate --network bsc_testnet_bn -f 2 --to 2 --reset`
-//    `export INSTANCE_ID=UAT_97_SD_RichGlory && node process_sol_js && truffle migrate --network bsc_testnet_bn -f 2 --to 2 --reset`
-//    `export INSTANCE_ID=UAT_97_SD_SBGLand && node process_sol_js && truffle migrate --network bsc_testnet_bn -f 2 --to 2 --reset`
-//    `export INSTANCE_ID=UAT_97_SD_WilsonAndCo && node process_sol_js && truffle migrate --network bsc_testnet_bn -f 2 --to 2 --reset`
-//    `export INSTANCE_ID=UAT_97_SD_WorldbridgeLand && node process_sol_js && truffle migrate --network bsc_testnet_bn -f 2 --to 2 --reset`
+//    `export INSTANCE_ID=UAT_97_SD && node process_sol_js && truffle compile && truffle migrate --network bsc_testnet_bn -f 2 --to 2`
+//    `export INSTANCE_ID=UAT_97_SD_RichGlory && node process_sol_js && truffle compile && truffle migrate --network bsc_testnet_bn -f 2 --to 2`
+//    `export INSTANCE_ID=UAT_97_SD_SBGLand && node process_sol_js && truffle compile && truffle migrate --network bsc_testnet_bn -f 2 --to 2`
+//    `export INSTANCE_ID=UAT_97_SD_WilsonAndCo && node process_sol_js && truffle compile && truffle migrate --network bsc_testnet_bn -f 2 --to 2`
+//    `export INSTANCE_ID=UAT_97_SD_WorldbridgeLand && node process_sol_js && truffle compile && truffle migrate --network bsc_testnet_bn -f 2 --to 2`
 //
 //   SD BSC Testnet 97 (DEMO)
-//    `export INSTANCE_ID=DEMO_97_SD && node process_sol_js && truffle migrate --network bsc_testnet_bn -f 2 --to 2 --reset`
-//    `export INSTANCE_ID=DEMO_97_SD_RichGlory && node process_sol_js && truffle migrate --network bsc_testnet_bn -f 2 --to 2 --reset`
-//    `export INSTANCE_ID=DEMO_97_SD_SBGLand && node process_sol_js && truffle migrate --network bsc_testnet_bn -f 2 --to 2 --reset`
-//    `export INSTANCE_ID=DEMO_97_SD_WilsonAndCo && node process_sol_js && truffle migrate --network bsc_testnet_bn -f 2 --to 2 --reset`
-//    `export INSTANCE_ID=DEMO_97_SD_WorldbridgeLand && node process_sol_js && truffle migrate --network bsc_testnet_bn -f 2 --to 2 --reset`
+//    `export INSTANCE_ID=DEMO_97_SD && node process_sol_js && truffle compile && truffle migrate --network bsc_testnet_bn -f 2 --to 2`
+//    `export INSTANCE_ID=DEMO_97_SD_RichGlory && node process_sol_js && truffle compile && truffle migrate --network bsc_testnet_bn -f 2 --to 2`
+//    `export INSTANCE_ID=DEMO_97_SD_SBGLand && node process_sol_js && truffle compile && truffle migrate --network bsc_testnet_bn -f 2 --to 2`
+//    `export INSTANCE_ID=DEMO_97_SD_WilsonAndCo && node process_sol_js && truffle compile && truffle migrate --network bsc_testnet_bn -f 2 --to 2`
+//    `export INSTANCE_ID=DEMO_97_SD_WorldbridgeLand && node process_sol_js && truffle compile && truffle migrate --network bsc_testnet_bn -f 2 --to 2`
 //
 //   SD BSC Mainnet 56 (ordered)
-//    `export INSTANCE_ID=PROD_56_SD && node process_sol_js && truffle migrate --network bsc_mainnet_ac -f 2 --to 2 --reset`
-//    `export INSTANCE_ID=PROD_56_SD_RichGlory && node process_sol_js && truffle migrate --network bsc_mainnet_ac -f 2 --to 2 --reset`
-//    `export INSTANCE_ID=PROD_56_SD_SBGLand && node process_sol_js && truffle migrate --network bsc_mainnet_ac -f 2 --to 2 --reset`
+//    `export INSTANCE_ID=PROD_56_SD && node process_sol_js && truffle compile && truffle migrate --network bsc_mainnet_ac -f 2 --to 2`
+//    `export INSTANCE_ID=PROD_56_SD_RichGlory && node process_sol_js && truffle compile && truffle migrate --network bsc_mainnet_ac -f 2 --to 2`
+//    `export INSTANCE_ID=PROD_56_SD_SBGLand && node process_sol_js && truffle compile && truffle migrate --network bsc_mainnet_ac -f 2 --to 2`
 //
 //   SD Matic Mainnet 137
-//    `export INSTANCE_ID=PROD_137_SD && node process_sol_js && truffle migrate --network matic_mainnet -f 2 --to 2 --reset`
+//    `export INSTANCE_ID=PROD_137_SD && node process_sol_js && truffle compile && truffle migrate --network matic_mainnet -f 2 --to 2`
 //
 //   SD Matic (Mumbai) Testnet 80001
-//    `export INSTANCE_ID=UAT_80001_SD && node process_sol_js && truffle migrate --network matic_testnet -f 2 --to 2 --reset`
+//    `export INSTANCE_ID=UAT_80001_SD && node process_sol_js && truffle compile && truffle migrate --network matic_testnet -f 2 --to 2`
 //
 //   AC Matic (Mumbai) Testnet 80001
-//    `export INSTANCE_ID=UAT_80001 && node process_sol_js && truffle migrate --network matic_testnet -f 2 --to 2 --reset`
+//    `export INSTANCE_ID=UAT_80001 && node process_sol_js && truffle compile && truffle migrate --network matic_testnet -f 2 --to 2`
 
 // Matic (Mumbai) Testnet 80001 deployments have intermittent errors (results in an non-terminating solc-js dump)
 
@@ -160,7 +161,7 @@ module.exports = async function (deployer) {
             // const execSync = require("child_process").execSync;
             // process.env.CONTRACT_TYPE = 'CASHFLOW_BASE';
             // console.log(chalk.inverse('run pre-processor: set source files & compile for base-type deployments...'));
-            // const childResult1 = execSync(`node process_sol_js && truffle compile --reset`);
+            // const childResult1 = execSync(`node process_sol_js && truffle compile`);
             // console.group('Child Output');
             // console.log(chalk.dim(childResult1.toString("utf8")));
             // console.groupEnd();
@@ -171,8 +172,8 @@ module.exports = async function (deployer) {
             // deploy controller
             process.env.CONTRACT_TYPE = 'CASHFLOW_CONTROLLER';
             // console.log(chalk.inverse('set source files & compile for controller deployment...'));
-            // execSync(`node process_sol_js && truffle compile --reset`);
-            // const childResult2 = execSync(`node process_sol_js && truffle compile --reset`);
+            // execSync(`node process_sol_js && truffle compile`);
+            // const childResult2 = execSync(`node process_sol_js && truffle compile`);
             // console.group('Child Output');
             // console.log(chalk.dim(childResult2.toString("utf8")));
             // console.groupEnd();
@@ -232,14 +233,12 @@ module.exports = async function (deployer) {
                 // init new base type, set whitelist to match controller
                 await setup.setDefaults({ nameOverride: nameBase });
 
-                // TODO: skip first n for baseclass, and instead pass in the controller address for index 0, then 0x0 for remaining n-1 reserved addresses
                 const wlChunked = _.chunk(controllerWhitelist, 50); 
                 for (let chunk of wlChunked) {
                     //try {
                         await CONST.web3_tx('whitelistMany', [ chunk ], O.addr, O.privKey, /*nameOverride*/undefined, /*addrOverride*/addrBase);
                     //} catch(ex) { console.warn(ex); }
                 }
-                //await CONST.web3_tx('whitelistMany', [controllerWhitelist], O.addr, O.privKey, /*nameOverride*/undefined, /*addrOverride*/addrBase);
 
                 const baseWhitelist = await CONST.web3_call('getWhitelist', [], /*nameOverride*/undefined, /*addrOverride*/addrBase);
                 console.log('      baseWhitelist.length', baseWhitelist.length);
