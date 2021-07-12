@@ -2,7 +2,6 @@
 // Author: https://github.com/7-of-9
 pragma solidity ^0.8.0;
 
-import "./Owned.sol";
 import "./StLedger.sol";
 
 import "../Interfaces/StructLib.sol";
@@ -23,21 +22,13 @@ import "../Libs/SpotFeeLib.sol";
   * <pre>   - uses SpotFeeLib runtime library</pre>
   */
   
-contract StFees is
-    Owned, StLedger {
+abstract contract StFees is
+    StLedger {
 
     enum GetFeeType { CCY, TOK }
 
     // GLOBAL FEES
     StructLib.FeeStruct globalFees;
-
-    /**
-     * @dev constructor for security token fee management
-     * @param feeType 0: currency fee<br/>1: token fee
-     * @param typeId fee type unique identifier
-     * @param ledgerOwner account address of the ledger owner
-     */
-    //constructor() public {}
 
     /**
      * @dev returns fee structure

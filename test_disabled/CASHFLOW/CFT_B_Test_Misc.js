@@ -28,13 +28,24 @@ contract("StMaster", accounts => {
             console.log(`addrNdx: ${global.TaddrNdx} - contract @ ${stm.address} (owner: ${accounts[0]})`);
     });
 
-    it(`cashflow - misc - have correct initial state`, async () => {
-        assert((await stm.getSecTokenTypes()).tokenTypes.length == 1);
-        assert((await stm.getCcyTypes()).ccyTypes.length == 1);
+    it(`cashflow - misc - base should not be able to get currency types`, async () => {
+        try{
+            await stm.getCcyTypes();
+        } catch (ex) {
+            assert(ex.reason == undefined, `unexpected: ${ex.reason}`);
+            return;
+        }
+        assert.fail('expected contract exception');
     });
 
     it(`cashflow - misc - be able to read cashflow data`, async () => {
-        const cashflowData = await stm.getCashflowData();
+        try{
+            
+            assert((await stm.getCashflowData()), "expected cashflow data on base type");
+        } catch (ex) {
+            assert.fail('expected cashflow data');
+            return;
+        }
     });
 
     it(`cashflow - misc - should not be able add token types`, async () => {
@@ -51,7 +62,7 @@ contract("StMaster", accounts => {
         try {
             await stm.addCcyType('TEST_COIN', 'TEST_UNIT', 2);
         } catch (ex) {
-            assert(ex.reason == 'Bad cashflow request', `unexpected: ${ex.reason}`);
+            assert(ex.reason == undefined, `unexpected: ${ex.reason}`);
             return;
         }
         assert.fail('expected contract exception');

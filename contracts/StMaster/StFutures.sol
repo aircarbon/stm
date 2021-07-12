@@ -2,9 +2,6 @@
 // Author: https://github.com/7-of-9
 pragma solidity ^0.8.0;
 
-import "./Owned.sol";
-import "./StLedger.sol";
-import "./StFees.sol";
 import "./StErc20.sol";
 import "./StPayable.sol";
 
@@ -125,8 +122,6 @@ older:
 >> COULD KEEP BOTH IN CONTRACT DATA, IF WE PURGE AFTER POSITION CLOSE? (events would give the historic values?)
 */
 
-abstract // solc 0.6
-
  /**
   * @title Security Token Futures Trading
   * @author Dominic Morris (7-of-9)
@@ -142,8 +137,8 @@ abstract // solc 0.6
   * <pre>   - uses LedgerLib runtime library</pre>
   */
   
-contract StFutures is Owned,
-    StLedger, StFees, StErc20, StPayable {
+abstract contract StFutures is Owned,
+    StErc20, StPayable {
 
 //#if process.env.CONTRACT_TYPE === 'COMMODITY'
 

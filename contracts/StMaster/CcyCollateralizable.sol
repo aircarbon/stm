@@ -2,7 +2,6 @@
 // Author: https://github.com/7-of-9
 pragma solidity ^0.8.0;
 
-import "./Owned.sol";
 import "./StLedger.sol";
 
 import "../Interfaces/StructLib.sol";
@@ -18,8 +17,8 @@ import "../Libs/CcyLib.sol";
   * <pre>   - uses StructLib interface library</pre>
   * <pre>   - uses CcyLib runtime library</pre>
   */
-contract Collateralizable is
-    Owned, StLedger {
+abstract contract Collateralizable is
+    StLedger {
 
 //#if process.env.CONTRACT_TYPE !== 'CASHFLOW_BASE'
     /**

@@ -2,9 +2,6 @@
 // Author: https://github.com/7-of-9
 pragma solidity ^0.8.0;
 
-import "./Owned.sol";
-import "./StLedger.sol";
-import "./StFees.sol";
 import "./StErc20.sol";
 import "./StPayable.sol";
 
@@ -31,7 +28,7 @@ abstract // solc 0.6
   */
   
 contract StTransferable is Owned,
-    StLedger, StFees, StErc20, StPayable {
+    StErc20, StPayable {
 
     /**
      * @dev returns the hashcode of the ledger

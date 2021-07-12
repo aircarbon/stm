@@ -19,7 +19,7 @@ import "../Libs/TokenLib.sol";
   * <pre>   - uses LedgerLib runtime library</pre>
   */
   
-contract StLedger is
+abstract contract StLedger is
     Owned {
 
     StructLib.LedgerStruct ld;

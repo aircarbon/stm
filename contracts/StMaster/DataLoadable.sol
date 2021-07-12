@@ -2,9 +2,6 @@
 // Author: https://github.com/7-of-9
 pragma solidity ^0.8.0;
 
-import "./Owned.sol";
-import "./StLedger.sol";
-import "./StFees.sol";
 import "./StErc20.sol";
 
 import "../Interfaces/StructLib.sol";
@@ -23,8 +20,9 @@ abstract // solc 0.6
   * <pre>   - uses StructLib interface library</pre>
   * <pre>   - uses LoadLib runtime library</pre>
   */
+  
 contract DataLoadable is
-    Owned, StLedger, StFees, StErc20 {
+    StErc20 {
 
     /**
     * @dev load a single or multiple security token batch(es)

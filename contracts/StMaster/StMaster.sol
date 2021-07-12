@@ -200,6 +200,7 @@ contract StMaster
 //#if process.env.CONTRACT_TYPE === 'CASHFLOW_BASE' || process.env.CONTRACT_TYPE === 'COMMODITY'
         StErc20(_contractSymbol, _contractDecimals)
 //#endif
+        Owned(_owners)
     {
 
 //#if process.env.CONTRACT_TYPE === 'CASHFLOW_BASE'
@@ -217,8 +218,6 @@ contract StMaster
         // contract type
         ld.contractType = _contractType;
 
-        // set supplied owners (these function identically to the traditional deployment owner)
-        owners = _owners;
     }
 
     // todo: for updateable libs - proxy dispatcher

@@ -2,8 +2,6 @@
 // Author: https://github.com/7-of-9
 pragma solidity ^0.8.0;
 
-import "./Owned.sol";
-import "./StLedger.sol";
 import "./StFees.sol";
 
 import "../Interfaces/StructLib.sol";
@@ -26,7 +24,7 @@ import "../Libs/Erc20Lib.sol";
   * <pre>   - inherits TransferLib runtime library</pre>
   */
 
-contract StErc20 is StFees
+abstract contract StErc20 is StFees
 {
     StructLib.Erc20Struct erc20d;
 

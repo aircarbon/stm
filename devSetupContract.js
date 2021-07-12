@@ -71,9 +71,9 @@ module.exports = {
             // cashflow controller - holds ledger collateral, so ccy types only here
             const ccyTypes = (await CONST.web3_call('getCcyTypes', [], nameOverride)).ccyTypes;
             await addCcyIfNotPresent(ccyTypes, 'USD', 'cents', 2, O, nameOverride);
-            await addCcyIfNotPresent(ccyTypes, 'HKD', 'cents', 2, O, nameOverride);
+            await addCcyIfNotPresent(ccyTypes, 'ETH', 'Wei', 18, O, nameOverride);
+            // await addCcyIfNotPresent(ccyTypes, 'HKD', 'cents', 2, O, nameOverride);
             await addCcyIfNotPresent(ccyTypes, 'BTC', 'Satoshi', 8, O, nameOverride);
-            //await addCcyIfNotPresent(ccyTypes, 'ETH', 'Wei', 18, O, nameOverride);
 
             // create owner ledger entry
             const ownerLedger = (await CONST.web3_call('getLedgerEntry', [O.addr], nameOverride));

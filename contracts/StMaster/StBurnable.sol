@@ -2,7 +2,6 @@
 // Author: https://github.com/7-of-9
 pragma solidity ^0.8.0;
 
-import "./Owned.sol";
 import "./StLedger.sol";
 
 import "../Interfaces/StructLib.sol";
@@ -17,7 +16,7 @@ import "../Libs/TokenLib.sol";
   * <pre>   - uses StructLib interface library</pre>
   * <pre>   - uses TokenLib runtime library</pre>
   */
-contract StBurnable is Owned, StLedger {
+abstract contract StBurnable is StLedger {
 
     /**
      * @dev burning of security tokens

@@ -107,7 +107,7 @@ contract("StMaster", accounts => {
 
     it(`cashflow - issuance (${bondPricing} bond) - should not allow non-issuer to set issuer values`, async () => {
         try {
-            await stm.setIssuerValues(wei_currentPrice, cents_currentPrice, 1, { from: OWNER });
+            await stm.setIssuerValues(wei_currentPrice, cents_currentPrice, 1, { from: accounts[++global.TaddrNdx] });
         } catch (ex) {  
             assert(ex.reason == 'Bad cashflow request: access denied', `unexpected: ${ex.reason}`);
             return;
@@ -168,11 +168,18 @@ contract("StMaster", accounts => {
             assert(ex.reason == 'Bad cashflow request: cannot change price for bond once set', `unexpected: ${ex.reason}`);
             return;
         }
+        assert.fail('expected contract exception');
     });
-
+    
     it(`cashflow - issuance (${bondPricing} bond) - should be able to handle zero-value payable tx`, async () => {
         const SUB_1 = ++global.TaddrNdx;
-        await issuanceHelper.subscribe(stm, wei_priceForOne, ISSUER, accounts[SUB_1], "0.0");
+        try{
+            await issuanceHelper.subscribe(stm, wei_priceForOne, ISSUER, accounts[SUB_1], "0.0");
+        } catch (ex) {
+            assert(ex.reason == 'Bad msg.value', `unexpected: ${ex.reason}`);
+            return;
+        }
+        assert.fail('expected contract exception');
     });
 
     it(`cashflow - issuance (${bondPricing} bond) - should not handle payable tx when contract is read only`, async () => {

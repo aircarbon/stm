@@ -22,8 +22,8 @@ contract Owned
      * @param isReadOnly returns the read only state of the deployement
      */
     function readOnly() external view returns (bool isReadOnly) { return readOnlyState; }
-
-    constructor() { // TODO: address[] _owners...
+    constructor(address[] memory _owners) {
+        owners = _owners;
         deploymentOwner = payable(msg.sender); // payable used in solidity version 0.8.0 onwards
         readOnlyState = false;
     }

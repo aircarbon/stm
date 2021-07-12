@@ -2,7 +2,6 @@
 // Author: https://github.com/7-of-9
 pragma solidity ^0.8.0;
 
-import "./Owned.sol";
 import "./StLedger.sol";
 
 import "../Interfaces/StructLib.sol";
@@ -20,8 +19,8 @@ import "../Libs/SpotFeeLib.sol";
   * <pre>   - uses SpotFeeLib runtime library</pre>
   */
 
-contract StMintable is
-    Owned, StLedger {
+abstract contract StMintable is
+    StLedger {
 
     /**
      * @dev mint a fresh security token batch
