@@ -63,7 +63,8 @@
     "solidity-docgen": "^0.3.14",
     "truffle": "5.1.22",
     "truffle-assertions": "^0.9.1",
-    "web3": "^2.0.0-alpha.1"
+    "web3": "^2.0.0-alpha.1",
+    "yargs-parser": "^20.2.9"
   },
   "husky": {
     "hooks": {
