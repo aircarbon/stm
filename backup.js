@@ -37,8 +37,9 @@ module.exports = async (callback) => {
   const symbol = await contract.symbol();
   const decimals = await contract.decimals();
   const network = argv?.network || 'development';
-  // FIXME: { code: -32000, message: 'execution reverted' } on BSC Testnet
-  const ledgerHash = network.includes('bsc') ? 'TBD' : await CONST.getLedgerHashcode(contract);
+  // Note: we might got to { code: -32000, message: 'execution reverted' } on BSC Mainnet/Testnet with Binance nodes
+  // only works with our private node
+  const ledgerHash = await CONST.getLedgerHashcode(contract);
   const name = await contract.name();
   const version = await contract.version();
   console.log(`Contract address: ${contractAddress}`);

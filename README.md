@@ -108,7 +108,7 @@ If you see `Error: invalid reporter "eth-gas-reporter"` -- try running `npm i` i
 
 ```sh
 # Backup
-truffle exec backup.js -a='0c383c375513B345961aFFb0B35ddf65EF49d5e8' --network=matic_testnet
+INSTANCE_ID=local truffle exec backup.js -a='cada1b5846aa836d60c00f1ed77d04401c9e421e' --network=bsc_testnet_bn
 # Restore
-truffle exec restore.js -a='0c383c375513B345961aFFb0B35ddf65EF49d5e8' --network=development
+INSTANCE_ID=local truffle exec restore.js -a='cada1b5846aa836d60c00f1ed77d04401c9e421e' --network=development
 ```
