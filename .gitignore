@@ -4,3 +4,4 @@ artifacts
 .env.*
 PROD_MNEMONIC.js
 !.env.example
+data
