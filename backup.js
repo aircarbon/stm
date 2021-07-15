@@ -11,7 +11,13 @@ const CONST = require('./const');
  * @link https://github.com/trufflesuite/truffle/issues/889#issuecomment-522581580
  */
 module.exports = async (callback) => {
-  const contractAddress = `0x${argv?.a || '0000000000000000000000000000000000000000!'}`;
+  const contractAddress = `0x${argv?.a}`;
+
+  // throw error if not valid address
+  if (!contractAddress.match(/^0x[0-9a-f]{40}$/)) {
+    callback('Invalid address');
+    return;
+  }
 
   const contract = await StMaster.at(contractAddress);
 
@@ -27,7 +33,9 @@ module.exports = async (callback) => {
   const unit = await contract.unit();
   const symbol = await contract.symbol();
   const decimals = await contract.decimals();
-  const ledgerHash = await CONST.getLedgerHashcode(contract);
+  // FIXME: { code: -32000, message: 'execution reverted' } on BSC Testnet
+  // const ledgerHash = await CONST.getLedgerHashcode(contract);
+  const ledgerHash = 'TBD';
   const name = await contract.name();
   const version = await contract.version();
   // show debug info
