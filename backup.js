@@ -23,6 +23,10 @@ module.exports = async (callback) => {
     return;
   }
 
+  const owners = await contract.getOwners();
+  const unit = await contract.unit();
+  const symbol = await contract.symbol();
+  const decimals = await contract.decimals();
   const ledgerHash = await CONST.getLedgerHashcode(contract);
   const name = await contract.name();
   const version = await contract.version();
@@ -59,11 +63,16 @@ module.exports = async (callback) => {
   // write backup to json file
   const backup = {
     info: {
+      network: argv?.network || 'development',
       contractAddress,
       contractType,
       ledgerHash,
       name,
       version,
+      owners,
+      symbol,
+      unit,
+      decimals,
     },
     data: {
       ccyTypes,
