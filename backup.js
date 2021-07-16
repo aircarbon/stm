@@ -10,11 +10,11 @@ const { helpers } = require('../utils-common/dist');
 process.on('unhandledRejection', console.error);
 
 /**
- * Usage: `truffle exec backup.js -a=ADDR [--network <name>] [--compile]`,
+ * Usage: `truffle exec backup.js -s=ADDR [--network <name>] [--compile]`,
  * @link https://github.com/trufflesuite/truffle/issues/889#issuecomment-522581580
  */
 module.exports = async (callback) => {
-  const contractAddress = `0x${argv?.a}`.toLowerCase();
+  const contractAddress = `0x${argv?.s}`.toLowerCase();
 
   // return error if not a valid address
   if (!contractAddress.match(/^0x[0-9a-f]{40}$/i)) {
