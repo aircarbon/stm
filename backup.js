@@ -43,22 +43,28 @@ module.exports = async (callback) => {
   const name = await contract.name();
   const version = await contract.version();
   console.log(`Contract address: ${contractAddress}`);
-  console.log(`Ledger hash: ${ledgerHash}`);
   console.log(`Name: ${name}`);
   console.log(`Version: ${version}`);
 
   // get all ccy and token types
   const ccyTypes = await contract.getCcyTypes();
-  const tokenTypes = await contract.getSecTokenTypes();
-  console.log(`Currency types: ${ccyTypes}`);
-  console.log(`Token types: ${tokenTypes}`);
-
-  const whitelistAddresses = await contract.getWhitelist();
+  const { ccyTypes: currencyTypes } = helpers.decodeWeb3Object(ccyTypes);
+  console.log(
+    `Currency types`,
+    currencyTypes.map((ccy) => ({
+      id: ccy.id,
+      name: ccy.name,
+      unit: ccy.unit,
+      decimals: ccy.decimals,
+    })),
+  );
+  const tokTypes = await contract.getSecTokenTypes();
+  const { tokenTypes } = helpers.decodeWeb3Object(tokTypes);
+  console.log(`Token types`, tokenTypes);
 
   // get ledgers
   const ledgerOwners = await contract.getLedgerOwners();
   const ledgers = await Promise.all(ledgerOwners.map((owner) => contract.getLedgerEntry(owner)));
-  console.log(`Ledger owners: ${ledgerOwners}`);
 
   // get all batches
   const batchesPromise = [];
@@ -67,6 +73,8 @@ module.exports = async (callback) => {
     batchesPromise.push(contract.getSecTokenBatch(index));
   }
   const batches = await Promise.all(batchesPromise);
+
+  const whitelistAddresses = await contract.getWhitelist();
 
   // write backup to json file
   const backup = {
@@ -85,8 +93,13 @@ module.exports = async (callback) => {
     data: {
       whitelistAddresses,
       ledgerOwners,
-      ...helpers.decodeWeb3Object(ccyTypes),
-      ...helpers.decodeWeb3Object(tokenTypes),
+      ccyTypes: currencyTypes.map((ccy) => ({
+        id: ccy.id,
+        name: ccy.name,
+        unit: ccy.unit,
+        decimals: ccy.decimals,
+      })),
+      tokenTypes,
       ledgers: ledgers.map((ledger) => helpers.decodeWeb3Object(ledger)),
       batches: batches.map((batch) => helpers.decodeWeb3Object(batch)),
     },

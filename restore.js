@@ -11,6 +11,10 @@ const { helpers } = require('../utils-common/dist');
 
 process.on('unhandledRejection', console.error);
 
+// how many items to process in one batch
+const WHITELIST_CHUNK_SIZE = 100;
+const BATCH_CHUNK_SIZE = 2;
+
 /**
  * Usage: `truffle exec restore.js -s=ADDR -t=NEW_ADDR [--network <name>] [--compile]`,
  * @link https://github.com/trufflesuite/truffle/issues/889#issuecomment-522581580
@@ -44,11 +48,10 @@ module.exports = async (callback) => {
   console.log(`Version: ${version}`);
 
   // whitelisting addresses to new contract
-  const WHITELIST_COUNT = 10;
   const whitelistPromises = data.whitelistAddresses
     .reduce((result, addr) => {
       const lastItem = result?.[result.length - 1] ?? [];
-      if (lastItem && lastItem.length === WHITELIST_COUNT) {
+      if (lastItem && lastItem.length === WHITELIST_CHUNK_SIZE) {
         return [...result, [addr]];
       } else {
         return [...result.slice(0, -1), [...lastItem, addr]];
@@ -71,9 +74,9 @@ module.exports = async (callback) => {
   const ccyTypesPromises = data.ccyTypes.map(
     (ccyType) =>
       function addCcyType(cb) {
-        console.log(`Adding ccyType`, ccyType[1], ccyType[2], ccyType[3]);
+        console.log(`Adding ccyType`, ccyType);
         newContract
-          .addCcyType(ccyType[1], ccyType[2], ccyType[3])
+          .addCcyType(ccyType.name, ccyType.unit, ccyType.decimals)
           .then((ccy) => cb(null, ccy))
           .catch((error) => cb(error));
       },
@@ -99,6 +102,29 @@ module.exports = async (callback) => {
   const tokenTypes = await newContract.getSecTokenTypes();
   console.log(helpers.decodeWeb3Object(tokenTypes));
 
+  // load batches data to new contract
+  const batchesPromises = data.batches
+    .reduce((result, batch) => {
+      const lastItem = result?.[result.length - 1] ?? [];
+      if (lastItem && lastItem.length === BATCH_CHUNK_SIZE) {
+        return [...result, [batch]];
+      } else {
+        return [...result.slice(0, -1), [...lastItem, batch]];
+      }
+    }, [])
+    .map(
+      (batches) =>
+        function loadSecTokenBatch(cb) {
+          console.log(`Adding batches`, batches);
+          newContract
+            .loadSecTokenBatch(batches, batches.length)
+            .then((result) => cb(null, result))
+            .catch((error) => cb(error));
+        },
+    );
+
+  await series(batchesPromises);
+
   // Default fee for smart contract
   await newContract.setFee_CcyType(CONST.ccyType.USD, CONST.nullAddr, {
     ...CONST.nullFees,
@@ -106,6 +132,8 @@ module.exports = async (callback) => {
     ccy_mirrorFee: true,
     fee_min: 300,
   });
+
+  await newContract.sealContract();
 
   callback();
 };
