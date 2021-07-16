@@ -102,6 +102,45 @@ module.exports = async (callback) => {
   const tokenTypes = await newContract.getSecTokenTypes();
   console.log(helpers.decodeWeb3Object(tokenTypes));
 
+  // load ledgers data to new contract
+  const ledgersPromises = data.ledgers.map(
+    (ledger, index) =>
+      function createLedgerEntry(cb) {
+        const owner = data.ledgerOwners[index];
+        console.log(`Creating ledger entry #${index} - currency`, owner, ledger.ccys);
+        newContract
+          .createLedgerEntry(owner, ledger.ccys, ledger.spot_sumQtyMinted, ledger.spot_sumQtyBurned)
+          .then((result) => cb(null, result))
+          .catch((error) => cb(error));
+      },
+  );
+  await series(ledgersPromises);
+  const addSecTokensPromises = data.ledgers.flatMap(
+    (ledger, index) =>
+      function addSecToken(cb) {
+        const owner = data.ledgerOwners[index];
+        console.log(`Creating ledger entry #${index} - token `, owner, ledger.tokens);
+        return ledger.tokens.map((token) =>
+          newContract
+            .addSecToken(
+              owner,
+              token.batchId,
+              token.stId,
+              token.tokTypeId,
+              token.mintedQty,
+              token.currentQty,
+              token.ft_price,
+              token.ft_lastMarkPrice,
+              token.ft_ledgerOwner,
+              token.ft_PL,
+            )
+            .then((result) => cb(null, result))
+            .catch((error) => cb(error)),
+        );
+      },
+  );
+  await series(addSecTokensPromises);
+
   // load batches data to new contract
   const batchesPromises = data.batches
     .reduce((result, batch) => {
