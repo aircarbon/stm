@@ -149,7 +149,7 @@ module.exports = async function (deployer) {
             console.log('COMMODITY...');
             // deploy a singleton COMMODITY contract
             await deploymentHelper.Deploy({ deployer, artifacts, contractType: 'COMMODITY' });
-            if (!deployer.network.includes("-fork")) {
+            if (!deployer.network.includes("-fork") && process.env.RESTORE_CONTRACT !== "YES") {
                 await setup.setDefaults();
             }
             break;
@@ -233,7 +233,7 @@ module.exports = async function (deployer) {
                 // init new base type, set whitelist to match controller
                 await setup.setDefaults({ nameOverride: nameBase });
 
-                const wlChunked = _.chunk(controllerWhitelist, 50); 
+                const wlChunked = _.chunk(controllerWhitelist, 50);
                 for (let chunk of wlChunked) {
                     //try {
                         await CONST.web3_tx('whitelistMany', [ chunk ], O.addr, O.privKey, /*nameOverride*/undefined, /*addrOverride*/addrBase);
