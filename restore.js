@@ -1,5 +1,6 @@
 // @ts-check
 const fs = require('fs');
+const { toBN } = require('web3-utils');
 const chalk = require('chalk');
 const argv = require('yargs-parser')(process.argv.slice(2));
 // @ts-ignore artifacts from truffle
@@ -210,12 +211,33 @@ module.exports = async (callback) => {
   await series(addSecTokensPromises);
   await sleep(1000);
 
-  // Default fee for smart contract
-  await newContract.setFee_CcyType(CONST.ccyType.USD, CONST.nullAddr, {
-    ...CONST.nullFees,
-    ccy_perMillion: 300,
-    ccy_mirrorFee: true,
-    fee_min: 300,
+  await newContract.setTokenTotals(
+    data.secTokenBaseId,
+    toBN(data.secTokenMintedCount),
+    toBN(data.secTokenMintedQty),
+    toBN(data.secTokenBurnedQty),
+  );
+
+  // set fee for currency and token types
+  const feePromises = [];
+  currencyTypes.map((ccyType, index) => {
+    feePromises.push(function setFeeForCcyType(cb) {
+      // get currency type fee by id
+      const fee = data.ccyFees[index];
+      newContract
+        .setFee_CcyType(ccyType.id, CONST.nullAddr, fee)
+        .then((result) => cb(null, result))
+        .catch((error) => cb(error));
+    });
+  });
+  tokenTypes.map((tokenType, index) => {
+    feePromises.push(function setFeeForTokenType(cb) {
+      const fee = data.ccyFees[index];
+      newContract
+        .setFee_TokType(tokenType.id, CONST.nullAddr, fee)
+        .then((result) => cb(null, result))
+        .catch((error) => cb(error));
+    });
   });
 
   await newContract.sealContract();
@@ -226,5 +248,5 @@ module.exports = async (callback) => {
     return callback(new Error(`Ledger hash mismatch!`));
   }
 
-  callback();
+  callback('Done.');
 };

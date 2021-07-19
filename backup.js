@@ -67,6 +67,25 @@ module.exports = async (callback) => {
 
   const whitelistAddresses = await contract.getWhitelist();
 
+  const secTokenBaseId = await contract.getSecToken_BaseId();
+  const secTokenMintedCount = await contract.getSecToken_MaxId();
+  const secTokenBurnedQty = await contract.getSecToken_totalBurnedQty();
+  const secTokenMintedQty = await contract.getSecToken_totalMintedQty();
+
+  // get all currency types fee
+  const ccyFeePromise = [];
+  for (let index = 0; index < currencyTypes.length; index++) {
+    ccyFeePromise.push(contract.getFee(CONST.getFeeType.CCY, currencyTypes[index].id, CONST.nullAddr));
+  }
+  const ccyFees = await Promise.all(ccyFeePromise);
+
+  // get all token types fee
+  const tokenFeePromise = [];
+  for (let index = 0; index < tokenTypes.length; index++) {
+    tokenFeePromise.push(contract.getFee(CONST.getFeeType.CCY, tokenTypes[index].id, CONST.nullAddr));
+  }
+  const tokenFees = await Promise.all(tokenFeePromise);
+
   // write backup to json file
   const backup = {
     info: {
@@ -82,6 +101,10 @@ module.exports = async (callback) => {
       decimals,
     },
     data: {
+      secTokenBaseId,
+      secTokenMintedCount,
+      secTokenBurnedQty,
+      secTokenMintedQty,
       whitelistAddresses,
       ledgerOwners,
       ccyTypes: currencyTypes.map((ccy) => ({
@@ -90,6 +113,7 @@ module.exports = async (callback) => {
         unit: ccy.unit,
         decimals: ccy.decimals,
       })),
+      ccyFees: ccyFees.map((fee) => helpers.decodeWeb3Object(fee)),
       tokenTypes: tokenTypes.map((tok, index) => {
         return {
           ...tok,
@@ -104,6 +128,7 @@ module.exports = async (callback) => {
           },
         };
       }),
+      tokenFees: tokenFees.map((fee) => helpers.decodeWeb3Object(fee)),
       ledgers: ledgers
         .map((ledger) => helpers.decodeWeb3Object(ledger))
         .map((ledger, index) => {
