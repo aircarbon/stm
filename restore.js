@@ -48,8 +48,13 @@ module.exports = async (callback) => {
   console.log(`Version: ${version}`);
 
   // whitelisting addresses to new contract
+  const whitelistAddresses = await newContract.getWhitelist();
   const whitelistPromises = data.whitelistAddresses
     .reduce((result, addr) => {
+      if (whitelistAddresses.includes(addr)) {
+        return result;
+      }
+
       const lastItem = result?.[result.length - 1] ?? [];
       if (lastItem && lastItem.length === WHITELIST_CHUNK_SIZE) {
         return [...result, [addr]];
@@ -61,6 +66,10 @@ module.exports = async (callback) => {
       (addresses) =>
         function addWhitelist(cb) {
           console.log(`Adding whitelist addresses`, addresses);
+          if (addresses.length === 0) {
+            return cb(null, []);
+          }
+
           newContract
             .whitelistMany(addresses)
             .then((result) => cb(null, result))
@@ -71,9 +80,15 @@ module.exports = async (callback) => {
   await series(whitelistPromises);
 
   // add ccy data to new contract
+  const ccyTypes = await newContract.getCcyTypes();
+  const { ccyTypes: currencyTypes } = helpers.decodeWeb3Object(ccyTypes);
+  const currencyNames = currencyTypes.map((type) => type.name);
   const ccyTypesPromises = data.ccyTypes.map(
     (ccyType) =>
       function addCcyType(cb) {
+        if (currencyNames.includes(ccyType.name)) {
+          return cb(null, ccyType);
+        }
         console.log(`Adding ccyType`, ccyType);
         newContract
           .addCcyType(ccyType.name, ccyType.unit, ccyType.decimals)
@@ -83,13 +98,18 @@ module.exports = async (callback) => {
   );
 
   await series(ccyTypesPromises);
-  const ccyTypes = await newContract.getCcyTypes();
-  console.log(helpers.decodeWeb3Object(ccyTypes));
 
   // add token types to new contract
+  const tokTypes = await newContract.getSecTokenTypes();
+  const { tokenTypes } = helpers.decodeWeb3Object(tokTypes);
+  const tokenNames = tokenTypes.map((type) => type.name);
   const tokenTypesPromises = data.tokenTypes.map(
     (tokenType) =>
       function addTokenType(cb) {
+        if (tokenNames.includes(tokenType.name)) {
+          return cb(null, tokenType);
+        }
+
         console.log(`Adding tokenType - spot type`, tokenType.name);
         newContract
           .addSecTokenType(tokenType.name, CONST.settlementType.SPOT, CONST.nullFutureArgs, CONST.nullAddr)
@@ -99,50 +119,13 @@ module.exports = async (callback) => {
   );
 
   await series(tokenTypesPromises);
-  const tokenTypes = await newContract.getSecTokenTypes();
-  console.log(helpers.decodeWeb3Object(tokenTypes));
-
-  // load ledgers data to new contract
-  const ledgersPromises = data.ledgers.map(
-    (ledger, index) =>
-      function createLedgerEntry(cb) {
-        const owner = data.ledgerOwners[index];
-        console.log(`Creating ledger entry #${index} - currency`, owner, ledger.ccys);
-        newContract
-          .createLedgerEntry(owner, ledger.ccys, ledger.spot_sumQtyMinted, ledger.spot_sumQtyBurned)
-          .then((result) => cb(null, result))
-          .catch((error) => cb(error));
-      },
-  );
-  await series(ledgersPromises);
-  const addSecTokensPromises = data.ledgers.flatMap(
-    (ledger, index) =>
-      function addSecToken(cb) {
-        const owner = data.ledgerOwners[index];
-        console.log(`Creating ledger entry #${index} - token `, owner, ledger.tokens);
-        return ledger.tokens.map((token) =>
-          newContract
-            .addSecToken(
-              owner,
-              token.batchId,
-              token.stId,
-              token.tokTypeId,
-              token.mintedQty,
-              token.currentQty,
-              token.ft_price,
-              token.ft_lastMarkPrice,
-              token.ft_ledgerOwner,
-              token.ft_PL,
-            )
-            .then((result) => cb(null, result))
-            .catch((error) => cb(error)),
-        );
-      },
-  );
-  await series(addSecTokensPromises);
 
   // load batches data to new contract
+  const maxBatchId = await newContract.getSecTokenBatch_MaxId();
+  console.log(`Max batch id: ${maxBatchId}`);
+
   const batchesPromises = data.batches
+    .filter((batch) => batch.id > maxBatchId)
     .reduce((result, batch) => {
       const lastItem = result?.[result.length - 1] ?? [];
       if (lastItem && lastItem.length === BATCH_CHUNK_SIZE) {
@@ -164,6 +147,56 @@ module.exports = async (callback) => {
 
   await series(batchesPromises);
 
+  // load ledgers data to new contract
+  const ledgersPromises = data.ledgers.map(
+    (ledger, index) =>
+      function createLedgerEntry(cb) {
+        const owner = data.ledgerOwners[index];
+        console.log(`Creating ledger entry #${index} - currency`, owner, ledger.ccys);
+        newContract
+          .createLedgerEntry(owner, ledger.ccys, ledger.spot_sumQtyMinted, ledger.spot_sumQtyBurned)
+          .then((result) => cb(null, result))
+          .catch((error) => cb(error));
+      },
+  );
+  await series(ledgersPromises);
+  const addSecTokensPromises = data.ledgers.flatMap(
+    (ledger, index) =>
+      function addSecToken(cb) {
+        const owner = data.ledgerOwners[index];
+        console.log(`Creating ledger entry #${index} - token `, owner, ledger.tokens);
+        if (ledger.tokens.length === 0) {
+          return cb(null, []);
+        }
+
+        return series(
+          ledger.tokens.map(
+            (token) =>
+              function AddSecTokenToEntry(callback) {
+                newContract
+                  .addSecToken(
+                    owner,
+                    token.batchId,
+                    token.stId,
+                    token.tokTypeId,
+                    token.mintedQty,
+                    token.currentQty,
+                    token.ft_price,
+                    token.ft_lastMarkPrice,
+                    token.ft_ledgerOwner,
+                    token.ft_PL,
+                  )
+                  .then((result) => callback(null, result))
+                  .catch((error) => callback(error));
+              },
+          ),
+        )
+          .then((result) => cb(null, result))
+          .catch((error) => cb(error));
+      },
+  );
+  await series(addSecTokensPromises);
+
   // Default fee for smart contract
   await newContract.setFee_CcyType(CONST.ccyType.USD, CONST.nullAddr, {
     ...CONST.nullFees,
@@ -173,6 +206,12 @@ module.exports = async (callback) => {
   });
 
   await newContract.sealContract();
+
+  const ledgerHash = await CONST.getLedgerHashcode(newContract);
+  if (ledgerHash !== info.ledgerHash) {
+    console.error(`Ledger hash mismatch!`);
+    return callback(new Error(`Ledger hash mismatch!`));
+  }
 
   callback();
 };

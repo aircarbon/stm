@@ -49,18 +49,9 @@ module.exports = async (callback) => {
   // get all ccy and token types
   const ccyTypes = await contract.getCcyTypes();
   const { ccyTypes: currencyTypes } = helpers.decodeWeb3Object(ccyTypes);
-  console.log(
-    `Currency types`,
-    currencyTypes.map((ccy) => ({
-      id: ccy.id,
-      name: ccy.name,
-      unit: ccy.unit,
-      decimals: ccy.decimals,
-    })),
-  );
+
   const tokTypes = await contract.getSecTokenTypes();
   const { tokenTypes } = helpers.decodeWeb3Object(tokTypes);
-  console.log(`Token types`, tokenTypes);
 
   // get ledgers
   const ledgerOwners = await contract.getLedgerOwners();
