@@ -256,7 +256,7 @@ module.exports = {
       provider: function () {
         var wallet = new HDWalletProvider(
           DEV_MNEMONIC,
-          'https://rpc-mainnet.maticvigil.com/v1/a04433ccf5f940476e6741f6f277eaa74989755e',
+          'https://speedy-nodes-nyc.moralis.io/b87b5b56ff659d8dd8a6c229/polygon/mainnet', // use speedy node https://docs.moralis.io/speedy-nodes/connect-to-polygon-node
           0,
           1000,
         );

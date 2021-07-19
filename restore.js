@@ -232,7 +232,7 @@ module.exports = async (callback) => {
   });
   tokenTypes.map((tokenType, index) => {
     feePromises.push(function setFeeForTokenType(cb) {
-      const fee = data.ccyFees[index];
+      const fee = data.tokenFees[index];
       newContract
         .setFee_TokType(tokenType.id, CONST.nullAddr, fee)
         .then((result) => cb(null, result))
