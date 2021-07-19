@@ -233,7 +233,7 @@ module.exports = {
       provider: function () {
         var wallet = new HDWalletProvider(
           DEV_MNEMONIC,
-          'https://polygon-mumbai.infura.io/v3/564f72f3786649a9bf2145302eeeeb43', // ankur's infura endpoint for matic mumbai testnet
+          'https://speedy-nodes-nyc.moralis.io/b87b5b56ff659d8dd8a6c229/polygon/mumbai', // use speedy node https://docs.moralis.io/speedy-nodes/connect-to-polygon-node
           0,
           1000,
         );

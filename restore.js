@@ -15,6 +15,9 @@ process.on('unhandledRejection', console.error);
 const WHITELIST_CHUNK_SIZE = 100;
 const BATCH_CHUNK_SIZE = 2;
 
+// create a sleep function to be used in the async series
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
 /**
  * Usage: `truffle exec restore.js -s=ADDR -t=NEW_ADDR [--network <name>] [--compile]`,
  * @link https://github.com/trufflesuite/truffle/issues/889#issuecomment-522581580
@@ -98,6 +101,7 @@ module.exports = async (callback) => {
   );
 
   await series(ccyTypesPromises);
+  await sleep(1000);
 
   // add token types to new contract
   const tokTypes = await newContract.getSecTokenTypes();
@@ -119,6 +123,7 @@ module.exports = async (callback) => {
   );
 
   await series(tokenTypesPromises);
+  await sleep(1000);
 
   // load batches data to new contract
   const maxBatchId = await newContract.getSecTokenBatch_MaxId();
@@ -135,24 +140,28 @@ module.exports = async (callback) => {
       }
     }, [])
     .map(
-      (batches) =>
+      (batches, index, allBatches) =>
         function loadSecTokenBatch(cb) {
           console.log(`Adding batches`, batches);
+          console.log(`Processing: ${index + 1}/${allBatches.length}`);
+          const batchCount = batches[1]?.id || batches[0]?.id;
           newContract
-            .loadSecTokenBatch(batches, batches.length)
+            .loadSecTokenBatch(batches, batchCount)
             .then((result) => cb(null, result))
             .catch((error) => cb(error));
         },
     );
 
   await series(batchesPromises);
+  await sleep(1000);
 
   // load ledgers data to new contract
   const ledgersPromises = data.ledgers.map(
-    (ledger, index) =>
+    (ledger, index, allLedgers) =>
       function createLedgerEntry(cb) {
         const owner = data.ledgerOwners[index];
         console.log(`Creating ledger entry #${index} - currency`, owner, ledger.ccys);
+        console.log(`Processing: ${index + 1}/${allLedgers.length}`);
         newContract
           .createLedgerEntry(owner, ledger.ccys, ledger.spot_sumQtyMinted, ledger.spot_sumQtyBurned)
           .then((result) => cb(null, result))
@@ -160,11 +169,14 @@ module.exports = async (callback) => {
       },
   );
   await series(ledgersPromises);
+  await sleep(1000);
+
   const addSecTokensPromises = data.ledgers.flatMap(
-    (ledger, index) =>
+    (ledger, index, allLedgers) =>
       function addSecToken(cb) {
         const owner = data.ledgerOwners[index];
         console.log(`Creating ledger entry #${index} - token `, owner, ledger.tokens);
+        console.log(`Processing: ${index + 1}/${allLedgers.length}`);
         if (ledger.tokens.length === 0) {
           return cb(null, []);
         }
@@ -196,6 +208,7 @@ module.exports = async (callback) => {
       },
   );
   await series(addSecTokensPromises);
+  await sleep(1000);
 
   // Default fee for smart contract
   await newContract.setFee_CcyType(CONST.ccyType.USD, CONST.nullAddr, {
@@ -209,7 +222,7 @@ module.exports = async (callback) => {
 
   const ledgerHash = await CONST.getLedgerHashcode(newContract);
   if (ledgerHash !== info.ledgerHash) {
-    console.error(`Ledger hash mismatch!`);
+    console.error(`Ledger hash mismatch!`, { ledgerHash, previousHash: info.ledgerHash });
     return callback(new Error(`Ledger hash mismatch!`));
   }
 

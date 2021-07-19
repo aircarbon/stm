@@ -90,9 +90,49 @@ module.exports = async (callback) => {
         unit: ccy.unit,
         decimals: ccy.decimals,
       })),
-      tokenTypes,
-      ledgers: ledgers.map((ledger) => helpers.decodeWeb3Object(ledger)),
-      batches: batches.map((batch) => helpers.decodeWeb3Object(batch)),
+      tokenTypes: tokenTypes.map((tok, index) => {
+        return {
+          ...tok,
+          ft: {
+            expiryTimestamp: tokTypes[0][index]['ft']['expiryTimestamp'],
+            underlyerTypeId: tokTypes[0][index]['ft']['underlyerTypeId'],
+            refCcyId: tokTypes[0][index]['ft']['refCcyId'],
+            initMarginBips: tokTypes[0][index]['ft']['initMarginBips'],
+            varMarginBips: tokTypes[0][index]['ft']['varMarginBips'],
+            contractSize: tokTypes[0][index]['ft']['contractSize'],
+            feePerContract: tokTypes[0][index]['ft']['feePerContract'],
+          },
+        };
+      }),
+      ledgers: ledgers
+        .map((ledger) => helpers.decodeWeb3Object(ledger))
+        .map((ledger, index) => {
+          return {
+            ...ledger,
+            ccys: ledgers[index].ccys.map((ccy) => ({
+              ccyTypeId: ccy.ccyTypeId,
+              name: ccy.name,
+              unit: ccy.unit,
+              balance: ccy.balance,
+              reserved: ccy.reserved,
+            })),
+          };
+        }),
+      batches: batches
+        .map((batch) => helpers.decodeWeb3Object(batch))
+        .map((batch, index) => {
+          return {
+            ...batch,
+            origTokFee: {
+              fee_fixed: batches[index]['origTokFee']['fee_fixed'],
+              fee_percBips: batches[index]['origTokFee']['fee_percBips'],
+              fee_min: batches[index]['origTokFee']['fee_min'],
+              fee_max: batches[index]['origTokFee']['fee_max'],
+              ccy_perMillion: batches[index]['origTokFee']['ccy_perMillion'],
+              ccy_mirrorFee: batches[index]['origTokFee']['ccy_mirrorFee'],
+            },
+          };
+        }),
     },
   };
 
