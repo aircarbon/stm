@@ -94,20 +94,15 @@ module.exports = {
                     accountAndKeys.push(await CONST.getAccountAndKey(i, MNEMONIC))
                 }
                 const owners = accountAndKeys.map(p => p.addr);
-                if (contractType == 'CASHFLOW_BASE') {
+                if (contractType == 'CASHFLOW_BASE') { // add controller address to base owners list
                     const controllerName = process.env.CONTRACT_PREFIX + (CONST.contractProps['CASHFLOW_CONTROLLER'].contractName);
                     const baseVer = process.env.CONTRACT_VER || CONST.contractProps[process.env.CONTRACT_TYPE].contractVer;
-                    try {
-                        controllerContract = (await db.GetDeployment(process.env.WEB3_NETWORK_ID, controllerName, baseVer)).recordset[0];
-                        if (!controllerContract) {
-                            console.log(chalk.bold.red(`Failed to lookup controller contract: networkId=${process.env.WEB3_NETWORK_ID}, contractName=${controllerName}, contractVer=${baseVer} from ${process.env.sql_server}`));
-                        }
-                        // add controller address to base owners list
-                        owners.push(controllerContract.addr);
+                    controllerContract = (await db.GetDeployment(process.env.WEB3_NETWORK_ID, controllerName, baseVer)).recordset[0];
+                    if (!controllerContract) {
+                        console.log(chalk.bold.red(`Failed to lookup controller contract: networkId=${process.env.WEB3_NETWORK_ID}, contractName=${controllerName}, contractVer=${baseVer} from ${process.env.sql_server}`));
+                        process.exit(1);
                     }
-                    catch(err) { 
-                        console.error(`Failed to fetch controller contract address from db for network id: ${process.env.WEB3_NETWORK_ID}, contractName: ${controllerName}, version: ${baseVer}`);
-                    };
+                    owners.push(controllerContract.addr);
                 }
 
                 //
