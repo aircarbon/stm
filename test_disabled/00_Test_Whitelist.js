@@ -1,8 +1,6 @@
 // Re: StErc20.sol => Erc20Lib.sol
 const st = artifacts.require('StMaster');
-const truffleAssert = require('truffle-assertions');
 const CONST = require('../const.js');
-const setupHelper = require('../test/testSetupContract.js');
 
 contract("StMaster", accounts => {
     var stm;
@@ -10,7 +8,7 @@ contract("StMaster", accounts => {
     const WHITELIST_RESERVED_COUNT = 10; // the contract reserves the first ten addresses for internal/test/exchange use
     const ALLOCATABLE_COUNT = WHITELIST_COUNT - WHITELIST_RESERVED_COUNT;
 
-    before(async function () {  
+    before(async function () {
         stm = await st.deployed();
         if (await stm.getContractType() != CONST.contractType.COMMODITY) this.skip();
     });
@@ -25,7 +23,7 @@ contract("StMaster", accounts => {
         //console.log('TOTAL COST USD $: ', totalCostUsd.toFixed(2)); // 50 = $10 one by one
 
         const whitelist = await stm.getWhitelist();
-        //console.log(`*** WHITELIST ***\n`, whitelist);
+        // console.log(`*** WHITELIST ***\n`, whitelist);
     });
 
     // whitelist & retrieve-next: owner-only & read-only 

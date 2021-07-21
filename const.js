@@ -234,6 +234,11 @@ module.exports = {
               CASHFLOW_BASE: 1,
         CASHFLOW_CONTROLLER: 2
     }),
+    
+    custodyType: Object.freeze({
+               SELF_CUSTODY: 0,
+        THIRD_PARTY_CUSTODY: 1
+    }),
 
     cashflowType: cashflowType,
 

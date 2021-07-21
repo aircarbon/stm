@@ -34,6 +34,8 @@ import "../Interfaces/StructLib.sol";
  *  23275: ... [+ _owners[], getOwners] 
  */
 
+ // FIXME: 24kb limit exceeded after custody flag addition
+
  /**
   * @title Security Token Master
   * @author Dominic Morris (7-of-9) and Ankur Daharwal (ankurdaharwal)
@@ -82,7 +84,7 @@ contract StMaster
      * @param contractType returns the contract type<br/>0: commodity token<br/>1: cashflow token<br/>2: cashflow controller
      */
     function getContractType() external view returns(StructLib.ContractType contractType) { return ld.contractType; }
-    
+
     /**
      * @dev returns the contract seal status
      * @return isSealed
@@ -172,6 +174,7 @@ contract StMaster
     * @dev deploys the STMaster contract as a commodity token (CT) or cashflow token (CFT)
     * @param _owners array of addresses to identify the deployment owners
     * @param _contractType 0: commodity token<br/>1: cashflow token<br/>2: cashflow controller
+    * @param _custodyType 0: self custody<br/>1: 3rd party custody
     * @param _contractName smart contract name
     * @param _contractVer smart contract version
     * @param _contractUnit measuring unit for commodity types (ex: KG, tons or N/A)
@@ -179,6 +182,7 @@ contract StMaster
     constructor(
         address[] memory              _owners,
         StructLib.ContractType        _contractType,
+        Owned.CustodyType             _custodyType,
 //#if process.env.CONTRACT_TYPE === 'CASHFLOW_BASE'
 //#         StructLib.CashflowArgs memory _cashflowArgs,
 //#endif
@@ -200,7 +204,7 @@ contract StMaster
 //#if process.env.CONTRACT_TYPE === 'CASHFLOW_BASE' || process.env.CONTRACT_TYPE === 'COMMODITY'
         StErc20(_contractSymbol, _contractDecimals)
 //#endif
-        Owned(_owners)
+        Owned(_owners, _custodyType)
     {
 
 //#if process.env.CONTRACT_TYPE === 'CASHFLOW_BASE'
@@ -217,7 +221,6 @@ contract StMaster
 
         // contract type
         ld.contractType = _contractType;
-
     }
 
     // todo: for updateable libs - proxy dispatcher

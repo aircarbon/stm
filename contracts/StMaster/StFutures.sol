@@ -131,7 +131,7 @@ older:
   * <pre>   - inherits StFees security token ledger contract</pre>
   * <pre>   - inherits StErc20 security token ledger contract</pre>
   * <pre>   - inherits StPayable security token ledger contract</pre>
-  * <pre>   - uses StrudddddctLib interface library</pre>
+  * <pre>   - uses StructLib interface library</pre>
   * <pre>   - uses FuturesLib runtime library</pre>
   * <pre>   - uses Erc20Lib runtime library</pre>
   * <pre>   - uses LedgerLib runtime library</pre>

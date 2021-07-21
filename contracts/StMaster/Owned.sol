@@ -9,10 +9,16 @@ pragma solidity ^0.8.0;
   */
 contract Owned
 {
+    // CUSTODY TYPE
+    enum CustodyType { SELF_CUSTODY, THIRD_PARTY_CUSTODY }
+
     address payable deploymentOwner;
     // Certik: (Minor) OSM-07 | Inexistent Management Functionality The Owned contract implementation should be self-sufficient and possess adding and removing owners within it.
     // Review: TODO - (Minor) OSM-07 ... pass array from parent into Owned
     address[] owners;
+
+    CustodyType public custodyType;
+    uint8 constant THIRDPARTY_CUSTODY_NDX = 1;
 
     bool readOnlyState;
     
@@ -22,8 +28,9 @@ contract Owned
      * @param isReadOnly returns the read only state of the deployement
      */
     function readOnly() external view returns (bool isReadOnly) { return readOnlyState; }
-    constructor(address[] memory _owners) {
+    constructor(address[] memory _owners, CustodyType _custodyType) {
         owners = _owners;
+        custodyType = _custodyType;
         deploymentOwner = payable(msg.sender); // payable used in solidity version 0.8.0 onwards
         readOnlyState = false;
     }
@@ -39,7 +46,6 @@ contract Owned
      * @dev modifier to limit access to deployment owners onlyOwner
      */
     modifier onlyOwner() {
-
         for (uint i = 0; i < owners.length; i++) {
             // Certik: (Minor) OSM-08 | Usage of tx.origin The use of tx.origin should be avoided for ownership-based systems given that firstly it can be tricked on-chain and secondly it will change its functionality once EIP-3074 is integrated.
             // Review: HIPRI - (Minor) OSM-08 | changed tx.origin to msg.sender - tested ok for cashflow base.
@@ -49,22 +55,22 @@ contract Owned
         _;
     }
 
-    // modifier onlyCustodian() {
-    //     if (ld.CustodyMode == 'SELF_CUSTODY') {
-    //         for (uint i = 0; i < owners.length; i++) {
-    //             if (owners[i] == msg.sender) {  _; return; }
-    //         }
-    //         revert("Restricted");
-    //         _;
-    //     }
-    //     else if (ld.CustodyMode ==  'THIRD_PARTY_CUSTODY') {
-    //         if (owners[1] == msg.sender) {  _; return; } // fixed reserved addresses index for custodian address
-    //         else {
-    //             revert("Restricted");
-    //         }
-    //     }
-    //     _;
-    // }
+    modifier onlyCustodian() {
+        if (custodyType == CustodyType.SELF_CUSTODY) {
+            for (uint i = 0; i < owners.length; i++) {
+                if (owners[i] == msg.sender) {  _; return; }
+            }
+            revert("Restricted");
+        }
+        else {
+            if (custodyType == CustodyType.THIRD_PARTY_CUSTODY) {
+                if (owners[THIRDPARTY_CUSTODY_NDX] == msg.sender) {  _; return; } // fixed reserved addresses index for custodian address
+                else { revert("Restricted"); }
+            }
+            revert("Bad custody type");
+        }
+        _;
+    }
     
     /**
      * @dev access modifier to allow read-write only when the READ-ONLY mode is off

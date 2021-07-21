@@ -60,7 +60,7 @@ const db = require('../../utils-server/db/dist');
 //    `export INSTANCE_ID=UAT_80001_SD && node process_sol_js && truffle compile && truffle migrate --network matic_testnet -f 2 --to 2`
 //
 //   AC Matic (Mumbai) Testnet 80001
-//    `export INSTANCE_ID=UAT_80001 && node process_sol_js && truffle compile && truffle migrate --network matic_testnet -f 2 --to 2`
+//    `export INSTANCE_ID=UAT_80001_AC && node process_sol_js && truffle compile && truffle migrate --network matic_testnet -f 2 --to 2`
 
 // Matic (Mumbai) Testnet 80001 deployments have intermittent errors (results in an non-terminating solc-js dump)
 
@@ -248,11 +248,16 @@ module.exports = async function (deployer) {
     process.exit(1);
   }
 
+  if (process.env.CUSTODY_TYPE !== 'SELF_CUSTODY' && process.env.CUSTODY_TYPE !== 'THIRD_PARTY_CUSTODY') {
+    console.warn(`Missing or unknown CUSTODY_TYPE ("${process.env.CUSTODY_TYPE}"): set to SELF_CUSTODY or THIRD_PARTY_CUSTODY.`);
+    process.env.CUSTODY_TYPE = 'SELF_CUSTODY';
+  }
+
   switch (process.env.CONTRACT_TYPE) {
     case 'COMMODITY':
       console.log('COMMODITY...');
       // deploy a singleton COMMODITY contract
-      await deploymentHelper.Deploy({ deployer, artifacts, contractType: 'COMMODITY' });
+      await deploymentHelper.Deploy({ deployer, artifacts, contractType: 'COMMODITY', custodyType: process.env.CUSTODY_TYPE });
       if (!deployer.network.includes('-fork') && process.env.RESTORE_CONTRACT !== 'YES') {
         await setup.setDefaults();
       }
@@ -286,6 +291,7 @@ module.exports = async function (deployer) {
         deployer,
         artifacts,
         contractType: 'CASHFLOW_CONTROLLER',
+        custodyType: process.env.CUSTODY_TYPE
       });
       await setup.setDefaults();
 
@@ -340,6 +346,7 @@ module.exports = async function (deployer) {
         deployer,
         artifacts,
         contractType: 'CASHFLOW_BASE',
+        custodyType: process.env.CUSTODY_TYPE,
         nameOverride: nameBase,
         symbolOverride: symbolBase,
       });

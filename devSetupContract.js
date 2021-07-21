@@ -14,6 +14,8 @@ module.exports = {
         console.group();
         const O = await CONST.getAccountAndKey(0);
 
+        console.log(chalk.gray(`custody type : ${await CONST.web3_call('custodyType', [], nameOverride)}`));
+
         if ((await CONST.web3_call('getContractType', [], nameOverride)) == CONST.contractType.COMMODITY) {
             console.log(chalk.italic('devSetupContract >> commodity contract...'));
 

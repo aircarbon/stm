@@ -12,10 +12,12 @@ module.exports = {
 
     Deploy: async (p) => {
         try {
-        const { deployer, artifacts, contractType, nameOverride, symbolOverride } = p;
+        const { deployer, artifacts, contractType, custodyType, nameOverride, symbolOverride } = p;
             var stmAddr;
             //const contractType = process.env.CONTRACT_TYPE;
             if (contractType != 'CASHFLOW_BASE' && contractType != 'CASHFLOW_CONTROLLER' && contractType != 'COMMODITY') throw ('Unknown contractType');
+
+            if (custodyType != 'SELF_CUSTODY' && custodyType != 'THIRD_PARTY_CUSTODY') throw ('Unknown custodyType');
 
             const StructLib = artifacts.require('../Interfaces/StructLib.sol');
             const CcyLib = artifacts.require('./CcyLib.sol');
@@ -102,7 +104,7 @@ module.exports = {
                         console.log(chalk.bold.red(`Failed to lookup controller contract: networkId=${process.env.WEB3_NETWORK_ID}, contractName=${controllerName}, contractVer=${baseVer} from ${process.env.sql_server}`));
                         process.exit(1);
                     }
-                    owners.push(controllerContract.addr);
+                    // owners.push(controllerContract.addr);
                 }
 
                 //
@@ -113,6 +115,8 @@ module.exports = {
                     contractType == 'CASHFLOW_BASE'       ? CONST.contractType.CASHFLOW_BASE :
                     contractType == 'CASHFLOW_CONTROLLER' ? CONST.contractType.CASHFLOW_CONTROLLER :
                                                             CONST.contractType.COMMODITY,
+                    custodyType == 'SELF_CUSTODY'         ? CONST.custodyType.SELF_CUSTODY :
+                                                            CONST.custodyType.THIRD_PARTY_CUSTODY,
 //#if process.env.CONTRACT_TYPE === 'CASHFLOW_BASE'
 //#                     cfa,
 //#endif
