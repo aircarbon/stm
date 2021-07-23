@@ -7,7 +7,7 @@ const BN = require("bn.js");
 
 const deploymentHelper = require("./deploymentHelper");
 const setup = require("../devSetupContract.js");
-const db = require("../../orm/dist");
+const db = require("../../orm/build");
 
 //
 // Deploy steps: from/to, inclusive:

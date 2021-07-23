@@ -1,7 +1,7 @@
 const assert = require("assert");
 const EthereumJsTx = require("ethereumjs-tx");
 const BN = require("bn.js");
-const db = require("../../orm/dist");
+const db = require("../../orm/build");
 const _ = require("lodash");
 const chalk = require("chalk");
 

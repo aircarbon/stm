@@ -4,7 +4,7 @@ const assert = require("assert");
 const EthereumJsTx = require("ethereumjs-tx");
 const chalk = require("chalk");
 const BN = require("bn.js");
-const db = require("../../orm/dist");
+const db = require("../../orm/build");
 
 const CONST = require("../const.js");
 process.env.WEB3_NETWORK_ID = Number(process.env.NETWORK_ID || 888);
