@@ -7,7 +7,7 @@ const mapSeries = require('async/mapSeries');
 const allSettled = require('promise.allsettled');
 const ky = require('ky-universal');
 const { web3_call } = require('./const.js');
-const  db  = require('../utils-server/db/dist');
+const  db  = require('../orm/dist');
 
 // Copy whitelist address to DB and init whitelist & oracle price settings
 //           Local: ("INSTANCE_ID=local node dbInit.js")
