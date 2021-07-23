@@ -20,7 +20,7 @@
    },
    "scripts": {
       "start": "ts-node src/migrate.ts",
-      "prebuild": "rimraf dist",
+      "prebuild": "rimraf build",
       "build:watch": "tsc -w --module commonjs",
       "build": "tsc",
       "test": "jest --coverage --updateSnapshot"
