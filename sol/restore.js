@@ -1,16 +1,16 @@
 // @ts-check
-const fs = require('fs');
-const { toBN } = require('web3-utils');
-const chalk = require('chalk');
-const argv = require('yargs-parser')(process.argv.slice(2));
+const fs = require("fs");
+const { toBN } = require("web3-utils");
+const chalk = require("chalk");
+const argv = require("yargs-parser")(process.argv.slice(2));
 // @ts-ignore artifacts from truffle
-const StMaster = artifacts.require('StMaster');
-const series = require('async/series');
+const StMaster = artifacts.require("StMaster");
+const series = require("async/series");
 
-const CONST = require('./const');
-const { helpers } = require('../utils-common/dist');
+const CONST = require("./const");
+const { helpers } = require("../orm/dist");
 
-process.on('unhandledRejection', console.error);
+process.on("unhandledRejection", console.error);
 
 // how many items to process in one batch
 const WHITELIST_CHUNK_SIZE = 100;
@@ -37,7 +37,7 @@ module.exports = async (callback) => {
 
   // read data from json file
   const backupFile = `data/${contractAddress}.json`;
-  const { data, info } = JSON.parse(fs.readFileSync(backupFile, 'utf8'));
+  const { data, info } = JSON.parse(fs.readFileSync(backupFile, "utf8"));
 
   // deploy new contract with info
   const newContract = await StMaster.at(newContractAddress);
@@ -78,7 +78,7 @@ module.exports = async (callback) => {
             .whitelistMany(addresses)
             .then((result) => cb(null, result))
             .catch((error) => cb(error));
-        },
+        }
     );
 
   await series(whitelistPromises);
@@ -98,7 +98,7 @@ module.exports = async (callback) => {
           .addCcyType(ccyType.name, ccyType.unit, ccyType.decimals)
           .then((ccy) => cb(null, ccy))
           .catch((error) => cb(error));
-      },
+      }
   );
 
   await series(ccyTypesPromises);
@@ -117,10 +117,15 @@ module.exports = async (callback) => {
 
         console.log(`Adding tokenType - spot type`, tokenType.name);
         newContract
-          .addSecTokenType(tokenType.name, CONST.settlementType.SPOT, CONST.nullFutureArgs, CONST.nullAddr)
+          .addSecTokenType(
+            tokenType.name,
+            CONST.settlementType.SPOT,
+            CONST.nullFutureArgs,
+            CONST.nullAddr
+          )
           .then((token) => cb(null, token))
           .catch((error) => cb(error));
-      },
+      }
   );
 
   await series(tokenTypesPromises);
@@ -150,7 +155,7 @@ module.exports = async (callback) => {
             .loadSecTokenBatch(batches, batchCount)
             .then((result) => cb(null, result))
             .catch((error) => cb(error));
-        },
+        }
     );
 
   await series(batchesPromises);
@@ -161,13 +166,22 @@ module.exports = async (callback) => {
     (ledger, index, allLedgers) =>
       function createLedgerEntry(cb) {
         const owner = data.ledgerOwners[index];
-        console.log(`Creating ledger entry #${index} - currency`, owner, ledger.ccys);
+        console.log(
+          `Creating ledger entry #${index} - currency`,
+          owner,
+          ledger.ccys
+        );
         console.log(`Processing: ${index + 1}/${allLedgers.length}`);
         newContract
-          .createLedgerEntry(owner, ledger.ccys, ledger.spot_sumQtyMinted, ledger.spot_sumQtyBurned)
+          .createLedgerEntry(
+            owner,
+            ledger.ccys,
+            ledger.spot_sumQtyMinted,
+            ledger.spot_sumQtyBurned
+          )
           .then((result) => cb(null, result))
           .catch((error) => cb(error));
-      },
+      }
   );
   await series(ledgersPromises);
   await sleep(1000);
@@ -176,7 +190,11 @@ module.exports = async (callback) => {
     (ledger, index, allLedgers) =>
       function addSecToken(cb) {
         const owner = data.ledgerOwners[index];
-        console.log(`Creating ledger entry #${index} - token `, owner, ledger.tokens);
+        console.log(
+          `Creating ledger entry #${index} - token `,
+          owner,
+          ledger.tokens
+        );
         console.log(`Processing: ${index + 1}/${allLedgers.length}`);
         if (ledger.tokens.length === 0) {
           return cb(null, []);
@@ -197,16 +215,16 @@ module.exports = async (callback) => {
                     token.ft_price,
                     token.ft_lastMarkPrice,
                     token.ft_ledgerOwner,
-                    token.ft_PL,
+                    token.ft_PL
                   )
                   .then((result) => callback(null, result))
                   .catch((error) => callback(error));
-              },
-          ),
+              }
+          )
         )
           .then((result) => cb(null, result))
           .catch((error) => cb(error));
-      },
+      }
   );
   await series(addSecTokensPromises);
   await sleep(1000);
@@ -215,7 +233,7 @@ module.exports = async (callback) => {
     data.secTokenBaseId,
     toBN(data.secTokenMintedCount),
     toBN(data.secTokenMintedQty),
-    toBN(data.secTokenBurnedQty),
+    toBN(data.secTokenBurnedQty)
   );
 
   // set fee for currency and token types
@@ -244,9 +262,12 @@ module.exports = async (callback) => {
 
   const ledgerHash = await CONST.getLedgerHashcode(newContract);
   if (ledgerHash !== info.ledgerHash) {
-    console.error(`Ledger hash mismatch!`, { ledgerHash, previousHash: info.ledgerHash });
+    console.error(`Ledger hash mismatch!`, {
+      ledgerHash,
+      previousHash: info.ledgerHash,
+    });
     return callback(new Error(`Ledger hash mismatch!`));
   }
 
-  callback('Done.');
+  callback("Done.");
 };
