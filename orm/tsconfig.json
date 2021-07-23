@@ -5,18 +5,15 @@
       "module": "commonjs",
       "moduleResolution": "node",
       "resolveJsonModule": true,
+      "emitDecoratorMetadata": true,
+      "experimentalDecorators": true,
       "pretty": true,
       "types": [
          "jest",
          "node"
       ],
       "sourceMap": true,
-      "experimentalDecorators": true,
-      "target": "ES2019",
-      "lib": [
-         "ESNext",
-         "DOM"
-      ],
+      "target": "es6",
       "outDir": "build/"
    }
 }

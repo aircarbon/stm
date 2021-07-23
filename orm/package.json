@@ -8,18 +8,20 @@
       "@types/node": "^14.17.5",
       "rimraf": "^3.0.2",
       "ts-node": "10.1.0",
+      "ts-node-dev": "^1.1.8",
       "typescript": "4.3.5"
    },
    "dependencies": {
       "ethereumjs-util": "^7.1.0",
-      "mssql": "^7.1.3",
+      "mssql": "^6.3.1",
       "reflect-metadata": "^0.1.13",
       "typeorm": "0.2.34",
       "web3": "^2.0.0-alpha.1",
       "web3-utils": "^2.0.0-alpha.1"
    },
    "scripts": {
-      "start": "ts-node src/migrate.ts",
+      "start": "ts-node-dev src/migrate.ts",
+      "db:migration": "ts-node-dev ./node_modules/.bin/typeorm migration:run",
       "prebuild": "rimraf build",
       "build:watch": "tsc -w --module commonjs",
       "build": "tsc",
