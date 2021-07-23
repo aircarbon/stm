@@ -1,16 +1,22 @@
 {
    "compilerOptions": {
-      "lib": [
-         "es5",
-         "es6"
-      ],
-      "target": "es5",
+      "esModuleInterop": true,
+      "noImplicitAny": true,
       "module": "commonjs",
       "moduleResolution": "node",
-      "outDir": "./build",
-      "emitDecoratorMetadata": true,
+      "resolveJsonModule": true,
+      "pretty": true,
+      "types": [
+         "jest",
+         "node"
+      ],
+      "sourceMap": true,
       "experimentalDecorators": true,
-      "esModuleInterop": true,
-      "sourceMap": true
+      "target": "ES2019",
+      "lib": [
+         "ESNext",
+         "DOM"
+      ],
+      "outDir": "build/"
    }
 }

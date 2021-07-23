@@ -1,5 +1,5 @@
 {
-  "name": "root",
+  "name": "@aircarbon/stm",
   "private": true,
   "workspaces": [
     "stm",
