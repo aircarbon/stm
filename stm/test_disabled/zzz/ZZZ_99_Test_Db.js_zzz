@@ -1,0 +1,9 @@
+const st = artifacts.require("StMaster");
+const db = require('../db.js');
+
+contract("StMaster", accounts => {
+    it("db - account write deployed table", async () => {
+        await db.SaveDeployment('AcMaster', 42, 'addr2');
+    });
+});
+

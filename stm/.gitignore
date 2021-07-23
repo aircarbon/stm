@@ -1,0 +1,7 @@
+node_modules
+build/contracts/
+artifacts
+.env.*
+PROD_MNEMONIC.js
+!.env.example
+data

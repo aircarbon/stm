@@ -1,0 +1,853 @@
+digraph G {
+  graph [ ratio = "auto", page = "100", compound =true, bgcolor = "#2e3e56" ];
+  node [ style = "filled", fillcolor = "#edad56", color = "#edad56", penwidth =3 ];
+  edge [ color = "#fcfcfc", penwidth =2, fontname = "helvetica Neue Ultra Light" ];
+subgraph "clusterFuturesLib" {
+  graph [ label = "FuturesLib  (lib)", color = "#445773", fontcolor = "#f0f0f0", style = "rounded", bgcolor = "#445773" ];
+  "FuturesLib.setLedgerOverride" [ label = "setLedgerOverride", color = "#FF9797", fillcolor = "#FF9797" ];
+  "FuturesLib.initMarginOverride" [ label = "initMarginOverride", color = "#edad56", fillcolor = "#edad56" ];
+  "FuturesLib.feePerContractOverride" [ label = "feePerContractOverride", color = "#edad56", fillcolor = "#edad56" ];
+  "FuturesLib.openFtPos" [ label = "openFtPos", color = "#FF9797", fillcolor = "#FF9797" ];
+  "FuturesLib.takePay2" [ label = "takePay2", color = "#FF9797", fillcolor = "#FF9797" ];
+  "FuturesLib.combineFtPos" [ label = "combineFtPos", color = "#FF9797", fillcolor = "#FF9797" ];
+  "FuturesLib.calcTakePay" [ label = "calcTakePay", color = "#edad56", fillcolor = "#edad56" ];
+  "FuturesLib.tokenTypeQtyOnledger" [ label = "tokenTypeQtyOnledger", color = "#edad56", fillcolor = "#edad56" ];
+  "FuturesLib.setReservedAllFtPos" [ label = "setReservedAllFtPos", color = "#edad56", fillcolor = "#edad56" ];
+  "FuturesLib.calcPosMargin" [ label = "calcPosMargin", color = "#edad56", fillcolor = "#edad56" ];
+  "FuturesLib.abs256" [ label = "abs256", color = "#edad56", fillcolor = "#edad56" ];
+  "FuturesLib.abs64" [ label = "abs64", color = "#edad56", fillcolor = "#edad56" ];
+}
+
+subgraph "clusterStFutures" {
+  graph [ label = "StFutures", color = "#445773", fontcolor = "#f0f0f0", style = "rounded", bgcolor = "#445773" ];
+}
+
+subgraph "clusterLoadLib" {
+  graph [ label = "LoadLib  (lib)", color = "#445773", fontcolor = "#f0f0f0", style = "rounded", bgcolor = "#445773" ];
+  "LoadLib.loadSecTokenBatch" [ label = "loadSecTokenBatch", color = "#FF9797", fillcolor = "#FF9797" ];
+  "LoadLib.createLedgerEntry" [ label = "createLedgerEntry", color = "#FF9797", fillcolor = "#FF9797" ];
+  "LoadLib.addSecToken" [ label = "addSecToken", color = "#FF9797", fillcolor = "#FF9797" ];
+  "LoadLib.setTokenTotals" [ label = "setTokenTotals", color = "#FF9797", fillcolor = "#FF9797" ];
+}
+
+subgraph "clusterDataLoadable" {
+  graph [ label = "DataLoadable", color = "#445773", fontcolor = "#f0f0f0", style = "rounded", bgcolor = "#445773" ];
+  "DataLoadable.loadSecTokenBatch" [ label = "loadSecTokenBatch", color = "#FF9797", fillcolor = "#FF9797" ];
+  "DataLoadable.createLedgerEntry" [ label = "createLedgerEntry", color = "#FF9797", fillcolor = "#FF9797" ];
+  "DataLoadable.addSecToken" [ label = "addSecToken", color = "#FF9797", fillcolor = "#FF9797" ];
+  "DataLoadable.setTokenTotals" [ label = "setTokenTotals", color = "#FF9797", fillcolor = "#FF9797" ];
+}
+
+subgraph "clusterSafeMath" {
+  graph [ label = "SafeMath  (lib)", color = "#445773", fontcolor = "#f0f0f0", style = "rounded", bgcolor = "#445773" ];
+  "SafeMath.add" [ label = "add", color = "#f2c383", fillcolor = "#f2c383" ];
+  "SafeMath.sub" [ label = "sub", color = "#f2c383", fillcolor = "#f2c383" ];
+  "SafeMath.mul" [ label = "mul", color = "#f2c383", fillcolor = "#f2c383" ];
+  "SafeMath.div" [ label = "div", color = "#f2c383", fillcolor = "#f2c383" ];
+  "SafeMath.mod" [ label = "mod", color = "#f2c383", fillcolor = "#f2c383" ];
+}
+
+subgraph "clusterIChainlinkAggregator" {
+  graph [ label = "IChainlinkAggregator  (iface)", color = "#445773", fontcolor = "#f0f0f0", style = "rounded", bgcolor = "#445773" ];
+  "IChainlinkAggregator.latestAnswer" [ label = "latestAnswer", color = "#ffbdb9", fillcolor = "#ffbdb9" ];
+  "IChainlinkAggregator.latestTimestamp" [ label = "latestTimestamp", color = "#ffbdb9", fillcolor = "#ffbdb9" ];
+  "IChainlinkAggregator.latestRound" [ label = "latestRound", color = "#ffbdb9", fillcolor = "#ffbdb9" ];
+  "IChainlinkAggregator.getAnswer" [ label = "getAnswer", color = "#ffbdb9", fillcolor = "#ffbdb9" ];
+  "IChainlinkAggregator.getTimestamp" [ label = "getTimestamp", color = "#ffbdb9", fillcolor = "#ffbdb9" ];
+}
+
+subgraph "clusterPayableLib" {
+  graph [ label = "PayableLib  (lib)", color = "#445773", fontcolor = "#f0f0f0", style = "rounded", bgcolor = "#445773" ];
+  "PayableLib.get_chainlinkRefPrice" [ label = "get_chainlinkRefPrice", color = "#FF9797", fillcolor = "#FF9797" ];
+  "PayableLib.setIssuerValues" [ label = "setIssuerValues", color = "#FF9797", fillcolor = "#FF9797" ];
+  "PayableLib.pay" [ label = "pay", color = "#FF9797", fillcolor = "#FF9797" ];
+  "PayableLib.processSubscriberPayment" [ label = "processSubscriberPayment", color = "#edad56", fillcolor = "#edad56" ];
+  "PayableLib.issuerPay" [ label = "issuerPay", color = "#FF9797", fillcolor = "#FF9797" ];
+  "PayableLib.resetIssuerPaymentBatch" [ label = "resetIssuerPaymentBatch", color = "#f2c383", fillcolor = "#f2c383" ];
+  "PayableLib.getCashflowData" [ label = "getCashflowData", color = "#FF9797", fillcolor = "#FF9797" ];
+  "PayableLib.getIssuerPaymentBatch" [ label = "getIssuerPaymentBatch", color = "#FF9797", fillcolor = "#FF9797" ];
+}
+
+subgraph "clusterStPayable" {
+  graph [ label = "StPayable", color = "#445773", fontcolor = "#f0f0f0", style = "rounded", bgcolor = "#445773" ];
+}
+
+subgraph "clusterErc20Lib" {
+  graph [ label = "Erc20Lib  (lib)", color = "#445773", fontcolor = "#f0f0f0", style = "rounded", bgcolor = "#445773" ];
+  "Erc20Lib.whitelist" [ label = "whitelist", color = "#FF9797", fillcolor = "#FF9797" ];
+  "Erc20Lib.transfer" [ label = "transfer", color = "#FF9797", fillcolor = "#FF9797" ];
+  "Erc20Lib.approve" [ label = "approve", color = "#FF9797", fillcolor = "#FF9797" ];
+  "Erc20Lib.transferFrom" [ label = "transferFrom", color = "#FF9797", fillcolor = "#FF9797" ];
+  "Erc20Lib.transferInternal" [ label = "transferInternal", color = "#edad56", fillcolor = "#edad56" ];
+}
+
+subgraph "clusterTransferLib" {
+  graph [ label = "TransferLib  (lib)", color = "#445773", fontcolor = "#f0f0f0", style = "rounded", bgcolor = "#445773" ];
+  "TransferLib.transferOrTrade" [ label = "transferOrTrade", color = "#FF9797", fillcolor = "#FF9797" ];
+  "TransferLib.transfer_feePreview" [ label = "transfer_feePreview", color = "#FF9797", fillcolor = "#FF9797" ];
+  "TransferLib.transfer_feePreview_ExchangeOnly" [ label = "transfer_feePreview_ExchangeOnly", color = "#FF9797", fillcolor = "#FF9797" ];
+  "TransferLib.applyOriginatorCcyFees" [ label = "applyOriginatorCcyFees", color = "#edad56", fillcolor = "#edad56" ];
+  "TransferLib.transferSplitSecTokens" [ label = "transferSplitSecTokens", color = "#edad56", fillcolor = "#edad56" ];
+  "TransferLib.transferSplitSecTokens_Preview" [ label = "transferSplitSecTokens_Preview", color = "#edad56", fillcolor = "#edad56" ];
+  "TransferLib.calcFeeWithCapCollar" [ label = "calcFeeWithCapCollar", color = "#edad56", fillcolor = "#edad56" ];
+  "TransferLib.applyFeeStruct" [ label = "applyFeeStruct", color = "#edad56", fillcolor = "#edad56" ];
+  "TransferLib.checkStIds" [ label = "checkStIds", color = "#edad56", fillcolor = "#edad56" ];
+}
+
+subgraph "clusterStErc20" {
+  graph [ label = "StErc20", color = "#445773", fontcolor = "#f0f0f0", style = "rounded", bgcolor = "#445773" ];
+  "StErc20.whitelistMany" [ label = "whitelistMany", color = "#FF9797", fillcolor = "#FF9797" ];
+  "StErc20.getWhitelist" [ label = "getWhitelist", color = "#ffbdb9", fillcolor = "#ffbdb9" ];
+}
+
+subgraph "clusterStFees" {
+  graph [ label = "StFees", color = "#445773", fontcolor = "#f0f0f0", style = "rounded", bgcolor = "#445773" ];
+  "StFees.getFee" [ label = "getFee", color = "#ffbdb9", fillcolor = "#ffbdb9" ];
+  "StFees.setFee_TokType" [ label = "setFee_TokType", color = "#FF9797", fillcolor = "#FF9797" ];
+  "StFees.setFee_CcyType" [ label = "setFee_CcyType", color = "#FF9797", fillcolor = "#FF9797" ];
+}
+
+subgraph "clusterStTransferable" {
+  graph [ label = "StTransferable", color = "#445773", fontcolor = "#f0f0f0", style = "rounded", bgcolor = "#445773" ];
+  "StTransferable.getLedgerHashcode" [ label = "getLedgerHashcode", color = "#ffbdb9", fillcolor = "#ffbdb9" ];
+  "StTransferable.transferOrTrade" [ label = "transferOrTrade", color = "#FF9797", fillcolor = "#FF9797" ];
+  "StTransferable.transfer_feePreview_ExchangeOnly" [ label = "transfer_feePreview_ExchangeOnly", color = "#ffbdb9", fillcolor = "#ffbdb9" ];
+  "StTransferable.transfer_feePreview" [ label = "transfer_feePreview", color = "#ffbdb9", fillcolor = "#ffbdb9" ];
+}
+
+subgraph "clusterStBurnable" {
+  graph [ label = "StBurnable", color = "#445773", fontcolor = "#f0f0f0", style = "rounded", bgcolor = "#445773" ];
+  "StBurnable.burnTokens" [ label = "burnTokens", color = "#FF9797", fillcolor = "#FF9797" ];
+  "StBurnable.getSecToken_totalBurnedQty" [ label = "getSecToken_totalBurnedQty", color = "#ffbdb9", fillcolor = "#ffbdb9" ];
+}
+
+subgraph "clusterStMintable" {
+  graph [ label = "StMintable", color = "#445773", fontcolor = "#f0f0f0", style = "rounded", bgcolor = "#445773" ];
+  "StMintable.mintSecTokenBatch" [ label = "mintSecTokenBatch", color = "#FF9797", fillcolor = "#FF9797" ];
+  "StMintable.addMetaSecTokenBatch" [ label = "addMetaSecTokenBatch", color = "#ffbdb9", fillcolor = "#ffbdb9" ];
+  "StMintable.setOriginatorFeeTokenBatch" [ label = "setOriginatorFeeTokenBatch", color = "#ffbdb9", fillcolor = "#ffbdb9" ];
+  "StMintable.setOriginatorFeeCurrencyBatch" [ label = "setOriginatorFeeCurrencyBatch", color = "#ffbdb9", fillcolor = "#ffbdb9" ];
+  "StMintable.getSecToken_totalMintedQty" [ label = "getSecToken_totalMintedQty", color = "#ffbdb9", fillcolor = "#ffbdb9" ];
+}
+
+subgraph "clusterCcyLib" {
+  graph [ label = "CcyLib  (lib)", color = "#445773", fontcolor = "#f0f0f0", style = "rounded", bgcolor = "#445773" ];
+  "CcyLib.addCcyType" [ label = "addCcyType", color = "#FF9797", fillcolor = "#FF9797" ];
+  "CcyLib.getCcyTypes" [ label = "getCcyTypes", color = "#FF9797", fillcolor = "#FF9797" ];
+  "CcyLib.fundOrWithdraw" [ label = "fundOrWithdraw", color = "#FF9797", fillcolor = "#FF9797" ];
+  "CcyLib.fund" [ label = "fund", color = "#edad56", fillcolor = "#edad56" ];
+  "CcyLib.withdraw" [ label = "withdraw", color = "#edad56", fillcolor = "#edad56" ];
+}
+
+subgraph "clusterstrings" {
+  graph [ label = "strings  (lib)", color = "#445773", fontcolor = "#f0f0f0", style = "rounded", bgcolor = "#445773" ];
+  "strings.memcpy" [ label = "memcpy", color = "#edad56", fillcolor = "#edad56" ];
+  "strings.toSlice" [ label = "toSlice", color = "#f2c383", fillcolor = "#f2c383" ];
+  "strings.len" [ label = "len", color = "#f2c383", fillcolor = "#f2c383" ];
+  "strings.toSliceB32" [ label = "toSliceB32", color = "#f2c383", fillcolor = "#f2c383" ];
+  "strings.copy" [ label = "copy", color = "#f2c383", fillcolor = "#f2c383" ];
+  "strings.toString" [ label = "toString", color = "#f2c383", fillcolor = "#f2c383" ];
+  "strings.empty" [ label = "empty", color = "#f2c383", fillcolor = "#f2c383" ];
+  "strings.compare" [ label = "compare", color = "#f2c383", fillcolor = "#f2c383" ];
+  "strings.equals" [ label = "equals", color = "#f2c383", fillcolor = "#f2c383" ];
+  "strings.nextRune" [ label = "nextRune", color = "#f2c383", fillcolor = "#f2c383" ];
+  "strings.ord" [ label = "ord", color = "#f2c383", fillcolor = "#f2c383" ];
+  "strings.keccak" [ label = "keccak", color = "#f2c383", fillcolor = "#f2c383" ];
+  "strings.startsWith" [ label = "startsWith", color = "#f2c383", fillcolor = "#f2c383" ];
+  "strings.beyond" [ label = "beyond", color = "#f2c383", fillcolor = "#f2c383" ];
+  "strings.endsWith" [ label = "endsWith", color = "#f2c383", fillcolor = "#f2c383" ];
+  "strings.until" [ label = "until", color = "#f2c383", fillcolor = "#f2c383" ];
+  "strings.findPtr" [ label = "findPtr", color = "#edad56", fillcolor = "#edad56" ];
+  "strings.rfindPtr" [ label = "rfindPtr", color = "#edad56", fillcolor = "#edad56" ];
+  "strings.find" [ label = "find", color = "#f2c383", fillcolor = "#f2c383" ];
+  "strings.rfind" [ label = "rfind", color = "#f2c383", fillcolor = "#f2c383" ];
+  "strings.split" [ label = "split", color = "#f2c383", fillcolor = "#f2c383" ];
+  "strings.rsplit" [ label = "rsplit", color = "#f2c383", fillcolor = "#f2c383" ];
+  "strings.count" [ label = "count", color = "#f2c383", fillcolor = "#f2c383" ];
+  "strings.contains" [ label = "contains", color = "#f2c383", fillcolor = "#f2c383" ];
+  "strings.concat" [ label = "concat", color = "#f2c383", fillcolor = "#f2c383" ];
+  "strings.join" [ label = "join", color = "#f2c383", fillcolor = "#f2c383" ];
+}
+
+subgraph "clusterSpotFeeLib" {
+  graph [ label = "SpotFeeLib  (lib)", color = "#445773", fontcolor = "#f0f0f0", style = "rounded", bgcolor = "#445773" ];
+  "SpotFeeLib.setFee_TokType" [ label = "setFee_TokType", color = "#FF9797", fillcolor = "#FF9797" ];
+  "SpotFeeLib.setFee_CcyType" [ label = "setFee_CcyType", color = "#FF9797", fillcolor = "#FF9797" ];
+}
+
+subgraph "clusterTokenLib" {
+  graph [ label = "TokenLib  (lib)", color = "#445773", fontcolor = "#f0f0f0", style = "rounded", bgcolor = "#445773" ];
+  "TokenLib.addSecTokenType" [ label = "addSecTokenType", color = "#FF9797", fillcolor = "#FF9797" ];
+  "TokenLib.setFuture_FeePerContract" [ label = "setFuture_FeePerContract", color = "#FF9797", fillcolor = "#FF9797" ];
+  "TokenLib.setFuture_VariationMargin" [ label = "setFuture_VariationMargin", color = "#FF9797", fillcolor = "#FF9797" ];
+  "TokenLib.getSecTokenTypes" [ label = "getSecTokenTypes", color = "#FF9797", fillcolor = "#FF9797" ];
+  "TokenLib.mintSecTokenBatch" [ label = "mintSecTokenBatch", color = "#FF9797", fillcolor = "#FF9797" ];
+  "TokenLib.burnTokens" [ label = "burnTokens", color = "#FF9797", fillcolor = "#FF9797" ];
+  "TokenLib.getSecToken" [ label = "getSecToken", color = "#FF9797", fillcolor = "#FF9797" ];
+  "TokenLib.addMetaSecTokenBatch" [ label = "addMetaSecTokenBatch", color = "#FF9797", fillcolor = "#FF9797" ];
+  "TokenLib.setOriginatorFeeTokenBatch" [ label = "setOriginatorFeeTokenBatch", color = "#FF9797", fillcolor = "#FF9797" ];
+  "TokenLib.setOriginatorFeeCurrencyBatch" [ label = "setOriginatorFeeCurrencyBatch", color = "#FF9797", fillcolor = "#FF9797" ];
+  "TokenLib.BurnTokenArgs" [ label = "BurnTokenArgs" ];
+  "TokenLib.MintSecTokenBatchArgs" [ label = "MintSecTokenBatchArgs" ];
+}
+
+subgraph "clusterLedgerLib" {
+  graph [ label = "LedgerLib  (lib)", color = "#445773", fontcolor = "#f0f0f0", style = "rounded", bgcolor = "#445773" ];
+  "LedgerLib.getLedgerEntry" [ label = "getLedgerEntry", color = "#FF9797", fillcolor = "#FF9797" ];
+  "LedgerLib.getLedgerHashcode" [ label = "getLedgerHashcode", color = "#FF9797", fillcolor = "#FF9797" ];
+  "LedgerLib.hashStringArray" [ label = "hashStringArray", color = "#edad56", fillcolor = "#edad56" ];
+  "LedgerLib.hashSetFeeArgs" [ label = "hashSetFeeArgs", color = "#edad56", fillcolor = "#edad56" ];
+}
+
+subgraph "clusterStructLib" {
+  graph [ label = "StructLib  (lib)", color = "#445773", fontcolor = "#f0f0f0", style = "rounded", bgcolor = "#445773" ];
+  "StructLib.transferCcy" [ label = "transferCcy", color = "#FF9797", fillcolor = "#FF9797" ];
+  "StructLib.emitTransferedLedgerCcy" [ label = "emitTransferedLedgerCcy", color = "#FF9797", fillcolor = "#FF9797" ];
+  "StructLib.setReservedCcy" [ label = "setReservedCcy", color = "#FF9797", fillcolor = "#FF9797" ];
+  "StructLib.initLedgerIfNew" [ label = "initLedgerIfNew", color = "#FF9797", fillcolor = "#FF9797" ];
+  "StructLib.sufficientTokens" [ label = "sufficientTokens", color = "#FF9797", fillcolor = "#FF9797" ];
+  "StructLib.sufficientCcy" [ label = "sufficientCcy", color = "#FF9797", fillcolor = "#FF9797" ];
+  "StructLib.tokenExistsOnLedger" [ label = "tokenExistsOnLedger", color = "#FF9797", fillcolor = "#FF9797" ];
+  "StructLib.TransferCcyArgs" [ label = "TransferCcyArgs" ];
+  "StructLib.TransferArgs" [ label = "TransferArgs" ];
+  "StructLib.FeesCalc" [ label = "FeesCalc" ];
+  "StructLib.SetFeeArgs" [ label = "SetFeeArgs" ];
+  "StructLib.Ccy" [ label = "Ccy" ];
+  "StructLib.GetCcyTypesReturn" [ label = "GetCcyTypesReturn" ];
+  "StructLib.SecTokenTypeReturn" [ label = "SecTokenTypeReturn" ];
+  "StructLib.GetSecTokenTypesReturn" [ label = "GetSecTokenTypesReturn" ];
+  "StructLib.SecTokenBatch" [ label = "SecTokenBatch" ];
+  "StructLib.LedgerSecTokenReturn" [ label = "LedgerSecTokenReturn" ];
+  "StructLib.LedgerCcyReturn" [ label = "LedgerCcyReturn" ];
+  "StructLib.LedgerReturn" [ label = "LedgerReturn" ];
+  "StructLib.TransferedLedgerCcy" [ label = "TransferedLedgerCcy" ];
+}
+
+subgraph "clusterStLedger" {
+  graph [ label = "StLedger", color = "#445773", fontcolor = "#f0f0f0", style = "rounded", bgcolor = "#445773" ];
+  "StLedger.addSecTokenType" [ label = "addSecTokenType", color = "#FF9797", fillcolor = "#FF9797" ];
+  "StLedger.getSecTokenTypes" [ label = "getSecTokenTypes", color = "#ffbdb9", fillcolor = "#ffbdb9" ];
+  "StLedger.getLedgerOwners" [ label = "getLedgerOwners", color = "#ffbdb9", fillcolor = "#ffbdb9" ];
+  "StLedger.getLedgerOwnerCount" [ label = "getLedgerOwnerCount", color = "#ffbdb9", fillcolor = "#ffbdb9" ];
+  "StLedger.getLedgerOwner" [ label = "getLedgerOwner", color = "#ffbdb9", fillcolor = "#ffbdb9" ];
+  "StLedger.getLedgerEntry" [ label = "getLedgerEntry", color = "#ffbdb9", fillcolor = "#ffbdb9" ];
+  "StLedger.getSecTokenBatch_MaxId" [ label = "getSecTokenBatch_MaxId", color = "#ffbdb9", fillcolor = "#ffbdb9" ];
+  "StLedger.getSecTokenBatch" [ label = "getSecTokenBatch", color = "#ffbdb9", fillcolor = "#ffbdb9" ];
+  "StLedger.getSecToken_BaseId" [ label = "getSecToken_BaseId", color = "#ffbdb9", fillcolor = "#ffbdb9" ];
+  "StLedger.getSecToken_MaxId" [ label = "getSecToken_MaxId", color = "#ffbdb9", fillcolor = "#ffbdb9" ];
+  "StLedger.getSecToken" [ label = "getSecToken", color = "#ffbdb9", fillcolor = "#ffbdb9" ];
+}
+
+subgraph "clusterOwned" {
+  graph [ label = "Owned", color = "#445773", fontcolor = "#f0f0f0", style = "rounded", bgcolor = "#445773" ];
+  "Owned.readOnly" [ label = "readOnly", color = "#ffbdb9", fillcolor = "#ffbdb9" ];
+  "Owned.<Constructor>" [ label = "<Constructor>", color = "#FF9797", fillcolor = "#FF9797" ];
+  "Owned.getOwners" [ label = "getOwners", color = "#ffbdb9", fillcolor = "#ffbdb9" ];
+  "Owned.onlyOwner" [ label = "onlyOwner", color = "#1bc6a6", shape =doubleoctagon ];
+  "Owned.onlyWhenReadWrite" [ label = "onlyWhenReadWrite", color = "#1bc6a6", shape =doubleoctagon ];
+  "Owned.setReadOnly" [ label = "setReadOnly", color = "#ffbdb9", fillcolor = "#ffbdb9" ];
+}
+
+subgraph "clusterCollateralizable" {
+  graph [ label = "Collateralizable", color = "#445773", fontcolor = "#f0f0f0", style = "rounded", bgcolor = "#445773" ];
+  "Collateralizable.addCcyType" [ label = "addCcyType", color = "#FF9797", fillcolor = "#FF9797" ];
+  "Collateralizable.getCcyTypes" [ label = "getCcyTypes", color = "#ffbdb9", fillcolor = "#ffbdb9" ];
+  "Collateralizable.fundOrWithdraw" [ label = "fundOrWithdraw", color = "#FF9797", fillcolor = "#FF9797" ];
+}
+
+subgraph "clusterStMaster" {
+  graph [ label = "StMaster", color = "#445773", fontcolor = "#f0f0f0", style = "rounded", bgcolor = "#445773" ];
+  "StMaster.getContractType" [ label = "getContractType", color = "#ffbdb9", fillcolor = "#ffbdb9" ];
+  "StMaster.getContractSeal" [ label = "getContractSeal", color = "#ffbdb9", fillcolor = "#ffbdb9" ];
+  "StMaster.sealContract" [ label = "sealContract", color = "#ffbdb9", fillcolor = "#ffbdb9" ];
+  "StMaster.version" [ label = "version", color = "#ffbdb9", fillcolor = "#ffbdb9" ];
+  "StMaster.unit" [ label = "unit", color = "#ffbdb9", fillcolor = "#ffbdb9" ];
+  "StMaster.<Constructor>" [ label = "<Constructor>", color = "#FF9797", fillcolor = "#FF9797" ];
+  "StMaster.transferOrTrade" [ label = "transferOrTrade" ];
+  "StMaster.transfer_feePreview" [ label = "transfer_feePreview" ];
+  "StMaster.getSecToken_MaxId" [ label = "getSecToken_MaxId" ];
+  "StMaster.getSecToken" [ label = "getSecToken" ];
+  "StMaster.getLedgerEntry" [ label = "getLedgerEntry" ];
+}
+
+subgraph "clusterMigrations" {
+  graph [ label = "Migrations", color = "#445773", fontcolor = "#f0f0f0", style = "rounded", bgcolor = "#445773" ];
+  "Migrations.<Constructor>" [ label = "<Constructor>", color = "#FF9797", fillcolor = "#FF9797" ];
+  "Migrations.restricted" [ label = "restricted", color = "#1bc6a6", shape =doubleoctagon ];
+  "Migrations.setCompleted" [ label = "setCompleted" ];
+  "Migrations.upgrade" [ label = "upgrade", color = "#FF9797", fillcolor = "#FF9797" ];
+}
+
+subgraph "clusteraddr" {
+  graph [ label = "addr", color = "#e8726d", fontcolor = "#f0f0f0", style = "rounded,dashed", bgcolor = "#3b4b63" ];
+  "addr.transfer" [ label = "transfer" ];
+}
+
+  "FuturesLib.setLedgerOverride";
+  "FuturesLib.initMarginOverride";
+  "FuturesLib.feePerContractOverride";
+  "StructLib.initLedgerIfNew";
+  "FuturesLib.openFtPos";
+  "StructLib.sufficientCcy";
+  "StructLib.transferCcy";
+  "StructLib.TransferCcyArgs";
+  "FuturesLib.setReservedAllFtPos";
+  "FuturesLib.takePay2";
+  "FuturesLib.calcTakePay";
+  "FuturesLib.abs256";
+  "StructLib.emitTransferedLedgerCcy";
+  "FuturesLib.combineFtPos";
+  "StructLib.tokenExistsOnLedger";
+  "FuturesLib.abs64";
+  "FuturesLib.calcPosMargin";
+  "StructLib.setReservedCcy";
+  "DataLoadable.loadSecTokenBatch";
+  "LoadLib.loadSecTokenBatch";
+  "DataLoadable.createLedgerEntry";
+  "LoadLib.createLedgerEntry";
+  "DataLoadable.addSecToken";
+  "LoadLib.addSecToken";
+  "DataLoadable.setTokenTotals";
+  "LoadLib.setTokenTotals";
+  "SafeMath.sub";
+  "SafeMath.div";
+  "SafeMath.mod";
+  "PayableLib.get_chainlinkRefPrice";
+  "IChainlinkAggregator.latestAnswer";
+  "PayableLib.setIssuerValues";
+  "PayableLib.getCashflowData";
+  "PayableLib.pay";
+  "PayableLib.processSubscriberPayment";
+  "StructLib.TransferArgs";
+  "TransferLib.transferOrTrade";
+  "PayableLib.issuerPay";
+  "addr.transfer";
+  "PayableLib.resetIssuerPaymentBatch";
+  "Erc20Lib.transfer";
+  "Erc20Lib.transferInternal";
+  "Erc20Lib.transferFrom";
+  "StMaster.transferOrTrade";
+  "TransferLib.checkStIds";
+  "StructLib.FeesCalc";
+  "TransferLib.calcFeeWithCapCollar";
+  "StructLib.SetFeeArgs";
+  "TransferLib.transferSplitSecTokens_Preview";
+  "StructLib.sufficientTokens";
+  "TransferLib.applyOriginatorCcyFees";
+  "TransferLib.transferSplitSecTokens";
+  "TransferLib.transfer_feePreview";
+  "StMaster.transfer_feePreview";
+  "TransferLib.transfer_feePreview_ExchangeOnly";
+  "TransferLib.applyFeeStruct";
+  "StErc20.whitelistMany";
+  "Erc20Lib.whitelist";
+  "StFees.getFee";
+  "StFees.setFee_TokType";
+  "SpotFeeLib.setFee_TokType";
+  "StFees.setFee_CcyType";
+  "SpotFeeLib.setFee_CcyType";
+  "StTransferable.getLedgerHashcode";
+  "LedgerLib.getLedgerHashcode";
+  "StTransferable.transferOrTrade";
+  "StTransferable.transfer_feePreview_ExchangeOnly";
+  "StTransferable.transfer_feePreview";
+  "StBurnable.burnTokens";
+  "TokenLib.burnTokens";
+  "TokenLib.BurnTokenArgs";
+  "StMintable.mintSecTokenBatch";
+  "TokenLib.MintSecTokenBatchArgs";
+  "TokenLib.mintSecTokenBatch";
+  "StMintable.addMetaSecTokenBatch";
+  "TokenLib.addMetaSecTokenBatch";
+  "StMintable.setOriginatorFeeTokenBatch";
+  "TokenLib.setOriginatorFeeTokenBatch";
+  "StMintable.setOriginatorFeeCurrencyBatch";
+  "TokenLib.setOriginatorFeeCurrencyBatch";
+  "CcyLib.addCcyType";
+  "StructLib.Ccy";
+  "CcyLib.getCcyTypes";
+  "StructLib.GetCcyTypesReturn";
+  "CcyLib.fundOrWithdraw";
+  "CcyLib.fund";
+  "CcyLib.withdraw";
+  "strings.toSliceB32";
+  "strings.len";
+  "strings.toString";
+  "strings.memcpy";
+  "strings.equals";
+  "strings.compare";
+  "strings.nextRune";
+  "strings.find";
+  "strings.findPtr";
+  "strings.rfind";
+  "strings.rfindPtr";
+  "strings.split";
+  "strings.rsplit";
+  "strings.count";
+  "strings.contains";
+  "strings.concat";
+  "strings.join";
+  "TokenLib.addSecTokenType";
+  "TokenLib.getSecTokenTypes";
+  "StructLib.SecTokenTypeReturn";
+  "StructLib.GetSecTokenTypesReturn";
+  "StructLib.SecTokenBatch";
+  "StMaster.getSecToken_MaxId";
+  "TokenLib.getSecToken";
+  "StMaster.getSecToken";
+  "StructLib.LedgerSecTokenReturn";
+  "LedgerLib.getLedgerEntry";
+  "StMaster.getLedgerEntry";
+  "StructLib.LedgerCcyReturn";
+  "StructLib.LedgerReturn";
+  "LedgerLib.hashSetFeeArgs";
+  "LedgerLib.hashStringArray";
+  "StructLib.TransferedLedgerCcy";
+  "StLedger.addSecTokenType";
+  "StLedger.getSecTokenTypes";
+  "StLedger.getLedgerEntry";
+  "StLedger.getSecToken";
+  "Collateralizable.addCcyType";
+  "Collateralizable.getCcyTypes";
+  "Collateralizable.fundOrWithdraw";
+  "Migrations.upgrade";
+  "Migrations.setCompleted";
+  "FuturesLib.setLedgerOverride" -> "FuturesLib.initMarginOverride" [ color = "#1bc6a6" ];
+  "FuturesLib.setLedgerOverride" -> "FuturesLib.feePerContractOverride" [ color = "#1bc6a6" ];
+  "FuturesLib.initMarginOverride" -> "StructLib.initLedgerIfNew" [ color = "white" ];
+  "FuturesLib.feePerContractOverride" -> "StructLib.initLedgerIfNew" [ color = "white" ];
+  "FuturesLib.openFtPos" -> "StructLib.sufficientCcy" [ color = "white" ];
+  "FuturesLib.openFtPos" -> "StructLib.sufficientCcy" [ color = "white" ];
+  "FuturesLib.openFtPos" -> "StructLib.transferCcy" [ color = "white" ];
+  "FuturesLib.openFtPos" -> "StructLib.TransferCcyArgs" [ color = "white" ];
+  "FuturesLib.openFtPos" -> "StructLib.transferCcy" [ color = "white" ];
+  "FuturesLib.openFtPos" -> "StructLib.TransferCcyArgs" [ color = "white" ];
+  "FuturesLib.openFtPos" -> "StructLib.initLedgerIfNew" [ color = "white" ];
+  "FuturesLib.openFtPos" -> "StructLib.initLedgerIfNew" [ color = "white" ];
+  "FuturesLib.openFtPos" -> "FuturesLib.setReservedAllFtPos" [ color = "#1bc6a6" ];
+  "FuturesLib.openFtPos" -> "FuturesLib.setReservedAllFtPos" [ color = "#1bc6a6" ];
+  "FuturesLib.takePay2" -> "FuturesLib.calcTakePay" [ color = "#1bc6a6" ];
+  "FuturesLib.takePay2" -> "FuturesLib.abs256" [ color = "#1bc6a6" ];
+  "FuturesLib.takePay2" -> "StructLib.emitTransferedLedgerCcy" [ color = "white" ];
+  "FuturesLib.takePay2" -> "StructLib.TransferCcyArgs" [ color = "white" ];
+  "FuturesLib.takePay2" -> "StructLib.emitTransferedLedgerCcy" [ color = "white" ];
+  "FuturesLib.takePay2" -> "StructLib.TransferCcyArgs" [ color = "white" ];
+  "FuturesLib.takePay2" -> "FuturesLib.abs256" [ color = "#1bc6a6" ];
+  "FuturesLib.takePay2" -> "StructLib.emitTransferedLedgerCcy" [ color = "white" ];
+  "FuturesLib.takePay2" -> "StructLib.TransferCcyArgs" [ color = "white" ];
+  "FuturesLib.takePay2" -> "StructLib.emitTransferedLedgerCcy" [ color = "white" ];
+  "FuturesLib.takePay2" -> "StructLib.TransferCcyArgs" [ color = "white" ];
+  "FuturesLib.takePay2" -> "StructLib.emitTransferedLedgerCcy" [ color = "white" ];
+  "FuturesLib.takePay2" -> "StructLib.TransferCcyArgs" [ color = "white" ];
+  "FuturesLib.combineFtPos" -> "StructLib.tokenExistsOnLedger" [ color = "white" ];
+  "FuturesLib.combineFtPos" -> "FuturesLib.abs64" [ color = "#1bc6a6" ];
+  "FuturesLib.combineFtPos" -> "FuturesLib.abs64" [ color = "#1bc6a6" ];
+  "FuturesLib.combineFtPos" -> "StructLib.tokenExistsOnLedger" [ color = "white" ];
+  "FuturesLib.combineFtPos" -> "FuturesLib.abs64" [ color = "#1bc6a6" ];
+  "FuturesLib.combineFtPos" -> "FuturesLib.abs64" [ color = "#1bc6a6" ];
+  "FuturesLib.setReservedAllFtPos" -> "FuturesLib.abs64" [ color = "#1bc6a6" ];
+  "FuturesLib.setReservedAllFtPos" -> "FuturesLib.abs64" [ color = "#1bc6a6" ];
+  "FuturesLib.setReservedAllFtPos" -> "FuturesLib.calcPosMargin" [ color = "#1bc6a6" ];
+  "FuturesLib.setReservedAllFtPos" -> "FuturesLib.abs256" [ color = "#1bc6a6" ];
+  "FuturesLib.setReservedAllFtPos" -> "StructLib.setReservedCcy" [ color = "white" ];
+  "DataLoadable.loadSecTokenBatch" -> "LoadLib.loadSecTokenBatch" [ color = "white" ];
+  "DataLoadable.createLedgerEntry" -> "LoadLib.createLedgerEntry" [ color = "white" ];
+  "DataLoadable.addSecToken" -> "LoadLib.addSecToken" [ color = "white" ];
+  "DataLoadable.setTokenTotals" -> "LoadLib.setTokenTotals" [ color = "white" ];
+  "SafeMath.sub" -> "SafeMath.sub" [ color = "#1bc6a6" ];
+  "SafeMath.div" -> "SafeMath.div" [ color = "#1bc6a6" ];
+  "SafeMath.mod" -> "SafeMath.mod" [ color = "#1bc6a6" ];
+  "PayableLib.get_chainlinkRefPrice" -> "IChainlinkAggregator.latestAnswer" [ color = "white" ];
+  "PayableLib.setIssuerValues" -> "PayableLib.getCashflowData" [ color = "#1bc6a6" ];
+  "PayableLib.pay" -> "PayableLib.processSubscriberPayment" [ color = "#1bc6a6" ];
+  "PayableLib.processSubscriberPayment" -> "StructLib.TransferArgs" [ color = "white" ];
+  "PayableLib.processSubscriberPayment" -> "TransferLib.transferOrTrade" [ color = "white" ];
+  "PayableLib.issuerPay" -> "addr.transfer" [ color = "white" ];
+  "PayableLib.issuerPay" -> "PayableLib.resetIssuerPaymentBatch" [ color = "#1bc6a6" ];
+  "Erc20Lib.transfer" -> "Erc20Lib.transferInternal" [ color = "#1bc6a6" ];
+  "Erc20Lib.transferFrom" -> "Erc20Lib.transferInternal" [ color = "#1bc6a6" ];
+  "Erc20Lib.transferInternal" -> "StructLib.TransferArgs" [ color = "white" ];
+  "Erc20Lib.transferInternal" -> "TransferLib.transferOrTrade" [ color = "white" ];
+  "TransferLib.transferOrTrade" -> "StMaster.transferOrTrade" [ color = "white" ];
+  "TransferLib.transferOrTrade" -> "StructLib.TransferArgs" [ color = "white" ];
+  "TransferLib.transferOrTrade" -> "StMaster.transferOrTrade" [ color = "white" ];
+  "TransferLib.transferOrTrade" -> "StructLib.TransferArgs" [ color = "white" ];
+  "TransferLib.transferOrTrade" -> "TransferLib.checkStIds" [ color = "#1bc6a6" ];
+  "TransferLib.transferOrTrade" -> "StructLib.initLedgerIfNew" [ color = "white" ];
+  "TransferLib.transferOrTrade" -> "StructLib.initLedgerIfNew" [ color = "white" ];
+  "TransferLib.transferOrTrade" -> "StructLib.FeesCalc" [ color = "white" ];
+  "TransferLib.transferOrTrade" -> "TransferLib.calcFeeWithCapCollar" [ color = "#1bc6a6" ];
+  "TransferLib.transferOrTrade" -> "TransferLib.calcFeeWithCapCollar" [ color = "#1bc6a6" ];
+  "TransferLib.transferOrTrade" -> "TransferLib.calcFeeWithCapCollar" [ color = "#1bc6a6" ];
+  "TransferLib.transferOrTrade" -> "TransferLib.calcFeeWithCapCollar" [ color = "#1bc6a6" ];
+  "TransferLib.transferOrTrade" -> "StructLib.SetFeeArgs" [ color = "white" ];
+  "TransferLib.transferOrTrade" -> "TransferLib.calcFeeWithCapCollar" [ color = "#1bc6a6" ];
+  "TransferLib.transferOrTrade" -> "TransferLib.calcFeeWithCapCollar" [ color = "#1bc6a6" ];
+  "TransferLib.transferOrTrade" -> "TransferLib.transferSplitSecTokens_Preview" [ color = "#1bc6a6" ];
+  "TransferLib.transferOrTrade" -> "TransferLib.calcFeeWithCapCollar" [ color = "#1bc6a6" ];
+  "TransferLib.transferOrTrade" -> "TransferLib.transferSplitSecTokens_Preview" [ color = "#1bc6a6" ];
+  "TransferLib.transferOrTrade" -> "TransferLib.calcFeeWithCapCollar" [ color = "#1bc6a6" ];
+  "TransferLib.transferOrTrade" -> "StructLib.sufficientCcy" [ color = "white" ];
+  "TransferLib.transferOrTrade" -> "StructLib.sufficientCcy" [ color = "white" ];
+  "TransferLib.transferOrTrade" -> "StructLib.sufficientTokens" [ color = "white" ];
+  "TransferLib.transferOrTrade" -> "StructLib.sufficientTokens" [ color = "white" ];
+  "TransferLib.transferOrTrade" -> "StructLib.transferCcy" [ color = "white" ];
+  "TransferLib.transferOrTrade" -> "StructLib.TransferCcyArgs" [ color = "white" ];
+  "TransferLib.transferOrTrade" -> "StructLib.transferCcy" [ color = "white" ];
+  "TransferLib.transferOrTrade" -> "StructLib.TransferCcyArgs" [ color = "white" ];
+  "TransferLib.transferOrTrade" -> "StructLib.transferCcy" [ color = "white" ];
+  "TransferLib.transferOrTrade" -> "StructLib.TransferCcyArgs" [ color = "white" ];
+  "TransferLib.transferOrTrade" -> "StructLib.transferCcy" [ color = "white" ];
+  "TransferLib.transferOrTrade" -> "StructLib.TransferCcyArgs" [ color = "white" ];
+  "TransferLib.transferOrTrade" -> "TransferLib.applyOriginatorCcyFees" [ color = "#1bc6a6" ];
+  "TransferLib.transferOrTrade" -> "TransferLib.applyOriginatorCcyFees" [ color = "#1bc6a6" ];
+  "TransferLib.transferOrTrade" -> "TransferLib.transferSplitSecTokens" [ color = "#1bc6a6" ];
+  "TransferLib.transferOrTrade" -> "TransferLib.calcFeeWithCapCollar" [ color = "#1bc6a6" ];
+  "TransferLib.transferOrTrade" -> "TransferLib.transferSplitSecTokens" [ color = "#1bc6a6" ];
+  "TransferLib.transferOrTrade" -> "TransferLib.transferSplitSecTokens" [ color = "#1bc6a6" ];
+  "TransferLib.transferOrTrade" -> "TransferLib.transferSplitSecTokens" [ color = "#1bc6a6" ];
+  "TransferLib.transferOrTrade" -> "TransferLib.calcFeeWithCapCollar" [ color = "#1bc6a6" ];
+  "TransferLib.transferOrTrade" -> "TransferLib.transferSplitSecTokens" [ color = "#1bc6a6" ];
+  "TransferLib.transferOrTrade" -> "TransferLib.transferSplitSecTokens" [ color = "#1bc6a6" ];
+  "TransferLib.transfer_feePreview" -> "TransferLib.checkStIds" [ color = "#1bc6a6" ];
+  "TransferLib.transfer_feePreview" -> "StructLib.FeesCalc" [ color = "white" ];
+  "TransferLib.transfer_feePreview" -> "TransferLib.calcFeeWithCapCollar" [ color = "#1bc6a6" ];
+  "TransferLib.transfer_feePreview" -> "TransferLib.calcFeeWithCapCollar" [ color = "#1bc6a6" ];
+  "TransferLib.transfer_feePreview" -> "TransferLib.calcFeeWithCapCollar" [ color = "#1bc6a6" ];
+  "TransferLib.transfer_feePreview" -> "TransferLib.calcFeeWithCapCollar" [ color = "#1bc6a6" ];
+  "TransferLib.transfer_feePreview" -> "StructLib.SetFeeArgs" [ color = "white" ];
+  "TransferLib.transfer_feePreview" -> "TransferLib.calcFeeWithCapCollar" [ color = "#1bc6a6" ];
+  "TransferLib.transfer_feePreview" -> "TransferLib.calcFeeWithCapCollar" [ color = "#1bc6a6" ];
+  "TransferLib.transfer_feePreview" -> "TransferLib.transferSplitSecTokens_Preview" [ color = "#1bc6a6" ];
+  "TransferLib.transfer_feePreview" -> "StructLib.FeesCalc" [ color = "white" ];
+  "TransferLib.transfer_feePreview" -> "TransferLib.calcFeeWithCapCollar" [ color = "#1bc6a6" ];
+  "TransferLib.transfer_feePreview" -> "TransferLib.transferSplitSecTokens_Preview" [ color = "#1bc6a6" ];
+  "TransferLib.transfer_feePreview" -> "StructLib.FeesCalc" [ color = "white" ];
+  "TransferLib.transfer_feePreview" -> "TransferLib.calcFeeWithCapCollar" [ color = "#1bc6a6" ];
+  "TransferLib.transfer_feePreview" -> "StMaster.transfer_feePreview" [ color = "white" ];
+  "TransferLib.transfer_feePreview" -> "StructLib.TransferArgs" [ color = "white" ];
+  "TransferLib.transfer_feePreview" -> "StMaster.transfer_feePreview" [ color = "white" ];
+  "TransferLib.transfer_feePreview" -> "StructLib.TransferArgs" [ color = "white" ];
+  "TransferLib.transfer_feePreview_ExchangeOnly" -> "TransferLib.checkStIds" [ color = "#1bc6a6" ];
+  "TransferLib.transfer_feePreview_ExchangeOnly" -> "StructLib.FeesCalc" [ color = "white" ];
+  "TransferLib.transfer_feePreview_ExchangeOnly" -> "TransferLib.calcFeeWithCapCollar" [ color = "#1bc6a6" ];
+  "TransferLib.transfer_feePreview_ExchangeOnly" -> "TransferLib.calcFeeWithCapCollar" [ color = "#1bc6a6" ];
+  "TransferLib.transfer_feePreview_ExchangeOnly" -> "TransferLib.calcFeeWithCapCollar" [ color = "#1bc6a6" ];
+  "TransferLib.transfer_feePreview_ExchangeOnly" -> "TransferLib.calcFeeWithCapCollar" [ color = "#1bc6a6" ];
+  "TransferLib.transfer_feePreview_ExchangeOnly" -> "StructLib.SetFeeArgs" [ color = "white" ];
+  "TransferLib.transfer_feePreview_ExchangeOnly" -> "TransferLib.calcFeeWithCapCollar" [ color = "#1bc6a6" ];
+  "TransferLib.transfer_feePreview_ExchangeOnly" -> "TransferLib.calcFeeWithCapCollar" [ color = "#1bc6a6" ];
+  "TransferLib.applyOriginatorCcyFees" -> "StructLib.transferCcy" [ color = "white" ];
+  "TransferLib.applyOriginatorCcyFees" -> "StructLib.TransferCcyArgs" [ color = "white" ];
+  "TransferLib.calcFeeWithCapCollar" -> "TransferLib.applyFeeStruct" [ color = "#1bc6a6" ];
+  "TransferLib.checkStIds" -> "StructLib.tokenExistsOnLedger" [ color = "white" ];
+  "TransferLib.checkStIds" -> "StructLib.tokenExistsOnLedger" [ color = "white" ];
+  "StErc20.whitelistMany" -> "Erc20Lib.whitelist" [ color = "white" ];
+  "StFees.getFee" -> "StructLib.SetFeeArgs" [ color = "white" ];
+  "StFees.setFee_TokType" -> "SpotFeeLib.setFee_TokType" [ color = "white" ];
+  "StFees.setFee_CcyType" -> "SpotFeeLib.setFee_CcyType" [ color = "white" ];
+  "StTransferable.getLedgerHashcode" -> "LedgerLib.getLedgerHashcode" [ color = "white" ];
+  "StTransferable.transferOrTrade" -> "TransferLib.transferOrTrade" [ color = "white" ];
+  "StTransferable.transfer_feePreview_ExchangeOnly" -> "TransferLib.transfer_feePreview_ExchangeOnly" [ color = "white" ];
+  "StTransferable.transfer_feePreview" -> "TransferLib.transfer_feePreview" [ color = "white" ];
+  "StBurnable.burnTokens" -> "TokenLib.burnTokens" [ color = "white" ];
+  "StBurnable.burnTokens" -> "TokenLib.BurnTokenArgs" [ color = "white" ];
+  "StMintable.mintSecTokenBatch" -> "TokenLib.MintSecTokenBatchArgs" [ color = "white" ];
+  "StMintable.mintSecTokenBatch" -> "TokenLib.mintSecTokenBatch" [ color = "white" ];
+  "StMintable.addMetaSecTokenBatch" -> "TokenLib.addMetaSecTokenBatch" [ color = "white" ];
+  "StMintable.setOriginatorFeeTokenBatch" -> "TokenLib.setOriginatorFeeTokenBatch" [ color = "white" ];
+  "StMintable.setOriginatorFeeCurrencyBatch" -> "TokenLib.setOriginatorFeeCurrencyBatch" [ color = "white" ];
+  "CcyLib.addCcyType" -> "StructLib.Ccy" [ color = "white" ];
+  "CcyLib.getCcyTypes" -> "StructLib.Ccy" [ color = "white" ];
+  "CcyLib.getCcyTypes" -> "StructLib.GetCcyTypesReturn" [ color = "white" ];
+  "CcyLib.fundOrWithdraw" -> "CcyLib.fund" [ color = "#1bc6a6" ];
+  "CcyLib.fundOrWithdraw" -> "CcyLib.withdraw" [ color = "#1bc6a6" ];
+  "CcyLib.fund" -> "StructLib.initLedgerIfNew" [ color = "white" ];
+  "strings.toSliceB32" -> "strings.len" [ color = "#1bc6a6" ];
+  "strings.toString" -> "strings.memcpy" [ color = "#1bc6a6" ];
+  "strings.equals" -> "strings.compare" [ color = "#1bc6a6" ];
+  "strings.nextRune" -> "strings.nextRune" [ color = "#1bc6a6" ];
+  "strings.find" -> "strings.findPtr" [ color = "#1bc6a6" ];
+  "strings.rfind" -> "strings.rfindPtr" [ color = "#1bc6a6" ];
+  "strings.split" -> "strings.findPtr" [ color = "#1bc6a6" ];
+  "strings.split" -> "strings.split" [ color = "#1bc6a6" ];
+  "strings.rsplit" -> "strings.rfindPtr" [ color = "#1bc6a6" ];
+  "strings.rsplit" -> "strings.rsplit" [ color = "#1bc6a6" ];
+  "strings.count" -> "strings.findPtr" [ color = "#1bc6a6" ];
+  "strings.count" -> "strings.findPtr" [ color = "#1bc6a6" ];
+  "strings.contains" -> "strings.rfindPtr" [ color = "#1bc6a6" ];
+  "strings.concat" -> "strings.memcpy" [ color = "#1bc6a6" ];
+  "strings.concat" -> "strings.memcpy" [ color = "#1bc6a6" ];
+  "strings.join" -> "strings.memcpy" [ color = "#1bc6a6" ];
+  "strings.join" -> "strings.memcpy" [ color = "#1bc6a6" ];
+  "SpotFeeLib.setFee_TokType" -> "StructLib.initLedgerIfNew" [ color = "white" ];
+  "SpotFeeLib.setFee_TokType" -> "StFees.setFee_TokType" [ color = "white" ];
+  "SpotFeeLib.setFee_CcyType" -> "StructLib.initLedgerIfNew" [ color = "white" ];
+  "TokenLib.addSecTokenType" -> "DataLoadable.setTokenTotals" [ color = "white" ];
+  "TokenLib.getSecTokenTypes" -> "StructLib.SecTokenTypeReturn" [ color = "white" ];
+  "TokenLib.getSecTokenTypes" -> "StructLib.GetSecTokenTypesReturn" [ color = "white" ];
+  "TokenLib.mintSecTokenBatch" -> "StructLib.SecTokenBatch" [ color = "white" ];
+  "TokenLib.mintSecTokenBatch" -> "StructLib.initLedgerIfNew" [ color = "white" ];
+  "TokenLib.mintSecTokenBatch" -> "StMaster.getSecToken_MaxId" [ color = "white" ];
+  "TokenLib.mintSecTokenBatch" -> "StMintable.mintSecTokenBatch" [ color = "white" ];
+  "TokenLib.burnTokens" -> "StBurnable.burnTokens" [ color = "white" ];
+  "TokenLib.burnTokens" -> "StructLib.sufficientTokens" [ color = "white" ];
+  "TokenLib.getSecToken" -> "StMaster.getSecToken" [ color = "white" ];
+  "TokenLib.getSecToken" -> "StructLib.LedgerSecTokenReturn" [ color = "white" ];
+  "LedgerLib.getLedgerEntry" -> "StMaster.getLedgerEntry" [ color = "white" ];
+  "LedgerLib.getLedgerEntry" -> "StructLib.LedgerSecTokenReturn" [ color = "white" ];
+  "LedgerLib.getLedgerEntry" -> "StructLib.LedgerSecTokenReturn" [ color = "white" ];
+  "LedgerLib.getLedgerEntry" -> "StructLib.LedgerCcyReturn" [ color = "white" ];
+  "LedgerLib.getLedgerEntry" -> "StructLib.LedgerReturn" [ color = "white" ];
+  "LedgerLib.getLedgerHashcode" -> "LedgerLib.hashSetFeeArgs" [ color = "#1bc6a6" ];
+  "LedgerLib.getLedgerHashcode" -> "LedgerLib.hashSetFeeArgs" [ color = "#1bc6a6" ];
+  "LedgerLib.getLedgerHashcode" -> "LedgerLib.hashStringArray" [ color = "#1bc6a6" ];
+  "LedgerLib.getLedgerHashcode" -> "LedgerLib.hashStringArray" [ color = "#1bc6a6" ];
+  "LedgerLib.getLedgerHashcode" -> "LedgerLib.hashSetFeeArgs" [ color = "#1bc6a6" ];
+  "LedgerLib.getLedgerHashcode" -> "LedgerLib.hashSetFeeArgs" [ color = "#1bc6a6" ];
+  "LedgerLib.getLedgerHashcode" -> "LedgerLib.hashSetFeeArgs" [ color = "#1bc6a6" ];
+  "LedgerLib.getLedgerHashcode" -> "StTransferable.getLedgerHashcode" [ color = "white" ];
+  "StructLib.transferCcy" -> "StructLib.emitTransferedLedgerCcy" [ color = "#1bc6a6" ];
+  "StructLib.emitTransferedLedgerCcy" -> "StructLib.TransferedLedgerCcy" [ color = "white" ];
+  "StructLib.setReservedCcy" -> "StructLib.initLedgerIfNew" [ color = "#1bc6a6" ];
+  "StLedger.addSecTokenType" -> "TokenLib.addSecTokenType" [ color = "white" ];
+  "StLedger.getSecTokenTypes" -> "TokenLib.getSecTokenTypes" [ color = "white" ];
+  "StLedger.getLedgerEntry" -> "LedgerLib.getLedgerEntry" [ color = "white" ];
+  "StLedger.getSecToken" -> "TokenLib.getSecToken" [ color = "white" ];
+  "Collateralizable.addCcyType" -> "CcyLib.addCcyType" [ color = "white" ];
+  "Collateralizable.getCcyTypes" -> "CcyLib.getCcyTypes" [ color = "white" ];
+  "Collateralizable.fundOrWithdraw" -> "CcyLib.fundOrWithdraw" [ color = "white" ];
+  "Collateralizable.addCcyType" -> "CcyLib.addCcyType" [ color = "white" ];
+  "Collateralizable.getCcyTypes" -> "CcyLib.getCcyTypes" [ color = "white" ];
+  "Collateralizable.fundOrWithdraw" -> "CcyLib.fundOrWithdraw" [ color = "white" ];
+  "StLedger.addSecTokenType" -> "TokenLib.addSecTokenType" [ color = "white" ];
+  "StLedger.getSecTokenTypes" -> "TokenLib.getSecTokenTypes" [ color = "white" ];
+  "StLedger.getLedgerEntry" -> "LedgerLib.getLedgerEntry" [ color = "white" ];
+  "StLedger.getSecToken" -> "TokenLib.getSecToken" [ color = "white" ];
+  "StructLib.transferCcy" -> "StructLib.emitTransferedLedgerCcy" [ color = "#1bc6a6" ];
+  "StructLib.emitTransferedLedgerCcy" -> "StructLib.TransferedLedgerCcy" [ color = "white" ];
+  "StructLib.setReservedCcy" -> "StructLib.initLedgerIfNew" [ color = "#1bc6a6" ];
+  "LedgerLib.getLedgerEntry" -> "StMaster.getLedgerEntry" [ color = "white" ];
+  "LedgerLib.getLedgerEntry" -> "StructLib.LedgerSecTokenReturn" [ color = "white" ];
+  "LedgerLib.getLedgerEntry" -> "StructLib.LedgerSecTokenReturn" [ color = "white" ];
+  "LedgerLib.getLedgerEntry" -> "StructLib.LedgerCcyReturn" [ color = "white" ];
+  "LedgerLib.getLedgerEntry" -> "StructLib.LedgerReturn" [ color = "white" ];
+  "LedgerLib.getLedgerHashcode" -> "LedgerLib.hashSetFeeArgs" [ color = "#1bc6a6" ];
+  "LedgerLib.getLedgerHashcode" -> "LedgerLib.hashSetFeeArgs" [ color = "#1bc6a6" ];
+  "LedgerLib.getLedgerHashcode" -> "LedgerLib.hashStringArray" [ color = "#1bc6a6" ];
+  "LedgerLib.getLedgerHashcode" -> "LedgerLib.hashStringArray" [ color = "#1bc6a6" ];
+  "LedgerLib.getLedgerHashcode" -> "LedgerLib.hashSetFeeArgs" [ color = "#1bc6a6" ];
+  "LedgerLib.getLedgerHashcode" -> "LedgerLib.hashSetFeeArgs" [ color = "#1bc6a6" ];
+  "LedgerLib.getLedgerHashcode" -> "LedgerLib.hashSetFeeArgs" [ color = "#1bc6a6" ];
+  "LedgerLib.getLedgerHashcode" -> "StTransferable.getLedgerHashcode" [ color = "white" ];
+  "TokenLib.addSecTokenType" -> "DataLoadable.setTokenTotals" [ color = "white" ];
+  "TokenLib.getSecTokenTypes" -> "StructLib.SecTokenTypeReturn" [ color = "white" ];
+  "TokenLib.getSecTokenTypes" -> "StructLib.GetSecTokenTypesReturn" [ color = "white" ];
+  "TokenLib.mintSecTokenBatch" -> "StructLib.SecTokenBatch" [ color = "white" ];
+  "TokenLib.mintSecTokenBatch" -> "StructLib.initLedgerIfNew" [ color = "white" ];
+  "TokenLib.mintSecTokenBatch" -> "StMaster.getSecToken_MaxId" [ color = "white" ];
+  "TokenLib.mintSecTokenBatch" -> "StMintable.mintSecTokenBatch" [ color = "white" ];
+  "TokenLib.burnTokens" -> "StBurnable.burnTokens" [ color = "white" ];
+  "TokenLib.burnTokens" -> "StructLib.sufficientTokens" [ color = "white" ];
+  "TokenLib.getSecToken" -> "StMaster.getSecToken" [ color = "white" ];
+  "TokenLib.getSecToken" -> "StructLib.LedgerSecTokenReturn" [ color = "white" ];
+  "SpotFeeLib.setFee_TokType" -> "StructLib.initLedgerIfNew" [ color = "white" ];
+  "SpotFeeLib.setFee_TokType" -> "StFees.setFee_TokType" [ color = "white" ];
+  "SpotFeeLib.setFee_CcyType" -> "StructLib.initLedgerIfNew" [ color = "white" ];
+  "strings.toSliceB32" -> "strings.len" [ color = "#1bc6a6" ];
+  "strings.toString" -> "strings.memcpy" [ color = "#1bc6a6" ];
+  "strings.equals" -> "strings.compare" [ color = "#1bc6a6" ];
+  "strings.nextRune" -> "strings.nextRune" [ color = "#1bc6a6" ];
+  "strings.find" -> "strings.findPtr" [ color = "#1bc6a6" ];
+  "strings.rfind" -> "strings.rfindPtr" [ color = "#1bc6a6" ];
+  "strings.split" -> "strings.findPtr" [ color = "#1bc6a6" ];
+  "strings.split" -> "strings.split" [ color = "#1bc6a6" ];
+  "strings.rsplit" -> "strings.rfindPtr" [ color = "#1bc6a6" ];
+  "strings.rsplit" -> "strings.rsplit" [ color = "#1bc6a6" ];
+  "strings.count" -> "strings.findPtr" [ color = "#1bc6a6" ];
+  "strings.count" -> "strings.findPtr" [ color = "#1bc6a6" ];
+  "strings.contains" -> "strings.rfindPtr" [ color = "#1bc6a6" ];
+  "strings.concat" -> "strings.memcpy" [ color = "#1bc6a6" ];
+  "strings.concat" -> "strings.memcpy" [ color = "#1bc6a6" ];
+  "strings.join" -> "strings.memcpy" [ color = "#1bc6a6" ];
+  "strings.join" -> "strings.memcpy" [ color = "#1bc6a6" ];
+  "CcyLib.addCcyType" -> "StructLib.Ccy" [ color = "white" ];
+  "CcyLib.getCcyTypes" -> "StructLib.Ccy" [ color = "white" ];
+  "CcyLib.getCcyTypes" -> "StructLib.GetCcyTypesReturn" [ color = "white" ];
+  "CcyLib.fundOrWithdraw" -> "CcyLib.fund" [ color = "#1bc6a6" ];
+  "CcyLib.fundOrWithdraw" -> "CcyLib.withdraw" [ color = "#1bc6a6" ];
+  "CcyLib.fund" -> "StructLib.initLedgerIfNew" [ color = "white" ];
+  "StMintable.mintSecTokenBatch" -> "TokenLib.MintSecTokenBatchArgs" [ color = "white" ];
+  "StMintable.mintSecTokenBatch" -> "TokenLib.mintSecTokenBatch" [ color = "white" ];
+  "StMintable.addMetaSecTokenBatch" -> "TokenLib.addMetaSecTokenBatch" [ color = "white" ];
+  "StMintable.setOriginatorFeeTokenBatch" -> "TokenLib.setOriginatorFeeTokenBatch" [ color = "white" ];
+  "StMintable.setOriginatorFeeCurrencyBatch" -> "TokenLib.setOriginatorFeeCurrencyBatch" [ color = "white" ];
+  "StBurnable.burnTokens" -> "TokenLib.burnTokens" [ color = "white" ];
+  "StBurnable.burnTokens" -> "TokenLib.BurnTokenArgs" [ color = "white" ];
+  "StTransferable.getLedgerHashcode" -> "LedgerLib.getLedgerHashcode" [ color = "white" ];
+  "StTransferable.transferOrTrade" -> "TransferLib.transferOrTrade" [ color = "white" ];
+  "StTransferable.transfer_feePreview_ExchangeOnly" -> "TransferLib.transfer_feePreview_ExchangeOnly" [ color = "white" ];
+  "StTransferable.transfer_feePreview" -> "TransferLib.transfer_feePreview" [ color = "white" ];
+  "StFees.getFee" -> "StructLib.SetFeeArgs" [ color = "white" ];
+  "StFees.setFee_TokType" -> "SpotFeeLib.setFee_TokType" [ color = "white" ];
+  "StFees.setFee_CcyType" -> "SpotFeeLib.setFee_CcyType" [ color = "white" ];
+  "StErc20.whitelistMany" -> "Erc20Lib.whitelist" [ color = "white" ];
+  "TransferLib.transferOrTrade" -> "StMaster.transferOrTrade" [ color = "white" ];
+  "TransferLib.transferOrTrade" -> "StructLib.TransferArgs" [ color = "white" ];
+  "TransferLib.transferOrTrade" -> "StMaster.transferOrTrade" [ color = "white" ];
+  "TransferLib.transferOrTrade" -> "StructLib.TransferArgs" [ color = "white" ];
+  "TransferLib.transferOrTrade" -> "TransferLib.checkStIds" [ color = "#1bc6a6" ];
+  "TransferLib.transferOrTrade" -> "StructLib.initLedgerIfNew" [ color = "white" ];
+  "TransferLib.transferOrTrade" -> "StructLib.initLedgerIfNew" [ color = "white" ];
+  "TransferLib.transferOrTrade" -> "StructLib.FeesCalc" [ color = "white" ];
+  "TransferLib.transferOrTrade" -> "TransferLib.calcFeeWithCapCollar" [ color = "#1bc6a6" ];
+  "TransferLib.transferOrTrade" -> "TransferLib.calcFeeWithCapCollar" [ color = "#1bc6a6" ];
+  "TransferLib.transferOrTrade" -> "TransferLib.calcFeeWithCapCollar" [ color = "#1bc6a6" ];
+  "TransferLib.transferOrTrade" -> "TransferLib.calcFeeWithCapCollar" [ color = "#1bc6a6" ];
+  "TransferLib.transferOrTrade" -> "StructLib.SetFeeArgs" [ color = "white" ];
+  "TransferLib.transferOrTrade" -> "TransferLib.calcFeeWithCapCollar" [ color = "#1bc6a6" ];
+  "TransferLib.transferOrTrade" -> "TransferLib.calcFeeWithCapCollar" [ color = "#1bc6a6" ];
+  "TransferLib.transferOrTrade" -> "TransferLib.transferSplitSecTokens_Preview" [ color = "#1bc6a6" ];
+  "TransferLib.transferOrTrade" -> "TransferLib.calcFeeWithCapCollar" [ color = "#1bc6a6" ];
+  "TransferLib.transferOrTrade" -> "TransferLib.transferSplitSecTokens_Preview" [ color = "#1bc6a6" ];
+  "TransferLib.transferOrTrade" -> "TransferLib.calcFeeWithCapCollar" [ color = "#1bc6a6" ];
+  "TransferLib.transferOrTrade" -> "StructLib.sufficientCcy" [ color = "white" ];
+  "TransferLib.transferOrTrade" -> "StructLib.sufficientCcy" [ color = "white" ];
+  "TransferLib.transferOrTrade" -> "StructLib.sufficientTokens" [ color = "white" ];
+  "TransferLib.transferOrTrade" -> "StructLib.sufficientTokens" [ color = "white" ];
+  "TransferLib.transferOrTrade" -> "StructLib.transferCcy" [ color = "white" ];
+  "TransferLib.transferOrTrade" -> "StructLib.TransferCcyArgs" [ color = "white" ];
+  "TransferLib.transferOrTrade" -> "StructLib.transferCcy" [ color = "white" ];
+  "TransferLib.transferOrTrade" -> "StructLib.TransferCcyArgs" [ color = "white" ];
+  "TransferLib.transferOrTrade" -> "StructLib.transferCcy" [ color = "white" ];
+  "TransferLib.transferOrTrade" -> "StructLib.TransferCcyArgs" [ color = "white" ];
+  "TransferLib.transferOrTrade" -> "StructLib.transferCcy" [ color = "white" ];
+  "TransferLib.transferOrTrade" -> "StructLib.TransferCcyArgs" [ color = "white" ];
+  "TransferLib.transferOrTrade" -> "TransferLib.applyOriginatorCcyFees" [ color = "#1bc6a6" ];
+  "TransferLib.transferOrTrade" -> "TransferLib.applyOriginatorCcyFees" [ color = "#1bc6a6" ];
+  "TransferLib.transferOrTrade" -> "TransferLib.transferSplitSecTokens" [ color = "#1bc6a6" ];
+  "TransferLib.transferOrTrade" -> "TransferLib.calcFeeWithCapCollar" [ color = "#1bc6a6" ];
+  "TransferLib.transferOrTrade" -> "TransferLib.transferSplitSecTokens" [ color = "#1bc6a6" ];
+  "TransferLib.transferOrTrade" -> "TransferLib.transferSplitSecTokens" [ color = "#1bc6a6" ];
+  "TransferLib.transferOrTrade" -> "TransferLib.transferSplitSecTokens" [ color = "#1bc6a6" ];
+  "TransferLib.transferOrTrade" -> "TransferLib.calcFeeWithCapCollar" [ color = "#1bc6a6" ];
+  "TransferLib.transferOrTrade" -> "TransferLib.transferSplitSecTokens" [ color = "#1bc6a6" ];
+  "TransferLib.transferOrTrade" -> "TransferLib.transferSplitSecTokens" [ color = "#1bc6a6" ];
+  "TransferLib.transfer_feePreview" -> "TransferLib.checkStIds" [ color = "#1bc6a6" ];
+  "TransferLib.transfer_feePreview" -> "StructLib.FeesCalc" [ color = "white" ];
+  "TransferLib.transfer_feePreview" -> "TransferLib.calcFeeWithCapCollar" [ color = "#1bc6a6" ];
+  "TransferLib.transfer_feePreview" -> "TransferLib.calcFeeWithCapCollar" [ color = "#1bc6a6" ];
+  "TransferLib.transfer_feePreview" -> "TransferLib.calcFeeWithCapCollar" [ color = "#1bc6a6" ];
+  "TransferLib.transfer_feePreview" -> "TransferLib.calcFeeWithCapCollar" [ color = "#1bc6a6" ];
+  "TransferLib.transfer_feePreview" -> "StructLib.SetFeeArgs" [ color = "white" ];
+  "TransferLib.transfer_feePreview" -> "TransferLib.calcFeeWithCapCollar" [ color = "#1bc6a6" ];
+  "TransferLib.transfer_feePreview" -> "TransferLib.calcFeeWithCapCollar" [ color = "#1bc6a6" ];
+  "TransferLib.transfer_feePreview" -> "TransferLib.transferSplitSecTokens_Preview" [ color = "#1bc6a6" ];
+  "TransferLib.transfer_feePreview" -> "StructLib.FeesCalc" [ color = "white" ];
+  "TransferLib.transfer_feePreview" -> "TransferLib.calcFeeWithCapCollar" [ color = "#1bc6a6" ];
+  "TransferLib.transfer_feePreview" -> "TransferLib.transferSplitSecTokens_Preview" [ color = "#1bc6a6" ];
+  "TransferLib.transfer_feePreview" -> "StructLib.FeesCalc" [ color = "white" ];
+  "TransferLib.transfer_feePreview" -> "TransferLib.calcFeeWithCapCollar" [ color = "#1bc6a6" ];
+  "TransferLib.transfer_feePreview" -> "StMaster.transfer_feePreview" [ color = "white" ];
+  "TransferLib.transfer_feePreview" -> "StructLib.TransferArgs" [ color = "white" ];
+  "TransferLib.transfer_feePreview" -> "StMaster.transfer_feePreview" [ color = "white" ];
+  "TransferLib.transfer_feePreview" -> "StructLib.TransferArgs" [ color = "white" ];
+  "TransferLib.transfer_feePreview_ExchangeOnly" -> "TransferLib.checkStIds" [ color = "#1bc6a6" ];
+  "TransferLib.transfer_feePreview_ExchangeOnly" -> "StructLib.FeesCalc" [ color = "white" ];
+  "TransferLib.transfer_feePreview_ExchangeOnly" -> "TransferLib.calcFeeWithCapCollar" [ color = "#1bc6a6" ];
+  "TransferLib.transfer_feePreview_ExchangeOnly" -> "TransferLib.calcFeeWithCapCollar" [ color = "#1bc6a6" ];
+  "TransferLib.transfer_feePreview_ExchangeOnly" -> "TransferLib.calcFeeWithCapCollar" [ color = "#1bc6a6" ];
+  "TransferLib.transfer_feePreview_ExchangeOnly" -> "TransferLib.calcFeeWithCapCollar" [ color = "#1bc6a6" ];
+  "TransferLib.transfer_feePreview_ExchangeOnly" -> "StructLib.SetFeeArgs" [ color = "white" ];
+  "TransferLib.transfer_feePreview_ExchangeOnly" -> "TransferLib.calcFeeWithCapCollar" [ color = "#1bc6a6" ];
+  "TransferLib.transfer_feePreview_ExchangeOnly" -> "TransferLib.calcFeeWithCapCollar" [ color = "#1bc6a6" ];
+  "TransferLib.applyOriginatorCcyFees" -> "StructLib.transferCcy" [ color = "white" ];
+  "TransferLib.applyOriginatorCcyFees" -> "StructLib.TransferCcyArgs" [ color = "white" ];
+  "TransferLib.calcFeeWithCapCollar" -> "TransferLib.applyFeeStruct" [ color = "#1bc6a6" ];
+  "TransferLib.checkStIds" -> "StructLib.tokenExistsOnLedger" [ color = "white" ];
+  "TransferLib.checkStIds" -> "StructLib.tokenExistsOnLedger" [ color = "white" ];
+  "Erc20Lib.transfer" -> "Erc20Lib.transferInternal" [ color = "#1bc6a6" ];
+  "Erc20Lib.transferFrom" -> "Erc20Lib.transferInternal" [ color = "#1bc6a6" ];
+  "Erc20Lib.transferInternal" -> "StructLib.TransferArgs" [ color = "white" ];
+  "Erc20Lib.transferInternal" -> "TransferLib.transferOrTrade" [ color = "white" ];
+  "PayableLib.get_chainlinkRefPrice" -> "IChainlinkAggregator.latestAnswer" [ color = "white" ];
+  "PayableLib.setIssuerValues" -> "PayableLib.getCashflowData" [ color = "#1bc6a6" ];
+  "PayableLib.pay" -> "PayableLib.processSubscriberPayment" [ color = "#1bc6a6" ];
+  "PayableLib.processSubscriberPayment" -> "StructLib.TransferArgs" [ color = "white" ];
+  "PayableLib.processSubscriberPayment" -> "TransferLib.transferOrTrade" [ color = "white" ];
+  "PayableLib.issuerPay" -> "addr.transfer" [ color = "white" ];
+  "PayableLib.issuerPay" -> "PayableLib.resetIssuerPaymentBatch" [ color = "#1bc6a6" ];
+  "SafeMath.sub" -> "SafeMath.sub" [ color = "#1bc6a6" ];
+  "SafeMath.div" -> "SafeMath.div" [ color = "#1bc6a6" ];
+  "SafeMath.mod" -> "SafeMath.mod" [ color = "#1bc6a6" ];
+  "DataLoadable.loadSecTokenBatch" -> "LoadLib.loadSecTokenBatch" [ color = "white" ];
+  "DataLoadable.createLedgerEntry" -> "LoadLib.createLedgerEntry" [ color = "white" ];
+  "DataLoadable.addSecToken" -> "LoadLib.addSecToken" [ color = "white" ];
+  "DataLoadable.setTokenTotals" -> "LoadLib.setTokenTotals" [ color = "white" ];
+  "FuturesLib.setLedgerOverride" -> "FuturesLib.initMarginOverride" [ color = "#1bc6a6" ];
+  "FuturesLib.setLedgerOverride" -> "FuturesLib.feePerContractOverride" [ color = "#1bc6a6" ];
+  "FuturesLib.initMarginOverride" -> "StructLib.initLedgerIfNew" [ color = "white" ];
+  "FuturesLib.feePerContractOverride" -> "StructLib.initLedgerIfNew" [ color = "white" ];
+  "FuturesLib.openFtPos" -> "StructLib.sufficientCcy" [ color = "white" ];
+  "FuturesLib.openFtPos" -> "StructLib.sufficientCcy" [ color = "white" ];
+  "FuturesLib.openFtPos" -> "StructLib.transferCcy" [ color = "white" ];
+  "FuturesLib.openFtPos" -> "StructLib.TransferCcyArgs" [ color = "white" ];
+  "FuturesLib.openFtPos" -> "StructLib.transferCcy" [ color = "white" ];
+  "FuturesLib.openFtPos" -> "StructLib.TransferCcyArgs" [ color = "white" ];
+  "FuturesLib.openFtPos" -> "StructLib.initLedgerIfNew" [ color = "white" ];
+  "FuturesLib.openFtPos" -> "StructLib.initLedgerIfNew" [ color = "white" ];
+  "FuturesLib.openFtPos" -> "FuturesLib.setReservedAllFtPos" [ color = "#1bc6a6" ];
+  "FuturesLib.openFtPos" -> "FuturesLib.setReservedAllFtPos" [ color = "#1bc6a6" ];
+  "FuturesLib.takePay2" -> "FuturesLib.calcTakePay" [ color = "#1bc6a6" ];
+  "FuturesLib.takePay2" -> "FuturesLib.abs256" [ color = "#1bc6a6" ];
+  "FuturesLib.takePay2" -> "StructLib.emitTransferedLedgerCcy" [ color = "white" ];
+  "FuturesLib.takePay2" -> "StructLib.TransferCcyArgs" [ color = "white" ];
+  "FuturesLib.takePay2" -> "StructLib.emitTransferedLedgerCcy" [ color = "white" ];
+  "FuturesLib.takePay2" -> "StructLib.TransferCcyArgs" [ color = "white" ];
+  "FuturesLib.takePay2" -> "FuturesLib.abs256" [ color = "#1bc6a6" ];
+  "FuturesLib.takePay2" -> "StructLib.emitTransferedLedgerCcy" [ color = "white" ];
+  "FuturesLib.takePay2" -> "StructLib.TransferCcyArgs" [ color = "white" ];
+  "FuturesLib.takePay2" -> "StructLib.emitTransferedLedgerCcy" [ color = "white" ];
+  "FuturesLib.takePay2" -> "StructLib.TransferCcyArgs" [ color = "white" ];
+  "FuturesLib.takePay2" -> "StructLib.emitTransferedLedgerCcy" [ color = "white" ];
+  "FuturesLib.takePay2" -> "StructLib.TransferCcyArgs" [ color = "white" ];
+  "FuturesLib.combineFtPos" -> "StructLib.tokenExistsOnLedger" [ color = "white" ];
+  "FuturesLib.combineFtPos" -> "FuturesLib.abs64" [ color = "#1bc6a6" ];
+  "FuturesLib.combineFtPos" -> "FuturesLib.abs64" [ color = "#1bc6a6" ];
+  "FuturesLib.combineFtPos" -> "StructLib.tokenExistsOnLedger" [ color = "white" ];
+  "FuturesLib.combineFtPos" -> "FuturesLib.abs64" [ color = "#1bc6a6" ];
+  "FuturesLib.combineFtPos" -> "FuturesLib.abs64" [ color = "#1bc6a6" ];
+  "FuturesLib.setReservedAllFtPos" -> "FuturesLib.abs64" [ color = "#1bc6a6" ];
+  "FuturesLib.setReservedAllFtPos" -> "FuturesLib.abs64" [ color = "#1bc6a6" ];
+  "FuturesLib.setReservedAllFtPos" -> "FuturesLib.calcPosMargin" [ color = "#1bc6a6" ];
+  "FuturesLib.setReservedAllFtPos" -> "FuturesLib.abs256" [ color = "#1bc6a6" ];
+  "FuturesLib.setReservedAllFtPos" -> "StructLib.setReservedCcy" [ color = "white" ];
+  "Migrations.upgrade" -> "Migrations.setCompleted" [ color = "white" ];
+
+
+rankdir=LR
+node [shape=plaintext]
+subgraph cluster_01 { 
+label = "Legend";
+key [label=<<table border="0" cellpadding="2" cellspacing="0" cellborder="0">
+  <tr><td align="right" port="i1">Internal Call</td></tr>
+  <tr><td align="right" port="i2">External Call</td></tr>
+  <tr><td align="right" port="i3">Defined Contract</td></tr>
+  <tr><td align="right" port="i4">Undefined Contract</td></tr>
+  </table>>]
+key2 [label=<<table border="0" cellpadding="2" cellspacing="0" cellborder="0">
+  <tr><td port="i1">&nbsp;&nbsp;&nbsp;</td></tr>
+  <tr><td port="i2">&nbsp;&nbsp;&nbsp;</td></tr>
+  <tr><td port="i3" bgcolor="#445773">&nbsp;&nbsp;&nbsp;</td></tr>
+  <tr><td port="i4">
+    <table border="1" cellborder="0" cellspacing="0" cellpadding="7" color="#e8726d">
+      <tr>
+       <td></td>
+      </tr>
+     </table>
+  </td></tr>
+  </table>>]
+key:i1:e -> key2:i1:w [color="#1bc6a6"]
+key:i2:e -> key2:i2:w [color="white"]
+}
+}
