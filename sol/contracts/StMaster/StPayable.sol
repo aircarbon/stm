@@ -8,6 +8,7 @@ import "./StErc20.sol";
 
 import "../Libs/LedgerLib.sol";
 import "../Interfaces/StructLib.sol";
+import "../Interfaces/ReentrancyGuard.sol";
 import "../Libs/PayableLib.sol";
 
 abstract // solc 0.6
@@ -24,7 +25,7 @@ abstract // solc 0.6
   */
 
 contract StPayable is
-    StErc20 {
+    StErc20, ReentrancyGuard {
         
     // === CFT === V0 ** =>>> MVP -- CFT SPLIT LEDGER (central WL, central collateral, central spot transferOrTrade...)
     //
