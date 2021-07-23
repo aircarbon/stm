@@ -9,7 +9,6 @@ import "./StTransferable.sol";
 import "./StErc20.sol";
 import "./StPayable.sol";
 import "./DataLoadable.sol";
-import "./StFutures.sol";
 
 import "../Interfaces/StructLib.sol";
 
@@ -21,7 +20,7 @@ import "../Interfaces/StructLib.sol";
  */
 
 /** 
- * node process_sol_js && truffle compile --reset --all && grep \"bytecode\" build/contracts/* | awk '{print $1 " " length($3)/2}'
+ * node process_sol_js && truffle compile && grep \"bytecode\" build/contracts/* | awk '{print $1 " " length($3)/2}'
  *  22123: ... [upgrade sol 0.6.6: removed ctor setup, removed WL deprecated, removed payable unused]
  *  23576: ... FTs v0 (paused) - baseline
  *  22830: ... [removed all global counters, except total minted & burned]
@@ -33,8 +32,6 @@ import "../Interfaces/StructLib.sol";
  *  24478: ... [+ _tokens_base_id, getSecToken_BaseId()]
  *  23275: ... [+ _owners[], getOwners] 
  */
-
- // FIXME: 24kb limit exceeded after custody flag addition
 
  /**
   * @title Security Token Master
@@ -61,7 +58,7 @@ import "../Interfaces/StructLib.sol";
 
 contract StMaster
     is
-    StMintable, StBurnable, Collateralizable, StTransferable, DataLoadable, StFutures
+    StMintable, StBurnable, Collateralizable, StTransferable, DataLoadable //, StFutures (excluded in v1)
 {
     // === STM (AC COMMODITY) ===
     // TODO: getLedgerHashcode() segmented...
@@ -77,6 +74,8 @@ contract StMaster
 
     // contract properties
     string public name;
+    string public version;
+    string public unit; // the smallest (integer, non-divisible) security token unit, e.g. "KGs" or "TONS"
 
     /**
      * @dev returns the contract type
@@ -96,23 +95,6 @@ contract StMaster
      * @dev permanenty seals the contract; once sealed, no further addresses can be whitelisted
      */
      function sealContract() external { ld._contractSealed = true; }
-
-    string contractVersion;
-    string contractUnit; // the smallest (integer, non-divisible) security token unit, e.g. "KGs" or "TONS"
-
-    /**
-     * @dev returns the contract version
-     * @return deploymentVersion
-     * @param deploymentVersion returns the contract version
-     */
-    function version() external view returns (string memory deploymentVersion) { return contractVersion; }
-
-    /**
-     * @dev returns the contract unit
-     * @return deploymentUnit
-     * @param deploymentUnit returns the contract unit : kg or ton for commodity type and N/A for cashflow type
-     */
-    function unit() external view returns (string memory deploymentUnit) { return contractUnit; }
 
     // events -- (hack: see: https://ethereum.stackexchange.com/questions/11137/watching-events-defined-in-libraries)
     // need to be defined (duplicated) here - web3 can't see event signatures in libraries
@@ -216,8 +198,8 @@ contract StMaster
 
         // set common properties
         name = _contractName;
-        contractVersion = _contractVer;
-        contractUnit = _contractUnit;
+        version = _contractVer;
+        unit = _contractUnit;
 
         // contract type
         ld.contractType = _contractType;

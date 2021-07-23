@@ -19,16 +19,18 @@ library PayableLib {
     // Payment Batch Detail: INDEXER API /api/issuer-payment-batch-detail?paymentBatchId=<paymentBatchId> fetches payment batch detail
     event SubscriberPaid(uint32 indexed paymentId, uint32 indexed paymentBatchId, address indexed issuer, address subscriber, uint256 amount);
     
-    function get_chainlinkRefPrice(address chainlinkAggAddr) public view returns(int256) {
+    function get_chainlinkRefPrice(address chainlinkAggAddr) public view returns(int256 price) {
         //if (chainlinkAggAddr == address(0x0)) return 100000000; // $1 - cents*satoshis
         if (chainlinkAggAddr == address(0x0)) return -1;
         // Certik: (Major) ICA-01 | Incorrect Chainlink Interface
         // Resolved: (Major) ICA-01 | Upgraded Chainlink Aggregator Interface to V3
         
-        // Review: TODO - should be checking staleness values coming back from latestRoundData()
+        // Review: checking staleness values coming back from latestRoundData() based on a timer
+        uint256 delayInSeconds = 30 * 60; // 30 minutes
         IChainlinkAggregator ref = IChainlinkAggregator(chainlinkAggAddr);
-        ( , int256 answer, , , ) = ref.latestRoundData();
-        return answer;
+        ( , int256 answer, , uint256 updatedAt, ) = ref.latestRoundData();
+        require(updatedAt > (block.timestamp - delayInSeconds), "Chainlink: stale price");
+        price = answer;
     }
 
     //
@@ -116,7 +118,8 @@ library PayableLib {
     }
 
     // Certik: (Medium) PLL-02 | Inexistent Reentrancy Guard - A detailed analysis on the vulnerability required from Certik
-    // Review: TODO - Use a standard modifier to prevent re-entrancy; anything at uses .transfer() native
+    // Review: Use a standard modifier to prevent re-entrancy; 
+    // Ankur: Added an OpenZeppelin ReentrancyGuard on StPayable with a standard nonReentrant() modifier
     function processSubscriberPayment(
         StructLib.LedgerStruct storage ld,
         StructLib.StTypesStruct storage std,
