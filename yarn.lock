@@ -1423,10 +1423,17 @@ eslint-config-prettier@^8.3.0:
   resolved "https://registry.yarnpkg.com/eslint-config-prettier/-/eslint-config-prettier-8.3.0.tgz#f7471b20b6fe8a9a9254cc684454202886a2dd7a"
   integrity sha512-BgZuLUSeKzvlL/VUjx/Yb787VQ26RU3gGjA3iiFvdsp/2bMfVIWUVP7tjxtjS0e+HP409cPlPvNkQloz8C91ew==
 
-eslint-config-productsway@0.1.6:
-  version "0.1.6"
-  resolved "https://registry.yarnpkg.com/eslint-config-productsway/-/eslint-config-productsway-0.1.6.tgz#140da014c0d8729ca3abdaea405a1f5355d44fd9"
-  integrity sha512-RsZ/rROwOTsekBKjDXt4CtXq6H2YKDl2dHzMbomb2k6tDsMLcLB+Iz1HSSUrZ5e/YqvCkOLyyh+ovGNbK7PGxA==
+eslint-config-productsway@0.1.7:
+  version "0.1.7"
+  resolved "https://registry.yarnpkg.com/eslint-config-productsway/-/eslint-config-productsway-0.1.7.tgz#9759d7808190f110099e0339b66b7e2cdde7c249"
+  integrity sha512-0nQmd24I7NCLpWIE5Qg2t3b05XtB8OaDFFSgmB3DbeFFuxE51OrRVCdqCE2015YOq4O097z7brk+OWivI9/9Pw==
+  dependencies:
+    eslint-config-airbnb-typescript "^12.3.1"
+    eslint-config-prettier "^8.3.0"
+    eslint-plugin-import "^2.23.4"
+    eslint-plugin-jsx-a11y "^6.4.1"
+    eslint-plugin-react "^7.24.0"
+    eslint-plugin-react-hooks "^4.2.0"
 
 eslint-import-resolver-node@^0.3.4:
   version "0.3.4"
@@ -4281,7 +4288,7 @@ web3-shh@2.0.0-alpha.1:
     web3-providers "2.0.0-alpha.1"
     web3-utils "2.0.0-alpha.1"
 
-web3-utils@2.0.0-alpha.1:
+web3-utils@2.0.0-alpha.1, web3-utils@^2.0.0-alpha.1:
   version "2.0.0-alpha.1"
   resolved "https://registry.yarnpkg.com/web3-utils/-/web3-utils-2.0.0-alpha.1.tgz#231442adea3b58bca0c7185ee5b7743c01938682"
   integrity sha512-xZY9rPC/5S2utQV26x2oeWlBjs1cGwO+AAwv0smK2zjNi6UeTZjG9aZ/RJZJpToIapKhdtmQI6yZ8/ZQNDRGGg==
