@@ -62,7 +62,7 @@ abstract contract StLedger is
     /**
      * @dev returns the total count of all ledger owners
      * @return ledgerOwnerCount
-     * @param ledgerOwnerCount sreturns the total count of all ledger owners
+     * @param ledgerOwnerCount returns the total count of all ledger owners
      */
     function getLedgerOwnerCount() external view returns (uint256 ledgerOwnerCount) { return ld._ledgerOwners.length; }
 

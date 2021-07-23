@@ -399,7 +399,8 @@ library FuturesLib {
 
         // delete child tokens from the master list
         // Certik: (Major) FLL-08 | Potentially Misbehaving Position Combination - "children might be skipped/complete"
-        // Review: TODO -- check that # of supplied child positions == 
+        // Review: TODO -- check that # of supplied child positions
+        // Ankur: Agreed with Dom to take this up in the next iteration - Futures will not be a part of the first open-source version
         int64 childQty = 0;
         for (uint256 x = 0; x < a.child_StIds.length ; x++) {
             StructLib.PackedSt storage childSt = ld._sts[a.child_StIds[x]];

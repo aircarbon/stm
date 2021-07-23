@@ -14,7 +14,8 @@ contract Owned
 
     address payable deploymentOwner;
     // Certik: (Minor) OSM-07 | Inexistent Management Functionality The Owned contract implementation should be self-sufficient and possess adding and removing owners within it.
-    // Review: TODO - (Minor) OSM-07 ... pass array from parent into Owned
+    // Review: (Minor) OSM-07 ... pass array from parent into Owned
+    // Ankur: Passing owners list from StMaster to Owned ctor
     address[] owners;
 
     CustodyType public custodyType;
@@ -48,7 +49,7 @@ contract Owned
     modifier onlyOwner() {
         for (uint i = 0; i < owners.length; i++) {
             // Certik: (Minor) OSM-08 | Usage of tx.origin The use of tx.origin should be avoided for ownership-based systems given that firstly it can be tricked on-chain and secondly it will change its functionality once EIP-3074 is integrated.
-            // Review: HIPRI - (Minor) OSM-08 | changed tx.origin to msg.sender - tested ok for cashflow base.
+            // Review: (Minor) OSM-08 | changed tx.origin to msg.sender - tested ok for cashflow base.
             if (owners[i] == msg.sender) {  _; return; }
         }
         revert("Restricted");
