@@ -292,7 +292,7 @@ library StructLib {
     enum CashflowType { BOND, EQUITY }
     struct CashflowArgs { // v1: single-issuance, single-subscriber
 
-        CashflowType cashflowType;          // issuance type
+        CashflowType  cashflowType;           // issuance type
         uint256      term_Blks;             // total term/tenor, in blocks - (todo: 0 for perpetual?)
         uint256      bond_bps;              // rates: basis points per year on principal
         uint256      bond_int_EveryBlks;    // rates: interest due every n blocks

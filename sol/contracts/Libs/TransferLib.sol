@@ -25,7 +25,7 @@ library TransferLib {
         uint80                        originatorFeesPaidQty;
     }
     // Certik: (Minor) TRA-01 | Equal ID Transfers The transfers of equal IDs are not prohibited in the transferOrTrade function
-    // Review: TODO - (Minor) TRA-01 | Check with Dom as this might break critical transfer / trading functionality
+    // Review: TODO - (Minor) TRA-01 | Check with Certik as this might break critical transfer / trading functionality
     function transferOrTrade(
         StructLib.LedgerStruct storage   ld,
         StructLib.StTypesStruct storage  std,
