@@ -1,6 +1,5 @@
 import sqlConfig from './config';
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
 const sql = require('mssql');
 
 const pools: Record<string, any> = {};

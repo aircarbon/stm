@@ -1,9 +1,7 @@
-import { isBN, isBigNumber } from "web3-utils";
+import { isBN, isBigNumber } from 'web3-utils';
 
 // NOTE: It should have both number key and field name in the array
-export function isWeb3ReturnData(
-  values: Record<string, any> | Array<Record<string | number, any>> | null
-): boolean {
+export function isWeb3ReturnData(values: Record<string, any> | Array<Record<string | number, any>> | null): boolean {
   if (Array.isArray(values)) {
     let hasKeyNumber = false;
     let hasFieldName = false;
@@ -19,11 +17,7 @@ export function isWeb3ReturnData(
   }
 
   const keys = Object.keys(values || {});
-  return (
-    keys.length > 0 &&
-    Number.isInteger(Number(keys[0])) &&
-    keys.length % 2 === 0
-  );
+  return keys.length > 0 && Number.isInteger(Number(keys[0])) && keys.length % 2 === 0;
 }
 
 /**
@@ -37,7 +31,7 @@ export function isSameArrayDataType(values: Array<any>) {
 
     const dataType = typeof values[0];
 
-    if (!["string", "number"].includes(dataType)) return false;
+    if (!['string', 'number'].includes(dataType)) return false;
 
     return !values.some((item) => typeof item !== dataType);
   }
@@ -53,7 +47,7 @@ export function decodeWeb3Object(values: any): any {
   // skip decode for those cases: string, number, array<string|number>
   if (
     !values || // null, undefined
-    ["string", "number"].includes(typeof values) || // number or string
+    ['string', 'number'].includes(typeof values) || // number or string
     isBN(values) || // big number
     isBigNumber(values) || // big number
     (Array.isArray(values) && isSameArrayDataType(values)) // Array[string | number]
@@ -102,8 +96,7 @@ export function decodeWeb3Object(values: any): any {
   const result: Record<string, any> = {};
 
   Object.keys(values || {}).forEach((field) => {
-    if (Number.isNaN(Number(field)))
-      result[field] = decodeWeb3Object(values[field]);
+    if (Number.isNaN(Number(field))) result[field] = decodeWeb3Object(values[field]);
   });
   return result;
 }
