@@ -8,7 +8,7 @@ const StMaster = artifacts.require("StMaster");
 const series = require("async/series");
 
 const CONST = require("./const");
-const { helpers } = require("../orm/dist");
+const { helpers } = require("../orm/build");
 
 process.on("unhandledRejection", console.error);
 

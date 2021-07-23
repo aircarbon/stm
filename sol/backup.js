@@ -5,7 +5,7 @@ const argv = require("yargs-parser")(process.argv.slice(2));
 const StMaster = artifacts.require("StMaster");
 
 const CONST = require("./const");
-const { helpers } = require("../orm/dist");
+const { helpers } = require("../orm/build");
 
 process.on("unhandledRejection", console.error);
 
