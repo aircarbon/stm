@@ -1,18 +1,14 @@
-/* eslint-disable no-underscore-dangle */
-import { BN } from "ethereumjs-util";
-import { fromWei, toBN, Hex, toWei } from "web3-utils";
+import { BN } from 'ethereumjs-util';
+import { fromWei, toBN, Hex, toWei } from 'web3-utils';
 
 /**
  *
  * @param value
  * @param decimals
  */
-export function convertUnit(
-  value: { _hex: Hex } | number | undefined,
-  decimals = 0
-): number {
+export function convertUnit(value: { _hex: Hex } | number | undefined, decimals = 0): number {
   let inputValue = 0;
-  if (typeof value === "number") {
+  if (typeof value === 'number') {
     inputValue = value;
   } else {
     inputValue = Number(toBN(value?._hex ?? 0).toString());
@@ -50,7 +46,7 @@ export function hex2usd(cents: { _hex: Hex }): number {
  * @param wei
  */
 export function hex2eth(wei: { _hex: Hex }): number | string {
-  return !wei?._hex ? 0 : fromWei(toBN(wei._hex), "ether");
+  return !wei?._hex ? 0 : fromWei(toBN(wei._hex), 'ether');
 }
 
 /**
@@ -66,7 +62,8 @@ export function usdToCents(val: number): number {
  * @param val
  */
 export function ethToWei(val: number): BN {
-  return toWei(toBN(val * 10 ** 18), "wei");
+  // @ts-ignore Property 'modrn' is missing in type 'import("/stm/node_modules/@types/bn.js/index")' but required in type 'import("/stm/node_modules/ethereumjs-util/node_modules/@types/bn.js/index")'.ts(2741)
+  return toWei(toBN(val * 10 ** 18), 'wei');
 }
 
 /**
@@ -76,9 +73,7 @@ export function ethToWei(val: number): BN {
  */
 export function truncateMiddle(s: string, n = 16): string {
   return s?.length > n && s?.length > 0
-    ? `${s.substr(0, s.length / 2 - (s.length - n) / 2)}…${s.substr(
-        s.length / 2 + (s.length - n) / 2
-      )}`
+    ? `${s.substr(0, s.length / 2 - (s.length - n) / 2)}…${s.substr(s.length / 2 + (s.length - n) / 2)}`
     : s;
 }
 

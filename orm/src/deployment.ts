@@ -1,7 +1,6 @@
-import { getPool } from './pool';
+import { getPool } from "./pool";
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const sql = require('mssql');
+const sql = require("mssql");
 
 /**
  * Get deployment by network id
@@ -13,10 +12,14 @@ const sql = require('mssql');
  * @param networkId string
  */
 export async function GetDeployedContracts(networkId: string) {
-  const sqlPool = await getPool('admin');
-  const result = await // AND clause stops all but latest verions being returned on dev networks
-  sqlPool.request().input('network_id', sql.NVarChar, networkId).input('contract_type', sql.NVarChar, 'CASHFLOW_BASE')
-    .query(`SELECT DISTINCT a.[contract_enum] FROM [contract] a WHERE a.[network_id] = @network_id \
+  const sqlPool = await getPool("admin");
+  const result =
+    await // AND clause stops all but latest verions being returned on dev networks
+    sqlPool
+      .request()
+      .input("network_id", sql.NVarChar, networkId)
+      .input("contract_type", sql.NVarChar, "CASHFLOW_BASE")
+      .query(`SELECT DISTINCT a.[contract_enum] FROM [contract] a WHERE a.[network_id] = @network_id \
             AND a.[contract_type] NOT LIKE @contract_type
             AND\
               (a.[contract_ver] = (SELECT TOP 1 [contract_ver] FROM [contract] WHERE [contract_enum] = a.[contract_enum] AND [contract_type] = a.[contract_type] ORDER BY [id] DESC)\
@@ -31,14 +34,17 @@ export async function GetDeployedContracts(networkId: string) {
  * @param contractName
  */
 
-export async function GetDeployedContractVersions(networkId: string, contractName: string) {
-  const sqlPool = await getPool('admin');
+export async function GetDeployedContractVersions(
+  networkId: string,
+  contractName: string
+) {
+  const sqlPool = await getPool("admin");
   const result = await sqlPool
     .request()
-    .input('network_id', sql.NVarChar, networkId)
-    .input('contract_enum', sql.NVarChar, contractName)
+    .input("network_id", sql.NVarChar, networkId)
+    .input("contract_enum", sql.NVarChar, contractName)
     .query(
-      `SELECT DISTINCT [contract_ver] FROM [contract] WHERE [network_id] = @network_id AND [contract_enum] = @contract_enum ORDER BY 1 DESC`,
+      `SELECT DISTINCT [contract_ver] FROM [contract] WHERE [network_id] = @network_id AND [contract_enum] = @contract_enum ORDER BY 1 DESC`
     );
   return result;
 }
@@ -50,19 +56,23 @@ export async function GetDeployedContractVersions(networkId: string, contractNam
  * @param contractVer
  */
 
-export async function GetDeployment(networkId: string, contractName: string, contractVer: string) {
-  const sqlPool = await getPool('admin');
+export async function GetDeployment(
+  networkId: string,
+  contractName: string,
+  contractVer: string
+) {
+  const sqlPool = await getPool("admin");
   const result = await sqlPool
     .request()
-    .input('network_id', sql.NVarChar, networkId)
-    .input('contract_enum', sql.NVarChar, contractName)
-    .input('contract_ver', sql.NVarChar, contractVer)
+    .input("network_id", sql.NVarChar, networkId)
+    .input("contract_enum", sql.NVarChar, contractName)
+    .input("contract_ver", sql.NVarChar, contractVer)
     .query(
       `SELECT TOP 1 * FROM [contract] \
        WHERE [network_id] = @network_id \
        AND [contract_enum] = @contract_enum \
        AND [contract_ver] = @contract_ver \
-       ORDER BY [deployed_utc] DESC`,
+       ORDER BY [deployed_utc] DESC`
     );
   return result;
 }
@@ -72,17 +82,20 @@ export async function GetDeployment(networkId: string, contractName: string, con
  * @param networkId
  * @param contractAddr
  */
-export async function GetDeploymentByAddress(networkId: string, contractAddr: string) {
-  const sqlPool = await getPool('admin');
+export async function GetDeploymentByAddress(
+  networkId: string,
+  contractAddr: string
+) {
+  const sqlPool = await getPool("admin");
   const result = await sqlPool
     .request()
-    .input('network_id', sql.NVarChar, networkId)
-    .input('addr', sql.NVarChar, contractAddr)
+    .input("network_id", sql.NVarChar, networkId)
+    .input("addr", sql.NVarChar, contractAddr)
     .query(
       `SELECT TOP 1 * FROM [contract] \
             WHERE [network_id] = @network_id \
             AND [addr] = @addr \
-            ORDER BY [deployed_utc] DESC`,
+            ORDER BY [deployed_utc] DESC`
     );
   return result;
 }
@@ -114,7 +127,9 @@ function parameterizedQueryForInWithGroupBy({
     request.input(parameterName, type, values[index]);
     parameterNames.push(`@${parameterName}`);
   }
-  return `${columnName} IN (${parameterNames.join(',')}) group by ${columnName}`;
+  return `${columnName} IN (${parameterNames.join(
+    ","
+  )}) group by ${columnName}`;
 }
 
 /**
@@ -122,20 +137,25 @@ function parameterizedQueryForInWithGroupBy({
  * @param networkId
  * @param contractAddresses
  */
-export async function GetDeploymentsByAddresses(networkId: string, contractAddresses: Array<string>) {
-  const sqlPool = await getPool('admin');
+export async function GetDeploymentsByAddresses(
+  networkId: string,
+  contractAddresses: Array<string>
+) {
+  const sqlPool = await getPool("admin");
   const request = await sqlPool.request();
   const parameterizedQuery = `SELECT * FROM [contract] WHERE [network_id] = @network_id AND [id] IN (
-    SELECT MAX(id) FROM [contract] WHERE 
+    SELECT MAX(id) FROM [contract] WHERE
       ${parameterizedQueryForInWithGroupBy({
         request,
-        columnName: '[addr]',
-        parameterNamePrefix: 'addr',
+        columnName: "[addr]",
+        parameterNamePrefix: "addr",
         type: sql.NVarChar,
         values: contractAddresses,
       })}
   )`;
-  const result = await request.input('network_id', sql.NVarChar, networkId).query(parameterizedQuery);
+  const result = await request
+    .input("network_id", sql.NVarChar, networkId)
+    .query(parameterizedQuery);
   return result;
 }
 
@@ -144,17 +164,20 @@ export async function GetDeploymentsByAddresses(networkId: string, contractAddre
  * @param networkId
  * @param contractName
  */
-export async function GetDeploymentByName(networkId: string, contractName: string) {
-  const sqlPool = await getPool('admin');
+export async function GetDeploymentByName(
+  networkId: string,
+  contractName: string
+) {
+  const sqlPool = await getPool("admin");
   const result = await sqlPool
     .request()
-    .input('network_id', sql.NVarChar, networkId)
-    .input('contract_enum', sql.NVarChar, contractName)
+    .input("network_id", sql.NVarChar, networkId)
+    .input("contract_enum", sql.NVarChar, contractName)
     .query(
       `SELECT TOP 1 * FROM [contract] \
             WHERE [network_id] = @network_id \
             AND [contract_enum] = @contract_enum \
-            ORDER BY [deployed_utc] DESC`,
+            ORDER BY [deployed_utc] DESC`
     );
   return result;
 }
@@ -164,17 +187,20 @@ export async function GetDeploymentByName(networkId: string, contractName: strin
  * @param networkId
  * @param contractType
  */
-export async function GetDeploymentByType(networkId: string, contractType: string) {
-  const sqlPool = await getPool('admin');
+export async function GetDeploymentByType(
+  networkId: string,
+  contractType: string
+) {
+  const sqlPool = await getPool("admin");
   const result = await sqlPool
     .request()
-    .input('network_id', sql.NVarChar, networkId)
-    .input('contract_type', sql.NVarChar, contractType)
+    .input("network_id", sql.NVarChar, networkId)
+    .input("contract_type", sql.NVarChar, contractType)
     .query(
       `SELECT TOP 1 * FROM [contract] \
             WHERE [network_id] = @network_id \
             AND [contract_type] = @contract_type \
-            ORDER BY [deployed_utc] DESC`,
+            ORDER BY [deployed_utc] DESC`
     );
   return result;
 }
@@ -206,23 +232,26 @@ export async function SaveDeployment({
   txHash: string;
   symbol: string;
 }) {
-  const sqlPool = await getPool('erc20');
+  const sqlPool = await getPool("erc20");
   const result = await sqlPool
     .request()
-    .input('contract_enum', sql.NVarChar, contractName)
-    .input('network_id', sql.Int, networkId)
-    .input('addr', sql.NVarChar, deployedAddress)
-    .input('host_name', sql.NVarChar, deployerHostName)
-    .input('ip_v4', sql.NVarChar, deployerIpv4)
-    .input('abi', sql.NVarChar, deployedAbi)
-    .input('contractVer', sql.NVarChar, contractVer)
-    .input('contractType', sql.NVarChar, contractType)
-    .input('txHash', sql.NVarChar, txHash)
-    .input('symbol', sql.NVarChar, symbol)
+    .input("contract_enum", sql.NVarChar, contractName)
+    .input("network_id", sql.Int, networkId)
+    .input("addr", sql.NVarChar, deployedAddress)
+    .input("host_name", sql.NVarChar, deployerHostName)
+    .input("ip_v4", sql.NVarChar, deployerIpv4)
+    .input("abi", sql.NVarChar, deployedAbi)
+    .input("contractVer", sql.NVarChar, contractVer)
+    .input("contractType", sql.NVarChar, contractType)
+    .input("txHash", sql.NVarChar, txHash)
+    .input("symbol", sql.NVarChar, symbol)
     .query(
       `INSERT INTO [contract] VALUES \
-      (@contract_enum, @network_id, GETUTCDATE(), @addr, @host_name, @ip_v4, @abi, @contractVer, @contractType, @txHash, @symbol)`,
+      (@contract_enum, @network_id, GETUTCDATE(), @addr, @host_name, @ip_v4, @abi, @contractVer, @contractType, @txHash, @symbol)`
     );
-  console.log(`DB: saved contract deployment network ${networkId} @ ${deployedAddress} - ok`, result.rowsAffected);
+  console.log(
+    `DB: saved contract deployment network ${networkId} @ ${deployedAddress} - ok`,
+    result.rowsAffected
+  );
   return true;
 }
