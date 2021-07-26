@@ -21,6 +21,7 @@
    },
    "scripts": {
       "start": "ts-node-dev src/migrate.ts",
+      "prepare": "yarn run build",
       "db:migration": "ts-node-dev ./node_modules/.bin/typeorm migration:run",
       "prebuild": "rimraf build",
       "build:watch": "tsc -w --module commonjs",
