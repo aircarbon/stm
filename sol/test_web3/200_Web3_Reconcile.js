@@ -1,0 +1,91 @@
+const assert = require("assert");
+const EthereumJsTx = require("ethereumjs-tx");
+const chalk = require("chalk");
+const BN = require("bn.js");
+const db = require("../../orm/build");
+
+const CONST = require("../const.js");
+process.env.WEB3_NETWORK_ID = Number(process.env.NETWORK_ID || 888);
+
+const OWNER_NDX = 0;
+var OWNER, OWNER_privKey;
+
+describe(`Contract Web3 Interface`, async () => {
+  //
+  //  AC various
+  //       ("export INSTANCE_ID=local && mocha test_web3 --timeout 10000000 --exit")
+  //       ("export INSTANCE_ID=DEV && mocha test_web3 --timeout 10000000 --exit")
+  //       ("export INSTANCE_ID=DEMO && mocha test_web3 --timeout 10000000 --exit")
+  //       ("export INSTANCE_ID=PROD_56 && mocha test_web3 --timeout 10000000 --exit")
+  //
+
+  // iterate over all ledger entries, query all ST quantities...
+  it(`web3 direct - reconciliation: _spot_totalMintedQty`, async () => {
+
+    console.log(`name: ${(await await CONST.web3_call("name", []))}`);
+    console.log(`version: ${(await await CONST.web3_call("version", []))}`);
+    console.log(`unit: ${(await await CONST.web3_call("unit", []))}`);
+    console.log(`getSecToken_totalMintedQty: ${(await await CONST.web3_call("getSecToken_totalMintedQty", []))}`);
+
+    CONST.consoleOutput(false);
+    //if ((await CONST.web3_call("getContractType", [])) != CONST.contractType.COMMODITY) { this.skip(); return; }
+    const types = (await CONST.web3_call("getSecTokenTypes", [])).tokenTypes;
+    console.log("types", types.map(p => p.name).join(', '));
+
+    // (A) iterate LEs, get STs from all LEs
+    const ledgerOwners = await CONST.web3_call("getLedgerOwners", []);
+    console.group("A");
+    var tot_minted_A = 0;
+    var tot_countST_A = 0;
+    for (var ledgerOwner of ledgerOwners) {
+        const ledgerEntry = await CONST.web3_call("getLedgerEntry", [ledgerOwner]);
+        const ccyInfo = [], tokInfo = [];
+        for (var ccy of ledgerEntry.ccys) {
+            ccyInfo.push(`name:${ccy.name} bal:${ccy.balance.toString()}`);
+        }
+        for (var token of ledgerEntry.tokens) {
+            const bn = new BN(token.stId.toString());
+            tokInfo.push(chalk.dim(`tokTypeId:${token.tokTypeId} batchId:${token.batchId} stId:0x${bn.toString(16)} currentQty:${token.currentQty} mintedQty:${token.mintedQty}`));
+            tot_minted_A += Number(token.mintedQty);
+            tot_countST_A++;
+        }
+        console.log(`${ledgerOwner} ${ccyInfo.join(" ")}\n\t${tokInfo.join("\n\t")}`);
+    }
+    console.log(`ledgerOwners.length: ${ledgerOwners.length}`); // prod: 41
+    console.log(`tot_countST_A: ${tot_countST_A}`); // prod: 77
+    console.log(`tot_minted_A: ${tot_minted_A}`); // prod: 1115266000
+    console.log(`getSecToken_totalMintedQty: ${(await await CONST.web3_call("getSecToken_totalMintedQty", []))}`); // prod: 1698725000
+    console.groupEnd("A");
+
+    // (2) iterate STs directly
+    console.group("B");
+    const baseStId = (await CONST.web3_call("getSecToken_BaseId", [])).toString(10);
+    const maxStId = (await CONST.web3_call("getSecToken_MaxId", [])).toString(10);
+    console.log("baseStId", baseStId);
+    console.log("maxStId", maxStId);
+    var tot_minted_B = 0;
+    var tot_countST_B = 0;
+    for (var i = baseStId ; i <= maxStId ; i++) {
+        const token = (await CONST.web3_call("getSecToken", [i]));
+        const bn = new BN(token.stId.toString());
+        if (Number(token.currentQty) != Number(token.mintedQty)) {
+            console.log(chalk.dim(`tokTypeId:${token.tokTypeId} batchId:${token.batchId} stId:0x${bn.toString(16)} currentQty:${token.currentQty} mintedQty:${token.mintedQty}`));
+        }
+        tot_minted_B += Number(token.mintedQty);
+        tot_countST_B++;
+    }
+    console.log(`tot_countST_B: ${tot_countST_B}`); // 96
+    console.log(`tot_minted_B: ${tot_minted_B}`); // prod: 1817787000
+    console.log(`getSecToken_totalMintedQty: ${(await await CONST.web3_call("getSecToken_totalMintedQty", []))}`); // prod: 1698725000
+    console.groupEnd("B");
+
+    // ... when burning a full ST: it doesn't get removed from the _sts[] list (only from the ledger)
+    // (hence difference between tot_countST_B && tot_countST_A?)
+    // i.e. the consistency check fail (1) is INVALID: ledger ST minted !== spot_totalMinted
+    //   (the latter is all time, the former is current)
+
+    // that still leaves discrepancy between all STs across all time !== _spot_totalMintedQty (it should be)
+
+    // separately: check that the 77 "live" (non-burned) STs for the 41 ledger entries === the actual physical amount held
+  });
+});

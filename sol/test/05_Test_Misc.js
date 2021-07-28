@@ -33,7 +33,7 @@ contract("StMaster", accounts => {
         if (CONST.logTestAccountUsage)
             console.log(`addrNdx: ${global.TaddrNdx} - contract @ ${stm.address} (owner: ${accounts[0]})`);
     });
-
+    
     // it(`misc - (commodity) should have default USD $3/1m tokens, mirrored`, async function() {
     //     const gfUsd = await stm.getFee(CONST.getFeeType.CCY, CONST.ccyType.USD, CONST.nullAddr);
     //     if (await stm.getContractType() != CONST.contractType.COMMODITY) this.skip();
@@ -44,22 +44,22 @@ contract("StMaster", accounts => {
     // });
 
     // // https://iancoleman.io/bip39/#english
-    it(`misc - bip39 - should be able to use a maximum entropy (24 word = 256-bit) BIP39 mnemonic (BIP44 HD)`, async () => {
-        console.log('> Enter mnemonic:');
-        for await (const mnemonic of rl) {
-            console.log('Mnemonic: ', mnemonic);
-            for (let i=0 ; i < 20 ; i++) {
-                const x = await CONST.getAccountAndKey(i,
-                    mnemonic
-                    );
-                console.log(`#${i} addr: ${x.addr} privKey: ${x.privKey}`);
-                // if (i==0) {
-                //     assert(x.privKey == '...', 'unexpected key')
-                // }
-            }
-            break;
-        }
-    });
+    // it(`misc - bip39 - should be able to use a maximum entropy (24 word = 256-bit) BIP39 mnemonic (BIP44 HD)`, async () => {
+    //     console.log('> Enter mnemonic:');
+    //     for await (const mnemonic of rl) {
+    //         console.log('Mnemonic: ', mnemonic);
+    //         for (let i=0 ; i < 20 ; i++) {
+    //             const x = await CONST.getAccountAndKey(i,
+    //                 mnemonic
+    //                 );
+    //             console.log(`#${i} addr: ${x.addr} privKey: ${x.privKey}`);
+    //             // if (i==0) {
+    //             //     assert(x.privKey == '...', 'unexpected key')
+    //             // }
+    //         }
+    //         break;
+    //     }
+    // });
 
     // it(`misc - bip39 - should be able to generate Binace Smart Chain (BSC) (eth-compat) address from BIP39 mnemonic (BIP44 HD)`, async () => {
     //     for (let i=0 ; i < 10 ; i++) {

@@ -491,7 +491,7 @@ function getTestContextWeb3(useWs) {
           web3: new Web3(
             useWs
               ? "wss://ac-prod1.aircarbon.co:9546"
-              : "https://ac-prod1.aircarbon.co:9545"
+              : "https://bsc-dataseed.binance.org"
           ),
           ethereumTxChain: {
             common: EthereumJsCommon.forCustomChain(
