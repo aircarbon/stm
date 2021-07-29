@@ -1,12 +1,12 @@
-const _ = require("lodash");
-const chalk = require("chalk");
-const BN = require("bn.js");
-const os = require("os");
-const publicIp = require("public-ip");
+const _ = require('lodash');
+const chalk = require('chalk');
+const BN = require('bn.js');
+const os = require('os');
+const publicIp = require('public-ip');
 
-const CONST = require("../const.js");
-const db = require("../../orm/build");
-const { assert } = require("console");
+const CONST = require('../const.js');
+const  db  = require('../../orm/build');
+const { assert } = require('console');
 
 module.exports = {
 
@@ -111,7 +111,7 @@ module.exports = {
                 // Deploy StMaster
                 //
                 stmAddr = await deployer.deploy(StMaster,
-                    owners, 
+                    owners,
                     contractType == 'CASHFLOW_BASE'       ? CONST.contractType.CASHFLOW_BASE :
                     contractType == 'CASHFLOW_CONTROLLER' ? CONST.contractType.CASHFLOW_CONTROLLER :
                                                             CONST.contractType.COMMODITY,

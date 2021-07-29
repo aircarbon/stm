@@ -9,7 +9,6 @@ import "./StTransferable.sol";
 import "./StErc20.sol";
 import "./StPayable.sol";
 import "./DataLoadable.sol";
-
 import "../Interfaces/StructLib.sol";
 
 // https://diligence.consensys.net/blog/2019/09/how-to-prepare-for-a-smart-contract-audit/
@@ -20,7 +19,7 @@ import "../Interfaces/StructLib.sol";
  */
 
 /** 
- * node process_sol_js && truffle compile && grep \"bytecode\" build/contracts/* | awk '{print $1 " " length($3)/2}'
+ *  node process_sol_js && truffle compile && grep \"bytecode\" build/contracts/* | awk '{print $1 " " length($3)/2}'
  *  22123: ... [upgrade sol 0.6.6: removed ctor setup, removed WL deprecated, removed payable unused]
  *  23576: ... FTs v0 (paused) - baseline
  *  22830: ... [removed all global counters, except total minted & burned]
@@ -83,7 +82,7 @@ contract StMaster
      * @param contractType returns the contract type<br/>0: commodity token<br/>1: cashflow token<br/>2: cashflow controller
      */
     function getContractType() external view returns(StructLib.ContractType contractType) { return ld.contractType; }
-
+    
     /**
      * @dev returns the contract seal status
      * @return isSealed
@@ -95,6 +94,7 @@ contract StMaster
      * @dev permanenty seals the contract; once sealed, no further addresses can be whitelisted
      */
      function sealContract() external { ld._contractSealed = true; }
+
 
     // events -- (hack: see: https://ethereum.stackexchange.com/questions/11137/watching-events-defined-in-libraries)
     // need to be defined (duplicated) here - web3 can't see event signatures in libraries

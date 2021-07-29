@@ -33,11 +33,6 @@ library PayableLib {
         price = answer;
     }
 
-    //
-    // TODO: re-entrancy guards, and .call instead of .transfer
-    //  https://diligence.consensys.net/blog/2019/09/stop-using-soliditys-transfer-now/
-    //
-
     function setIssuerValues(
         StructLib.LedgerStruct storage ld,
         StructLib.CashflowStruct storage cashflowData,
