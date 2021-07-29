@@ -40,6 +40,7 @@ async function processFile(filePath) {
     
     // scan source file; skip if possible
     const readFileName = path.parse(filePath).base;
+    if (filePath.includes("node_modules")) return;
     if (!(processFileNames.length === 0 || processFileNames.includes(readFileName))) return;
     if (readFileName.includes('_OUT')) return;
     if (readFileName === thisScriptFile) return;

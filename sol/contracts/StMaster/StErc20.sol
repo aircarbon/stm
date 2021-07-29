@@ -37,7 +37,8 @@ abstract contract StErc20 is StFees
     /**
      * @dev add multiple whitelist account addresses by deployment owners only
      * @param addr list of account addresses to be whitelisted
-     */    
+     */
+
     // Certik: SES-02 | Function Visibility Optimization
     // Review: Replaced public with external and memory with calldata for gas optimization
     function whitelistMany(address[] calldata addr) external onlyOwner() {
