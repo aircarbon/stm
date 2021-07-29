@@ -116,8 +116,7 @@ contract StPayable is
 //#     /**
 //#      * @dev token subscriptions in USD, ETH or BNB for cashflow token (base)
 //#      */
-//#     // TODO: add re-entrancy guard here, add flag to cashflowdata??
-//#     receive() external payable onlyWhenReadWrite() {
+//#     receive() external payable nonReentrant() onlyWhenReadWrite() {
 //#         PayableLib.pay(ld, std, ctd, cashflowData, globalFees, deploymentOwner, get_ethUsd(), get_bnbUsd());
 //#     }
 //#     
@@ -126,8 +125,7 @@ contract StPayable is
 //#      * @dev issuer payments in ETH or BNB for cashflow token (base)
 //#      * @param count next token holders from ledger to be paid in the payment batch
 //#      */
-//#     // TODO: add re-entrancy guard here, add flag to cashflowdata??
-//#     function receiveIssuerPaymentBatch(uint32 count) external payable onlyWhenReadWrite() {
+//#     function receiveIssuerPaymentBatch(uint32 count) external payable nonReentrant() onlyWhenReadWrite() {
 //#         PayableLib.issuerPay(count, ipbd, ld, cashflowData);
 //#     }
 //# 
