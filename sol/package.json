@@ -8,10 +8,11 @@
     "test": "test"
   },
   "scripts": {
+    "ganache": "INSTANCE_ID=local node ganache",
     "devInitSealContract": "node devInitSealContract",
     "test": "truffle test",
     "solium:lint": "solium lint -d ./contracts",
-    "migrate": "rimraf -rf ./build/contracts && export INSTANCE_ID=local && node process_sol_js && truffle migrate --network development -f 2 --to 2 --reset",
+    "migrate": "rimraf -rf ./build/contracts && export INSTANCE_ID=local && node process_sol_js && truffle migrate -f 2 --to 2",
     "console": "truffle console",
     "dev": "truffle develop",
     "ft": "cross-env WEB3_NETWORK_ID=888 NETWORK_ID=888 INSTANCE_ID=local node ./jobs/ft_job TEST_0"
@@ -34,6 +35,7 @@
     "lodash": "^4.17.21",
     "luxon": "^1.22.2",
     "psol": "^1.0.9",
+    "shelljs": "^0.8.4",
     "tcharts.js": "0.0.4",
     "web3-provider-engine": "^16.0.0"
   },
