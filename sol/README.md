@@ -107,10 +107,14 @@ If you see `Error: invalid reporter "eth-gas-reporter"` -- try running `npm i` i
 ## Data migration
 
 ```sh
+# Create folder for backup data
+mkdir data
 # Backup
-INSTANCE_ID=local truffle exec backup.js -s='cada1b5846aa836d60c00f1ed77d04401c9e421e' --network=bsc_testnet_bn
+INSTANCE_ID=local truffle exec backup.js -s='cada1b5846aa836d60c00f1ed77d04401c9e421e' -h=off --network=bsc_testnet_bn
 # Deploy new contract on local network
 export INSTANCE_ID=UAT_80001_AC && node process_sol_js && truffle compile && RESTORE_CONTRACT=YES truffle migrate --network matic_testnet -f 2 --to 2
 # Restore
 INSTANCE_ID=UAT_80001_AC truffle exec restore.js -s='cada1b5846aa836d60c00f1ed77d04401c9e421e' -t='27f090810aDDFF814a3991B23666163f843fDf3f' --network=matic_testnet
+# Validate the hash/data after migration
+INSTANCE_ID=local truffle exec backup.js -s='27f090810aDDFF814a3991B23666163f843fDf3f' -h=off --network=matic_testnet
 ```
