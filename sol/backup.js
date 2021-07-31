@@ -1,16 +1,26 @@
 // @ts-check
-const fs = require("fs");
-const argv = require("yargs-parser")(process.argv.slice(2));
+const fs = require('fs');
+const { hexToNumberString, soliditySha3 } = require('web3-utils');
+const argv = require('yargs-parser')(process.argv.slice(2));
 // @ts-ignore artifacts from truffle
-const StMaster = artifacts.require("StMaster");
+const StMaster = artifacts.require('StMaster');
 
-const CONST = require("./const");
-const { helpers } = require("../orm/build");
+const { getLedgerHash } = require('./getLedgerHash');
+const CONST = require('./const');
+const { helpers } = require('../orm/build');
 
-process.on("unhandledRejection", console.error);
+process.on('unhandledRejection', console.error);
+
+function getLedgerHashOffChain(data, mod, n) {
+  const hashes = [];
+  for (n = 0; n < mod; n++) {
+    hashes.push(getLedgerHash(data, mod, n));
+  }
+  return hashes.sort().join(',');
+}
 
 /**
- * Usage: `truffle exec backup.js -s=ADDR [--network <name>] [--compile]`,
+ * Usage: `INSTANCE_ID=local truffle exec backup.js -s=ADDR -h=[on|off] [--network <name>] [--compile]`,
  * @link https://github.com/trufflesuite/truffle/issues/889#issuecomment-522581580
  */
 module.exports = async (callback) => {
@@ -36,10 +46,7 @@ module.exports = async (callback) => {
   const unit = await contract.unit();
   const symbol = await contract.symbol();
   const decimals = await contract.decimals();
-  const network = argv?.network || "development";
-  // Note: we might got to { code: -32000, message: 'execution reverted' } on BSC Mainnet/Testnet with Binance nodes
-  // only works with our private node
-  const ledgerHash = await CONST.getLedgerHashcode(contract);
+  const network = argv?.network || 'development';
   const name = await contract.name();
   const version = await contract.version();
   console.log(`Contract address: ${contractAddress}`);
@@ -55,9 +62,7 @@ module.exports = async (callback) => {
 
   // get ledgers
   const ledgerOwners = await contract.getLedgerOwners();
-  const ledgers = await Promise.all(
-    ledgerOwners.map((owner) => contract.getLedgerEntry(owner))
-  );
+  const ledgers = await Promise.all(ledgerOwners.map((owner) => contract.getLedgerEntry(owner)));
 
   // get all batches
   const batchesPromise = [];
@@ -77,26 +82,14 @@ module.exports = async (callback) => {
   // get all currency types fee
   const ccyFeePromise = [];
   for (let index = 0; index < currencyTypes.length; index++) {
-    ccyFeePromise.push(
-      contract.getFee(
-        CONST.getFeeType.CCY,
-        currencyTypes[index].id,
-        CONST.nullAddr
-      )
-    );
+    ccyFeePromise.push(contract.getFee(CONST.getFeeType.CCY, currencyTypes[index].id, CONST.nullAddr));
   }
   const ccyFees = await Promise.all(ccyFeePromise);
 
   // get all token types fee
   const tokenFeePromise = [];
   for (let index = 0; index < tokenTypes.length; index++) {
-    tokenFeePromise.push(
-      contract.getFee(
-        CONST.getFeeType.CCY,
-        tokenTypes[index].id,
-        CONST.nullAddr
-      )
-    );
+    tokenFeePromise.push(contract.getFee(CONST.getFeeType.CCY, tokenTypes[index].id, CONST.nullAddr));
   }
   const tokenFees = await Promise.all(tokenFeePromise);
 
@@ -106,7 +99,6 @@ module.exports = async (callback) => {
       network,
       contractAddress,
       contractType,
-      ledgerHash,
       name,
       version,
       owners,
@@ -115,10 +107,10 @@ module.exports = async (callback) => {
       decimals,
     },
     data: {
-      secTokenBaseId,
-      secTokenMintedCount,
-      secTokenBurnedQty,
-      secTokenMintedQty,
+      secTokenBaseId: hexToNumberString(secTokenBaseId),
+      secTokenMintedCount: hexToNumberString(secTokenMintedCount),
+      secTokenBurnedQty: hexToNumberString(secTokenBurnedQty),
+      secTokenMintedQty: hexToNumberString(secTokenMintedQty),
       whitelistAddresses,
       ledgerOwners,
       ccyTypes: currencyTypes.map((ccy) => ({
@@ -132,13 +124,13 @@ module.exports = async (callback) => {
         return {
           ...tok,
           ft: {
-            expiryTimestamp: tokTypes[0][index]["ft"]["expiryTimestamp"],
-            underlyerTypeId: tokTypes[0][index]["ft"]["underlyerTypeId"],
-            refCcyId: tokTypes[0][index]["ft"]["refCcyId"],
-            initMarginBips: tokTypes[0][index]["ft"]["initMarginBips"],
-            varMarginBips: tokTypes[0][index]["ft"]["varMarginBips"],
-            contractSize: tokTypes[0][index]["ft"]["contractSize"],
-            feePerContract: tokTypes[0][index]["ft"]["feePerContract"],
+            expiryTimestamp: tokTypes[0][index]['ft']['expiryTimestamp'],
+            underlyerTypeId: tokTypes[0][index]['ft']['underlyerTypeId'],
+            refCcyId: tokTypes[0][index]['ft']['refCcyId'],
+            initMarginBips: tokTypes[0][index]['ft']['initMarginBips'],
+            varMarginBips: tokTypes[0][index]['ft']['varMarginBips'],
+            contractSize: tokTypes[0][index]['ft']['contractSize'],
+            feePerContract: tokTypes[0][index]['ft']['feePerContract'],
           },
         };
       }),
@@ -163,22 +155,27 @@ module.exports = async (callback) => {
           return {
             ...batch,
             origTokFee: {
-              fee_fixed: batches[index]["origTokFee"]["fee_fixed"],
-              fee_percBips: batches[index]["origTokFee"]["fee_percBips"],
-              fee_min: batches[index]["origTokFee"]["fee_min"],
-              fee_max: batches[index]["origTokFee"]["fee_max"],
-              ccy_perMillion: batches[index]["origTokFee"]["ccy_perMillion"],
-              ccy_mirrorFee: batches[index]["origTokFee"]["ccy_mirrorFee"],
+              fee_fixed: batches[index]['origTokFee']['fee_fixed'],
+              fee_percBips: batches[index]['origTokFee']['fee_percBips'],
+              fee_min: batches[index]['origTokFee']['fee_min'],
+              fee_max: batches[index]['origTokFee']['fee_max'],
+              ccy_perMillion: batches[index]['origTokFee']['ccy_perMillion'],
+              ccy_mirrorFee: batches[index]['origTokFee']['ccy_mirrorFee'],
             },
           };
         }),
     },
   };
 
+  const onChainLedgerHash = argv?.h === 'on';
+  const ledgerHash = onChainLedgerHash
+    ? await CONST.getLedgerHashcode(contract)
+    : getLedgerHashOffChain(backup.data, 10, 0);
+
   // write backup to json file
   const backupFile = `data/${contractAddress}.json`;
   console.log(`Writing backup to ${backupFile}`);
-  fs.writeFileSync(backupFile, JSON.stringify(backup, null, 2));
+  fs.writeFileSync(backupFile, JSON.stringify({ ledgerHash, ...backup }, null, 2));
 
   callback();
 };
