@@ -40,7 +40,7 @@ module.exports = async (callback) => {
   // read data from json file
   const dataDir = path.join(__dirname, 'data');
   const backupFile = path.join(dataDir, `${contractAddress}.json`);
-  const { data, info } = JSON.parse(fs.readFileSync(backupFile, 'utf8'));
+  const { data, info, ledgerHash: previousHash } = JSON.parse(fs.readFileSync(backupFile, 'utf8'));
 
   // deploy new contract with info
   const newContract = await StMaster.at(newContractAddress);
@@ -249,10 +249,10 @@ module.exports = async (callback) => {
   const ledgerHash = onChainLedgerHash
     ? await CONST.getLedgerHashcode(newContract)
     : getLedgerHashOffChain((await createBackupData(newContract, newContractAddress, 0)).data, 10, 0);
-  if (ledgerHash !== info.ledgerHash) {
+  if (ledgerHash !== previousHash) {
     console.error(`Ledger hash mismatch!`, {
       ledgerHash,
-      previousHash: info.ledgerHash,
+      previousHash,
     });
     return callback(new Error(`Ledger hash mismatch!`));
   }
