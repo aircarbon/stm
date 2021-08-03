@@ -1,26 +1,17 @@
 // @ts-check
 const fs = require('fs');
-const { hexToNumberString, soliditySha3 } = require('web3-utils');
+const path = require('path');
 const argv = require('yargs-parser')(process.argv.slice(2));
 // @ts-ignore artifacts from truffle
 const StMaster = artifacts.require('StMaster');
 
-const { getLedgerHash } = require('./getLedgerHash');
+const { getLedgerHashOffChain, createBackupData } = require('./utils');
 const CONST = require('../const');
-const { helpers } = require('../../orm/build');
 
 process.on('unhandledRejection', console.error);
 
-function getLedgerHashOffChain(data, mod, n) {
-  const hashes = [];
-  for (n = 0; n < mod; n++) {
-    hashes.push(getLedgerHash(data, mod, n));
-  }
-  return hashes.sort().join(',');
-}
-
 /**
- * Usage: `INSTANCE_ID=local truffle exec backup.js -s=ADDR -h=[offchain|onchain] [--network <name>] [--compile]`,
+ * Usage: `INSTANCE_ID=local truffle exec contract_upgrade/backup.js -s=ADDR -h=[offchain|onchain] [--network <name>] [--compile]`,
  * @link https://github.com/trufflesuite/truffle/issues/889#issuecomment-522581580
  */
 module.exports = async (callback) => {
@@ -42,138 +33,21 @@ module.exports = async (callback) => {
   }
 
   // get contract info
-  const owners = await contract.getOwners();
-  const unit = await contract.unit();
-  const symbol = await contract.symbol();
-  const decimals = await contract.decimals();
-  const network = argv?.network || 'development';
-  const name = await contract.name();
-  const version = await contract.version();
-  console.log(`Contract address: ${contractAddress}`);
-  console.log(`Name: ${name}`);
-  console.log(`Version: ${version}`);
-
-  // get all ccy and token types
-  const ccyTypes = await contract.getCcyTypes();
-  const { ccyTypes: currencyTypes } = helpers.decodeWeb3Object(ccyTypes);
-
-  const tokTypes = await contract.getSecTokenTypes();
-  const { tokenTypes } = helpers.decodeWeb3Object(tokTypes);
-
-  // get ledgers
-  const ledgerOwners = await contract.getLedgerOwners();
-  const ledgers = await Promise.all(ledgerOwners.map((owner) => contract.getLedgerEntry(owner)));
-
-  // get all batches
-  const batchesPromise = [];
-  const maxBatchId = await contract.getSecTokenBatch_MaxId();
-  for (let index = 1; index <= maxBatchId; index++) {
-    batchesPromise.push(contract.getSecTokenBatch(index));
-  }
-  const batches = await Promise.all(batchesPromise);
-
-  const whitelistAddresses = await contract.getWhitelist();
-
-  const secTokenBaseId = await contract.getSecToken_BaseId();
-  const secTokenMintedCount = await contract.getSecToken_MaxId();
-  const secTokenBurnedQty = await contract.getSecToken_totalBurnedQty();
-  const secTokenMintedQty = await contract.getSecToken_totalMintedQty();
-
-  // get all currency types fee
-  const ccyFeePromise = [];
-  for (let index = 0; index < currencyTypes.length; index++) {
-    ccyFeePromise.push(contract.getFee(CONST.getFeeType.CCY, currencyTypes[index].id, CONST.nullAddr));
-  }
-  const ccyFees = await Promise.all(ccyFeePromise);
-
-  // get all token types fee
-  const tokenFeePromise = [];
-  for (let index = 0; index < tokenTypes.length; index++) {
-    tokenFeePromise.push(contract.getFee(CONST.getFeeType.CCY, tokenTypes[index].id, CONST.nullAddr));
-  }
-  const tokenFees = await Promise.all(tokenFeePromise);
-
-  // write backup to json file
-  const backup = {
-    info: {
-      network,
-      contractAddress,
-      contractType,
-      name,
-      version,
-      owners,
-      symbol,
-      unit,
-      decimals,
-    },
-    data: {
-      secTokenBaseId: hexToNumberString(secTokenBaseId),
-      secTokenMintedCount: hexToNumberString(secTokenMintedCount),
-      secTokenBurnedQty: hexToNumberString(secTokenBurnedQty),
-      secTokenMintedQty: hexToNumberString(secTokenMintedQty),
-      whitelistAddresses,
-      ledgerOwners,
-      ccyTypes: currencyTypes.map((ccy) => ({
-        id: ccy.id,
-        name: ccy.name,
-        unit: ccy.unit,
-        decimals: ccy.decimals,
-      })),
-      ccyFees: ccyFees.map((fee) => helpers.decodeWeb3Object(fee)),
-      tokenTypes: tokenTypes.map((tok, index) => {
-        return {
-          ...tok,
-          ft: {
-            expiryTimestamp: tokTypes[0][index]['ft']['expiryTimestamp'],
-            underlyerTypeId: tokTypes[0][index]['ft']['underlyerTypeId'],
-            refCcyId: tokTypes[0][index]['ft']['refCcyId'],
-            initMarginBips: tokTypes[0][index]['ft']['initMarginBips'],
-            varMarginBips: tokTypes[0][index]['ft']['varMarginBips'],
-            contractSize: tokTypes[0][index]['ft']['contractSize'],
-            feePerContract: tokTypes[0][index]['ft']['feePerContract'],
-          },
-        };
-      }),
-      tokenFees: tokenFees.map((fee) => helpers.decodeWeb3Object(fee)),
-      ledgers: ledgers
-        .map((ledger) => helpers.decodeWeb3Object(ledger))
-        .map((ledger, index) => {
-          return {
-            ...ledger,
-            ccys: ledgers[index].ccys.map((ccy) => ({
-              ccyTypeId: ccy.ccyTypeId,
-              name: ccy.name,
-              unit: ccy.unit,
-              balance: ccy.balance,
-              reserved: ccy.reserved,
-            })),
-          };
-        }),
-      batches: batches
-        .map((batch) => helpers.decodeWeb3Object(batch))
-        .map((batch, index) => {
-          return {
-            ...batch,
-            origTokFee: {
-              fee_fixed: batches[index]['origTokFee']['fee_fixed'],
-              fee_percBips: batches[index]['origTokFee']['fee_percBips'],
-              fee_min: batches[index]['origTokFee']['fee_min'],
-              fee_max: batches[index]['origTokFee']['fee_max'],
-              ccy_perMillion: batches[index]['origTokFee']['ccy_perMillion'],
-              ccy_mirrorFee: batches[index]['origTokFee']['ccy_mirrorFee'],
-            },
-          };
-        }),
-    },
-  };
+  const backup = await createBackupData(contract, contractAddress, contractType);
 
   const onChainLedgerHash = argv?.h === 'onchain';
   const ledgerHash = onChainLedgerHash
     ? await CONST.getLedgerHashcode(contract)
     : getLedgerHashOffChain(backup.data, 10, 0);
 
+  // create data directory if not exists
+  const dataDir = path.join(__dirname, 'data');
+  if (!fs.existsSync(dataDir)) {
+    fs.mkdirSync(dataDir);
+  }
+
   // write backup to json file
-  const backupFile = `data/${contractAddress}.json`;
+  const backupFile = path.join(dataDir, `${contractAddress}.json`);
   console.log(`Writing backup to ${backupFile}`);
   fs.writeFileSync(backupFile, JSON.stringify({ ledgerHash, ...backup }, null, 2));
 
