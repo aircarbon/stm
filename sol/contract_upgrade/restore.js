@@ -1,5 +1,6 @@
 // @ts-check
 const fs = require('fs');
+const path = require('path');
 const { toBN } = require('web3-utils');
 const chalk = require('chalk');
 const argv = require('yargs-parser')(process.argv.slice(2));
@@ -7,6 +8,7 @@ const argv = require('yargs-parser')(process.argv.slice(2));
 const StMaster = artifacts.require('StMaster');
 const series = require('async/series');
 
+const { getLedgerHashOffChain, createBackupData } = require('./utils');
 const CONST = require('../const');
 const { helpers } = require('../../orm/build');
 
@@ -20,7 +22,7 @@ const BATCH_CHUNK_SIZE = 2;
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 /**
- * Usage: `truffle exec restore.js -s=ADDR -t=NEW_ADDR [--network <name>] [--compile]`,
+ * Usage: `INSTANCE_ID=local truffle exec upgrade_contract/restore.js -s=ADDR -t=NEW_ADDR  -h=[offchain|onchain] [--network <name>] [--compile]`,
  * @link https://github.com/trufflesuite/truffle/issues/889#issuecomment-522581580
  */
 module.exports = async (callback) => {
@@ -36,7 +38,8 @@ module.exports = async (callback) => {
   }
 
   // read data from json file
-  const backupFile = `data/${contractAddress}.json`;
+  const dataDir = path.join(__dirname, 'data');
+  const backupFile = path.join(dataDir, `${contractAddress}.json`);
   const { data, info } = JSON.parse(fs.readFileSync(backupFile, 'utf8'));
 
   // deploy new contract with info
@@ -242,8 +245,10 @@ module.exports = async (callback) => {
 
   await newContract.sealContract();
 
-  // TODO: compare with offchain
-  const ledgerHash = await CONST.getLedgerHashcode(newContract);
+  const onChainLedgerHash = argv?.h === 'onchain';
+  const ledgerHash = onChainLedgerHash
+    ? await CONST.getLedgerHashcode(newContract)
+    : getLedgerHashOffChain((await createBackupData(newContract, newContractAddress, 0)).data, 10, 0);
   if (ledgerHash !== info.ledgerHash) {
     console.error(`Ledger hash mismatch!`, {
       ledgerHash,
