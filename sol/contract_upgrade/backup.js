@@ -6,8 +6,8 @@ const argv = require('yargs-parser')(process.argv.slice(2));
 const StMaster = artifacts.require('StMaster');
 
 const { getLedgerHash } = require('./getLedgerHash');
-const CONST = require('./const');
-const { helpers } = require('../orm/build');
+const CONST = require('../const');
+const { helpers } = require('../../orm/build');
 
 process.on('unhandledRejection', console.error);
 
@@ -20,7 +20,7 @@ function getLedgerHashOffChain(data, mod, n) {
 }
 
 /**
- * Usage: `INSTANCE_ID=local truffle exec backup.js -s=ADDR -h=[on|off] [--network <name>] [--compile]`,
+ * Usage: `INSTANCE_ID=local truffle exec backup.js -s=ADDR -h=[offchain|onchain] [--network <name>] [--compile]`,
  * @link https://github.com/trufflesuite/truffle/issues/889#issuecomment-522581580
  */
 module.exports = async (callback) => {
@@ -167,7 +167,7 @@ module.exports = async (callback) => {
     },
   };
 
-  const onChainLedgerHash = argv?.h === 'on';
+  const onChainLedgerHash = argv?.h === 'onchain';
   const ledgerHash = onChainLedgerHash
     ? await CONST.getLedgerHashcode(contract)
     : getLedgerHashOffChain(backup.data, 10, 0);
