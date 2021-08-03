@@ -118,9 +118,9 @@ module.exports = async (callback) => {
           return cb(null, tokenType);
         }
 
-        console.log(`Adding tokenType - spot type`, tokenType.name);
+        console.log(`Adding tokenType`, tokenType);
         newContract
-          .addSecTokenType(tokenType.name, CONST.settlementType.SPOT, CONST.nullFutureArgs, CONST.nullAddr)
+          .addSecTokenType(tokenType.name, tokenType.settlementType, tokenType.ft, tokenType.cashflowBaseAddr)
           .then((token) => cb(null, token))
           .catch((error) => cb(error));
       },
