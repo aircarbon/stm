@@ -448,8 +448,8 @@ function getTestContextWeb3(useWs) {
         // Matic (Mumbai) Testnet
         : process.env.WEB3_NETWORK_ID == 80001 ? { web3: new Web3(
                 useWs ?
-                'wss://rpc-mumbai.maticvigil.com/ws/v1/a04433ccf5f940476e6741f6f277eaa74989755e' :
-                'https://polygon-mumbai.infura.io/v3/564f72f3786649a9bf2145302eeeeb43'
+                'wss://competent-booth:stage-going-acts-possum-shield-twins@ws-nd-373-856-321.p2pify.com' :
+                'https://competent-booth:stage-going-acts-possum-shield-twins@nd-373-856-321.p2pify.com'
             ),
             ethereumTxChain: { common: EthereumJsCommon.forCustomChain(
             'ropsten', // forCustomChain() requires a "known" name!?
