@@ -129,6 +129,34 @@ module.exports = async (callback) => {
   await series(tokenTypesPromises);
   await sleep(1000);
 
+  // set fee for currency and token types
+  const ccyFeePromises = currencyTypes.map((ccyType, index) => {
+    return function setFeeForCcyType(cb) {
+      const fee = data.ccyFees[index];
+      console.log(`Setting fee for ccyType ${ccyType.name}`, fee);
+      newContract
+        .setFee_CcyType(ccyType.id, CONST.nullAddr, fee)
+        .then((result) => cb(null, result))
+        .catch((error) => cb(error));
+    };
+  });
+  await series(ccyFeePromises);
+  await sleep(1000);
+
+  const tokenFeePromises = tokenTypes.map((tokenType, index) => {
+    return function setFeeForTokenType(cb) {
+      const fee = data.tokenFees[index];
+      console.log(`Setting fee for tokenType ${tokenType.name}`, fee);
+      newContract
+        .setFee_TokType(tokenType.id, CONST.nullAddr, fee)
+        .then((result) => cb(null, result))
+        .catch((error) => cb(error));
+    };
+  });
+
+  await series(tokenFeePromises);
+  await sleep(1000);
+
   // load batches data to new contract
   const maxBatchId = await newContract.getSecTokenBatch_MaxId();
   console.log(`Max batch id: ${maxBatchId}`);
@@ -220,32 +248,6 @@ module.exports = async (callback) => {
     toBN(data.secTokenMintedQty),
     toBN(data.secTokenBurnedQty),
   );
-
-  // set fee for currency and token types
-  const feePromises = [];
-  currencyTypes.map((ccyType, index) => {
-    feePromises.push(function setFeeForCcyType(cb) {
-      const fee = data.ccyFees[index];
-      console.log(`Setting fee for ccyType ${ccyType.name}`, fee);
-      newContract
-        .setFee_CcyType(ccyType.id, CONST.nullAddr, fee)
-        .then((result) => cb(null, result))
-        .catch((error) => cb(error));
-    });
-  });
-  tokenTypes.map((tokenType, index) => {
-    feePromises.push(function setFeeForTokenType(cb) {
-      const fee = data.tokenFees[index];
-      console.log(`Setting fee for tokenFees ${tokenType.name}`, fee);
-      newContract
-        .setFee_TokType(tokenType.id, CONST.nullAddr, fee)
-        .then((result) => cb(null, result))
-        .catch((error) => cb(error));
-    });
-  });
-
-  await series(feePromises);
-  await sleep(1000);
 
   await newContract.sealContract();
 
