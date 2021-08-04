@@ -243,8 +243,9 @@ module.exports = {
     cashflowType: cashflowType,
 
     settlementType: Object.freeze({
-             SPOT: 0,
-           FUTURE: 1,
+        UNDEFINED: 0,
+             SPOT: 1,
+           FUTURE: 2,
     }),
 
     getFeeType: Object.freeze({
