@@ -120,8 +120,7 @@ module.exports = async (callback) => {
 
         console.log(`Adding tokenType`, tokenType);
         newContract
-          .addSecTokenType(tokenType.name, 0, tokenType.ft, tokenType.cashflowBaseAddr)
-          // .addSecTokenType(tokenType.name, tokenType.settlementType, tokenType.ft, tokenType.cashflowBaseAddr)
+          .addSecTokenType(tokenType.name, tokenType.settlementType, tokenType.ft, tokenType.cashflowBaseAddr)
           .then((token) => cb(null, token))
           .catch((error) => cb(error));
       },
@@ -246,10 +245,18 @@ module.exports = async (callback) => {
 
   await newContract.sealContract();
 
+  const backupData = await createBackupData(newContract, newContractAddress, 0);
+
   const onChainLedgerHash = argv?.h === 'onchain';
   const ledgerHash = onChainLedgerHash
     ? await CONST.getLedgerHashcode(newContract)
-    : getLedgerHashOffChain((await createBackupData(newContract, newContractAddress, 0)).data, 10, 0);
+    : getLedgerHashOffChain(backupData.data);
+
+  // write backup to json file
+  const newBackupFile = path.join(dataDir, `${newContractAddress}.json`);
+  console.log(`Writing backup to ${backupFile}`);
+  fs.writeFileSync(newBackupFile, JSON.stringify({ ledgerHash, ...backupData }, null, 2));
+
   if (ledgerHash !== previousHash) {
     console.error(`Ledger hash mismatch!`, {
       ledgerHash,
