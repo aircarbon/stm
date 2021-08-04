@@ -7,6 +7,7 @@ const { helpers } = require('../../orm/build');
 // implement get ledger hash
 // Refer to: getLedgerHashcode on LedgerLib.sol
 function getLedgerHash(data, mod, n) {
+  console.log('getLedgerHash', mod, n);
   // hash currency types & exchange currency fees
   let ledgerHash = '';
   const ccyTypes = data?.ccyTypes ?? [];
@@ -18,12 +19,12 @@ function getLedgerHash(data, mod, n) {
     }
     ledgerHash = soliditySha3(ledgerHash, ccyType.id, ccyType.name, ccyType.unit, ccyType.decimals);
     if (
-      ccyFees[index]?.fee_fixed ||
-      ccyFees[index]?.fee_percBips ||
-      ccyFees[index]?.fee_min ||
-      ccyFees[index]?.fee_max ||
-      ccyFees[index]?.ccy_perMillion ||
-      ccyFees[index]?.ccy_mirrorFee
+      Number(ccyFees[index]?.fee_fixed) ||
+      Number(ccyFees[index]?.fee_percBips) ||
+      Number(ccyFees[index]?.fee_min) ||
+      Number(ccyFees[index]?.fee_max) ||
+      Number(ccyFees[index]?.ccy_perMillion) ||
+      Boolean(ccyFees[index]?.ccy_mirrorFee)
     ) {
       ledgerHash = soliditySha3(
         ledgerHash,
@@ -36,6 +37,7 @@ function getLedgerHash(data, mod, n) {
       );
     }
   }
+  console.log('ledger hash - hash currency types & exchange currency fees', ledgerHash);
 
   // hash token types & exchange token fees
   const tokenTypes = data?.tokenTypes ?? [];
@@ -48,7 +50,8 @@ function getLedgerHash(data, mod, n) {
     ledgerHash = soliditySha3(
       ledgerHash,
       tokenType.name,
-      tokenType.settlementType,
+      // NOTE: comment out settlement type due to bad data on SC
+      // tokenType.settlementType,
       tokenType.ft.expiryTimestamp,
       tokenType.ft.underlyerTypeId,
       tokenType.ft.refCcyId,
@@ -59,12 +62,12 @@ function getLedgerHash(data, mod, n) {
       tokenType.cashflowBaseAddr,
     );
     if (
-      tokenFees[index]?.fee_fixed ||
-      tokenFees[index]?.fee_percBips ||
-      tokenFees[index]?.fee_min ||
-      tokenFees[index]?.fee_max ||
-      tokenFees[index]?.ccy_perMillion ||
-      tokenFees[index]?.ccy_mirrorFee
+      Number(tokenFees[index]?.fee_fixed) ||
+      Number(tokenFees[index]?.fee_percBips) ||
+      Number(tokenFees[index]?.fee_min) ||
+      Number(tokenFees[index]?.fee_max) ||
+      Number(tokenFees[index]?.ccy_perMillion) ||
+      Boolean(tokenFees[index]?.ccy_mirrorFee)
     ) {
       ledgerHash = soliditySha3(
         ledgerHash,
@@ -77,6 +80,7 @@ function getLedgerHash(data, mod, n) {
       );
     }
   }
+  console.log('ledger hash - token types & exchange token fees', ledgerHash);
 
   // hash whitelist
   const whitelistAddresses = data?.whitelistAddresses ?? [];
@@ -85,6 +89,8 @@ function getLedgerHash(data, mod, n) {
     .forEach((address) => {
       ledgerHash = soliditySha3(ledgerHash, address);
     });
+
+  console.log('ledger hash - whitelist', ledgerHash);
 
   // hash batches
   const batches = data?.batches ?? [];
@@ -110,6 +116,8 @@ function getLedgerHash(data, mod, n) {
         batch.originator,
       );
     });
+
+  console.log('ledger hash - batches', ledgerHash);
 
   // hash ledgers
   const ledgers = data?.ledgers ?? [];
@@ -153,6 +161,7 @@ function getLedgerHash(data, mod, n) {
     });
   }
 
+  console.log('result', ledgerHash);
   return ledgerHash;
 }
 
@@ -244,6 +253,7 @@ async function createBackupData(contract, contractAddress, contractType) {
       })),
       ccyFees: ccyFees.map((fee) => helpers.decodeWeb3Object(fee)),
       tokenTypes: tokenTypes.map((tok, index) => {
+        console.log(tok, index);
         return {
           ...tok,
           ft: {
