@@ -45,8 +45,7 @@ function getLedgerHashOffChain(data) {
     ledgerHash = soliditySha3(
       ledgerHash,
       tokenType.name,
-      // NOTE: comment out settlement type due to bad data on SC
-      // tokenType.settlementType,
+      tokenType.settlementType,
       tokenType.ft.expiryTimestamp,
       tokenType.ft.underlyerTypeId,
       tokenType.ft.refCcyId,
@@ -200,7 +199,7 @@ async function createBackupData(contract, contractAddress, contractType) {
   // get all token types fee
   const tokenFeePromise = [];
   for (let index = 0; index < tokenTypes.length; index++) {
-    tokenFeePromise.push(contract.getFee(CONST.getFeeType.CCY, tokenTypes[index].id, CONST.nullAddr));
+    tokenFeePromise.push(contract.getFee(CONST.getFeeType.TOK, tokenTypes[index].id, CONST.nullAddr));
   }
   const tokenFees = await Promise.all(tokenFeePromise);
 

@@ -225,8 +225,8 @@ module.exports = async (callback) => {
   const feePromises = [];
   currencyTypes.map((ccyType, index) => {
     feePromises.push(function setFeeForCcyType(cb) {
-      // get currency type fee by id
       const fee = data.ccyFees[index];
+      console.log(`Setting fee for ccyType ${ccyType.name}`, fee);
       newContract
         .setFee_CcyType(ccyType.id, CONST.nullAddr, fee)
         .then((result) => cb(null, result))
@@ -236,12 +236,16 @@ module.exports = async (callback) => {
   tokenTypes.map((tokenType, index) => {
     feePromises.push(function setFeeForTokenType(cb) {
       const fee = data.tokenFees[index];
+      console.log(`Setting fee for tokenFees ${tokenType.name}`, fee);
       newContract
         .setFee_TokType(tokenType.id, CONST.nullAddr, fee)
         .then((result) => cb(null, result))
         .catch((error) => cb(error));
     });
   });
+
+  await series(feePromises);
+  await sleep(1000);
 
   await newContract.sealContract();
 
