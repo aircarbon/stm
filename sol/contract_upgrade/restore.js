@@ -120,7 +120,8 @@ module.exports = async (callback) => {
 
         console.log(`Adding tokenType`, tokenType);
         newContract
-          .addSecTokenType(tokenType.name, tokenType.settlementType, tokenType.ft, tokenType.cashflowBaseAddr)
+          .addSecTokenType(tokenType.name, 0, tokenType.ft, tokenType.cashflowBaseAddr)
+          // .addSecTokenType(tokenType.name, tokenType.settlementType, tokenType.ft, tokenType.cashflowBaseAddr)
           .then((token) => cb(null, token))
           .catch((error) => cb(error));
       },
