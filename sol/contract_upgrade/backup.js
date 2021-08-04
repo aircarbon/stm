@@ -36,9 +36,7 @@ module.exports = async (callback) => {
   const backup = await createBackupData(contract, contractAddress, contractType);
 
   const onChainLedgerHash = argv?.h === 'onchain';
-  const ledgerHash = onChainLedgerHash
-    ? await CONST.getLedgerHashcode(contract)
-    : getLedgerHashOffChain(backup.data, 10, 0);
+  const ledgerHash = onChainLedgerHash ? await CONST.getLedgerHashcode(contract) : getLedgerHashOffChain(backup.data);
 
   // create data directory if not exists
   const dataDir = path.join(__dirname, 'data');

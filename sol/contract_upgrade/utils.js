@@ -1,3 +1,4 @@
+// @ts-check
 const { soliditySha3, hexToNumberString } = require('web3-utils');
 const argv = require('yargs-parser')(process.argv.slice(2));
 
@@ -6,17 +7,14 @@ const { helpers } = require('../../orm/build');
 
 // implement get ledger hash
 // Refer to: getLedgerHashcode on LedgerLib.sol
-function getLedgerHash(data, mod, n) {
-  console.log('getLedgerHash', mod, n);
+function getLedgerHashOffChain(data) {
+  console.log('getLedgerHashOffChain');
   // hash currency types & exchange currency fees
   let ledgerHash = '';
   const ccyTypes = data?.ccyTypes ?? [];
   const ccyFees = data?.ccyFees ?? [];
   for (let index = 0; index < ccyTypes.length; index++) {
     const ccyType = ccyTypes[index];
-    if (ccyType.id % mod !== n) {
-      continue;
-    }
     ledgerHash = soliditySha3(ledgerHash, ccyType.id, ccyType.name, ccyType.unit, ccyType.decimals);
     if (
       Number(ccyFees[index]?.fee_fixed) ||
@@ -44,9 +42,6 @@ function getLedgerHash(data, mod, n) {
   const tokenFees = data?.tokenFees ?? [];
   for (let index = 0; index < tokenTypes.length; index++) {
     const tokenType = tokenTypes[index];
-    if (tokenType.id % mod !== n) {
-      continue;
-    }
     ledgerHash = soliditySha3(
       ledgerHash,
       tokenType.name,
@@ -84,38 +79,34 @@ function getLedgerHash(data, mod, n) {
 
   // hash whitelist
   const whitelistAddresses = data?.whitelistAddresses ?? [];
-  whitelistAddresses
-    .filter((_address, index) => Number(index) % mod !== n)
-    .forEach((address) => {
-      ledgerHash = soliditySha3(ledgerHash, address);
-    });
+  whitelistAddresses.forEach((address) => {
+    ledgerHash = soliditySha3(ledgerHash, address);
+  });
 
   console.log('ledger hash - whitelist', ledgerHash);
 
   // hash batches
   const batches = data?.batches ?? [];
-  batches
-    .filter((batch) => Number(batch.id) % mod !== n)
-    .forEach((batch) => {
-      ledgerHash = soliditySha3(
-        ledgerHash,
-        batch.id,
-        batch.mintedTimestamp,
-        batch.tokTypeId,
-        batch.mintedQty,
-        batch.burnedQty,
-        ...batch.metaKeys,
-        ...batch.metaValues,
-        batch.origTokFee.fee_fixed,
-        batch.origTokFee.fee_percBips,
-        batch.origTokFee.fee_min,
-        batch.origTokFee.fee_max,
-        batch.origTokFee.ccy_perMillion,
-        batch.origTokFee.ccy_mirrorFee,
-        batch.origCcyFee_percBips_ExFee,
-        batch.originator,
-      );
-    });
+  batches.forEach((batch) => {
+    ledgerHash = soliditySha3(
+      ledgerHash,
+      batch.id,
+      batch.mintedTimestamp,
+      batch.tokTypeId,
+      batch.mintedQty,
+      batch.burnedQty,
+      ...batch.metaKeys,
+      ...batch.metaValues,
+      batch.origTokFee.fee_fixed,
+      batch.origTokFee.fee_percBips,
+      batch.origTokFee.fee_min,
+      batch.origTokFee.fee_max,
+      batch.origTokFee.ccy_perMillion,
+      batch.origTokFee.ccy_mirrorFee,
+      batch.origCcyFee_percBips_ExFee,
+      batch.originator,
+    );
+  });
 
   console.log('ledger hash - batches', ledgerHash);
 
@@ -123,10 +114,6 @@ function getLedgerHash(data, mod, n) {
   const ledgers = data?.ledgers ?? [];
   const ledgerOwners = data?.ledgerOwners ?? [];
   for (let index = 0; index < ledgers.length; index++) {
-    if (index % mod !== n) {
-      continue;
-    }
-
     if (index !== 0) {
       ledgerHash = soliditySha3(ledgerHash, ledgerOwners[index]);
     }
@@ -163,14 +150,6 @@ function getLedgerHash(data, mod, n) {
 
   console.log('result', ledgerHash);
   return ledgerHash;
-}
-
-function getLedgerHashOffChain(data, mod, n) {
-  const hashes = [];
-  for (n = 0; n < mod; n++) {
-    hashes.push(getLedgerHash(data, mod, n));
-  }
-  return hashes.sort().join(',');
 }
 
 async function createBackupData(contract, contractAddress, contractType) {
@@ -302,6 +281,5 @@ async function createBackupData(contract, contractAddress, contractType) {
   return backup;
 }
 
-exports.getLedgerHash = getLedgerHash;
 exports.getLedgerHashOffChain = getLedgerHashOffChain;
 exports.createBackupData = createBackupData;
