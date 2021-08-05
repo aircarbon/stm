@@ -233,7 +233,7 @@
        provider: function () {
          var wallet = new HDWalletProvider(
            DEV_MNEMONIC,
-           'https://speedy-nodes-nyc.moralis.io/b87b5b56ff659d8dd8a6c229/polygon/mumbai', // use speedy node https://docs.moralis.io/speedy-nodes/connect-to-polygon-node
+           'https://polygon-test.sdax.co:8545', // use speedy node https://docs.moralis.io/speedy-nodes/connect-to-polygon-node
            0,
            1000,
          );
@@ -245,7 +245,7 @@
        gas: 8000000, // 8m
        gasPrice: web3.utils.toWei(GWEI_MATIC, 'gwei'),
        network_id: '80001',
-       networkCheckTimeout: 30000,
+       networkCheckTimeout: 90000,
        confirmations: 1,
        skipDryRun: false,
        timeoutBlocks: 200,
