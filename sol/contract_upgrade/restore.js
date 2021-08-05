@@ -209,15 +209,20 @@ module.exports = async (callback) => {
         // skip if already inserted
         let tokens = ledger.tokens;
         if (ledgerOwners.includes(owner)) {
-          tokens = tokens.filter((token) => !ledgers[ledgerOwners.indexOf(owner)].tokens.includes(token));
+          const stIds = ledgers[ledgerOwners.indexOf(owner)].tokens.map((token) => token.stId);
+          tokens = tokens.filter((token) => !stIds.includes(token.stId));
+          if (tokens.length === 0) {
+            return cb(null, []);
+          }
         }
 
-        console.log(`Creating ledger entry #${index} - token `, owner, ledger.tokens);
+        console.log(`Creating ledger entry #${index + 1} - token `, owner, tokens);
 
         return series(
           tokens.map(
             (token) =>
               function AddSecTokenToEntry(callback) {
+                console.log('AddSecTokenToEntry', owner, token.stId);
                 newContract
                   .addSecToken(
                     owner,
