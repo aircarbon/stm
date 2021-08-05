@@ -307,7 +307,7 @@ module.exports = async (callback) => {
     return callback(new Error(`Ledger hash mismatch!`));
   }
 
-  await newContract.salContract();
+  await newContract.sealContract();
 
   callback('Done.');
 };
