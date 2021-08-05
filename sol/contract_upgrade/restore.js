@@ -129,160 +129,163 @@ module.exports = async (callback) => {
   await series(tokenTypesPromises);
   await sleep(1000);
 
-  // load batches data to new contract
-  const maxBatchId = await newContract.getSecTokenBatch_MaxId();
-  console.log(`Max batch id: ${maxBatchId}`);
+  const hasSealed = await newContract.getContractSeal();
+  console.log('Contract seal', hasSealed);
 
-  const batchesPromises = data.batches
-    .filter((batch) => batch.id > maxBatchId)
-    .reduce((result, batch) => {
-      const lastItem = result?.[result.length - 1] ?? [];
-      if (lastItem && lastItem.length === BATCH_CHUNK_SIZE) {
-        return [...result, [batch]];
-      } else {
-        return [...result.slice(0, -1), [...lastItem, batch]];
-      }
-    }, [])
-    .map(
-      (batches, index, allBatches) =>
-        function loadSecTokenBatch(cb) {
-          console.log(`Adding batches`, batches);
-          console.log(`Processing batches: ${index + 1}/${allBatches.length}`);
-          const batchCount = batches[1]?.id || batches[0]?.id;
-          newContract
-            .loadSecTokenBatch(batches, batchCount)
+  if (!hasSealed) {
+    // load batches data to new contract
+    const maxBatchId = await newContract.getSecTokenBatch_MaxId();
+    console.log(`Max batch id: ${maxBatchId}`);
+
+    const batchesPromises = data.batches
+      .filter((batch) => Number(batch.id) > Number(maxBatchId))
+      .reduce((result, batch) => {
+        const lastItem = result?.[result.length - 1] ?? [];
+        if (lastItem && lastItem.length === BATCH_CHUNK_SIZE) {
+          return [...result, [batch]];
+        } else {
+          return [...result.slice(0, -1), [...lastItem, batch]];
+        }
+      }, [])
+      .map(
+        (batches, index, allBatches) =>
+          function loadSecTokenBatch(cb) {
+            console.log(`Adding batches`, batches);
+            console.log(`Processing batches: ${index + 1}/${allBatches.length}`);
+            const batchCount = batches[1]?.id || batches[0]?.id;
+            newContract
+              .loadSecTokenBatch(batches, batchCount)
+              .then((result) => cb(null, result))
+              .catch((error) => cb(error));
+          },
+      );
+
+    await series(batchesPromises);
+    await sleep(1000);
+
+    // get ledgers
+    const ledgerOwners = await newContract.getLedgerOwners();
+    const ledgers = (await Promise.all(ledgerOwners.map((owner) => newContract.getLedgerEntry(owner))))
+      .map((ledger) => helpers.decodeWeb3Object(ledger))
+      .map((ledger) => {
+        return {
+          ...ledger,
+          ccys: ledger.ccys.map((ccy) => ({
+            ccyTypeId: ccy.ccyTypeId,
+            name: ccy.name,
+            unit: ccy.unit,
+            balance: ccy.balance,
+            reserved: ccy.reserved,
+          })),
+        };
+      });
+
+    // load ledgers data to new contract
+    const ledgersPromises = data.ledgers.map(
+      (ledger, index, allLedgers) =>
+        function createLedgerEntry(cb) {
+          const owner = data.ledgerOwners[index];
+          // skip if owner already inserted
+          if (ledgerOwners.includes(owner)) {
+            cb(null, []);
+          } else {
+            console.log(`Creating ledger entry #${index} - currency`, owner, ledger.ccys);
+            console.log(`Processing ledger - currency: ${index + 1}/${allLedgers.length}`);
+            newContract
+              .createLedgerEntry(owner, ledger.ccys, ledger.spot_sumQtyMinted, ledger.spot_sumQtyBurned)
+              .then((result) => cb(null, result))
+              .catch((error) => cb(error));
+          }
+        },
+    );
+    await series(ledgersPromises);
+    await sleep(1000);
+
+    const addSecTokensPromises = data.ledgers.flatMap(
+      (ledger, index, allLedgers) =>
+        function addSecToken(cb) {
+          const owner = data.ledgerOwners[index];
+          if (ledger.tokens.length === 0) {
+            return cb(null, []);
+          }
+
+          // skip if already inserted
+          let tokens = ledger.tokens;
+          if (ledgerOwners.includes(owner)) {
+            const stIds = ledgers[ledgerOwners.indexOf(owner)].tokens.map((token) => token.stId);
+            tokens = tokens.filter((token) => !stIds.includes(token.stId));
+            if (tokens.length === 0) {
+              return cb(null, []);
+            }
+          }
+
+          console.log(`Processing ledger - token: ${index + 1}/${allLedgers.length}`, owner, tokens);
+
+          return series(
+            tokens.map(
+              (token) =>
+                function AddSecTokenToEntry(callback) {
+                  console.log('AddSecTokenToEntry', token.stId);
+                  newContract
+                    .addSecToken(
+                      owner,
+                      token.batchId,
+                      token.stId,
+                      token.tokTypeId,
+                      token.mintedQty,
+                      token.currentQty,
+                      token.ft_price,
+                      token.ft_lastMarkPrice,
+                      token.ft_ledgerOwner,
+                      token.ft_PL,
+                    )
+                    .then((result) => callback(null, result))
+                    .catch((error) => callback(error));
+                },
+            ),
+          )
             .then((result) => cb(null, result))
             .catch((error) => cb(error));
         },
     );
+    await series(addSecTokensPromises);
+    await sleep(1000);
 
-  await series(batchesPromises);
-  await sleep(1000);
+    await newContract.setTokenTotals(
+      data.secTokenBaseId,
+      toBN(data.secTokenMintedCount),
+      toBN(data.secTokenMintedQty),
+      toBN(data.secTokenBurnedQty),
+    );
 
-  // get ledgers
-  const ledgerOwners = await newContract.getLedgerOwners();
-  const ledgers = (await Promise.all(ledgerOwners.map((owner) => newContract.getLedgerEntry(owner))))
-    .map((ledger) => helpers.decodeWeb3Object(ledger))
-    .map((ledger) => {
-      return {
-        ...ledger,
-        ccys: ledger.ccys.map((ccy) => ({
-          ccyTypeId: ccy.ccyTypeId,
-          name: ccy.name,
-          unit: ccy.unit,
-          balance: ccy.balance,
-          reserved: ccy.reserved,
-        })),
+    // set fee for currency and token types
+    const ccyFeePromises = data.ccyTypes.map((ccyType, index) => {
+      return function setFeeForCcyType(cb) {
+        const fee = data.ccyFees[index];
+        console.log(`Setting fee for ccyType ${ccyType.name}`, fee);
+        newContract
+          .setFee_CcyType(ccyType.id, CONST.nullAddr, fee)
+          .then((result) => cb(null, result))
+          .catch((error) => cb(error));
+      };
+    });
+    await series(ccyFeePromises);
+    await sleep(1000);
+
+    const tokenFeePromises = data.tokenTypes.map((tokenType, index) => {
+      return function setFeeForTokenType(cb) {
+        const fee = data.tokenFees[index];
+        console.log(`Setting fee for tokenType ${tokenType.name}`, fee);
+        newContract
+          .setFee_TokType(tokenType.id, CONST.nullAddr, fee)
+          .then((result) => cb(null, result))
+          .catch((error) => cb(error));
       };
     });
 
-  // load ledgers data to new contract
-  const ledgersPromises = data.ledgers.map(
-    (ledger, index, allLedgers) =>
-      function createLedgerEntry(cb) {
-        const owner = data.ledgerOwners[index];
-        // skip if owner already inserted
-        if (ledgerOwners.includes(owner)) {
-          cb(null, []);
-        } else {
-          console.log(`Creating ledger entry #${index} - currency`, owner, ledger.ccys);
-          console.log(`Processing ledger - currency: ${index + 1}/${allLedgers.length}`);
-          newContract
-            .createLedgerEntry(owner, ledger.ccys, ledger.spot_sumQtyMinted, ledger.spot_sumQtyBurned)
-            .then((result) => cb(null, result))
-            .catch((error) => cb(error));
-        }
-      },
-  );
-  await series(ledgersPromises);
-  await sleep(1000);
-
-  const addSecTokensPromises = data.ledgers.flatMap(
-    (ledger, index, allLedgers) =>
-      function addSecToken(cb) {
-        const owner = data.ledgerOwners[index];
-        if (ledger.tokens.length === 0) {
-          return cb(null, []);
-        }
-
-        // skip if already inserted
-        let tokens = ledger.tokens;
-        if (ledgerOwners.includes(owner)) {
-          const stIds = ledgers[ledgerOwners.indexOf(owner)].tokens.map((token) => token.stId);
-          tokens = tokens.filter((token) => !stIds.includes(token.stId));
-          if (tokens.length === 0) {
-            return cb(null, []);
-          }
-        }
-
-        console.log(`Processing ledger - token: ${index + 1}/${allLedgers.length}`, owner, tokens);
-
-        return series(
-          tokens.map(
-            (token) =>
-              function AddSecTokenToEntry(callback) {
-                console.log('AddSecTokenToEntry', token.stId);
-                newContract
-                  .addSecToken(
-                    owner,
-                    token.batchId,
-                    token.stId,
-                    token.tokTypeId,
-                    token.mintedQty,
-                    token.currentQty,
-                    token.ft_price,
-                    token.ft_lastMarkPrice,
-                    token.ft_ledgerOwner,
-                    token.ft_PL,
-                  )
-                  .then((result) => callback(null, result))
-                  .catch((error) => callback(error));
-              },
-          ),
-        )
-          .then((result) => cb(null, result))
-          .catch((error) => cb(error));
-      },
-  );
-  await series(addSecTokensPromises);
-  await sleep(1000);
-
-  await newContract.setTokenTotals(
-    data.secTokenBaseId,
-    toBN(data.secTokenMintedCount),
-    toBN(data.secTokenMintedQty),
-    toBN(data.secTokenBurnedQty),
-  );
-
-  // set fee for currency and token types
-  const ccyFeePromises = data.ccyTypes.map((ccyType, index) => {
-    return function setFeeForCcyType(cb) {
-      const fee = data.ccyFees[index];
-      console.log(`Setting fee for ccyType ${ccyType.name}`, fee);
-      newContract
-        .setFee_CcyType(ccyType.id, CONST.nullAddr, fee)
-        .then((result) => cb(null, result))
-        .catch((error) => cb(error));
-    };
-  });
-  await series(ccyFeePromises);
-  await sleep(1000);
-
-  const tokenFeePromises = data.tokenTypes.map((tokenType, index) => {
-    return function setFeeForTokenType(cb) {
-      const fee = data.tokenFees[index];
-      console.log(`Setting fee for tokenType ${tokenType.name}`, fee);
-      newContract
-        .setFee_TokType(tokenType.id, CONST.nullAddr, fee)
-        .then((result) => cb(null, result))
-        .catch((error) => cb(error));
-    };
-  });
-
-  await series(tokenFeePromises);
-  await sleep(1000);
-
-  await newContract.sealContract();
+    await series(tokenFeePromises);
+    await sleep(1000);
+  }
 
   const backupData = await createBackupData(newContract, newContractAddress, 0);
 
@@ -303,6 +306,8 @@ module.exports = async (callback) => {
     });
     return callback(new Error(`Ledger hash mismatch!`));
   }
+
+  await newContract.salContract();
 
   callback('Done.');
 };
