@@ -204,7 +204,6 @@ module.exports = async (callback) => {
         if (ledger.tokens.length === 0) {
           return cb(null, []);
         }
-        console.log(`Processing ledger - token: ${index + 1}/${allLedgers.length}`);
 
         // skip if already inserted
         let tokens = ledger.tokens;
@@ -216,13 +215,13 @@ module.exports = async (callback) => {
           }
         }
 
-        console.log(`Creating ledger entry #${index + 1} - token `, owner, tokens);
+        console.log(`Processing ledger - token: ${index + 1}/${allLedgers.length}`, owner, tokens);
 
         return series(
           tokens.map(
             (token) =>
               function AddSecTokenToEntry(callback) {
-                console.log('AddSecTokenToEntry', owner, token.stId);
+                console.log('AddSecTokenToEntry', token.stId);
                 newContract
                   .addSecToken(
                     owner,
