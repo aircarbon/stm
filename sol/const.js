@@ -363,6 +363,8 @@ ${chalk.inverse(`$${(usdCost).toFixed(4)}`)} (@ $${GAS_USD} ETH[||BNB]/USD)`);
 };
 
 function getTestContextWeb3(useWs) {
+    const options = { keepAlive: true, withCredentials: false, timeout: 90000 };
+    
     const context =
 
         // dev - DM
@@ -449,7 +451,9 @@ function getTestContextWeb3(useWs) {
         : process.env.WEB3_NETWORK_ID == 80001 ? { web3: new Web3(
                 useWs ?
                 'wss://competent-booth:stage-going-acts-possum-shield-twins@ws-nd-373-856-321.p2pify.com' :
-                'https://competent-booth:stage-going-acts-possum-shield-twins@nd-373-856-321.p2pify.com'
+                'https://polygon-test.sdax.co:8545',
+                //'https://competent-booth:stage-going-acts-possum-shield-twins@nd-373-856-321.p2pify.com',
+                options
             ),
             ethereumTxChain: { common: EthereumJsCommon.forCustomChain(
             'ropsten', // forCustomChain() requires a "known" name!?
