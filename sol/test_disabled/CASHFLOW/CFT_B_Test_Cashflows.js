@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0-only - (c) AirCarbon Pte Ltd - see /LICENSE.md for Terms
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *   CashFlow Token Tests - Covering the following scenarios:          *
  *   (0) deploy new asset                                              *

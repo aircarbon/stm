@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: AGPL-3.0-only
+// SPDX-License-Identifier: AGPL-3.0-only - (c) AirCarbon Pte Ltd - see /LICENSE.md for Terms
 // Author: https://github.com/7-of-9
 pragma solidity ^0.8.0;
 
@@ -55,23 +55,7 @@ abstract contract StErc20 is StFees
     function getWhitelist() external view returns (address[] memory whitelistAddresses) {
         return erc20d._whitelist;
     }
-    // 24k
-    // function getWhitelistCount() external view returns (uint256) {
-    //     return erc20d._whitelist.length;
-    // }
-    // function isWhitelisted(address addr) external view returns (bool) {
-    //     return erc20d._whitelisted[addr];
-    // }
-    // WHITELIST - get next entry and advance ndx
-    // function getWhitelistNext() external view returns (address) {
-    //     return Erc20Lib.getWhitelistNext(ld, erc20d);
-    // }
-    // function incWhitelistNext() public onlyOwner() onlyWhenReadWrite() {
-    //     Erc20Lib.incWhitelistNext(ld, erc20d);
-    // }
-    // function getWhitelistNextNdx() external view returns (uint256) { return erc20d._nextWhitelistNdx; }
-    // function setWhitelistNextNdx(uint256 v) public onlyOwner() { erc20d._nextWhitelistNdx = v; }
-
+ 
 //#if process.env.CONTRACT_TYPE === 'CASHFLOW_BASE' || process.env.CONTRACT_TYPE === 'COMMODITY'
     /// @notice symbol standard ERC20 token symbol
     string public symbol;

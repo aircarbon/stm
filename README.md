@@ -1,8 +1,18 @@
 # SecTokMaster - Security Token Master (ERC20 [partial] Compatible Commodity or Cashflow Token)
 
+(c) AirCarbon Pte Ltd
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as published
+    by the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Distributed under AGPLv3 license: see /LICENSE.md for terms.
+
+
 [Overview](./contracts/Interfaces/docs/OVERVIEW__STM.md)
 
-## Recommended/Supported:
+## Recommended/Supported
 
 Linux/OSX/WSL - ## scripts are _not_ currently Windows/Powershell compatible ##
 
@@ -89,3 +99,9 @@ You'll need to populate the whitelist addresses and oracle price setting into th
 ## Dbg - misc
 
 If you see `Error: invalid reporter "eth-gas-reporter"` -- try running `npm i` in ./packages/erc20
+
+`truffle deploy` using "infinite" gas?
+ *  bytecode limit (24576): https://github.com/trufflesuite/ganache/issues/960
+ *  https://github.com/ethereum/EIPs/issues/1662
+
+
