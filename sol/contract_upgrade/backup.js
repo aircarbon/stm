@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-only - (c) AirCarbon Pte Ltd - see /LICENSE.md for Terms
+
 // @ts-check
 const fs = require('fs');
 const path = require('path');

@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: AGPL-3.0-only
+// SPDX-License-Identifier: AGPL-3.0-only - (c) AirCarbon Pte Ltd - see /LICENSE.md for Terms
 // Author: https://github.com/7-of-9
 pragma solidity ^0.8.0;
 
@@ -10,13 +10,6 @@ import "./StErc20.sol";
 import "./StPayable.sol";
 import "./DataLoadable.sol";
 import "../Interfaces/StructLib.sol";
-
-// https://diligence.consensys.net/blog/2019/09/how-to-prepare-for-a-smart-contract-audit/
-
-/** truffle deploy using "infinite" gas?
- *  bytecode limit (24576): https://github.com/trufflesuite/ganache/issues/960
- *  https://github.com/ethereum/EIPs/issues/1662
- */
 
 /** 
  *  node process_sol_js && truffle compile && grep \"bytecode\" build/contracts/* | awk '{print $1 " " length($3)/2}'
@@ -57,19 +50,13 @@ import "../Interfaces/StructLib.sol";
 
 contract StMaster
     is
-    StMintable, StBurnable, Collateralizable, StTransferable, DataLoadable //, StFutures (excluded in v1)
+    StMintable, StBurnable, Collateralizable, StTransferable, DataLoadable //, StFutures (excluded/paused for v1) - 24k limit
 {
     // === STM (AC COMMODITY) ===
-    // TODO: getLedgerHashcode() segmented...
     // TODO: type-rename...
-    // TODO: ERC20 authorize + re-entrancy guards, and .call instead of .transfer
     // todo: drop fee_fixed completely (it's == fee_min)
     // todo: etherscan -> verify contract interfaces? -- needs ctor bytecode
     // todo: change internalTransfer so it can operate on *any* stTypeId
-
-    // (others)
-    // todo: SCP - show totalSupply() for erc20's
-    // todo: SCP - use decimals fields for erc20 (send/exchange text fields, or at least round to .decimals before passing to API)
 
     // contract properties
     string public name;
@@ -93,8 +80,7 @@ contract StMaster
     /**
      * @dev permanenty seals the contract; once sealed, no further addresses can be whitelisted
      */
-     function sealContract() external { ld._contractSealed = true; }
-
+    function sealContract() external { ld._contractSealed = true; }
 
     // events -- (hack: see: https://ethereum.stackexchange.com/questions/11137/watching-events-defined-in-libraries)
     // need to be defined (duplicated) here - web3 can't see event signatures in libraries
@@ -204,33 +190,4 @@ contract StMaster
         // contract type
         ld.contractType = _contractType;
     }
-
-    // todo: for updateable libs - proxy dispatcher
-    // https://blog.openzeppelin.com/proxy-libraries-in-solidity-79fbe4b970fd/
-    // test lib...
-    /*mapping(uint256 => St2x.SecTokenBatch) __batches;
-    function call_st2() external returns (uint256) {
-        //St2Interface st2 = St2Interface(addr_st2);
-
-        //return St2x.name2();
-
-        //St2x st2 = St2x(addr_st2);
-        //st2.set_batch_id1(__batches);
-
-        St2x.set_batch_id1(__batches);
-        return __batches[42].tokTypeId;
-
-        // ## visibility problem...
-        //st2.set_batch_id1(__batches);
-        //st2.test(42);
-
-        // ## __batches: "this type cannot be encoded" -- so still no way of passing in a mapping...
-        //
-        // this looks like the answer: https://ethereum.stackexchange.com/questions/6755/how-to-access-a-mapping-in-a-library
-        // simplyify, repro just that struct { mapping (int,int) } call ....
-        //
-        //addr_st2.delegatecall(abi.encodePacked(bytes4(keccak256("set_batch_id1(mapping(uint256 => St2Interface.SecTokenBatch))")), __batches));
-
-        //return st2.name2();
-    }*/
 }

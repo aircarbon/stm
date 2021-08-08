@@ -1,5 +1,7 @@
-// SPDX-License-Identifier: AGPL-3.0-only
+// SPDX-License-Identifier: AGPL-3.0-only - (c) AirCarbon Pte Ltd - see /LICENSE.md for Terms
 // Author: https://github.com/7-of-9
+// PAUSED
+
 pragma solidity ^0.8.0;
 
 import "./StErc20.sol";
@@ -18,7 +20,7 @@ TODO: no open of positions on FT types after expiry timestamp - ** must be enfor
 
 === IMPLEMENTATION:
 
-  PAUSED: Thom, Bill & Tom review 29th Apr ...
+  PAUSED: ...
   ================================
      (done: FT fees per contract --> account level override)
      (done: unrealizedPL ---> new field in PackedSt: just inc/dec on each settlement cycle... (probably *needed* for position-level liquiation))
@@ -41,8 +43,6 @@ TODO: no open of positions on FT types after expiry timestamp - ** must be enfor
               ?? or use the position PL value to calc how much is remaining of its init+var ???
 
 ==================================
-
-FUTURES - notes 26/MAR/2020
 
 done: 
 
@@ -155,29 +155,7 @@ abstract contract StFutures is Owned,
     function setLedgerOverride(uint256 overrideType, uint256 tokTypeId, address ledgerOwner, uint128 value)
     public onlyOwner() onlyWhenReadWrite() {
         FuturesLib.setLedgerOverride(overrideType, ld, std, tokTypeId, ledgerOwner, value);
-        // if (overrideType == OverrideType.INIT_MARGIN) {
-        //     FuturesLib.initMarginOverride(ld, std, tokTypeId, ledgerOwner, uint16(value));
-        // }
-        // else if (overrideType == OverrideType.FEE_PER_CONTRACT) {
-        //     FuturesLib.feePerContractOverride(ld, std, tokTypeId, ledgerOwner, value);
-        // }
     }
-    // // set initial margin - ledger override
-    // function initMarginOverride(
-    //     uint256 tokTypeId,
-    //     address ledgerOwner,
-    //     uint16  initMarginBips)
-    // public onlyOwner() onlyWhenReadWrite() {
-    //     FuturesLib.initMarginOverride(ld, std, tokTypeId, ledgerOwner, initMarginBips);
-    // }
-    // // set fee per contract - ledger override
-    // function feePerContractOverride(
-    //     uint256 tokTypeId,
-    //     address ledgerOwner,
-    //     uint128 feePerContract)
-    // public onlyOwner() onlyWhenReadWrite() {
-    //     FuturesLib.feePerContractOverride(ld, std, tokTypeId, ledgerOwner, feePerContract);
-    // }
 
     /**
      * @dev open futures position

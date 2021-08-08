@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: AGPL-3.0-only
+// SPDX-License-Identifier: AGPL-3.0-only - (c) AirCarbon Pte Ltd - see /LICENSE.md for Terms
 // Author: https://github.com/7-of-9
 pragma solidity ^0.8.0;
 
@@ -39,7 +39,7 @@ abstract contract StLedger is
      * @param cashflowBaseAddr account address of the cashflow base token (CFT)
      */
     function addSecTokenType(string memory name, StructLib.SettlementType settlementType, StructLib.FutureTokenTypeArgs memory ft, address payable cashflowBaseAddr)
-    public onlyOwner() onlyWhenReadWrite() { TokenLib.addSecTokenType(ld, std, ctd, name, settlementType, ft, cashflowBaseAddr); }
+        public onlyOwner() onlyWhenReadWrite() { TokenLib.addSecTokenType(ld, std, ctd, name, settlementType, ft, cashflowBaseAddr); }
 
     //
     // VIEW LEDGER
@@ -80,9 +80,7 @@ abstract contract StLedger is
      * @return ledgerEntry
      * @param ledgerEntry returns the ledger entry for the account provided
      */
-    function getLedgerEntry(address account) external view returns (StructLib.LedgerReturn memory ledgerEntry) { 
-        return LedgerLib.getLedgerEntry(ld, std, ctd, account);
-    }
+    function getLedgerEntry(address account) external view returns (StructLib.LedgerReturn memory ledgerEntry) { return LedgerLib.getLedgerEntry(ld, std, ctd, account); }
 
     // get batch(es)
     /**
@@ -123,9 +121,5 @@ abstract contract StLedger is
      * @return secToken
      * @param secToken returns a security token for the identifier provided
      */
-    function getSecToken(uint256 id) external view returns (
-        StructLib.LedgerSecTokenReturn memory secToken
-    ) {
-        return TokenLib.getSecToken(ld, std, id);
-    }
+    function getSecToken(uint256 id) external view returns (StructLib.LedgerSecTokenReturn memory secToken) { return TokenLib.getSecToken(ld, std, id); }
 }

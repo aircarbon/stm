@@ -1,5 +1,4 @@
-
-// SPDX-License-Identifier: AGPL-3.0-only
+// SPDX-License-Identifier: AGPL-3.0-only - (c) AirCarbon Pte Ltd - see /LICENSE.md for Terms
 // Author: https://github.com/7-of-9
 pragma solidity ^0.8.0;
 
@@ -27,10 +26,10 @@ abstract // solc 0.6
 contract StPayable is
     StErc20, ReentrancyGuard {
         
-    // === CFT === V0 ** =>>> MVP -- CFT SPLIT LEDGER (central WL, central collateral, central spot transferOrTrade...)
+    // === CFT - Cashflow Types === V1/MVP DONE ** =>>> CFT SPLIT LEDGER (decentralized token balances w/ central WL, collateral balances, and centralized spot transferOrTrade entry point...)
     //
-    //  Cashflow type is fundamentally way less fungible than Commodity type, i.e. loan A != loan B
-    //  Therefore, the only way to preserve ERC20 semanitcs for CFTs, is for each CFT *to have its own contract address*
+    //  Cashflow type is fundamentally way less fungible than Commodity type, i.e. loanA != loanB, equityA != equityB, etc.
+    //  Only way to preserve ERC20 semanitcs for CFTs, is for each CFT to have its own contract address;
     //    (i.e. we can't use token-types (or batch metadata) to separate different CFTs in a single contract ledger)
     //
     //          (1) CASHFLOW_CONTROLLER: new contract type
@@ -49,14 +48,14 @@ contract StPayable is
     //          (3) CASHFLOW_CONTROLLER === (interface compatible) with COMMODITY (base) EXCEPT:
     //                  > can only add indirect (CASHFLOW_BASE) types
     //                  > only 1 mint action per sec-type (i.e. mint is passed through to the unitoken model on CASHFLOW_BASE)
-    //                  > no ERC20 support (not fungible, meaningless) -- but ERC20 should work on CASHFLOW_BASE
+    //                  > no ERC20 support (not fungible, meaningless) -- ERC20 works only on CASHFLOW_BASE
     //
- 
-    // === CFT === V0.1 ** =>>> MVP -- CFT CORE (w/ WL, w/ trade intercace via CFT-C, w/ full ERC20 on delegated types...)
-    //  >>> TODO: PoC data load/compare JS tests for CFT-C and CFT-B is TODO...
-    //      TODO: pri1 - issuerPayments (EQ)   v0.1 -- MVP (any amount ok, no validations) -- test pack: changing issuancePrice mid-issuance
-    //      TODO: pri1 - issuerPayments (BOND) v0.1 -- MVP basic (no validations, i.e. eq-path only / simple term-structure table -- revisit loan/interest etc. later)
-    //      TODO: pri2 - PE: issuance fee on subscriptions
+    // === CFT ====>>> V2...
+    //  >>> TODO: PoC data load/compare JS tests for CFT-C and CFT-B...
+    //      TODO: pri2 - PI: softcap/escrow/timelimits, etc...
+    //      TODO: pri2 - PI: issuance fee on subscriptions..
+    //      done/v1: pri1 - issuerPayments (EQ)   v0.1 -- MVP (any amount ok, no validations) -- test pack: changing issuancePrice mid-issuance
+    //      done/v1: pri1 - issuerPayments (BOND) v0.1 -- MVP basic (no validations, i.e. eq-path only / simple term-structure table -- revisit loan/interest etc. later)
 
 //#if process.env.CONTRACT_TYPE === 'CASHFLOW_BASE'
 //#     StructLib.CashflowStruct cashflowData;
