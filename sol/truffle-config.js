@@ -221,7 +221,7 @@
          nonceTracker.setEngine(wallet.engine);
          return wallet;
        },
-       gas: 80000000, // 80m
+       gas: 8000000, // 8m
        gasPrice: web3.utils.toWei(GWEI_TESTNET_97, 'gwei'),
        network_id: '97',
        networkCheckTimeout: 30000,
