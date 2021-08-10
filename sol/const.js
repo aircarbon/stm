@@ -467,6 +467,23 @@ function getTestContextWeb3(useWs) {
             },
             'petersburg'
         ) } }
+        
+        // Fantom Testnet
+        : process.env.WEB3_NETWORK_ID == 4002 ? { web3: new Web3(
+                useWs ?
+                '' :
+                'https://rpc.testnet.fantom.network',
+                options
+            ),
+            ethereumTxChain: { common: EthereumJsCommon.forCustomChain(
+            'ropsten', // forCustomChain() requires a "known" name!?
+            {
+                name: 'fantom_testnet',
+                networkId: 4002,
+                chainId: 4002,
+            },
+            'petersburg'
+        ) } }
 
         // ETH Mainnet - Infura (AirCarbon-AwsDev)
       //: process.env.WEB3_NETWORK_ID == 1 ? { web3: new Web3('https://ac-dev0.net:10545'), ethereumTxChain: {} }
