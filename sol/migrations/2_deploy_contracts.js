@@ -64,6 +64,9 @@ const db = require('../../orm/build');
 //
 //   AC Matic (Mumbai) Testnet 80001
 //    `export INSTANCE_ID=UAT_80001_AC && node process_sol_js && truffle compile && truffle migrate --network matic_testnet -f 2 --to 2`
+//
+//   AC Fantom Testnet 4002
+//    `export INSTANCE_ID=UAT_4002_AC && node process_sol_js && truffle compile && truffle migrate --network fantom_testnet -f 2 --to 2`
 
 // Matic (Mumbai) Testnet 80001 deployments have intermittent errors (results in an non-terminating solc-js dump)
 
@@ -88,129 +91,67 @@ module.exports = async function (deployer) {
       console.log(`Deploying (AWS DEV / DEMO) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`);
       break;
     case 'UAT_80001_AC':
-      console.log(
-        `Deploying (AWS UAT / Matic Testnet (Mumbai) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`,
-      );
+      console.log(`Deploying (AWS UAT / Matic Testnet (Mumbai) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`);
+      break;
+    case 'UAT_4002_AC':
+      console.log(`Deploying (AWS UAT / Fantom Testnet instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`);
       break;
     case 'UAT':
       console.log(`Deploying (AWS DEV / UAT) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`);
       break;
     case 'PROD_1':
-      console.log(
-        `Deploying (AWS PROD / ETH 1 MAINNET) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`,
-      );
+      console.log(`Deploying (AWS PROD / ETH 1 MAINNET) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`);
       break;
     case 'PROD_52101':
-      console.log(
-        `Deploying (AWS PROD / AC 52101 PRODNET) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`,
-      );
+      console.log(`Deploying (AWS PROD / AC 52101 PRODNET) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`);
       break;
     case 'PROD_56':
-      console.log(
-        `Deploying (AWS PROD / BSC 56 MAINNET) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`,
-      );
+      console.log(`Deploying (AWS PROD / BSC 56 MAINNET) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`);
       break;
 
     // SD
     case 'DEV_SD':
-      console.log(
-        `Deploying (AWS DEV / DEV [controller w/ 0 default base types] for SDAX) instance, saving to DB: ${chalk.inverse(
-          process.env.sql_server,
-        )}`,
-      );
+      console.log(`Deploying (AWS DEV / DEV [controller w/ 0 default base types] for SDAX) instance, saving to DB: ${chalk.inverse(process.env.sql_server,)}`);
       break;
     case 'UAT_SD':
-      console.log(
-        `Deploying (AWS DEV / UAT [controller w/ 0 default base types] for SDAX) instance, saving to DB: ${chalk.inverse(
-          process.env.sql_server,
-        )}`,
-      );
+      console.log(`Deploying (AWS DEV / UAT [controller w/ 0 default base types] for SDAX) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`);
       break;
     case 'UAT_97_SD':
-      console.log(
-        `Deploying (AWS UAT / BSC Testnet [controller w/ 0 default base types] for SDAX) instance, saving to DB: ${chalk.inverse(
-          process.env.sql_server,
-        )}`,
-      );
-      break;
-    case 'UAT_80001':
-      console.log(
-        `Deploying (AWS UAT / Matic Testnet (Mumbai) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`,
-      );
+      console.log(`Deploying (AWS UAT / BSC Testnet [controller w/ 0 default base types] for SDAX) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`);
       break;
     case 'UAT_80001_SD':
-      console.log(
-        `Deploying (AWS UAT / Matic Testnet (Mumbai) [controller w/ 0 default base types] for SDAX) instance, saving to DB: ${chalk.inverse(
-          process.env.sql_server,
-        )}`,
-      );
+      console.log(`Deploying (AWS UAT / Matic Testnet (Mumbai) [controller w/ 0 default base types] for SDAX) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`);
+      break;
+    case 'UAT_4002_SD':
+      console.log(`Deploying (AWS UAT / Fantom Testnet instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`);
       break;
     case 'DEMO_97_SD':
-      console.log(
-        `Deploying (AWS DEMO / BSC Testnet [controller w/ 0 default base types] for SDAX) instance, saving to DB: ${chalk.inverse(
-          process.env.sql_server,
-        )}`,
-      );
+      console.log(`Deploying (AWS DEMO / BSC Testnet [controller w/ 0 default base types] for SDAX) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`);
       break;
     case 'PROD_3_SD':
-      console.log(
-        `Deploying (AWS PROD / Ropsten 3 [controller w/ 0 default base types] for SDAX) instance, saving to DB: ${chalk.inverse(
-          process.env.sql_server,
-        )}`,
-      );
+      console.log(`Deploying (AWS PROD / Ropsten 3 [controller w/ 0 default base types] for SDAX) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`);
       break;
     case 'PROD_56_SD':
-      console.log(
-        `Deploying (AWS PROD / BSC Mainnet [controller w/ 0 default base types] for SDAX) instance, saving to DB: ${chalk.inverse(
-          process.env.sql_server,
-        )}`,
-      );
+      console.log(`Deploying (AWS PROD / BSC Mainnet [controller w/ 0 default base types] for SDAX) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`);
       break;
     case 'PROD_137_SD':
-      console.log(
-        `Deploying (AWS PROD / Matic Mainnet [controller w/ 0 default base types] for SDAX) instance, saving to DB: ${chalk.inverse(
-          process.env.sql_server,
-        )}`,
-      );
+      console.log(`Deploying (AWS PROD / Matic Mainnet [controller w/ 0 default base types] for SDAX) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`);
       break;
 
     default:
       if (process.env.INSTANCE_ID.startsWith('UAT_3_SD_')) {
-        console.log(
-          `Deploying (AWS DEV / UAT Ropsten [additional base type] for SDAX) instance, saving to DB: ${chalk.inverse(
-            process.env.sql_server,
-          )}`,
-        );
+        console.log(`Deploying (AWS DEV / UAT Ropsten [additional base type] for SDAX) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`);
       } else if (process.env.INSTANCE_ID.startsWith('UAT_97_SD_')) {
-        console.log(
-          `Deploying (AWS DEV / UAT BSC Testnet [additional base type] for SDAX) instance, saving to DB: ${chalk.inverse(
-            process.env.sql_server,
-          )}`,
-        );
+        console.log(`Deploying (AWS DEV / UAT BSC Testnet [additional base type] for SDAX) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`);
       } else if (process.env.INSTANCE_ID.startsWith('UAT_80001_SD_')) {
-        console.log(
-          `Deploying (AWS DEV / UAT Matic Testnet (Mumbai) [additional base type] for SDAX) instance, saving to DB: ${chalk.inverse(
-            process.env.sql_server,
-          )}`,
-        );
+        console.log(`Deploying (AWS DEV / UAT Matic Testnet (Mumbai) [additional base type] for SDAX) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`);
       } else if (process.env.INSTANCE_ID.startsWith('DEMO_97_SD_')) {
-        console.log(
-          `Deploying (AWS DEV / DEMO BSC Testnet [additional base type] for SDAX) instance, saving to DB: ${chalk.inverse(
-            process.env.sql_server,
-          )}`,
-        );
+        console.log(`Deploying (AWS DEV / DEMO BSC Testnet [additional base type] for SDAX) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`);
       } else if (process.env.INSTANCE_ID.startsWith('PROD_56_SD_')) {
         console.log(
-          `Deploying (AWS PROD / BSC Mainnet [additional base type] for SDAX) instance, saving to DB: ${chalk.inverse(
-            process.env.sql_server,
-          )}`,
-        );
+          `Deploying (AWS PROD / BSC Mainnet [additional base type] for SDAX) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`);
       } else if (process.env.INSTANCE_ID.startsWith('PROD_137_SD_')) {
-        console.log(
-          `Deploying (AWS PROD / Matic Mainnet [additional base type] for SDAX) instance, saving to DB: ${chalk.inverse(
-            process.env.sql_server,
-          )}`,
-        );
+        console.log(`Deploying (AWS PROD / Matic Mainnet [additional base type] for SDAX) instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`);
       } else if (process.env.INSTANCE_ID.startsWith('local')) {
         console.log(`Deploying localhost contract instance, saving to DB: ${chalk.inverse(process.env.sql_server)}`);
       } else {
