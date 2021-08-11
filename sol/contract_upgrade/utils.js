@@ -148,6 +148,25 @@ function getLedgerHashOffChain(data) {
       );
     });
   }
+  console.log('ledger hash - ledgers', ledgerHash);
+
+  // hash secTokens
+  const secTokens = data?.globalSecTokens ?? [];
+  secTokens.forEach((token) => {
+    ledgerHash = soliditySha3(
+      ledgerHash,
+      token.stId,
+      token.tokTypeId,
+      token.tokTypeName,
+      token.batchId,
+      token.mintedQty,
+      token.currentQty,
+      token.ft_price,
+      token.ft_ledgerOwner,
+      token.ft_lastMarkPrice,
+      token.ft_PL,
+    );
+  });
 
   console.log('result', ledgerHash);
   return ledgerHash;
@@ -174,7 +193,20 @@ async function createBackupData(contract, contractAddress, contractType) {
 
   // get ledgers
   const ledgerOwners = await contract.getLedgerOwners();
-  const ledgers = await Promise.all(ledgerOwners.map((owner) => contract.getLedgerEntry(owner)));
+  const ledgers = (await Promise.all(ledgerOwners.map((owner) => contract.getLedgerEntry(owner))))
+    .map((ledger) => helpers.decodeWeb3Object(ledger))
+    .map((ledger, index, ledgers) => {
+      return {
+        ...ledger,
+        ccys: ledgers[index].ccys.map((ccy) => ({
+          ccyTypeId: ccy.ccyTypeId,
+          name: ccy.name,
+          unit: ccy.unit,
+          balance: ccy.balance,
+          reserved: ccy.reserved,
+        })),
+      };
+    });
 
   // get all batches
   const batchesPromise = [];
@@ -204,6 +236,25 @@ async function createBackupData(contract, contractAddress, contractType) {
     tokenFeePromise.push(contract.getFee(CONST.getFeeType.TOK, tokenTypes[index].id, CONST.nullAddr));
   }
   const tokenFees = await Promise.all(tokenFeePromise);
+
+  // get all stId
+  const maxStId = Number(hexToNumberString(secTokenMintedCount));
+  const getTokenPromise = [];
+  const existStId = [];
+  ledgers.forEach((ledger) => {
+    ledger.tokens.forEach((token) => {
+      const stId = Number(token.stId);
+      if (!existStId.includes(stId)) {
+        existStId.push(stId);
+      }
+    });
+  });
+  for (let index = 0; index < maxStId; index++) {
+    if (!existStId.includes(index + 1)) {
+      getTokenPromise.push(contract.getSecToken(index + 1));
+    }
+  }
+  const globalSecTokens = await Promise.all(getTokenPromise);
 
   // write backup to json file
   const backup = {
@@ -248,20 +299,8 @@ async function createBackupData(contract, contractAddress, contractType) {
         };
       }),
       tokenFees: tokenFees.map((fee) => helpers.decodeWeb3Object(fee)),
-      ledgers: ledgers
-        .map((ledger) => helpers.decodeWeb3Object(ledger))
-        .map((ledger, index) => {
-          return {
-            ...ledger,
-            ccys: ledgers[index].ccys.map((ccy) => ({
-              ccyTypeId: ccy.ccyTypeId,
-              name: ccy.name,
-              unit: ccy.unit,
-              balance: ccy.balance,
-              reserved: ccy.reserved,
-            })),
-          };
-        }),
+      globalSecTokens: globalSecTokens.map((token) => helpers.decodeWeb3Object(token)),
+      ledgers,
       batches: batches
         .map((batch) => helpers.decodeWeb3Object(batch))
         .map((batch, index) => {

@@ -253,6 +253,38 @@ module.exports = async (callback) => {
     await series(addSecTokensPromises);
     await sleep(1000);
 
+    // add globalSecTokens to new contract
+    const globalSecTokensPromises = data.globalSecTokens.map(
+      (token, index, tokens) =>
+        function addGlobalSecToken(cb) {
+          console.log('Add global sec token', token);
+          console.log(`Processing ${index + 1}/${tokens.length}`);
+          newContract
+            .getSecToken(token.stId)
+            .then((result) => helpers.decodeWeb3Object(result))
+            .then((existToken) =>
+              existToken.exists
+                ? existToken
+                : newContract.addSecToken(
+                    '0x0000000000000000000000000000000000000000',
+                    token.batchId,
+                    token.stId,
+                    token.tokTypeId,
+                    token.mintedQty,
+                    token.currentQty,
+                    token.ft_price,
+                    token.ft_lastMarkPrice,
+                    token.ft_ledgerOwner,
+                    token.ft_PL,
+                  ),
+            )
+            .then((result) => cb(null, result))
+            .catch((error) => cb(error));
+        },
+    );
+    await series(globalSecTokensPromises);
+    await sleep(1000);
+
     await newContract.setTokenTotals(
       data.secTokenBaseId,
       toBN(data.secTokenMintedCount),
