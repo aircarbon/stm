@@ -32,6 +32,7 @@
  const GWEI_TESTNET_97 = '10';
  const GWEI_TESTNET = '20';
  const GWEI_MATIC = '1'; // https://www.polygongasstation.com/
+ const GWEI_FANTOM = '5';
 
  //
  // https://chainid.network/chains/
@@ -221,7 +222,7 @@
          nonceTracker.setEngine(wallet.engine);
          return wallet;
        },
-       gas: 80000000, // 80m
+       gas: 8000000, // 8m
        gasPrice: web3.utils.toWei(GWEI_TESTNET_97, 'gwei'),
        network_id: '97',
        networkCheckTimeout: 30000,
@@ -275,6 +276,29 @@
        skipDryRun: false,
        timeoutBlocks: 200,
      },
+        
+        // Fantom Testnet
+        fantom_testnet: {
+          provider: function () {
+            var wallet = new HDWalletProvider(
+              DEV_MNEMONIC,
+              'https://rpc.testnet.fantom.network', // https://docs.fantom.foundation/tutorials/set-up-metamask-testnet
+              0,
+              1000,
+            );
+            var nonceTracker = new NonceTrackerSubprovider();
+            wallet.engine._providers.unshift(nonceTracker);
+            nonceTracker.setEngine(wallet.engine);
+            return wallet;
+          },
+          gas: 8000000, // 8m
+          gasPrice: web3.utils.toWei(GWEI_FANTOM, 'gwei'),
+          network_id: '4002',
+          networkCheckTimeout: 90000,
+          confirmations: 1,
+          skipDryRun: false,
+          timeoutBlocks: 200,
+        },
 
      // Another network with more advanced options...
      // advanced: {
