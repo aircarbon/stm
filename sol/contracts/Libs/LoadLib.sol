@@ -69,7 +69,14 @@ library LoadLib {
         ld._sts[stId].ft_ledgerOwner = ft_ledgerOwner;
         ld._sts[stId].ft_lastMarkPrice = ft_lastMarkPrice;
         ld._sts[stId].ft_PL = ft_PL;
-        ld._ledger[ledgerEntryOwner].tokenType_stIds[tokTypeId].push(stId);
+
+        // v1.1 bugfix
+        // burned tokens don't exist against any ledger entry, (but do exist
+        // on the master _sts global list); this conditional allows us to use the
+        // null-address to correctly represent these burned tokens in the target contract
+        if (ledgerEntryOwner != 0x0000000000000000000000000000000000000000) {  // v1.1 bugfix
+            ld._ledger[ledgerEntryOwner].tokenType_stIds[tokTypeId].push(stId);
+        }
     }
 
     function setTokenTotals(
