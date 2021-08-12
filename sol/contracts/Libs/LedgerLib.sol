@@ -326,8 +326,10 @@ library LedgerLib {
         }
 
         // base & commodity - apply consistency check: global totals vs. sum ST totals
+        // v1.1 bugfix
+        // this logic is borked; TODO: document why logic is invalid, and then remove these checkes...
         if (ld.contractType != StructLib.ContractType.CASHFLOW_CONTROLLER) {
-            require(chk.totalMinted == ld._spot_totalMintedQty, "Consistency check failed (1)");
+            require(chk.totalMinted == ld._spot_totalMintedQty, "Consistency check failed (1)"); 
             require(chk.totalMinted - chk.totalCur == ld._spot_totalBurnedQty, "Consistency check failed (2)");
         }
 
@@ -335,17 +337,6 @@ library LedgerLib {
         ledgerHash = keccak256(abi.encodePacked(ledgerHash, ld._tokens_currentMax_id));
         ledgerHash = keccak256(abi.encodePacked(ledgerHash, ld._spot_totalMintedQty));
         ledgerHash = keccak256(abi.encodePacked(ledgerHash, ld._spot_totalBurnedQty));
-
-        // 24k
-        //ledgerHash = keccak256(abi.encodePacked(ledgerHash, uint256(ld._spot_total.transferedQty)));
-        //ledgerHash = keccak256(abi.encodePacked(ledgerHash, uint256(ld._spot_total.exchangeFeesPaidQty)));
-        //ledgerHash = keccak256(abi.encodePacked(ledgerHash, uint256(ld._spot_total.originatorFeesPaidQty)));
-        // for (uint256 ccyTypeId = 1; ccyTypeId <= ctd._ct_Count; ccyTypeId++) {
-        //     ledgerHash = keccak256(abi.encodePacked(ledgerHash, uint256(ld._ccyType_totalFunded[ccyTypeId])));
-        //     ledgerHash = keccak256(abi.encodePacked(ledgerHash, uint256(ld._ccyType_totalWithdrawn[ccyTypeId])));
-        //     ledgerHash = keccak256(abi.encodePacked(ledgerHash, uint256(ld._ccyType_totalTransfered[ccyTypeId])));
-        //     ledgerHash = keccak256(abi.encodePacked(ledgerHash, uint256(ld._ccyType_totalFeesPaid[ccyTypeId])));
-        // }
 
         return ledgerHash;
     }
