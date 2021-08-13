@@ -194,8 +194,8 @@
      bsc_mainnet_ac: {
        provider: function () {
          var wallet = new HDWalletProvider(
-           process.env.PROD_MNEMONIC || require('./PROD_MNEMONIC.js').MNEMONIC,
-           'https://ac-prod1.aircarbon.co:9545',
+           DEV_MNEMONIC,
+           'https://bsc-prod1.sdax.co:9545',
            0,
            1000,
          );
