@@ -411,7 +411,7 @@ function getTestContextWeb3(useWs) {
         ) } }
 
         // BSC Mainnet - Binance Smart Chain
-        : process.env.WEB3_NETWORK_ID == 56 ? { web3: new Web3(useWs ? 'wss://ac-prod1.aircarbon.co:9546' : 'https://ac-prod1.aircarbon.co:9545'),
+        : process.env.WEB3_NETWORK_ID == 56 ? { web3: new Web3(useWs ? 'wss://bsc-prod1.sdax.co:9546' : 'https://bsc-prod1.sdax.co:9545'),
             ethereumTxChain: { common: EthereumJsCommon.forCustomChain(
             'ropsten', // forCustomChain() requires a "known" name!?
             {
