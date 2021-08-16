@@ -676,9 +676,9 @@ library TransferLib {
                             ld._sts[to_stIds[i]].currentQty += v.stQty; // PACKED
                             ld._sts[to_stIds[i]].mintedQty += v.stQty; // PACKED
 
-                            // resize (shrink) the source global ST
-                            ld._sts[from_stIds[v.ndx]].currentQty -= v.stQty; // ***
-                            ld._sts[from_stIds[v.ndx]].mintedQty -= v.stQty; // ***
+                            // v1.1b - FIX: resize (shrink) the source global ST
+                            ld._sts[from_stIds[v.ndx]].currentQty -= v.stQty;
+                            ld._sts[from_stIds[v.ndx]].mintedQty -= v.stQty;
                             
                             v.mergedExisting = true;
                             emit TransferedFullSecToken(a.from, a.to, stId, to_stIds[i], uint256(uint64(v.stQty)), a.transferType);
