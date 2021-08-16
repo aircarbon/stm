@@ -326,11 +326,11 @@ library LedgerLib {
         }
 
         // base & commodity - apply consistency check: global totals vs. sum ST totals
-        // v1.1 bugfix -- borked, would be nice to know why...
-        // if (ld.contractType != StructLib.ContractType.CASHFLOW_CONTROLLER) {
-        //     require(chk.totalMinted == ld._spot_totalMintedQty, "Consistency check failed (1)"); 
-        //     require(chk.totalMinted - chk.totalCur == ld._spot_totalBurnedQty, "Consistency check failed (2)");
-        // }
+        // v1.1b fix on TransferLib: transferSplitSecTokens
+        if (ld.contractType != StructLib.ContractType.CASHFLOW_CONTROLLER) {
+            require(chk.totalMinted == ld._spot_totalMintedQty, "Consistency check failed (1)"); 
+            require(chk.totalMinted - chk.totalCur == ld._spot_totalBurnedQty, "Consistency check failed (2)");
+        }
 
         // hash totals & counters
         ledgerHash = keccak256(abi.encodePacked(ledgerHash, ld._tokens_currentMax_id));
