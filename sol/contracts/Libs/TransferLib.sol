@@ -657,17 +657,11 @@ library TransferLib {
                 v.ndx++;
             }
             else {
-                if (v.remainingToTransfer >= v.stQty) {
-                    // reassign the full ST across the ledger entries
+                if (v.remainingToTransfer >= v.stQty) { // reassign the FULL ST across the ledger entries
 
-                    // remove from origin - replace hot index 0 with value at last (ndx++, in effect)
+                    // remove from origin ledger - replace hot index 0 with value at last (ndx++, in effect)
                     from_stIds[v.ndx] = from_stIds[from_stIds.length - 1];
-                    //from_stIds.length--;
                     from_stIds.pop(); // solc 0.6
-
-                    //ld._ledger[from].tokenType_sumQty[a.tokTypeId] -= stQty;            //* gas - DROP DONE - only used internally, validation params
-
-                    // TODO -- reinstate this!? seems **needed** for combining of erc20's -- but *why* wasn't it needed for commodity transfers...?!
 
                     // assign to destination
                     //  IFF minting >1 ST is disallowed AND
@@ -678,9 +672,13 @@ library TransferLib {
                     v.mergedExisting = false;
                     for (uint i = 0; i < to_stIds.length; i++) {
                         if (ld._sts[to_stIds[i]].batchId == ld._sts[stId].batchId) {
-                            // resize (grow) the destination ST
+                            // resize (grow) the destination global ST
                             ld._sts[to_stIds[i]].currentQty += v.stQty; // PACKED
                             ld._sts[to_stIds[i]].mintedQty += v.stQty; // PACKED
+
+                            // resize (shrink) the source global ST
+                            ld._sts[from_stIds[v.ndx]].currentQty -= v.stQty; // ***
+                            ld._sts[from_stIds[v.ndx]].mintedQty -= v.stQty; // ***
                             
                             v.mergedExisting = true;
                             emit TransferedFullSecToken(a.from, a.to, stId, to_stIds[i], uint256(uint64(v.stQty)), a.transferType);
@@ -693,19 +691,17 @@ library TransferLib {
                         emit TransferedFullSecToken(a.from, a.to, stId, 0, uint256(uint64(v.stQty)), a.transferType);
                     }
 
-                    //ld._ledger[to].tokenType_sumQty[tokTypeId] += stQty;                //* gas - DROP DONE - only used internally, validation params
-
                     v.remainingToTransfer -= v.stQty;
                     if (v.remainingToTransfer > 0) {
                         require(from_stIds.length > 0, "Insufficient tokens");
                     }
                 }
-                else {
-                    // split the ST across the ledger entries, soft-minting a new ST in the destination
-                    // note: the parent (origin) ST's minted qty also gets split across the two ST;
+                else { // move PART of an ST across the ledger entries
+
+                    // SPLIT the ST across the ledger entries, soft-minting a new ST in the destination
+                    // note: the parent (origin) ST's minted qty also gets split across the two STs;
                     //         this is so the total minted in the system is unchanged,
-                    //         and also so the total burned amount in the ST can still be calculated by mintedQty[x] - currentQty[x]
-                    // note: both parent and child ST point to each other (double-linked list)
+                    //           (and also so the total burned amount in the ST can still be calculated by mintedQty[x] - currentQty[x])
 
                     // assign new ST to destination
 
@@ -725,14 +721,9 @@ library TransferLib {
                         }
                         // SOFT-MINT - if no existing destination ST from same batch; inherit batch ID from parent ST
                         if (!v.mergedExisting) {
-                            // gas: 50k
                             ld._sts[maxStId + 1].batchId = ld._sts[stId].batchId; // PACKED
                             ld._sts[maxStId + 1].currentQty = v.remainingToTransfer; // PACKED
                             ld._sts[maxStId + 1].mintedQty = v.remainingToTransfer; // PACKED
-
-                            //ld._sts_mintedTimestamp[maxStId + 1] = block.timestamp;                 // gas - DROP DONE - can fetch from events
-                            //ld._sts_splitFrom_id[maxStId + 1] = stId;                               // gas - DROP DONE - can fetch from events
-                            //ld._ledger[to].tokenType_sumQty[tokTypeId] += remainingToTransfer; // gas - DROP DONE - only used internally, validation params
 
                             to_stIds.push(maxStId + 1); // gas: 94k
                             emit TransferedPartialSecToken(a.from, a.to, stId, maxStId + 1, 0, uint256(uint64(v.remainingToTransfer)), a.transferType); // gas: 11k
@@ -742,9 +733,6 @@ library TransferLib {
                     // resize (shrink) the origin ST
                     ld._sts[stId].currentQty -= v.remainingToTransfer; // PACKED
                     ld._sts[stId].mintedQty -= v.remainingToTransfer; // PACKED
-
-                    //ld._sts_splitTo_id[stId] = newStId;                                          // gas - DROP DONE - can index from events
-                    //ld._ledger[from].tokenType_sumQty[tokTypeId] -= remainingToTransfer;       // gas - DROP DONE - only used internally, validation params
 
                     v.remainingToTransfer = 0;
                 }
