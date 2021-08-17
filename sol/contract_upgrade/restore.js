@@ -259,8 +259,15 @@ module.exports = async (callback) => {
         function addGlobalSecToken(cb) {
           console.log('Add global sec token', token);
           console.log(`Processing ${index + 1}/${tokens.length}`);
+          const { stId, mintedQty, currentQty } = token;
+          const transferedFullSecTokensEvent = data.transferedFullSecTokensEvents.find(
+            (event) => Number(event.stId) === Number(stId),
+          );
+          if (transferedFullSecTokensEvent) {
+            console.log(`Found transferedFullSecTokensEvent for ${stId}`, transferedFullSecTokensEvent);
+          }
           newContract
-            .getSecToken(token.stId)
+            .getSecToken(stId)
             .then((result) => helpers.decodeWeb3Object(result))
             .then((existToken) =>
               existToken.exists
@@ -268,10 +275,10 @@ module.exports = async (callback) => {
                 : newContract.addSecToken(
                     '0x0000000000000000000000000000000000000000',
                     token.batchId,
-                    token.stId,
+                    stId,
                     token.tokTypeId,
-                    token.mintedQty,
-                    token.currentQty,
+                    Number(mintedQty) - Number(transferedFullSecTokensEvent?.qty ?? 0),
+                    Number(currentQty) - Number(transferedFullSecTokensEvent?.qty ?? 0),
                     token.ft_price,
                     token.ft_lastMarkPrice,
                     token.ft_ledgerOwner,
@@ -321,7 +328,7 @@ module.exports = async (callback) => {
     await sleep(1000);
   }
 
-  const backupData = await createBackupData(newContract, newContractAddress, 0);
+  const backupData = await createBackupData(newContract, newContractAddress, 0, false);
 
   const onChainLedgerHash = argv?.h === 'onchain';
   const ledgerHash = onChainLedgerHash
