@@ -172,7 +172,7 @@ function getLedgerHashOffChain(data) {
   return ledgerHash;
 }
 
-async function createBackupData(contract, contractAddress, contractType) {
+async function createBackupData(contract, contractAddress, contractType, getTransferedFullSecToken = true) {
   const owners = await contract.getOwners();
   const unit = await contract.unit();
   const symbol = await contract.symbol();
@@ -190,6 +190,21 @@ async function createBackupData(contract, contractAddress, contractType) {
 
   const tokTypes = await contract.getSecTokenTypes();
   const { tokenTypes } = helpers.decodeWeb3Object(tokTypes);
+
+  // get all TransferedFullSecToken events
+  const events = getTransferedFullSecToken
+    ? await contract.getPastEvents('TransferedFullSecToken', { fromBlock: 0, toBlock: 'latest' })
+    : [];
+  const transferedFullSecTokens = events
+    .filter((event) => Number(event.returnValues.mergedToSecTokenId) > 0)
+    .map((event) => ({
+      from: event.returnValues.from,
+      to: event.returnValues.to,
+      stId: event.returnValues.stId,
+      mergedToSecTokenId: event.returnValues.mergedToSecTokenId,
+      qty: event.returnValues.qty,
+      transferType: event.returnValues.transferType,
+    }));
 
   // get ledgers
   const ledgerOwners = await contract.getLedgerOwners();
@@ -274,6 +289,7 @@ async function createBackupData(contract, contractAddress, contractType) {
       secTokenMintedCount: hexToNumberString(secTokenMintedCount),
       secTokenBurnedQty: hexToNumberString(secTokenBurnedQty),
       secTokenMintedQty: hexToNumberString(secTokenMintedQty),
+      transferedFullSecTokensEvents: transferedFullSecTokens,
       whitelistAddresses,
       ledgerOwners,
       ccyTypes: currencyTypes.map((ccy) => ({
