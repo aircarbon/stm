@@ -333,7 +333,7 @@ module.exports = async (callback) => {
   const onChainLedgerHash = argv?.h === 'onchain';
   const ledgerHash = onChainLedgerHash
     ? await CONST.getLedgerHashcode(newContract)
-    : getLedgerHashOffChain(backupData.data);
+    : getLedgerHashOffChain(backupData.data, true);
 
   // write backup to json file
   const newBackupFile = path.join(dataDir, `${newContractAddress}.json`);
