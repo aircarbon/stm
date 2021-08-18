@@ -340,6 +340,8 @@ module.exports = async (callback) => {
   console.log(`Writing backup to ${backupFile}`);
   fs.writeFileSync(newBackupFile, JSON.stringify({ ledgerHash, ...backupData }, null, 2));
 
+  await newContract.sealContract();
+
   if (ledgerHash !== previousHash) {
     console.error(`Ledger hash mismatch!`, {
       ledgerHash,
@@ -347,8 +349,6 @@ module.exports = async (callback) => {
     });
     return callback(new Error(`Ledger hash mismatch!`));
   }
-
-  await newContract.sealContract();
 
   callback('Done.');
 };
