@@ -2,14 +2,17 @@
 
 // @ts-check
 const { soliditySha3, hexToNumberString } = require('web3-utils');
+const Web3 = require('web3');
 const argv = require('yargs-parser')(process.argv.slice(2));
+const parallelLimit = require('async/parallelLimit');
 
 const CONST = require('../const');
 const { helpers } = require('../../orm/build');
+const config = require('../truffle-config');
 
 // implement get ledger hash
 // Refer to: getLedgerHashcode on LedgerLib.sol
-function getLedgerHashOffChain(data) {
+function getLedgerHashOffChain(data, ignoreGlobalStId = false) {
   console.log('getLedgerHashOffChain');
   // hash currency types & exchange currency fees
   let ledgerHash = '';
@@ -151,25 +154,76 @@ function getLedgerHashOffChain(data) {
   console.log('ledger hash - ledgers', ledgerHash);
 
   // hash secTokens
+  // TODO: ignore the null address
   const secTokens = data?.globalSecTokens ?? [];
   secTokens.forEach((token) => {
-    ledgerHash = soliditySha3(
-      ledgerHash,
-      token.stId,
-      token.tokTypeId,
-      token.tokTypeName,
-      token.batchId,
-      token.mintedQty,
-      token.currentQty,
-      token.ft_price,
-      token.ft_ledgerOwner,
-      token.ft_lastMarkPrice,
-      token.ft_PL,
-    );
+    if (ignoreGlobalStId) {
+      const isExist = data.transferedFullSecTokensEvents.find((event) => Number(event.tokenId) === Number(token.stId));
+      if (!isExist)
+        ledgerHash = soliditySha3(
+          ledgerHash,
+          token.stId,
+          token.tokTypeId,
+          token.tokTypeName,
+          token.batchId,
+          token.mintedQty,
+          token.currentQty,
+          token.ft_price,
+          token.ft_ledgerOwner,
+          token.ft_lastMarkPrice,
+          token.ft_PL,
+        );
+    } else {
+      ledgerHash = soliditySha3(
+        ledgerHash,
+        token.stId,
+        token.tokTypeId,
+        token.tokTypeName,
+        token.batchId,
+        token.mintedQty,
+        token.currentQty,
+        token.ft_price,
+        token.ft_ledgerOwner,
+        token.ft_lastMarkPrice,
+        token.ft_PL,
+      );
+    }
   });
 
   console.log('result', ledgerHash);
   return ledgerHash;
+}
+
+// get transfer full token event by chunk
+const EVENT_CHUNK_SIZE = 3000;
+async function getTransferFullTokenEvents(contract) {
+  const promises = [];
+  const network = argv?.network || 'development';
+  // @ts-ignore
+  const web3 = new Web3(config.networks[network].provider());
+  const latestBlockNumber = await web3.eth.getBlockNumber();
+  console.log(`Latest block number: ${latestBlockNumber}`);
+  const range = Math.ceil(latestBlockNumber / EVENT_CHUNK_SIZE);
+  for (let index = 0; index <= range; index += 1) {
+    const fromBlock = index * EVENT_CHUNK_SIZE;
+
+    const toBlock = (index + 1) * EVENT_CHUNK_SIZE;
+    promises.push(function searchEventByBlockRange(cb) {
+      console.log(`#${index}/${range} - Searching for TransferedFullSecToken`, {
+        fromBlock,
+        toBlock,
+      });
+      contract
+        .getPastEvents('TransferedFullSecToken', {
+          fromBlock,
+          toBlock,
+        })
+        .then((events) => cb(null, events))
+        .catch((err) => cb(err));
+    });
+  }
+
+  return (await parallelLimit(promises, 5)).flat();
 }
 
 async function createBackupData(contract, contractAddress, contractType, getTransferedFullSecToken = true) {
@@ -192,9 +246,8 @@ async function createBackupData(contract, contractAddress, contractType, getTran
   const { tokenTypes } = helpers.decodeWeb3Object(tokTypes);
 
   // get all TransferedFullSecToken events
-  const events = getTransferedFullSecToken
-    ? await contract.getPastEvents('TransferedFullSecToken', { fromBlock: 0, toBlock: 'latest' })
-    : [];
+  // TODO:  will remove on next migration
+  const events = getTransferedFullSecToken ? await getTransferFullTokenEvents(contract) : [];
   const transferedFullSecTokens = events
     .filter((event) => Number(event.returnValues.mergedToSecTokenId) > 0)
     .map((event) => ({
@@ -205,6 +258,8 @@ async function createBackupData(contract, contractAddress, contractType, getTran
       qty: event.returnValues.qty,
       transferType: event.returnValues.transferType,
     }));
+
+  console.log(`transferedFullSecTokens count: ${transferedFullSecTokens.length}`);
 
   // get ledgers
   const ledgerOwners = await contract.getLedgerOwners();
