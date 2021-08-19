@@ -9,11 +9,13 @@ const parallelLimit = require('async/parallelLimit');
 const CONST = require('../const');
 const { helpers } = require('../../orm/build');
 const config = require('../truffle-config');
+const previousLedgersOwners = require('./owners.json');
+const previousFees = require('./fees.json');
 
 // implement get ledger hash
 // Refer to: getLedgerHashcode on LedgerLib.sol
 function getLedgerHashOffChain(data, ignoreGlobalStIds = []) {
-  console.log('getLedgerHashOffChain', ignoreGlobalStIds);
+  console.log('getLedgerHashOffChain');
   // hash currency types & exchange currency fees
   let ledgerHash = '';
   const ccyTypes = data?.ccyTypes ?? [];
@@ -154,7 +156,6 @@ function getLedgerHashOffChain(data, ignoreGlobalStIds = []) {
   console.log('ledger hash - ledgers', ledgerHash);
 
   // hash secTokens
-  // TODO: ignore the null address
   const secTokens = data?.globalSecTokens ?? [];
   secTokens.forEach((token) => {
     if (ignoreGlobalStIds.length > 0) {
@@ -247,24 +248,8 @@ async function createBackupData(contract, contractAddress, contractType, getTran
   const tokTypes = await contract.getSecTokenTypes();
   const { tokenTypes } = helpers.decodeWeb3Object(tokTypes);
 
-  // get all TransferedFullSecToken events
-  // TODO:  will remove on next migration
-  const events = getTransferedFullSecToken ? await getTransferFullTokenEvents(contract) : [];
-  const transferedFullSecTokens = events
-    .filter((event) => Number(event.returnValues.mergedToSecTokenId) > 0)
-    .map((event) => ({
-      from: event.returnValues.from,
-      to: event.returnValues.to,
-      stId: event.returnValues.stId,
-      mergedToSecTokenId: event.returnValues.mergedToSecTokenId,
-      qty: event.returnValues.qty,
-      transferType: event.returnValues.transferType,
-    }));
-
-  console.log(`transferedFullSecTokens count: ${transferedFullSecTokens.length}`);
-
   // get ledgers
-  const ledgerOwners = await contract.getLedgerOwners();
+  const ledgerOwners = previousLedgersOwners[name] || (await contract.getLedgerOwners());
   const ledgers = (await Promise.all(ledgerOwners.map((owner) => contract.getLedgerEntry(owner))))
     .map((ledger) => helpers.decodeWeb3Object(ledger))
     .map((ledger, index, ledgers) => {
@@ -296,18 +281,28 @@ async function createBackupData(contract, contractAddress, contractType, getTran
   const secTokenMintedQty = await contract.getSecToken_totalMintedQty();
 
   // get all currency types fee
-  const ccyFeePromise = [];
-  for (let index = 0; index < currencyTypes.length; index++) {
-    ccyFeePromise.push(contract.getFee(CONST.getFeeType.CCY, currencyTypes[index].id, CONST.nullAddr));
+  let ccyFees;
+  if (previousFees.currency[name]) {
+    ccyFees = previousFees.currency[name];
+  } else {
+    const ccyFeePromise = [];
+    for (let index = 0; index < currencyTypes.length; index++) {
+      ccyFeePromise.push(contract.getFee(CONST.getFeeType.CCY, currencyTypes[index].id, CONST.nullAddr));
+    }
+    ccyFees = await Promise.all(ccyFeePromise);
   }
-  const ccyFees = await Promise.all(ccyFeePromise);
 
   // get all token types fee
-  const tokenFeePromise = [];
-  for (let index = 0; index < tokenTypes.length; index++) {
-    tokenFeePromise.push(contract.getFee(CONST.getFeeType.TOK, tokenTypes[index].id, CONST.nullAddr));
+  let tokenFees;
+  if (previousFees.token[name]) {
+    tokenFees = previousFees.token[name];
+  } else {
+    const tokenFeePromise = [];
+    for (let index = 0; index < tokenTypes.length; index++) {
+      tokenFeePromise.push(contract.getFee(CONST.getFeeType.TOK, tokenTypes[index].id, CONST.nullAddr));
+    }
+    tokenFees = await Promise.all(tokenFeePromise);
   }
-  const tokenFees = await Promise.all(tokenFeePromise);
 
   // get all stId
   const maxStId = Number(hexToNumberString(secTokenMintedCount));
@@ -327,6 +322,23 @@ async function createBackupData(contract, contractAddress, contractType, getTran
     }
   }
   const globalSecTokens = await Promise.all(getTokenPromise);
+
+  // get all TransferedFullSecToken events
+  // TODO:  will remove on next migration
+  console.time('transferedFullSecTokens');
+  const events = getTransferedFullSecToken ? await getTransferFullTokenEvents(contract) : [];
+  const transferedFullSecTokens = events
+    .filter((event) => Number(event.returnValues.mergedToSecTokenId) > 0)
+    .map((event) => ({
+      from: event.returnValues.from,
+      to: event.returnValues.to,
+      stId: event.returnValues.stId,
+      mergedToSecTokenId: event.returnValues.mergedToSecTokenId,
+      qty: event.returnValues.qty,
+      transferType: event.returnValues.transferType,
+    }));
+  console.timeEnd('transferedFullSecTokens');
+  console.log(`transferedFullSecTokens count: ${transferedFullSecTokens.length}`);
 
   // write backup to json file
   const backup = {
