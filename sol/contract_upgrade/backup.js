@@ -40,7 +40,7 @@ module.exports = async (callback) => {
   const onChainLedgerHash = argv?.h === 'onchain';
   const ledgerHash = onChainLedgerHash
     ? await CONST.getLedgerHashcode(contract)
-    : getLedgerHashOffChain(backup.data, true);
+    : getLedgerHashOffChain(backup.data, backup.data.transferedFullSecTokensEvents);
 
   // create data directory if not exists
   const dataDir = path.join(__dirname, 'data');
