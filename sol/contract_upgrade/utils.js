@@ -12,8 +12,8 @@ const config = require('../truffle-config');
 
 // implement get ledger hash
 // Refer to: getLedgerHashcode on LedgerLib.sol
-function getLedgerHashOffChain(data, ignoreGlobalStId = false) {
-  console.log('getLedgerHashOffChain');
+function getLedgerHashOffChain(data, ignoreGlobalStIds = []) {
+  console.log('getLedgerHashOffChain', ignoreGlobalStIds);
   // hash currency types & exchange currency fees
   let ledgerHash = '';
   const ccyTypes = data?.ccyTypes ?? [];
@@ -157,9 +157,9 @@ function getLedgerHashOffChain(data, ignoreGlobalStId = false) {
   // TODO: ignore the null address
   const secTokens = data?.globalSecTokens ?? [];
   secTokens.forEach((token) => {
-    if (ignoreGlobalStId) {
-      const isExist = data.transferedFullSecTokensEvents.find((event) => Number(event.tokenId) === Number(token.stId));
-      if (!isExist)
+    if (ignoreGlobalStIds.length > 0) {
+      const isExist = ignoreGlobalStIds.find((event) => Number(event.stId) === Number(token.stId));
+      if (!isExist) {
         ledgerHash = soliditySha3(
           ledgerHash,
           token.stId,
@@ -173,6 +173,7 @@ function getLedgerHashOffChain(data, ignoreGlobalStId = false) {
           token.ft_lastMarkPrice,
           token.ft_PL,
         );
+      }
     } else {
       ledgerHash = soliditySha3(
         ledgerHash,
@@ -196,6 +197,7 @@ function getLedgerHashOffChain(data, ignoreGlobalStId = false) {
 
 // get transfer full token event by chunk
 const EVENT_CHUNK_SIZE = 3000;
+const MAX_CONCURRENT = 5;
 async function getTransferFullTokenEvents(contract) {
   const promises = [];
   const network = argv?.network || 'development';
@@ -223,7 +225,7 @@ async function getTransferFullTokenEvents(contract) {
     });
   }
 
-  return (await parallelLimit(promises, 5)).flat();
+  return (await parallelLimit(promises, MAX_CONCURRENT)).flat();
 }
 
 async function createBackupData(contract, contractAddress, contractType, getTransferedFullSecToken = true) {

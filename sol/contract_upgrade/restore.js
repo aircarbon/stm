@@ -328,19 +328,19 @@ module.exports = async (callback) => {
     await sleep(1000);
   }
 
-  const backupData = await createBackupData(newContract, newContractAddress, 0, false);
+  const backupData = await createBackupData(newContract, newContractAddress, 0, true);
 
   const onChainLedgerHash = argv?.h === 'onchain';
   const ledgerHash = onChainLedgerHash
     ? await CONST.getLedgerHashcode(newContract)
-    : getLedgerHashOffChain(backupData.data, true);
+    : getLedgerHashOffChain(backupData.data, data.transferedFullSecTokensEvents);
 
   // write backup to json file
   const newBackupFile = path.join(dataDir, `${newContractAddress}.json`);
   console.log(`Writing backup to ${backupFile}`);
   fs.writeFileSync(newBackupFile, JSON.stringify({ ledgerHash, ...backupData }, null, 2));
 
-  await newContract.sealContract();
+  if (!hasSealed) await newContract.sealContract();
 
   if (ledgerHash !== previousHash) {
     console.error(`Ledger hash mismatch!`, {
