@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-only - (c) AirCarbon Pte Ltd - see /LICENSE.md for Terms
 // Author: https://github.com/7-of-9
+// Certik (AD): locked compiler version
 pragma solidity 0.8.5;
 
 import "../Interfaces/StructLib.sol";
@@ -25,12 +26,16 @@ library LedgerLib {
         StructLib.CcyTypesStruct storage ctd,
         address                          account
     )
-    public view returns (StructLib.LedgerReturn memory) {
+    // Certik : LLL-06 | Explicitly returning local variable
+    // Resolved (AD): Use of named return variables to reduce overall gas cost
+    public view returns (StructLib.LedgerReturn memory ledgerEntry) {
 
         GetLedgerEntryVars memory v;
 
         // count total # of tokens (i.e. token count distinct by batch,type) across all types
-        uint256 countAllSecTokens = 0;
+        // Certik: LLL-02 | Redundant Variable Initialization
+        // Resolved (AD): Removed redundant 0 initialization
+        uint256 countAllSecTokens;
         StructLib.LedgerReturn[] memory baseLedgers;
         if (ld.contractType == StructLib.ContractType.CASHFLOW_CONTROLLER) { // controller: save/resuse base types' ledgers
             baseLedgers = new StructLib.LedgerReturn[](std._tt_Count);
@@ -39,9 +44,9 @@ library LedgerLib {
             if (ld.contractType == StructLib.ContractType.CASHFLOW_CONTROLLER) { // controller: passthrough to base type
                 StMaster base = StMaster(std._tt_addr[tokTypeId]);
                 baseLedgers[tokTypeId - 1] = base.getLedgerEntry(account);
-                for (uint256 i = 0; i < baseLedgers[tokTypeId - 1].tokens.length; i++) {
-                    countAllSecTokens++;
-                }
+                // Certik: LLL-03 | Inefficient use of for loop
+                // Resolved (AD): Replaced inefficient for loop by incrementing countAllSecTokens by baseLedgers[tokTypeId - 1].tokens.length
+                countAllSecTokens += baseLedgers[tokTypeId - 1].tokens.length;
             }
             else {
                 countAllSecTokens += ld._ledger[account].tokenType_stIds[tokTypeId].length;
@@ -50,7 +55,9 @@ library LedgerLib {
         v.tokens = new StructLib.LedgerSecTokenReturn[](countAllSecTokens);
 
         // core & base: flatten STs (and sum total spot size)
-        uint256 flatSecTokenNdx = 0;
+        // Certik: LLL-02 | Redundant Variable Initialization
+        // Resolved (AD): Removed redundant 0 initialization
+        uint256 flatSecTokenNdx;
         if (ld.contractType != StructLib.ContractType.CASHFLOW_CONTROLLER) {
             for (uint256 tokTypeId = 1; tokTypeId <= std._tt_Count; tokTypeId++) { // get ST IDs & data from local storage
                 uint256[] memory tokenType_stIds = ld._ledger[account].tokenType_stIds[tokTypeId];
@@ -107,9 +114,12 @@ library LedgerLib {
                     });
 
                     // map/lookup return field: batchId - ASSUMES: only one batch per type in the controller (uni-batch/uni-mint model)
-                    for (uint64 batchId = 1; batchId <= ld._batches_currentMax_id; batchId++) {
+                    // Certik: LLL-05 | Inefficient storage read
+                    // Resolved (AD): Utilized local variable to avoid multiple storage reads and save gas cost
+                    uint256 currentMaxBatchId = uint256(ld._batches_currentMax_id);
+                    for (uint256 batchId = 1; batchId <= currentMaxBatchId; batchId++) {
                         if (ld._batches[batchId].tokTypeId == tokTypeId) {
-                            v.tokens[flatSecTokenNdx].batchId = batchId;
+                            v.tokens[flatSecTokenNdx].batchId = uint64(batchId);
                             break;
                         }
                     }
@@ -131,7 +141,7 @@ library LedgerLib {
             });
         }
 
-        StructLib.LedgerReturn memory ret = StructLib.LedgerReturn({
+        ledgerEntry = StructLib.LedgerReturn({
              exists: ld._ledger[account].exists,
              tokens: v.tokens,
         spot_sumQty: v.spot_sumQty,
@@ -139,7 +149,6 @@ library LedgerLib {
   spot_sumQtyMinted: ld._ledger[account].spot_sumQtyMinted,
   spot_sumQtyBurned: ld._ledger[account].spot_sumQtyBurned
         });
-        return ret;
     }
 
     //
@@ -159,19 +168,9 @@ library LedgerLib {
         StructLib.FeeStruct storage globalFees,
         uint mod, uint n
     )
-    public view returns (bytes32) {
-        bytes32 ledgerHash;
-
-        // hash cashflow data
-        // ledgerHash = keccak256(abi.encodePacked(ledgerHash,
-        //     cashflowData.args.cashflowType,
-        //     cashflowData.args.term_Blks,
-        //     cashflowData.args.bond_bps,
-        //     cashflowData.args.bond_int_EveryBlks,
-        //     cashflowData.qty_issuanceMax,
-        //     cashflowData.qty_issuanceRemaining,
-        //     cashflowData.wei_currentPrice
-        // ));
+    // Certik : LLL-06 | Explicitly returning local variable
+    // Resolved (AD): Use of named return variables to reduce overall gas cost
+    public view returns (bytes32 ledgerHash) {
 
         // hash currency types & exchange currency fees
         for (uint256 ccyTypeId = 1; ccyTypeId <= ctd._ct_Count; ccyTypeId++) {
@@ -188,7 +187,10 @@ library LedgerLib {
         }
 
         // hash token types & exchange token fees
-        for (uint256 stTypeId = 1; stTypeId <= std._tt_Count; stTypeId++) {
+        // Certik: LLL-08 | Inefficient storage read
+        // Resolved (AD): Utilized local variable to avoid multiple storage reads and save gas cost
+        uint256 currentMaxTokenTypeId = std._tt_Count;
+        for (uint256 stTypeId = 1; stTypeId <= currentMaxTokenTypeId; stTypeId++) {
             if (stTypeId % mod != n) continue;
 
             ledgerHash = keccak256(abi.encodePacked(ledgerHash, std._tt_name[stTypeId]));
@@ -210,24 +212,25 @@ library LedgerLib {
         }
 
         // hash whitelist
+        // Certik: LLL-09 | Inefficient storage read
+        // Resolved (AD): Utilized local variable to avoid multiple storage reads and save gas cost
+        uint256 whiteListLength = erc20d._whitelist.length;
         for (uint256 whitelistNdx = 1; // exclude contract owner @ndx 0
-            whitelistNdx < erc20d._whitelist.length; whitelistNdx++) {
+            whitelistNdx < whiteListLength; whitelistNdx++) {
 
             if (whitelistNdx % mod != n) continue;
 
             if (erc20d._whitelist[whitelistNdx] != msg.sender // exclude caller, contract owner
-                //&& whitelistNdx > 0 
             ) {
-                //if (whitelistNdx % mod != n) continue; // ## why?
-                //if (whitelistNdx == 3) continue; // ## why??
-
                 ledgerHash = keccak256(abi.encodePacked(ledgerHash, erc20d._whitelist[whitelistNdx]));
             }
         }
-        //ledgerHash = keccak256(abi.encodePacked(ledgerHash, erc20d._nextWhitelistNdx));
 
         // hash batches
-        for (uint256 batchId = 1; batchId <= ld._batches_currentMax_id; batchId++) {
+        // Certik: LLL-10 | Inefficient storage read
+        // Resolved (AD): Utilized local variable to avoid multiple storage reads and save gas cost
+        uint256 maxCurrentBatchId = ld._batches_currentMax_id;
+        for (uint256 batchId = 1; batchId <= maxCurrentBatchId; batchId++) {
             if (batchId % mod != n) continue;
 
             StructLib.SecTokenBatch storage batch = ld._batches[batchId];
@@ -251,7 +254,10 @@ library LedgerLib {
         }
 
         // walk ledger -- exclude contract owner from hashes
-        for (uint256 ledgerNdx = 0; ledgerNdx < ld._ledgerOwners.length; ledgerNdx++) {
+        // Certik: LLL-11 | Inefficient storage read
+        // Resolved (AD): Utilized local variable to avoid multiple storage reads and save gas cost
+        uint256 ledgerOwnersCount = ld._ledgerOwners.length;
+        for (uint256 ledgerNdx = 0; ledgerNdx < ledgerOwnersCount; ledgerNdx++) {
             if (ledgerNdx % mod != n) continue;
 
             address entryOwner = ld._ledgerOwners[ledgerNdx];
@@ -262,7 +268,9 @@ library LedgerLib {
                 ledgerHash = keccak256(abi.encodePacked(ledgerHash, entryOwner));
 
             // hash ledger token types: token IDs, custom spot fees & FT type data
-            for (uint256 stTypeId = 1; stTypeId <= std._tt_Count; stTypeId++) {
+            // Certik: LLL-12 and LLL-16 | Inefficient storage read
+            // Resolved (AD): Utilized local variable to avoid multiple storage reads and save gas cost
+            for (uint256 stTypeId = 1; stTypeId <= currentMaxTokenTypeId; stTypeId++) {
 
                 // ### TODO? ## switch -- delegate-base types for CFT-C... ##
                 // ### ??? IDs themselves are not material, can skip this hashing?
@@ -280,7 +288,10 @@ library LedgerLib {
             }
 
             // hash balances & custom ccy fees
-            for (uint256 ccyTypeId = 1; ccyTypeId <= ctd._ct_Count; ccyTypeId++) {
+            // Certik: LLL-14 | Inefficient storage read
+            // Resolved (AD): Utilized local variable to avoid multiple storage reads and save gas cost
+            uint256 currentMaxCcyTypeId = ctd._ct_Count;
+            for (uint256 ccyTypeId = 1; ccyTypeId <= currentMaxCcyTypeId; ccyTypeId++) {
                 ledgerHash = keccak256(abi.encodePacked(ledgerHash, entry.ccyType_balance[ccyTypeId]));
                 ledgerHash = keccak256(abi.encodePacked(ledgerHash, entry.ccyType_reserved[ccyTypeId]));
                 if (entry.spot_customFees.ccyType_Set[ccyTypeId]) {
@@ -297,7 +308,7 @@ library LedgerLib {
         ConsistencyCheck memory chk;
         if (ld.contractType == StructLib.ContractType.CASHFLOW_CONTROLLER) {
             // controller - passthrough delegate-base call to getLedgerHashcode() to each base type
-            for (uint256 tokTypeId = 1; tokTypeId <= std._tt_Count; tokTypeId++) {
+            for (uint256 tokTypeId = 1; tokTypeId <= currentMaxTokenTypeId; tokTypeId++) {
                 StMaster base = StMaster(std._tt_addr[tokTypeId]);
                 bytes32 baseTypeHashcode = base.getLedgerHashcode(mod, n);
                 ledgerHash = keccak256(abi.encodePacked(ledgerHash, baseTypeHashcode));
@@ -305,8 +316,10 @@ library LedgerLib {
         }
         else {
             // base & commodity - walk & hash individual tokens, and apply consistency check on totals
-            //for (uint256 stId = 1; stId <= ld._tokens_currentMax_id; stId++) {
-            for (uint256 stId = ld._tokens_base_id; stId <= ld._tokens_currentMax_id; stId++) {
+            // Certik: LLL-17 | Inefficient storage read
+            // Resolved (AD): Utilized local variable to avoid multiple storage reads and save gas cost
+            uint256 currentMaxStId = ld._tokens_currentMax_id;
+            for (uint256 stId = ld._tokens_base_id; stId <= currentMaxStId; stId++) {
                 StructLib.PackedSt memory st = ld._sts[stId];
                 chk.totalCur += uint256(uint64(st.currentQty)); // consistency check (base & commodity)
                 chk.totalMinted += uint256(uint64(st.mintedQty));
@@ -337,23 +350,24 @@ library LedgerLib {
         ledgerHash = keccak256(abi.encodePacked(ledgerHash, ld._spot_totalMintedQty));
         ledgerHash = keccak256(abi.encodePacked(ledgerHash, ld._spot_totalBurnedQty));
 
-        return ledgerHash;
     }
 
     //
     // INTERNAL
     //
 
-    function hashStringArray(string[] memory strings) private pure returns (bytes32) {
-        bytes32 arrayHash = 0;
+    // Certik: LLL-06 | Explicitly returning local variable
+    // Resolved (AD): Use of named return variables to reduce overall gas cost
+    function hashStringArray(string[] memory strings) private pure returns (bytes32 arrayHash) {
         for (uint256 i = 0 ; i < strings.length ; i++) {
             arrayHash = keccak256(abi.encodePacked(arrayHash, strings[i]));
         }
-        return arrayHash;
     }
 
-    function hashSetFeeArgs(StructLib.SetFeeArgs memory setFeeArgs) private pure returns (bytes32) {
-        return keccak256(abi.encodePacked(
+    // Certik: LLL-06 | Explicitly returning local variable
+    // Resolved (AD): Use of named return variables to reduce overall gas cost
+    function hashSetFeeArgs(StructLib.SetFeeArgs memory setFeeArgs) private pure returns (bytes32 setFeeArgsHash) {
+        setFeeArgsHash = keccak256(abi.encodePacked(
             setFeeArgs.fee_fixed,
             setFeeArgs.fee_percBips,
             setFeeArgs.fee_min,

@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-only - (c) AirCarbon Pte Ltd - see /LICENSE.md for Terms
 // Author: https://github.com/7-of-9
+// Certik (AD): locked compiler version
 pragma solidity 0.8.5;
 
 import "./Owned.sol";
@@ -49,14 +50,18 @@ abstract contract StLedger is
      * @return secTokenTypes
      * @param secTokenTypes returns all security token types
      */
-    function getSecTokenTypes() external view returns (StructLib.GetSecTokenTypesReturn memory secTokenTypes) { return TokenLib.getSecTokenTypes(std); }
+    // Certik: SLS-02 | Return Variable Utilization
+    // Resolved (AD): Utilized return variable for gas optimization
+    function getSecTokenTypes() external view returns (StructLib.GetSecTokenTypesReturn memory secTokenTypes) { secTokenTypes = TokenLib.getSecTokenTypes(std); }
 
     /**
      * @dev returns all ledger owners
      * @return ledgerOwners
      * @param ledgerOwners returns all ledger owners
      */
-    function getLedgerOwners() external view returns (address[] memory ledgerOwners) { return ld._ledgerOwners; }
+    // Certik: SLS-02 | Return Variable Utilization
+    // Resolved (AD): Utilized return variable for gas optimization
+    function getLedgerOwners() external view returns (address[] memory ledgerOwners) { ledgerOwners = ld._ledgerOwners; }
 
     // 24k??
     /**
@@ -64,7 +69,9 @@ abstract contract StLedger is
      * @return ledgerOwnerCount
      * @param ledgerOwnerCount returns the total count of all ledger owners
      */
-    function getLedgerOwnerCount() external view returns (uint256 ledgerOwnerCount) { return ld._ledgerOwners.length; }
+    // Certik: SLS-02 | Return Variable Utilization
+    // Resolved (AD): Utilized return variable for gas optimization
+    function getLedgerOwnerCount() external view returns (uint256 ledgerOwnerCount) { ledgerOwnerCount = ld._ledgerOwners.length; }
 
     /**
      * @dev returns the ledger owner based on HD wallet derived index
@@ -72,7 +79,9 @@ abstract contract StLedger is
      * @return ledgerOwner
      * @param ledgerOwner returns the ledger owner based on HD wallet derived index 
      */
-    function getLedgerOwner(uint256 index) external view returns (address ledgerOwner) { return ld._ledgerOwners[index]; }
+    // Certik: SLS-02 | Return Variable Utilization
+    // Resolved (AD): Utilized return variable for gas optimization
+    function getLedgerOwner(uint256 index) external view returns (address ledgerOwner) { ledgerOwner = ld._ledgerOwners[index]; }
     
     /**
      * @dev returns the ledger entry for the account provided
@@ -80,7 +89,9 @@ abstract contract StLedger is
      * @return ledgerEntry
      * @param ledgerEntry returns the ledger entry for the account provided
      */
-    function getLedgerEntry(address account) external view returns (StructLib.LedgerReturn memory ledgerEntry) { return LedgerLib.getLedgerEntry(ld, std, ctd, account); }
+    // Certik: SLS-02 | Return Variable Utilization
+    // Resolved (AD): Utilized return variable for gas optimization
+    function getLedgerEntry(address account) external view returns (StructLib.LedgerReturn memory ledgerEntry) { ledgerEntry = LedgerLib.getLedgerEntry(ld, std, ctd, account); }
 
     // get batch(es)
     /**
@@ -88,7 +99,9 @@ abstract contract StLedger is
      * @return secTokenBatch_MaxId
      * @param secTokenBatch_MaxId returns the maximum identifier of 1-based security token batches IDs
      */
-    function getSecTokenBatch_MaxId() external view returns (uint256 secTokenBatch_MaxId) { return ld._batches_currentMax_id; } // 1-based
+    // Certik: SLS-02 | Return Variable Utilization
+    // Resolved (AD): Utilized return variable for gas optimization
+    function getSecTokenBatch_MaxId() external view returns (uint256 secTokenBatch_MaxId) { secTokenBatch_MaxId = ld._batches_currentMax_id; } // 1-based
     
     /**
      * @dev returns a security token batch
@@ -96,8 +109,10 @@ abstract contract StLedger is
      * @return secTokenBatch
      * @param secTokenBatch returns a security token batch
      */
+    // Certik: SLS-02 | Return Variable Utilization
+    // Resolved (AD): Utilized return variable for gas optimization
     function getSecTokenBatch(uint256 batchId) external view returns (StructLib.SecTokenBatch memory secTokenBatch) {
-        return ld._batches[batchId];
+        secTokenBatch = ld._batches[batchId];
     }
 
     // get token(s)
@@ -106,14 +121,18 @@ abstract contract StLedger is
      * @return secTokenBaseId
      * @param secTokenBaseId returns the security token base id
      */
-    function getSecToken_BaseId() external view returns (uint256 secTokenBaseId) { return ld._tokens_base_id; } // 1-based
+    // Certik: SLS-02 | Return Variable Utilization
+    // Resolved (AD): Utilized return variable for gas optimization
+    function getSecToken_BaseId() external view returns (uint256 secTokenBaseId) { secTokenBaseId = ld._tokens_base_id; } // 1-based
     
     /**
      * @dev returns the maximum count for security token types
      * @return secTokenMaxId
      * @param secTokenMaxId returns the maximum count for security token types
      */
-    function getSecToken_MaxId() external view returns (uint256 secTokenMaxId) { return ld._tokens_currentMax_id; } // 1-based
+    // Certik: SLS-02 | Return Variable Utilization
+    // Resolved (AD): Utilized return variable for gas optimization
+    function getSecToken_MaxId() external view returns (uint256 secTokenMaxId) { secTokenMaxId = ld._tokens_currentMax_id; } // 1-based
     
     /**
      * @dev returns a security token
@@ -121,5 +140,7 @@ abstract contract StLedger is
      * @return secToken
      * @param secToken returns a security token for the identifier provided
      */
-    function getSecToken(uint256 id) external view returns (StructLib.LedgerSecTokenReturn memory secToken) { return TokenLib.getSecToken(ld, std, id); }
+    // Certik: SLS-02 | Return Variable Utilization
+    // Resolved (AD): Utilized return variable for gas optimization
+    function getSecToken(uint256 id) external view returns (StructLib.LedgerSecTokenReturn memory secToken) { secToken = TokenLib.getSecToken(ld, std, id); }
 }
