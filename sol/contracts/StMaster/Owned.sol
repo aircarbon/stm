@@ -39,7 +39,6 @@ contract Owned
         deploymentOwner = payable(msg.sender); // payable used in solidity version 0.8.0 onwards
         // Certik: OSM-04 | Redundant Variable Initialization
         // Resolved (AD): Default READ-ONLY state is false
-        readOnlyState;
     }
 
     /**

@@ -416,20 +416,10 @@ library StructLib {
     public {
         if (!ld._ledger[addr].exists) {
 
-        // solc 0.7
-        StructLib.Ledger storage entry = ld._ledger[addr];
-        entry.exists = true;
-        // Certik: SLI-02 | Redundant Variable Initialization
-        // Resolved (AD): Removed redundant variable intialization; default value = 0
-        entry.spot_sumQtyMinted;
-        entry.spot_sumQtyBurned;
-//      ld._ledger[addr] = StructLib.Ledger({
-//              exists: true,
-//     spot_customFees: StructLib.FeeStruct(),
-//   spot_sumQtyMinted: 0,
-//   spot_sumQtyBurned: 0
-//         });
-
+            StructLib.Ledger storage entry = ld._ledger[addr];
+            entry.exists = true;
+            // Certik: SLI-02 | Redundant Variable Initialization
+            // Resolved (AD): Removed redundant variable intialization; default value = 0
             ld._ledgerOwners.push(addr);
         }
     }
