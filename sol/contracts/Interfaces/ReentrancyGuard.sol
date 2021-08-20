@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: MIT
+// Certik (AD): locked compiler version
 pragma solidity 0.8.5;
 
 /**

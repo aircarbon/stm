@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-only - (c) AirCarbon Pte Ltd - see /LICENSE.md for Terms
 // Author: @7-of-9 and @ankurdaharwal
+// Certik (AD): locked compiler version
 pragma solidity 0.8.5;
 
 import "../StMaster/StMaster.sol";
@@ -418,8 +419,10 @@ library StructLib {
         // solc 0.7
         StructLib.Ledger storage entry = ld._ledger[addr];
         entry.exists = true;
-        entry.spot_sumQtyMinted = 0;
-        entry.spot_sumQtyBurned = 0;
+        // Certik: SLI-02 | Redundant Variable Initialization
+        // Resolved (AD): Removed redundant variable intialization; default value = 0
+        entry.spot_sumQtyMinted;
+        entry.spot_sumQtyBurned;
 //      ld._ledger[addr] = StructLib.Ledger({
 //              exists: true,
 //     spot_customFees: StructLib.FeeStruct(),
@@ -441,13 +444,18 @@ library StructLib {
         StructLib.LedgerStruct storage ld,
         address ledger, uint256 tokTypeId, int256 qty, int256 fee
     ) public view returns (bool) {
-        int256 qtyAvailable = 0;
+        // Certik: SLI-02 | Redundant Variable Initialization
+        // Resolved (AD): Removed redundant variable intialization; default value = 0
+        int256 qtyAvailable;
         // Certik: (Minor) SLI-08 | Unsafe Mathematical Operations The linked statements perform unsafe mathematical operations between multiple arguments that would rely on caller sanitization, an ill-advised pattern
         // Resolved: (Minor) SLI-08 | Safe operations are in-built in Solidity version ^0.8.0
         require(ld._contractSealed, "Contract is not sealed");
         require(ld._ledger[ledger].exists == true, "Bad ledgerOwner");
-        for (uint i = 0; i < ld._ledger[ledger].tokenType_stIds[tokTypeId].length; i++) {
-            qtyAvailable += ld._sts[ld._ledger[ledger].tokenType_stIds[tokTypeId][i]].currentQty;
+        // Certik: SLI-03 and SLI-07 | Inefficient storage read & Loop Optimizations
+        // Resolved (AD): Utilized local variable for gas optimization
+        uint tokenTypeStIds = ld._ledger[ledger].tokenType_stIds[tokTypeId];
+        for (uint i = 0; i < tokenTypeStIds.length; i++) {
+            qtyAvailable += ld._sts[tokenTypeStIds[i]].currentQty;
         }
         return qtyAvailable >= qty + fee;
     }
@@ -483,8 +491,11 @@ library StructLib {
         StructLib.LedgerStruct storage ld,
         uint256 tokTypeId, address ledger, uint256 stId
     ) public view returns(bool) {
-        for (uint256 x = 0; x < ld._ledger[ledger].tokenType_stIds[tokTypeId].length ; x++) {
-            if (ld._ledger[ledger].tokenType_stIds[tokTypeId][x] == stId) {
+        // Certik: SLI-03 and SLI-07 | Inefficient storage read & Loop Optimizations
+        // Resolved (AD): Utilized local variable for gas optimization
+        uint256 tokenTypeStIds = ld._ledger[ledger].tokenType_stIds[tokTypeId];
+        for (uint256 x = 0; x < tokenTypeStIds.length ; x++) {
+            if (tokenTypeStIds[x] == stId) {
                 return true;
             }
         }

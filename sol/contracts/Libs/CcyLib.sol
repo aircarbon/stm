@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-only - (c) AirCarbon Pte Ltd - see /LICENSE.md for Terms
 // Author: https://github.com/7-of-9
+// Certik (AD): locked compiler version
 pragma solidity 0.8.5;
 
 import "../Interfaces/StructLib.sol";
@@ -21,8 +22,10 @@ library CcyLib {
                 ld.contractType == StructLib.ContractType.CASHFLOW_CONTROLLER, "Bad cashflow request"); // disallow ccy's on base cashflow contract
 
         require(ctd._ct_Count < 32/*MAX_CCYS*/, "Too many currencies");
-
-        for (uint256 ccyTypeId = 1; ccyTypeId <= ctd._ct_Count; ccyTypeId++) {
+        // Certik: CLL-02 | Inefficient storage read
+        // Resolved (AD): Utilized a local variable to store ctd._ct_Count to save gas cost
+        uint256 ccyTypesCount = ctd._ct_Count;
+        for (uint256 ccyTypeId = 1; ccyTypeId <= ccyTypesCount; ccyTypeId++) {
             require(keccak256(abi.encodePacked(ctd._ct_Ccy[ccyTypeId].name)) != keccak256(abi.encodePacked(name)), "Currency type name already exists");
         }
 
@@ -39,11 +42,14 @@ library CcyLib {
     function getCcyTypes(
         StructLib.CcyTypesStruct storage ctd)
     public view
-    returns (StructLib.GetCcyTypesReturn memory) {
+    returns (StructLib.GetCcyTypesReturn memory ccys) {
         StructLib.Ccy[] memory ccyTypes;
-        ccyTypes = new StructLib.Ccy[](ctd._ct_Count);
+        // Certik: CLL-05 | Inefficient storage read
+        // Resolved (AD): Utilized a local variable to store ctd._ct_Count to save gas cost
+        uint256 ccyTypesCount = ctd._ct_Count;
+        ccyTypes = new StructLib.Ccy[](ccyTypesCount);
 
-        for (uint256 ccyTypeId = 1; ccyTypeId <= ctd._ct_Count; ccyTypeId++) {
+        for (uint256 ccyTypeId = 1; ccyTypeId <= ccyTypesCount; ccyTypeId++) {
             ccyTypes[ccyTypeId - 1] = StructLib.Ccy({
                     id: ctd._ct_Ccy[ccyTypeId].id,
                   name: ctd._ct_Ccy[ccyTypeId].name,
@@ -51,11 +57,11 @@ library CcyLib {
               decimals: ctd._ct_Ccy[ccyTypeId].decimals
             });
         }
-
-        StructLib.GetCcyTypesReturn memory ret = StructLib.GetCcyTypesReturn({
+        // Certik: CLL-04 | Explicitly returning local variable
+        // Resolved (AD): Refactored to remove the local variable declaration and explicit return statement in order to reduce the overall cost of gas
+        ccys = StructLib.GetCcyTypesReturn({
             ccyTypes: ccyTypes
         });
-        return ret;
     }
 
     // FUND & WITHDRAW
@@ -99,10 +105,6 @@ library CcyLib {
         // update ledger balance
         ld._ledger[ledgerOwner].ccyType_balance[ccyTypeId] += amount;
 
-        // update global total funded
-        // 24k
-        //ld._ccyType_totalFunded[ccyTypeId] += uint256(amount);
-
         emit CcyFundedLedger(ccyTypeId, ledgerOwner, amount, desc);
     }
 
@@ -117,7 +119,9 @@ library CcyLib {
         require(ld._contractSealed, "Contract is not sealed");
         require(ccyTypeId >= 1 && ccyTypeId <= ctd._ct_Count, "Bad ccyTypeId");
         require(amount > 0, "Bad amount");
-        require(ld._ledger[ledgerOwner].exists == true, "Bad ledgerOwner");
+        // Certik: CLL-06 | Comparison with literal true
+        // Resolved (AD): Substituted the literal true comparison with the expression itself
+        require(ld._ledger[ledgerOwner].exists, "Bad ledgerOwner");
 
         require((ld._ledger[ledgerOwner].ccyType_balance[ccyTypeId] - ld._ledger[ledgerOwner].ccyType_reserved[ccyTypeId]) >= amount, "Insufficient balance");
 

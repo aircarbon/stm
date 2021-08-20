@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // Author: @ankurdaharwal
+// Certik (AD): locked compiler version
 pragma solidity 0.8.5;
 
 /**

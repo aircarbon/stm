@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-only - (c) AirCarbon Pte Ltd - see /LICENSE.md for Terms
 // Author: https://github.com/7-of-9
+// Certik (AD): locked compiler version
 pragma solidity 0.8.5;
 
 import "../Interfaces/StructLib.sol";
@@ -47,9 +48,12 @@ library LoadLib {
 
         // Certik: (Minor) LOA-03 | Inexistent Balance Sanitization The linked for loop does not sanitize the reserve member of ccys[i] to be less-than-or-equal-to the balance member.
         // Resolved: (Minor) LOA-03 | Logically consistent with architectural design for contract upgrade
+        // Certik: LOA-04 | Lookup Optimization
+        // Resolved (AD): Utilizing local variable to save gas cost in lookup
         for (uint256 i = 0 ; i < ccys.length ; i++) {
-            ld._ledger[ledgerEntryOwner].ccyType_balance[ccys[i].ccyTypeId] = ccys[i].balance;
-            ld._ledger[ledgerEntryOwner].ccyType_reserved[ccys[i].ccyTypeId] = ccys[i].reserved;
+            uint256 ccyTypeId = ccys[i].ccyTypeId;
+            ld._ledger[ledgerEntryOwner].ccyType_balance[ccyTypeId] = ccys[i].balance;
+            ld._ledger[ledgerEntryOwner].ccyType_reserved[ccyTypeId] = ccys[i].reserved;
         }
     }
     // Certik: (Minor) LOA-05 | Inexistent Duplicate Check The addSecToken can overwrite over a currently present security token ID as no sanitization is performed to ensure the security token hasn't already been added.
