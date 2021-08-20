@@ -453,7 +453,7 @@ library StructLib {
         require(ld._ledger[ledger].exists == true, "Bad ledgerOwner");
         // Certik: SLI-03 and SLI-07 | Inefficient storage read & Loop Optimizations
         // Resolved (AD): Utilized local variable for gas optimization
-        uint tokenTypeStIds = ld._ledger[ledger].tokenType_stIds[tokTypeId];
+        uint256[] memory tokenTypeStIds = ld._ledger[ledger].tokenType_stIds[tokTypeId];
         for (uint i = 0; i < tokenTypeStIds.length; i++) {
             qtyAvailable += ld._sts[tokenTypeStIds[i]].currentQty;
         }
@@ -493,7 +493,7 @@ library StructLib {
     ) public view returns(bool) {
         // Certik: SLI-03 and SLI-07 | Inefficient storage read & Loop Optimizations
         // Resolved (AD): Utilized local variable for gas optimization
-        uint256 tokenTypeStIds = ld._ledger[ledger].tokenType_stIds[tokTypeId];
+        uint256[] memory tokenTypeStIds = ld._ledger[ledger].tokenType_stIds[tokTypeId];
         for (uint256 x = 0; x < tokenTypeStIds.length ; x++) {
             if (tokenTypeStIds[x] == stId) {
                 return true;
