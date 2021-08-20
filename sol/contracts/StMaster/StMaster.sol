@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-only - (c) AirCarbon Pte Ltd - see /LICENSE.md for Terms
 // Author: https://github.com/7-of-9
-pragma solidity ^0.8.0;
+pragma solidity 0.8.5;
 
 import "./CcyCollateralizable.sol";
 import "./StMintable.sol";

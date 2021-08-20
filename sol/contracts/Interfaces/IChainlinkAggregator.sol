@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // Author: @ankurdaharwal
-pragma solidity ^0.8.0;
+pragma solidity 0.8.5;
 
 /**
  * @notice Chainlink Reference Data Contract

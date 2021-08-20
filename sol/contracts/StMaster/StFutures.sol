@@ -2,7 +2,7 @@
 // Author: https://github.com/7-of-9
 // PAUSED
 
-pragma solidity ^0.8.0;
+pragma solidity 0.8.5;
 
 import "./StErc20.sol";
 import "./StPayable.sol";
