@@ -2,6 +2,7 @@
 // Author: https://github.com/7-of-9
 // PAUSED
 
+// Certik (AD): locked compiler version
 pragma solidity 0.8.5;
 
 import "./StErc20.sol";

@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-only - (c) AirCarbon Pte Ltd - see /LICENSE.md for Terms
 // Author: https://github.com/7-of-9
+// Certik (AD): locked compiler version
 pragma solidity 0.8.5;
 
 import "./StFees.sol";
@@ -52,8 +53,10 @@ abstract contract StErc20 is StFees
      * @return whitelistAddresses
      * @param whitelistAddresses list of all whitelisted account addresses
      */
+    // Certik: SES-03 | Return Variable Utilization
+    // Resolved (AD): Utilized return variable for gas optimization
     function getWhitelist() external view returns (address[] memory whitelistAddresses) {
-        return erc20d._whitelist;
+        whitelistAddresses = erc20d._whitelist;
     }
  
 //#if process.env.CONTRACT_TYPE === 'CASHFLOW_BASE' || process.env.CONTRACT_TYPE === 'COMMODITY'
@@ -83,8 +86,10 @@ abstract contract StErc20 is StFees
      * @return availableQty
      * @param availableQty returns total available quantity (minted quantity - burned quantitypublic
      */
+    // Certik: SES-03 | Return Variable Utilization
+    // Resolved (AD): Utilized return variable for gas optimization
     function totalSupply() public view returns (uint256 availableQty) {
-        return ld._spot_totalMintedQty - ld._spot_totalBurnedQty;
+        availableQty = ld._spot_totalMintedQty - ld._spot_totalBurnedQty;
     }
     
     /**
@@ -93,22 +98,26 @@ abstract contract StErc20 is StFees
      * @return balance
      * @param balance returns balance of the account address provided
      */
+    // Certik: SES-03 | Return Variable Utilization
+    // Resolved (AD): Utilized return variable for gas optimization
     function balanceOf(address account) public view returns (uint256 balance) {
         StructLib.LedgerReturn memory ret = LedgerLib.getLedgerEntry(ld, std, ctd, account);
-        return ret.spot_sumQty;
+        balance = ret.spot_sumQty;
     }
     
     /**
      * @dev standard ERC20 token transfer
      * @param recipient receiver's account address
      * @param amount to be transferred to the recipient
-     * @return status
-     * @param status returns status of transfer: true or false 
+     * @return transferStatus
+     * @param transferStatus returns status of transfer: true or false 
      */
-    function transfer(address recipient, uint256 amount) public returns (bool status) {
+    // Certik: SES-03 | Return Variable Utilization
+    // Resolved (AD): Utilized return variable for gas optimization
+    function transfer(address recipient, uint256 amount) public returns (bool transferStatus) {
         require(balanceOf(msg.sender) >= amount, "Insufficient tokens");
 
-        return Erc20Lib.transfer(ld, std, ctd, globalFees, Erc20Lib.transferErc20Args({
+        transferStatus = Erc20Lib.transfer(ld, std, ctd, globalFees, Erc20Lib.transferErc20Args({
       deploymentOwner: deploymentOwner,
             recipient: recipient,
                amount: amount
@@ -124,8 +133,10 @@ abstract contract StErc20 is StFees
      * @return spendAllowance 
      * @param spendAllowance returns the erc20 allowance as per approval by owner
      */
+    // Certik: SES-03 | Return Variable Utilization
+    // Resolved (AD): Utilized return variable for gas optimization
     function allowance(address sender, address spender) public view returns (uint256 spendAllowance) { 
-        return erc20d._allowances[sender][spender];
+        spendAllowance = erc20d._allowances[sender][spender];
     }
     
     /**
@@ -135,8 +146,10 @@ abstract contract StErc20 is StFees
      * @return approvalStatus 
      * @param approvalStatus returns approval status
      */
+    // Certik: SES-03 | Return Variable Utilization
+    // Resolved (AD): Utilized return variable for gas optimization
     function approve(address spender, uint256 amount) public returns (bool approvalStatus) { 
-        return Erc20Lib.approve(ld, erc20d, spender, amount);
+        approvalStatus = Erc20Lib.approve(ld, erc20d, spender, amount);
     }
     
     /**
@@ -144,11 +157,13 @@ abstract contract StErc20 is StFees
      * @param sender ERC20 token sender
      * @param recipient ERC20 tkoen receiver
      * @param amount amount to be transferred
-     * @return transferStatus
-     * @param transferStatus returns status of transfer: true or false 
+     * @return transferFromStatus
+     * @param transferFromStatus returns status of transfer: true or false 
      */
-    function transferFrom(address sender, address recipient, uint256 amount) public returns (bool transferStatus) { 
-        return Erc20Lib.transferFrom(ld, std, ctd, globalFees, erc20d, sender, Erc20Lib.transferErc20Args({
+    // Certik: SES-03 | Return Variable Utilization
+    // Resolved (AD): Utilized return variable for gas optimization
+    function transferFrom(address sender, address recipient, uint256 amount) public returns (bool transferFromStatus) { 
+        transferFromStatus = Erc20Lib.transferFrom(ld, std, ctd, globalFees, erc20d, sender, Erc20Lib.transferErc20Args({
       deploymentOwner: deploymentOwner,
             recipient: recipient,
                amount: amount
