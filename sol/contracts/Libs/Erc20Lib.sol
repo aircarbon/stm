@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-only - (c) AirCarbon Pte Ltd - see /LICENSE.md for Terms
 // Author: https://github.com/7-of-9
+// Certik (AD): locked compiler version
 pragma solidity 0.8.5;
 
 import "../Interfaces/StructLib.sol";
@@ -87,14 +88,20 @@ library Erc20Lib {
         uint256 remainingToTransfer = a.amount;
         while (remainingToTransfer > 0) {
             // iterate ST types
-            for (uint256 tokTypeId = 1; tokTypeId <= std._tt_Count; tokTypeId++) {
+            // Certik: ELL-02 | Inefficient storage read
+            // Resolved (AD): Utilized a local variable to store std._tt_Count to save gas cost
+            uint256 tokenTypeCount = std._tt_Count;
+            for (uint256 tokTypeId = 1; tokTypeId <= tokenTypeCount; tokTypeId++) {
 
                 // sum qty tokens of this type
                 uint256[] memory tokenType_stIds = ld._ledger[sender].tokenType_stIds[tokTypeId];
                 uint256 qtyType;
                 for (uint256 ndx = 0; ndx < tokenType_stIds.length; ndx++) {
-                    require(ld._sts[tokenType_stIds[ndx]].currentQty > 0, "Unexpected token quantity");
-                    qtyType += uint256(uint64(ld._sts[tokenType_stIds[ndx]].currentQty));
+                    // Certik: ELL-03 | Inefficient storage read
+                    // REsolved (AD): Utilized local variable to store ld._sts[tokenType_stIds[ndx]].currentQty to save gas cost
+                    int64 currentQtyPerGlobalStId = ld._sts[tokenType_stIds[ndx]].currentQty;
+                    require(currentQtyPerGlobalStId > 0, "Unexpected token quantity");
+                    qtyType += uint256(uint64(currentQtyPerGlobalStId));
                 }
 
                 // transfer this type up to required amount
