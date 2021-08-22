@@ -149,7 +149,7 @@ module.exports = {
         "97": { // BSC testnet...? https://docs.chain.link/docs/reference-data-contracts-binance-smart-chain#price-feeds
             btcUsd: '0x0000000000000000000000000000000000000000',
             ethUsd: '0x0000000000000000000000000000000000000000',
-            bnbUsd: '0x859AAa51961284C94d970B47E82b8771942F1980',
+            bnbUsd: '0x2514895c72f50D8bd4B4F9b1110F0D6bD2c97526', //https://docs.chain.link/docs/binance-smart-chain-addresses/
         },
         "888": { // dev - DM
             btcUsd: '0x0000000000000000000000000000000000000000',
