@@ -16,28 +16,19 @@ library PayableLib {
     event IssuerPaymentProcessed(uint32 indexed paymentId, address indexed issuer, uint256 totalAmount, uint32 totalBatchCount);
     event IssuerPaymentBatchProcessed(uint32 indexed paymentId, uint32 indexed paymentBatchId, address indexed issuer, uint256 weiSent, uint256 weiChange);
     event SubscriberPaid(uint32 indexed paymentId, uint32 indexed paymentBatchId, address indexed issuer, address subscriber, uint256 amount);
-    
-    // FIXME: Fix and replace ChainLink price feed function for AggregatorV3Interface
 
-    // function get_chainlinkRefPrice(address chainlinkAggAddr) public view returns(int256 price) {
-    //     //if (chainlinkAggAddr == address(0x0)) return 100000000; // $1 - cents*satoshis
-    //     if (chainlinkAggAddr == address(0x0)) return -1;
-    //     // Certik: (Major) ICA-01 | Incorrect Chainlink Interface
-    //     // Resolved: (Major) ICA-01 | Upgraded Chainlink Aggregator Interface to V3
-        
-    //     // Review: checking staleness values coming back from latestRoundData() based on a timer
-    //     uint256 delayInSeconds = 30 * 60; // 30 minutes
-    //     IChainlinkAggregator ref = IChainlinkAggregator(chainlinkAggAddr);
-    //     ( , int256 answer, , uint256 updatedAt, ) = ref.latestRoundData();
-    //     require(updatedAt > (block.timestamp - delayInSeconds), "Chainlink: stale price");
-    //     price = answer;
-    // }
-
-    function get_chainlinkRefPrice(address chainlinkAggAddr) public view returns(int256) {
+    function get_chainlinkRefPrice(address chainlinkAggAddr) public view returns(int256 price) {
         //if (chainlinkAggAddr == address(0x0)) return 100000000; // $1 - cents*satoshis
         if (chainlinkAggAddr == address(0x0)) return -1;
+        // Certik: (Major) ICA-01 | Incorrect Chainlink Interface
+        // Resolved: (Major) ICA-01 | Upgraded Chainlink Aggregator Interface to V3
+        
+        // Updated: checking staleness values coming back from latestRoundData() based on a timer
+        uint256 updatedAt;
+        uint256 delayInSeconds = 120 * 60; // 2 hours
         IChainlinkAggregator ref = IChainlinkAggregator(chainlinkAggAddr);
-        return ref.latestAnswer();
+        ( , price, , updatedAt, ) = ref.latestRoundData();
+        require(updatedAt > (block.timestamp - delayInSeconds), "Chainlink: stale price");
     }
 
     function setIssuerValues(
