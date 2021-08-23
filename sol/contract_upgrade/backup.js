@@ -18,6 +18,7 @@ process.on('unhandledRejection', console.error);
  */
 module.exports = async (callback) => {
   const contractAddress = `0x${argv?.s}`.toLowerCase();
+  console.time('backup');
 
   // return error if not a valid address
   if (!contractAddress.match(/^0x[0-9a-f]{40}$/i)) {
@@ -53,5 +54,6 @@ module.exports = async (callback) => {
   console.log(`Writing backup to ${backupFile}`);
   fs.writeFileSync(backupFile, JSON.stringify({ ledgerHash, ...backup }, null, 2));
 
+  console.timeEnd('backup');
   callback();
 };

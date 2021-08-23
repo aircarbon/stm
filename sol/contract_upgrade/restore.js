@@ -28,6 +28,7 @@ const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
  * @link https://github.com/trufflesuite/truffle/issues/889#issuecomment-522581580
  */
 module.exports = async (callback) => {
+  console.time('restore');
   const contractAddress = `0x${argv?.s}`.toLowerCase();
   const newContractAddress = `0x${argv?.t}`.toLowerCase();
 
@@ -303,11 +304,22 @@ module.exports = async (callback) => {
     const ccyFeePromises = data.ccyTypes.map((ccyType, index) => {
       return function setFeeForCcyType(cb) {
         const fee = data.ccyFees[index];
-        console.log(`Setting fee for ccyType ${ccyType.name}`, fee);
-        newContract
-          .setFee_CcyType(ccyType.id, CONST.nullAddr, fee)
-          .then((result) => cb(null, result))
-          .catch((error) => cb(error));
+        if (
+          Number(fee?.fee_fixed) ||
+          Number(fee?.fee_percBips) ||
+          Number(fee?.fee_min) ||
+          Number(fee?.fee_max) ||
+          Number(fee?.ccy_perMillion) ||
+          Boolean(fee?.ccy_mirrorFee)
+        ) {
+          console.log(`Setting fee for ccyType ${ccyType.name}`, fee);
+          newContract
+            .setFee_CcyType(ccyType.id, CONST.nullAddr, fee)
+            .then((result) => cb(null, result))
+            .catch((error) => cb(error));
+        } else {
+          cb(null, fee);
+        }
       };
     });
     await series(ccyFeePromises);
@@ -316,15 +328,84 @@ module.exports = async (callback) => {
     const tokenFeePromises = data.tokenTypes.map((tokenType, index) => {
       return function setFeeForTokenType(cb) {
         const fee = data.tokenFees[index];
-        console.log(`Setting fee for tokenType ${tokenType.name}`, fee);
-        newContract
-          .setFee_TokType(tokenType.id, CONST.nullAddr, fee)
-          .then((result) => cb(null, result))
-          .catch((error) => cb(error));
+        if (
+          Number(fee?.fee_fixed) ||
+          Number(fee?.fee_percBips) ||
+          Number(fee?.fee_min) ||
+          Number(fee?.fee_max) ||
+          Number(fee?.ccy_perMillion) ||
+          Boolean(fee?.ccy_mirrorFee)
+        ) {
+          console.log(`Setting fee for tokenType ${tokenType.name}`, fee);
+          newContract
+            .setFee_TokType(tokenType.id, CONST.nullAddr, fee)
+            .then((result) => cb(null, result))
+            .catch((error) => cb(error));
+        } else {
+          cb(null, fee);
+        }
       };
     });
 
     await series(tokenFeePromises);
+    await sleep(1000);
+
+    // set currency and token types fee for ledger owner
+    const ccyFeeForLedgerOwnerPromises = data.ledgerOwners.map((ledgerOwner, index) => {
+      return function setFeeForLedgerOwner(callback) {
+        console.log(`Setting fee for ledgerOwner ${ledgerOwner}`);
+        // TODO: set fee for all currency and token types
+        // set fee for currency and token types
+        const ccyFeePromises = data.ledgerOwnersFees[index]?.currencies?.map((fee, counter) => {
+          return function setFeeForCcyType(cb) {
+            const ccyType = data.ccyTypes[counter];
+            if (
+              Number(fee?.fee_fixed) ||
+              Number(fee?.fee_percBips) ||
+              Number(fee?.fee_min) ||
+              Number(fee?.fee_max) ||
+              Number(fee?.ccy_perMillion) ||
+              Boolean(fee?.ccy_mirrorFee)
+            ) {
+              console.log(`Setting fee for ccyType ${ccyType.name}`, ledgerOwner, fee);
+              newContract
+                .setFee_CcyType(ccyType.id, ledgerOwner, fee)
+                .then((result) => cb(null, result))
+                .catch((error) => cb(error));
+            } else {
+              cb(null, fee);
+            }
+          };
+        });
+
+        const tokenFeePromises = data.ledgerOwnersFees[index]?.tokens?.map((fee, counter) => {
+          return function setFeeForTokenType(cb) {
+            const tokenType = data.tokenTypes[counter];
+            if (
+              Number(fee?.fee_fixed) ||
+              Number(fee?.fee_percBips) ||
+              Number(fee?.fee_min) ||
+              Number(fee?.fee_max) ||
+              Number(fee?.ccy_perMillion) ||
+              Boolean(fee?.ccy_mirrorFee)
+            ) {
+              console.log(`Setting fee for tokenType ${tokenType.name}`, ledgerOwner, fee);
+              newContract
+                .setFee_TokType(tokenType.id, ledgerOwner, fee)
+                .then((result) => cb(null, result))
+                .catch((error) => cb(error));
+            } else {
+              cb(null, fee);
+            }
+          };
+        });
+
+        series([...tokenFeePromises, ...ccyFeePromises])
+          .then(() => callback(null, ledgerOwner))
+          .catch((error) => callback(error));
+      };
+    });
+    await series(ccyFeeForLedgerOwnerPromises);
     await sleep(1000);
   }
 
@@ -350,5 +431,6 @@ module.exports = async (callback) => {
     return callback(new Error(`Ledger hash mismatch!`));
   }
 
+  console.timeEnd('restore');
   callback('Done.');
 };
