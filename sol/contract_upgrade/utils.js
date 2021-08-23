@@ -5,12 +5,13 @@ const { soliditySha3, hexToNumberString } = require('web3-utils');
 const Web3 = require('web3');
 const argv = require('yargs-parser')(process.argv.slice(2));
 const parallelLimit = require('async/parallelLimit');
+const fs = require('fs');
+const path = require('path');
 
 const CONST = require('../const');
 const { helpers } = require('../../orm/build');
 const config = require('../truffle-config');
-const previousLedgersOwners = require('./owners.json');
-const previousFees = require('./fees.json');
+const { series } = require('async');
 
 // implement get ledger hash
 // Refer to: getLedgerHashcode on LedgerLib.sol
@@ -41,6 +42,29 @@ function getLedgerHashOffChain(data, ignoreGlobalStIds = []) {
         ccyFees[index].ccy_mirrorFee,
       );
     }
+
+    // hash ledger owner fees for token type
+    data.ledgerOwnersFees.forEach((ledgerOwnerFee) => {
+      const fee = ledgerOwnerFee.currencies[index];
+      if (
+        Number(fee?.fee_fixed) ||
+        Number(fee?.fee_percBips) ||
+        Number(fee?.fee_min) ||
+        Number(fee?.fee_max) ||
+        Number(fee?.ccy_perMillion) ||
+        Boolean(fee?.ccy_mirrorFee)
+      ) {
+        ledgerHash = soliditySha3(
+          ledgerHash,
+          fee.fee_fixed,
+          fee.fee_percBips,
+          fee.fee_min,
+          fee.fee_max,
+          fee.ccy_perMillion,
+          fee.ccy_mirrorFee,
+        );
+      }
+    });
   }
   console.log('ledger hash - hash currency types & exchange currency fees', ledgerHash);
 
@@ -80,6 +104,28 @@ function getLedgerHashOffChain(data, ignoreGlobalStIds = []) {
         tokenFees[index].ccy_mirrorFee,
       );
     }
+    // hash ledger owner fees for token type
+    data.ledgerOwnersFees.forEach((ledgerOwnerFee) => {
+      const fee = ledgerOwnerFee.tokens[index];
+      if (
+        Number(fee?.fee_fixed) ||
+        Number(fee?.fee_percBips) ||
+        Number(fee?.fee_min) ||
+        Number(fee?.fee_max) ||
+        Number(fee?.ccy_perMillion) ||
+        Boolean(fee?.ccy_mirrorFee)
+      ) {
+        ledgerHash = soliditySha3(
+          ledgerHash,
+          fee.fee_fixed,
+          fee.fee_percBips,
+          fee.fee_min,
+          fee.fee_max,
+          fee.ccy_perMillion,
+          fee.ccy_mirrorFee,
+        );
+      }
+    });
   }
   console.log('ledger hash - token types & exchange token fees', ledgerHash);
 
@@ -248,8 +294,21 @@ async function createBackupData(contract, contractAddress, contractType, getTran
   const tokTypes = await contract.getSecTokenTypes();
   const { tokenTypes } = helpers.decodeWeb3Object(tokTypes);
 
+  // open contract file if exist
+  let previousLedgersOwners;
+  let previousGlobalFees;
+  let previousLedgerOwnersFees;
+  const dataFile = path.join(__dirname, `${name}.json`);
+  if (fs.existsSync(dataFile)) {
+    const data = JSON.parse(fs.readFileSync(dataFile, 'utf8'));
+    console.log(`Previous data found: ${name}.json`, data);
+    previousLedgersOwners = data.ledgerOwners;
+    previousGlobalFees = data.globalFees;
+    previousLedgerOwnersFees = data.ledgerOwnersFees;
+  }
+
   // get ledgers
-  const ledgerOwners = previousLedgersOwners[name] || (await contract.getLedgerOwners());
+  const ledgerOwners = previousLedgersOwners || (await contract.getLedgerOwners());
   const ledgers = (await Promise.all(ledgerOwners.map((owner) => contract.getLedgerEntry(owner))))
     .map((ledger) => helpers.decodeWeb3Object(ledger))
     .map((ledger, index, ledgers) => {
@@ -264,6 +323,38 @@ async function createBackupData(contract, contractAddress, contractType, getTran
         })),
       };
     });
+
+  if (!previousLedgerOwnersFees) {
+    // fetch ledger owner fee for all currencies types and token types
+    const ledgerOwnersFeesPromises = [];
+    console.time('ledgerOwnersFeesPromises');
+    ledgerOwners.forEach((owner, index) => {
+      ledgerOwnersFeesPromises.push(function getedgerOwnersFees(cb) {
+        console.log(`#${index + 1}/${ledgerOwners.length} - getedgerOwnersFees`, owner);
+        const ccyFeePromise = [];
+        for (let index = 0; index < currencyTypes.length; index++) {
+          ccyFeePromise.push(contract.getFee(CONST.getFeeType.CCY, currencyTypes[index].id, owner));
+        }
+        const tokenFeePromise = [];
+        for (let index = 0; index < tokenTypes.length; index++) {
+          tokenFeePromise.push(contract.getFee(CONST.getFeeType.TOK, tokenTypes[index].id, owner));
+        }
+
+        Promise.all(ccyFeePromise)
+          .then((ccyFees) =>
+            Promise.all(tokenFeePromise).then((tokenFees) =>
+              cb(null, {
+                currencies: ccyFees.map((fee) => helpers.decodeWeb3Object(fee)),
+                tokens: tokenFees.map((fee) => helpers.decodeWeb3Object(fee)),
+              }),
+            ),
+          )
+          .catch((err) => cb(err));
+      });
+    });
+    previousLedgerOwnersFees = await series(ledgerOwnersFeesPromises);
+    console.timeEnd('ledgerOwnersFeesPromises');
+  }
 
   // get all batches
   const batchesPromise = [];
@@ -282,8 +373,8 @@ async function createBackupData(contract, contractAddress, contractType, getTran
 
   // get all currency types fee
   let ccyFees;
-  if (previousFees.currency[name]) {
-    ccyFees = previousFees.currency[name];
+  if (previousGlobalFees?.currencies) {
+    ccyFees = previousGlobalFees.currencies;
   } else {
     const ccyFeePromise = [];
     for (let index = 0; index < currencyTypes.length; index++) {
@@ -294,8 +385,8 @@ async function createBackupData(contract, contractAddress, contractType, getTran
 
   // get all token types fee
   let tokenFees;
-  if (previousFees.token[name]) {
-    tokenFees = previousFees.token[name];
+  if (previousGlobalFees?.tokens) {
+    tokenFees = previousGlobalFees.tokens;
   } else {
     const tokenFeePromise = [];
     for (let index = 0; index < tokenTypes.length; index++) {
@@ -361,6 +452,7 @@ async function createBackupData(contract, contractAddress, contractType, getTran
       transferedFullSecTokensEvents: transferedFullSecTokens,
       whitelistAddresses,
       ledgerOwners,
+      ledgerOwnersFees: previousLedgerOwnersFees || [],
       ccyTypes: currencyTypes.map((ccy) => ({
         id: ccy.id,
         name: ccy.name,
@@ -369,7 +461,6 @@ async function createBackupData(contract, contractAddress, contractType, getTran
       })),
       ccyFees: ccyFees.map((fee) => helpers.decodeWeb3Object(fee)),
       tokenTypes: tokenTypes.map((tok, index) => {
-        console.log(tok, index);
         return {
           ...tok,
           ft: {

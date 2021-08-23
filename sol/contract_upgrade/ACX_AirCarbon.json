@@ -1,0 +1,3381 @@
+{
+  "ledgerOwners": [
+    "0xB83Ac778bc18045D71C358f0BcF8d8A8D7965A9c",
+    "0x4b8A129e492F6099365Bcb2dde2A4Cf39171B5D9",
+    "0x12188D26f4bFD78cca27084fA92D432775cAC5c4",
+    "0xb863ab1f2b4C3bBF32CDf3A243678D7aB85dC657",
+    "0xeADbd6CbF2be9c02e08CbF646522f48b1483A0a3",
+    "0x5c63efcC037e51DCCaCD377d8ff1Ad8Fc2Ded4f2",
+    "0x9e65FD13Fb40547F23c89481842E14C78DAAd72E",
+    "0x9fBE0C55BF023E682E21cc77da2538c2B8cA87Ec",
+    "0x40FD20949FdA4c6e44ED300dd6CC75A427F97da4",
+    "0x1D91f6847FC027E2c123E7a511692e5D52CAD372",
+    "0xDdbFe2D07dd588910Fb7CEfcab9676e471CA792C",
+    "0xcA3c49bdEaf48e5E0Cc46F5C767503E18EcA0369",
+    "0x2355Df0d1fcd07712cf6AaC0726da3D5A913B1CD",
+    "0x41D17071D2F42257616c176D1DA7870A97D4ECE2",
+    "0x17f543C5591A657216633Ccb1c59063a41749456",
+    "0x01bE6Cec2999f69177138F0aacf80FEcEba07044",
+    "0x75D8513BbC266b655DCB2B4c8006c269D46fD4EA",
+    "0xD59eECe0bf01965f315A3B93D02B35b2558F854D",
+    "0xfCbD9eFe77C02EDE71C271A96D60C0f8A2cE820D",
+    "0x3a3AA73E1960f9D9819D98047330Cc57f0e49512",
+    "0xC16803bA27a469bCa48F392fcDc12cF297a2c9Fc",
+    "0xab9d5bE4c1D037d280Fe431b34Fc7C82dFe42B1F",
+    "0x14B44E558D7Eb65E67Fc2ADd5e2dD4C8B071EB7c",
+    "0x51443e2c75D033D40906639707f1d330201b42dA",
+    "0xa76368efcCEA5d09Ad6a0c6c017De16153D4405b",
+    "0xdC933877a96c3eBe1A06ea6910866Ff4Cd21763C",
+    "0x2A1E093d194550CA6e4Feed559E6D8ca77B3Ab40",
+    "0x9E96a76AB5D972EFbe0aA49836D3bD9c0Baf87e0",
+    "0xCa2ACbCFf30F319670F6937393d704807F22f1A9",
+    "0xB55c60ed30b6602b0BD49C79a82d5eDA94Cb32A0",
+    "0x44F33BA88746E926a452565A6c357b49e5ea8781",
+    "0x37cF766Cb038DF57Bd448Af7A89e0bC9AFF340A6",
+    "0x62d1Be64035Ad53A3634990546eeE2740CF7a300",
+    "0x145979B3BcB1730d2D4d8833E68504bc24331D2F",
+    "0x3793F3e38E94d5A7235B17fda7e76c82cE87964B",
+    "0x23cF54230D3b10D453c9f1aADeBDe030523cC32c",
+    "0x71e2b43e663FeE756D9C727dDeE23a4baaCf13F4",
+    "0xCc149467056eE04925D7506673b43689a53F5B1f",
+    "0xc3Cd28072D2952487c547143BfD00740689839d0",
+    "0xaA6c7F8F2d9118343Db660d6E2b5fe88637D19fF",
+    "0x1Ee7830719168F675E7ba8C290a13aCa8E8710BA",
+    "0xFE67B249973CB5A33b7feACDCbE0B768C86FBcda",
+    "0x6F717Db18846900cbce3490196461a0AE11b3d74",
+    "0xeC158648614C3c4c8D89247ca9AE045962b8d9FF",
+    "0xA11919557EC0A5096AC59D097b965BAac250A63a",
+    "0x39307d6b57B4D3125F79A3FB364dA0596D85695b",
+    "0xc0Fb527c511D72363DFbc8c4021dD0Bd7110576E",
+    "0xc7Cf7e0E9366662873CcD6A174E37BCde1b5DFE3",
+    "0xbdb3A433121dDcd058AdBD88925952c1D2885541",
+    "0xcC87E01e14892d78980fE6E7Ff90a13168e2Be63",
+    "0xa7641c437657462B102729D528B20fABffbBBDe4"
+  ],
+  "ledgerOwnersFees": [
+    {
+      "tokens": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ],
+      "currencies": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ]
+    },
+    {
+      "tokens": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ],
+      "currencies": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ]
+    },
+    {
+      "tokens": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ],
+      "currencies": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ]
+    },
+    {
+      "tokens": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ],
+      "currencies": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ]
+    },
+    {
+      "tokens": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ],
+      "currencies": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ]
+    },
+    {
+      "tokens": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ],
+      "currencies": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ]
+    },
+    {
+      "tokens": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ],
+      "currencies": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ]
+    },
+    {
+      "tokens": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ],
+      "currencies": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 100,
+          "ccy_mirrorFee": false
+        }
+      ]
+    },
+    {
+      "tokens": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ],
+      "currencies": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ]
+    },
+    {
+      "tokens": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ],
+      "currencies": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ]
+    },
+    {
+      "tokens": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ],
+      "currencies": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ]
+    },
+    {
+      "tokens": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ],
+      "currencies": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ]
+    },
+    {
+      "tokens": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ],
+      "currencies": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ]
+    },
+    {
+      "tokens": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ],
+      "currencies": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ]
+    },
+    {
+      "tokens": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ],
+      "currencies": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ]
+    },
+    {
+      "tokens": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ],
+      "currencies": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ]
+    },
+    {
+      "tokens": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ],
+      "currencies": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ]
+    },
+    {
+      "tokens": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ],
+      "currencies": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ]
+    },
+    {
+      "tokens": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ],
+      "currencies": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ]
+    },
+    {
+      "tokens": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ],
+      "currencies": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ]
+    },
+    {
+      "tokens": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ],
+      "currencies": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ]
+    },
+    {
+      "tokens": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ],
+      "currencies": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ]
+    },
+    {
+      "tokens": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ],
+      "currencies": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ]
+    },
+    {
+      "tokens": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ],
+      "currencies": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ]
+    },
+    {
+      "tokens": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ],
+      "currencies": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ]
+    },
+    {
+      "tokens": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ],
+      "currencies": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ]
+    },
+    {
+      "tokens": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ],
+      "currencies": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ]
+    },
+    {
+      "tokens": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ],
+      "currencies": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ]
+    },
+    {
+      "tokens": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ],
+      "currencies": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ]
+    },
+    {
+      "tokens": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ],
+      "currencies": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ]
+    },
+    {
+      "tokens": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ],
+      "currencies": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ]
+    },
+    {
+      "tokens": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ],
+      "currencies": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ]
+    },
+    {
+      "tokens": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ],
+      "currencies": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ]
+    },
+    {
+      "tokens": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ],
+      "currencies": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ]
+    },
+    {
+      "tokens": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ],
+      "currencies": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ]
+    },
+    {
+      "tokens": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ],
+      "currencies": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ]
+    },
+    {
+      "tokens": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ],
+      "currencies": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ]
+    },
+    {
+      "tokens": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ],
+      "currencies": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ]
+    },
+    {
+      "tokens": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ],
+      "currencies": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ]
+    },
+    {
+      "tokens": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ],
+      "currencies": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ]
+    },
+    {
+      "tokens": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ],
+      "currencies": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ]
+    },
+    {
+      "tokens": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ],
+      "currencies": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ]
+    },
+    {
+      "tokens": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ],
+      "currencies": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ]
+    },
+    {
+      "tokens": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ],
+      "currencies": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ]
+    },
+    {
+      "tokens": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ],
+      "currencies": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ]
+    },
+    {
+      "tokens": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ],
+      "currencies": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ]
+    },
+    {
+      "tokens": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ],
+      "currencies": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ]
+    },
+    {
+      "tokens": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ],
+      "currencies": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ]
+    },
+    {
+      "tokens": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ],
+      "currencies": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ]
+    },
+    {
+      "tokens": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ],
+      "currencies": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ]
+    },
+    {
+      "tokens": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ],
+      "currencies": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ]
+    }
+  ],
+  "ccyTypes": [
+    {
+      "id": "1",
+      "name": "USD",
+      "unit": "cents",
+      "decimals": "2"
+    }
+  ],
+  "tokenTypes": [
+    {
+      "id": "1",
+      "name": "CET",
+      "settlementType": "1",
+      "ft": {
+        "expiryTimestamp": "0",
+        "underlyerTypeId": "0",
+        "refCcyId": "0",
+        "initMarginBips": "0",
+        "varMarginBips": "0",
+        "contractSize": "0",
+        "feePerContract": "0"
+      },
+      "cashflowBaseAddr": "0x0000000000000000000000000000000000000000"
+    },
+    {
+      "id": "2",
+      "name": "RET",
+      "settlementType": "1",
+      "ft": {
+        "expiryTimestamp": "0",
+        "underlyerTypeId": "0",
+        "refCcyId": "0",
+        "initMarginBips": "0",
+        "varMarginBips": "0",
+        "contractSize": "0",
+        "feePerContract": "0"
+      },
+      "cashflowBaseAddr": "0x0000000000000000000000000000000000000000"
+    },
+    {
+      "id": "3",
+      "name": "ESG",
+      "settlementType": "1",
+      "ft": {
+        "expiryTimestamp": "0",
+        "underlyerTypeId": "0",
+        "refCcyId": "0",
+        "initMarginBips": "0",
+        "varMarginBips": "0",
+        "contractSize": "0",
+        "feePerContract": "0"
+      },
+      "cashflowBaseAddr": "0x0000000000000000000000000000000000000000"
+    },
+    {
+      "id": "4",
+      "name": "GNT",
+      "settlementType": "1",
+      "ft": {
+        "expiryTimestamp": "0",
+        "underlyerTypeId": "0",
+        "refCcyId": "0",
+        "initMarginBips": "0",
+        "varMarginBips": "0",
+        "contractSize": "0",
+        "feePerContract": "0"
+      },
+      "cashflowBaseAddr": "0x0000000000000000000000000000000000000000"
+    },
+    {
+      "id": "5",
+      "name": "GNT+",
+      "settlementType": "1",
+      "ft": {
+        "expiryTimestamp": "0",
+        "underlyerTypeId": "0",
+        "refCcyId": "0",
+        "initMarginBips": "0",
+        "varMarginBips": "0",
+        "contractSize": "0",
+        "feePerContract": "0"
+      },
+      "cashflowBaseAddr": "0x0000000000000000000000000000000000000000"
+    },
+    {
+      "id": "6",
+      "name": "SDT",
+      "settlementType": "1",
+      "ft": {
+        "expiryTimestamp": "0",
+        "underlyerTypeId": "0",
+        "refCcyId": "0",
+        "initMarginBips": "0",
+        "varMarginBips": "0",
+        "contractSize": "0",
+        "feePerContract": "0"
+      },
+      "cashflowBaseAddr": "0x0000000000000000000000000000000000000000"
+    }
+  ],
+  "globalFees": {
+    "tokens": [
+      {
+        "fee_fixed": 0,
+        "fee_percBips": 0,
+        "fee_min": 0,
+        "fee_max": 0,
+        "ccy_perMillion": 0,
+        "ccy_mirrorFee": false
+      },
+      {
+        "fee_fixed": 0,
+        "fee_percBips": 0,
+        "fee_min": 0,
+        "fee_max": 0,
+        "ccy_perMillion": 0,
+        "ccy_mirrorFee": false
+      },
+      {
+        "fee_fixed": 0,
+        "fee_percBips": 0,
+        "fee_min": 0,
+        "fee_max": 0,
+        "ccy_perMillion": 0,
+        "ccy_mirrorFee": false
+      },
+      {
+        "fee_fixed": 0,
+        "fee_percBips": 0,
+        "fee_min": 0,
+        "fee_max": 0,
+        "ccy_perMillion": 0,
+        "ccy_mirrorFee": false
+      },
+      {
+        "fee_fixed": 0,
+        "fee_percBips": 0,
+        "fee_min": 0,
+        "fee_max": 0,
+        "ccy_perMillion": 0,
+        "ccy_mirrorFee": false
+      },
+      {
+        "fee_fixed": 0,
+        "fee_percBips": 0,
+        "fee_min": 0,
+        "fee_max": 0,
+        "ccy_perMillion": 0,
+        "ccy_mirrorFee": false
+      }
+    ],
+    "currencies": [
+      {
+        "fee_fixed": 0,
+        "fee_percBips": 0,
+        "fee_min": 300,
+        "fee_max": 0,
+        "ccy_perMillion": 300,
+        "ccy_mirrorFee": true
+      }
+    ]
+  }
+}
