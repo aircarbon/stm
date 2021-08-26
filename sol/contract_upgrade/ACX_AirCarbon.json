@@ -50,7 +50,8 @@
     "0xc7Cf7e0E9366662873CcD6A174E37BCde1b5DFE3",
     "0xbdb3A433121dDcd058AdBD88925952c1D2885541",
     "0xcC87E01e14892d78980fE6E7Ff90a13168e2Be63",
-    "0xa7641c437657462B102729D528B20fABffbBBDe4"
+    "0xa7641c437657462B102729D528B20fABffbBBDe4",
+    "0x15A2c94335Af3cf0f38c231197841Cb6a7F6BB92"
   ],
   "ledgerOwnersFees": [
     {
@@ -545,6 +546,68 @@
           "fee_min": 0,
           "fee_max": 0,
           "ccy_perMillion": 100,
+          "ccy_mirrorFee": false
+        }
+      ]
+    },
+    {
+      "tokens": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        },
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
+          "ccy_mirrorFee": false
+        }
+      ],
+      "currencies": [
+        {
+          "fee_fixed": 0,
+          "fee_percBips": 0,
+          "fee_min": 0,
+          "fee_max": 0,
+          "ccy_perMillion": 0,
           "ccy_mirrorFee": false
         }
       ]
