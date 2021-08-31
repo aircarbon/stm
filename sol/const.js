@@ -65,7 +65,7 @@ const blocksFromMonths = (months) => Math.ceil(blocksFromDays(months * 30.42));
 //
 // MAIN: deployer definitions -- contract ctor() params
 //
-const contractVer = process.env.CONTRACT_VERSION || "1.1c";
+const contractVer = process.env.CONTRACT_VERSION || "1.1d";
 const contractProps = {
     COMMODITY: {
         contractVer: contractVer,
@@ -285,6 +285,8 @@ module.exports = {
 
               ERC20: 19,
        CFT_ISSUANCE: 20,
+
+        BLOCK_TRADE: 21, // BLOCK TRADE
 
     }),
 

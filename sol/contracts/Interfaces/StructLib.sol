@@ -42,7 +42,10 @@ library StructLib {
         ERC20,
 
         // CFT: token issuance/subscription
-        Subscription
+        Subscription,
+
+        // AC: BLOCK_TRADE
+        BlockTrade
     }
 
     // EVENTS - SHARED (FuturesLib & TransferLib)
