@@ -74,7 +74,7 @@ abstract contract StErc20 is StFees
      * @param whitelistAddresses list of all whitelisted account addresses
      */
     function getWhitelist(uint256 pageNo, uint256 pageSize) external view returns (address[] memory whitelistAddresses) {
-        require(pageSize > 0 && pageSize < 2000, 'Bad page size: must be > 0 and < 8750');
+        require(pageSize > 0 && pageSize < 2000, 'Bad page size: must be > 0 and < 2000');
         whitelistAddresses = Erc20Lib.getWhitelist(erc20d._whitelist,pageNo,pageSize);
     }
  
