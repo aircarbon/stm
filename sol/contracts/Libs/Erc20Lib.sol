@@ -20,6 +20,11 @@ library Erc20Lib {
         erc20d._whitelisted[addr] = true;
     }
 
+    function getWhitelist(address[] calldata wld, uint256 pageNo, uint256 pageSize) pure external returns (address[] memory whitelistAddresses) {
+        require(pageSize > 0 && pageSize < 2000, 'Bad page size: must be > 0 and < 8750');
+        whitelistAddresses = wld[pageNo*pageSize:pageNo*pageSize+pageSize];
+    }
+
     // TRANSFER
     struct transferErc20Args {
         address deploymentOwner;

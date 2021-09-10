@@ -226,7 +226,7 @@ describe(`Contract Web3 Interface`, async () => {
                 submittedToWhitelist.concat(wlMany);
                     async function whitelistChunked(wlMany, OWNER, OWNER_privKey) {
                         if (wlMany.length > 0) {
-                            const wlChunked = _.chunk(wlMany, 50);
+                            const wlChunked = _.chunk(wlMany, 100);
                             for (let chunk of wlChunked) {
                                 try {
                                     await CONST.web3_tx('whitelistMany', [ chunk ], OWNER, OWNER_privKey, nameOverride, addrOverride);
