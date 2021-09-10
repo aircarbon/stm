@@ -49,6 +49,15 @@ abstract contract StErc20 is StFees
     }
     
     /**
+     * @dev return whitelist addresses count
+     * @return whitelistAddressCount
+     * @param whitelistAddressCount count of whitelisted account addresses
+     */
+    function getWhitelistCount() external view returns (uint256 whitelistAddressCount) {
+        whitelistAddressCount = erc20d._whitelist.length;
+    }
+
+    /**
      * @dev return all whitelist addresses
      * @return whitelistAddresses
      * @param whitelistAddresses list of all whitelisted account addresses
@@ -57,6 +66,16 @@ abstract contract StErc20 is StFees
     // Resolved (AD): Utilized return variable for gas optimization
     function getWhitelist() external view returns (address[] memory whitelistAddresses) {
         whitelistAddresses = erc20d._whitelist;
+    }
+
+    /**
+     * @dev return all whitelist addresses (extended functionality to overcome gas constraint for a larger whitelist set)
+     * @return whitelistAddresses
+     * @param whitelistAddresses list of all whitelisted account addresses
+     */
+    function getWhitelist(uint256 pageNo, uint256 pageSize) external view returns (address[] memory whitelistAddresses) {
+        require(pageSize > 0 && pageSize < 2000, 'Bad page size: must be > 0 and < 8750');
+        whitelistAddresses = Erc20Lib.getWhitelist(erc20d._whitelist,pageNo,pageSize);
     }
  
 //#if process.env.CONTRACT_TYPE === 'CASHFLOW_BASE' || process.env.CONTRACT_TYPE === 'COMMODITY'
