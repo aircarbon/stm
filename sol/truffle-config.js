@@ -245,8 +245,8 @@
          wallet.engine._providers.unshift(nonceTracker);
          nonceTracker.setEngine(wallet.engine);
          return wallet;
-       },
-       gas: 8000000, // 8m
+        },
+       gas: 19000000, // 19m
        gasPrice: web3.utils.toWei(GWEI_MATIC, 'gwei'),
        network_id: '80001',
        networkCheckTimeout: 90000,
