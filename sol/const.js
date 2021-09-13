@@ -39,7 +39,7 @@ const WEB3_GWEI_GAS_BID =
   : process.env.INSTANCE_ID === 'PROD_52101' ? '1'  // AC privnet
   : process.env.INSTANCE_ID === 'PROD_1'     ? '80' // ETH mainnet
                                              : '5';
-const WEB3_GAS_LIMIT = 5000000;
+const WEB3_GAS_LIMIT = process.env.INSTANCE_ID.includes('_80001') || process.env.INSTANCE_ID.includes('_137') ? 8000000 : 5000000 // BSC mainnet;
 
 // CFT helpers
 const nullCashflowArgs = {
