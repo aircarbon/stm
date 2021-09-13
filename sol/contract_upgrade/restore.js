@@ -17,7 +17,8 @@ const { helpers } = require('../../orm/build');
 process.on('unhandledRejection', console.error);
 
 // how many items to process in one batch
-const WHITELIST_CHUNK_SIZE = 100;
+// const WHITELIST_COUNT = 5000;
+// const WHITELIST_CHUNK_SIZE = 100;
 const BATCH_CHUNK_SIZE = 2;
 
 // create a sleep function to be used in the async series
@@ -57,37 +58,51 @@ module.exports = async (callback) => {
   console.log(`Name: ${name}`);
   console.log(`Version: ${version}`);
 
+  // NOTE: moved this logic to separate file, to restore WL first before closing market to initiate migration.
   // whitelisting addresses to new contract
-  const whitelistAddresses = await newContract.getWhitelist();
-  const whitelistPromises = data.whitelistAddresses
-    .reduce((result, addr) => {
-      if (whitelistAddresses.includes(addr)) {
-        return result;
-      }
+  // const whitelistAddressesOnTarget = await newContract.getWhitelist();
+  // console.log('# of WL Addresses on Target', whitelistAddressesOnTarget.length);
+  // const additionalWLAddresses = [];
+  // for (let i = data.whitelistAddresses.length; i < WHITELIST_COUNT; i++) {
+  //   // note - we include account[0] owner account in the whitelist
+  //   const x = await CONST.getAccountAndKey(i);
+  //   if (!data.whitelistAddresses.map((p) => p.toLowerCase()).includes(x.addr.toLowerCase())) {
+  //     additionalWLAddresses.push(x.addr);
+  //   } else {
+  //     console.log(`skipping ${x.addr} (already in WL)...`);
+  //   }
+  // }
+  
+  // const addressesToWhiteList = [...data.whitelistAddresses, ...additionalWLAddresses];
+  // const whitelistPromises = addressesToWhiteList
+  //   .reduce((result, addr) => {
+  //     if (whitelistAddressesOnTarget.map((p) => p.toLowerCase()).includes(addr.toLowerCase())) {
+  //       return result;
+  //     }
 
-      const lastItem = result?.[result.length - 1] ?? [];
-      if (lastItem && lastItem.length === WHITELIST_CHUNK_SIZE) {
-        return [...result, [addr]];
-      } else {
-        return [...result.slice(0, -1), [...lastItem, addr]];
-      }
-    }, [])
-    .map(
-      (addresses) =>
-        function addWhitelist(cb) {
-          console.log(`Adding whitelist addresses`, addresses);
-          if (addresses.length === 0) {
-            return cb(null, []);
-          }
+  //     const lastItem = result?.[result.length - 1] ?? [];
+  //     if (lastItem && lastItem.length === WHITELIST_CHUNK_SIZE) {
+  //       return [...result, [addr]];
+  //     } else {
+  //       return [...result.slice(0, -1), [...lastItem, addr]];
+  //     }
+  //   }, [])
+  //   .map(
+  //     (addresses) =>
+  //       function addWhitelist(cb) {
+  //         console.log(`Adding whitelist addresses`, addresses);
+  //         if (addresses.length === 0) {
+  //           return cb(null, []);
+  //         }
 
-          newContract
-            .whitelistMany(addresses)
-            .then((result) => cb(null, result))
-            .catch((error) => cb(error));
-        },
-    );
+  //         newContract
+  //           .whitelistMany(addresses)
+  //           .then((result) => cb(null, result))
+  //           .catch((error) => cb(error));
+  //       },
+  //   );
 
-  await series(whitelistPromises);
+  // await series(whitelistPromises);
 
   // add ccy data to new contract
   const ccyTypes = await newContract.getCcyTypes();
@@ -258,8 +273,7 @@ module.exports = async (callback) => {
     const globalSecTokensPromises = data.globalSecTokens.map(
       (token, index, tokens) =>
         function addGlobalSecToken(cb) {
-          console.log('Add global sec token', token);
-          console.log(`Processing ${index + 1}/${tokens.length}`);
+          
           const { stId, mintedQty, currentQty } = token;
           const transferedFullSecTokensEvent = data.transferedFullSecTokensEvents.find(
             (event) => Number(event.stId) === Number(stId),
@@ -270,10 +284,13 @@ module.exports = async (callback) => {
           newContract
             .getSecToken(stId)
             .then((result) => helpers.decodeWeb3Object(result))
-            .then((existToken) =>
-              existToken.exists
-                ? existToken
-                : newContract.addSecToken(
+            .then((existToken) => {
+              console.log(`Processing ${index + 1}/${tokens.length}`);
+              if (existToken.exists)
+                return existToken;
+              
+              console.log('Add global sec token', token);
+              return newContract.addSecToken(
                     '0x0000000000000000000000000000000000000000',
                     token.batchId,
                     stId,
@@ -284,8 +301,8 @@ module.exports = async (callback) => {
                     token.ft_lastMarkPrice,
                     token.ft_ledgerOwner,
                     token.ft_PL,
-                  ),
-            )
+                  );
+              })
             .then((result) => cb(null, result))
             .catch((error) => cb(error));
         },
@@ -409,19 +426,19 @@ module.exports = async (callback) => {
     await sleep(1000);
   }
 
-  const backupData = await createBackupData(newContract, newContractAddress, 0, true);
+  if (!hasSealed) await newContract.sealContract();
+
+  const backupData = await createBackupData(newContract, newContractAddress, 0, false);
 
   const onChainLedgerHash = argv?.h === 'onchain';
   const ledgerHash = onChainLedgerHash
     ? await CONST.getLedgerHashcode(newContract)
-    : getLedgerHashOffChain(backupData.data, data.transferedFullSecTokensEvents);
+    : getLedgerHashOffChain(backupData.data, data.transferedFullSecTokensEvents, data.whitelistAddresses.length);
 
   // write backup to json file
   const newBackupFile = path.join(dataDir, `${newContractAddress}.json`);
   console.log(`Writing backup to ${backupFile}`);
   fs.writeFileSync(newBackupFile, JSON.stringify({ ledgerHash, ...backupData }, null, 2));
-
-  if (!hasSealed) await newContract.sealContract();
 
   if (ledgerHash !== previousHash) {
     console.error(`Ledger hash mismatch!`, {
@@ -430,6 +447,11 @@ module.exports = async (callback) => {
     });
     return callback(new Error(`Ledger hash mismatch!`));
   }
+
+  console.log(`GREAT! Ledger hashes match!`, {
+    previousHash,
+    ledgerHash,
+  });
 
   console.timeEnd('restore');
   callback('Done.');
