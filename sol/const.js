@@ -413,7 +413,7 @@ function getTestContextWeb3(useWs) {
         ) } }
 
         // BSC Mainnet - Binance Smart Chain
-        : process.env.WEB3_NETWORK_ID == 56 ? { web3: new Web3(useWs ? 'wss://bsc-prod1.sdax.co:9546' : 'https://bsc-prod1.sdax.co:9545'),
+        : process.env.WEB3_NETWORK_ID == 56 ? { web3: new Web3(useWs ? 'wss://bsc-prod1.sdax.co:9546' : 'https://bsc-prod.sdax.co:9545'),
             ethereumTxChain: { common: EthereumJsCommon.forCustomChain(
             'ropsten', // forCustomChain() requires a "known" name!?
             {
@@ -439,8 +439,11 @@ function getTestContextWeb3(useWs) {
         // Matic Mainnet
         : process.env.WEB3_NETWORK_ID == 137 ? { web3: new Web3(
                 useWs ?
-                'wss://rpc-mainnet.maticvigil.com/ws/v1/a04433ccf5f940476e6741f6f277eaa74989755e' :
-                'https://rpc-mainnet.maticvigil.com/v1/a04433ccf5f940476e6741f6f277eaa74989755e'
+                'wss://polygon-main1.aircarbon.co:9546' :
+                // 'https://quizzical-wing:deck-hull-strut-parlor-cannon-sweep@nd-151-773-880.p2pify.com'
+            //    'https://polygon-main1.aircarbon.co:9545'
+                'https://condescending-knuth:crate-tiger-crummy-tablet-sheath-armory@nd-195-385-665.p2pify.com'
+
             ),
             ethereumTxChain: { common: EthereumJsCommon.forCustomChain(
             'ropsten', // forCustomChain() requires a "known" name!?

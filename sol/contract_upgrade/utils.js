@@ -15,7 +15,7 @@ const { series } = require('async');
 
 // implement get ledger hash
 // Refer to: getLedgerHashcode on LedgerLib.sol
-function getLedgerHashOffChain(data, ignoreGlobalStIds = []) {
+function getLedgerHashOffChain(data, ignoreGlobalStIds = [], wlAddressesStopAtIdx) {
   console.log('getLedgerHashOffChain');
   // hash currency types & exchange currency fees
   let ledgerHash = '';
@@ -131,9 +131,15 @@ function getLedgerHashOffChain(data, ignoreGlobalStIds = []) {
 
   // hash whitelist
   const whitelistAddresses = data?.whitelistAddresses ?? [];
-  whitelistAddresses.forEach((address) => {
-    ledgerHash = soliditySha3(ledgerHash, address);
-  });
+  if (wlAddressesStopAtIdx) {
+    for (let i = 0; i < wlAddressesStopAtIdx; i++) {
+      ledgerHash = soliditySha3(ledgerHash, data?.whitelistAddresses[i]);
+    }
+  } else {
+    whitelistAddresses.forEach((address) => {
+      ledgerHash = soliditySha3(ledgerHash, address);
+    });
+  }
 
   console.log('ledger hash - whitelist', ledgerHash);
 
@@ -243,8 +249,9 @@ function getLedgerHashOffChain(data, ignoreGlobalStIds = []) {
 }
 
 // get transfer full token event by chunk
-const EVENT_CHUNK_SIZE = 3000;
+const EVENT_CHUNK_SIZE = 1000;
 const MAX_CONCURRENT = 5;
+const startFrom = 3799000;
 async function getTransferFullTokenEvents(contract) {
   const promises = [];
   const network = argv?.network || 'development';
@@ -252,11 +259,11 @@ async function getTransferFullTokenEvents(contract) {
   const web3 = new Web3(config.networks[network].provider());
   const latestBlockNumber = await web3.eth.getBlockNumber();
   console.log(`Latest block number: ${latestBlockNumber}`);
-  const range = Math.ceil(latestBlockNumber / EVENT_CHUNK_SIZE);
+  const range = Math.ceil((latestBlockNumber - startFrom) / EVENT_CHUNK_SIZE);
   for (let index = 0; index <= range; index += 1) {
-    const fromBlock = index * EVENT_CHUNK_SIZE;
+    const fromBlock = index * EVENT_CHUNK_SIZE + startFrom;
 
-    const toBlock = (index + 1) * EVENT_CHUNK_SIZE;
+    const toBlock = (index + 1) * EVENT_CHUNK_SIZE + startFrom;
     promises.push(function searchEventByBlockRange(cb) {
       console.log(`#${index}/${range} - Searching for TransferedFullSecToken`, {
         fromBlock,
@@ -459,7 +466,7 @@ async function createBackupData(contract, contractAddress, contractType, getTran
         unit: ccy.unit,
         decimals: ccy.decimals,
       })),
-      ccyFees: ccyFees.map((fee) => helpers.decodeWeb3Object(fee)),
+      ccyFees: previousGlobalFees?.currencies ?? ccyFees.map((fee) => helpers.decodeWeb3Object(fee)),
       tokenTypes: tokenTypes.map((tok, index) => {
         return {
           ...tok,
@@ -474,7 +481,7 @@ async function createBackupData(contract, contractAddress, contractType, getTran
           },
         };
       }),
-      tokenFees: tokenFees.map((fee) => helpers.decodeWeb3Object(fee)),
+      tokenFees: previousGlobalFees?.tokens ?? tokenFees.map((fee) => helpers.decodeWeb3Object(fee)),
       globalSecTokens: globalSecTokens.map((token) => helpers.decodeWeb3Object(token)),
       ledgers,
       batches: batches

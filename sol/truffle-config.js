@@ -29,6 +29,7 @@
 
  const GWEI_MAINNET_1 = '80';
  const GWEI_MAINNET_56 = '5'; // 5 gwei minimum [PoA validator cartel!]?! trial & error - not clear at all; <5 gwei seems to never mine...
+ const GWEI_MAINNET_137 = '80';
  const GWEI_TESTNET_97 = '10';
  const GWEI_TESTNET = '20';
  const GWEI_MATIC = '1'; // https://www.polygongasstation.com/
@@ -258,8 +259,10 @@
      matic_mainnet: {
        provider: function () {
          var wallet = new HDWalletProvider(
-           DEV_MNEMONIC,
-           'https://rpc-mainnet.maticvigil.com/v1/a04433ccf5f940476e6741f6f277eaa74989755e',
+           require('./PROD_MNEMONIC.js').MNEMONIC,
+          //  'https://quizzical-wing:deck-hull-strut-parlor-cannon-sweep@nd-151-773-880.p2pify.com',
+          'https://condescending-knuth:crate-tiger-crummy-tablet-sheath-armory@nd-195-385-665.p2pify.com',
+          //  'https://polygon-main1.aircarbon.co:9545',
            0,
            1000,
          );
@@ -268,8 +271,8 @@
          nonceTracker.setEngine(wallet.engine);
          return wallet;
        },
-       gas: 8000000, // 8m
-       gasPrice: web3.utils.toWei(GWEI_MATIC, 'gwei'),
+       gas: 19000000, // 19m
+       gasPrice: web3.utils.toWei(GWEI_MAINNET_137, 'gwei'),
        network_id: '137',
        networkCheckTimeout: 30000,
        confirmations: 1,
