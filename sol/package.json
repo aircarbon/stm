@@ -40,7 +40,6 @@
     "web3-provider-engine": "^16.0.0"
   },
   "devDependencies": {
-    "@digix/doxity": "^0.5.2",
     "@truffle/hdwallet-provider": "^1.4.0",
     "big-number": "2.0.0",
     "cross-env": "^7.0.2",
