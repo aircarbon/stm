@@ -17,6 +17,7 @@
     "eslint-config-productsway": "0.1.9",
     "husky": "^7.0.2",
     "lint-staged": ">=11.2.6",
+    "nlf": "^2.1.1",
     "prettier": "^2.4.1"
   },
   "lint-staged": {

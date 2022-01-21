@@ -15,7 +15,8 @@
     "migrate": "rimraf -rf ./build/contracts && export INSTANCE_ID=local && node process_sol_js && truffle migrate -f 2 --to 2",
     "console": "truffle console",
     "dev": "truffle develop",
-    "ft": "cross-env WEB3_NETWORK_ID=888 NETWORK_ID=888 INSTANCE_ID=local node ./jobs/ft_job TEST_0"
+    "ft": "cross-env WEB3_NETWORK_ID=888 NETWORK_ID=888 INSTANCE_ID=local node ./jobs/ft_job TEST_0",
+    "license": "npx nlf --summary detail -d > LICENSE.md"
   },
   "keywords": [],
   "license": "AGPL-3.0",

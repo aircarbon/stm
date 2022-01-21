@@ -26,6 +26,7 @@
     "prebuild": "rimraf build",
     "build:watch": "tsc -w --module commonjs",
     "build": "tsc",
-    "test": "jest --coverage --updateSnapshot"
+    "test": "jest --coverage --updateSnapshot",
+    "license": "npx nlf --summary detail -d > LICENSE.md"
   }
 }
